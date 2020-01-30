@@ -373,7 +373,11 @@ void GLRenderingContext::clearColor(GLclampf red, GLclampf green, GLclampf blue,
 
 void GLRenderingContext::clearDepth(GLclampf depth)
 {
+#ifdef __EMSCRIPTEN__
+  glClearDepthf(depth);
+#else
   glClearDepth(depth);
+#endif
 }
 
 void GLRenderingContext::clearStencil(GLint stencil)
@@ -389,6 +393,18 @@ void GLRenderingContext::colorMask(GLboolean red, GLboolean green, GLboolean blu
 void GLRenderingContext::compileShader(IGLShader* shader)
 {
   glCompileShader(shader->value);
+
+  GLint compileStatus;
+  glGetShaderiv(shader->value, GL_COMPILE_STATUS, &compileStatus);
+  if (compileStatus != GL_TRUE)
+  {
+    char shaderInfoLog[5000];
+    GLsizei shaderInfoLogLength;
+    glGetShaderInfoLog(shader->value, 5000, &shaderInfoLogLength, shaderInfoLog);
+    BABYLON_LOG_ERROR("compileShader", "Error!", shaderInfoLog);
+    BABYLON_LOG_ERROR("compileShader", "Related shader source", getShaderSource(shader).c_str());
+  }
+
 }
 
 void GLRenderingContext::compressedTexImage2D(GLenum target, GLint level, GLenum internalformat,

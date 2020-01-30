@@ -69,7 +69,7 @@ void FileTools::LoadImageFromUrl(
   };
   auto onErrorWrapper = [=](const std::string& errorMessage) { onError(errorMessage, ""); };
 
-  asio::LoadUrlAsync_Binary(url, onArrayBufferReceived, onErrorWrapper);
+  asio::LoadAssetAsync_Binary(url, onArrayBufferReceived, onErrorWrapper);
 }
 
 void FileTools::LoadImageFromBuffer(
@@ -365,7 +365,7 @@ void FileTools::LoadFile(
       if (onSuccess)
         onSuccess(data, dummyResponseUrl);
     };
-    asio::LoadUrlAsync_Binary(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
+    asio::LoadAssetAsync_Binary(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
   else {
     auto onSuccessWrapper = [onSuccess](const std::string& data) {
@@ -373,7 +373,7 @@ void FileTools::LoadFile(
         onSuccess(data, dummyResponseUrl);
       }
     };
-    asio::LoadUrlAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
+    asio::LoadAssetAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
   // asio::Service_WaitAll_Sync();

@@ -45,21 +45,26 @@ if (OPTION_ENABLE_SIMD)
     target_compile_definitions(${TARGET} PRIVATE OPTION_ENABLE_SIMD)
 endif()
 
-# Export library for downstream projects
-export(TARGETS ${TARGET} NAMESPACE ${META_PROJECT_NAME}:: FILE ${CMAKE_OUTPUT_PATH}/${TARGET}-export.cmake)
-
-# Include directories
-target_include_directories(${TARGET}
-    PRIVATE SYSTEM
-        ${EARCUT_HPP_INCLUDE_DIRS}
-        ${JSON_HPP_INCLUDE_DIRS}
+# Link libraries
+target_link_libraries(
+    ${TARGET}
     PUBLIC
-        $<BUILD_INTERFACE:${STB_IMAGE_INCLUDE_DIR}>
-        $<BUILD_INTERFACE:${PROMISE_CPP_INCLUDE_DIR}>
+        earcut_hpp  # Header only
+        json_hpp    # Header only
+        stb_image   # Header only
+        promise_cpp # Header only
+        FunctionalPlus # Header only
+        fmt # 2 cc files
+)
+
+target_include_directories(
+    ${TARGET}
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     INTERFACE
         $<INSTALL_INTERFACE:include>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
 
 target_compile_definitions(${TARGET} PUBLIC BABYLON_REPO_FOLDER="${CMAKE_SOURCE_DIR}")
@@ -93,17 +98,25 @@ endif()
 #                       Deployment                                             #
 # ============================================================================ #
 
-# 'make install' to the correct location
-if (NOT BABYLON_DISABLE_INSTALL)
-    install(TARGETS ${TARGET}
-        EXPORT   "${TARGET}-export"                    COMPONENT dev
-        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}    COMPONENT dev
-        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH} COMPONENT runtime
-        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}    COMPONENT runtime
-    )
+# This part needs to be fixed
+# The original implementation was using old cmake style variables
+# and made it impossible to use transitive dependencies
 
-    # Make the project importable from the install directory
-    install(EXPORT "${TARGET}-export"
-        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
-    )
-endif()
+# Export library for downstream projects
+#export(TARGETS ${TARGET} NAMESPACE ${META_PROJECT_NAME}:: FILE ${CMAKE_OUTPUT_PATH}/${TARGET}-export.cmake)
+
+
+# 'make install' to the correct location
+#if (NOT BABYLON_DISABLE_INSTALL)
+#    install(TARGETS ${TARGET}
+#        EXPORT   "${TARGET}-export"                    COMPONENT dev
+#        ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}    COMPONENT dev
+#        RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH} COMPONENT runtime
+#        LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}    COMPONENT runtime
+#    )
+#
+#    # Make the project importable from the install directory
+#    install(EXPORT "${TARGET}-export"
+#        DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
+#    )
+#endif()

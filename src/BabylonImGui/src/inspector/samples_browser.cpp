@@ -18,26 +18,6 @@
 
 using namespace BABYLON::SamplesInfo;
 
-namespace {
-std::string to_snake_case(const std::string& sPascalCase)
-{
-  std::stringstream ss;
-  bool first = true;
-  for (auto c : sPascalCase) {
-    if (std::tolower(c) != c) {
-      if (!first)
-        ss << "_";
-      ss << static_cast<unsigned char>(std::tolower(c));
-    }
-    else
-      ss << c;
-    first = false;
-  }
-  return ss.str();
-}
-
-} // end anonymous namespace
-
 namespace BABYLON {
 
 
@@ -65,10 +45,10 @@ public:
 private:
   void render_filter()
   {
-    bool changed = false;
+    bool needSearch = false;
     ImGui::PushItemWidth(200);
     if (ImGui::InputText_String("Search " ICON_FA_SEARCH, _sampleSearchQuery.Query))
-      changed = true;
+      needSearch = true;
     ImGui::SameLine();
     ImGui::Checkbox(ICON_FA_WRENCH "Experimental", &_queryExperimental);
 
@@ -81,13 +61,13 @@ private:
         if (ImGui::Checkbox(statusName.c_str(), &v))
         {
           this->_sampleSearchQuery.IncludeStatus[status] = v;
-          changed = true;
+          needSearch                                     = true;
         }
       }
       ImGui::Separator();
 
       if (ImGui::Checkbox("With manual run failures", &_sampleSearchQuery.OnlyManualRunFailure))
-        changed = true;
+        needSearch = true;
     }
 
     if (OnLoopSamples) {
@@ -101,7 +81,14 @@ private:
       }
     }
 
-    if (changed)
+    static bool wasQueriedAfterLoad = false;
+    if (!wasQueriedAfterLoad and _samplesCollection.IsLoaded())
+    {
+      wasQueriedAfterLoad = true;
+      needSearch          = true;
+    }
+
+    if (needSearch)
       fillMatchingSamples();
 
     ImGui::Text("Matching samples : %zi", nbMatchingSamples());
@@ -190,9 +177,7 @@ private:
   void guiOneSample(const SamplesInfo::SampleData& sampleData)
   {
     const auto& sampleInfo =  sampleData.sourceInfo;
-    std::string currentScreenshotFile = screenshotsDirectory() + "/" + sampleData.sampleName + ".jpg";
-    std::string sample_snake          = to_snake_case(sampleData.sampleName);
-
+    std::string currentScreenshotFile = SamplesInfo::SampleScreenshotFile_RelativeToAssets(sampleData.sampleName);
     // Screenshot
     {
       ImGui::BeginGroup();

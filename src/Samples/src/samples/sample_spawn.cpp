@@ -1,3 +1,4 @@
+#include <babylon/babylon_common.h>
 #include <babylon/core/timer.h>
 #include <babylon/asio/internal/future_utils.h>
 #include <stb_image/stb_image.h>
@@ -115,7 +116,7 @@ bool ReadImage_IsUniformColor_Sync(const std::string &imageFileName)
 
 bool ReadScreenshot_IsImageEmpty(const std::string & sampleName)
 {
-  std::string filename = BABYLON::SamplesInfo::screenshotsDirectory() + "/" + sampleName + ".jpg";
+  std::string filename = BABYLON::SamplesInfo::SampleScreenshotFile_Absolute(sampleName);
   return ReadImage_IsUniformColor_Sync(filename);
 }
 

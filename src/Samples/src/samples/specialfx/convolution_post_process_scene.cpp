@@ -87,7 +87,7 @@ public:
 
     // Post-process
     auto postProcess = ConvolutionPostProcess::New(
-      "convolution", ConvolutionPostProcess::EmbossKernel, 1.f, camera);
+      "convolution", ConvolutionPostProcess::EmbossKernel(), 1.f, camera);
 
     // Animations
     _scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {

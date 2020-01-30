@@ -48,7 +48,7 @@ namespace ECS {
 class BABYLON_SHARED_EXPORT World {
 
 private:
-  struct SystemDeleter {
+  struct BABYLON_SHARED_EXPORT SystemDeleter {
     void operator()(detail::BaseSystem* system) const;
   };
 

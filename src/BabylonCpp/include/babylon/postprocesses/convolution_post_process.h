@@ -23,32 +23,32 @@ public:
    * Edge detection 0 see
    * https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
-  static const Float32Array EdgeDetect0Kernel;
+  static const Float32Array EdgeDetect0Kernel();
   /**
    * Edge detection 1 see
    * https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
-  static const Float32Array EdgeDetect1Kernel;
+  static const Float32Array EdgeDetect1Kernel();
   /**
    * Edge detection 2 see
    * https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
-  static const Float32Array EdgeDetect2Kernel;
+  static const Float32Array EdgeDetect2Kernel();
   /**
    * Kernel to sharpen an image see
    * https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
-  static const Float32Array SharpenKernel;
+  static const Float32Array SharpenKernel();
   /**
    * Kernel to emboss an image see
    * https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
-  static const Float32Array EmbossKernel;
+  static const Float32Array EmbossKernel();
   /**
    * Kernel to blur an image see
    * https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
-  static const Float32Array GaussianKernel;
+  static const Float32Array GaussianKernel();
 
 public:
   template <typename... Ts>

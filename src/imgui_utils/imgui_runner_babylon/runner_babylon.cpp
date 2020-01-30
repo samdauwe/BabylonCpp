@@ -41,11 +41,11 @@ void LoadFontAwesome()
   {
     _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
                                                 ImGui::IconSize, &config, ranges);
-    printf("Found font file %s", fontRegularPath.c_str());
+    printf("Found font file %s\n", fontRegularPath.c_str());
   }
   else
   {
-    printf("Could not read font file %s", fontRegularPath.c_str());
+    printf("Could not read font file %s\n", fontRegularPath.c_str());
   }
 
   auto fontSolidPath
@@ -54,11 +54,11 @@ void LoadFontAwesome()
   {
     _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
                                               ImGui::IconSize, &config, ranges);
-    printf("Found font file %s", fontSolidPath.c_str());
+    printf("Found font file %s\n", fontSolidPath.c_str());
   }
   else
   {
-    printf("Could not read font file %s", fontSolidPath.c_str());
+    printf("Could not read font file %s\n", fontSolidPath.c_str());
   }
 
 }

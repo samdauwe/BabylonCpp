@@ -3,6 +3,9 @@
 #include <imgui.h>
 #include <iostream>
 
+//#define BABYLON_LOG_TRACE_ON
+#include <babylon/core/log_trace.h>
+
 namespace ImGui {
 namespace ImGuiRunner {
 
@@ -146,23 +149,19 @@ void AbstractRunner::Frame_OpenGl_ClearColor()
 
 void AbstractRunner::FullInit()
 {
-  std::cout << "FullInit start \n";
+  TRACE_WHERE("start");
   InitBackend();
-  std::cout << "FullInit after InitBackend \n";
+  TRACE_WHERE("after InitBackend");
   Select_Gl_Version();
-  std::cout << "FullInit after Select_Gl_Version \n";
   CreateWindowAndContext();
-  std::cout << "FullInit after CreateWindowAndContext \n";
   InitGlLoader();
-  std::cout << "FullInit after InitGlLoader \n";
+  TRACE_WHERE("after InitGlLoader");
   SetupImgGuiContext();
-  std::cout << "FullInit after SetupImgGuiContext \n";
   SetupImGuiStyle();
-  std::cout << "FullInit after SetupImGuiStyle \n";
   SetupPlatformRendererBindings();
-  std::cout << "FullInit after SetupPlatformRendererBindings \n";
+  TRACE_WHERE("after SetupPlatformRendererBindings");
   LoadFonts();
-  std::cout << "FullInit after LoadFonts \n";
+  TRACE_WHERE("end after LoadFonts");
 }
 
 void AbstractRunner::LoopProc()

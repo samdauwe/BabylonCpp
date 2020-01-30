@@ -1,6 +1,7 @@
 #ifdef __EMSCRIPTEN__
 
 #include <babylon/asio/asio.h>
+#include <babylon/asio/internal/decode_data_uri.h>
 #include <babylon/core/logging.h>
 #include <babylon/misc/string_tools.h>
 #include <iostream>
@@ -10,12 +11,24 @@
 #include <chrono>
 #include <sstream>
 
+//#define BABYLON_LOG_TRACE_ON // define this in order to get more traces
+#include <babylon/core/log_trace.h>
+
 namespace BABYLON {
 namespace asio {
 
 
 namespace
 {
+
+std::string ShortenedUrl(const std::string& url)
+{
+  const std::size_t maxLength = 100;
+  if (url.size() < maxLength)
+    return url;
+  else
+    return url.substr(0, maxLength) + "...";
+}
 
 static std::string ArrayBufferToString(const ArrayBuffer & dataUint8)
 {
@@ -43,6 +56,7 @@ DownloadId storeDownloadInfo(
   std::function<void(const ArrayBuffer& data)> onSuccessFunction,
   std::function<void(const std::string& message)> onErrorFunction)
 {
+  TRACE_WHERE_VAR(ShortenedUrl(url));
   static int id = 0;
   ++id;
   DownloadInfo info {url, onSuccessFunction, onErrorFunction};
@@ -59,6 +73,7 @@ DownloadInfo consumeDownloadInfo(DownloadId id)
     throw std::runtime_error(msg.str().c_str());
   }
   DownloadInfo r = gDownloadInfos.at(id);
+  TRACE_WHERE_VAR(ShortenedUrl(r.url));
   gDownloadInfos.erase(id);
   return r;
 }
@@ -70,38 +85,42 @@ void babylon_emscripten_onLoad(void *arg_downloadId, void *bufferData, int buffe
   ArrayBuffer arrayBuffer(bufferDataAsUint8, bufferDataAsUint8 + bufferSize); // this makes a copy
 
   DownloadInfo info = consumeDownloadInfo((DownloadId)arg_downloadId);
-  BABYLON_LOG_DEBUG("babylon_emscripten_onLoad", info.url.c_str(), " Success!");
+  BABYLON_LOG_DEBUG("babylon_emscripten_onLoad", ShortenedUrl(info.url).c_str(), " Success!");
   info.onSuccessFunction(arrayBuffer);
 }
 
 void babylon_emscripten_onError(void *arg_downloadId)
 {
   DownloadInfo info = consumeDownloadInfo((DownloadId)arg_downloadId);
-  std::string errorMessage = std::string("Error while downloading ") + info.url;
-  BABYLON_LOG_DEBUG("babylon_emscripten_onError", info.url.c_str(), " Failure!");
+  std::string errorMessage = std::string("Error while downloading ") + ShortenedUrl(info.url);
+  BABYLON_LOG_DEBUG("babylon_emscripten_onError", ShortenedUrl(info.url).c_str(), " Failure!");
   info.onErrorFunction(errorMessage);
 }
 
-static std::string BaseUrl() {
+static std::string AssetsBaseUrl() {
   return "./emscripten_http_assets/assets/";
 }
 
 } // anonymous namespace
 
-
-void set_HACK_DISABLE_ASYNC(bool v)
+void push_HACK_DISABLE_ASYNC()
 {
-  BABYLON_LOG_WARN("asio", "set_HACK_DISABLE_ASYNC does not work under emscripten", "");
+  BABYLON_LOG_WARN("asio", "push_HACK_DISABLE_ASYNC does not work under emscripten", "");
+}
+void pop_HACK_DISABLE_ASYNC()
+{
+  BABYLON_LOG_WARN("asio", "pop_HACK_DISABLE_ASYNC does not work under emscripten", "");
 }
 
-void LoadUrlAsync_Text(
-  const std::string& url,
+void LoadAssetAsync_Text(
+  const std::string& assetPath,
   const std::function<void(const std::string& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string fullUrl = BaseUrl() + url;
+  std::string fullUrl = AssetsBaseUrl() + assetPath;
+  TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
     onSuccessFunction(ArrayBufferToString(dataUint8));
   };
@@ -109,14 +128,21 @@ void LoadUrlAsync_Text(
   emscripten_async_wget_data(fullUrl.c_str(), (void*)downloadId, babylon_emscripten_onLoad, babylon_emscripten_onError);
 }
 
-void LoadUrlAsync_Binary(
-  const std::string& url,
+void LoadAssetAsync_Binary(
+  const std::string& assetPath,
   const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string fullUrl = BaseUrl() + url;
+  if (IsBase64JpgDataUri(assetPath)) {
+    TRACE_WHERE("LoadAssetAsync_Binary with data uri");
+    onSuccessFunction(DecodeBase64JpgDataUri(assetPath));
+    return;
+  }
+
+  std::string fullUrl = AssetsBaseUrl() + assetPath;
+  TRACE_WHERE_VAR(ShortenedUrl(fullUrl));
   auto downloadId = storeDownloadInfo(fullUrl.c_str(), onSuccessFunction, onErrorFunction);
   emscripten_async_wget_data(fullUrl.c_str(), (void*)downloadId, babylon_emscripten_onLoad, babylon_emscripten_onError);
 }
@@ -130,9 +156,7 @@ void HeartBeat_Sync()
 
 void Service_WaitAll_Sync()
 {
-  using namespace std::literals;
-  while(!gDownloadInfos.empty())
-    std::this_thread::sleep_for(30ms);
+  BABYLON_LOG_WARN("asio", "Service_WaitAll_Sync disabled for emscripten");
 }
 
 BABYLON_SHARED_EXPORT void Service_Stop()

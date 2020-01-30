@@ -1595,8 +1595,9 @@ ThinEngine::createShaderProgram(const IPipelineContextPtr& pipelineContext,
                                 const std::vector<std::string>& transformFeedbackVaryings)
 {
   context = context ? context : _gl;
-
-#ifdef GLES3
+#if defined(__EMSCRIPTEN__)
+  auto shaderVersion = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
+#elif defined(GLES3)
   auto shaderVersion = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
 #else
   auto shaderVersion = (_webGLVersion > 1.f) ? "#version 330\n#define WEBGL2 \n" : "";

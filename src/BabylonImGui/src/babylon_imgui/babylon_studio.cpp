@@ -19,6 +19,9 @@
 #include <windows.h>
 #endif
 
+// #define BABYLON_LOG_TRACE_ON
+#include <babylon/core/log_trace.h>
+
 #include <iostream>
 
 namespace BABYLON {
@@ -127,18 +130,18 @@ private:
   void initScene()
   {
     _appContext.sampleListComponent().OnNewRenderableScene
-      = [&](std::shared_ptr<IRenderableScene> scene) {
-          this->setRenderableScene(scene);
-          _studioLayout.FocusWindow(DockableWindowId::Scene3d);
-        };
+    = [=](std::shared_ptr<IRenderableScene> scene) {
+        this->setRenderableScene(scene);
+        _studioLayout.FocusWindow(DockableWindowId::Scene3d);
+      };
 
-    _appContext.sampleListComponent().OnEditFiles = [&](const std::vector<std::string>& files) {
+    _appContext.sampleListComponent().OnEditFiles = [=](const std::vector<std::string>& files) {
       _samplesCodeEditor.setFiles(files);
       _studioLayout.setVisible(DockableWindowId::SamplesCodeViewer, true);
       _studioLayout.FocusWindow(DockableWindowId::SamplesCodeViewer);
     };
 
-    _appContext.sampleListComponent().OnLoopSamples = [&](const std::vector<std::string>& samples) {
+    _appContext.sampleListComponent().OnLoopSamples = [=](const std::vector<std::string>& samples) {
       _appContext._loopSamples.flagLoop      = true;
       _appContext._loopSamples.samplesToLoop = samples;
       _appContext._loopSamples.currentIdx    = 0;
@@ -237,12 +240,12 @@ private:
       _appContext._inspector->setScene(_appContext._sceneWidget->getScene());
   }
 
-  void saveScreenshot(std::string filename = "")
+  void saveScreenshot(std::string sampleName = "")
   {
-    if (filename.empty())
-      filename = std::string(_appContext._sceneWidget->getRenderableScene()->getName()) + ".jpg";
+    if (sampleName.empty())
+      sampleName = std::string(_appContext._sceneWidget->getRenderableScene()->getName());
 
-    filename = BABYLON::SamplesInfo::screenshotsDirectory() + "/" + filename;
+    std::string filename = SamplesInfo::SampleScreenshotFile_Absolute(sampleName);
     int imageWidth = 200;
     int jpgQuality = 75;
     this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
@@ -255,7 +258,7 @@ private:
     _appContext._frameCounter++;
     if (_appContext._frameCounter < 30)
       return false;
-    saveScreenshot(_appContext._options._sceneName + ".jpg");
+    saveScreenshot(_appContext._options._sceneName);
     return true;
   }
 

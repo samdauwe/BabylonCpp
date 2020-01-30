@@ -52,20 +52,21 @@ void from_json(const nlohmann::json& j, SampleManualRunInfo& v)
 }
 
 
-std::string screenshotsDirectory() {
-  std::string directory = assets_folder() + "/screenshots/ScreenshotsData";
-  if (!Filesystem::isDirectory(directory))
-    Filesystem::createDirectory(directory);
+std::string screenshotsDirectory_RelativeToAssets() {
+  std::string directory = "screenshots/ScreenshotsData/";
   return directory;
 }
 
-std::string SampleRunInfoFilePrefix(const SampleName& sampleName) {
-  return screenshotsDirectory() + "/" + sampleName;
+std::string SampleScreenshotFile_RelativeToAssets(const std::string& sampleName)
+{
+  return screenshotsDirectory_RelativeToAssets() + sampleName + ".jpg";
 }
 
-std::string SampleScreenshotFilename(const SampleName& sampleName) {
-  return SampleRunInfoFilePrefix(sampleName) + ".jpg";
+std::string SampleScreenshotFile_Absolute(const std::string& sampleName)
+{
+  return assets_folder() + SampleScreenshotFile_RelativeToAssets(sampleName);
 }
+
 
 std::string SamplesProjectFolder()
 {
@@ -108,20 +109,53 @@ SamplesCollection::SamplesCollection()
   // 2. Sort by catgory, then name
   std::sort(_allSamples.begin(), _allSamples.end(), compareSampleData_CategoryThenName);
 
-  // 3. Read Run status
-  ReadAllSampleStatuses();
-
-  // 4. Read source info
-  ReadSamplesSourceInfos();
-
-  // 5. Read Manual Run Status
-  ReadSampleManualRunInfo();
-
-  BABYLON_LOG_INFO("SamplesCollection", "found", _allSamples.size(), " samples");
-  BABYLON_LOG_INFO("SamplesCollection", "stats", GetSampleStatsString().c_str());
+  ReadAllDataThenDisplayStats();
 }
 
-void SamplesCollection::ReadSamplesSourceInfos()
+
+void SamplesCollection::ReadAllDataThenDisplayStats()
+{
+#define USING_CHAINED_LAMBDAS
+//#define USING_NAMED_LAMBDAS
+
+  auto onLoadEnd = [this]() {
+    BABYLON_LOG_INFO("SamplesCollection", "found", _allSamples.size(), " samples");
+    BABYLON_LOG_INFO("SamplesCollection", "stats", GetSampleStatsString().c_str());
+    this->_isLoaded = true;
+  };
+
+  #ifdef USING_NAMED_LAMBDAS
+  auto readSampleManualRunInfo = [=]() {
+    ReadSampleManualRunInfo(displayStats);
+  };
+  auto readAllSampleStatuses = [=]() {
+    ReadAllSampleStatuses(readSampleManualRunInfo);
+  };
+  auto readSampleSourcesInfos = [=]() {
+    ReadSamplesSourceInfos(readAllSampleStatuses);
+  };
+
+  // readSampleSourcesInfos will run the following chain
+  //
+  //  ReadSamplesSourceInfos
+  // .then(ReadAllSampleStatuses)
+  // .then(ReadSampleManualRunInfo)
+  // .then(onLoadEnd)
+  readSampleSourcesInfos();
+  #endif
+
+#ifdef USING_CHAINED_LAMBDAS
+  ReadSamplesSourceInfos([=](){
+    ReadAllSampleStatuses([=](){
+      ReadSampleManualRunInfo([=](){ onLoadEnd();
+      });
+    });
+  });
+#endif
+}
+
+
+void SamplesCollection::ReadSamplesSourceInfos(VoidFunction then)
 {
   auto lowerCaseName = [](const std::string & sampleNameMixedCase) -> std::string
   {
@@ -157,16 +191,16 @@ void SamplesCollection::ReadSamplesSourceInfos()
           sampleData.sourceInfo = sampleInfo;
       }
     }
+    then();
   };
 
-  BABYLON::asio::LoadUrlAsync_Text(assets_folder() + "/samples_info.json", onJsonLoaded, onJsonErrorLoad);
-
+  BABYLON::asio::LoadAssetAsync_Text("samples_info.json", onJsonLoaded, onJsonErrorLoad);
 }
 
 
-void SamplesCollection::ReadAllSampleStatuses()
+void SamplesCollection::ReadAllSampleStatuses(VoidFunction then)
 {
-  auto onStatusesLoaded = [this](const std::string& jsonString) {
+  auto onStatusesLoaded = [this, then](const std::string& jsonString) {
     using namespace nlohmann;
     auto jsonData = json::parse(jsonString);
     auto allRunStatuses =  jsonData.get<std::map<SampleName, SampleAutoRunStatus>>();
@@ -177,16 +211,16 @@ void SamplesCollection::ReadAllSampleStatuses()
       if (data)
         data->autoRunInfo.sampleRunStatus = sampleRunStatus;
     }
+
+    then();
   };
 
   auto onError = [](const std::string &msg) {
     BABYLON_LOG_ERROR("SamplesCollection", "Could not read statuses: ", msg.c_str());
   };
 
-  asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_runStatus.json",
-                          onStatusesLoaded, onError);
-
-  asio::Service_WaitAll_Sync(); // Because we want to display stats right after the start
+  asio::LoadAssetAsync_Text(screenshotsDirectory_RelativeToAssets() + "/aa_runStatus.json",
+                            onStatusesLoaded, onError);
 }
 
 
@@ -197,15 +231,15 @@ void SamplesCollection::SaveSampleManualRunInfo()
   for (const auto& sampleData : _allSamples)
     allRunManualInfo[sampleData.sampleName] = sampleData.sampleManualRunInfo;
 
-  std::ofstream ofs(screenshotsDirectory() + "/aa_sampleRunManualInfo.json");
+  std::ofstream ofs(assets_folder() + screenshotsDirectory_RelativeToAssets() + "/aa_sampleRunManualInfo.json");
   nlohmann::json j = allRunManualInfo;
   ofs << std::setw(4) << j << std::endl;
   ofs.close();
 }
 
-void SamplesCollection::ReadSampleManualRunInfo()
+void SamplesCollection::ReadSampleManualRunInfo(VoidFunction then)
 {
-  auto onLoaded = [this](const std::string& jsonString) {
+  auto onLoaded = [this, then](const std::string& jsonString) {
     using namespace nlohmann;
     auto jsonData = json::parse(jsonString);
 
@@ -217,15 +251,15 @@ void SamplesCollection::ReadSampleManualRunInfo()
       if (data)
         data->sampleManualRunInfo = sampleRunManualInfo;
     }
+    then();
   };
 
   auto onError = [](const std::string &msg) {
     BABYLON_LOG_ERROR("SamplesCollection", "Could not read sampleRunManualInfo: ", msg.c_str());
   };
 
-  asio::LoadUrlAsync_Text(screenshotsDirectory() + "/aa_sampleRunManualInfo.json",
-                          onLoaded, onError);
-  BABYLON::asio::Service_WaitAll_Sync();
+  asio::LoadAssetAsync_Text(
+    screenshotsDirectory_RelativeToAssets() + "/aa_sampleRunManualInfo.json", onLoaded, onError);
 }
 
 void SamplesCollection::SetSampleManualRunInfo(
@@ -244,8 +278,10 @@ void SamplesCollection::SetSampleRunInfo(
   SampleData *sampleData = GetSampleByName(sampleName);
   assert(sampleData != nullptr);
   sampleData->autoRunInfo = sampleRunInfo;
-  if (sampleRunInfo.sampleRunStatus != SampleAutoRunStatus::success) {
-    Filesystem::removeFile(SampleScreenshotFilename(sampleName));
+  if (sampleRunInfo.sampleRunStatus != SampleAutoRunStatus::success)
+  {
+    std::string screenshotFile = SampleScreenshotFile_Absolute(sampleName);
+    Filesystem::removeFile(screenshotFile);
   }
 }
 
@@ -255,7 +291,7 @@ void SamplesCollection::SaveAllSamplesRunStatuses()
   for (const auto & sampleData : _allSamples)
     allRunStatuses[sampleData.sampleName] = sampleData.autoRunInfo.sampleRunStatus;
 
-  std::ofstream ofs(screenshotsDirectory() + "/aa_runStatus.json");
+  std::ofstream ofs( assets_folder() + screenshotsDirectory_RelativeToAssets() + "/aa_runStatus.json");
   nlohmann::json j = allRunStatuses;
   ofs << std::setw(4) << j << std::endl;
   ofs.close();

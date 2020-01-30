@@ -63,13 +63,13 @@ void SampleApplicationLoop()
     {
       std::string url = textFilesUrls.back();
       textFilesUrls.pop_back();
-      BABYLON::asio::LoadUrlAsync_Text(url, onSuccessText, onError, onProgress);
+      BABYLON::asio::LoadAssetAsync_Text(url, onSuccessText, onError, onProgress);
     }
     if (!binaryFilesUrls.empty())
     {
       std::string url = binaryFilesUrls.back();
       binaryFilesUrls.pop_back();
-      BABYLON::asio::LoadUrlAsync_Binary(url, onSuccessBinary, onError, onProgress);
+      BABYLON::asio::LoadAssetAsync_Binary(url, onSuccessBinary, onError, onProgress);
     }
 
     applicationShallExit =

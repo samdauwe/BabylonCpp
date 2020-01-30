@@ -41,7 +41,7 @@ namespace ImGuiUtils
         BABYLON_LOG_WARN("ImGuiUtils::ImageFileTexture ->", errorMessage.c_str(), "");
       };
 
-      BABYLON::asio::LoadUrlAsync_Binary(filename, onSuccessLoadBuffer, onError);
+      BABYLON::asio::LoadAssetAsync_Binary(filename, onSuccessLoadBuffer, onError);
     }
     
     ~ImageFileTexture() = default;

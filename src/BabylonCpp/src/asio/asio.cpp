@@ -1,7 +1,7 @@
 #ifndef __EMSCRIPTEN__
 
 #include <babylon/asio/asio.h>
-
+#include <babylon/asio/internal/decode_data_uri.h>
 #include <babylon/asio/internal/file_loader_sync.h>
 #include <babylon/asio/internal/future_utils.h>
 #include <babylon/core/filesystem.h>
@@ -23,7 +23,6 @@
 #endif
 
 
-#include <deque>
 #include <future>
 #include <atomic>
 #include <chrono>
@@ -265,42 +264,31 @@ void LoadFileAsync_Binary(
   }
 }
 
-void LoadUrlAsync_Text(
-  const std::string& url_,
-  const std::function<void(const std::string& data)>& onSuccessFunction,
+void LoadAssetAsync_Text(
+  const std::string& assetPath,
+                         const OnSuccessFunction<std::string>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string url = url_;
-
-  if (StringTools::startsWith(url, "http://"))
-    throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
-
-  // Add automatically "file:/"
-  if (!StringTools::startsWith(url, "file:/"))
-    url = std::string("file:/") + url;
-
-  std::string filename = url.substr(6);
+  std::string filename = assets_folder() + assetPath;
   LoadFileAsync_Text(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
 }
 
-void LoadUrlAsync_Binary(
-  const std::string& url_,
+
+void LoadAssetAsync_Binary(
+  const std::string& assetPath,
   const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
   const OnProgressFunction& onProgressFunction
 )
 {
-  std::string url = url_;
-  if (StringTools::startsWith(url, "http://"))
-    throw std::runtime_error("LoadUrlAsync_Text only support files for the moment");
+  if (IsBase64JpgDataUri(assetPath)) {
+    onSuccessFunction(DecodeBase64JpgDataUri(assetPath));
+    return;
+  }
 
-  // Add automatically "file:/"
-  if (!StringTools::startsWith(url, "file:/"))
-    url = std::string("file:/") + url;
-
-  std::string filename = url.substr(6);
+  std::string filename = assets_folder() + assetPath;
   LoadFileAsync_Binary(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
 }
 

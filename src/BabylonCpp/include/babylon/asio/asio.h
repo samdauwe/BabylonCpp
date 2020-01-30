@@ -14,26 +14,24 @@ namespace asio {
 
 
 /**
- * @brief LoadUrlAsync_Text will load a text resource *asynchronously*
+ * @brief LoadAssetAsync_Text will load a text resource *asynchronously*
  * and raise the given callbacks *synchronously*
  */
-BABYLON_SHARED_EXPORT void LoadUrlAsync_Text(
-  const std::string& url,
-  const OnSuccessFunction<std::string>& onSuccessFunction,
+BABYLON_SHARED_EXPORT void
+LoadAssetAsync_Text(
+  const std::string& assetPath, const OnSuccessFunction<std::string>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
-  const OnProgressFunction& onProgressFunction = nullptr
-);
+  const OnProgressFunction& onProgressFunction = nullptr);
 
 /**
- * @brief LoadUrlAsync_Text will load a binary resource *asynchronously*
+ * @brief LoadAssetAsync_Text will load a binary resource *asynchronously*
  * and raise the given callbacks *synchronously*
  */
-BABYLON_SHARED_EXPORT void LoadUrlAsync_Binary(
-  const std::string& url,
+BABYLON_SHARED_EXPORT void LoadAssetAsync_Binary(
+  const std::string& assetPath,
   const OnSuccessFunction<ArrayBuffer>& onSuccessFunction,
   const OnErrorFunction& onErrorFunction,
-  const OnProgressFunction& onProgressFunction = nullptr
-);
+  const OnProgressFunction& onProgressFunction = nullptr);
 
 /**
  * @brief HeartBeat_Sync: call this in the app's main loop:
