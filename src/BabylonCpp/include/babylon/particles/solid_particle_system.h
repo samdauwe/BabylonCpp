@@ -12,11 +12,15 @@
 namespace BABYLON {
 
 struct DepthSortedParticle;
+class Material;
 class Mesh;
+class MultiMaterial;
 class SolidParticleSystem;
 class Scene;
 class TargetCamera;
+using MaterialPtr            = std::shared_ptr<Material>;
 using MeshPtr                = std::shared_ptr<Mesh>;
+using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
 using TargetCameraPtr        = std::shared_ptr<TargetCamera>;
 using SolidParticleSystemPtr = std::shared_ptr<SolidParticleSystem>;
 
@@ -27,6 +31,9 @@ struct SolidParticleSystemOptions {
   bool particleIntersection                = false;
   bool boundingSphereOnly                  = false;
   std::optional<float> bSphereRadiusFactor = std::nullopt;
+  bool expandable                          = false;
+  bool useModelMaterial                    = false;
+  bool enableMultiMaterial                 = false;
 }; // end of struct SolidParticleSystemOptions
 
 struct SolidParticleSystemDigestOptions {
@@ -43,18 +50,14 @@ struct SolidParticleSystemMeshBuilderOptions {
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 
 /**
- * @brief The SPS is a single updatable mesh. The solid particles are simply
- * separate parts or faces fo this big mesh. As it is just a mesh, the SPS has
- * all the same properties than any other BJS mesh : not more, not less. It can
- * be scaled, rotated, translated, enlighted, textured, moved, etc.
+ * @brief The SPS is a single updatable mesh. The solid particles are simply separate parts or faces
+ * fo this big mesh. As it is just a mesh, the SPS has all the same properties than any other BJS
+ * mesh : not more, not less. It can be scaled, rotated, translated, enlighted, textured, moved,
+ * etc. The SPS is also a particle system. It provides some methods to manage the particles. However
+ * it is behavior agnostic. This means it has no emitter, no particle physics, no particle recycler.
+ * You have to implement your own behavior.
  *
- * The SPS is also a particle system. It provides some methods to manage the
- * particles. However it is behavior agnostic. This means it has no emitter, no
- * particle physics, no particle recycler. You have to implement your own
- * behavior.
- *
- * Full documentation here :
- * http://doc.babylonjs.com/how_to/Solid_Particle_System
+ * Full documentation here : http://doc.babylonjs.com/how_to/Solid_Particle_System
  */
 class BABYLON_SHARED_EXPORT SolidParticleSystem : public IDisposable {
 
@@ -344,26 +347,27 @@ public:
 protected:
   /**
    * @brief Creates a SPS (Solid Particle System) object.
-   * @param name (String) is the SPS name, this will be the underlying mesh
-   * name.
+   * @param name (String) is the SPS name, this will be the underlying mesh name.
    * @param scene (Scene) is the scene in which the SPS is added.
    * @param options defines the options of the sps e.g.
-   * * updatable (optional boolean, default true) : if the SPS must be updatable
-   * or immutable.
-   * * isPickable (optional boolean, default false) : if the solid particles
-   * must be pickable.
-   * * enableDepthSort (optional boolean, default false) : if the solid
-   * particles must be sorted in the geometry according to their distance to the
-   * camera.
-   * * particleIntersection (optional boolean, default false) : if the solid
-   * particle intersections must be computed.
-   * * boundingSphereOnly (optional boolean, default false) : if the particle
-   * intersection must be computed only with the bounding sphere (no bounding
-   * box computation, so faster).
-   * * bSphereRadiusFactor (optional float, default 1.0) : a number to multiply
-   * the boundind sphere radius by in order to reduce it for instance.
-   * @example bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
-   * exactly matches a spherical mesh.
+   * * updatable (optional boolean, default true) : if the SPS must be updatable or immutable.
+   * * isPickable (optional boolean, default false) : if the solid particles must be pickable.
+   * * enableDepthSort (optional boolean, default false) : if the solid particles must be sorted in
+   * the geometry according to their distance to the camera.
+   * * useModelMaterial (optional boolean, defaut false) : if the model materials must be used to
+   * create the SPS multimaterial. This enables the multimaterial supports of the SPS.
+   * * enableMultiMaterial (optional boolean, default false) : if the solid particles can be given
+   * different materials.
+   * * expandable (optional boolean, default false) : if particles can still be added after the
+   * initial SPS mesh creation.
+   * * particleIntersection (optional boolean, default false) : if the solid particle intersections
+   * must be computed.
+   * * boundingSphereOnly (optional boolean, default false) : if the particle intersection must be
+   * computed only with the bounding sphere (no bounding box computation, so faster).
+   * * bSphereRadiusFactor (optional float, default 1.0) : a number to multiply the boundind sphere
+   * radius by in order to reduce it for instance.
+   * @example bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere exactly matches a
+   * spherical mesh.
    */
   SolidParticleSystem(const std::string& name, Scene* scene,
                       const std::optional<SolidParticleSystemOptions>& options = std::nullopt);
@@ -416,21 +420,19 @@ private:
 
 public:
   /**
-   * The SPS array of Solid Particle objects. Just access each particle as with
-   * any classic array.
-   * Example : var p = SPS.particles[i];
+   * The SPS array of Solid Particle objects. Just access each particle as with any classic array.
+   *  Example : var p = SPS.particles[i];
    */
   std::vector<std::unique_ptr<SolidParticle>> particles;
 
   /**
-   * The SPS total number of particles. Read only. Use SPS.counter instead if
-   * you need to set your own value.
+   * The SPS total number of particles. Read only. Use SPS.counter instead if you need to set your
+   * own value.
    */
   unsigned int nbParticles;
 
   /**
-   * If the particles must ever face the camera (default false). Useful for
-   * planar particles.
+   * If the particles must ever face the camera (default false). Useful for planar particles.
    */
   bool billboard;
 
@@ -450,19 +452,17 @@ public:
   std::string name;
 
   /**
-   * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh
-   * class are avalaible.
+   * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh class are avalaible.
    */
   MeshPtr mesh;
 
   /**
    * This array is populated when the SPS is set as 'pickable'.
-   * Each key of this array is a `faceId` value that you can get from a
-   * pickResult object. Each element of this array is an object `{idx: int,
-   * faceId: int}`. `idx` is the picked particle index in the `SPS.particles`
-   * array `faceId` is the picked face index counted within this particle.
-   * Please read :
-   * http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
+   * Each key of this array is a `faceId` value that you can get from a pickResult object.
+   * Each element of this array is an object `{idx: int, faceId: int}`.
+   * `idx` is the picked particle index in the `SPS.particles` array
+   * `faceId` is the picked face index counted within this particle.
+   * Please read : http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
    */
   std::vector<PickedParticle> pickedParticles;
 
@@ -473,16 +473,16 @@ public:
   std::vector<DepthSortedParticle> depthSortedParticles;
 
   /**
-   * If the particle intersection must be computed only with the bounding sphere
-   * (no bounding box computation, so faster). (Internal use only)
-   * Hidden
+   * If the particle intersection must be computed only with the bounding sphere (no bounding box
+   * computation, so faster). (Internal use only)
+   * @hidden
    */
   bool _bSphereOnly;
 
   /**
-   * A number to multiply the boundind sphere radius by in order to reduce it
-   * for instance. (Internal use only)
-   * Hidden
+   * A number to multiply the boundind sphere radius by in order to reduce it for instance.
+   * (Internal use only)
+   * @hidden
    */
   float _bSphereRadiusFactor;
 
@@ -508,6 +508,7 @@ private:
   bool _isVisibilityBoxLocked;
   bool _alwaysVisible;
   bool _depthSort;
+  bool _expandable;
   int _shapeCounter;
   std::unique_ptr<SolidParticle> _copy;
   std::unique_ptr<Color4> _color;
@@ -522,9 +523,23 @@ private:
   Vector3 _scale;
   Vector3 _translation;
   bool _particlesIntersect;
-  std::function<int(const DepthSortedParticle& p1, const DepthSortedParticle& p2)>
-    _depthSortFunction;
   bool _needs32Bits;
+  bool _isNotBuilt;
+  size_t _lastParticleId;
+  std::vector<size_t> _idxOfId; // array : key = particle.id / value = particle.idx
+  bool _multimaterialEnabled;
+  bool _useModelMaterial;
+  std::vector<size_t> _indicesByMaterial;
+  std::vector<size_t> _materialIndexes;
+  std::function<bool(const DepthSortedParticle& p1, const DepthSortedParticle& p2)>
+    _depthSortFunction;
+  std::function<bool(const DepthSortedParticle& p1, const DepthSortedParticle& p2)>
+    _materialSortFunction;
+  std::vector<MaterialPtr> _materials;
+  MultiMaterialPtr _multimaterial;
+  std::unordered_map<size_t, std::vector<size_t>> _materialIndexesById;
+  MaterialPtr _defaultMaterial;
+  bool _autoUpdateSubMeshes;
 
 }; // end of class SolidParticleSystem
 

@@ -7,6 +7,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/multi_material.h>
 #include <babylon/maths/axis.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -17,8 +18,7 @@
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
-
-#include <memory>
+#include <babylon/particles/solid_particle.h>
 
 namespace BABYLON {
 
@@ -26,7 +26,7 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
                                          const std::optional<SolidParticleSystemOptions>& options)
     : nbParticles{0}
     , billboard{false}
-    , recomputeNormals{true}
+    , recomputeNormals{false}
     , counter{0}
     , mesh{nullptr}
     , _index{0}
@@ -35,9 +35,10 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
     , _depthSort{false}
+    , _expandable{false}
     , _shapeCounter{0}
-    //, _copy{std::make_unique<SolidParticle>(0, 0, 0, nullptr, 0, 0, this,
-    //                                        BoundingInfo{Vector3::Zero(), Vector3::Zero()})}
+    , _copy{std::make_unique<SolidParticle>(0, 0, 0, 0, nullptr, 0, 0, this,
+                                            BoundingInfo{Vector3::Zero(), Vector3::Zero()})}
     , _color{std::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
     , _computeParticleColor{true}
     , _computeParticleTexture{true}
@@ -49,14 +50,25 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
     , _scale{TmpVectors::Vector3Array[2]}
     , _translation{TmpVectors::Vector3Array[3]}
     , _needs32Bits{false}
+    , _isNotBuilt{true}
+    , _lastParticleId{0}
+    , _multimaterialEnabled{false}
+    , _useModelMaterial{false}
+    , _multimaterial{nullptr}
+    , _defaultMaterial{nullptr}
+    , _autoUpdateSubMeshes{false}
 {
-  name                = iName;
-  _scene              = scene ? scene : Engine::LastCreatedScene();
-  _camera             = std::static_pointer_cast<TargetCamera>(_scene->activeCamera());
-  _pickable           = options ? options->isPickable : false;
-  _depthSort          = options ? options->enableDepthSort : false;
-  _particlesIntersect = options ? options->particleIntersection : false;
-  _bSphereOnly        = options ? options->boundingSphereOnly : false;
+  name                  = iName;
+  _scene                = scene ? scene : Engine::LastCreatedScene();
+  _camera               = std::static_pointer_cast<TargetCamera>(_scene->activeCamera());
+  _pickable             = options ? options->isPickable : false;
+  _depthSort            = options ? options->enableDepthSort : false;
+  _multimaterialEnabled = options ? options->enableMultiMaterial : false;
+  _useModelMaterial     = options ? options->useModelMaterial : false;
+  _multimaterialEnabled = _useModelMaterial ? true : _multimaterialEnabled;
+  _expandable           = options ? options->expandable : false;
+  _particlesIntersect   = options ? options->particleIntersection : false;
+  _bSphereOnly          = options ? options->boundingSphereOnly : false;
   _bSphereRadiusFactor
     = (options && options->bSphereRadiusFactor) ? options->bSphereRadiusFactor.value() : 1.f;
   if (options && options->updatable.has_value()) {
@@ -65,9 +77,25 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
   else {
     _updatable = true;
   }
+  if (_pickable) {
+    pickedParticles = {};
+  }
 
-  _depthSortFunction = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
-    return static_cast<int>(p2.sqDistance - p1.sqDistance);
+  if (_depthSort || _multimaterialEnabled) {
+    depthSortedParticles = {};
+  }
+  if (_multimaterialEnabled) {
+    _multimaterial       = MultiMaterial::New(name + "MultiMaterial", _scene);
+    _materials           = {};
+    _materialIndexesById = {};
+  }
+
+  _depthSortFunction = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) -> bool {
+    return p1.sqDistance < p2.sqDistance;
+  };
+
+  _materialSortFunction = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) -> bool {
+    return p2.materialIndex < p1.materialIndex;
   };
 }
 
@@ -219,7 +247,7 @@ SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
     if (_particlesIntersect) {
       bInfo = BoundingInfo(minimum, maximum);
     }
-    //auto modelShape
+    // auto modelShape
     //  = std::make_unique<ModelShape>(_shapeCounter, shape, size * 3, shapeUV, nullptr, nullptr);
     std::unique_ptr<ModelShape> modelShape = nullptr;
 
@@ -418,10 +446,12 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
 
 SolidParticle* SolidParticleSystem::_addParticle(unsigned int /*idx*/, unsigned int /*idxpos*/,
                                                  unsigned int /*idxind*/,
-                                                 std::unique_ptr<ModelShape>&& /*model*/, int /*shapeId*/,
-                                                 unsigned int /*idxInShape*/, const BoundingInfo& /*bInfo*/)
+                                                 std::unique_ptr<ModelShape>&& /*model*/,
+                                                 int /*shapeId*/, unsigned int /*idxInShape*/,
+                                                 const BoundingInfo& /*bInfo*/)
 {
-  //particles.emplace_back(std::make_unique<SolidParticle>(idx, idxpos, idxind, model.get(), shapeId,
+  // particles.emplace_back(std::make_unique<SolidParticle>(idx, idxpos, idxind, model.get(),
+  // shapeId,
   //                                                       idxInShape, this, bInfo));
   return particles.back().get();
 }
@@ -442,8 +472,8 @@ int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
   auto shape   = _posToShape(meshPos);
   auto shapeUV = _uvsToShapeUV(meshUV);
 
-  //auto& posfunc = options.positionFunction;
-  //auto& vtxfunc = options.vertexFunction;
+  // auto& posfunc = options.positionFunction;
+  // auto& vtxfunc = options.vertexFunction;
 
   // auto modelShape
   //= std::make_unique<ModelShape>(_shapeCounter, shape, meshInd.size(), shapeUV, posfunc, vtxfunc);
