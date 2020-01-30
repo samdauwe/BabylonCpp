@@ -33,6 +33,7 @@ babylon_add_library_glob(${TARGET})
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
+    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include

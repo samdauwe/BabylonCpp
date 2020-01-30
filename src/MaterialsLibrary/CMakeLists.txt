@@ -37,6 +37,7 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
+    ${JSON_HPP_INCLUDE_DIRS}
     PUBLIC
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
