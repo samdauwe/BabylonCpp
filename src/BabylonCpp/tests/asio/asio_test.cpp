@@ -7,12 +7,9 @@
 #include <thread>
 #include <iostream>
 
-std::string assets_folder = BABYLON::babylon_repo_folder() + std::string("/assets/");
-
-std::string textUrl = std::string("file:/") + assets_folder + "/fonts/fa-regular-400.ttf";
-std::string binaryUrl = std::string("file:/") + assets_folder
-  + "/glTF-Sample-Models/2.0/AntiqueCamera/glTF/camera_camera_Normal.png";
-std::string nonExistingFileUrl = "file:/non_existing_file";
+std::string textUrl = "fonts/fa-regular-400.ttf";
+std::string binaryUrl = "glTF-Sample-Models/2.0/AntiqueCamera/glTF/camera_camera_Normal.png";
+std::string nonExistingFileUrl = "non_existing_file";
 
 std::vector<std::string> textFilesUrls = {
   textUrl, nonExistingFileUrl, textUrl, textUrl, nonExistingFileUrl, textUrl, nonExistingFileUrl
