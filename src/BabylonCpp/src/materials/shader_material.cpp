@@ -468,98 +468,98 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh)
     MaterialHelper::BindBonesParameters(mesh, _effect);
 
     // Texture
-    for (const auto& [name, texture] : _textures) {
-      _effect->setTexture(name, texture);
+    for (const auto& [channel, texture] : _textures) {
+      _effect->setTexture(channel, texture);
     }
 
     // Texture arrays
-    for (const auto& [name, textureArray] : _textureArrays) {
-      _effect->setTextureArray(name, textureArray);
+    for (const auto& [channel, textureArray] : _textureArrays) {
+      _effect->setTextureArray(channel, textureArray);
     }
 
     // Int
-    for (const auto& [name, intValue] : _ints) {
-      _effect->setInt(name, intValue);
+    for (const auto& [channel, intValue] : _ints) {
+      _effect->setInt(channel, intValue);
     }
 
     // Float
-    for (const auto& [name, floatValue] : _floats) {
-      _effect->setFloat(name, floatValue);
+    for (const auto& [channel, floatValue] : _floats) {
+      _effect->setFloat(channel, floatValue);
     }
 
     // Floats
-    for (const auto& [name, floatsArray] : _floatsArrays) {
-      _effect->setArray(name, floatsArray);
+    for (const auto& [channel, floatsArray] : _floatsArrays) {
+      _effect->setArray(channel, floatsArray);
     }
 
     // Color3
-    for (const auto& [name, colors3] : _colors3) {
-      _effect->setColor3(name, colors3);
+    for (const auto& [channel, colors3] : _colors3) {
+      _effect->setColor3(channel, colors3);
     }
 
     // Color3Array
-    for (const auto& [name, array3] : _colors3Arrays) {
-      _effect->setArray3(name, array3);
+    for (const auto& [channel, array3] : _colors3Arrays) {
+      _effect->setArray3(channel, array3);
     }
 
     // Color4
-    for (const auto& [name, color] : _colors4) {
-      _effect->setFloat4(name, color.r, color.g, color.b, color.a);
+    for (const auto& [channel, color] : _colors4) {
+      _effect->setFloat4(channel, color.r, color.g, color.b, color.a);
     }
 
     // Color4Array
-    for (const auto& [name, array4] : _colors4Arrays) {
-      _effect->setArray4(name, array4);
+    for (const auto& [channel, array4] : _colors4Arrays) {
+      _effect->setArray4(channel, array4);
     }
 
     // Vector2
-    for (const auto& [name, vectors2] : _vectors2) {
-      _effect->setVector2(name, vectors2);
+    for (const auto& [channel, vectors2] : _vectors2) {
+      _effect->setVector2(channel, vectors2);
     }
 
     // Vector3
-    for (const auto& [name, vector3] : _vectors3) {
-      _effect->setVector3(name, vector3);
+    for (const auto& [channel, vector3] : _vectors3) {
+      _effect->setVector3(channel, vector3);
     }
 
     // Vector4
-    for (const auto& [name, vector4] : _vectors4) {
-      _effect->setVector4(name, vector4);
+    for (const auto& [channel, vector4] : _vectors4) {
+      _effect->setVector4(channel, vector4);
     }
 
     // Matrix
-    for (const auto& [name, matrix] : _matrices) {
-      _effect->setMatrix(name, matrix);
+    for (const auto& [channel, matrix] : _matrices) {
+      _effect->setMatrix(channel, matrix);
     }
 
     // MatrixArray
-    for (const auto& [name, matrixArray] : _matrixArrays) {
-      _effect->setMatrices(name, matrixArray);
+    for (const auto& [channel, matrixArray] : _matrixArrays) {
+      _effect->setMatrices(channel, matrixArray);
     }
 
     // Matrix 3x3
-    for (const auto& [name, matrices3x3] : _matrices3x3) {
-      _effect->setMatrix3x3(name, matrices3x3);
+    for (const auto& [channel, matrices3x3] : _matrices3x3) {
+      _effect->setMatrix3x3(channel, matrices3x3);
     }
 
     // Matrix 2x2
-    for (const auto& [name, matrix2x2] : _matrices2x2) {
-      _effect->setMatrix2x2(name, matrix2x2);
+    for (const auto& [channel, matrix2x2] : _matrices2x2) {
+      _effect->setMatrix2x2(channel, matrix2x2);
     }
 
     // Vector2Array
-    for (const auto& [name, array2] : _vectors2Arrays) {
-      _effect->setArray2(name, array2);
+    for (const auto& [channel, array2] : _vectors2Arrays) {
+      _effect->setArray2(channel, array2);
     }
 
     // Vector3Array
-    for (const auto& [name, array3] : _vectors3Arrays) {
-      _effect->setArray3(name, array3);
+    for (const auto& [channel, array3] : _vectors3Arrays) {
+      _effect->setArray3(channel, array3);
     }
 
     // Vector4Array
-    for (const auto& [name, array4] : _vectors4Arrays) {
-      _effect->setArray4(name, array4);
+    for (const auto& [channel, array4] : _vectors4Arrays) {
+      _effect->setArray4(channel, array4);
     }
   }
 
@@ -613,58 +613,58 @@ MaterialPtr ShaderMaterial::clone(const std::string& iName, bool /*cloneChildren
   result->id   = name;
 
   // Texture
-  for (const auto& [name, texture] : _textures) {
-    result->setTexture(name, texture);
+  for (const auto& [channel, texture] : _textures) {
+    result->setTexture(channel, texture);
   }
 
   // Float
-  for (const auto& [name, floatValue] : _floats) {
-    result->setFloat(name, floatValue);
+  for (const auto& [channel, floatValue] : _floats) {
+    result->setFloat(channel, floatValue);
   }
 
   // Floats
-  for (const auto& [name, floatsArray] : _floatsArrays) {
-    result->setFloats(name, floatsArray);
+  for (const auto& [channel, floatsArray] : _floatsArrays) {
+    result->setFloats(channel, floatsArray);
   }
 
   // Color3
-  for (const auto& [name, colors3] : _colors3) {
-    result->setColor3(name, colors3);
+  for (const auto& [channel, colors3] : _colors3) {
+    result->setColor3(channel, colors3);
   }
 
   // Color4
-  for (const auto& [name, colors4] : _colors4) {
-    result->setColor4(name, colors4);
+  for (const auto& [channel, colors4] : _colors4) {
+    result->setColor4(channel, colors4);
   }
 
   // Vector2
-  for (const auto& [name, vectors2] : _vectors2) {
-    result->setVector2(name, vectors2);
+  for (const auto& [channel, vectors2] : _vectors2) {
+    result->setVector2(channel, vectors2);
   }
 
   // Vector3
-  for (const auto& [name, vector3] : _vectors3) {
-    result->setVector3(name, vector3);
+  for (const auto& [channel, vector3] : _vectors3) {
+    result->setVector3(channel, vector3);
   }
 
   // Vector4
-  for (const auto& [name, vector4] : _vectors4) {
-    result->setVector4(name, vector4);
+  for (const auto& [channel, vector4] : _vectors4) {
+    result->setVector4(channel, vector4);
   }
 
   // Matrix
-  for (const auto& [name, matrix] : _matrices) {
-    result->setMatrix(name, matrix);
+  for (const auto& [channel, matrix] : _matrices) {
+    result->setMatrix(channel, matrix);
   }
 
   // Matrix 3x3
-  for (const auto& [name, matrix3x3] : _matrices3x3) {
-    result->setMatrix3x3(name, matrix3x3);
+  for (const auto& [channel, matrix3x3] : _matrices3x3) {
+    result->setMatrix3x3(channel, matrix3x3);
   }
 
   // Matrix 2x2
-  for (const auto& [name, matrix2x2] : _matrices2x2) {
-    result->setMatrix2x2(name, matrix2x2);
+  for (const auto& [channel, matrix2x2] : _matrices2x2) {
+    result->setMatrix2x2(channel, matrix2x2);
   }
 
   return result;
