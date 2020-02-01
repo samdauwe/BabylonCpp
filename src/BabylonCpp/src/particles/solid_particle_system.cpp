@@ -379,7 +379,7 @@ void SolidParticleSystem::_resetCopy()
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
-  unsigned int p, size_t ind, const std::vector<Vector3>& shape, Float32Array& positions,
+  size_t p, size_t ind, const std::vector<Vector3>& shape, Float32Array& positions,
   const Uint32Array& meshInd, Uint32Array& indices, const Float32Array& meshUV, Float32Array& uvs,
   const Float32Array& meshCol, Float32Array& colors, const Float32Array& meshNor,
   Float32Array& normals, size_t idx, size_t idxInShape,
@@ -480,8 +480,9 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     }
   }
 
+  const auto _p = static_cast<uint32_t>(p);
   for (i = 0; i < meshInd.size(); ++i) {
-    auto current_ind = p + meshInd[i];
+    auto current_ind = _p + meshInd[i];
     indices.emplace_back(current_ind);
     if (current_ind > 65535) {
       _needs32Bits = true;
@@ -812,8 +813,7 @@ SolidParticlePtr SolidParticleSystem::_insertNewParticle(
   return sp;
 }
 
-SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsigned int end,
-                                                       bool update)
+SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end, bool update)
 {
   if (!_updatable || _isNotBuilt) {
     return *this;
@@ -901,7 +901,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsig
   colorIndex = vpos * 4;
   uvIndex    = vpos * 2;
 
-  for (unsigned int p = start; p <= end; p++) {
+  for (size_t p = start; p <= end; p++) {
     auto particle = particles[p].get();
 
     // call to custom user function to update the particle properties
@@ -1226,7 +1226,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsig
       }
     }
     if (_depthSort && _depthSortParticles) {
-      BABYLON::stl_util::sort_js_style(depthSortedParticles, _depthSortFunction);
+      std::sort(depthSortedParticles.begin(), depthSortedParticles.end(), _depthSortFunction);
       const auto dspl = depthSortedParticles.size();
       auto sid        = 0ull;
       for (size_t sorted = 0; sorted < dspl; ++sorted) {
@@ -1338,9 +1338,9 @@ SolidParticleSystem& SolidParticleSystem::computeSubMeshes()
   mesh->subMeshes               = {};
   const auto vcount             = mesh->getTotalVertices();
   for (size_t m = 0; m < materialIndexes.size(); ++m) {
-    const auto& start    = indicesByMaterial[m];
-    const auto& count    = indicesByMaterial[m + 1] - start;
-    const auto& matIndex = materialIndexes[m];
+    const auto start    = static_cast<uint32_t>(indicesByMaterial[m]);
+    const auto count    = static_cast<uint32_t>(indicesByMaterial[m + 1] - start);
+    const auto matIndex = static_cast<uint32_t>(materialIndexes[m]);
     SubMesh::New(matIndex, 0, vcount, start, count, mesh);
   }
   return *this;
@@ -1584,13 +1584,11 @@ Vector3 SolidParticleSystem::updateParticleVertex(SolidParticle* /*particle*/,
   return vertex;
 }
 
-void SolidParticleSystem::beforeUpdateParticles(unsigned int /*start*/, unsigned int /*stop*/,
-                                                bool /*update*/)
+void SolidParticleSystem::beforeUpdateParticles(size_t /*start*/, size_t /*stop*/, bool /*update*/)
 {
 }
 
-void SolidParticleSystem::afterUpdateParticles(unsigned int /*start*/, unsigned int /*stop*/,
-                                               bool /*update*/)
+void SolidParticleSystem::afterUpdateParticles(size_t /*start*/, size_t /*stop*/, bool /*update*/)
 {
 }
 

@@ -170,8 +170,7 @@ public:
    * computations _(default true)_
    * @returns the SPS.
    */
-  SolidParticleSystem& setParticles(unsigned int start = 0, unsigned int end = 0,
-                                    bool update = true);
+  SolidParticleSystem& setParticles(size_t start = 0, size_t end = 0, bool update = true);
 
   /**
    * @brief Disposes the SPS.
@@ -310,7 +309,7 @@ public:
    * value passed to setParticle()
    * @param update the boolean update value actually passed to setParticles()
    */
-  virtual void beforeUpdateParticles(unsigned int start, unsigned int stop, bool update);
+  virtual void beforeUpdateParticles(size_t start, size_t stop, bool update);
 
   /**
    * @brief This will be called  by `setParticles()` after all the other treatments and just before
@@ -322,7 +321,7 @@ public:
    * value passed to setParticle()
    * @param update the boolean update value actually passed to setParticles()
    */
-  virtual void afterUpdateParticles(unsigned int start, unsigned int stop, bool update);
+  virtual void afterUpdateParticles(size_t start, size_t stop, bool update);
 
 protected:
   /**
@@ -516,7 +515,7 @@ private:
    * @model the particle model
    * @hidden
    */
-  SolidParticle* _meshBuilder(unsigned int p, size_t ind, const std::vector<Vector3>& shape,
+  SolidParticle* _meshBuilder(size_t p, size_t ind, const std::vector<Vector3>& shape,
                               Float32Array& positions, const Uint32Array& meshInd,
                               Uint32Array& indices, const Float32Array& meshUV, Float32Array& uvs,
                               const Float32Array& meshCol, Float32Array& colors,
@@ -650,7 +649,7 @@ public:
    * The SPS total number of particles. Read only. Use SPS.counter instead if you need to set your
    * own value.
    */
-  unsigned int nbParticles;
+  size_t nbParticles;
 
   /**
    * If the particles must ever face the camera (default false). Useful for planar particles.
@@ -798,7 +797,7 @@ private:
   Float32Array _fixedNormal32; // initial normal references
   Float32Array _colors32;
   Float32Array _uvs32;
-  unsigned int _index; // indices index
+  size_t _index; // indices index
   bool _updatable;
   bool _pickable;
   bool _isVisibilityBoxLocked;
