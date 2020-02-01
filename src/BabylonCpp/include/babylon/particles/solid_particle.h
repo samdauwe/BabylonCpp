@@ -15,6 +15,7 @@ namespace BABYLON {
 class Mesh;
 class ModelShape;
 class SolidParticleSystem;
+using ModelShapePtr = std::shared_ptr<ModelShape>;
 
 /**
  * @brief Represents one particle of a solid particle system.
@@ -43,8 +44,8 @@ public:
    * @param materialIndex is the particle material identifier (integer) when the MultiMaterials are
    * enabled in the SPS.
    */
-  SolidParticle(unsigned int particleIndex, int particleId, unsigned int positionIndex,
-                unsigned int indiceIndex, ModelShape* model, int shapeId, unsigned int idxInShape,
+  SolidParticle(size_t particleIndex, int particleId, size_t positionIndex, size_t indiceIndex,
+                const ModelShapePtr& model, int shapeId, size_t idxInShape,
                 SolidParticleSystem* sps,
                 const std::optional<BoundingInfo>& modelBoundingInfo = std::nullopt,
                 const std::optional<size_t>& materialIndex           = std::nullopt);
@@ -86,7 +87,7 @@ public:
   /**
    * particle global index
    */
-  unsigned int idx;
+  size_t idx;
   /**
    * particle identifier
    */
@@ -141,16 +142,16 @@ public:
    * Index of this particle in the global "positions" array (Internal use)
    * Hidden
    */
-  unsigned int _pos;
+  size_t _pos;
   /**
    * Index of this particle in the global "indices" array (Internal use)
    */
-  unsigned int _ind;
+  size_t _ind;
   /**
    * ModelShape of this particle (Internal use)
    * Hidden
    */
-  ModelShape* _model;
+  ModelShapePtr _model;
   /**
    * ModelShape id of this particle
    */
@@ -158,7 +159,7 @@ public:
   /**
    * Index of the particle in its shape id
    */
-  unsigned int idxInShape;
+  size_t idxInShape;
   /**
    * Reference to the shape model BoundingInfo object (Internal use)
    * Hidden
@@ -188,7 +189,7 @@ public:
    * Parent particle Id, if any.
    * Default null.
    */
-  std::optional<unsigned int> parentId;
+  std::optional<size_t> parentId;
   /**
    * The particle material identifier (integer) when MultiMaterials are enabled in the SPS.
    */

@@ -8,12 +8,14 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/multi_material.h>
+#include <babylon/materials/standard_material.h>
 #include <babylon/maths/axis.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/depth_sorted_particle.h>
@@ -29,6 +31,26 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
     , recomputeNormals{false}
     , counter{0}
     , mesh{nullptr}
+    , computeParticleRotation{this, &SolidParticleSystem::get_computeParticleRotation,
+                              &SolidParticleSystem::set_computeParticleRotation}
+    , computeParticleColor{this, &SolidParticleSystem::get_computeParticleColor,
+                           &SolidParticleSystem::set_computeParticleColor}
+    , computeParticleTexture{this, &SolidParticleSystem::get_computeParticleTexture,
+                             &SolidParticleSystem::set_computeParticleTexture}
+    , computeParticleVertex{this, &SolidParticleSystem::get_computeParticleVertex,
+                            &SolidParticleSystem::set_computeParticleVertex}
+    , computeBoundingBox{this, &SolidParticleSystem::get_computeBoundingBox,
+                         &SolidParticleSystem::set_computeBoundingBox}
+    , depthSortParticles{this, &SolidParticleSystem::get_depthSortParticles,
+                         &SolidParticleSystem::set_depthSortParticles}
+    , expandable{this, &SolidParticleSystem::get_expandable}
+    , multimaterialEnabled{this, &SolidParticleSystem::get_multimaterialEnabled}
+    , useModelMaterial{this, &SolidParticleSystem::get_useModelMaterial}
+    , materials{this, &SolidParticleSystem::get_materials}
+    , multimaterial{this, &SolidParticleSystem::get_multimaterial,
+                    &SolidParticleSystem::set_multimaterial}
+    , autoUpdateSubMeshes{this, &SolidParticleSystem::get_autoUpdateSubMeshes,
+                          &SolidParticleSystem::set_autoUpdateSubMeshes}
     , _index{0}
     , _updatable{true}
     , _pickable{false}
@@ -103,12 +125,16 @@ SolidParticleSystem::~SolidParticleSystem() = default;
 
 MeshPtr SolidParticleSystem::buildMesh()
 {
-  if (nbParticles == 0) {
+  if (!_isNotBuilt && mesh) {
+    return mesh;
+  }
+  if (nbParticles == 0 && !mesh) {
     DiscOptions options;
     options.radius       = 1.f;
     options.tessellation = 3;
     auto triangle        = MeshBuilder::CreateDisc("", options, _scene);
-    addShape(triangle, 1, {nullptr, nullptr});
+    std::optional<SolidParticleSystemMeshBuilderOptions> shapeOptions = std::nullopt;
+    addShape(triangle, 1, shapeOptions);
     triangle->dispose();
   }
 
@@ -116,6 +142,13 @@ MeshPtr SolidParticleSystem::buildMesh()
   _positions32 = Float32Array(_positions);
   _uvs32       = Float32Array(_uvs);
   _colors32    = Float32Array(_colors);
+
+  if (!mesh) { // in case it's already expanded
+    mesh = Mesh::New(name, _scene);
+  }
+  if (!_updatable && _multimaterialEnabled) {
+    _sortParticlesByMaterial(); // this may reorder the indices32
+  }
   if (recomputeNormals) {
     VertexData::ComputeNormals(_positions32, _indices32, _normals);
   }
@@ -138,33 +171,40 @@ MeshPtr SolidParticleSystem::buildMesh()
   if (!_colors32.empty()) {
     vertexData->set(_colors32, VertexBuffer::ColorKind);
   }
-  auto _mesh = Mesh::New(name, _scene);
-  vertexData->applyToMesh(*_mesh, _updatable);
-  mesh             = _mesh;
+
+  vertexData->applyToMesh(*mesh, _updatable);
   mesh->isPickable = _pickable;
 
-  // free memory
-  if (!_depthSort) {
-    _indices.clear();
-  }
-  _positions.clear();
-  _normals.clear();
-  _uvs.clear();
-  _colors.clear();
-
-  if (!_updatable) {
-    particles.clear();
+  if (_multimaterialEnabled) {
+    setMultiMaterial(_materials);
   }
 
-  return _mesh;
+  if (!_expandable) {
+    // free memory
+    if (!_depthSort && !_multimaterialEnabled) {
+      _indices.clear();
+    }
+    _positions.clear();
+    _normals.clear();
+    _uvs.clear();
+    _colors.clear();
+
+    if (!_updatable) {
+      particles.clear();
+    }
+  }
+  _isNotBuilt      = false;
+  recomputeNormals = false;
+
+  return mesh;
 }
 
-SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
-                                                 const SolidParticleSystemDigestOptions& options)
+SolidParticleSystem&
+SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigestOptions>& options)
 {
-  auto size    = options.facetNb;
-  auto number  = options.number;
-  auto delta   = options.delta;
+  auto size    = (options && options->facetNb) ? options->facetNb : 1;
+  auto number  = (options && options->number) ? options->number : 0;
+  auto delta   = (options && options->delta) ? options->delta : 0;
   auto meshPos = _mesh->getVerticesData(VertexBuffer::PositionKind);
   auto meshInd = _mesh->getIndices();
   auto meshUV  = _mesh->getVerticesData(VertexBuffer::UVKind);
@@ -186,6 +226,7 @@ SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
   }
 
   Float32Array facetPos; // submesh positions
+  Float32Array facetNor;
   Uint32Array facetInd;  // submesh indices
   Float32Array facetUV;  // submesh UV
   Float32Array facetCol; // submesh colors
@@ -200,6 +241,7 @@ SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
     }
     // reset temp arrays
     facetPos.clear();
+    facetNor.clear();
     facetInd.clear();
     facetUV.clear();
     facetCol.clear();
@@ -208,22 +250,29 @@ SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
     int fi = 0;
     for (size_t j = f * 3; j < (f + size) * 3; ++j) {
       facetInd.emplace_back(fi);
-      auto i = static_cast<unsigned int>(meshInd[j]);
-      stl_util::concat(facetPos, {meshPos[i * 3], meshPos[i * 3 + 1], meshPos[i * 3 + 2]});
+      auto i  = static_cast<unsigned int>(meshInd[j]);
+      auto i3 = i * 3;
+      stl_util::concat(facetPos, {meshPos[i3], meshPos[i3 + 1], meshPos[i3 + 2]});
+      stl_util::concat(meshNor, {meshNor[i3], meshNor[i3 + 1], meshNor[i3 + 2]});
       if (!meshUV.empty()) {
-        stl_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
+        auto i2 = i * 2;
+        stl_util::concat(facetUV, {meshUV[i2], meshUV[i2 + 1]});
       }
       if (!meshCol.empty()) {
-        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1], meshCol[i * 4 + 2],
-                                    meshCol[i * 4 + 3]});
+        auto i4 = i * 4;
+        stl_util::concat(facetCol,
+                         {meshCol[i4 + 0], meshCol[i4 + 1], meshCol[i4 + 2], meshCol[i4 + 3]});
       }
       ++fi;
     }
 
     // create a model shape for each single particle
-    auto idx     = nbParticles;
-    auto shape   = _posToShape(facetPos);
-    auto shapeUV = _uvsToShapeUV(facetUV);
+    auto idx             = nbParticles;
+    auto shape           = _posToShape(facetPos);
+    auto shapeUV         = _uvsToShapeUV(facetUV);
+    const auto& shapeInd = facetInd;
+    const auto& shapeCol = facetCol;
+    const auto& shapeNor = facetNor;
 
     // compute the barycenter of the shape
     barycenter.copyFromFloats(0.f, 0.f, 0.f);
@@ -232,8 +281,8 @@ SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
     }
     barycenter.scaleInPlace(1.f / static_cast<float>(shape.size()));
 
-    // shift the shape from its barycenter to the origin
-    // and compute the BBox required for intersection.
+    // shift the shape from its barycenter to the origin and compute the BBox required for
+    // intersection.
     Vector3 minimum{std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                     std::numeric_limits<float>::max()};
     Vector3 maximum{std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
@@ -247,32 +296,46 @@ SolidParticleSystem& SolidParticleSystem::digest(Mesh* _mesh,
     if (_particlesIntersect) {
       bInfo = BoundingInfo(minimum, maximum);
     }
-    // auto modelShape
-    //  = std::make_unique<ModelShape>(_shapeCounter, shape, size * 3, shapeUV, nullptr, nullptr);
-    std::unique_ptr<ModelShape> modelShape = nullptr;
+    MaterialPtr material = nullptr;
+    if (_useModelMaterial) {
+      material = (mesh->material()) ? mesh->material() : _setDefaultMaterial();
+    }
+    auto modelShape = std::make_shared<ModelShape>(_shapeCounter, shape, shapeInd, shapeNor,
+                                                   shapeCol, shapeUV, nullptr, nullptr, material);
 
     // add the particle in the SPS
     auto currentPos = static_cast<unsigned int>(_positions.size());
     auto currentInd = static_cast<unsigned int>(_indices.size());
-    _meshBuilder(_index, shape, _positions, facetInd, _indices, facetUV, _uvs, facetCol, _colors,
-                 meshNor, _normals, idx, 0, {nullptr, nullptr});
-    _addParticle(idx, currentPos, currentInd, std::move(modelShape), _shapeCounter, 0, bInfo);
+    _meshBuilder(_index, currentInd, shape, _positions, shapeInd, _indices, facetUV, _uvs, shapeCol,
+                 _colors, shapeNor, _normals, idx, 0, std::nullopt, modelShape);
+    if (options.has_value() && options->storage.has_value()) {
+      _addParticle(idx, _lastParticleId, currentPos, currentInd, modelShape, _shapeCounter, 0,
+                   bInfo, *options->storage);
+    }
+    else {
+      _addParticle(idx, _lastParticleId, currentPos, currentInd, modelShape, _shapeCounter, 0,
+                   bInfo);
+    }
     // initialize the particle position
     particles[nbParticles]->position.addInPlace(barycenter);
 
-    _index += static_cast<unsigned int>(shape.size());
-    ++idx;
-    ++nbParticles;
+    if (!options.has_value() || !options->storage.has_value()) {
+      _index += static_cast<unsigned int>(shape.size());
+      ++idx;
+      ++nbParticles;
+      ++_lastParticleId;
+    }
     ++_shapeCounter;
     f += size;
   }
+  _isNotBuilt = true; // buildMesh() is now expected for setParticles() to work
   return *this;
 }
 
 void SolidParticleSystem::_unrotateFixedNormals()
 {
-  unsigned int index      = 0;
-  unsigned int idx        = 0;
+  auto index              = 0u;
+  auto idx                = 0u;
   auto& tmpNormal         = TmpVectors::Vector3Array[0];
   auto& quaternion        = TmpVectors::QuaternionArray[0];
   auto& invertedRotMatrix = TmpVectors::MatrixArray[0];
@@ -280,8 +343,8 @@ void SolidParticleSystem::_unrotateFixedNormals()
     auto& shape = particle->_model->_shape;
 
     // computing the inverse of the rotation matrix from the quaternion
-    // is equivalent to computing the matrix of the inverse quaternion, i.e of
-    // the conjugate quaternion
+    // is equivalent to computing the matrix of the inverse quaternion, i.e of the conjugate
+    // quaternion
     if (particle->rotationQuaternion) {
       particle->rotationQuaternion->conjugateToRef(quaternion);
     }
@@ -302,7 +365,6 @@ void SolidParticleSystem::_unrotateFixedNormals()
   }
 }
 
-// reset copy
 void SolidParticleSystem::_resetCopy()
 {
   const auto& copy = _copy;
@@ -313,13 +375,15 @@ void SolidParticleSystem::_resetCopy()
   copy->uvs.copyFromFloats(0.f, 0.f, 1.f, 1.f);
   copy->color              = std::nullopt;
   copy->translateFromPivot = false;
+  copy->materialIndex      = std::nullopt;
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
-  unsigned int p, const std::vector<Vector3>& shape, Float32Array& positions, Uint32Array& meshInd,
-  Uint32Array& indices, const Float32Array& meshUV, Float32Array& uvs, const Float32Array& meshCol,
-  Float32Array& colors, const Float32Array& meshNor, Float32Array& normals, unsigned int idx,
-  unsigned int idxInShape, const SolidParticleSystemMeshBuilderOptions& options)
+  unsigned int p, size_t ind, const std::vector<Vector3>& shape, Float32Array& positions,
+  const Uint32Array& meshInd, Uint32Array& indices, const Float32Array& meshUV, Float32Array& uvs,
+  const Float32Array& meshCol, Float32Array& colors, const Float32Array& meshNor,
+  Float32Array& normals, size_t idx, size_t idxInShape,
+  const std::optional<SolidParticleSystemMeshBuilderOptions>& options, const ModelShapePtr& model)
 {
   size_t i = 0;
   size_t u = 0;
@@ -328,11 +392,28 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
 
   _resetCopy();
   auto& copy      = *_copy;
+  auto storeApart = (options && options->storage) ? true : false;
   copy.idx        = idx;
   copy.idxInShape = idxInShape;
-  if (options.positionFunction) { // call to custom
-    options.positionFunction(_copy.get(), idx, idxInShape);
+  if (_useModelMaterial) {
+    const auto materialId     = model->_material->uniqueId;
+    auto& materialIndexesById = _materialIndexesById;
+    if (!stl_util::contains(materialIndexesById, materialId)) {
+      materialIndexesById[materialId] = _materials.size();
+      _materials.emplace_back(model->_material);
+    }
+    auto matIdx        = materialIndexesById[materialId];
+    copy.materialIndex = matIdx;
+  }
+
+  if (options && options->positionFunction) { // call to custom
+    options->positionFunction(_copy.get(), idx, idxInShape);
     _mustUnrotateFixedNormals = true;
+  }
+
+  // in case the particle geometry must NOT be inserted in the SPS mesh geometry
+  if (storeApart) {
+    return &copy;
   }
 
   auto& rotMatrix            = TmpVectors::MatrixArray[0];
@@ -340,6 +421,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   auto& tmpRotated           = TmpVectors::Vector3Array[1];
   auto& pivotBackTranslation = TmpVectors::Vector3Array[2];
   auto& scaledPivot          = TmpVectors::Vector3Array[3];
+  Matrix::IdentityToRef(rotMatrix);
   copy.getRotationMatrix(rotMatrix);
 
   copy.pivot.multiplyToRef(copy.scaling, scaledPivot);
@@ -351,10 +433,11 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     pivotBackTranslation.copyFrom(scaledPivot);
   }
 
+  auto someVertexFunction = (options && options->vertexFunction);
   for (i = 0; i < shape.size(); i++) {
     tmpVertex.copyFrom(shape[i]);
-    if (options.vertexFunction) {
-      options.vertexFunction(&copy, tmpVertex, i);
+    if (someVertexFunction) {
+      options->vertexFunction(&copy, tmpVertex, i);
     }
 
     tmpVertex.multiplyInPlace(copy.scaling).subtractInPlace(scaledPivot);
@@ -390,10 +473,8 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     c += 4;
 
     if (!recomputeNormals && (n + 2) < meshNor.size()) {
-      tmpVertex.x = meshNor[n];
-      tmpVertex.y = meshNor[n + 1];
-      tmpVertex.z = meshNor[n + 2];
-      Vector3::TransformNormalToRef(tmpVertex, rotMatrix, tmpVertex);
+      Vector3::TransformNormalFromFloatsToRef(meshNor[n], meshNor[n + 1], meshNor[n + 2], rotMatrix,
+                                              tmpVertex);
       stl_util::concat(normals, {tmpVertex.x, tmpVertex.y, tmpVertex.z});
       n += 3;
     }
@@ -417,9 +498,10 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     }
   }
 
-  /*if (_depthSort) {
-    depthSortedParticles.emplace_back(DepthSortedParticle{});
-  }*/
+  if (_depthSort || _multimaterialEnabled) {
+    auto matIndex = copy.materialIndex.has_value() ? copy.materialIndex : 0;
+    depthSortedParticles.emplace_back(DepthSortedParticle(ind, meshInd.size(), matIndex.value()));
+  }
 
   return &copy;
 }
@@ -444,74 +526,87 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
   return shapeUV;
 }
 
-SolidParticle* SolidParticleSystem::_addParticle(unsigned int /*idx*/, unsigned int /*idxpos*/,
-                                                 unsigned int /*idxind*/,
-                                                 std::unique_ptr<ModelShape>&& /*model*/,
-                                                 int /*shapeId*/, unsigned int /*idxInShape*/,
-                                                 const BoundingInfo& /*bInfo*/)
+SolidParticlePtr SolidParticleSystem::_addParticle(size_t idx, size_t id, size_t idxpos,
+                                                   size_t idxind, const ModelShapePtr& model,
+                                                   int shapeId, size_t idxInShape,
+                                                   const BoundingInfo& bInfo)
 {
-  // particles.emplace_back(std::make_unique<SolidParticle>(idx, idxpos, idxind, model.get(),
-  // shapeId,
-  //                                                       idxInShape, this, bInfo));
-  return particles.back().get();
+  auto sp = std::make_shared<SolidParticle>(idx, static_cast<int>(id), idxpos, idxind, model,
+                                            shapeId, idxInShape, this, bInfo);
+
+  particles.emplace_back(sp);
+  return sp;
+}
+
+SolidParticlePtr SolidParticleSystem::_addParticle(size_t idx, size_t id, size_t idxpos,
+                                                   size_t idxind, const ModelShapePtr& model,
+                                                   int shapeId, size_t idxInShape,
+                                                   const BoundingInfo& bInfo,
+                                                   std::vector<SolidParticlePtr>& storage)
+{
+  auto sp = std::make_shared<SolidParticle>(idx, static_cast<int>(id), idxpos, idxind, model,
+                                            shapeId, idxInShape, this, bInfo);
+
+  storage.emplace_back(sp);
+  return sp;
 }
 
 int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
-                                  const SolidParticleSystemMeshBuilderOptions& options)
+                                  SolidParticleSystemMeshBuilderOptions& options)
 {
-  auto meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
-  auto meshInd = iMesh->getIndices();
-  auto meshUV  = iMesh->getVerticesData(VertexBuffer::UVKind);
-  auto meshCol = iMesh->getVerticesData(VertexBuffer::ColorKind);
-  auto meshNor = iMesh->getVerticesData(VertexBuffer::NormalKind);
-  auto bbInfo  = std::make_shared<BoundingInfo>(Vector3::Zero(), Vector3::Zero());
+  std::optional<SolidParticleSystemMeshBuilderOptions> shapOptions = options;
+  return addShape(iMesh, nb, shapOptions);
+}
+
+int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
+                                  std::optional<SolidParticleSystemMeshBuilderOptions>& options)
+{
+  auto meshPos             = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  auto meshInd             = iMesh->getIndices();
+  auto meshUV              = iMesh->getVerticesData(VertexBuffer::UVKind);
+  auto meshCol             = iMesh->getVerticesData(VertexBuffer::ColorKind);
+  auto meshNor             = iMesh->getVerticesData(VertexBuffer::NormalKind);
+  recomputeNormals         = !meshNor.empty() ? false : true;
+  const auto& indices      = meshInd;
+  const auto& shapeNormals = meshNor;
+  const auto& shapeColors  = meshCol;
+  BoundingInfoPtr bbInfo   = nullptr;
   if (_particlesIntersect) {
-    bbInfo = iMesh->getBoundingInfo();
+    bbInfo = mesh->getBoundingInfo();
   }
 
   auto shape   = _posToShape(meshPos);
   auto shapeUV = _uvsToShapeUV(meshUV);
 
-  // auto& posfunc = options.positionFunction;
-  // auto& vtxfunc = options.vertexFunction;
-
-  // auto modelShape
-  //= std::make_unique<ModelShape>(_shapeCounter, shape, meshInd.size(), shapeUV, posfunc, vtxfunc);
-  std::unique_ptr<ModelShape> modelShape = nullptr;
+  auto posfunc         = options ? options->positionFunction : nullptr;
+  auto vtxfunc         = options ? options->vertexFunction : nullptr;
+  MaterialPtr material = nullptr;
+  if (_useModelMaterial) {
+    material = mesh->material() ? mesh->material : _setDefaultMaterial();
+  }
+  auto modelShape = std::make_shared<ModelShape>(_shapeCounter, shape, indices, shapeNormals,
+                                                 shapeColors, shapeUV, posfunc, vtxfunc, material);
 
   // particles
-  SolidParticle* sp = nullptr;
-  auto idx          = nbParticles;
-  for (unsigned int i = 0; i < nb; ++i) {
-    auto currentPos  = static_cast<unsigned int>(_positions.size());
-    auto currentInd  = static_cast<unsigned int>(_indices.size());
-    auto currentCopy = _meshBuilder(_index, shape, _positions, meshInd, _indices, meshUV, _uvs,
-                                    meshCol, _colors, meshNor, _normals, idx, i, options);
-    if (_updatable) {
-      sp = _addParticle(idx, currentPos, currentInd, std::move(modelShape), _shapeCounter, i,
-                        *bbInfo);
-      sp->position.copyFrom(currentCopy->position);
-      sp->rotation.copyFrom(currentCopy->rotation);
-      if (currentCopy->rotationQuaternion) {
-        sp->rotationQuaternion->copyFrom(*currentCopy->rotationQuaternion);
-      }
-      if (currentCopy->color) {
-        auto color = *sp->color;
-        color.copyFrom(*currentCopy->color);
-        sp->color = std::move(color);
-      }
-      sp->scaling.copyFrom(currentCopy->scaling);
-      sp->uvs.copyFrom(currentCopy->uvs);
+  if (options && options->storage) {
+    for (size_t i = 0; i < nb; i++) {
+      _insertNewParticle(nbParticles, i, modelShape, shape, meshInd, meshUV, meshCol, meshNor,
+                         bbInfo, options->storage, options);
     }
-    _index += static_cast<unsigned int>(shape.size());
-    ++idx;
   }
-  nbParticles += static_cast<unsigned int>(nb);
+  else {
+    std::optional<std::vector<SolidParticlePtr>> storage = std::nullopt;
+    for (size_t i = 0; i < nb; i++) {
+      _insertNewParticle(nbParticles, i, modelShape, shape, meshInd, meshUV, meshCol, meshNor,
+                         bbInfo, storage, options);
+    }
+  }
   ++_shapeCounter;
+  _isNotBuilt = true; // buildMesh() call is now expected for setParticles() to work
   return _shapeCounter - 1;
 }
 
-void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
+void SolidParticleSystem::_rebuildParticle(SolidParticle* particle, bool reset)
 {
   _resetCopy();
   auto& copy = *_copy;
@@ -549,31 +644,178 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
     Vector3::TransformCoordinatesToRef(tmpVertex, rotMatrix, tmpRotated);
     tmpRotated.addInPlace(pivotBackTranslation)
       .addInPlace(copy.position)
-      .toArray(_positions32, particle->_pos + pt * 3);
+      .toArray(_positions32, static_cast<unsigned int>(particle->_pos + pt * 3));
   }
-  particle->position.setAll(0.f);
-  particle->rotation.setAll(0.f);
-  particle->rotationQuaternion = nullptr;
-  particle->scaling.setAll(1.f);
-  particle->uvs.setAll(0.f);
-  particle->pivot.setAll(0.f);
-  particle->translateFromPivot = false;
-  particle->parentId           = std::nullopt;
+  if (reset) {
+    particle->position.setAll(0.f);
+    particle->rotation.setAll(0.f);
+    particle->rotationQuaternion = nullptr;
+    particle->scaling.setAll(1.f);
+    particle->uvs.setAll(0.f);
+    particle->pivot.setAll(0.f);
+    particle->translateFromPivot = false;
+    particle->parentId           = std::nullopt;
+  }
 }
 
-SolidParticleSystem& SolidParticleSystem::rebuildMesh()
+SolidParticleSystem& SolidParticleSystem::rebuildMesh(bool reset)
 {
   for (const auto& particle : particles) {
-    _rebuildParticle(particle.get());
+    _rebuildParticle(particle.get(), reset);
   }
   mesh->updateVerticesData(VertexBuffer::PositionKind, _positions32, false, false);
   return *this;
 }
 
+std::vector<SolidParticlePtr> SolidParticleSystem::removeParticles(size_t start, size_t end)
+{
+  auto nb = end - start + 1;
+  if (!_expandable || (start >= end + 1) || nb >= nbParticles || !_updatable) {
+    return {};
+  }
+  const auto& currentNb = nbParticles;
+  if (end < currentNb - 1) { // update the particle indexes in the positions array in case they're
+                             // remaining particles after the last removed
+    auto firstRemaining = end + 1;
+    auto shiftPos       = particles[firstRemaining]->_pos - particles[start]->_pos;
+    auto shifInd        = particles[firstRemaining]->_ind - particles[start]->_ind;
+    for (size_t i = firstRemaining; i < currentNb; i++) {
+      auto part = particles[i];
+      part->_pos -= shiftPos;
+      part->_ind -= shifInd;
+    }
+  }
+  auto removed = stl_util::splice(particles, static_cast<int>(start), static_cast<int>(nb));
+  _positions.clear();
+  _indices.clear();
+  _colors.clear();
+  _uvs.clear();
+  _normals.clear();
+  _index = 0;
+  _idxOfId.clear();
+  if (_depthSort || _multimaterialEnabled) {
+    depthSortedParticles = {};
+  }
+  auto ind                   = 0ull;
+  const auto particlesLength = particles.size();
+  for (unsigned int p = 0; p < particlesLength; p++) {
+    const auto& particle                        = particles[p];
+    const auto& model                           = particle->_model;
+    const auto& shape                           = model->_shape;
+    const auto& modelIndices                    = model->_indices;
+    const auto& modelNormals                    = model->_normals;
+    const auto& modelColors                     = model->_shapeColors;
+    const auto& modelUVs                        = model->_shapeUV;
+    particle->idx                               = p;
+    _idxOfId[static_cast<size_t>(particle->id)] = p;
+    _meshBuilder(_index, ind, shape, _positions, modelIndices, _indices, modelUVs, _uvs,
+                 modelColors, _colors, modelNormals, _normals, particle->idx, particle->idxInShape,
+                 std::nullopt, model);
+    _index += shape.size();
+    ind += modelIndices.size();
+  }
+  nbParticles -= nb;
+  _isNotBuilt = true; // buildMesh() call is now expected for setParticles() to work
+  return removed;
+}
+
+SolidParticleSystem& SolidParticleSystem::insertParticlesFromArray(
+  const std::vector<SolidParticlePtr>& solidParticleArray)
+{
+  if (!_expandable) {
+    return *this;
+  }
+  auto idxInShape     = 0ull;
+  auto currentShapeId = solidParticleArray[0]->shapeId;
+  const auto nb       = solidParticleArray.size();
+  for (size_t i = 0; i < nb; i++) {
+    const auto& sp      = solidParticleArray[i];
+    const auto& model   = sp->_model;
+    const auto& shape   = model->_shape;
+    const auto& meshInd = model->_indices;
+    const auto& meshUV  = model->_shapeUV;
+    const auto& meshCol = model->_shapeColors;
+    const auto& meshNor = model->_normals;
+    const auto noNor    = (!meshNor.empty()) ? false : true;
+    recomputeNormals    = (noNor || recomputeNormals);
+    const auto& bbInfo  = sp->_boundingInfo;
+
+    std::optional<std::vector<SolidParticlePtr>> storage = std::nullopt;
+    auto newPart = _insertNewParticle(nbParticles, idxInShape, model, shape, meshInd, meshUV,
+                                      meshCol, meshNor, bbInfo, storage);
+    sp->copyToRef(*newPart);
+    ++idxInShape;
+    if (currentShapeId != sp->shapeId) {
+      currentShapeId = sp->shapeId;
+      idxInShape     = 0;
+    }
+  }
+  _isNotBuilt = true; // buildMesh() call is now expected for setParticles() to work
+  return *this;
+}
+
+SolidParticlePtr SolidParticleSystem::_insertNewParticle(
+  size_t idx, size_t i, const ModelShapePtr& modelShape, const std::vector<Vector3>& shape,
+  const IndicesArray& meshInd, const Float32Array& meshUV, const Float32Array& meshCol,
+  const Float32Array& meshNor, const BoundingInfoPtr& bbInfo,
+  std::optional<std::vector<SolidParticlePtr>>& storage,
+  const std::optional<SolidParticleSystemMeshBuilderOptions>& options)
+{
+  auto currentPos = _positions.size();
+  auto currentInd = _indices.size();
+  auto currentCopy
+    = _meshBuilder(_index, currentInd, shape, _positions, meshInd, _indices, meshUV, _uvs, meshCol,
+                   _colors, meshNor, _normals, idx, i, options, modelShape);
+  SolidParticlePtr sp = nullptr;
+  if (_updatable) {
+    auto defaultBbInfo = BoundingInfo{Vector3::Zero(), Vector3::Zero()};
+    if (storage) {
+      sp = _addParticle(nbParticles, _lastParticleId, currentPos, currentInd, modelShape,
+                        _shapeCounter, i, bbInfo ? *bbInfo : defaultBbInfo, *storage);
+    }
+    else {
+      _addParticle(nbParticles, _lastParticleId, currentPos, currentInd, modelShape, _shapeCounter,
+                   i, bbInfo ? *bbInfo : defaultBbInfo);
+    }
+    sp->position.copyFrom(currentCopy->position);
+    sp->rotation.copyFrom(currentCopy->rotation);
+    if (currentCopy->rotationQuaternion) {
+      if (sp->rotationQuaternion) {
+        sp->rotationQuaternion->copyFrom(*currentCopy->rotationQuaternion);
+      }
+      else {
+        sp->rotationQuaternion = currentCopy->rotationQuaternion->clone();
+      }
+    }
+    if (currentCopy->color) {
+      if (sp->color) {
+        sp->color->copyFrom(*currentCopy->color);
+      }
+      else {
+        sp->color = currentCopy->color;
+      }
+    }
+    sp->scaling.copyFrom(currentCopy->scaling);
+    sp->uvs.copyFrom(currentCopy->uvs);
+    if (currentCopy->materialIndex.has_value()) {
+      sp->materialIndex = currentCopy->materialIndex;
+    }
+    if (expandable) {
+      _idxOfId[static_cast<size_t>(sp->id)] = sp->idx;
+    }
+  }
+  if (!storage) {
+    _index += shape.size();
+    nbParticles++;
+    _lastParticleId++;
+  }
+  return sp;
+}
+
 SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsigned int end,
                                                        bool update)
 {
-  if (!_updatable) {
+  if (!_updatable || _isNotBuilt) {
     return *this;
   }
 
@@ -708,53 +950,58 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsig
 
       auto particleHasParent = particle->parentId.has_value();
       if (particleHasParent) {
-        auto& parent               = particles[particle->parentId.value()];
-        auto& parentRotationMatrix = parent->_rotationMatrix;
-        auto& parentGlobalPosition = parent->_globalPosition;
+        auto parent = getParticleById(particle->parentId.value_or(0));
+        if (parent) {
+          auto& parentRotationMatrix = parent->_rotationMatrix;
+          auto& parentGlobalPosition = parent->_globalPosition;
 
-        auto rotatedY = particlePosition.x * parentRotationMatrix[1]
-                        + particlePosition.y * parentRotationMatrix[4]
-                        + particlePosition.z * parentRotationMatrix[7];
-        auto rotatedX = particlePosition.x * parentRotationMatrix[0]
-                        + particlePosition.y * parentRotationMatrix[3]
-                        + particlePosition.z * parentRotationMatrix[6];
-        auto rotatedZ = particlePosition.x * parentRotationMatrix[2]
-                        + particlePosition.y * parentRotationMatrix[5]
-                        + particlePosition.z * parentRotationMatrix[8];
+          auto rotatedY = particlePosition.x * parentRotationMatrix[1]
+                          + particlePosition.y * parentRotationMatrix[4]
+                          + particlePosition.z * parentRotationMatrix[7];
+          auto rotatedX = particlePosition.x * parentRotationMatrix[0]
+                          + particlePosition.y * parentRotationMatrix[3]
+                          + particlePosition.z * parentRotationMatrix[6];
+          auto rotatedZ = particlePosition.x * parentRotationMatrix[2]
+                          + particlePosition.y * parentRotationMatrix[5]
+                          + particlePosition.z * parentRotationMatrix[8];
 
-        particleGlobalPosition.x = parentGlobalPosition.x + rotatedX;
-        particleGlobalPosition.y = parentGlobalPosition.y + rotatedY;
-        particleGlobalPosition.z = parentGlobalPosition.z + rotatedZ;
+          particleGlobalPosition.x = parentGlobalPosition.x + rotatedX;
+          particleGlobalPosition.y = parentGlobalPosition.y + rotatedY;
+          particleGlobalPosition.z = parentGlobalPosition.z + rotatedZ;
 
-        if (_computeParticleRotation || billboard) {
-          const auto& rotMatrixValues = rotMatrix.m();
-          particleRotationMatrix[0]   = rotMatrixValues[0] * parentRotationMatrix[0]
-                                      + rotMatrixValues[1] * parentRotationMatrix[3]
-                                      + rotMatrixValues[2] * parentRotationMatrix[6];
-          particleRotationMatrix[1] = rotMatrixValues[0] * parentRotationMatrix[1]
-                                      + rotMatrixValues[1] * parentRotationMatrix[4]
-                                      + rotMatrixValues[2] * parentRotationMatrix[7];
-          particleRotationMatrix[2] = rotMatrixValues[0] * parentRotationMatrix[2]
-                                      + rotMatrixValues[1] * parentRotationMatrix[5]
-                                      + rotMatrixValues[2] * parentRotationMatrix[8];
-          particleRotationMatrix[3] = rotMatrixValues[4] * parentRotationMatrix[0]
-                                      + rotMatrixValues[5] * parentRotationMatrix[3]
-                                      + rotMatrixValues[6] * parentRotationMatrix[6];
-          particleRotationMatrix[4] = rotMatrixValues[4] * parentRotationMatrix[1]
-                                      + rotMatrixValues[5] * parentRotationMatrix[4]
-                                      + rotMatrixValues[6] * parentRotationMatrix[7];
-          particleRotationMatrix[5] = rotMatrixValues[4] * parentRotationMatrix[2]
-                                      + rotMatrixValues[5] * parentRotationMatrix[5]
-                                      + rotMatrixValues[6] * parentRotationMatrix[8];
-          particleRotationMatrix[6] = rotMatrixValues[8] * parentRotationMatrix[0]
-                                      + rotMatrixValues[9] * parentRotationMatrix[3]
-                                      + rotMatrixValues[10] * parentRotationMatrix[6];
-          particleRotationMatrix[7] = rotMatrixValues[8] * parentRotationMatrix[1]
-                                      + rotMatrixValues[9] * parentRotationMatrix[4]
-                                      + rotMatrixValues[10] * parentRotationMatrix[7];
-          particleRotationMatrix[8] = rotMatrixValues[8] * parentRotationMatrix[2]
-                                      + rotMatrixValues[9] * parentRotationMatrix[5]
-                                      + rotMatrixValues[10] * parentRotationMatrix[8];
+          if (_computeParticleRotation || billboard) {
+            const auto& rotMatrixValues = rotMatrix.m();
+            particleRotationMatrix[0]   = rotMatrixValues[0] * parentRotationMatrix[0]
+                                        + rotMatrixValues[1] * parentRotationMatrix[3]
+                                        + rotMatrixValues[2] * parentRotationMatrix[6];
+            particleRotationMatrix[1] = rotMatrixValues[0] * parentRotationMatrix[1]
+                                        + rotMatrixValues[1] * parentRotationMatrix[4]
+                                        + rotMatrixValues[2] * parentRotationMatrix[7];
+            particleRotationMatrix[2] = rotMatrixValues[0] * parentRotationMatrix[2]
+                                        + rotMatrixValues[1] * parentRotationMatrix[5]
+                                        + rotMatrixValues[2] * parentRotationMatrix[8];
+            particleRotationMatrix[3] = rotMatrixValues[4] * parentRotationMatrix[0]
+                                        + rotMatrixValues[5] * parentRotationMatrix[3]
+                                        + rotMatrixValues[6] * parentRotationMatrix[6];
+            particleRotationMatrix[4] = rotMatrixValues[4] * parentRotationMatrix[1]
+                                        + rotMatrixValues[5] * parentRotationMatrix[4]
+                                        + rotMatrixValues[6] * parentRotationMatrix[7];
+            particleRotationMatrix[5] = rotMatrixValues[4] * parentRotationMatrix[2]
+                                        + rotMatrixValues[5] * parentRotationMatrix[5]
+                                        + rotMatrixValues[6] * parentRotationMatrix[8];
+            particleRotationMatrix[6] = rotMatrixValues[8] * parentRotationMatrix[0]
+                                        + rotMatrixValues[9] * parentRotationMatrix[3]
+                                        + rotMatrixValues[10] * parentRotationMatrix[6];
+            particleRotationMatrix[7] = rotMatrixValues[8] * parentRotationMatrix[1]
+                                        + rotMatrixValues[9] * parentRotationMatrix[4]
+                                        + rotMatrixValues[10] * parentRotationMatrix[7];
+            particleRotationMatrix[8] = rotMatrixValues[8] * parentRotationMatrix[2]
+                                        + rotMatrixValues[9] * parentRotationMatrix[5]
+                                        + rotMatrixValues[10] * parentRotationMatrix[8];
+          }
+        }
+        else { // in case the parent were removed at some moment
+          particle->parentId = std::nullopt;
         }
       }
       else {
@@ -961,8 +1208,8 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsig
     mesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false, false);
     if (!mesh->areNormalsFrozen || mesh->isFacetDataEnabled) {
       if (_computeParticleVertex || mesh->isFacetDataEnabled) {
-        // recompute the normals only if the particles can be morphed, update
-        // then also the normal reference array _fixedNormal32[]
+        // recompute the normals only if the particles can be morphed, update then also the normal
+        // reference array _fixedNormal32[]
         if (mesh->isFacetDataEnabled) {
           VertexData::ComputeNormals(positions32, indices32, normals32,
                                      mesh->getFacetDataParameters());
@@ -1001,6 +1248,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start, unsig
       mesh->_boundingInfo = std::make_unique<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
     }
   }
+  if (_autoUpdateSubMeshes) {
+    computeSubMeshes();
+  }
   afterUpdateParticles(start, end, update);
   return *this;
 }
@@ -1021,6 +1271,142 @@ void SolidParticleSystem::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialA
   _uvs32.clear();
   _colors32.clear();
   pickedParticles.clear();
+}
+
+SolidParticlePtr SolidParticleSystem::getParticleById(size_t id)
+{
+  if (id < particles.size() && particles[id]->id == static_cast<int>(id)) {
+    const auto& p = particles[id];
+    return p;
+  }
+  if (id < _idxOfId.size()) {
+    const auto idx = _idxOfId[id];
+    return particles[idx];
+  }
+  auto i        = 0ull;
+  const auto nb = nbParticles;
+  while (i < nb) {
+    const auto& particle = particles[i];
+    if (particle->id == static_cast<int>(id)) {
+      return particle;
+    }
+    ++i;
+  }
+  return nullptr;
+}
+
+std::vector<SolidParticlePtr> SolidParticleSystem::getParticlesByShapeId(int shapeId)
+{
+  std::vector<SolidParticlePtr> ref;
+  getParticlesByShapeIdToRef(shapeId, ref);
+  return ref;
+}
+
+SolidParticleSystem&
+SolidParticleSystem::getParticlesByShapeIdToRef(int shapeId, std::vector<SolidParticlePtr>& ref)
+{
+  ref.clear();
+  for (size_t i = 0; i < nbParticles; ++i) {
+    const auto& p = particles[i];
+    if (p->shapeId == shapeId) {
+      ref.emplace_back(p);
+    }
+  }
+  return *this;
+}
+
+SolidParticleSystem& SolidParticleSystem::computeSubMeshes()
+{
+  if (!mesh || !_multimaterialEnabled) {
+    return *this;
+  }
+  if (!particles.empty()) {
+    for (size_t p = 0; p < particles.size(); ++p) {
+      const auto& part = particles[p];
+      if (!part->materialIndex.has_value()) {
+        part->materialIndex = 0;
+      }
+      auto& sortedPart         = depthSortedParticles[p];
+      sortedPart.materialIndex = part->materialIndex.value_or(0);
+      sortedPart.ind           = part->_ind;
+      sortedPart.indicesLength = part->_model->_indicesLength;
+    }
+  }
+  _sortParticlesByMaterial();
+  const auto& indicesByMaterial = _indicesByMaterial;
+  const auto& materialIndexes   = _materialIndexes;
+  mesh->subMeshes               = {};
+  const auto vcount             = mesh->getTotalVertices();
+  for (size_t m = 0; m < materialIndexes.size(); ++m) {
+    const auto& start    = indicesByMaterial[m];
+    const auto& count    = indicesByMaterial[m + 1] - start;
+    const auto& matIndex = materialIndexes[m];
+    SubMesh::New(matIndex, 0, vcount, start, count, mesh);
+  }
+  return *this;
+}
+
+SolidParticleSystem& SolidParticleSystem::_sortParticlesByMaterial()
+{
+  std::vector<size_t> indicesByMaterial = {0};
+  _indicesByMaterial                    = indicesByMaterial;
+  std::vector<size_t> materialIndexes;
+  _materialIndexes = materialIndexes;
+  std::sort(depthSortedParticles.begin(), depthSortedParticles.end(), _materialSortFunction);
+  auto length       = depthSortedParticles.size();
+  auto& indices32   = _indices32;
+  auto& indices     = _indices;
+  auto sid          = 0ull;
+  auto lastMatIndex = depthSortedParticles[0].materialIndex;
+  materialIndexes.emplace_back(lastMatIndex);
+  for (size_t sorted = 0; sorted < length; sorted++) {
+    auto& sortedPart = depthSortedParticles[sorted];
+    auto lind        = sortedPart.indicesLength;
+    auto sind        = sortedPart.ind;
+    if (sortedPart.materialIndex != lastMatIndex) {
+      lastMatIndex = sortedPart.materialIndex;
+      indicesByMaterial.emplace_back(sid);
+      materialIndexes.emplace_back(lastMatIndex);
+    }
+    for (size_t i = 0; i < lind; i++) {
+      indices32[sid] = indices[sind + i];
+      sid++;
+    }
+  }
+  indicesByMaterial.emplace_back(
+    indices32
+      .size()); // add the last number to ease the indices start/count values for subMeshes creation
+  if (_updatable) {
+    mesh->updateIndices(indices32);
+  }
+  return *this;
+}
+
+void SolidParticleSystem::_setMaterialIndexesById()
+{
+  _materialIndexesById = {};
+  for (size_t i = 0; i < _materials.size(); ++i) {
+    auto id                  = _materials[i]->uniqueId;
+    _materialIndexesById[id] = i;
+  }
+}
+
+std::vector<MaterialPtr>
+SolidParticleSystem::_filterUniqueMaterialId(const std::vector<MaterialPtr>& array)
+{
+  std::vector<MaterialPtr> filtered;
+  for (auto& value : array) {
+    stl_util::push_unique(filtered, value);
+  }
+  return filtered;
+}
+
+MaterialPtr SolidParticleSystem::_setDefaultMaterial()
+{
+  if (!_defaultMaterial) {
+    _defaultMaterial = StandardMaterial::New(name + "DefaultMaterial", _scene);
+  }
+  return _defaultMaterial;
 }
 
 SolidParticleSystem& SolidParticleSystem::refreshVisibleSize()
@@ -1063,68 +1449,123 @@ bool SolidParticleSystem::SolidParticleSystem::isVisibilityBoxLocked() const
   return _isVisibilityBoxLocked;
 }
 
-void SolidParticleSystem::setComputeParticleRotation(bool val)
+void SolidParticleSystem::set_computeParticleRotation(bool val)
 {
   _computeParticleRotation = val;
 }
 
-void SolidParticleSystem::setComputeParticleColor(bool val)
+void SolidParticleSystem::set_computeParticleColor(bool val)
 {
   _computeParticleColor = val;
 }
 
-void SolidParticleSystem::setComputeParticleTexture(bool val)
+void SolidParticleSystem::set_computeParticleTexture(bool val)
 {
   _computeParticleTexture = val;
 }
 
-void SolidParticleSystem::setComputeParticleVertex(bool val)
+void SolidParticleSystem::set_computeParticleVertex(bool val)
 {
   _computeParticleVertex = val;
 }
 
-void SolidParticleSystem::setComputeBoundingBox(bool val)
+void SolidParticleSystem::set_computeBoundingBox(bool val)
 {
   _computeBoundingBox = val;
 }
 
-void SolidParticleSystem::setDepthSortParticles(bool val)
+void SolidParticleSystem::set_depthSortParticles(bool val)
 {
   _depthSortParticles = val;
 }
 
-bool SolidParticleSystem::computeParticleRotation() const
+bool SolidParticleSystem::get_computeParticleRotation() const
 {
   return _computeParticleRotation;
 }
 
-bool SolidParticleSystem::computeParticleColor() const
+bool SolidParticleSystem::get_computeParticleColor() const
 {
   return _computeParticleColor;
 }
 
-bool SolidParticleSystem::computeParticleTexture() const
+bool SolidParticleSystem::get_computeParticleTexture() const
 {
   return _computeParticleTexture;
 }
 
-bool SolidParticleSystem::computeParticleVertex() const
+bool SolidParticleSystem::get_computeParticleVertex() const
 {
   return _computeParticleVertex;
 }
 
-bool SolidParticleSystem::computeBoundingBox() const
+bool SolidParticleSystem::get_computeBoundingBox() const
 {
   return _computeBoundingBox;
 }
 
-bool SolidParticleSystem::depthSortParticles() const
+bool SolidParticleSystem::get_depthSortParticles() const
 {
   return _depthSortParticles;
 }
 
+bool SolidParticleSystem::get_expandable() const
+{
+  return _expandable;
+}
+
+bool SolidParticleSystem::get_multimaterialEnabled() const
+{
+  return _multimaterialEnabled;
+}
+
+bool SolidParticleSystem::get_useModelMaterial() const
+{
+  return _useModelMaterial;
+}
+
+std::vector<MaterialPtr>& SolidParticleSystem::get_materials()
+{
+  return _materials;
+}
+
+void SolidParticleSystem::setMultiMaterial(const std::vector<MaterialPtr>& iMaterials)
+{
+  _materials = _filterUniqueMaterialId(iMaterials);
+  _setMaterialIndexesById();
+  if (_multimaterial) {
+    _multimaterial->dispose();
+  }
+  _multimaterial = MultiMaterial::New(name + "MultiMaterial", _scene);
+  for (const auto& material : _materials) {
+    _multimaterial->subMaterials().emplace_back(material);
+  }
+  computeSubMeshes();
+  mesh->material = _multimaterial;
+}
+
 void SolidParticleSystem::initParticles()
 {
+}
+
+MultiMaterialPtr& SolidParticleSystem::get_multimaterial()
+{
+  return _multimaterial;
+}
+
+void SolidParticleSystem::set_multimaterial(const MultiMaterialPtr& mm)
+{
+  _multimaterial = mm;
+}
+
+bool SolidParticleSystem::get_autoUpdateSubMeshes() const
+{
+  return _autoUpdateSubMeshes;
+}
+
+void SolidParticleSystem::set_autoUpdateSubMeshes(bool val)
+{
+  _autoUpdateSubMeshes = val;
 }
 
 SolidParticle* SolidParticleSystem::recycleParticle(SolidParticle* particle)

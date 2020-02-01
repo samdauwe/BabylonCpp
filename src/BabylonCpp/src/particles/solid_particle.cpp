@@ -6,9 +6,9 @@
 
 namespace BABYLON {
 
-SolidParticle::SolidParticle(unsigned int particleIndex, int particleId, unsigned int positionIndex,
-                             unsigned int indiceIndex, ModelShape* model, int iShapeId,
-                             unsigned int iIdxInShape, SolidParticleSystem* sps,
+SolidParticle::SolidParticle(size_t particleIndex, int particleId, size_t positionIndex,
+                             size_t indiceIndex, const ModelShapePtr& model, int iShapeId,
+                             size_t iIdxInShape, SolidParticleSystem* sps,
                              const std::optional<BoundingInfo>& modelBoundingInfo,
                              const std::optional<size_t>& iMaterialIndex)
     : id{0}

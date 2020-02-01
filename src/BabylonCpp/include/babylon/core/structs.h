@@ -208,7 +208,7 @@ struct NodeCache {
 }; // end of struct NodeCache
 
 struct PickedParticle {
-  unsigned int idx;
+  size_t idx;
   size_t faceId;
 }; // end of struct PickedParticle
 
