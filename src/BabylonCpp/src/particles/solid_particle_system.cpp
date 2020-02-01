@@ -154,8 +154,7 @@ MeshPtr SolidParticleSystem::buildMesh()
   }
   _normals32     = Float32Array(_normals);
   _fixedNormal32 = Float32Array(_normals);
-  // The particles could be created already rotated in the mesh with a
-  // positionFunction
+  // The particles could be created already rotated in the mesh with a positionFunction
   if (_mustUnrotateFixedNormals) {
     _unrotateFixedNormals();
   }
@@ -250,7 +249,7 @@ SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigest
     int fi = 0;
     for (size_t j = f * 3; j < (f + size) * 3; ++j) {
       facetInd.emplace_back(fi);
-      auto i  = static_cast<unsigned int>(meshInd[j]);
+      auto i  = static_cast<uint32_t>(meshInd[j]);
       auto i3 = i * 3;
       stl_util::concat(facetPos, {meshPos[i3], meshPos[i3 + 1], meshPos[i3 + 2]});
       stl_util::concat(meshNor, {meshNor[i3], meshNor[i3 + 1], meshNor[i3 + 2]});
@@ -304,8 +303,8 @@ SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigest
                                                    shapeCol, shapeUV, nullptr, nullptr, material);
 
     // add the particle in the SPS
-    auto currentPos = static_cast<unsigned int>(_positions.size());
-    auto currentInd = static_cast<unsigned int>(_indices.size());
+    auto currentPos = static_cast<uint32_t>(_positions.size());
+    auto currentInd = static_cast<uint32_t>(_indices.size());
     _meshBuilder(_index, currentInd, shape, _positions, shapeInd, _indices, facetUV, _uvs, shapeCol,
                  _colors, shapeNor, _normals, idx, 0, std::nullopt, modelShape);
     if (options.has_value() && options->storage.has_value()) {
@@ -320,7 +319,7 @@ SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigest
     particles[nbParticles]->position.addInPlace(barycenter);
 
     if (!options.has_value() || !options->storage.has_value()) {
-      _index += static_cast<unsigned int>(shape.size());
+      _index += static_cast<uint32_t>(shape.size());
       ++idx;
       ++nbParticles;
       ++_lastParticleId;
@@ -342,9 +341,8 @@ void SolidParticleSystem::_unrotateFixedNormals()
   for (const auto& particle : particles) {
     auto& shape = particle->_model->_shape;
 
-    // computing the inverse of the rotation matrix from the quaternion
-    // is equivalent to computing the matrix of the inverse quaternion, i.e of the conjugate
-    // quaternion
+    // computing the inverse of the rotation matrix from the quaternion is equivalent to computing
+    // the matrix of the inverse quaternion, i.e of the conjugate quaternion
     if (particle->rotationQuaternion) {
       particle->rotationQuaternion->conjugateToRef(quaternion);
     }
@@ -355,7 +353,7 @@ void SolidParticleSystem::_unrotateFixedNormals()
     }
     quaternion.toRotationMatrix(invertedRotMatrix);
 
-    for (unsigned int pt = 0; pt < shape.size(); pt++) {
+    for (uint32_t pt = 0; pt < shape.size(); pt++) {
       idx = index + pt * 3;
       Vector3::TransformNormalFromFloatsToRef(_normals32[idx], _normals32[idx + 1],
                                               _normals32[idx + 2], invertedRotMatrix, tmpNormal);
@@ -510,7 +508,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
 std::vector<Vector3> SolidParticleSystem::_posToShape(const Float32Array& positions)
 {
   std::vector<Vector3> shape;
-  for (unsigned int i = 0; i < positions.size(); i += 3) {
+  for (uint32_t i = 0; i < positions.size(); i += 3) {
     shape.emplace_back(Vector3::FromArray(positions, i));
   }
   return shape;
@@ -562,11 +560,11 @@ int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
 int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
                                   std::optional<SolidParticleSystemMeshBuilderOptions>& options)
 {
-  auto meshPos             = iMesh->getVerticesData(VertexBuffer::PositionKind);
-  auto meshInd             = iMesh->getIndices();
-  auto meshUV              = iMesh->getVerticesData(VertexBuffer::UVKind);
-  auto meshCol             = iMesh->getVerticesData(VertexBuffer::ColorKind);
-  auto meshNor             = iMesh->getVerticesData(VertexBuffer::NormalKind);
+  const auto meshPos       = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd       = iMesh->getIndices();
+  const auto meshUV        = iMesh->getVerticesData(VertexBuffer::UVKind);
+  const auto meshCol       = iMesh->getVerticesData(VertexBuffer::ColorKind);
+  const auto meshNor       = iMesh->getVerticesData(VertexBuffer::NormalKind);
   recomputeNormals         = !meshNor.empty() ? false : true;
   const auto& indices      = meshInd;
   const auto& shapeNormals = meshNor;
@@ -634,7 +632,7 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle, bool reset)
 
   auto& shape = particle->_model->_shape;
 
-  for (unsigned int pt = 0; pt < shape.size(); ++pt) {
+  for (uint32_t pt = 0; pt < shape.size(); ++pt) {
     tmpVertex.copyFrom(shape[pt]);
     if (particle->_model->_vertexFunction) {
       particle->_model->_vertexFunction(&copy, tmpVertex,
@@ -645,7 +643,7 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle, bool reset)
     Vector3::TransformCoordinatesToRef(tmpVertex, rotMatrix, tmpRotated);
     tmpRotated.addInPlace(pivotBackTranslation)
       .addInPlace(copy.position)
-      .toArray(_positions32, static_cast<unsigned int>(particle->_pos + pt * 3));
+      .toArray(_positions32, static_cast<uint32_t>(particle->_pos + pt * 3));
   }
   if (reset) {
     particle->position.setAll(0.f);
@@ -699,7 +697,7 @@ std::vector<SolidParticlePtr> SolidParticleSystem::removeParticles(size_t start,
   }
   auto ind                   = 0ull;
   const auto particlesLength = particles.size();
-  for (unsigned int p = 0; p < particlesLength; p++) {
+  for (uint32_t p = 0; p < particlesLength; ++p) {
     const auto& particle                        = particles[p];
     const auto& model                           = particle->_model;
     const auto& shape                           = model->_shape;
@@ -743,7 +741,7 @@ SolidParticleSystem& SolidParticleSystem::insertParticlesFromArray(
 
     std::optional<std::vector<SolidParticlePtr>> storage = std::nullopt;
     auto newPart = _insertNewParticle(nbParticles, idxInShape, model, shape, meshInd, meshUV,
-                                      meshCol, meshNor, bbInfo, storage);
+                                      meshCol, meshNor, bbInfo, storage, std::nullopt);
     sp->copyToRef(*newPart);
     ++idxInShape;
     if (currentShapeId != sp->shapeId) {
@@ -762,9 +760,9 @@ SolidParticlePtr SolidParticleSystem::_insertNewParticle(
   std::optional<std::vector<SolidParticlePtr>>& storage,
   const std::optional<SolidParticleSystemMeshBuilderOptions>& options)
 {
-  auto currentPos = _positions.size();
-  auto currentInd = _indices.size();
-  auto currentCopy
+  const auto currentPos = _positions.size();
+  const auto currentInd = _indices.size();
+  const auto currentCopy
     = _meshBuilder(_index, currentInd, shape, _positions, meshInd, _indices, meshUV, _uvs, meshCol,
                    _colors, meshNor, _normals, idx, i, options, modelShape);
   SolidParticlePtr sp = nullptr;
@@ -807,8 +805,8 @@ SolidParticlePtr SolidParticleSystem::_insertNewParticle(
   }
   if (!storage) {
     _index += shape.size();
-    nbParticles++;
-    _lastParticleId++;
+    ++nbParticles;
+    ++_lastParticleId;
   }
   return sp;
 }
@@ -837,8 +835,8 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
   auto& camAxisY            = tempVectors[6].copyFromFloats(0.f, 1.f, 0.f);
   auto& camAxisZ            = tempVectors[7].copyFromFloats(0.f, 0.f, 1.f);
   auto& minimum             = tempVectors[8].setAll(std::numeric_limits<float>::max());
-  auto& maximum             = tempVectors[9].setAll(std::numeric_limits<float>::min());
-  auto& camInvertedPosition = tempVectors[10].setAll(0);
+  auto& maximum             = tempVectors[9].setAll(std::numeric_limits<float>::lowest());
+  auto& camInvertedPosition = tempVectors[10].setAll(0.f);
 
   // cases when the World Matrix is to be computed first
   if (billboard || _depthSort) {
@@ -1071,8 +1069,8 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
           maximum.maximizeInPlaceFromFloats(px, py, pz);
         }
 
-        // normals : if the particles can't be morphed then just rotate the
-        // normals, what is much more faster than ComputeNormals()
+        // normals : if the particles can't be morphed then just rotate the normals, what is much
+        // more faster than ComputeNormals()
         if (!_computeParticleVertex) {
           const auto& normalx = fixedNormal32[idx];
           const auto& normaly = fixedNormal32[idx + 1];
@@ -1113,7 +1111,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
     // particle just set invisible : scaled to zero and positioned at the origin
     else {
       particle->_stillInvisible = true; // mark the particle as invisible
-      for (pt = 0; pt < shape.size(); pt++) {
+      for (pt = 0; pt < shape.size(); ++pt) {
         idx    = index + pt * 3;
         colidx = colorIndex + pt * 4;
         uvidx  = uvIndex + pt * 2;
@@ -1142,15 +1140,14 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
       auto& bSphere           = bInfo->boundingSphere;
       auto& modelBoundingInfo = particle->_modelBoundingInfo;
       if (!_bSphereOnly) {
-        // place, scale and rotate the particle bbox within the SPS local
-        // system, then update it
+        // place, scale and rotate the particle bbox within the SPS local system, then update it
         auto& modelBoundingInfoVectors = modelBoundingInfo->boundingBox.vectors;
 
         auto& tempMin = tempVectors[1];
         auto& tempMax = tempVectors[2];
         tempMin.setAll(std::numeric_limits<float>::max());
         tempMax.setAll(std::numeric_limits<float>::min());
-        for (unsigned int b = 0; b < 8; b++) {
+        for (uint32_t b = 0; b < 8; ++b) {
           const auto scaledX  = modelBoundingInfoVectors[b].x * particleScaling.x;
           const auto scaledY  = modelBoundingInfoVectors[b].y * particleScaling.y;
           const auto scaledZ  = modelBoundingInfoVectors[b].z * particleScaling.z;
@@ -1176,8 +1173,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
         bBox.reConstruct(tempMin, tempMax, mesh->_worldMatrix);
       }
 
-      // place and scale the particle bouding sphere in the SPS local system,
-      // then update it
+      // place and scale the particle bouding sphere in the SPS local system, then update it
       auto minBbox = modelBoundingInfo->minimum().multiplyToRef(particleScaling, tempVectors[1]);
       auto maxBbox = modelBoundingInfo->maximum().multiplyToRef(particleScaling, tempVectors[2]);
 
@@ -1234,7 +1230,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
         const auto sind = depthSortedParticles[sorted].ind;
         for (size_t i = 0; i < lind; i++) {
           indices32[sid] = indices[sind + i];
-          sid++;
+          ++sid;
         }
       }
       mesh->updateIndices(indices32);
@@ -1275,7 +1271,7 @@ void SolidParticleSystem::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialA
 
 SolidParticlePtr SolidParticleSystem::getParticleById(size_t id)
 {
-  if (id < particles.size() && particles[id]->id == static_cast<int>(id)) {
+  if (id < particles.size() && particles[id] && particles[id]->id == static_cast<int>(id)) {
     const auto& p = particles[id];
     return p;
   }
@@ -1359,7 +1355,7 @@ SolidParticleSystem& SolidParticleSystem::_sortParticlesByMaterial()
   auto sid          = 0ull;
   auto lastMatIndex = depthSortedParticles[0].materialIndex;
   materialIndexes.emplace_back(lastMatIndex);
-  for (size_t sorted = 0; sorted < length; sorted++) {
+  for (size_t sorted = 0; sorted < length; ++sorted) {
     auto& sortedPart = depthSortedParticles[sorted];
     auto lind        = sortedPart.indicesLength;
     auto sind        = sortedPart.ind;
@@ -1395,7 +1391,7 @@ std::vector<MaterialPtr>
 SolidParticleSystem::_filterUniqueMaterialId(const std::vector<MaterialPtr>& array)
 {
   std::vector<MaterialPtr> filtered;
-  for (auto& value : array) {
+  for (const auto& value : array) {
     stl_util::push_unique(filtered, value);
   }
   return filtered;
