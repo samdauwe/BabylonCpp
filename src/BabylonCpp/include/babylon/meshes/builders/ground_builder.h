@@ -62,7 +62,7 @@ struct BABYLON_SHARED_EXPORT GroundBuilder {
                                    Scene* scene = nullptr);
 
   /**
-   * @brief Creates a ground mesh from a height map
+   * @brief Creates a ground mesh from a height map.
    * * The parameter `url` sets the URL of the height map image resource.
    * * The parameters `width` and `height` (positive floats, default 10) set the ground width and
    * height sizes.
