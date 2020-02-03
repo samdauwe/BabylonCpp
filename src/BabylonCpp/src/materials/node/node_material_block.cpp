@@ -14,13 +14,14 @@ namespace BABYLON {
 
 NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlockTargets target,
                                      bool isFinalMerger, bool isInput)
-    : _isUnique{false}
+    : isUnique{this, &NodeMaterialBlock::get_isUnique}
     , isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
     , isInput{this, &NodeMaterialBlock::get_isInput}
     , buildId{this, &NodeMaterialBlock::get_buildId, &NodeMaterialBlock::set_buildId}
     , target{this, &NodeMaterialBlock::get_target, &NodeMaterialBlock::set_target}
     , inputs{this, &NodeMaterialBlock::get_inputs}
     , outputs{this, &NodeMaterialBlock::get_outputs}
+    , _isUnique{false}
     , _target{NodeMaterialBlockTargets::Undefined}
 {
   name = iName;
@@ -33,6 +34,11 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
 }
 
 NodeMaterialBlock::~NodeMaterialBlock() = default;
+
+bool NodeMaterialBlock::get_isUnique() const
+{
+  return _isUnique;
+}
 
 bool NodeMaterialBlock::get_isFinalMerger() const
 {
@@ -271,16 +277,16 @@ void NodeMaterialBlock::provideFallbacks(AbstractMesh* /*mesh*/, EffectFallbacks
   // Do nothing
 }
 
-void NodeMaterialBlock::prepareDefines(AbstractMesh* /*mesh*/,
-                                       const NodeMaterialPtr& /*nodeMaterial*/,
-                                       NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
+void NodeMaterialBlock::initializeDefines(AbstractMesh* /*mesh*/,
+                                          const NodeMaterialPtr& /*nodeMaterial*/,
+                                          NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
 {
   // Do nothing
 }
 
-void NodeMaterialBlock::initializeDefines(AbstractMesh* /*mesh*/,
-                                          const NodeMaterialPtr& /*nodeMaterial*/,
-                                          NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
+void NodeMaterialBlock::prepareDefines(AbstractMesh* /*mesh*/,
+                                       const NodeMaterialPtr& /*nodeMaterial*/,
+                                       NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
 {
   // Do nothing
 }
@@ -353,6 +359,15 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
     return true;
   }
 
+  if (!isInput()) {
+    /** Prepare outputs */
+    for (const auto& output : _outputs) {
+      if (output->associatedVariableName().empty()) {
+        output->associatedVariableName = state._getFreeVariableName(output->name);
+      }
+    }
+  }
+
   // Check if "parent" blocks are compiled
   for (const auto& input : _inputs) {
     if (!input->connectedPoint()) {
@@ -389,24 +404,6 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
       state.target == NodeMaterialBlockTargets::Vertex ? "Vertex shader" : "Fragment shader",
       name.c_str(), getClassName().c_str());
     BABYLON_LOG_INFO("NodeMaterialBlock", logStr)
-  }
-
-  if (!isInput()) {
-    /** Prepare outputs */
-    for (const auto& output : _outputs) {
-      if (target() != NodeMaterialBlockTargets::Neutral) {
-        if (output->target() == target()) {
-          continue;
-        }
-        if (output->target() == state.target) {
-          continue;
-        }
-      }
-
-      if (output->associatedVariableName().empty()) {
-        output->associatedVariableName = state._getFreeVariableName(output->name);
-      }
-    }
   }
 
   // Checks final outputs
@@ -486,8 +483,12 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   uniqueNames.emplace_back(_codeVariableName);
 
   // Declaration
-  codeString = StringTools::printf("\r\nauto %s = %s::New(\"%s\");\r\n", _codeVariableName.c_str(),
-                                   getClassName().c_str(), name.c_str());
+  codeString = StringTools::printf("\r\n// %s\r\n", getClassName().c_str());
+  if (!comments.empty()) {
+    codeString += StringTools::printf("// %s\r\n", comments.c_str());
+  }
+  codeString += StringTools::printf("auto %s = %s::New(\"%s\");\r\n", _codeVariableName.c_str(),
+                                    getClassName().c_str(), name.c_str());
 
   // Properties
   codeString += _dumpPropertiesCode();
@@ -504,11 +505,6 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
     if (!stl_util::contains(alreadyDumped, connectedBlock)) {
       codeString += connectedBlock->_dumpCode(uniqueNames, alreadyDumped);
     }
-
-    codeString += StringTools::printf("%s.%s.connectTo(%s.%s);\r\n",
-                                      connectedBlock->_codeVariableName.c_str(),
-                                      connectedBlock->_outputRename(connectedOutput->name).c_str(),
-                                      _codeVariableName.c_str(), _inputRename(input->name).c_str());
   }
 
   // Outputs
@@ -528,6 +524,35 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   return codeString;
 }
 
+std::string
+NodeMaterialBlock::_dumpCodeForOutputConnections(std::vector<NodeMaterialBlockPtr>& alreadyDumped)
+{
+  std::string codeString = "";
+
+  if (stl_util::contains(alreadyDumped, shared_from_this())) {
+    return codeString;
+  }
+
+  alreadyDumped.emplace_back(shared_from_this());
+
+  for (const auto& input : inputs()) {
+    if (!input->isConnected()) {
+      continue;
+    }
+
+    const auto& connectedOutput = input->connectedPoint();
+    const auto& connectedBlock  = connectedOutput->ownerBlock();
+
+    codeString += connectedBlock->_dumpCodeForOutputConnections(alreadyDumped);
+    codeString += StringTools::printf("%s.%s.connectTo(%s.%s);\r\n",
+                                      connectedBlock->_codeVariableName.c_str(),
+                                      connectedBlock->_outputRename(connectedOutput->name).c_str(),
+                                      _codeVariableName.c_str(), _inputRename(input->name).c_str());
+  }
+
+  return codeString;
+}
+
 NodeMaterialPtr NodeMaterialBlock::clone(Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
@@ -538,9 +563,22 @@ json NodeMaterialBlock::serialize() const
   return nullptr;
 }
 
-void NodeMaterialBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
+void NodeMaterialBlock::_deserialize(const json& serializationObject, Scene* /*scene*/,
                                      const std::string& /*rootUrl*/)
 {
+  name     = json_util::get_string(serializationObject, "name");
+  comments = json_util::get_string(serializationObject, "comments");
+}
+
+void NodeMaterialBlock::dispose()
+{
+  for (const auto& input : inputs()) {
+    input->dispose();
+  }
+
+  for (const auto& output : outputs()) {
+    output->dispose();
+  }
 }
 
 } // end of namespace BABYLON

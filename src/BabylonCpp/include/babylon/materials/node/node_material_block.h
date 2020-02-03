@@ -165,16 +165,6 @@ public:
   virtual void provideFallbacks(AbstractMesh* mesh, EffectFallbacks* fallbacks);
 
   /**
-   * @brief Update defines for shader compilation.
-   * @param mesh defines the mesh to be rendered
-   * @param nodeMaterial defines the node material requesting the update
-   * @param defines defines the material defines to update
-   * @param useInstances specifies that instances should be used
-   */
-  virtual void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                              NodeMaterialDefines& defines, bool useInstances = false);
-
-  /**
    * @brief Initialize defines for shader compilation.
    * @param mesh defines the mesh to be rendered
    * @param nodeMaterial defines the node material requesting the update
@@ -183,6 +173,16 @@ public:
    */
   virtual void initializeDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                                  NodeMaterialDefines& defines, bool useInstances = false);
+
+  /**
+   * @brief Update defines for shader compilation.
+   * @param mesh defines the mesh to be rendered
+   * @param nodeMaterial defines the node material requesting the update
+   * @param defines defines the material defines to update
+   * @param useInstances specifies that instances should be used
+   */
+  virtual void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+                              NodeMaterialDefines& defines, bool useInstances = false);
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
@@ -227,6 +227,11 @@ public:
                         std::vector<NodeMaterialBlockPtr>& alreadyDumped);
 
   /**
+   * @brief Hidden
+   */
+  std::string _dumpCodeForOutputConnections(std::vector<NodeMaterialBlockPtr>& alreadyDumped);
+
+  /**
    * @brief Clone the current block to a new identical block.
    * @param scene defines the hosting scene
    * @param rootUrl defines the root URL to use to load textures and relative dependencies
@@ -246,6 +251,11 @@ public:
   virtual void _deserialize(const json& serializationObject, Scene* scene,
                             const std::string& rootUrl);
 
+  /**
+   * @brief Release resources.
+   */
+  void dispose();
+
 protected:
   /**
    * @brief Creates a new NodeMaterialBlock.
@@ -261,9 +271,9 @@ protected:
                     bool isFinalMerger = false, bool isInput = false);
 
   /**
-   * @brief Hidden
+   * @brief Gets a boolean indicating that this block can only be used once per NodeMaterial.
    */
-  bool _isUnique;
+  bool get_isUnique() const;
 
   /**
    * @brief Gets a boolean indicating that this block is an end block (e.g. it is generating a
@@ -345,6 +355,16 @@ public:
   size_t uniqueId;
 
   /**
+   * Gets or sets the comments associated with this block
+   */
+  std::string comments;
+
+  /**
+   * Gets a boolean indicating that this block can only be used once per NodeMaterial
+   */
+  ReadOnlyProperty<NodeMaterialBlock, bool> isUnique;
+
+  /**
    * Gets a boolean indicating that this block is an end block (e.g. it is generating a system
    * value)
    */
@@ -374,6 +394,12 @@ public:
    * Gets the list of output points
    */
   ReadOnlyProperty<NodeMaterialBlock, std::vector<NodeMaterialConnectionPointPtr>> outputs;
+
+protected:
+  /**
+   * Hidden
+   */
+  bool _isUnique;
 
 private:
   size_t _buildId;
