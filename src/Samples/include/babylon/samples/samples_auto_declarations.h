@@ -143,6 +143,7 @@ std::shared_ptr<IRenderableScene> make_ShaderMaterialSparseGridMarchingScene(ICa
 std::shared_ptr<IRenderableScene> make_ShaderMaterialSpeedTracerScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialStarNestScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialTheDriveHomeScene(ICanvas* canvas);
+std::shared_ptr<IRenderableScene> make_ShaderMaterialTheRingColorRemixScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialTilesScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialVoronoianWaterwayScene(ICanvas* canvas);
 std::shared_ptr<IRenderableScene> make_ShaderMaterialWarpSpeedScene(ICanvas* canvas);
@@ -418,6 +419,7 @@ inline void auto_populate_samples(RegisterFunction& registerFunction)
   registerFunction("Shader Material", "ShaderMaterialSpeedTracerScene", make_ShaderMaterialSpeedTracerScene);
   registerFunction("Shader Material", "ShaderMaterialStarNestScene", make_ShaderMaterialStarNestScene);
   registerFunction("Shader Material", "ShaderMaterialTheDriveHomeScene", make_ShaderMaterialTheDriveHomeScene);
+  registerFunction("Shader Material", "ShaderMaterialTheRingColorRemixScene", make_ShaderMaterialTheRingColorRemixScene);
   registerFunction("Shader Material", "ShaderMaterialTilesScene", make_ShaderMaterialTilesScene);
   registerFunction("Shader Material", "ShaderMaterialVoronoianWaterwayScene", make_ShaderMaterialVoronoianWaterwayScene);
   registerFunction("Shader Material", "ShaderMaterialWarpSpeedScene", make_ShaderMaterialWarpSpeedScene);
