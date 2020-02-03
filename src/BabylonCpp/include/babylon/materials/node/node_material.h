@@ -124,6 +124,12 @@ public:
   bool needAlphaTesting() const override;
 
   /**
+   * @brief Remove a block from the current node material.
+   * @param block defines the block to remove
+   */
+  void removeBlock(const NodeMaterialBlockPtr& block);
+
+  /**
    * @brief Build the material and generates the inner effect.
    * @param verbose defines if the build should log activity
    */

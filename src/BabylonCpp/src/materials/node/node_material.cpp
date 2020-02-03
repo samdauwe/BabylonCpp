@@ -294,13 +294,21 @@ void NodeMaterial::_initializeBlock(
   node->_preparationId = _buildId;
 
   if (!stl_util::contains(attachedBlocks, node)) {
+    if (node->isUnique()) {
+      const auto className = node->getClassName();
+
+      for (const auto& other : attachedBlocks) {
+        if (other->getClassName() == className) {
+          throw std::runtime_error(StringTools::printf(
+            "Cannot have multiple blocks of type %s in the same NodeMaterial", className.c_str()));
+        }
+      }
+    }
     attachedBlocks.emplace_back(node);
   }
 
   for (const auto& input : node->inputs()) {
-    if (!node->isInput()) {
-      input->associatedVariableName = "";
-    }
+    input->associatedVariableName = "";
 
     const auto& connectedPoint = input->connectedPoint();
     if (connectedPoint) {
@@ -341,6 +349,18 @@ void NodeMaterial::_resetDualBlocks(const NodeMaterialBlockPtr& node, size_t iId
   }
 }
 
+void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
+{
+  auto attachedBlockIndex = stl_util::index_of(attachedBlocks, block);
+  if (attachedBlockIndex > -1) {
+    stl_util::splice(attachedBlocks, attachedBlockIndex, 1);
+  }
+
+  if (block->isFinalMerger()) {
+    removeOutputNode(block);
+  }
+}
+
 void NodeMaterial::build(bool verbose)
 {
   _buildWasSuccessful = false;
@@ -369,6 +389,7 @@ void NodeMaterial::build(bool verbose)
   _sharedData->buildId                  = _buildId;
   _sharedData->emitComments             = _options->emitComments;
   _sharedData->verbose                  = verbose;
+  _sharedData->scene                    = getScene();
 
   // Initialize blocks
   std::vector<NodeMaterialBlockPtr> vertexNodes;
@@ -393,9 +414,10 @@ void NodeMaterial::build(bool verbose)
   }
 
   // Fragment
-  _fragmentCompilationState->uniforms            = _vertexCompilationState->uniforms;
-  _fragmentCompilationState->_uniformDeclaration = _vertexCompilationState->_uniformDeclaration;
-  _fragmentCompilationState->_vertexState        = _vertexCompilationState;
+  _fragmentCompilationState->uniforms             = _vertexCompilationState->uniforms;
+  _fragmentCompilationState->_uniformDeclaration  = _vertexCompilationState->_uniformDeclaration;
+  _fragmentCompilationState->_constantDeclaration = _vertexCompilationState->_constantDeclaration;
+  _fragmentCompilationState->_vertexState         = _vertexCompilationState;
 
   for (const auto& fragmentOutputNode : fragmentNodes) {
     _resetDualBlocks(fragmentOutputNode, _buildId - 1);
@@ -737,7 +759,24 @@ bool NodeMaterial::hasTexture(const BaseTexturePtr& texture) const
 void NodeMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures, bool notBoundToMesh)
 {
   if (forceDisposeTextures) {
-    _sharedData->textureBlocks.clear();
+    for (const auto& tb : _sharedData->textureBlocks) {
+      if (std::holds_alternative<TextureBlockPtr>(tb)) {
+        auto texture = std::get<TextureBlockPtr>(tb)->texture;
+        if (texture) {
+          texture->dispose();
+        }
+      }
+      else if (std::holds_alternative<ReflectionTextureBlockPtr>(tb)) {
+        auto texture = std::get<ReflectionTextureBlockPtr>(tb)->texture;
+        if (texture) {
+          texture->dispose();
+        }
+      }
+    }
+  }
+
+  for (const auto& block : attachedBlocks) {
+    block->dispose();
   }
 
   onBuildObservable.clear();
@@ -847,7 +886,8 @@ std::string NodeMaterial::generateCode()
   }
 
   // Generate vertex shader
-  std::string codeString = "auto nodeMaterial = NodeMaterial::New(\"node material\");\r\n";
+  std::string codeString = StringTools::printf("auto nodeMaterial = NodeMaterial::New(\"%s\");\r\n",
+                                               !name.empty() ? name.c_str() : "node material");
   for (const auto& node : vertexBlocks) {
     if (node->isInput() && !stl_util::contains(alreadyDumped, node)) {
       codeString += node->_dumpCode(uniqueNames, alreadyDumped);
@@ -861,6 +901,18 @@ std::string NodeMaterial::generateCode()
     }
   }
 
+  // Connections
+  alreadyDumped = {};
+  codeString += "\r\n// Connections\r\n";
+  for (const auto& node : _vertexOutputNodes) {
+    codeString += node->_dumpCodeForOutputConnections(alreadyDumped);
+  }
+  for (const auto& node : _fragmentOutputNodes) {
+    codeString += node->_dumpCodeForOutputConnections(alreadyDumped);
+  }
+
+  // Output nodes
+  codeString += "\r\n// Output nodes\r\n";
   for (const auto& node : _vertexOutputNodes) {
     codeString += StringTools::printf("nodeMaterial->addOutputNode(%s);\r\n",
                                       node->_codeVariableName.c_str());
