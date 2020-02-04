@@ -20,15 +20,13 @@ using CameraPtr               = std::shared_ptr<Camera>;
 using SpriteSceneComponentPtr = std::shared_ptr<SpriteSceneComponent>;
 
 /**
- * @brief Defines the sprite scene component responsible to manage sprites.
- * in a given scene.
+ * @brief Defines the sprite scene component responsible to manage sprites in a given scene.
  */
 class BABYLON_SHARED_EXPORT SpriteSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_SPRITE;
 
@@ -47,8 +45,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
@@ -70,7 +67,7 @@ private:
                         bool fastCheck = false, const CameraPtr& camera = nullptr);
   std::optional<PickingInfo> _pointerMove(int unTranslatedPointerX, int unTranslatedPointerY,
                                           std::optional<PickingInfo> pickResult, bool isMeshPicked,
-                                          ICanvas* canvas);
+                                          ICanvas* element);
   std::optional<PickingInfo> _pointerDown(int unTranslatedPointerX, int unTranslatedPointerY,
                                           std::optional<PickingInfo> pickResult,
                                           const PointerEvent& evt);

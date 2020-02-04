@@ -33,24 +33,22 @@ void SpriteSceneComponent::_register()
     [this](int unTranslatedPointerX, int unTranslatedPointerY,
            const std::optional<PickingInfo>& pickResult, bool isMeshPicked,
            ICanvas* canvas) -> std::optional<PickingInfo> {
-      return _pointerMove(unTranslatedPointerX, unTranslatedPointerY,
-                          pickResult, isMeshPicked, canvas);
+      return _pointerMove(unTranslatedPointerX, unTranslatedPointerY, pickResult, isMeshPicked,
+                          canvas);
     });
   scene->_pointerDownStage.registerStep(
     SceneComponentConstants::STEP_POINTERDOWN_SPRITE, this,
     [this](int unTranslatedPointerX, int unTranslatedPointerY,
            const std::optional<PickingInfo>& pickResult,
            const PointerEvent& evt) -> std::optional<PickingInfo> {
-      return _pointerDown(unTranslatedPointerX, unTranslatedPointerY,
-                          pickResult, evt);
+      return _pointerDown(unTranslatedPointerX, unTranslatedPointerY, pickResult, evt);
     });
   scene->_pointerUpStage.registerStep(
     SceneComponentConstants::STEP_POINTERUP_SPRITE, this,
     [this](int unTranslatedPointerX, int unTranslatedPointerY,
            const std::optional<PickingInfo>& pickResult,
            const PointerEvent& evt) -> std::optional<PickingInfo> {
-      return _pointerUp(unTranslatedPointerX, unTranslatedPointerY, pickResult,
-                        evt);
+      return _pointerUp(unTranslatedPointerX, unTranslatedPointerY, pickResult, evt);
     });
 }
 
@@ -69,9 +67,9 @@ void SpriteSceneComponent::dispose()
   }
 }
 
-std::optional<PickingInfo> SpriteSceneComponent::_pickSpriteButKeepRay(
-  const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
-  bool fastCheck, const CameraPtr& camera)
+std::optional<PickingInfo>
+SpriteSceneComponent::_pickSpriteButKeepRay(const std::optional<PickingInfo>& originalPointerInfo,
+                                            int x, int y, bool fastCheck, const CameraPtr& camera)
 {
   auto result = scene->pickSprite(x, y, _spritePredicate, fastCheck, camera);
   if (result.has_value()) {
@@ -80,27 +78,28 @@ std::optional<PickingInfo> SpriteSceneComponent::_pickSpriteButKeepRay(
   return result;
 }
 
-std::optional<PickingInfo> SpriteSceneComponent::_pointerMove(
-  int unTranslatedPointerX, int unTranslatedPointerY,
-  std::optional<PickingInfo> pickResult, bool isMeshPicked, ICanvas* canvas)
+std::optional<PickingInfo> SpriteSceneComponent::_pointerMove(int unTranslatedPointerX,
+                                                              int unTranslatedPointerY,
+                                                              std::optional<PickingInfo> pickResult,
+                                                              bool isMeshPicked, ICanvas* element)
 {
   if (isMeshPicked) {
     scene->setPointerOverSprite(nullptr);
   }
   else {
-    pickResult = _pickSpriteButKeepRay(pickResult, unTranslatedPointerX,
-                                       unTranslatedPointerY, false,
-                                       scene->cameraToUseForPointers);
+    pickResult = _pickSpriteButKeepRay(pickResult, unTranslatedPointerX, unTranslatedPointerY,
+                                       false, scene->cameraToUseForPointers);
 
     if (pickResult && pickResult->hit && pickResult->pickedSprite) {
       scene->setPointerOverSprite(pickResult->pickedSprite);
-      if (scene->_pointerOverSprite && scene->_pointerOverSprite->actionManager
-          && !scene->_pointerOverSprite->actionManager->hoverCursor.empty()) {
-        canvas->style.cursor
-          = scene->_pointerOverSprite->actionManager->hoverCursor;
-      }
-      else {
-        canvas->style.cursor = scene->hoverCursor;
+      if (!scene->doNotHandleCursors) {
+        if (scene->_pointerOverSprite && scene->_pointerOverSprite->actionManager
+            && !scene->_pointerOverSprite->actionManager->hoverCursor.empty()) {
+          element->style.cursor = scene->_pointerOverSprite->actionManager->hoverCursor;
+        }
+        else {
+          element->style.cursor = scene->hoverCursor;
+        }
       }
     }
     else {
@@ -111,15 +110,15 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerMove(
   return pickResult;
 }
 
-std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
-  int unTranslatedPointerX, int unTranslatedPointerY,
-  std::optional<PickingInfo> pickResult, const PointerEvent& evt)
+std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPointerX,
+                                                              int unTranslatedPointerY,
+                                                              std::optional<PickingInfo> pickResult,
+                                                              const PointerEvent& evt)
 {
   scene->_pickedDownSprite = nullptr;
   if (!scene->spriteManagers.empty()) {
-    pickResult = scene->pickSprite(unTranslatedPointerX, unTranslatedPointerY,
-                                   _spritePredicate, false,
-                                   scene->cameraToUseForPointers);
+    pickResult = scene->pickSprite(unTranslatedPointerX, unTranslatedPointerY, _spritePredicate,
+                                   false, scene->cameraToUseForPointers);
 
     if (pickResult && pickResult->hit && pickResult->pickedSprite) {
       if (pickResult->pickedSprite->actionManager) {
@@ -128,20 +127,17 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
           case MouseButtonType::LEFT:
             pickResult->pickedSprite->actionManager->processTrigger(
               Constants::ACTION_OnLeftPickTrigger,
-              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
-                                               evt));
+              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene, evt));
             break;
           case MouseButtonType::MIDDLE:
             pickResult->pickedSprite->actionManager->processTrigger(
               Constants::ACTION_OnCenterPickTrigger,
-              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
-                                               evt));
+              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene, evt));
             break;
           case MouseButtonType::RIGHT:
             pickResult->pickedSprite->actionManager->processTrigger(
               Constants::ACTION_OnRightPickTrigger,
-              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
-                                               evt));
+              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene, evt));
             break;
           default:
             break;
@@ -149,8 +145,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
         if (pickResult->pickedSprite->actionManager) {
           pickResult->pickedSprite->actionManager->processTrigger(
             Constants::ACTION_OnPickDownTrigger,
-            ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
-                                             evt));
+            ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene, evt));
         }
       }
     }
@@ -159,22 +154,22 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
   return pickResult;
 }
 
-std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
-  int unTranslatedPointerX, int unTranslatedPointerY,
-  std::optional<PickingInfo> pickResult, const PointerEvent& evt)
+std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(int unTranslatedPointerX,
+                                                            int unTranslatedPointerY,
+                                                            std::optional<PickingInfo> pickResult,
+                                                            const PointerEvent& evt)
 {
   if (!scene->spriteManagers.empty()) {
-    auto spritePickResult = scene->pickSprite(
-      unTranslatedPointerX, unTranslatedPointerY, _spritePredicate, false,
-      scene->cameraToUseForPointers);
+    auto spritePickResult
+      = scene->pickSprite(unTranslatedPointerX, unTranslatedPointerY, _spritePredicate, false,
+                          scene->cameraToUseForPointers);
 
     if (spritePickResult) {
       if (spritePickResult->hit && spritePickResult->pickedSprite) {
         if (spritePickResult->pickedSprite->actionManager) {
           spritePickResult->pickedSprite->actionManager->processTrigger(
             Constants::ACTION_OnPickUpTrigger,
-            ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
-                                             scene, evt));
+            ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite, scene, evt));
           if (spritePickResult->pickedSprite->actionManager) {
             /*if (!scene->_isPointerSwiping()) {
               spritePickResult->pickedSprite->actionManager->processTrigger(
@@ -189,8 +184,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
           && scene->_pickedDownSprite != spritePickResult->pickedSprite) {
         scene->_pickedDownSprite->actionManager->processTrigger(
           Constants::ACTION_OnPickOutTrigger,
-          ActionEvent::CreateNewFromSprite(scene->_pickedDownSprite, scene,
-                                           evt));
+          ActionEvent::CreateNewFromSprite(scene->_pickedDownSprite, scene, evt));
       }
     }
   }
