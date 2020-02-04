@@ -1433,17 +1433,13 @@ public:
 
   /**
    * @brief Hidden
-   * @param ray
-   * @param predicate
-   * @param camera
-   * @return
    */
   std::vector<PickingInfo>
   _internalMultiPickSprites(const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
                             CameraPtr& camera);
 
   /**
-   * @brief Launch a ray to try to pick sprites in the scene
+   * @brief Launch a ray to try to pick sprites in the scene.
    * @param x position on screen
    * @param y position on screen
    * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
@@ -1457,7 +1453,7 @@ public:
                                            CameraPtr& camera);
 
   /**
-   * @brief Use the given ray to pick sprites in the scene
+   * @brief Use the given ray to pick sprites in the scene.
    * @param ray The ray (in world space) to use to pick meshes
    * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
    * this case, a sprite must have isPickable set to true
@@ -1824,7 +1820,7 @@ private:
                      const std::function<bool(AbstractMesh* mesh)>& predicate);
 
   /**
-   * @Brief hidden
+   * @brief hidden
    */
   std::optional<PickingInfo>
   _internalPickSprites(const Ray& ray,
@@ -2416,15 +2412,15 @@ public:
 
   /**
    * An event triggered when sprites rendering is about to start
-   * Note: This event can be trigger more than once per frame (because sprites
-   * can be rendered by render target textures as well)
+   * Note: This event can be trigger more than once per frame (because sprites can be rendered by
+   * render target textures as well)
    */
   Observable<Scene> onBeforeSpritesRenderingObservable;
 
   /**
    * An event triggered when sprites rendering is done
-   * Note: This event can be trigger more than once per frame (because sprites
-   * can be rendered by render target textures as well)
+   * Note: This event can be trigger more than once per frame (because sprites can be rendered by
+   * render target textures as well)
    */
   Observable<Scene> onAfterSpritesRenderingObservable;
 
