@@ -48,7 +48,7 @@ install:
 # Perform git clone with submodules
 clone_script:
 - cmd: >-
-    git clone --recursive -q https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+    git clone --depth 1 --recursive -q https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 #---------------------------------#
 #       Build configuration       #
