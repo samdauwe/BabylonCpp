@@ -187,7 +187,7 @@ public:
    * If set, the drag plane/axis will be rotated based on the attached mesh's world rotation
    * (Default: true)
    */
-  bool useObjectOrienationForDragging;
+  bool useObjectOrientationForDragging;
 
   /**
    * Gets or sets the options used by the behavior.

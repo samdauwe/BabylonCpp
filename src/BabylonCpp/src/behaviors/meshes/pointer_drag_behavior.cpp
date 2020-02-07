@@ -23,7 +23,7 @@ PointerDragBehavior::PointerDragBehavior(const PointerDragBehaviorOptions& iOpti
     , enabled{true}
     , startAndReleaseDragOnPointerEvents{true}
     , detachCameraControls{true}
-    , useObjectOrienationForDragging{true}
+    , useObjectOrientationForDragging{true}
     , options{this, &PointerDragBehavior::get_options, &PointerDragBehavior::set_options}
     , _dragPlane{nullptr}
     , _scene{nullptr}
@@ -195,7 +195,8 @@ void PointerDragBehavior::releaseDrag()
   // Reattach camera controls
   if (detachCameraControls && _attachedElement && _scene->activeCamera()
       && !_scene->activeCamera()->leftCamera()) {
-    _scene->activeCamera()->attachControl(_attachedElement, true);
+    _scene->activeCamera()->attachControl(_attachedElement,
+                                          _scene->activeCamera()->inputs.noPreventDefault);
   }
 }
 
@@ -279,8 +280,8 @@ void PointerDragBehavior::_moveDrag(const Ray& ray)
     auto dragLength = 0.f;
     // depending on the drag mode option drag accordingly
     if (_options.dragAxis) {
-      // Convert local drag axis to world if useObjectOrienationForDragging
-      if (useObjectOrienationForDragging) {
+      // Convert local drag axis to world if useObjectOrientationForDragging
+      if (useObjectOrientationForDragging) {
         Vector3::TransformCoordinatesToRef(
           *_options.dragAxis, attachedNode->getWorldMatrix().getRotationMatrix(), _worldDragAxis);
       }
@@ -363,7 +364,7 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
 {
   _pointA.copyFrom(dragPlanePosition);
   if (_options.dragAxis) {
-    if (useObjectOrienationForDragging) {
+    if (useObjectOrientationForDragging) {
       Vector3::TransformCoordinatesToRef(
         *_options.dragAxis, attachedNode->getWorldMatrix().getRotationMatrix(), _localAxis);
     }
@@ -371,8 +372,7 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
       _localAxis.copyFrom(*_options.dragAxis);
     }
 
-    // Calculate plane normal in direction of camera but perpendicular to drag
-    // axis
+    // Calculate plane normal in direction of camera but perpendicular to drag axis
     _pointA.addToRef(_localAxis, _pointB); // towards drag axis
     ray.origin.subtractToRef(_pointA, _pointC);
     _pointA.addToRef(_pointC.normalize(), _pointC); // towards camera
@@ -380,8 +380,8 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
     _pointB.subtractToRef(_pointA, _lineA);
     _pointC.subtractToRef(_pointA, _lineB);
     Vector3::CrossToRef(_lineA, _lineB, _lookAt);
-    // Get perpendicular line from previous result and drag axis to adjust lineB
-    // to be perpendiculat to camera
+    // Get perpendicular line from previous result and drag axis to adjust lineB to be perpendiculat
+    // to camera
     Vector3::CrossToRef(_lineA, _lookAt, _lookAt);
     _lookAt.normalize();
 
@@ -390,7 +390,7 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
     _dragPlane->lookAt(_lookAt);
   }
   else if (_options.dragPlaneNormal) {
-    if (useObjectOrienationForDragging) {
+    if (useObjectOrientationForDragging) {
       Vector3::TransformCoordinatesToRef(
         *_options.dragPlaneNormal, attachedNode->getWorldMatrix().getRotationMatrix(), _localAxis);
     }
@@ -405,8 +405,8 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
     _dragPlane->position().copyFrom(_pointA);
     _dragPlane->lookAt(ray.origin);
   }
-  // Update the position of the drag plane so it doesn't get out of sync with
-  // the node (eg. when moving back and forth quickly)
+  // Update the position of the drag plane so it doesn't get out of sync with the node (eg. when
+  // moving back and forth quickly)
   _dragPlane->position().copyFrom(attachedNode->absolutePosition());
 
   _dragPlane->computeWorldMatrix(true);

@@ -590,7 +590,7 @@ void BoundingBoxGizmo::enableDragBehavior()
   _dragMesh                     = Mesh::CreateBox("dummy", 1, gizmoLayer->utilityLayerScene.get());
   _dragMesh->visibility         = 0.f;
   _dragMesh->rotationQuaternion = Quaternion();
-  pointerDragBehavior->useObjectOrienationForDragging = false;
+  pointerDragBehavior->useObjectOrientationForDragging = false;
   // _dragMesh->addBehavior(pointerDragBehavior);
 }
 
