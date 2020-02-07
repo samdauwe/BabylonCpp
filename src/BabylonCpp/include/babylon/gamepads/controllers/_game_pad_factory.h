@@ -16,10 +16,8 @@ struct _GamePadFactory {
   virtual ~_GamePadFactory() = default;
 
   /**
-   * @brief Returns wether or not the current gamepad can be created for this
-   * type of controller.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @brief Returns whether or not the current gamepad can be created for this type of controller.
+   * @param gamepadInfo Defines the gamepad info as received from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
   [[nodiscard]] virtual bool canCreate(const IBrowserGamepadPtr& /*gamepadInfo*/) const
@@ -29,8 +27,7 @@ struct _GamePadFactory {
 
   /**
    * @brief Creates a new instance of the Gamepad.
-   * @param gamepadInfo Defines the gamepad info as receveid from the controller
-   * APIs.
+   * @param gamepadInfo Defines the gamepad info as received from the controller APIs.
    * @returns the new gamepad instance
    */
   [[nodiscard]] virtual WebVRControllerPtr create(const IBrowserGamepadPtr& /*gamepadInfo*/) const
