@@ -160,6 +160,19 @@ Vector3 Vector3::negate() const
   return Vector3(-x, -y, -z);
 }
 
+Vector3& Vector3::negateInPlace()
+{
+  x *= -1.f;
+  y *= -1.f;
+  z *= -1.f;
+  return *this;
+}
+
+Vector3 Vector3::negateToRef(Vector3& result)
+{
+  return result.copyFromFloats(x * -1.f, y * -1.f, z * -1.f);
+}
+
 Vector3& Vector3::scaleInPlace(float iscale)
 {
   x *= iscale;

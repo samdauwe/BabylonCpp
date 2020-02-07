@@ -6,8 +6,7 @@
 
 namespace BABYLON {
 
-Vector4::Vector4(float ix, float iy, float iz, float iw)
-    : x{ix}, y{iy}, z{iz}, w{iw}
+Vector4::Vector4(float ix, float iy, float iz, float iw) : x{ix}, y{iy}, z{iz}, w{iw}
 {
 }
 
@@ -81,12 +80,10 @@ Vector4& Vector4::addInPlace(const Vector4& otherVector)
 
 Vector4 Vector4::add(const Vector4& otherVector) const
 {
-  return Vector4(x + otherVector.x, y + otherVector.y, z + otherVector.z,
-                 w + otherVector.w);
+  return Vector4(x + otherVector.x, y + otherVector.y, z + otherVector.z, w + otherVector.w);
 }
 
-const Vector4& Vector4::addToRef(const Vector4& otherVector,
-                                 Vector4& result) const
+const Vector4& Vector4::addToRef(const Vector4& otherVector, Vector4& result) const
 {
   result.x = x + otherVector.x;
   result.y = y + otherVector.y;
@@ -108,12 +105,10 @@ Vector4& Vector4::subtractInPlace(const Vector4& otherVector)
 
 Vector4 Vector4::subtract(const Vector4& otherVector) const
 {
-  return Vector4(x - otherVector.x, y - otherVector.y, z - otherVector.z,
-                 w - otherVector.w);
+  return Vector4(x - otherVector.x, y - otherVector.y, z - otherVector.z, w - otherVector.w);
 }
 
-const Vector4& Vector4::subtractToRef(const Vector4& otherVector,
-                                      Vector4& result) const
+const Vector4& Vector4::subtractToRef(const Vector4& otherVector, Vector4& result) const
 {
   result.x = x - otherVector.x;
   result.y = y - otherVector.y;
@@ -123,14 +118,13 @@ const Vector4& Vector4::subtractToRef(const Vector4& otherVector,
   return *this;
 }
 
-Vector4 Vector4::subtractFromFloats(float ix, float iy, float iz,
-                                    float iw) const
+Vector4 Vector4::subtractFromFloats(float ix, float iy, float iz, float iw) const
 {
   return Vector4(x - ix, y - iy, z - iz, w - iw);
 }
 
-const Vector4& Vector4::subtractFromFloatsToRef(float ix, float iy, float iz,
-                                                float iw, Vector4& result) const
+const Vector4& Vector4::subtractFromFloatsToRef(float ix, float iy, float iz, float iw,
+                                                Vector4& result) const
 {
   result.x = x - ix;
   result.y = y - iy;
@@ -143,6 +137,20 @@ const Vector4& Vector4::subtractFromFloatsToRef(float ix, float iy, float iz,
 Vector4 Vector4::negate() const
 {
   return Vector4(-x, -y, -z, -w);
+}
+
+Vector4& Vector4::negateInPlace()
+{
+  x *= -1.f;
+  y *= -1.f;
+  z *= -1.f;
+  w *= -1.f;
+  return *this;
+}
+
+Vector4 Vector4::negateToRef(Vector4& result)
+{
+  return result.copyFromFloats(x * -1.f, y * -1.f, z * -1.f, w * -1.f);
 }
 
 Vector4& Vector4::scaleInPlace(float iscale)
@@ -182,10 +190,8 @@ const Vector4& Vector4::scaleAndAddToRef(float iscale, Vector4& result) const
 
 bool Vector4::equals(const Vector4& otherVector) const
 {
-  return stl_util::almost_equal(x, otherVector.x)
-         && stl_util::almost_equal(y, otherVector.y)
-         && stl_util::almost_equal(z, otherVector.z)
-         && stl_util::almost_equal(w, otherVector.w);
+  return stl_util::almost_equal(x, otherVector.x) && stl_util::almost_equal(y, otherVector.y)
+         && stl_util::almost_equal(z, otherVector.z) && stl_util::almost_equal(w, otherVector.w);
 }
 
 bool Vector4::equalsWithEpsilon(const Vector4& otherVector, float epsilon) const
@@ -214,12 +220,10 @@ Vector4& Vector4::multiplyInPlace(const Vector4& otherVector)
 
 Vector4 Vector4::multiply(const Vector4& otherVector) const
 {
-  return Vector4(x * otherVector.x, y * otherVector.y, z * otherVector.z,
-                 w * otherVector.w);
+  return Vector4(x * otherVector.x, y * otherVector.y, z * otherVector.z, w * otherVector.w);
 }
 
-const Vector4& Vector4::multiplyToRef(const Vector4& otherVector,
-                                      Vector4& result) const
+const Vector4& Vector4::multiplyToRef(const Vector4& otherVector, Vector4& result) const
 {
   result.x = x * otherVector.x;
   result.y = y * otherVector.y;
@@ -236,12 +240,10 @@ Vector4 Vector4::multiplyByFloats(float ix, float iy, float iz, float iw) const
 
 Vector4 Vector4::divide(const Vector4& otherVector) const
 {
-  return Vector4(x / otherVector.x, y / otherVector.y, z / otherVector.z,
-                 w / otherVector.w);
+  return Vector4(x / otherVector.x, y / otherVector.y, z / otherVector.z, w / otherVector.w);
 }
 
-const Vector4& Vector4::divideToRef(const Vector4& otherVector,
-                                    Vector4& result) const
+const Vector4& Vector4::divideToRef(const Vector4& otherVector, Vector4& result) const
 {
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
@@ -449,12 +451,10 @@ Vector4& Vector4::setAll(float v)
 /** Statics **/
 Vector4 Vector4::FromArray(const Float32Array& array, unsigned int offset)
 {
-  return Vector4(array[offset], array[offset + 1], array[offset + 2],
-                 array[offset + 3]);
+  return Vector4(array[offset], array[offset + 1], array[offset + 2], array[offset + 3]);
 }
 
-void Vector4::FromArrayToRef(const Float32Array& array, unsigned int offset,
-                             Vector4& result)
+void Vector4::FromArrayToRef(const Float32Array& array, unsigned int offset, Vector4& result)
 {
   result.x = array[offset];
   result.y = array[offset + 1];
@@ -462,8 +462,7 @@ void Vector4::FromArrayToRef(const Float32Array& array, unsigned int offset,
   result.w = array[offset + 3];
 }
 
-void Vector4::FromFloatsToRef(float ix, float iy, float iz, float iw,
-                              Vector4& result)
+void Vector4::FromFloatsToRef(float ix, float iy, float iz, float iw, Vector4& result)
 {
   result.x = ix;
   result.y = iy;
@@ -530,16 +529,14 @@ Vector4 Vector4::Center(const Vector4& value1, const Vector4& value2)
   return center;
 }
 
-Vector4 Vector4::TransformNormal(const Vector4& vector,
-                                 const Matrix& transformation)
+Vector4 Vector4::TransformNormal(const Vector4& vector, const Matrix& transformation)
 {
   auto result = Vector4::Zero();
   Vector4::TransformNormalToRef(vector, transformation, result);
   return result;
 }
 
-void Vector4::TransformNormalToRef(const Vector4& vector,
-                                   const Matrix& transformation,
+void Vector4::TransformNormalToRef(const Vector4& vector, const Matrix& transformation,
                                    Vector4& result)
 {
   const auto& m = transformation.m();
@@ -553,8 +550,7 @@ void Vector4::TransformNormalToRef(const Vector4& vector,
 }
 
 void Vector4::TransformNormalFromFloatsToRef(float x, float y, float z, float w,
-                                             const Matrix& transformation,
-                                             Vector4& result)
+                                             const Matrix& transformation, Vector4& result)
 {
   const auto& m = transformation.m();
   result.x      = (x * m[0]) + (y * m[4]) + (z * m[8]);

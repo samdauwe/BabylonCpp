@@ -149,6 +149,20 @@ public:
   [[nodiscard]] Vector4 negate() const;
 
   /**
+   * @brief Negate this vector in place.
+   * @returns this
+   */
+  Vector4& negateInPlace();
+
+  /**
+   * @brief Negate the current Vector4 and stores the result in the given vector "result"
+   * coordinates.
+   * @param result defines the Vector3 object where to store the result
+   * @returns the current Vector4
+   */
+  Vector4 negateToRef(Vector4& result);
+
+  /**
    * @brief Multiplies the current Vector4 coordinates by scale (float).
    * @param scale the number to scale with
    * @returns the updated Vector4.

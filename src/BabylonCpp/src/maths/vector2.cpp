@@ -191,6 +191,18 @@ Vector2 Vector2::negate() const
   return Vector2(-x, -y);
 }
 
+Vector2& Vector2::negateInPlace()
+{
+  x *= -1.f;
+  y *= -1.f;
+  return *this;
+}
+
+Vector2 Vector2::negateToRef(Vector2& result)
+{
+  return result.copyFromFloats(x * -1.f, y * -1.f);
+}
+
 Vector2& Vector2::scaleInPlace(float scaleVal)
 {
   x *= scaleVal;

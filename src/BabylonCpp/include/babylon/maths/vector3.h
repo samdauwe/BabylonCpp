@@ -200,6 +200,20 @@ public:
   [[nodiscard]] Vector3 negate() const;
 
   /**
+   * @brief Negate this vector in place.
+   * @returns this
+   */
+  Vector3& negateInPlace();
+
+  /**
+   * @brief Negate the current Vector3 and stores the result in the given vector "result"
+   * coordinates.
+   * @param result defines the Vector3 object where to store the result
+   * @returns the current Vector3
+   */
+  Vector3 negateToRef(Vector3& result);
+
+  /**
    * @brief Multiplies the Vector3 coordinates by the float "scale".
    * @param scale defines the multiplier factor
    * @returns the current updated Vector3

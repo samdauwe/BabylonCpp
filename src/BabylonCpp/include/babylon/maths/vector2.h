@@ -213,6 +213,20 @@ public:
   [[nodiscard]] Vector2 negate() const;
 
   /**
+   * @brief Negate this vector in place.
+   * @returns this
+   */
+  Vector2& negateInPlace();
+
+  /**
+   * @brief Negate the current Vector2 and stores the result in the given vector "result"
+   * coordinates.
+   * @param result defines the Vector3 object where to store the result
+   * @returns the current Vector2
+   */
+  Vector2 negateToRef(Vector2& result);
+
+  /**
    * @brief Multiply the Vector2 coordinates by scale.
    * @param scale defines the scaling factor
    * @returns the current updated Vector2
