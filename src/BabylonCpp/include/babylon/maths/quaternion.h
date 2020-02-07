@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_constants.h>
 
 namespace BABYLON {
 
@@ -74,6 +75,15 @@ public:
    * strictly equals
    */
   [[nodiscard]] bool equals(const Quaternion& otherQuaternion) const;
+
+  /**
+   * @brief Gets a boolean if two quaternions are equals (using an epsilon value).
+   * @param otherQuaternion defines the other quaternion
+   * @param epsilon defines the minimal distance to consider equality
+   * @returns true if the given quaternion coordinates are close to the current ones by a distance
+   * of epsilon.
+   */
+  bool equalsWithEpsilon(const Quaternion& otherQuaternion, float epsilon = Math::Epsilon) const;
 
   /**
    * @brief Copy a quaternion to the current one.
