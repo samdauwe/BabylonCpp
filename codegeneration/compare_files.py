@@ -125,7 +125,19 @@ def main():
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
-        "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts"
+        "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts",
+        # XR
+        "webXRInputSource.ts",
+        # XR / features
+        "WebXRAbstractFeature.ts", "WebXRControllerPhysics.ts",
+        "WebXRControllerPointerSelection.ts", "WebXRControllerTeleportation.ts",
+        # XR / motionController
+        "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
+        "webXRHTCViveMotionController.ts", "webXRGenericMotionController.ts",
+        "webXRMicrosoftMixedRealityController.ts",
+        "webXRMotionControllerManager.ts",
+        "webXROculusTouchMotionController.ts",
+        "webXRProfiledMotionController.ts",
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
