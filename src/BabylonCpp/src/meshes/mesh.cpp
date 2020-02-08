@@ -2786,8 +2786,10 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
   }
 
   mesh->checkCollisions = json_util::get_bool(parsedMesh, "checkCollisions");
-  mesh->overrideMaterialSideOrientation
-    = json_util::get_bool(parsedMesh, "overrideMaterialSideOrientation");
+  if (json_util::has_valid_key_value(parsedMesh, "overrideMaterialSideOrientation")) {
+    mesh->overrideMaterialSideOrientation
+      = json_util::get_bool(parsedMesh, "overrideMaterialSideOrientation");
+  }
 
   if (json_util::has_valid_key_value(parsedMesh, "isBlocker")) {
     mesh->isBlocker = json_util::get_bool(parsedMesh, "isBlocker");
