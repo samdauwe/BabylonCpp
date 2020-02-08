@@ -333,9 +333,9 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
-  auto comments = StringTools::printf("//%s", name.c_str());
+  auto iComments = StringTools::printf("//%s", name.c_str());
   state._emitFunction("ReciprocalPI", "#define RECIPROCAL_PI2 0.15915494", "");
-  state._emitFunctionFromInclude("reflectionFunction", comments);
+  state._emitFunctionFromInclude("reflectionFunction", iComments);
 
   _reflectionColorName    = state._getFreeVariableName("reflectionColor");
   _reflectionCoordsName   = state._getFreeVariableName("reflectionUVW");

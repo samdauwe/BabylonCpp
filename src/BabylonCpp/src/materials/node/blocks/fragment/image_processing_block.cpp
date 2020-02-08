@@ -113,13 +113,13 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
   state.uniforms.emplace_back("colorTransformSettings");
 
   // Emit code
-  const auto& iColor  = color();
-  const auto& iOutput = _outputs[0];
-  const auto comments = StringTools::printf("//%s", name.c_str());
+  const auto& iColor   = color();
+  const auto& iOutput  = _outputs[0];
+  const auto iComments = StringTools::printf("//%s", name.c_str());
 
-  state._emitFunctionFromInclude("helperFunctions", comments);
-  state._emitFunctionFromInclude("imageProcessingDeclaration", comments);
-  state._emitFunctionFromInclude("imageProcessingFunctions", comments);
+  state._emitFunctionFromInclude("helperFunctions", iComments);
+  state._emitFunctionFromInclude("imageProcessingDeclaration", iComments);
+  state._emitFunctionFromInclude("imageProcessingFunctions", iComments);
 
   if (iColor->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Color4) {
     state.compilationString

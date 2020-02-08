@@ -81,11 +81,11 @@ FresnelBlock& FresnelBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto comments = StringTools::printf("//%s", name.c_str());
+  const auto iComments = StringTools::printf("//%s", name.c_str());
 
   EmitFunctionFromIncludeOptions options;
   options.removeIfDef = true;
-  state._emitFunctionFromInclude("fresnelFunction", comments, options);
+  state._emitFunctionFromInclude("fresnelFunction", iComments, options);
 
   state.compilationString
     += _declareOutput(fresnel, state)

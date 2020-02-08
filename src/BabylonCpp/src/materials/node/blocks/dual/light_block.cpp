@@ -191,12 +191,12 @@ void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMateri
 void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
 {
   const auto& worldPos = worldPosition();
-  auto comments        = StringTools::printf("//%s", name.c_str());
+  auto iComments       = StringTools::printf("//%s", name.c_str());
 
   // Declaration
   if (!light) { // Emit for all lights
     state._emitFunctionFromInclude(
-      state.supportUniformBuffers ? "lightUboDeclaration" : "lightFragmentDeclaration", comments,
+      state.supportUniformBuffers ? "lightUboDeclaration" : "lightFragmentDeclaration", iComments,
       EmitFunctionFromIncludeOptions{
         "maxSimultaneousLights" // repeatKey
       });
@@ -219,7 +219,7 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
     }};
     state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
                                                                  "lightFragmentDeclaration",
-                                   comments, options, std::to_string(_lightId));
+                                   iComments, options, std::to_string(_lightId));
   }
 
   // Inject code in vertex
@@ -240,14 +240,14 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
                                 "worldPos",                        // search
                                 worldPos->associatedVariableName() // replace
                               }};
-    state.compilationString += state._emitCodeFromInclude("shadowsVertex", comments, options);
+    state.compilationString += state._emitCodeFromInclude("shadowsVertex", iComments, options);
   }
   else {
     state.compilationString
       += StringTools::printf("vec4 worldPos = %s;\r\n", worldPos->associatedVariableName().c_str());
     EmitCodeFromIncludeOptions options;
     options.repeatKey = "maxSimultaneousLights";
-    state.compilationString += state._emitCodeFromInclude("shadowsVertex", comments, options);
+    state.compilationString += state._emitCodeFromInclude("shadowsVertex", iComments, options);
   }
 }
 
@@ -266,23 +266,23 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
-  auto comments        = StringTools::printf("//%s", name.c_str());
+  auto iComments       = StringTools::printf("//%s", name.c_str());
   const auto& worldPos = worldPosition();
 
-  state._emitFunctionFromInclude("helperFunctions", comments);
+  state._emitFunctionFromInclude("helperFunctions", iComments);
 
   EmitFunctionFromIncludeOptions options;
   options.replaceStrings = {StringsReplacement{
     "vPositionW",                                                               // search
     StringTools::printf("v_%s.xyz", worldPos->associatedVariableName().c_str()) // replace
   }};
-  state._emitFunctionFromInclude("lightsFragmentFunctions", comments, options);
+  state._emitFunctionFromInclude("lightsFragmentFunctions", iComments, options);
 
-  state._emitFunctionFromInclude("shadowsFragmentFunctions", comments, options);
+  state._emitFunctionFromInclude("shadowsFragmentFunctions", iComments, options);
 
   if (!light) { // Emit for all lights
     state._emitFunctionFromInclude(
-      state.supportUniformBuffers ? "lightUboDeclaration" : "lightFragmentDeclaration", comments,
+      state.supportUniformBuffers ? "lightUboDeclaration" : "lightFragmentDeclaration", iComments,
       EmitFunctionFromIncludeOptions{
         "maxSimultaneousLights" // repeatKey
       });
@@ -295,7 +295,7 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
 
     state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
                                                                  "lightFragmentDeclaration",
-                                   comments, options, std::to_string(_lightId));
+                                   iComments, options, std::to_string(_lightId));
   }
 
   // Code
@@ -328,7 +328,7 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
     EmitCodeFromIncludeOptions includeOptions;
     includeOptions.repeatKey = "maxSimultaneousLights";
     state.compilationString
-      += state._emitCodeFromInclude("lightFragment", comments, includeOptions);
+      += state._emitCodeFromInclude("lightFragment", iComments, includeOptions);
   }
 
   const auto& _diffuseOutput  = diffuseOutput();
@@ -337,19 +337,20 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString
     += _declareOutput(_diffuseOutput, state)
        + StringTools::printf(
-         " = diffuseBase%s;\r\n",
-         diffuseColor()->isConnected() ?
-           StringTools::printf(" * %s", diffuseColor()->associatedVariableName().c_str()).c_str() :
-           "");
+           " = diffuseBase%s;\r\n",
+           diffuseColor()->isConnected() ?
+             StringTools::printf(" * %s", diffuseColor()->associatedVariableName().c_str())
+               .c_str() :
+             "");
   if (_specularOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(_specularOutput, state)
          + StringTools::printf(
-           " = specularBase%s;\r\n",
-           specularColor()->isConnected() ?
-             StringTools::printf(" * %s", specularColor()->associatedVariableName().c_str())
-               .c_str() :
-             "");
+             " = specularBase%s;\r\n",
+             specularColor()->isConnected() ?
+               StringTools::printf(" * %s", specularColor()->associatedVariableName().c_str())
+                 .c_str() :
+               "");
   }
 
   if (shadow()->hasEndpoints()) {

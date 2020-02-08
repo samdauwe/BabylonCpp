@@ -48,8 +48,8 @@ RandomNumberBlock& RandomNumberBlock::_buildBlock(NodeMaterialBuildState& state)
 
   const auto& iOutput = _outputs[0];
 
-  const auto comments = StringTools::printf("//%s", name.c_str());
-  state._emitFunctionFromInclude("helperFunctions", comments);
+  const auto iComments = StringTools::printf("//%s", name.c_str());
+  state._emitFunctionFromInclude("helperFunctions", iComments);
 
   state.compilationString
     += _declareOutput(iOutput, state)

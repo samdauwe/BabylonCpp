@@ -255,12 +255,12 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& _normalOutput   = normalOutput();
   const auto& _tangentOutput  = tangentOutput();
   const auto& _uvOutput       = uvOutput;
-  auto comments               = StringTools::printf("//%s", name.c_str());
+  auto iComments              = StringTools::printf("//%s", name.c_str());
 
   state.uniforms.emplace_back("morphTargetInfluences");
 
-  state._emitFunctionFromInclude("morphTargetsVertexGlobalDeclaration", comments);
-  state._emitFunctionFromInclude("morphTargetsVertexDeclaration", comments,
+  state._emitFunctionFromInclude("morphTargetsVertexGlobalDeclaration", iComments);
+  state._emitFunctionFromInclude("morphTargetsVertexDeclaration", iComments,
                                  EmitFunctionFromIncludeOptions{
                                    "maxSimultaneousMorphTargets" // repeatKey
                                  });

@@ -399,8 +399,8 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 
   _linearDefineName = state._getFreeDefineName("ISLINEAR");
 
-  auto comments = StringTools::printf("//%s", name.c_str());
-  state._emitFunctionFromInclude("helperFunctions", comments);
+  auto iComments = StringTools::printf("//%s", name.c_str());
+  state._emitFunctionFromInclude("helperFunctions", iComments);
 
   if (_isMixed) {
     state._emitUniformFromString(_textureInfoName, "float");

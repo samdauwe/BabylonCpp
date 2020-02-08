@@ -158,8 +158,8 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.samplers.emplace_back("boneSampler");
 
   // Emit code
-  auto comments = StringTools::printf("//%s", name.c_str());
-  state._emitFunctionFromInclude("bonesDeclaration", comments,
+  auto iComments = StringTools::printf("//%s", name.c_str());
+  state._emitFunctionFromInclude("bonesDeclaration", iComments,
                                  EmitFunctionFromIncludeOptions{
                                    "",    // repeatKey
                                    true,  // removeAttributes
@@ -172,7 +172,7 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
   auto influenceVariablename = state._getFreeVariableName("influence");
 
   state.compilationString
-    += state._emitCodeFromInclude("bonesVertex", comments,
+    += state._emitCodeFromInclude("bonesVertex", iComments,
                                   EmitCodeFromIncludeOptions{
                                     {StringsReplacement{
                                        "finalWorld=finalWorld\\*influence;", // search

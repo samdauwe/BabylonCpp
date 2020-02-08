@@ -114,7 +114,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto comments        = StringTools::printf("//%s", name.c_str());
+  const auto iComments       = StringTools::printf("//%s", name.c_str());
   const auto& _uv            = uv();
   const auto& _worldPosition = worldPosition();
   const auto& _worldNormal   = worldNormal();
@@ -138,7 +138,8 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
        {"vTangentSpaceParams", _tangentSpaceParameterName},
        {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
        {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
-  state._emitFunctionFromInclude("bumpFragmentFunctions", comments, emitFunctionFromIncludeOptions);
+  state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
+                                 emitFunctionFromIncludeOptions);
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
   emitCodeFromIncludeOptions.replaceStrings
@@ -152,7 +153,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
        {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
        {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
   state.compilationString
-    += state._emitCodeFromInclude("bumpFragment", comments, emitCodeFromIncludeOptions);
+    += state._emitCodeFromInclude("bumpFragment", iComments, emitCodeFromIncludeOptions);
 
   return *this;
 }
