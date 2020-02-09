@@ -154,7 +154,7 @@ public:
   Vector3 getObjectCenter();
 
   /**
-   * @brief Get a specific parametes from the options parameter.
+   * @brief Get a specific parameter from the options parameters.
    * @param paramName The object parameter name
    * @returns The object parameter
    */
