@@ -21,7 +21,7 @@ using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
 
   /**
-   * Specifies wether or not to create a ground.
+   * Specifies whether or not to create a ground.
    * True by default.
    */
   bool createGround = true;
@@ -115,7 +115,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
   float groundYBias;
 
   /**
-   * Specifies wether or not to create a skybox.
+   * Specifies whether or not to create a skybox.
    * True by default.
    */
   bool createSkybox = true;
@@ -184,7 +184,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
   float cameraContrast = 1.6f;
 
   /**
-   * Specifies wether or not tonemapping should be enabled in the scene.
+   * Specifies whether or not tonemapping should be enabled in the scene.
    * true by default if setupImageProcessing is true.
    */
   bool toneMappingEnabled = true;
