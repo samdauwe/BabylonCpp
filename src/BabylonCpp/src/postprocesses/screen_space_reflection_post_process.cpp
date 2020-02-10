@@ -57,7 +57,7 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
   _updateEffectDefines();
 
   // On apply, send uniforms
-  onApply = [this, geometryBufferRenderer, scene, camera](Effect* effect, EventState&) -> void {
+  onApply = [this, geometryBufferRenderer, scene](Effect* effect, EventState&) -> void {
     if (!geometryBufferRenderer) {
       return;
     }
