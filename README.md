@@ -8,8 +8,6 @@ It includes more than 200 examples, a graphical inspector for all 3D objects (ba
 
 [![BabylonCpp](doc/assets/babylon_demo_video.jpg)](https://www.youtube.com/watch?v=o05_5Wyzv54 "BabylonCpp")
 
-Note: The master branch code is in an unstable state due to the upgrade to [Babylon.js 4.0.0](https://doc.babylonjs.com/whats-new). Please refer to a [more stable branch](https://github.com/pthom/BabylonCpp/tree/stable) from Nov 22nd when most of the examples were working. This version should give a better experience with the library compared to the master branch.
-
 
 # Get the Sources
 
@@ -105,7 +103,9 @@ This code results in the following scene:
 Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
 
 # Status
-The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working for [Babylon.js 3.3.0](https://doc.babylonjs.com/whats-new).
+The master branch code is in sync with [Babylon.js 4.1.0-beta.13](https://doc.babylonjs.com/whats-new) of 2019/12/13.
+
+The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working for [Babylon.js 4.0.0](https://doc.babylonjs.com/whats-new).
 
 Known issues are summarized [here](https://github.com/samdauwe/BabylonCpp/issues).
 
