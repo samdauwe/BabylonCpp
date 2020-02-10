@@ -47,6 +47,11 @@ public:
    * getIndex(GeometryBufferRenderer.VELOCITY_TEXTURE_INDEX)
    */
   static constexpr unsigned int VELOCITY_TEXTURE_TYPE = 2;
+  /**
+   * Constant used to retrieve the reflectivity texture index in the G-Buffer textures array
+   * using the getIndex(GeometryBufferRenderer.REFLECTIVITY_TEXTURE_TYPE)
+   */
+  static constexpr unsigned int REFLECTIVITY_TEXTURE_TYPE = 3;
 
 public:
   /**
@@ -119,6 +124,16 @@ protected:
    * @brief Sets wether or not objects velocities are enabled for the G buffer.
    */
   void set_enableVelocity(bool enable);
+
+  /**
+   * @brief Gets a boolean indicating if objects roughness are enabled in the G buffer.
+   */
+  bool get_enableReflectivity() const;
+
+  /**
+   * @brief Sets wether or not objects roughness are enabled for the G buffer.
+   */
+  void set_enableReflectivity(bool enable);
 
   /**
    * @brief Gets the scene associated with the buffer.
@@ -206,6 +221,11 @@ public:
   Property<GeometryBufferRenderer, bool> enableVelocity;
 
   /**
+   * Gets or sets a boolean indicating if objects roughness are enabled in the G buffer.
+   */
+  Property<GeometryBufferRenderer, bool> enableReflectivity;
+
+  /**
    * The scene associated with the buffer.
    */
   ReadOnlyProperty<GeometryBufferRenderer, Scene*> scene;
@@ -231,6 +251,7 @@ private:
   float _ratio;
   bool _enablePosition;
   bool _enableVelocity;
+  bool _enableReflectivity;
 
   int _positionIndex;
   int _velocityIndex;

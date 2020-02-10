@@ -28,6 +28,8 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
                      &GeometryBufferRenderer::set_enablePosition}
     , enableVelocity{this, &GeometryBufferRenderer::get_enableVelocity,
                      &GeometryBufferRenderer::set_enableVelocity}
+    , enableReflectivity{this, &GeometryBufferRenderer::get_enableReflectivity,
+                         &GeometryBufferRenderer::set_enableReflectivity}
     , scene{this, &GeometryBufferRenderer::get_scene}
     , ratio{this, &GeometryBufferRenderer::get_ratio}
     , samples{this, &GeometryBufferRenderer::get_samples, &GeometryBufferRenderer::set_samples}
@@ -36,6 +38,7 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _multiRenderTarget{nullptr}
     , _enablePosition{false}
     , _enableVelocity{false}
+    , _enableReflectivity{false}
     , _positionIndex{-1}
     , _velocityIndex{-1}
 {
@@ -107,6 +110,18 @@ void GeometryBufferRenderer::set_enableVelocity(bool enable)
     _previousTransformationMatrices = {};
   }
 
+  dispose();
+  _createRenderTargets();
+}
+
+bool GeometryBufferRenderer::get_enableReflectivity() const
+{
+  return _enableReflectivity;
+}
+
+void GeometryBufferRenderer::set_enableReflectivity(bool enable)
+{
+  _enableReflectivity = enable;
   dispose();
   _createRenderTargets();
 }
