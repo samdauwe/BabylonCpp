@@ -137,7 +137,7 @@ json ConeParticleEmitter::serialize() const
   return nullptr;
 }
 
-void ConeParticleEmitter::parse(const json& serializationObject)
+void ConeParticleEmitter::parse(const json& serializationObject, Scene* /*scene*/)
 {
   if (json_util::has_valid_key_value(serializationObject, "radius")) {
     radius = json_util::get_number<float>(serializationObject, "radius", 1.f);

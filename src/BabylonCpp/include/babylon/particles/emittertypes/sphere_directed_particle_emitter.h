@@ -68,10 +68,11 @@ public:
   [[nodiscard]] json serialize() const override;
 
   /**
-   * @brief Parse properties from a JSON object
+   * @brief Parse properties from a JSON object.
    * @param serializationObject defines the JSON object
+   * @param scene defines the hosting scene
    */
-  void parse(const json& serializationObject) override;
+  void parse(const json& serializationObject, Scene* scene) override;
 
 public:
   /**

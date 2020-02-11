@@ -1,17 +1,15 @@
 #include <babylon/particles/iparticle_system.h>
 
-#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
+#include <babylon/particles/emittertypes/iparticle_emitter_type.h>
 
 namespace BABYLON {
 
 IParticleSystem::IParticleSystem()
     : isBillboardBased{this, &IParticleSystem::get_isBillboardBased,
                        &IParticleSystem::set_isBillboardBased}
-    , isAnimationSheetEnabled{this,
-                              &IParticleSystem::get_isAnimationSheetEnabled,
+    , isAnimationSheetEnabled{this, &IParticleSystem::get_isAnimationSheetEnabled,
                               &IParticleSystem::set_isAnimationSheetEnabled}
-    , noiseTexture{this, &IParticleSystem::get_noiseTexture,
-                   &IParticleSystem::set_noiseTexture}
+    , noiseTexture{this, &IParticleSystem::get_noiseTexture, &IParticleSystem::set_noiseTexture}
     , useRampGradients{this, &IParticleSystem::get_useRampGradients,
                        &IParticleSystem::set_useRampGradients}
 {

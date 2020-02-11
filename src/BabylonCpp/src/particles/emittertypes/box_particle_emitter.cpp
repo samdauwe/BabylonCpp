@@ -68,7 +68,7 @@ json BoxParticleEmitter::serialize() const
   return nullptr;
 }
 
-void BoxParticleEmitter::parse(const json& serializationObject)
+void BoxParticleEmitter::parse(const json& serializationObject, Scene* /*scene*/)
 {
   if (json_util::has_key(serializationObject, "direction1")) {
     Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "direction1"), 0,

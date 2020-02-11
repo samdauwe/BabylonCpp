@@ -78,7 +78,7 @@ json CustomParticleEmitter::serialize() const
   return nullptr;
 }
 
-void CustomParticleEmitter::parse(const json& /*serializationObject*/)
+void CustomParticleEmitter::parse(const json& /*serializationObject*/, Scene* /*scene*/)
 {
 }
 

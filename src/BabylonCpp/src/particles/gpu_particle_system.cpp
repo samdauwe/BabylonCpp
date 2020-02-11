@@ -24,7 +24,7 @@
 #include <babylon/misc/color3_gradient.h>
 #include <babylon/misc/gradient_helper.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
-#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
+#include <babylon/particles/emittertypes/iparticle_emitter_type.h>
 #include <babylon/particles/particle_system.h>
 
 namespace BABYLON {

@@ -15,6 +15,7 @@ namespace BABYLON {
 class Effect;
 class Matrix;
 class Particle;
+class Scene;
 class Vector3;
 
 /**
@@ -79,8 +80,9 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
   /**
    * @brief Parse properties from a JSON object.
    * @param serializationObject defines the JSON object
+   * @param scene defines the hosting scene
    */
-  virtual void parse(const json& serializationObject) = 0;
+  virtual void parse(const json& serializationObject, Scene* scene) = 0;
 
 }; // end of struct IParticleEmitterType
 

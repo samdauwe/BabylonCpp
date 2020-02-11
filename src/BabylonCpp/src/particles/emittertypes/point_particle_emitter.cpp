@@ -21,16 +21,13 @@ void PointParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
   auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
 
-  Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix,
-                                          directionToUpdate);
+  Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix, directionToUpdate);
 }
 
 void PointParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                 Vector3& positionToUpdate,
-                                                 Particle* /*particle*/)
+                                                 Vector3& positionToUpdate, Particle* /*particle*/)
 {
-  Vector3::TransformCoordinatesFromFloatsToRef(0.f, 0.f, 0.f, worldMatrix,
-                                               positionToUpdate);
+  Vector3::TransformCoordinatesFromFloatsToRef(0.f, 0.f, 0.f, worldMatrix, positionToUpdate);
 }
 
 std::unique_ptr<IParticleEmitterType> PointParticleEmitter::clone() const
@@ -62,17 +59,15 @@ json PointParticleEmitter::serialize() const
   return nullptr;
 }
 
-void PointParticleEmitter::parse(const json& serializationObject)
+void PointParticleEmitter::parse(const json& serializationObject, Scene* /*scene*/)
 {
   if (json_util::has_key(serializationObject, "direction1")) {
-    Vector3::FromArrayToRef(
-      json_util::get_array<float>(serializationObject, "direction1"), 0,
-      direction1);
+    Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "direction1"), 0,
+                            direction1);
   }
   if (json_util::has_key(serializationObject, "direction2")) {
-    Vector3::FromArrayToRef(
-      json_util::get_array<float>(serializationObject, "direction2"), 0,
-      direction2);
+    Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "direction2"), 0,
+                            direction2);
   }
 }
 

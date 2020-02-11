@@ -11,20 +11,16 @@ namespace BABYLON {
 
 SphereParticleEmitter::SphereParticleEmitter(float iRadius, float iRadiusRange,
                                              float iDirectionRandomizer)
-    : radius{iRadius}
-    , radiusRange{iRadiusRange}
-    , directionRandomizer{iDirectionRandomizer}
+    : radius{iRadius}, radiusRange{iRadiusRange}, directionRandomizer{iDirectionRandomizer}
 {
 }
 
 SphereParticleEmitter::~SphereParticleEmitter() = default;
 
 void SphereParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                   Vector3& directionToUpdate,
-                                                   Particle* particle)
+                                                   Vector3& directionToUpdate, Particle* particle)
 {
-  auto direction
-    = particle->position.subtract(worldMatrix.getTranslation()).normalize();
+  auto direction   = particle->position.subtract(worldMatrix.getTranslation()).normalize();
   const auto randX = Scalar::RandomRange(0, directionRandomizer);
   const auto randY = Scalar::RandomRange(0, directionRandomizer);
   const auto randZ = Scalar::RandomRange(0, directionRandomizer);
@@ -33,13 +29,12 @@ void SphereParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
   direction.z += randZ;
   direction.normalize();
 
-  Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z,
-                                          worldMatrix, directionToUpdate);
+  Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z, worldMatrix,
+                                          directionToUpdate);
 }
 
 void SphereParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                  Vector3& positionToUpdate,
-                                                  Particle* /*particle*/)
+                                                  Vector3& positionToUpdate, Particle* /*particle*/)
 {
   const auto randRadius = radius - Scalar::RandomRange(0, radius * radiusRange);
   const auto v          = Scalar::RandomRange(0.f, 1.f);
@@ -49,14 +44,12 @@ void SphereParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   const auto randX = randRadius * std::cos(phi) * std::sin(theta);
   const auto randY = randRadius * std::cos(theta);
   const auto randZ = randRadius * std::sin(phi) * std::sin(theta);
-  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
-                                               positionToUpdate);
+  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 }
 
 std::unique_ptr<IParticleEmitterType> SphereParticleEmitter::clone() const
 {
-  auto newOne
-    = std::make_unique<SphereParticleEmitter>(radius, directionRandomizer);
+  auto newOne = std::make_unique<SphereParticleEmitter>(radius, directionRandomizer);
 
   return newOne;
 }
@@ -83,18 +76,17 @@ json SphereParticleEmitter::serialize() const
   return nullptr;
 }
 
-void SphereParticleEmitter::parse(const json& serializationObject)
+void SphereParticleEmitter::parse(const json& serializationObject, Scene* /*scene*/)
 {
   if (json_util::has_key(serializationObject, "radius")) {
     radius = json_util::get_number<float>(serializationObject, "radius", 1.f);
   }
   if (json_util::has_key(serializationObject, "radiusRange")) {
-    radiusRange
-      = json_util::get_number<float>(serializationObject, "radiusRange", 1.f);
+    radiusRange = json_util::get_number<float>(serializationObject, "radiusRange", 1.f);
   }
   if (json_util::has_key(serializationObject, "directionRandomizer")) {
-    directionRandomizer = json_util::get_number<float>(
-      serializationObject, "directionRandomizer", 0.f);
+    directionRandomizer
+      = json_util::get_number<float>(serializationObject, "directionRandomizer", 0.f);
   }
 }
 
