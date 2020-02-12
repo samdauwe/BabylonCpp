@@ -11,12 +11,13 @@
 namespace BABYLON {
 namespace Extensions {
 
-MeshPtr SPSTreeGenerator::CreateTree(
-  float trunkHeight, float trunkTaper, size_t trunkSlices,
-  const MaterialPtr& trunkMaterial, unsigned int iBoughs, unsigned int forks,
-  float forkAngle, float forkRatio, unsigned int branches, float branchAngle,
-  unsigned int bowFreq, float bowHeight, unsigned int leavesOnBranch,
-  float leafWHRatio, const MaterialPtr& leafMaterial, Scene* scene)
+MeshPtr SPSTreeGenerator::CreateTree(float trunkHeight, float trunkTaper, size_t trunkSlices,
+                                     const MaterialPtr& trunkMaterial, unsigned int iBoughs,
+                                     unsigned int forks, float forkAngle, float forkRatio,
+                                     unsigned int branches, float branchAngle, unsigned int bowFreq,
+                                     float bowHeight, unsigned int leavesOnBranch,
+                                     float leafWHRatio, const MaterialPtr& leafMaterial,
+                                     Scene* scene)
 {
   auto boughs = iBoughs;
   if (!(boughs == 1 || boughs == 2)) {
@@ -25,9 +26,8 @@ MeshPtr SPSTreeGenerator::CreateTree(
   auto _boughs = static_cast<float>(boughs);
 
   // Create base tree
-  auto _base
-    = createTreeBase(trunkHeight, trunkTaper, trunkSlices, boughs, forks,
-                     forkAngle, forkRatio, bowFreq, bowHeight, scene);
+  auto _base = createTreeBase(trunkHeight, trunkTaper, trunkSlices, boughs, forks, forkAngle,
+                              forkRatio, bowFreq, bowHeight, scene);
   _base.tree->material = trunkMaterial;
 
   // Create one leaf
@@ -38,22 +38,21 @@ MeshPtr SPSTreeGenerator::CreateTree(
   discOptions.radius          = _leaf_width / 2.f;
   discOptions.tessellation    = 12;
   discOptions.sideOrientation = Mesh::DOUBLESIDE;
-  auto _leaf = MeshBuilder::CreateDisc("leaf", discOptions, scene);
+  auto _leaf                  = MeshBuilder::CreateDisc("leaf", discOptions, scene);
 
   // Create solid particle system for leaves
   SolidParticleSystemOptions spsOptions;
   spsOptions.updatable = false;
-  auto _leaves_SPS = SolidParticleSystem::New("leaveSPS", scene, spsOptions);
+  auto _leaves_SPS     = SolidParticleSystem::New("leaveSPS", scene, spsOptions);
 
   // Function to position leaves on base tree
-  auto _set_leaves = [&](SolidParticle* particle, unsigned int /*i*/, unsigned int s) {
+  auto _set_leaves = [&](SolidParticle* particle, size_t /*i*/, size_t s) {
     auto _a = static_cast<unsigned>(std::floor(s / (2.f * leavesOnBranch)));
     if (boughs == 1) {
       ++_a;
     }
     else {
-      _a = 2 + _a % forks
-           + static_cast<unsigned>(std::floor(_a / forks) * (forks + 1));
+      _a = 2 + _a % forks + static_cast<unsigned>(std::floor(_a / forks) * (forks + 1));
     }
     unsigned int _j = s % (2 * leavesOnBranch);
     float _g        = (_j * _leaf_gap + 3 * _leaf_gap / 2.f) / _branch_length;
@@ -65,21 +64,18 @@ MeshPtr SPSTreeGenerator::CreateTree(
     size_t _lower = _upper - 1;
     size_t _gl    = _lower / (trunkSlices - 1);
     size_t _gu    = _upper / (trunkSlices - 1);
-    float _px     = _base.paths[_a][_lower].x
-                + (_base.paths[_a][_upper].x - _base.paths[_a][_lower].x)
-                    * (_g - _gl) / (_gu - _gl);
-    float _py = _base.paths[_a][_lower].y
-                + (_base.paths[_a][_upper].y - _base.paths[_a][_lower].y)
-                    * (_g - _gl) / (_gu - _gl);
-    float _pz = _base.paths[_a][_lower].z
-                + (_base.paths[_a][_upper].z - _base.paths[_a][_lower].z)
-                    * (_g - _gl) / (_gu - _gl);
-    particle->position
-      = Vector3(_px,
-                _py
-                  + (0.6f * _leaf_width / leafWHRatio + _base.radii[_a][_upper])
-                      * (2 * (s % 2) - 1),
-                _pz);
+    float _px
+      = _base.paths[_a][_lower].x
+        + (_base.paths[_a][_upper].x - _base.paths[_a][_lower].x) * (_g - _gl) / (_gu - _gl);
+    float _py
+      = _base.paths[_a][_lower].y
+        + (_base.paths[_a][_upper].y - _base.paths[_a][_lower].y) * (_g - _gl) / (_gu - _gl);
+    float _pz
+      = _base.paths[_a][_lower].z
+        + (_base.paths[_a][_upper].z - _base.paths[_a][_lower].z) * (_g - _gl) / (_gu - _gl);
+    particle->position = Vector3(
+      _px, _py + (0.6f * _leaf_width / leafWHRatio + _base.radii[_a][_upper]) * (2 * (s % 2) - 1),
+      _pz);
     particle->rotation.z = Math::random() * Math::PI_4;
     particle->rotation.y = Math::random() * Math::PI_2;
     particle->rotation.z = Math::random() * Math::PI_4;
@@ -90,9 +86,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
   SolidParticleSystemMeshBuilderOptions spsBuilderOptions;
   spsBuilderOptions.positionFunction = _set_leaves;
   _leaves_SPS->addShape(
-    _leaf,
-    static_cast<size_t>(2.f * leavesOnBranch
-                        * std::pow(static_cast<float>(forks), _boughs)),
+    _leaf, static_cast<size_t>(2.f * leavesOnBranch * std::pow(static_cast<float>(forks), _boughs)),
     spsBuilderOptions);
   auto _leaves = _leaves_SPS->buildMesh(); // mesh of leaves
   // _leaves->billboard=true;
@@ -102,8 +96,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
   auto _mini_trees_SPS = SolidParticleSystem::New("miniSPS", scene, spsOptions);
 
   // create SPS to use with leaves mesh
-  auto _mini_leaves_SPS
-    = SolidParticleSystem::New("minileavesSPS", scene, spsOptions);
+  auto _mini_leaves_SPS = SolidParticleSystem::New("minileavesSPS", scene, spsOptions);
 
   // The mini base trees and leaves added to both the SPS systems have to be
   // positioned at the same places and angles.
@@ -113,23 +106,20 @@ MeshPtr SPSTreeGenerator::CreateTree(
   Float32Array _turns;
   float _fork_turn = Math::PI2 / forks;
   for (double f = 0; f < std::pow(forks, boughs + 1); f++) {
-    _turns.emplace_back(randPct(
-      static_cast<float>(std::floor(f / std::pow(forks, boughs))) * _fork_turn,
-      0.2f));
+    _turns.emplace_back(
+      randPct(static_cast<float>(std::floor(f / std::pow(forks, boughs))) * _fork_turn, 0.2f));
   }
 
   // The _set_mini_trees function positions mini base trees and leaves at the
   // end of base tree branches, one for each of the forks
-  auto _set_mini_trees = [&](SolidParticle* particle, unsigned int /*i*/,
-                             unsigned int s) {
+  auto _set_mini_trees = [&](SolidParticle* particle, size_t /*i*/, size_t s) {
     unsigned int _a = s % static_cast<unsigned>(std::pow(forks, boughs));
     if (boughs == 1) {
       _a++;
     }
     else {
       _a = 2 + _a % forks
-           + static_cast<unsigned>(
-               std::floor(static_cast<float>(_a) / static_cast<float>(forks)))
+           + static_cast<unsigned>(std::floor(static_cast<float>(_a) / static_cast<float>(forks)))
                * (forks + 1);
     }
     CoordSystem& _mini_sys = _base.directions[_a];
@@ -139,16 +129,13 @@ MeshPtr SPSTreeGenerator::CreateTree(
     float turn = _turns[s];
     Vector3 _mini_direction
       = _mini_sys.y.scale(std::cos(randPct(forkAngle, 0.f)))
-          .add(_mini_sys.x.scale(std::sin(randPct(forkAngle, 0.f))
-                                 * std::sin(turn)))
-          .add(_mini_sys.z.scale(std::sin(randPct(forkAngle, 0.f))
-                                 * std::cos(turn)));
-    Vector3 axis      = Vector3::Cross(Axis::Y(), _mini_direction);
-    float _theta      = std::acos(Vector3::Dot(_mini_direction, Axis::Y())
-                             / _mini_direction.length());
-    particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
-                                std::pow(trunkTaper, _boughs + 1.f),
-                                std::pow(trunkTaper, _boughs + 1.f));
+          .add(_mini_sys.x.scale(std::sin(randPct(forkAngle, 0.f)) * std::sin(turn)))
+          .add(_mini_sys.z.scale(std::sin(randPct(forkAngle, 0.f)) * std::cos(turn)));
+    Vector3 axis = Vector3::Cross(Axis::Y(), _mini_direction);
+    float _theta = std::acos(Vector3::Dot(_mini_direction, Axis::Y()) / _mini_direction.length());
+    particle->scaling
+      = Vector3(std::pow(trunkTaper, _boughs + 1.f), std::pow(trunkTaper, _boughs + 1.f),
+                std::pow(trunkTaper, _boughs + 1.f));
     particle->rotationQuaternion
       = std::make_unique<Quaternion>(Quaternion::RotationAxis(axis, _theta));
     particle->position = mini_top;
@@ -167,35 +154,29 @@ MeshPtr SPSTreeGenerator::CreateTree(
   size_t _bp0len = _base.paths[0].size();
   for (unsigned int b = 0; b < branches; ++b) {
     _bturns.emplace_back(2.f * Math::PI * Math::random() - Math::PI);
-    Uint32Array newPlace{
-      static_cast<unsigned>(std::floor(Math::random() * _bplen)),
-      static_cast<unsigned>(std::floor(Math::random() * (_bp0len - 1) + 1))};
+    Uint32Array newPlace{static_cast<unsigned>(std::floor(Math::random() * _bplen)),
+                         static_cast<unsigned>(std::floor(Math::random() * (_bp0len - 1) + 1))};
     _places.emplace_back(newPlace);
   }
 
   // The _set_branches function positions mini base trees and leaves at random
   // positions along random branches
-  auto _set_branches = [&](SolidParticle* particle, unsigned int /*i*/,
-                           unsigned int s) {
+  auto _set_branches = [&](SolidParticle* particle, size_t /*i*/, size_t s) {
     unsigned int _a        = _places[s][0];
     unsigned int _b        = _places[s][1];
     CoordSystem& _mini_sys = _base.directions[_a];
-    Vector3 _mini_place(_base.paths[_a][_b].x, _base.paths[_a][_b].y,
-                        _base.paths[_a][_b].z);
+    Vector3 _mini_place(_base.paths[_a][_b].x, _base.paths[_a][_b].y, _base.paths[_a][_b].z);
     _mini_place.addInPlace(_mini_sys.z.scale(_base.radii[_a][_b] / 2.f));
     float _turn = _bturns[s];
     Vector3 _mini_direction
       = _mini_sys.y.scale(std::cos(randPct(branchAngle, 0.f)))
-          .add(_mini_sys.x.scale(std::sin(randPct(branchAngle, 0.f))
-                                 * std::sin(_turn)))
-          .add(_mini_sys.z.scale(std::sin(randPct(branchAngle, 0.f))
-                                 * std::cos(_turn)));
-    Vector3 _axis     = Vector3::Cross(Axis::Y(), _mini_direction);
-    float _theta      = std::acos(Vector3::Dot(_mini_direction, Axis::Y())
-                             / _mini_direction.length());
-    particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
-                                std::pow(trunkTaper, _boughs + 1.f),
-                                std::pow(trunkTaper, _boughs + 1.f));
+          .add(_mini_sys.x.scale(std::sin(randPct(branchAngle, 0.f)) * std::sin(_turn)))
+          .add(_mini_sys.z.scale(std::sin(randPct(branchAngle, 0.f)) * std::cos(_turn)));
+    Vector3 _axis = Vector3::Cross(Axis::Y(), _mini_direction);
+    float _theta  = std::acos(Vector3::Dot(_mini_direction, Axis::Y()) / _mini_direction.length());
+    particle->scaling
+      = Vector3(std::pow(trunkTaper, _boughs + 1.f), std::pow(trunkTaper, _boughs + 1.f),
+                std::pow(trunkTaper, _boughs + 1.f));
     particle->rotationQuaternion
       = std::make_unique<Quaternion>(Quaternion::RotationAxis(_axis, _theta));
     particle->position = _mini_place;
@@ -204,8 +185,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
   // Add base tree mesh enough for all the final forked branches
   SolidParticleSystemMeshBuilderOptions spsBuilderOptionsMiniTrees;
   spsBuilderOptionsMiniTrees.positionFunction = _set_mini_trees;
-  _mini_trees_SPS->addShape(_base.tree,
-                            static_cast<size_t>(std::pow(forks, boughs + 1)),
+  _mini_trees_SPS->addShape(_base.tree, static_cast<size_t>(std::pow(forks, boughs + 1)),
                             spsBuilderOptionsMiniTrees);
 
   // Add base tree mesh given the number of branches in that parameter.
@@ -217,8 +197,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
   _tree_crown->material = trunkMaterial;
 
   // Add leaves mesh enough for all the final forked branches
-  _mini_leaves_SPS->addShape(_leaves,
-                             static_cast<size_t>(std::pow(forks, boughs + 1)),
+  _mini_leaves_SPS->addShape(_leaves, static_cast<size_t>(std::pow(forks, boughs + 1)),
                              spsBuilderOptionsMiniTrees);
 
   // Add leaves mesh given the number of branches in that parameter.
@@ -263,10 +242,10 @@ float SPSTreeGenerator::randPct(float v, float p)
   return (1.f + (1.f - 2.f * Math::random()) * p) * v;
 }
 
-SPSTreeBranch SPSTreeGenerator::createBranch(
-  const Vector3& branchAt, const CoordSystem& branchSys, float branchLength,
-  float branchTaper, size_t branchSlices, size_t bowFreq, float bowHeight,
-  float branchRadius, Scene* scene)
+SPSTreeBranch SPSTreeGenerator::createBranch(const Vector3& branchAt, const CoordSystem& branchSys,
+                                             float branchLength, float branchTaper,
+                                             size_t branchSlices, size_t bowFreq, float bowHeight,
+                                             float branchRadius, Scene* scene)
 {
   Vector3 _core_point;
   // array of Vector3 points that give the path of the central core of the
@@ -286,9 +265,8 @@ SPSTreeBranch SPSTreeGenerator::createBranch(
     // central point along core path
     _core_point = branchSys.y.scale(_d_slices_length * branchLength);
     // add damped wave along branch to give bows
-    _core_point.addInPlace(
-      branchSys.x.scale(bowHeight * std::exp(-_d_slices_length)
-                        * std::sin(bowFreq * _d_slices_length * Math::PI)));
+    _core_point.addInPlace(branchSys.x.scale(bowHeight * std::exp(-_d_slices_length)
+                                             * std::sin(bowFreq * _d_slices_length * Math::PI)));
     // set core point start at spur position.
     _core_point.addInPlace(branchAt);
     _core_path[d] = _core_point;
@@ -330,10 +308,10 @@ SPSTreeBranch SPSTreeGenerator::createBranch(
   return spsTreeBranch;
 }
 
-SPSTreeBase SPSTreeGenerator::createTreeBase(
-  float trunkHeight, float trunkTaper, size_t trunkSlices, unsigned int boughs,
-  unsigned int forks, float forkAngle, float forkRatio, size_t bowFreq,
-  float bowHeight, Scene* scene)
+SPSTreeBase SPSTreeGenerator::createTreeBase(float trunkHeight, float trunkTaper,
+                                             size_t trunkSlices, unsigned int boughs,
+                                             unsigned int forks, float forkAngle, float forkRatio,
+                                             size_t bowFreq, float bowHeight, Scene* scene)
 {
   // Golden ratio for scale
   const float _PHI = 2.f / (1.f + std::sqrt(5.f));
@@ -352,8 +330,8 @@ SPSTreeBase SPSTreeGenerator::createTreeBase(
   std::vector<CoordSystem> _tree_directions;
 
   // Create trunk
-  auto _trunk = createBranch(_trunk_root_at, _trunk_sys, trunkHeight,
-                             trunkTaper, trunkSlices, 1, bowHeight, 1, scene);
+  auto _trunk = createBranch(_trunk_root_at, _trunk_sys, trunkHeight, trunkTaper, trunkSlices, 1,
+                             bowHeight, 1, scene);
   _tree_branches.emplace_back(_trunk.branch);
   auto& _core_path = _trunk.core;
   _tree_paths.emplace_back(_core_path);
@@ -375,14 +353,11 @@ SPSTreeBase SPSTreeGenerator::createTreeBase(
     _turn = randPct(f * _fork_turn, 0.25f);
     _fork_branch_direction
       = _trunk_sys.y.scale(std::cos(randPct(forkAngle, 0.15f)))
-          .add(_trunk_sys.x.scale(std::sin(randPct(forkAngle, 0.15f))
-                                  * std::sin(_turn)))
-          .add(_trunk_sys.z.scale(std::sin(randPct(forkAngle, 0.15f))
-                                  * std::cos(_turn)));
+          .add(_trunk_sys.x.scale(std::sin(randPct(forkAngle, 0.15f)) * std::sin(_turn)))
+          .add(_trunk_sys.z.scale(std::sin(randPct(forkAngle, 0.15f)) * std::cos(_turn)));
     _fork_branchSys = coordSystem(_fork_branch_direction);
-    _branch = createBranch(_top_point, _fork_branchSys, trunkHeight * forkRatio,
-                           trunkTaper, trunkSlices, bowFreq, bowHeight * _PHI,
-                           trunkTaper, scene);
+    _branch         = createBranch(_top_point, _fork_branchSys, trunkHeight * forkRatio, trunkTaper,
+                           trunkSlices, bowFreq, bowHeight * _PHI, trunkTaper, scene);
     _bough_core_path = _branch.core;
     _bough_top       = _bough_core_path.back();
 
@@ -394,17 +369,15 @@ SPSTreeBase SPSTreeGenerator::createTreeBase(
     if (boughs > 1) {
       // When boughs = 2 create further branches at end of new branch
       for (unsigned int k = 0; k < forks; k++) {
-        _bough_turn = randPct(k * _fork_turn, 0.25f);
-        _bough_direction
-          = _fork_branchSys.y.scale(std::cos(randPct(forkAngle, 0.15f)))
-              .add(_fork_branchSys.x.scale(std::sin(randPct(forkAngle, 0.15f))
-                                           * std::sin(_bough_turn)))
-              .add(_fork_branchSys.z.scale(std::sin(randPct(forkAngle, 0.15f))
-                                           * std::cos(_bough_turn)));
+        _bough_turn      = randPct(k * _fork_turn, 0.25f);
+        _bough_direction = _fork_branchSys.y.scale(std::cos(randPct(forkAngle, 0.15f)))
+                             .add(_fork_branchSys.x.scale(std::sin(randPct(forkAngle, 0.15f))
+                                                          * std::sin(_bough_turn)))
+                             .add(_fork_branchSys.z.scale(std::sin(randPct(forkAngle, 0.15f))
+                                                          * std::cos(_bough_turn)));
         _bough_sys = coordSystem(_bough_direction);
-        _bough     = createBranch(_bough_top, _bough_sys,
-                              trunkHeight * forkRatio * forkRatio, trunkTaper,
-                              trunkSlices, bowFreq, bowHeight * _PHI * _PHI,
+        _bough     = createBranch(_bough_top, _bough_sys, trunkHeight * forkRatio * forkRatio,
+                              trunkTaper, trunkSlices, bowFreq, bowHeight * _PHI * _PHI,
                               trunkTaper * trunkTaper, scene);
 
         // store branch details

@@ -58,7 +58,7 @@ public:
     _sps                 = SolidParticleSystem::New("SPS", scene, spsOptions);
     SolidParticleSystemMeshBuilderOptions spsMeshBuilderOptions;
     spsMeshBuilderOptions.positionFunction
-      = [this](SolidParticle* particle, unsigned int i, unsigned int s) -> void {
+      = [this](SolidParticle* particle, size_t i, size_t s) -> void {
       _positionFunction(particle, i, s);
     };
     _sps->addShape(triangle, _nb, spsMeshBuilderOptions);
@@ -78,7 +78,7 @@ private:
   /**
    * @brief Custom position function for SPS creation.
    */
-  void _positionFunction(SolidParticle* particle, unsigned int i, unsigned int /*s*/)
+  void _positionFunction(SolidParticle* particle, size_t i, size_t /*s*/)
   {
     const auto cbrt      = static_cast<float>(std::cbrt(_nb));
     const auto z         = std::floor(i / (cbrt * cbrt));

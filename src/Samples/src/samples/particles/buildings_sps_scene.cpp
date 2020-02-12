@@ -105,7 +105,7 @@ public:
     auto model = MeshBuilder::CreateBox("m", boxOptions, scene);
     SolidParticleSystemMeshBuilderOptions spsMeshBuilderOptions;
     spsMeshBuilderOptions.positionFunction
-      = [this](SolidParticle* particle, unsigned int i, unsigned int s) -> void {
+      = [this](SolidParticle* particle, size_t i, size_t s) -> void {
       _positionFunction(particle, i, s);
     };
     _sps->addShape(model, nbBuildings, spsMeshBuilderOptions);
@@ -126,7 +126,7 @@ private:
   /**
    * @brief Custom position function for SPS creation.
    */
-  void _positionFunction(SolidParticle* particle, unsigned int /*i*/, unsigned int /*s*/)
+  void _positionFunction(SolidParticle* particle, size_t /*i*/, size_t /*s*/)
   {
     auto scaleX          = Math::random() * 2.f + 0.8f;
     auto scaleY          = Math::random() * Math::random() * Math::random() * 6.f + 0.8f;
