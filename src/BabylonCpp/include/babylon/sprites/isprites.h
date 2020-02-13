@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include <nlohmann/json_fwd.hpp>
+#include <nlohmann/json.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>

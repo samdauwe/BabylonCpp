@@ -9,10 +9,12 @@
 
 namespace BABYLON {
 
+class BaseTexture;
 class Mesh;
 class RawTexture;
 class Scene;
 class ShaderMaterial;
+using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
 using MeshPtr           = std::shared_ptr<Mesh>;
 using RawTexturePtr     = std::shared_ptr<RawTexture>;
 using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
@@ -88,7 +90,7 @@ protected:
   /**
    * @brief Returns the Position of Output Plane.
    */
-  void set_position(Vector3& v);
+  void set_position(const Vector3& v);
 
   /**
    * @brief Sets the Rotation of Output Plane.
@@ -158,6 +160,11 @@ private:
    */
   RawTexturePtr _createTileAnimationBuffer(const std::optional<ArrayBufferView>& buffer);
 
+  /**
+   * @brief Hidden
+   */
+  std::vector<BaseTexturePtr> _getTileMaps() const;
+
 public:
   /**
    * Public Sprite Storage array, parsed from atlasJSON
@@ -170,19 +177,19 @@ public:
   ReadOnlyProperty<SpriteMap, size_t> spriteCount;
 
   /**
-   * Returns the Position of Output Plane
+   * Returns or sets the Position of Output Plane
    */
-  ReadOnlyProperty<SpriteMap, Vector3> position;
+  Property<SpriteMap, Vector3> position;
 
   /**
    * Sets the Rotation of Output Plane
    */
-  ReadOnlyProperty<SpriteMap, Vector3> rotation;
+  Property<SpriteMap, Vector3> rotation;
 
   /**
    * Sets the AnimationMap
    */
-  ReadOnlyProperty<SpriteMap, RawTexturePtr> animationMap;
+  Property<SpriteMap, RawTexturePtr> animationMap;
 
 private:
   /**
