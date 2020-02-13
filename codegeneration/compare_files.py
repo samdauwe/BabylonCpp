@@ -115,13 +115,14 @@ def main():
         # Misc
         "andOrNotEvaluator.ts", "assetsManager.ts", "basis.ts", "baseError.ts",
         "canvasGenerator.ts", "customAnimationFrameRequester.ts",
-        "decorators.ts", "deepCopier.ts", "deferred.ts", "domManagement.ts",
-        "fileRequest.ts", "filesInput.ts", "filesInputStore.ts",
-        "instantiationTools.ts", "logger.ts", "loadFileError.ts",
-        "precisionDate.ts", "promise.ts", "retryStrategy.ts",
-        "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
-        "stringDictionary.ts", "tags.ts", "typeStore.ts", "videoRecorder.ts",
-        "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
+        "dataReader.ts", "decorators.ts", "deepCopier.ts", "deferred.ts",
+        "domManagement.ts", "fileRequest.ts", "filesInput.ts",
+        "filesInputStore.ts", "instantiationTools.ts", "logger.ts",
+        "loadFileError.ts", "precisionDate.ts", "promise.ts",
+        "retryStrategy.ts", "sceneSerializer.ts", "screenshotTools.ts",
+        "smartArray.ts", "stringDictionary.ts", "tags.ts", "typeStore.ts",
+        "videoRecorder.ts", "virtualJoystick.ts", "webRequest.ts",
+        "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
