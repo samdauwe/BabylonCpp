@@ -1121,9 +1121,13 @@ void ThinEngine::_bindVertexBuffersAttributes(
     auto order = effect->getAttributeLocation(index);
 
     if (order >= 0) {
-      _order                   = static_cast<unsigned int>(order);
-      const auto& vertexBuffer = vertexBuffers.at(attributes[index]);
+      _order = static_cast<unsigned int>(order);
 
+      if (!stl_util::contains(vertexBuffers, attributes[index])) {
+        continue;
+      }
+
+      const auto& vertexBuffer = vertexBuffers.at(attributes[index]);
       if (!vertexBuffer) {
         continue;
       }
