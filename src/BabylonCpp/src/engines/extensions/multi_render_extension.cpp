@@ -220,7 +220,6 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
   }
 
   gl.drawBuffers(attachments);
-  gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   _this->_bindUnboundFramebuffer(nullptr);
 
   _this->resetTextureCache();

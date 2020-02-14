@@ -75,8 +75,14 @@ void LightGizmo::set_light(const LightPtr& iLight)
     // Get update position and direction if the light has it
     auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
     if (shadowLight && attachedMesh()) {
+      // Position
       attachedMesh()->position().copyFrom(shadowLight->position());
+      attachedMesh()->computeWorldMatrix(true);
+      _cachedPosition.copyFrom(attachedMesh()->position());
+      // Direction
       attachedMesh()->setDirection(shadowLight->direction());
+      attachedMesh()->computeWorldMatrix(true);
+      _cachedForward.copyFrom(attachedMesh()->forward());
     }
 
     _update();
@@ -115,6 +121,8 @@ void LightGizmo::_update()
     else {
       // update gizmo to match light
       attachedMesh()->position().copyFrom(shadowLight->position());
+      attachedMesh()->computeWorldMatrix(true);
+      _cachedPosition.copyFrom(attachedMesh()->position());
     }
   }
   if (shadowLight) {
@@ -128,7 +136,8 @@ void LightGizmo::_update()
              > 0.0001f) {
       // update gizmo to match light
       attachedMesh()->setDirection(shadowLight->direction());
-      _cachedForward.copyFrom(_lightMesh->forward);
+      attachedMesh()->computeWorldMatrix(true);
+      _cachedForward.copyFrom(attachedMesh()->forward);
     }
   }
   if (!_light->isEnabled()) {

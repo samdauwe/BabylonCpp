@@ -51,8 +51,8 @@ public:
    * @param ray defines the ray to intersect with
    * @param camera defines the current active camera
    * @param predicate defines a predicate used to select candidate sprites
-   * @param fastCheck defines if a fast check only must be done (the first
-   * potential sprite is will be used and not the closer)
+   * @param fastCheck defines if a fast check only must be done (the first potential sprite is will
+   * be used and not the closer)
    * @returns null if no hit or a PickingInfo
    */
   std::optional<PickingInfo> intersects(const Ray& ray, const CameraPtr& camera,
@@ -130,8 +130,7 @@ public:
   std::string spriteJSON;
 
   /**
-   * Gets or sets a boolean indicating if the manager must consider scene fog
-   * when rendering
+   * Gets or sets a boolean indicating if the manager must consider scene fog when rendering
    */
   bool fogEnabled;
 

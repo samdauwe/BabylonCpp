@@ -83,7 +83,6 @@ RenderTargetCubeExtension::createRenderTargetCubeTexture(const ISize& size,
 
   // Unbind
   _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
-  gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   _this->_bindUnboundFramebuffer(nullptr);
 
   texture->_framebuffer           = std::move(framebuffer);
