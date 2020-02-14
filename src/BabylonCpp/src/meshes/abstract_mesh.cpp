@@ -65,7 +65,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , occlusionQueryAlgorithmType{this, &AbstractMesh::get_occlusionQueryAlgorithmType,
                                   &AbstractMesh::set_occlusionQueryAlgorithmType}
     , isOccluded{this, &AbstractMesh::get_isOccluded, &AbstractMesh::set_isOccluded}
-    , isOcclusionQueryInProgress{this, &AbstractMesh::get_isOcclusionQueryInProgress}
+    , isOcclusionQueryInProgress{this, &AbstractMesh::get_isOcclusionQueryInProgress,
+                                 &AbstractMesh::set_isOcclusionQueryInProgress}
     , visibility{this, &AbstractMesh::get_visibility, &AbstractMesh::set_visibility}
     , alphaIndex{std::numeric_limits<int>::max()}
     , isVisible{true}
@@ -384,6 +385,11 @@ void AbstractMesh::set_layerMask(unsigned int value)
 bool AbstractMesh::get_isOcclusionQueryInProgress() const
 {
   return _occlusionDataStorage()->isOcclusionQueryInProgress;
+}
+
+void AbstractMesh::set_isOcclusionQueryInProgress(bool value)
+{
+  _occlusionDataStorage()->isOcclusionQueryInProgress = value;
 }
 
 _OcclusionDataStoragePtr& AbstractMesh::get__occlusionDataStorage()

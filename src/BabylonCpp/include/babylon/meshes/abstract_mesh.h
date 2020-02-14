@@ -1022,10 +1022,16 @@ protected:
   void set_onCollisionPositionChange(const std::function<void(Vector3*, EventState&)>& callback);
 
   /**
-   * @brief Flag to check the progress status of the query.
+   * @brief Gets the flag to check the progress status of the query.
    * @see http://doc.babylonjs.com/features/occlusionquery
    */
   bool get_isOcclusionQueryInProgress() const;
+
+  /**
+   * @brief Sets the flag to check the progress status of the query.
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   */
+  void set_isOcclusionQueryInProgress(bool value);
 
   /**
    * @brief Gets the occlusion data storage reference.
@@ -1537,7 +1543,7 @@ public:
    * Flag to check the progress status of the query
    * @see http://doc.babylonjs.com/features/occlusionquery
    */
-  ReadOnlyProperty<AbstractMesh, bool> isOcclusionQueryInProgress;
+  Property<AbstractMesh, bool> isOcclusionQueryInProgress;
 
   /**
    * The mesh visibility between 0 and 1 (default is 1)
