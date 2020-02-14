@@ -48,7 +48,7 @@ install:
 # Perform git clone with submodules
 clone_script:
 - cmd: >-
-    git clone --depth 1 --recursive -q https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+    git clone --depth 1 --recursive -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 #---------------------------------#
 #       Build configuration       #
@@ -56,23 +56,9 @@ clone_script:
 
 before_build:
   - cd C:\projects\babyloncpp
-  - git clean -fx
-  - REM Boring hacks in order to get AppVeyor to build PR branches
-  - IF DEFINED APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME git remote add pr https://github.com/%APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME%.git & git fetch pr
-  - IF DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH%
-  - IF DEFINED APPVEYOR_PULL_REQUEST_TITLE echo "Building PR %APPVEYOR_PULL_REQUEST_TITLE%"
-  - IF NOT DEFINED APPVEYOR_PULL_REQUEST_HEAD_COMMIT git checkout %APPVEYOR_REPO_BRANCH%
-  - REM End of boring hacks
-  - git submodule update --init --recursive
-  - git branch
-  - git log -1
 
 build_script:
-  - mkdir build
-  - cd build
-  - cmake .. -G"Visual Studio 15 2017 Win64"
-  - cmake --build . --config Release
-  - ctest . -C Release --output-on-failure
+  - python cmake_build.py all
 
 #---------------------------------#
 #       Build notifications       #
