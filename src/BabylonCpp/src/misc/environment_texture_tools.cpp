@@ -11,12 +11,14 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/spherical_polynomial.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/environment_texture_info.h>
+#include <babylon/misc/environment_texture_irradiance_info_v1.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
@@ -64,6 +66,31 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer&
   }
 
   return manifest;
+}
+
+EnvironmentTextureIrradianceInfoV1Ptr
+EnvironmentTextureTools::_CreateEnvTextureIrradiance(const CubeTexturePtr& texture)
+{
+  auto polynmials = texture->sphericalPolynomial();
+  if (polynmials == nullptr) {
+    return nullptr;
+  }
+
+  auto info = std::make_shared<EnvironmentTextureIrradianceInfoV1>();
+
+  info->x = {polynmials->x.x, polynmials->x.y, polynmials->x.z};
+  info->y = {polynmials->y.x, polynmials->y.y, polynmials->y.z};
+  info->z = {polynmials->z.x, polynmials->z.y, polynmials->z.z};
+
+  info->xx = {polynmials->xx.x, polynmials->xx.y, polynmials->xx.z};
+  info->yy = {polynmials->yy.x, polynmials->yy.y, polynmials->yy.z};
+  info->zz = {polynmials->zz.x, polynmials->zz.y, polynmials->zz.z};
+
+  info->yz = {polynmials->yz.x, polynmials->yz.y, polynmials->yz.z};
+  info->zx = {polynmials->zx.x, polynmials->zx.y, polynmials->zx.z};
+  info->xy = {polynmials->xy.x, polynmials->xy.y, polynmials->xy.z};
+
+  return info;
 }
 
 std::vector<std::vector<ArrayBuffer>>
@@ -118,11 +145,54 @@ void EnvironmentTextureTools::UploadEnvLevels(const InternalTexturePtr& texture,
   const auto imageData
     = EnvironmentTextureTools::CreateImageDataArrayBufferViews(arrayBuffer, info);
 
-  return EnvironmentTextureTools::UploadLevels(texture, imageData);
+  return EnvironmentTextureTools::UploadLevelsSync(texture, imageData);
 }
 
-void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
-                                           const std::vector<std::vector<ArrayBuffer>>& imageData)
+void EnvironmentTextureTools::_OnImageReadySync(
+  const Image& image, Engine* engine, bool expandTexture, const PostProcessPtr& rgbdPostProcess,
+  const std::string& /*url*/, unsigned int face, int i, bool generateNonLODTextures,
+  const std::unordered_map<size_t, BaseTexturePtr>& lodTextures, const InternalTexturePtr& cubeRtt,
+  const InternalTexturePtr& texture)
+{
+  // Upload to the texture.
+  if (expandTexture) {
+    auto tempTexture = engine->createTexture(
+      "", true, true, nullptr, Constants::TEXTURE_NEAREST_SAMPLINGMODE, nullptr,
+      [](const std::string& message, const std::string& /*exception*/) {
+        throw std::runtime_error(message);
+      },
+      image);
+
+    rgbdPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
+      // Uncompress the data to a RTT
+      rgbdPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
+        effect->_bindTexture("textureSampler", tempTexture);
+        effect->setFloat2("scale", 1.f, 1.f);
+      };
+
+      engine->scenes[0]->postProcessManager->directRender({rgbdPostProcess}, cubeRtt, true, face,
+                                                          static_cast<int>(i));
+
+      // Cleanup
+      engine->restoreDefaultFramebuffer();
+      tempTexture->dispose();
+    });
+  }
+  else {
+    engine->_uploadImageToTexture(texture, image, face, static_cast<int>(i));
+
+    // Upload the face to the non lod texture support
+    if (generateNonLODTextures) {
+      auto lodTexture = lodTextures.at(static_cast<size_t>(i));
+      if (lodTexture) {
+        engine->_uploadImageToTexture(lodTexture->_texture, image, face, 0);
+      }
+    }
+  }
+}
+
+void EnvironmentTextureTools::UploadLevelsSync(
+  const InternalTexturePtr& texture, const std::vector<std::vector<ArrayBuffer>>& imageData)
 {
   if (!Tools::IsExponentOfTwo(static_cast<size_t>(texture->width))) {
     throw std::runtime_error("Texture size must be a power of two");
@@ -152,7 +222,7 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
   }
   // in webgl 1 there are no ways to either render or copy lod level information
   // for float textures.
-  else if (engine->webGLVersion() < 2) {
+  else if (engine->webGLVersion() < 2.f) {
     expandTexture = false;
   }
   // If half float available we can uncompress the texture
@@ -196,9 +266,8 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
       auto scale     = texture->_lodGenerationScale;
       auto offset    = texture->_lodGenerationOffset;
 
-      for (unsigned int i = 0; i < mipSlices; i++) {
-        // compute LOD from even spacing in smoothness (matching shader
-        // calculation)
+      for (unsigned int i = 0; i < mipSlices; ++i) {
+        // compute LOD from even spacing in smoothness (matching shader calculation)
         auto smoothness = static_cast<float>(i) / static_cast<float>(mipSlices - 1);
         auto roughness  = 1.f - smoothness;
 
@@ -247,43 +316,12 @@ void EnvironmentTextureTools::UploadLevels(const InternalTexturePtr& texture,
         // Constructs an image element from image data
         const auto& bytes = imageData[i][face];
         auto image        = FileTools::ArrayBufferToImage(bytes);
+        std::string url;
 
-        // Upload to the texture.
-        if (expandTexture) {
-          auto tempTexture = engine->createTexture(
-            "", true, true, nullptr, Constants::TEXTURE_NEAREST_SAMPLINGMODE, nullptr,
-            [](const std::string& message, const std::string& /*exception*/) {
-              throw std::runtime_error(message);
-            },
-            image);
-
-          rgbdPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
-            // Uncompress the data to a RTT
-            rgbdPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
-              effect->_bindTexture("textureSampler", tempTexture);
-              effect->setFloat2("scale", 1, 1);
-            };
-
-            engine->scenes[0]->postProcessManager->directRender({rgbdPostProcess}, cubeRtt, true,
-                                                                face, static_cast<int>(i));
-
-            // Cleanup
-            engine->restoreDefaultFramebuffer();
-            tempTexture->dispose();
-          });
-        }
-        else {
-          engine->_uploadImageToTexture(texture, image, face, static_cast<int>(i));
-
-          // Upload the face to the non lod texture support
-          if (generateNonLODTextures) {
-            auto lodTexture = lodTextures.at(i);
-            if (lodTexture) {
-              engine->_uploadImageToTexture(lodTexture->_texture, image, face, 0);
-            }
-          }
-        }
+        _OnImageReadySync(image, engine, expandTexture, rgbdPostProcess, url, face, i,
+                          generateNonLODTextures, lodTextures, cubeRtt, texture);
       };
+
       promises.emplace_back(promise);
     }
   }
@@ -368,6 +406,21 @@ void EnvironmentTextureTools::UploadEnvSpherical(const InternalTexturePtr& textu
   Vector3::FromArrayToRef(irradianceInfo->zx, 0, sp->zx);
   Vector3::FromArrayToRef(irradianceInfo->xy, 0, sp->xy);
   texture->_sphericalPolynomial = sp;
+}
+
+void EnvironmentTextureTools::_UpdateRGBDSync(const InternalTexturePtr& internalTexture,
+                                              const std::vector<std::vector<ArrayBuffer>>& data,
+                                              const SphericalPolynomialPtr& sphericalPolynomial,
+                                              float lodScale, float lodOffset)
+{
+  internalTexture->_source               = InternalTextureSource::CubeRawRGBD;
+  internalTexture->_bufferViewArrayArray = data;
+  internalTexture->_lodGenerationScale   = lodScale;
+  internalTexture->_lodGenerationOffset  = lodOffset;
+  internalTexture->_sphericalPolynomial  = sphericalPolynomial;
+
+  EnvironmentTextureTools::UploadLevelsSync(internalTexture, data);
+  internalTexture->isReady = true;
 }
 
 } // end of namespace BABYLON

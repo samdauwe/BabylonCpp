@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include <unordered_map>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -10,15 +11,26 @@
 namespace BABYLON {
 
 class ArrayBufferView;
+class BaseTexture;
+class CubeTexture;
+class Engine;
 class EnvironmentTextureInfo;
+class EnvironmentTextureIrradianceInfoV1;
+struct Image;
 class InternalTexture;
-using EnvironmentTextureInfoPtr = std::shared_ptr<EnvironmentTextureInfo>;
-using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
+class PostProcess;
+class SphericalPolynomial;
+using BaseTexturePtr                        = std::shared_ptr<BaseTexture>;
+using CubeTexturePtr                        = std::shared_ptr<CubeTexture>;
+using EnvironmentTextureInfoPtr             = std::shared_ptr<EnvironmentTextureInfo>;
+using EnvironmentTextureIrradianceInfoV1Ptr = std::shared_ptr<EnvironmentTextureIrradianceInfoV1>;
+using InternalTexturePtr                    = std::shared_ptr<InternalTexture>;
+using PostProcessPtr                        = std::shared_ptr<PostProcess>;
+using SphericalPolynomialPtr                = std::shared_ptr<SphericalPolynomial>;
 
 /**
- * @brief Sets of helpers addressing the serialization and deserialization of
- * environment texture stored in a BabylonJS env file. Those files are usually
- * stored as .env files.
+ * @brief Sets of helpers addressing the serialization and deserialization of environment texture
+ * stored in a BabylonJS env file. Those files are usually stored as .env files.
  */
 class BABYLON_SHARED_EXPORT EnvironmentTextureTools {
 
@@ -65,8 +77,8 @@ public:
    * @param texture defines the internal texture to upload to
    * @param imageData defines the array buffer views of image data [mipmap][face]
    */
-  static void UploadLevels(const InternalTexturePtr& texture,
-                           const std::vector<std::vector<ArrayBuffer>>& imageData);
+  static void UploadLevelsSync(const InternalTexturePtr& texture,
+                               const std::vector<std::vector<ArrayBuffer>>& imageData);
 
   /**
    * @brief Uploads spherical polynomials information to the texture.
@@ -75,6 +87,33 @@ public:
    */
   static void UploadEnvSpherical(const InternalTexturePtr& texture,
                                  const EnvironmentTextureInfo& info);
+
+  /**
+   * @brief Hidden
+   */
+  static void _UpdateRGBDSync(const InternalTexturePtr& internalTexture,
+                              const std::vector<std::vector<ArrayBuffer>>& data,
+                              const SphericalPolynomialPtr& sphericalPolynomial, float lodScale,
+                              float lodOffset);
+
+private:
+  /**
+   * @brief Creates a JSON representation of the spherical data.
+   * @param texture defines the texture containing the polynomials
+   * @return the JSON representation of the spherical info
+   */
+  static EnvironmentTextureIrradianceInfoV1Ptr
+  _CreateEnvTextureIrradiance(const CubeTexturePtr& texture);
+
+  /**
+   * @brief Hidden
+   */
+  static void _OnImageReadySync(const Image& image, Engine* engine, bool expandTexture,
+                                const PostProcessPtr& rgbdPostProcess, const std::string& url,
+                                unsigned int face, int i, bool generateNonLODTextures,
+                                const std::unordered_map<size_t, BaseTexturePtr>& lodTextures,
+                                const InternalTexturePtr& cubeRtt,
+                                const InternalTexturePtr& texture);
 
 }; // end of class EnvironmentTextureTools
 
