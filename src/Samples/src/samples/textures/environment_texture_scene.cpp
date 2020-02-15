@@ -37,7 +37,8 @@ struct EnvironmentTextureScene : public IRenderableScene {
     scene->imageProcessingConfiguration()->toneMappingEnabled = true;
 
     // Define a general environment textue
-    auto hdrTexture = CubeTexture::CreateFromPrefilteredData("textures/environment.env", scene);
+    auto hdrTexture
+      = CubeTexture::CreateFromPrefilteredData("textures/environmentSpecular.env", scene);
     hdrTexture->gammaSpace = false;
     scene->createDefaultSkybox(
       hdrTexture, true, (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f, 0.f);

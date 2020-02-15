@@ -2369,8 +2369,8 @@ InternalTexturePtr ThinEngine::createTexture(
     };
 
     if (!fromData || isBase64) {
-      if (url.empty()) {
-        // onload(buffer);
+      if (url.empty() && buffer.has_value() && std::holds_alternative<Image>(*buffer)) {
+        onload(std::get<Image>(*buffer));
       }
       else {
         ThinEngine::_FileToolsLoadImageFromUrl(url, onload, onInternalError, invertY, mimeType);

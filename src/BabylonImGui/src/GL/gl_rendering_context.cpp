@@ -240,12 +240,7 @@ void GLRenderingContext::bindRenderbuffer(GLenum target, IGLRenderbuffer* render
 
 void GLRenderingContext::bindTexture(GLenum target, IGLTexture* texture)
 {
-  if (texture) {
-    glBindTexture(target, texture->value);
-  }
-  else {
-    glDisable(target);
-  }
+  glBindTexture(target, texture ? texture->value : 0);
 }
 
 void GLRenderingContext::bindTransformFeedback(GLenum target,
@@ -396,15 +391,13 @@ void GLRenderingContext::compileShader(IGLShader* shader)
 
   GLint compileStatus;
   glGetShaderiv(shader->value, GL_COMPILE_STATUS, &compileStatus);
-  if (compileStatus != GL_TRUE)
-  {
+  if (compileStatus != GL_TRUE) {
     char shaderInfoLog[5000];
     GLsizei shaderInfoLogLength;
     glGetShaderInfoLog(shader->value, 5000, &shaderInfoLogLength, shaderInfoLog);
     BABYLON_LOG_ERROR("compileShader", "Error!", shaderInfoLog);
     BABYLON_LOG_ERROR("compileShader", "Related shader source", getShaderSource(shader).c_str());
   }
-
 }
 
 void GLRenderingContext::compressedTexImage2D(GLenum target, GLint level, GLenum internalformat,

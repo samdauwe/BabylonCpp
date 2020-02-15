@@ -163,20 +163,21 @@ void EnvironmentTextureTools::_OnImageReadySync(
       },
       image);
 
-    rgbdPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
-      // Uncompress the data to a RTT
-      rgbdPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
-        effect->_bindTexture("textureSampler", tempTexture);
-        effect->setFloat2("scale", 1.f, 1.f);
-      };
+    rgbdPostProcess->getEffect()->executeWhenCompiled(
+      [rgbdPostProcess, tempTexture, engine, cubeRtt, face, i](Effect* /*effect*/) {
+        // Uncompress the data to a RTT
+        rgbdPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
+          effect->_bindTexture("textureSampler", tempTexture);
+          effect->setFloat2("scale", 1.f, 1.f);
+        };
 
-      engine->scenes[0]->postProcessManager->directRender({rgbdPostProcess}, cubeRtt, true, face,
-                                                          static_cast<int>(i));
+        engine->scenes[0]->postProcessManager->directRender({rgbdPostProcess}, cubeRtt, true, face,
+                                                            static_cast<int>(i));
 
-      // Cleanup
-      engine->restoreDefaultFramebuffer();
-      tempTexture->dispose();
-    });
+        // Cleanup
+        engine->restoreDefaultFramebuffer();
+        tempTexture->dispose();
+      });
   }
   else {
     engine->_uploadImageToTexture(texture, image, face, static_cast<int>(i));
@@ -318,8 +319,9 @@ void EnvironmentTextureTools::UploadLevelsSync(
         auto image        = FileTools::ArrayBufferToImage(bytes);
         std::string url;
 
-        _OnImageReadySync(image, engine, expandTexture, rgbdPostProcess, url, face, i,
-                          generateNonLODTextures, lodTextures, cubeRtt, texture);
+        _OnImageReadySync(image, engine, expandTexture, rgbdPostProcess, url, face,
+                          static_cast<int>(i), generateNonLODTextures, lodTextures, cubeRtt,
+                          texture);
       };
 
       promises.emplace_back(promise);
