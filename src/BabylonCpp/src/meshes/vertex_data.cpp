@@ -819,29 +819,31 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 
   auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
-  const auto& faceUV = options.faceUV;
-  auto& faceColors   = options.faceColors;
+  auto& faceUV     = options.faceUV;
+  auto& faceColors = options.faceColors;
   Float32Array colors;
 
-  // default face colors
-  if (!faceColors.has_value()) {
-    faceColors = {
-      Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-      Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-    };
+  // default face colors and UV if undefined
+  for (unsigned f = 0; f < 6; ++f) {
+    if (!faceUV[f].has_value()) {
+      faceUV[f] = Vector4(0.f, 0.f, 1.f, 1.f);
+    }
+    if (faceColors && !(*faceColors)[f].has_value()) {
+      (*faceColors)[f] = Color4(1.f, 1.f, 1.f, 1.f);
+    }
   }
 
   // Create each face in turn.
   for (auto index = 0u; index < nbFaces; index++) {
-    stl_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
-    stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
-    stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
-    stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
+    stl_util::concat(uvs, {faceUV[index]->z, faceUV[index]->w});
+    stl_util::concat(uvs, {faceUV[index]->x, faceUV[index]->w});
+    stl_util::concat(uvs, {faceUV[index]->x, faceUV[index]->y});
+    stl_util::concat(uvs, {faceUV[index]->z, faceUV[index]->y});
     if (faceColors) {
       const auto& _faceColors = *faceColors;
       for (auto c = 0u; c < 4; c++) {
-        stl_util::concat(colors, {_faceColors[index].r, _faceColors[index].g, _faceColors[index].b,
-                                  _faceColors[index].a});
+        stl_util::concat(colors, {_faceColors[index]->r, _faceColors[index]->g,
+                                  _faceColors[index]->b, _faceColors[index]->a});
       }
     }
   }

@@ -68,13 +68,13 @@ struct MergedMeshesScene : public IRenderableScene {
     // Block factory method
     const auto createBlock = [&scene](const std::string& name, const Block& block) {
       // Set the face colors
-      std::array<Color4, 6> faceColors{{
-        Color4(),                                   // Face 1
-        Color4(),                                   // Face 2
-        Color4(),                                   // Face 3
-        Color4(),                                   // Face 4
+      std::array<std::optional<Color4>, 6> faceColors{{
+        std::nullopt,                               // Face 1
+        std::nullopt,                               // Face 2
+        std::nullopt,                               // Face 3
+        std::nullopt,                               // Face 4
         Color4(block.r, block.g, block.b, block.a), // Face 5
-        Color4(),                                   // Face 6
+        std::nullopt,                               // Face 6
       }};
       // Create the box with height, width and depth of 5
       BoxOptions options;

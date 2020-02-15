@@ -55,7 +55,7 @@ public:
     auto columns = 6.f; // 6 columns
     auto rows    = 4.f; // 4 rows
 
-    std::array<Vector4, 6> faceUV;
+    std::array<std::optional<Vector4>, 6> faceUV;
     for (unsigned int i = 0; i < 6; i++) {
       faceUV[i] = Vector4(0.f, 0.f, 1.f / columns, 1.f / rows);
     }

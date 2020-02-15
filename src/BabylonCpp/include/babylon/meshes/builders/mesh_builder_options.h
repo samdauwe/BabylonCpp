@@ -43,8 +43,8 @@ public:
   std::optional<float> width;
   std::optional<float> height;
   std::optional<float> depth;
-  std::array<Vector4, 6> faceUV;
-  std::optional<std::array<Color4, 6>> faceColors;
+  std::array<std::optional<Vector4>, 6> faceUV;
+  std::optional<std::array<std::optional<Color4>, 6>> faceColors;
   std::optional<unsigned int> sideOrientation;
   std::optional<Vector4> frontUVs;
   std::optional<Vector4> backUVs;

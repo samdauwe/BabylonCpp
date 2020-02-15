@@ -59,7 +59,7 @@ struct MultiViewsScene : public IRenderableScene {
     light2->intensity = 0.8f;
 
     // Create Box
-    const std::array<Color4, 6> faceColors{{
+    const std::array<std::optional<Color4>, 6> faceColors{{
       Color3::Blue(),   // faceColors[0]
       Color3::White(),  // faceColors[1]
       Color3::Red(),    // faceColors[2]

@@ -80,7 +80,7 @@ public:
     unsigned int hSpriteNb = 6; // 6 sprites per row
     unsigned int vSpriteNb = 4; // 4 sprite rows
 
-    std::array<Vector4, 6> faceUV;
+    std::array<std::optional<Vector4>, 6> faceUV;
     for (unsigned int i = 0; i < 6; i++) {
       faceUV[i]
         = Vector4(i / static_cast<float>(hSpriteNb), 0.f, (i + 1) / static_cast<float>(hSpriteNb),
