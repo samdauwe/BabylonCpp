@@ -1365,7 +1365,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
     sideOrientation = instanceDataStorage.sideOrientation;
   }
 
-  auto reverse = _effectiveMaterial->_preBind(effect, *sideOrientation);
+  auto reverse = _effectiveMaterial->_preBind(effect, sideOrientation);
 
   if (_effectiveMaterial->forceDepthWrite) {
     engine->setDepthWrite(true);

@@ -405,9 +405,8 @@ bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> ove
 {
   auto engine = _scene->getEngine();
 
-  auto orientation = (!overrideOrientation.has_value()) ? static_cast<unsigned>(sideOrientation) :
-                                                          *overrideOrientation;
-  const bool reverse = orientation == Material::ClockWiseSideOrientation;
+  const auto orientation = overrideOrientation.value_or(static_cast<unsigned>(sideOrientation));
+  const auto reverse     = orientation == Material::ClockWiseSideOrientation;
 
   engine->enableEffect(effect ? effect : _effect);
   engine->setState(backFaceCulling(), zOffset, false, reverse);
