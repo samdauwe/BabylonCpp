@@ -2040,7 +2040,7 @@ void ThinEngine::wipeCaches(bool bruteForce)
     _colorWrite        = true;
     _colorWriteChanged = true;
 
-    _unpackFlipYCached = nullptr;
+    _unpackFlipYCached = std::nullopt;
 
     _gl->pixelStorei(GL::UNPACK_COLORSPACE_CONVERSION_WEBGL, GL::NONE);
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
