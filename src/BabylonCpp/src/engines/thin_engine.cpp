@@ -1116,11 +1116,6 @@ void ThinEngine::_bindVertexBuffersAttributes(
 
   unbindAllAttributes();
 
-  // Make sure that the core context VAO is bound
-#if !defined(__EMSCRIPTEN__)
-  _gl->bindVertexArray(_coreContextVAO.get());
-#endif
-
   auto _order = 0u;
   for (unsigned int index = 0; index < attributes.size(); ++index) {
     auto order = effect->getAttributeLocation(index);

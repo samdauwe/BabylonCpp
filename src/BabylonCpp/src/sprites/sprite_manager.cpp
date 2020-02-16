@@ -33,8 +33,6 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     , texture{this, &SpriteManager::get_texture, &SpriteManager::set_texture}
     , _packedAndReady{false}
     , _onDisposeObserver{nullptr}
-    , _epsilon{epsilon}
-    , _scene{scene}
 {
   auto component = std::static_pointer_cast<SpriteSceneComponent>(
     scene->_getComponent(SceneComponentConstants::NAME_SPRITE));
@@ -71,6 +69,9 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
   else {
     return;
   }
+
+  _epsilon = epsilon;
+  _scene   = scene;
 
   IndicesArray indices;
   int index = 0;
@@ -207,7 +208,6 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offset
     auto offset  = (rowSize == 0) ? 0 : sprite.cellIndex / rowSize;
     _vertexData[arrayOffset + 10]
       = static_cast<float>((sprite.cellIndex - offset * rowSize) * cellWidth / baseSize.width);
-
     _vertexData[arrayOffset + 11] = static_cast<float>(offset * cellHeight / baseSize.height);
     _vertexData[arrayOffset + 12] = static_cast<float>(cellWidth / baseSize.width);
     _vertexData[arrayOffset + 13] = static_cast<float>(cellHeight / baseSize.height);
@@ -340,7 +340,7 @@ SpriteManager::multiIntersects(const Ray& ray, const CameraPtr& camera,
       result.distance     = distance;
 
       // Get picked point
-      auto direction = TmpVectors::Vector3Array[2];
+      auto& direction = TmpVectors::Vector3Array[2];
       direction.copyFrom(ray.direction);
       direction.normalize();
       direction.scaleInPlace(distance);
@@ -376,7 +376,6 @@ void SpriteManager::render()
   auto noSprite = true;
   for (size_t index = 0; index < max; index++) {
     const auto& sprite = sprites[index];
-
     if (!sprite || !sprite->isVisible) {
       continue;
     }
