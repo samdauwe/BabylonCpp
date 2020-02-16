@@ -459,8 +459,8 @@ public:
   std::vector<Vector3> shape;
   std::vector<std::vector<Vector3>> holes;
   std::optional<float> depth;
-  std::vector<Vector4> faceUV;
-  std::vector<Color4> faceColors;
+  std::array<std::optional<Vector4>, 3> faceUV;
+  std::optional<std::array<std::optional<Color4>, 3>> faceColors;
   std::optional<bool> updatable;
   std::optional<unsigned int> sideOrientation;
   Vector4 frontUVs;

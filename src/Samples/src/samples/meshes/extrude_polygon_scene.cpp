@@ -128,7 +128,7 @@ public:
                                                        }};
 
     // Front wall faceUVs
-    std::vector<Vector4> frontWallFaceUV{
+    std::array<std::optional<Vector4>, 3> frontWallFaceUV{
       Vector4(0.f, 0.f, 7.f / 15.f, 1.f),        //
       Vector4(14.f / 15.f, 0.f, 1.f, 1.f),       //
       Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f) //
@@ -176,7 +176,7 @@ public:
                                                        }};
 
     // Rear Wall faceUVs
-    std::vector<Vector4> rearFaceUV{
+    std::array<std::optional<Vector4>, 3> rearFaceUV{
       Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f), //
       Vector4(14.f / 15.f, 0.f, 1.f, 1.f),        //
       Vector4(0.f, 0.f, 7.f / 15.f, 1.f)          //
@@ -253,7 +253,7 @@ public:
     };
 
     // Side wall 1 faceUVs
-    std::vector<Vector4> side1FaceUV{
+    std::array<std::optional<Vector4>, 3> side1FaceUV{
       Vector4(0.f, 0.f, 7.f / 15.f, 1.f),        //
       Vector4(14.f / 15.f, 0.f, 1.f, 1.f),       //
       Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f) //
@@ -282,7 +282,7 @@ public:
     };
 
     // Side wall 2 faceUVs
-    std::vector<Vector4> side2FaceUV{
+    std::array<std::optional<Vector4>, 3> side2FaceUV{
       Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f), //
       Vector4(14.f / 15.f, 0.f, 1.f, 1.f),        //
       Vector4(0.f, 0.f, 7.f / 15.f, 1.f)          //
@@ -313,7 +313,7 @@ public:
     };
 
     // Side wall 3 faceUVs
-    std::vector<Vector4> side3FaceUV{
+    std::array<std::optional<Vector4>, 3> side3FaceUV{
       Vector4(0.f, 0.f, 7.f / 15.f, 1.f),        //
       Vector4(14.f / 15.f, 0.f, 1.f, 1.f),       //
       Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f) //
@@ -432,7 +432,7 @@ public:
       stairs.emplace_back(Vector3(x, 0.f, z));
     }
 
-    std::vector<Color4> faceColors{
+    std::array<std::optional<Color4>, 3> faceColors{
       Color4(0.f, 0.f, 0.f, 1.f),                              //
       Color4(190.f / 255.f, 139.f / 255.f, 94.f / 255.f, 1.f), //
       Color4(0.f, 0.f, 0.f, 1.f),                              //
@@ -475,7 +475,7 @@ public:
                                                  }};
 
     // Rear Wall faceUVs
-    std::vector<Vector4> floorFaceUV{
+    std::array<std::optional<Vector4>, 3> floorFaceUV{
       Vector4(0.f, 0.f, 0.5f, 1.f), //
       Vector4(0.f, 0.f, 0.f, 0.f),  //
       Vector4(0.5f, 0.f, 1.f, 1.f)  //
@@ -503,7 +503,7 @@ public:
     };
 
     // Ground floor faceUVs
-    std::vector<Vector4> groundFloorFaceUV{
+    std::array<std::optional<Vector4>, 3> groundFloorFaceUV{
       Vector4(0.f, 0.f, 0.5f, 1.f), //
       Vector4(0.f, 0.f, 0.f, 0.f),  //
       Vector4(0.5f, 0.f, 1.f, 1.f)  //

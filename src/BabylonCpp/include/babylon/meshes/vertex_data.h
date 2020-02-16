@@ -467,10 +467,11 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the Polygon
    */
-  static std::unique_ptr<VertexData> CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
-                                                   const std::vector<Vector4>& fUV,
-                                                   const std::vector<Color4>& fColors,
-                                                   Vector4& frontUVs, Vector4& backUVs);
+  static std::unique_ptr<VertexData>
+  CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
+                const std::array<std::optional<Vector4>, 3>& fUV,
+                const std::optional<std::array<std::optional<Color4>, 3>>& fColors,
+                Vector4& frontUVs, Vector4& backUVs);
 
   /**
    * @brief Creates the VertexData of the IcoSphere.

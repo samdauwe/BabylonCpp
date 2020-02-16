@@ -312,6 +312,12 @@ PolyhedronOptions::~PolyhedronOptions() = default;
 
 PolygonOptions::PolygonOptions()
     : depth{std::nullopt}
+    , faceUV{{
+        Vector4(0.f, 0.f, 1.f, 1.f),
+        Vector4(0.f, 0.f, 1.f, 1.f),
+        Vector4(0.f, 0.f, 1.f, 1.f),
+      }}
+    , faceColors{std::nullopt}
     , updatable{std::nullopt}
     , sideOrientation{std::nullopt}
     , frontUVs{Vector4(0.f, 0.f, 1.f, 1.f)}

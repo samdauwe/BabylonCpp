@@ -2397,25 +2397,23 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
-                                                      const std::vector<Vector4>& fUV,
-                                                      const std::vector<Color4>& fColors,
-                                                      Vector4& frontUVs, Vector4& backUVs)
+std::unique_ptr<VertexData>
+VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
+                          const std::array<std::optional<Vector4>, 3>& fUV,
+                          const std::optional<std::array<std::optional<Color4>, 3>>& fColors,
+                          Vector4& frontUVs, Vector4& backUVs)
 {
   auto faceUV     = fUV;
   auto faceColors = fColors;
   Float32Array colors;
 
-  faceUV.resize(3);
-  faceColors.resize(3);
-
   // default face colors and UV if undefined
   for (uint32_t f = 0; f < 3; ++f) {
-    if (f >= fUV.size()) {
-      faceUV[f] = Vector4(0, 0, 1, 1);
+    if (!faceUV[f].has_value()) {
+      faceUV[f] = Vector4(0.f, 0.f, 1.f, 1.f);
     }
-    if (f >= fColors.size()) {
-      faceColors[f] = Color4(1, 1, 1, 1);
+    if (faceColors && !(*faceColors)[f].has_value()) {
+      (*faceColors)[f] = Color4(1.f, 1.f, 1.f, 1.f);
     }
   }
 
@@ -2441,12 +2439,12 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(Mesh* polygon, uint32_t si
       face = 2;
     }
     idx          = index / 3;
-    uvs[2 * idx] = (1 - uvs[2 * idx]) * faceUV[face].x + uvs[2 * idx] * faceUV[face].z;
+    uvs[2 * idx] = (1 - uvs[2 * idx]) * faceUV[face]->x + uvs[2 * idx] * faceUV[face]->z;
     uvs[2 * idx + 1]
-      = (1.f - uvs[2 * idx + 1]) * faceUV[face].y + uvs[2 * idx + 1] * faceUV[face].w;
-    if (!faceColors.empty()) {
-      stl_util::concat(
-        colors, {faceColors[face].r, faceColors[face].g, faceColors[face].b, faceColors[face].a});
+      = (1.f - uvs[2 * idx + 1]) * faceUV[face]->y + uvs[2 * idx + 1] * faceUV[face]->w;
+    if (faceColors) {
+      stl_util::concat(colors, {(*faceColors)[face]->r, (*faceColors)[face]->g,
+                                (*faceColors)[face]->b, (*faceColors)[face]->a});
     }
   }
 
@@ -2460,7 +2458,7 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(Mesh* polygon, uint32_t si
   vertexData->normals   = std::move(normals);
   vertexData->uvs       = std::move(uvs);
 
-  if (!faceColors.empty()) {
+  if (faceColors) {
     auto totalColors
       = (sideOrientation == Mesh::DOUBLESIDE) ? stl_util::concat(colors, colors) : colors;
     vertexData->colors = std::move(totalColors);

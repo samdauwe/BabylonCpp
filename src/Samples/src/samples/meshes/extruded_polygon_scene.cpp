@@ -88,7 +88,7 @@ public:
                                             }};
 
     // faceUVs
-    std::vector<Vector4> faceUV{
+    std::array<std::optional<Vector4>, 3> faceUV{
       Vector4(0.f, 0.f, 7.f / 15.f, 1.f),        //
       Vector4(14.f / 15.f, 0.f, 1.f, 1.f),       //
       Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f) //
@@ -139,7 +139,7 @@ public:
       stairs.emplace_back(Vector3(x, 0.f, z));
     }
 
-    std::vector<Color4> faceColors{
+    std::array<std::optional<Color4>, 3> faceColors{
       Color4(0.f, 0.f, 0.f, 1.f), //
       Color4(1.f, 0.f, 0.f, 1.f), //
       Color4(0.f, 0.f, 0.f, 1.f)  //
@@ -169,7 +169,7 @@ public:
       Vector3(-3.5f, 0.f, 4.f)   //
     };
 
-    std::vector<Vector4> floorFaceUV{
+    std::array<std::optional<Vector4>, 3> floorFaceUV{
       Vector4(0.f, 0.f, 0.5f, 1.f), //
       Vector4(0.5f, 0.f, 1.f, 1.f)  //
     };
