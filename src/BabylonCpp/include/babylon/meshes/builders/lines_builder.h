@@ -90,6 +90,8 @@ struct BABYLON_SHARED_EXPORT LinesBuilder {
    * * The optional parameter `instance` is an instance of an existing LineMesh object to be updated
    * with the passed `points` parameter :
    * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#lines-and-dashedlines
+   * * The optional parameter `useVertexAlpha` is to be set to `false` (default `true`) when you
+   * don't need the alpha blending (faster)
    * * When updating an instance, remember that only point positions can change, not the number of
    * points
    * * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if

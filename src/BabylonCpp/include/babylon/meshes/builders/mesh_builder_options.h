@@ -107,6 +107,7 @@ public:
   std::optional<float> gapSize;
   std::optional<unsigned int> dashNb;
   std::optional<bool> updatable;
+  std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
 
 }; // end of class DashedLinesOptions

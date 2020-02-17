@@ -70,6 +70,7 @@ DashedLinesOptions::DashedLinesOptions()
     , gapSize{std::nullopt}
     , dashNb{std::nullopt}
     , updatable{std::nullopt}
+    , useVertexAlpha{std::nullopt}
     , instance{nullptr}
 {
 }

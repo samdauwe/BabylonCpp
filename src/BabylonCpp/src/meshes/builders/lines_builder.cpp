@@ -8,8 +8,7 @@
 
 namespace BABYLON {
 
-LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name,
-                                            LineSystemOptions& options,
+LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name, LineSystemOptions& options,
                                             Scene* scene)
 {
   const auto& instance = options.instance;
@@ -42,34 +41,29 @@ LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name,
         i += 3;
       }
     }
-    instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
-                                 false);
+    instance->updateVerticesData(VertexBuffer::PositionKind, positions, false, false);
     if (!colors.empty() && !vertexColor.empty()) {
-      instance->updateVerticesData(VertexBuffer::ColorKind, vertexColor, false,
-                                   false);
+      instance->updateVerticesData(VertexBuffer::ColorKind, vertexColor, false, false);
     }
     return instance;
   }
 
   // line system creation
   auto useVertexColor = !colors.empty();
-  auto lineSystem
-    = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
-                     options.useVertexAlpha.value_or(true));
-  auto vertexData = VertexData::CreateLineSystem(options);
+  auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
+                                   options.useVertexAlpha.value_or(true));
+  auto vertexData     = VertexData::CreateLineSystem(options);
   vertexData->applyToMesh(*lineSystem, options.updatable);
   return lineSystem;
 }
 
-LinesMeshPtr LinesBuilder::CreateLines(const std::string& name,
-                                       LinesOptions& options, Scene* scene)
+LinesMeshPtr LinesBuilder::CreateLines(const std::string& name, LinesOptions& options, Scene* scene)
 {
   LineSystemOptions lineSystemOptions(options);
   return LinesBuilder::CreateLineSystem(name, lineSystemOptions, scene);
 }
 
-LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name,
-                                             DashedLinesOptions& options,
+LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name, DashedLinesOptions& options,
                                              Scene* scene)
 {
   const auto& points   = options.points;
@@ -125,11 +119,12 @@ LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name,
     return instance;
   }
   // dashed lines creation
-  auto dashedLines = LinesMesh::New(name, scene);
+  auto dashedLines = LinesMesh::New(name, scene, nullptr, nullptr, true, false,
+                                    options.useVertexAlpha.value_or(false));
   auto vertexData  = VertexData::CreateDashedLines(options);
   vertexData->applyToMesh(*dashedLines, options.updatable);
 
-  dashedLines->_creationDataStorage = std::make_shared<_CreationDataStorage>();
+  dashedLines->_creationDataStorage           = std::make_shared<_CreationDataStorage>();
   dashedLines->_creationDataStorage->dashSize = dashSize;
   dashedLines->_creationDataStorage->gapSize  = gapSize;
   return dashedLines;
