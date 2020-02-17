@@ -203,18 +203,21 @@ struct BABYLON_SHARED_EXPORT Constants {
   /** FLOAT_32_UNSIGNED_INT_24_8_REV */
   static constexpr unsigned int TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV = 15;
 
-  /** nearest is mag = nearest and min = nearest and mip = nearest */
+  /** nearest is mag = nearest and min = nearest and no mip */
   static constexpr unsigned int TEXTURE_NEAREST_SAMPLINGMODE = 1;
-  /** Bilinear is mag = linear and min = linear and mip = nearest */
+  /** mag = nearest and min = nearest and mip = none */
+  static constexpr unsigned int TEXTURE_NEAREST_NEAREST = 1;
+
+  /** Bilinear is mag = linear and min = linear and no mip */
   static constexpr unsigned int TEXTURE_BILINEAR_SAMPLINGMODE = 2;
+  /** mag = linear and min = linear and mip = none */
+  static constexpr unsigned int TEXTURE_LINEAR_LINEAR = 2;
+
   /** Trilinear is mag = linear and min = linear and mip = linear */
   static constexpr unsigned int TEXTURE_TRILINEAR_SAMPLINGMODE = 3;
-  /** nearest is mag = nearest and min = nearest and mip = linear */
-  static constexpr unsigned int TEXTURE_NEAREST_NEAREST_MIPLINEAR = 1;
-  /** Bilinear is mag = linear and min = linear and mip = nearest */
-  static constexpr unsigned int TEXTURE_LINEAR_LINEAR_MIPNEAREST = 2;
   /** Trilinear is mag = linear and min = linear and mip = linear */
   static constexpr unsigned int TEXTURE_LINEAR_LINEAR_MIPLINEAR = 3;
+
   /** mag = nearest and min = nearest and mip = nearest */
   static constexpr unsigned int TEXTURE_NEAREST_NEAREST_MIPNEAREST = 4;
   /** mag = nearest and min = linear and mip = nearest */
@@ -223,14 +226,14 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int TEXTURE_NEAREST_LINEAR_MIPLINEAR = 6;
   /** mag = nearest and min = linear and mip = none */
   static constexpr unsigned int TEXTURE_NEAREST_LINEAR = 7;
-  /** mag = nearest and min = nearest and mip = none */
-  static constexpr unsigned int TEXTURE_NEAREST_NEAREST = 8;
+  /** nearest is mag = nearest and min = nearest and mip = linear */
+  static constexpr unsigned int TEXTURE_NEAREST_NEAREST_MIPLINEAR = 8;
   /** mag = linear and min = nearest and mip = nearest */
   static constexpr unsigned int TEXTURE_LINEAR_NEAREST_MIPNEAREST = 9;
   /** mag = linear and min = nearest and mip = linear */
   static constexpr unsigned int TEXTURE_LINEAR_NEAREST_MIPLINEAR = 10;
-  /** mag = linear and min = linear and mip = none */
-  static constexpr unsigned int TEXTURE_LINEAR_LINEAR = 11;
+  /** Bilinear is mag = linear and min = linear and mip = nearest */
+  static constexpr unsigned int TEXTURE_LINEAR_LINEAR_MIPNEAREST = 11;
   /** mag = linear and min = nearest and mip = none */
   static constexpr unsigned int TEXTURE_LINEAR_NEAREST = 12;
 
