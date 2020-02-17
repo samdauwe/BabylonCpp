@@ -13,6 +13,7 @@ ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
     , angularSensibilityY{1000.f}
     , pinchPrecision{12.f}
     , pinchDeltaPercentage{0.f}
+    , useNaturalPinchZoom{false}
     , panningSensibility{1000.f}
     , multiTouchPanning{true}
     , multiTouchPanAndZoom{true}
@@ -30,11 +31,10 @@ std::string ArcRotateCameraPointersInput::getClassName() const
   return "ArcRotateCameraPointersInput";
 }
 
-void ArcRotateCameraPointersInput::onTouch(
-  const std::optional<PointerTouch>& /*point*/, int offsetX, int offsetY)
+void ArcRotateCameraPointersInput::onTouch(const std::optional<PointerTouch>& /*point*/,
+                                           int offsetX, int offsetY)
 {
-  if (panningSensibility != 0.f
-      && ((_ctrlKey && camera->_useCtrlForPanning) || _isPanClick)) {
+  if (panningSensibility != 0.f && ((_ctrlKey && camera->_useCtrlForPanning) || _isPanClick)) {
     camera->inertialPanningX += -offsetX / panningSensibility;
     camera->inertialPanningY += offsetY / panningSensibility;
   }
@@ -52,14 +52,12 @@ void ArcRotateCameraPointersInput::onDoubleTap(const std::string& /*type*/)
 }
 
 void ArcRotateCameraPointersInput::onMultiTouch(
-  const std::optional<PointerTouch>& /*pointA*/,
-  const std::optional<PointerTouch>& /*pointB*/,
+  const std::optional<PointerTouch>& /*pointA*/, const std::optional<PointerTouch>& /*pointB*/,
   float previousPinchSquaredDistance, float pinchSquaredDistance,
   const std::optional<PointerTouch>& previousMultiTouchPanPosition,
   const std::optional<PointerTouch>& multiTouchPanPosition)
 {
-  if (previousPinchSquaredDistance == 0.f
-      && !previousMultiTouchPanPosition.has_value()) {
+  if (previousPinchSquaredDistance == 0.f && !previousMultiTouchPanPosition.has_value()) {
     // First time this method is called for new pinch.
     // Next time this is called there will be a
     // previousPinchSquaredDistance and pinchSquaredDistance to compare.
@@ -73,24 +71,23 @@ void ArcRotateCameraPointersInput::onMultiTouch(
   auto direction = pinchInwards ? 1.f : -1.f;
 
   if (multiTouchPanAndZoom) {
-    if (pinchDeltaPercentage != 0.f) {
-      camera->inertialRadiusOffset
-        += (pinchSquaredDistance - previousPinchSquaredDistance) * 0.001f
-           * camera->radius * pinchDeltaPercentage;
+    if (useNaturalPinchZoom) {
+      camera->radius = camera->radius * std::sqrt(previousPinchSquaredDistance)
+                       / std::sqrt(pinchSquaredDistance);
+    }
+    else if (pinchDeltaPercentage != 0.f) {
+      camera->inertialRadiusOffset += (pinchSquaredDistance - previousPinchSquaredDistance) * 0.001f
+                                      * camera->radius * pinchDeltaPercentage;
     }
     else {
       camera->inertialRadiusOffset
         += (pinchSquaredDistance - previousPinchSquaredDistance)
-           / (pinchPrecision * direction
-              * (angularSensibilityX + angularSensibilityY) / 2.f);
+           / (pinchPrecision * direction * (angularSensibilityX + angularSensibilityY) / 2.f);
     }
 
-    if (panningSensibility != 0.f && previousMultiTouchPanPosition
-        && multiTouchPanPosition) {
-      auto moveDeltaX
-        = multiTouchPanPosition->x - previousMultiTouchPanPosition->x;
-      auto moveDeltaY
-        = multiTouchPanPosition->y - previousMultiTouchPanPosition->y;
+    if (panningSensibility != 0.f && previousMultiTouchPanPosition && multiTouchPanPosition) {
+      auto moveDeltaX = multiTouchPanPosition->x - previousMultiTouchPanPosition->x;
+      auto moveDeltaY = multiTouchPanPosition->y - previousMultiTouchPanPosition->y;
       camera->inertialPanningX += -moveDeltaX / panningSensibility;
       camera->inertialPanningY += moveDeltaY / panningSensibility;
     }
@@ -101,19 +98,16 @@ void ArcRotateCameraPointersInput::onMultiTouch(
     auto pinchDistance         = std::sqrt(pinchSquaredDistance);
     if (_isPinching
         || (_twoFingerActivityCount < 20
-            && std::abs(pinchDistance - previousPinchDistance)
-                 > camera->pinchToPanMaxDistance)) {
+            && std::abs(pinchDistance - previousPinchDistance) > camera->pinchToPanMaxDistance)) {
       // Since pinch has not been active long, assume we intend to zoom.
       if (pinchDeltaPercentage != 0.f) {
-        camera->inertialRadiusOffset
-          += (pinchSquaredDistance - previousPinchSquaredDistance) * 0.001f
-             * camera->radius * pinchDeltaPercentage;
+        camera->inertialRadiusOffset += (pinchSquaredDistance - previousPinchSquaredDistance)
+                                        * 0.001f * camera->radius * pinchDeltaPercentage;
       }
       else {
         camera->inertialRadiusOffset
           += (pinchSquaredDistance - previousPinchSquaredDistance)
-             / (pinchPrecision * direction
-                * (angularSensibilityX + angularSensibilityY) / 2.f);
+             / (pinchPrecision * direction * (angularSensibilityX + angularSensibilityY) / 2.f);
       }
 
       // Since we are pinching, remain pinching on next iteration.
@@ -122,12 +116,10 @@ void ArcRotateCameraPointersInput::onMultiTouch(
     else {
       // Pause between pinch starting and moving implies not a zoom event.
       // Pan instead.
-      if (panningSensibility != 0.f && multiTouchPanning
-          && multiTouchPanPosition && previousMultiTouchPanPosition) {
-        auto moveDeltaX
-          = multiTouchPanPosition->x - previousMultiTouchPanPosition->x;
-        auto moveDeltaY
-          = multiTouchPanPosition->y - previousMultiTouchPanPosition->y;
+      if (panningSensibility != 0.f && multiTouchPanning && multiTouchPanPosition
+          && previousMultiTouchPanPosition) {
+        auto moveDeltaX = multiTouchPanPosition->x - previousMultiTouchPanPosition->x;
+        auto moveDeltaY = multiTouchPanPosition->y - previousMultiTouchPanPosition->y;
         camera->inertialPanningX += -moveDeltaX / panningSensibility;
         camera->inertialPanningY += moveDeltaY / panningSensibility;
       }

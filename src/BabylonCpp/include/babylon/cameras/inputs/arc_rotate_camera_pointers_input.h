@@ -28,8 +28,8 @@ public:
   [[nodiscard]] std::string getClassName() const override;
 
   /**
-   * @brief Called on pointer POINTERMOVE event if only a single touch is
-   * active. Override this method to provide functionality.
+   * @brief Called on pointer POINTERMOVE event if only a single touch is active.
+   * Override this method to provide functionality.
    */
   void onTouch(const std::optional<PointerTouch>& point, int offsetX, int offsetY) override;
 
@@ -50,15 +50,13 @@ public:
                     const std::optional<PointerTouch>& multiTouchPanPosition) override;
 
   /**
-   * @brief Called each time a new POINTERDOWN event occurs. Ie, for each button
-   * press.
+   * @brief Called each time a new POINTERDOWN event occurs. Ie, for each button press.
    * Override this method to provide functionality.
    */
   void onButtonDown(PointerEvent& evt) override;
 
   /**
-   * @brief Called each time a new POINTERUP event occurs. Ie, for each button
-   * release.
+   * @brief Called each time a new POINTERUP event occurs. Ie, for each button release.
    * Override this method to provide functionality.
    */
   void onButtonUp(PointerEvent& evt) override;
@@ -71,14 +69,12 @@ public:
 
 public:
   /**
-   * Defines the pointer angular sensibility  along the X axis or how fast is
-   * the camera rotating.
+   * Defines the pointer angular sensibility  along the X axis or how fast is the camera rotating.
    */
   float angularSensibilityX;
 
   /**
-   * Defines the pointer angular sensibility along the Y axis or how fast is the
-   * camera rotating.
+   * Defines the pointer angular sensibility along the Y axis or how fast is the camera rotating.
    */
   float angularSensibilityY;
 
@@ -88,12 +84,17 @@ public:
   float pinchPrecision;
 
   /**
-   * pinchDeltaPercentage will be used instead of pinchPrecision if different
-   * from 0.
-   * It defines the percentage of current camera.radius to use as delta when
-   * pinch zoom is used.
+   * pinchDeltaPercentage will be used instead of pinchPrecision if different from 0.
+   * It defines the percentage of current camera.radius to use as delta when pinch zoom is used.
    */
   float pinchDeltaPercentage;
+
+  /**
+   * When useNaturalPinchZoom is true, multi touch zoom will zoom in such that any object in the
+   * plane at the camera's target point will scale perfectly with finger motion.
+   * Overrides pinchDeltaPercentage and pinchPrecision.
+   */
+  bool useNaturalPinchZoom;
 
   /**
    * Defines the pointer panning sensibility or how fast is the camera moving.
@@ -106,8 +107,8 @@ public:
   bool multiTouchPanning;
 
   /**
-   * Defines whether panning is enabled for both pan (2 fingers swipe) and zoom
-   * (pinch) through multitouch.
+   * Defines whether panning is enabled for both pan (2 fingers swipe) and zoom (pinch) through
+   * multitouch.
    */
   bool multiTouchPanAndZoom;
 
