@@ -13,7 +13,6 @@
 #include <babylon/cameras/virtual_joysticks_camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>
@@ -22,6 +21,7 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/maths/frustum.h>
 #include <babylon/misc/serialization_helper.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/postprocesses/anaglyph_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
@@ -58,6 +58,8 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , fovMode{Camera::FOVMODE_VERTICAL_FIXED}
     , cameraRigMode{Camera::RIG_MODE_NONE}
     , outputRenderTarget{nullptr}
+    , isRigCamera{false}
+    , rigParent{nullptr}
     , _skipRendering{false}
     , _projectionMatrix{Matrix()}
     , _computedViewMatrix{Matrix::Identity()}
@@ -758,6 +760,7 @@ void Camera::setCameraRigMode(unsigned int iMode, const RigParamaters& rigParams
     case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
     case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
     case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
+    case Camera::RIG_MODE_STEREOSCOPIC_INTERLACED:
       Camera::_setStereoscopicRigMode(*this);
       break;
     case Camera::RIG_MODE_VR:

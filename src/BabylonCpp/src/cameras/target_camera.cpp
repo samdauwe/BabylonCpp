@@ -462,7 +462,9 @@ void TargetCamera::_computeViewMatrix(const Vector3& iPosition, const Vector3& t
 CameraPtr TargetCamera::createRigCamera(const std::string& iName, int /*cameraIndex*/)
 {
   if (cameraRigMode != Camera::RIG_MODE_NONE) {
-    auto rigCamera = TargetCamera::New(iName, position, getScene());
+    auto rigCamera         = TargetCamera::New(iName, position, getScene());
+    rigCamera->isRigCamera = true;
+    rigCamera->rigParent   = shared_from_base<TargetCamera>();
     if (cameraRigMode == Camera::RIG_MODE_VR || cameraRigMode == Camera::RIG_MODE_WEBVR) {
       if (!rotationQuaternion) {
         rotationQuaternion = std::make_unique<Quaternion>();
@@ -487,9 +489,10 @@ void TargetCamera::_updateRigCameras()
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
     case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
     case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER: {
-      // provisionnaly using _cameraRigParams.stereoHalfAngle instead of
-      // calculations based on _cameraRigParams.interaxialDistance:
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
+    case Camera::RIG_MODE_STEREOSCOPIC_INTERLACED: {
+      // provisionnaly using _cameraRigParams.stereoHalfAngle instead of calculations based on
+      // _cameraRigParams.interaxialDistance:
       auto leftSign
         = (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ? 1.f : -1.f;
       auto rightSign

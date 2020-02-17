@@ -99,6 +99,11 @@ public:
    */
   static constexpr unsigned int RIG_MODE_STEREOSCOPIC_OVERUNDER = 13;
   /**
+   * Defines that both eyes of the camera will be rendered on successive lines interlaced for
+   * passive 3d monitors.
+   */
+  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_INTERLACED = 14;
+  /**
    * Defines that both eyes of the camera should be renderered in a VR mode
    * (carbox).
    */
@@ -155,8 +160,7 @@ public:
   std::vector<AbstractMesh*>& getActiveMeshes();
 
   /**
-   * @brief Check wether a mesh is part of the current active mesh list of the
-   * camera.
+   * @brief Check whether a mesh is part of the current active mesh list of the camera.
    * @param mesh Defines the mesh to check
    * @returns true if active, false otherwise
    */
@@ -649,9 +653,9 @@ public:
   unsigned int mode;
 
   /**
-   * Define wether the camera is intermediate.
-   * This is useful to not present the output directly to the screen in case of
-   * rig without post process for instance
+   * Define whether the camera is intermediate.
+   * This is useful to not present the output directly to the screen in case of rig without post
+   * process for instance
    */
   bool isIntermediate;
 
@@ -731,6 +735,17 @@ public:
    * Observable triggered when reset has been called and applied to the camera.
    */
   Observable<Camera> onRestoreStateObservable;
+
+  /**
+   * Is this camera a part of a rig system?
+   */
+  bool isRigCamera;
+
+  /**
+   * If isRigCamera set to true this will be set with the parent camera.
+   * The parent camera is not (!) necessarily the .parent of this camera (like in the case of XR)
+   */
+  CameraPtr rigParent;
 
   /** Hidden */
   CameraRigParams _cameraRigParams;
