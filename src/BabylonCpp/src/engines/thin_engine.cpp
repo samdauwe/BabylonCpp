@@ -2120,10 +2120,10 @@ SamplingParameters ThinEngine::_getSamplingParameters(unsigned int samplingMode,
       magFilter = GL::NEAREST;
       minFilter = GL::LINEAR;
       break;
-    case Constants::TEXTURE_NEAREST_NEAREST:
+    /*case Constants::TEXTURE_NEAREST_NEAREST:
       magFilter = GL::NEAREST;
       minFilter = GL::NEAREST;
-      break;
+      break;*/
     case Constants::TEXTURE_LINEAR_NEAREST_MIPNEAREST:
       magFilter = GL::LINEAR;
       if (generateMipMaps) {
@@ -2142,10 +2142,10 @@ SamplingParameters ThinEngine::_getSamplingParameters(unsigned int samplingMode,
         minFilter = GL::NEAREST;
       }
       break;
-    case Constants::TEXTURE_LINEAR_LINEAR:
+    /*case Constants::TEXTURE_LINEAR_LINEAR:
       magFilter = GL::LINEAR;
       minFilter = GL::LINEAR;
-      break;
+      break;*/
     case Constants::TEXTURE_LINEAR_NEAREST:
       magFilter = GL::LINEAR;
       minFilter = GL::NEAREST;
