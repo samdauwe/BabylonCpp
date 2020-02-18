@@ -2241,6 +2241,11 @@ public:
   // Members
 
   /**
+   * Hidden
+   */
+  bool _blockEntityCollection;
+
+  /**
    * Gets or sets a boolean that indicates if the scene must clear the render
    * buffer before rendering a frame
    */

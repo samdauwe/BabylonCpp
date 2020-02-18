@@ -97,7 +97,8 @@ milliseconds_t Scene::DoubleClickDelay    = std::chrono::milliseconds(300);
 bool Scene::ExclusiveDoubleClickMode      = false;
 
 Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
-    : autoClear{true}
+    : _blockEntityCollection{false}
+    , autoClear{true}
     , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
