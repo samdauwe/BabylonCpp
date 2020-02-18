@@ -9,10 +9,11 @@ namespace BABYLON {
 
 ShadowLight::ShadowLight(const std::string& iName, Scene* scene)
     : IShadowLight{iName, scene}
-    , shadowMinZ{this, &ShadowLight::get_shadowMinZ,
-                 &ShadowLight::set_shadowMinZ}
-    , shadowMaxZ{this, &ShadowLight::get_shadowMaxZ,
-                 &ShadowLight::set_shadowMaxZ}
+    , shadowMinZ{this, &ShadowLight::get_shadowMinZ, &ShadowLight::set_shadowMinZ}
+    , shadowMaxZ{this, &ShadowLight::get_shadowMaxZ, &ShadowLight::set_shadowMaxZ}
+    , _direction{nullptr}
+    , _shadowMinZ{std::nullopt}
+    , _shadowMaxZ{std::nullopt}
     , _needProjectionMatrixCompute{true}
 {
 }
@@ -87,8 +88,7 @@ bool ShadowLight::computeTransformedInformation()
     if (!_transformedPosition) {
       _transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
     }
-    Vector3::TransformCoordinatesToRef(position, parent()->getWorldMatrix(),
-                                       *_transformedPosition);
+    Vector3::TransformCoordinatesToRef(position, parent()->getWorldMatrix(), *_transformedPosition);
 
     // In case the direction is present.
     if (_direction) {
@@ -174,8 +174,7 @@ Matrix& ShadowLight::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/)
   _updateCache();
   _cache.position.copyFrom(position);
 
-  Matrix::TranslationToRef(position().x, position().y, position().z,
-                           _worldMatrix);
+  Matrix::TranslationToRef(position().x, position().y, position().z, _worldMatrix);
 
   if (parent) {
     _worldMatrix.multiplyToRef(parent()->getWorldMatrix(), _worldMatrix);
@@ -199,9 +198,8 @@ float ShadowLight::getDepthMaxZ(const Camera& activeCamera) const
   return shadowMaxZ().has_value() ? *shadowMaxZ() : activeCamera.maxZ;
 }
 
-IShadowLight* ShadowLight::setShadowProjectionMatrix(
-  Matrix& matrix, Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
+IShadowLight* ShadowLight::setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
+                                                     const std::vector<AbstractMesh*>& renderList)
 {
   if (customProjectionMatrixBuilder) {
     customProjectionMatrixBuilder(viewMatrix, renderList, matrix);

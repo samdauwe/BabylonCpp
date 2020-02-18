@@ -37,7 +37,7 @@ void HemisphericLight::_buildUniformLayout()
 {
   _uniformBuffer->addUniform("vLightData", 4);
   _uniformBuffer->addUniform("vLightDiffuse", 4);
-  _uniformBuffer->addUniform("vLightSpecular", 3);
+  _uniformBuffer->addUniform("vLightSpecular", 4);
   _uniformBuffer->addUniform("vLightGround", 3);
   _uniformBuffer->addUniform("shadowsInfo", 3);
   _uniformBuffer->addUniform("depthValues", 2);

@@ -223,6 +223,8 @@ public:
 protected:
   Vector3 _position;
   std::unique_ptr<Vector3> _direction;
+  std::optional<float> _shadowMinZ;
+  std::optional<float> _shadowMaxZ;
 
   /**
    * The transformed position. Position of the light in world space taking
@@ -237,8 +239,6 @@ protected:
   std::unique_ptr<Vector3> _transformedDirection;
 
 private:
-  std::optional<float> _shadowMinZ;
-  std::optional<float> _shadowMaxZ;
   bool _needProjectionMatrixCompute;
 
 }; // end of class ShadowLight

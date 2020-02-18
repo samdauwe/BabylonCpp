@@ -285,8 +285,8 @@ Light& Light::transferTexturesToEffect(const EffectPtr& /*effect*/,
   return *this;
 }
 
-void Light::bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect,
-                      bool useSpecular, bool usePhysicalLightFalloff, bool rebuildInParallel)
+void Light::_bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect,
+                       bool useSpecular, bool rebuildInParallel)
 {
   auto iAsString  = std::to_string(lightIndex);
   auto needUpdate = false;
@@ -305,11 +305,10 @@ void Light::bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& ef
     transferToEffect(effect, iAsString);
 
     diffuse.scaleToRef(scaledIntensity, TmpVectors::Color3Array[0]);
-    _uniformBuffer->updateColor4("vLightDiffuse", TmpVectors::Color3Array[0],
-                                 usePhysicalLightFalloff ? radius : range, iAsString);
+    _uniformBuffer->updateColor4("vLightDiffuse", TmpVectors::Color3Array[0], range, iAsString);
     if (useSpecular) {
       specular.scaleToRef(scaledIntensity, TmpVectors::Color3Array[1]);
-      _uniformBuffer->updateColor3("vLightSpecular", TmpVectors::Color3Array[1], iAsString);
+      _uniformBuffer->updateColor4("vLightSpecular", TmpVectors::Color3Array[1], radius, iAsString);
     }
     needUpdate = true;
   }

@@ -202,11 +202,10 @@ public:
    * @param scene The scene where the light belongs to
    * @param effect The effect we are binding the data to
    * @param useSpecular Defines if specular is supported
-   * @param usePhysicalLightFalloff Specifies whether the light falloff is defined physically or not
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
-  void bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect, bool useSpecular,
-                 bool usePhysicalLightFalloff = false, bool rebuildInParallel = false);
+  void _bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect, bool useSpecular,
+                  bool rebuildInParallel = false);
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.

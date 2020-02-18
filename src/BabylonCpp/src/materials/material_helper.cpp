@@ -634,10 +634,9 @@ void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
 
 void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
                                const EffectPtr& effect, bool useSpecular,
-                               bool usePhysicalLightFalloff, bool rebuildInParallel)
+                               bool /*usePhysicalLightFalloff*/, bool rebuildInParallel)
 {
-  light->bindLight(lightIndex, scene, effect, useSpecular, usePhysicalLightFalloff,
-                   rebuildInParallel);
+  light->_bindLight(lightIndex, scene, effect, useSpecular, rebuildInParallel);
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,

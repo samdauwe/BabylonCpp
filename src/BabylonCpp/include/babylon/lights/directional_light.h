@@ -170,6 +170,13 @@ public:
    */
   bool autoUpdateExtends;
 
+  /**
+   * Automatically compute the shadowMinZ and shadowMaxZ for the projection matrix to best fit
+   * (including all the casters) on each frame. autoUpdateExtends must be set to true for this to
+   * work
+   */
+  bool autoCalcShadowZBounds;
+
 private:
   float _shadowFrustumSize;
   float _shadowOrthoScale;
