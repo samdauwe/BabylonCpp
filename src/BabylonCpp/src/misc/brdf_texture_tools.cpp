@@ -16,9 +16,12 @@ BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
     auto useDelayedTextureLoading   = scene->useDelayedTextureLoading;
     scene->useDelayedTextureLoading = false;
 
-    auto texture = Texture::CreateFromBase64String(_environmentBRDFBase64Texture,
+    const auto previousState      = scene->_blockEntityCollection;
+    scene->_blockEntityCollection = false;
+    auto texture                  = Texture::CreateFromBase64String(_environmentBRDFBase64Texture,
                                                    "EnvironmentBRDFTexture", scene, true, false,
                                                    TextureConstants::BILINEAR_SAMPLINGMODE);
+    scene->_blockEntityCollection = previousState;
     // BRDF Texture should not be cached here due to pre processing and redundant scene caches.
     auto& texturesCache = scene->getEngine()->getLoadedTexturesCache();
     auto index          = stl_util::index_of(texturesCache, texture->getInternalTexture());
