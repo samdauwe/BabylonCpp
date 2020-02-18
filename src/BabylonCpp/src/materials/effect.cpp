@@ -43,6 +43,7 @@ Effect::Effect(
   IEffectCreationOptions& options, ThinEngine* engine)
     : name{baseName}
     , onBind{nullptr}
+    , _wasPreviouslyReady{false}
     , _bonesComputationForcedToCPU{false}
     , onBindObservable{this, &Effect::get_onBindObservable}
     , _pipelineContext{nullptr}

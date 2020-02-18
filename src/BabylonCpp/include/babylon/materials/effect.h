@@ -608,6 +608,13 @@ public:
    * Hidden
    */
   Observable<Effect> _onBindObservable;
+
+  /**
+   * @hidden
+   * Specifies if the effect was previously ready
+   */
+  bool _wasPreviouslyReady;
+
   /** Hidden */
   bool _bonesComputationForcedToCPU;
   /**
