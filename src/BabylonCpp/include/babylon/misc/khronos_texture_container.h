@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/array_buffer_view.h>
 
 namespace BABYLON {
 
@@ -22,34 +23,28 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 class BABYLON_SHARED_EXPORT KhronosTextureContainer {
 
 private:
-  static constexpr unsigned int HEADER_LEN
-    = 12 + (13 * 4); // identifier + header elements (not including key value
-                     // meta-data pairs)
+  static constexpr unsigned int HEADER_LEN = 12 + (13 * 4); // identifier + header elements (not
+                                                            // including key value meta-data pairs)
 
   // load types
-  static constexpr unsigned int COMPRESSED_2D
-    = 0; // uses a gl.compressedTexImage2D()
-  static constexpr unsigned int COMPRESSED_3D
-    = 1;                                    // uses a gl.compressedTexImage3D()
-  static constexpr unsigned int TEX_2D = 2; // uses a gl.texImage2D()
-  static constexpr unsigned int TEX_3D = 3; // uses a gl.texImage3D()
+  static constexpr unsigned int COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
+  static constexpr unsigned int COMPRESSED_3D = 1; // uses a gl.compressedTexImage3D()
+  static constexpr unsigned int TEX_2D        = 2; // uses a gl.texImage2D()
+  static constexpr unsigned int TEX_3D        = 3; // uses a gl.texImage3D()
 
 public:
   /**
    * @brief Creates a new KhronosTextureContainer.
-   * @param arrayBuffer contents of the KTX container file
-   * @param facesExpected should be either 1 or 6, based whether a cube texture
-   * or or
-   * @param threeDExpected provision for indicating that data should be a 3D
-   * texture, not implemented
-   * @param textureArrayExpected provision for indicating that data should be a
-   * texture array, not implemented
+   * @param data contents of the KTX container file
+   * @param facesExpected should be either 1 or 6, based whether a cube texture or or
+   * @param threeDExpected provision for indicating that data should be a 3D texture, not
+   * implemented
+   * @param textureArrayExpected provision for indicating that data should be a texture array, not
+   * implemented
    */
-  KhronosTextureContainer(const ArrayBuffer& arrayBuffer, int facesExpected,
-                          const std::optional<bool>& threeDExpected
-                          = std::nullopt,
-                          const std::optional<bool>& textureArrayExpected
-                          = std::nullopt);
+  KhronosTextureContainer(const ArrayBufferView& data, int facesExpected,
+                          const std::optional<bool>& threeDExpected       = std::nullopt,
+                          const std::optional<bool>& textureArrayExpected = std::nullopt);
   ~KhronosTextureContainer(); // = default
 
   /**
@@ -61,12 +56,11 @@ public:
   void uploadLevels(const InternalTexturePtr& texture, bool loadMipmaps);
 
 private:
-  void _upload2DCompressedLevels(const InternalTexturePtr& texture,
-                                 bool loadMipmaps);
+  void _upload2DCompressedLevels(const InternalTexturePtr& texture, bool loadMipmaps);
 
 public:
   /** Contents of the KTX container file */
-  ArrayBuffer arrayBuffer;
+  ArrayBufferView data;
   int facesExpected;
   std::optional<bool> threeDExpected;
   std::optional<bool> textureArrayExpected;

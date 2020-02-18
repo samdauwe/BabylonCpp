@@ -8,11 +8,10 @@
 
 namespace BABYLON {
 
-KhronosTextureContainer::KhronosTextureContainer(const ArrayBuffer& iArrayBuffer,
-                                                 int iFacesExpected,
+KhronosTextureContainer::KhronosTextureContainer(const ArrayBufferView& iData, int iFacesExpected,
                                                  const std::optional<bool>& iThreeDExpected,
                                                  const std::optional<bool>& iTextureArrayExpected)
-    : arrayBuffer{iArrayBuffer}
+    : data{iData}
     , facesExpected{iFacesExpected}
     , threeDExpected{iThreeDExpected}
     , textureArrayExpected{iTextureArrayExpected}
@@ -22,7 +21,7 @@ KhronosTextureContainer::KhronosTextureContainer(const ArrayBuffer& iArrayBuffer
   // character representation is: '�', 'K', 'T', 'X', ' ', '1', '1', '�', '\r',
   // '\n', '\x1A', '\n' 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D,
   // 0x0A, 0x1A, 0x0A
-  auto identifier = stl_util::to_array<uint8_t>(arrayBuffer, 0, 12);
+  auto identifier = stl_util::to_array<uint8_t>(data.uint8Array(), data.byteOffset, 12);
   if (identifier[0] != 0xAB || identifier[1] != 0x4B || identifier[2] != 0x54
       || identifier[3] != 0x58 || identifier[4] != 0x20 || identifier[5] != 0x31
       || identifier[6] != 0x31 || identifier[7] != 0xBB || identifier[8] != 0x0D
@@ -34,7 +33,7 @@ KhronosTextureContainer::KhronosTextureContainer(const ArrayBuffer& iArrayBuffer
 
   // load the reset of the header in native 32 bit uint
   auto dataSize = sizeof(uint32_t); // Uint32Array.BYTES_PER_ELEMENT;
-  DataView headerDataView(arrayBuffer, 12, 13 * dataSize);
+  DataView headerDataView(data.uint8Array(), data.byteOffset + 12, 13 * dataSize);
   auto endianness   = headerDataView.getUint32(0, true);
   auto littleEndian = endianness == 0x04030201;
 
@@ -131,12 +130,13 @@ void KhronosTextureContainer::_upload2DCompressedLevels(const InternalTexturePtr
   auto mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
   for (auto level = 0u; level < mipmapCount; ++level) {
     // size per face, since not supporting array cubemaps
-    auto imageSize = stl_util::to_array<int32_t>(arrayBuffer, dataOffset, 1)[0];
+    auto imageSize
+      = stl_util::to_array<int32_t>(data.uint8Array(), data.byteOffset + dataOffset, 1)[0];
     dataOffset += 4; // image data starts from next multiple of 4 offset. Each
                      // face refers to same imagesize field above.
     for (unsigned int face = 0; face < numberOfFaces; face++) {
-      auto byteArray
-        = stl_util::to_array<uint8_t>(arrayBuffer, dataOffset, static_cast<size_t>(imageSize));
+      auto byteArray = stl_util::to_array<uint8_t>(data.uint8Array(), data.byteOffset + dataOffset,
+                                                   static_cast<size_t>(imageSize));
 
       auto engine = texture->getEngine();
       engine->_uploadCompressedDataToTextureDirectly(
