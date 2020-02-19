@@ -20,15 +20,17 @@ class FxaaPostProcess;
 class Light;
 class PostProcess;
 class Scene;
+class ScreenSpaceReflectionPostProcess;
 class ShadowLight;
 class StandardRenderingPipeline;
 class Texture;
-using BlurPostProcessPtr           = std::shared_ptr<BlurPostProcess>;
-using FxaaPostProcessPtr           = std::shared_ptr<FxaaPostProcess>;
-using PostProcessPtr               = std::shared_ptr<PostProcess>;
-using TexturePtr                   = std::shared_ptr<Texture>;
-using ShadowLightPtr               = std::shared_ptr<ShadowLight>;
-using StandardRenderingPipelinePtr = std::shared_ptr<StandardRenderingPipeline>;
+using BlurPostProcessPtr                  = std::shared_ptr<BlurPostProcess>;
+using FxaaPostProcessPtr                  = std::shared_ptr<FxaaPostProcess>;
+using PostProcessPtr                      = std::shared_ptr<PostProcess>;
+using TexturePtr                          = std::shared_ptr<Texture>;
+using ScreenSpaceReflectionPostProcessPtr = std::shared_ptr<ScreenSpaceReflectionPostProcess>;
+using ShadowLightPtr                      = std::shared_ptr<ShadowLight>;
+using StandardRenderingPipelinePtr        = std::shared_ptr<StandardRenderingPipeline>;
 
 /**
  * @brief Standard rendering pipeline.
@@ -58,14 +60,14 @@ public:
   ~StandardRenderingPipeline() override; // = default
 
   void addToScene(const StandardRenderingPipelinePtr& renderingPipeline);
-  [[nodiscard]] Type type() const override;
+  Type type() const override;
   float operator[](const std::string& key) const;
 
   /**
    * @brief Get the class name.
    * @returns "StandardRenderingPipeline"
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Dispose of the pipeline and stop all post processes.
@@ -76,7 +78,7 @@ public:
    * @brief Serialize the rendering pipeline (Used when exporting).
    * @returns the serialized object
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline.
@@ -108,7 +110,7 @@ protected:
   /**
    * @brief Gets the overall exposure used by the pipeline.
    */
-  [[nodiscard]] float get_exposure() const;
+  float get_exposure() const;
 
   /**
    * @brief Sets the overall exposure used by the pipeline.
@@ -116,60 +118,152 @@ protected:
   void set_exposure(float value);
 
   /**
-   * @brief Gets wether or not the exposure of the overall pipeline should be
-   * automatically adjusted by the HDR post-process.
+   * @brief Gets wether or not the exposure of the overall pipeline should be automatically adjusted
+   * by the HDR post-process.
    */
-  [[nodiscard]] bool get_hdrAutoExposure() const;
+  bool get_hdrAutoExposure() const;
 
   /**
-   * @brief Sets wether or not the exposure of the overall pipeline should be
-   * automatically adjusted by the HDR post-process.
+   * @brief Sets wether or not the exposure of the overall pipeline should be automatically adjusted
+   * by the HDR post-process.
    */
   void set_hdrAutoExposure(bool value);
 
   /**
-   * @brief Gets how much the image is blurred by the movement while using the
-   * motion blur post-process.
+   * @brief Gets how much the image is blurred by the movement while using the motion blur
+   * post-process.
    */
-  [[nodiscard]] float get_motionStrength() const;
+  float get_motionStrength() const;
 
   /**
-   * @brief Sets how much the image is blurred by the movement while using the
-   * motion blur post-process.
+   * @brief Sets how much the image is blurred by the movement while using the motion blur
+   * post-process.
    */
   void set_motionStrength(float strength);
 
   /**
-   * @brief Gets wether or not the motion blur post-process is object based or
-   * screen based.
+   * @brief Gets wether or not the motion blur post-process is object based or screen based.
    */
-  [[nodiscard]] bool get_objectBasedMotionBlur() const;
+  bool get_objectBasedMotionBlur() const;
 
   /**
-   * @brief Sets wether or not the motion blur post-process should be object
-   * based or screen based.
+   * @brief Sets wether or not the motion blur post-process should be object based or screen based.
    */
   void set_objectBasedMotionBlur(bool value);
 
-  [[nodiscard]] bool get_bloomEnabled() const;
+  /**
+   * @brief Gets wether or not the bloom pipeline is enabled.
+   */
+  bool get_bloomEnabled() const;
+
+  /**
+   * @brief Sets wether or not the bloom pipeline is enabled.
+   */
   void set_bloomEnabled(bool enabled);
-  [[nodiscard]] bool get_depthOfFieldEnabled() const;
+
+  /**
+   * @brief Gets wether or not the depth of field pipeline is enabled.
+   */
+  bool get_depthOfFieldEnabled() const;
+
+  /**
+   * @brief Sets wether or not the depth of field pipeline is enabled.
+   */
   void set_depthOfFieldEnabled(bool enabled);
-  [[nodiscard]] bool get_lensFlareEnabled() const;
+
+  /**
+   * @brief Gets wether or not the lens flare pipeline is enabled.
+   */
+  bool get_lensFlareEnabled() const;
+
+  /**
+   * @brief Sets wether or not the lens flare pipeline is enabled.
+   */
   void set_lensFlareEnabled(bool enabled);
-  [[nodiscard]] bool get_HDREnabled() const;
+
+  /**
+   * @brief Gets wether or not the HDR pipeline is enabled.
+   */
+  bool get_HDREnabled() const;
+
+  /**
+   * @brief Sets wether or not the HDR pipeline is enabled.
+   */
   void set_HDREnabled(bool enabled);
-  [[nodiscard]] bool get_VLSEnabled() const;
+
+  /**
+   * @brief Gets wether or not the volumetric lights scattering effect is enabled.
+   */
+  bool get_VLSEnabled() const;
+
+  /**
+   * @brief Sets wether or not the volumetric lights scattering effect is enabled.
+   */
   void set_VLSEnabled(bool enabled);
-  [[nodiscard]] bool get_motionBlurEnabled() const;
+
+  /**
+   * @brief Gets wether or not the motion blur effect is enabled.
+   */
+  bool get_motionBlurEnabled() const;
+
+  /**
+   * @brief Sets wether or not the motion blur effect is enabled.
+   */
   void set_motionBlurEnabled(bool enabled);
-  [[nodiscard]] bool get_fxaaEnabled() const;
+
+  /**
+   * @brief Gets wether or not the anti-aliasing is enabled.
+   */
+  bool get_fxaaEnabled() const;
+
+  /**
+   * @brief Sets wether or not the anti-aliasing is enabled.
+   */
   void set_fxaaEnabled(bool enabled);
-  [[nodiscard]] float get_volumetricLightStepsCount() const;
+
+  /**
+   * @brief Gets wether or not the screen space reflections are enabled.
+   */
+  bool get_screenSpaceReflectionsEnabled() const;
+
+  /**
+   * @brief Sets wether or not the screen space reflections are enabled.
+   */
+  void set_screenSpaceReflectionsEnabled(bool enabled);
+
+  /**
+   * @brief Gets the number of steps used to calculate the volumetric lights.
+   * Typically in interval [50, 200]
+   */
+  float get_volumetricLightStepsCount() const;
+
+  /**
+   * @brief Sets the number of steps used to calculate the volumetric lights.
+   * Typically in interval [50, 200]
+   */
   void set_volumetricLightStepsCount(float count);
-  [[nodiscard]] float get_motionBlurSamples() const;
+
+  /**
+   * @brief Gets the number of samples used for the motion blur effect.
+   * Typically in interval [16, 64]
+   */
+  float get_motionBlurSamples() const;
+
+  /**
+   * @brief Sets the number of samples used for the motion blur effect.
+   * Typically in interval [16, 64]
+   */
   void set_motionBlurSamples(float samples);
-  [[nodiscard]] unsigned int get_samples() const;
+
+  /**
+   * @brief Gets the MSAA sample count.
+   */
+  unsigned int get_samples() const;
+
+  /**
+   * @brief Sets the MSAA sample count, setting this to 4 will provide 4x anti aliasing. (default:
+   * 1)
+   */
   void set_samples(unsigned int sampleCount);
 
 private:
@@ -311,6 +405,11 @@ public:
    * aliasing from an image.
    */
   FxaaPostProcessPtr fxaaPostProcess;
+  /**
+   * Post-process used to simulate realtime reflections using the screen space and geometry
+   * renderer.
+   */
+  ScreenSpaceReflectionPostProcessPtr screenSpaceReflectionPostProcess;
 
   // Values
 
@@ -482,6 +581,11 @@ public:
   Property<StandardRenderingPipeline, bool> fxaaEnabled;
 
   /**
+   * Specifies if screen space reflections are enabled.
+   */
+  Property<StandardRenderingPipeline, bool> screenSpaceReflectionsEnabled;
+
+  /**
    * Specifies the number of steps used to calculate the volumetric lights
    * Typically in interval [50, 200]
    */
@@ -520,6 +624,7 @@ private:
   bool _hdrEnabled;
   bool _motionBlurEnabled;
   bool _fxaaEnabled;
+  bool _screenSpaceReflectionsEnabled;
   float _motionBlurSamples;
   float _volumetricLightStepsCount;
   unsigned int _samples;

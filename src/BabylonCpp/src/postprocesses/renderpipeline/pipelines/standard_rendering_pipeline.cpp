@@ -26,6 +26,7 @@
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
+#include <babylon/postprocesses/screen_space_reflection_post_process.h>
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
 
@@ -57,6 +58,7 @@ StandardRenderingPipeline::StandardRenderingPipeline(const std::string& iName, S
     , motionBlurPostProcess{nullptr}
     , depthOfFieldPostProcess{nullptr}
     , fxaaPostProcess{nullptr}
+    , screenSpaceReflectionPostProcess{nullptr}
     , brightThreshold{1.f}
     , blurWidth{512.f}
     , horizontalBlur{false}
@@ -100,6 +102,9 @@ StandardRenderingPipeline::StandardRenderingPipeline(const std::string& iName, S
                         &StandardRenderingPipeline::set_motionBlurEnabled}
     , fxaaEnabled{this, &StandardRenderingPipeline::get_fxaaEnabled,
                   &StandardRenderingPipeline::set_fxaaEnabled}
+    , screenSpaceReflectionsEnabled{this,
+                                    &StandardRenderingPipeline::get_screenSpaceReflectionsEnabled,
+                                    &StandardRenderingPipeline::set_screenSpaceReflectionsEnabled}
     , volumetricLightStepsCount{this, &StandardRenderingPipeline::get_volumetricLightStepsCount,
                                 &StandardRenderingPipeline::set_volumetricLightStepsCount}
     , motionBlurSamples{this, &StandardRenderingPipeline::get_motionBlurSamples,
@@ -121,6 +126,7 @@ StandardRenderingPipeline::StandardRenderingPipeline(const std::string& iName, S
     , _hdrEnabled{false}
     , _motionBlurEnabled{false}
     , _fxaaEnabled{false}
+    , _screenSpaceReflectionsEnabled{false}
     , _motionBlurSamples{64.f}
     , _volumetricLightStepsCount{50.f}
     , _samples{1}
@@ -381,6 +387,21 @@ void StandardRenderingPipeline::set_fxaaEnabled(bool enabled)
   _buildPipeline();
 }
 
+bool StandardRenderingPipeline::get_screenSpaceReflectionsEnabled() const
+{
+  return _screenSpaceReflectionsEnabled;
+}
+
+void StandardRenderingPipeline::set_screenSpaceReflectionsEnabled(bool enabled)
+{
+  if (_screenSpaceReflectionsEnabled == enabled) {
+    return;
+  }
+
+  _screenSpaceReflectionsEnabled = enabled;
+  _buildPipeline();
+}
+
 float StandardRenderingPipeline::get_volumetricLightStepsCount() const
 {
   return _volumetricLightStepsCount;
@@ -435,44 +456,51 @@ void StandardRenderingPipeline::set_samples(unsigned int sampleCount)
 void StandardRenderingPipeline::_buildPipeline()
 {
   auto ratio = _ratio;
+  auto scene = _scene;
+
+  _disposePostProcesses();
   if (!_cameras.empty()) {
     _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(_name, _cameras);
     // get back cameras to be used to reattach pipeline
     _cameras = _camerasToBeAttached;
   }
-  auto scene = _scene;
-
-  _disposePostProcesses();
   _reset();
 
   // Create pass post-process
+  if (_screenSpaceReflectionsEnabled) {
+    screenSpaceReflectionPostProcess = ScreenSpaceReflectionPostProcess::New(
+      "HDRPass", scene, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
+      false, _floatTextureType);
+    screenSpaceReflectionPostProcess->onApplyObservable.add(
+      [&](Effect* /*effect*/, EventState& /*es*/) {
+        _currentDepthOfFieldSource = screenSpaceReflectionPostProcess;
+      });
+  }
+
   if (!_basePostProcess) {
     originalPostProcess = PostProcess::New(
       "HDRPass", "standard", {}, {}, ratio, nullptr, Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
       scene->getEngine(), false, "#define PASS_POST_PROCESS", _floatTextureType);
-    originalPostProcess->onApply = [&](Effect* /*effect*/, EventState& /*es*/) {
-      _currentDepthOfFieldSource = originalPostProcess;
-    };
   }
   else {
     originalPostProcess = _basePostProcess;
   }
 
-  if (_bloomEnabled || _vlsEnabled || _lensFlareEnabled || _depthOfFieldEnabled
-      || _motionBlurEnabled) {
-    addEffect(PostProcessRenderEffect::New(
-      scene->getEngine(), "HDRPassPostProcess",
-      [&]() -> std::vector<PostProcessPtr> { return {originalPostProcess}; }, true));
-  }
+  originalPostProcess->autoClear = !screenSpaceReflectionPostProcess;
+  originalPostProcess->onApply   = [&](Effect* /*effect*/, EventState& /*es*/) {
+    _currentDepthOfFieldSource = originalPostProcess;
+  };
 
-  _currentDepthOfFieldSource = originalPostProcess;
+  addEffect(PostProcessRenderEffect::New(
+    scene->getEngine(), "HDRPassPostProcess",
+    [&]() -> std::vector<PostProcessPtr> { return {originalPostProcess}; }, true));
 
   if (_bloomEnabled) {
     // Create down sample X4 post-process
-    _createDownSampleX4PostProcess(scene, ratio / 2.f);
+    _createDownSampleX4PostProcess(scene, ratio / 4.f);
 
     // Create bright pass post-process
-    _createBrightPassPostProcess(scene, ratio / 2.f);
+    _createBrightPassPostProcess(scene, ratio / 4.f);
 
     // Create gaussian blur post-processes (down sampling blurs)
     _createBlurPostProcesses(scene, ratio / 4.f, 1);
@@ -574,7 +602,7 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene, flo
   downSampleX4PostProcess
     = PostProcess::New("HDRDownSampleX4", "standard", {"dsOffsets"}, {}, ratio, nullptr,
                        TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-                       "#define DOWN_SAMPLE_X4", Constants::TEXTURETYPE_UNSIGNED_INT);
+                       "#define DOWN_SAMPLE_X4", _floatTextureType);
 
   downSampleX4PostProcess->onApply = [&](Effect* effect, EventState&) {
     Float32Array downSampleX4Offsets(32);
@@ -602,7 +630,7 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene, float
   brightPassPostProcess
     = PostProcess::New("HDRBrightPass", "standard", {"dsOffsets", "brightThreshold"}, {}, ratio,
                        nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-                       "#define BRIGHT_PASS", Constants::TEXTURETYPE_UNSIGNED_INT);
+                       "#define BRIGHT_PASS", _floatTextureType);
 
   brightPassPostProcess->onApply = [&](Effect* effect, EventState&) {
     const float sU = (1.f / brightPassPostProcess->width);
@@ -636,14 +664,12 @@ void StandardRenderingPipeline::_createBlurPostProcesses(Scene* scene, float rat
 
   const std::string underscore = "_";
   const auto indiceStr         = std::to_string(indice);
-  auto blurX = BlurPostProcess::New("HDRBlurH" + underscore + indiceStr, Vector2(1.f, 0.f),
-                                    (*this)[blurWidthKey], ratio, nullptr,
-                                    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
-                                    false, Constants::TEXTURETYPE_UNSIGNED_INT);
-  auto blurY = BlurPostProcess::New("HDRBlurV" + underscore + indiceStr, Vector2(0.f, 1.f),
-                                    (*this)[blurWidthKey], ratio, nullptr,
-                                    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
-                                    false, Constants::TEXTURETYPE_UNSIGNED_INT);
+  auto blurX                   = BlurPostProcess::New(
+    "HDRBlurH" + underscore + indiceStr, Vector2(1.f, 0.f), (*this)[blurWidthKey], ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false, _floatTextureType);
+  auto blurY = BlurPostProcess::New(
+    "HDRBlurV" + underscore + indiceStr, Vector2(0.f, 1.f), (*this)[blurWidthKey], ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false, _floatTextureType);
 
   blurX->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurX->width) / static_cast<float>(iEngine->getRenderWidth());
@@ -671,7 +697,7 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene, flo
   textureAdderPostProcess
     = PostProcess::New("HDRTextureAdder", "standard", {"exposure"}, {"otherSampler", "lensSampler"},
                        ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
-                       false, "#define TEXTURE_ADDER", Constants::TEXTURETYPE_UNSIGNED_INT);
+                       false, "#define TEXTURE_ADDER", _floatTextureType);
   textureAdderPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
     effect->setTextureFromPostProcess("otherSampler", _vlsEnabled ? _currentDepthOfFieldSource :
                                                                     originalPostProcess);
@@ -955,7 +981,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene, float 
       return;
     }
 
-    effect->setTextureFromPostProcess("otherSampler", textureAdderFinalPostProcess);
+    effect->setTextureFromPostProcess("otherSampler", lensFlarePostProcess);
     effect->setTexture("lensDirtSampler", lensFlareDirtTexture);
     effect->setTexture("lensStarSampler", lensStarTexture);
 
@@ -1082,6 +1108,9 @@ void StandardRenderingPipeline::_disposePostProcesses()
     if (originalPostProcess) {
       originalPostProcess->dispose(camera);
     }
+    if (screenSpaceReflectionPostProcess) {
+      screenSpaceReflectionPostProcess->dispose(camera);
+    }
 
     if (downSampleX4PostProcess) {
       downSampleX4PostProcess->dispose(camera);
@@ -1091,9 +1120,6 @@ void StandardRenderingPipeline::_disposePostProcesses()
     }
     if (textureAdderPostProcess) {
       textureAdderPostProcess->dispose(camera);
-    }
-    if (textureAdderFinalPostProcess) {
-      textureAdderFinalPostProcess->dispose(camera);
     }
 
     if (volumetricLightPostProcess) {
@@ -1172,6 +1198,7 @@ void StandardRenderingPipeline::_disposePostProcesses()
   depthOfFieldPostProcess           = nullptr;
   motionBlurPostProcess             = nullptr;
   fxaaPostProcess                   = nullptr;
+  screenSpaceReflectionPostProcess  = nullptr;
 
   luminanceDownSamplePostProcesses.clear();
   blurHPostProcesses.clear();
