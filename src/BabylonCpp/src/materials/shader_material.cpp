@@ -290,7 +290,7 @@ bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* /*subMes
 bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
   if (_effect && isFrozen()) {
-    if (_wasPreviouslyReady) {
+    if (_effect->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -414,8 +414,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     scene->resetCachedMaterial();
   }
 
-  _renderId           = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  _renderId                    = scene->getRenderId();
+  _effect->_wasPreviouslyReady = true;
 
   return true;
 }
@@ -462,6 +462,10 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh)
       if (_multiview) {
         _effect->setMatrix("viewProjectionR", getScene()->_transformMatrixR);
       }
+    }
+
+    if (getScene()->activeCamera() && stl_util::contains(_options.uniforms, "cameraPosition")) {
+      _effect->setVector3("cameraPosition", getScene()->activeCamera()->globalPosition());
     }
 
     // Bones
