@@ -209,6 +209,8 @@ protected:
    * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage in
    * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
    * @param blockCompilation If the shader should not be compiled imediatly. (default: false)
+   * @param textureFormat Format of textures used when performing the post process. (default:
+   * TEXTUREFORMAT_RGBA)
    */
   PostProcess(const std::string& name, const std::string& fragmentUrl,
               const std::vector<std::string>& parameters, const std::vector<std::string>& samplers,
@@ -218,7 +220,8 @@ protected:
               unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
               const std::string& vertexUrl = "postprocess",
               const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-              bool blockCompilation                                                = false);
+              bool blockCompilation                                                = false,
+              unsigned int textureFormat = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Gets the number of sample textures (default: 1)
@@ -461,6 +464,7 @@ private:
   std::variant<float, PostProcessOptions> _options;
   bool _reusable;
   unsigned int _textureType;
+  unsigned int _textureFormat;
   EffectPtr _effect;
   std::vector<std::string> _samplers;
   std::string _fragmentUrl;

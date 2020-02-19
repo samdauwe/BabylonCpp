@@ -251,7 +251,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
       }
 
       engine_->enableEffect(effect);
-      _mesh->_bind(subMesh, effect, Material::TriangleFillMode);
+      _mesh->_bind(subMesh, effect, material->fillMode());
 
       if (_mesh == mesh) {
         material->bind(_mesh->getWorldMatrix(), _mesh.get());

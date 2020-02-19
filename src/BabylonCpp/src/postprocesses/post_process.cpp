@@ -21,7 +21,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
                          Engine* engine, bool reusable, const std::string& defines,
                          unsigned int textureType, const std::string& vertexUrl,
                          const std::unordered_map<std::string, unsigned int>& indexParameters,
-                         bool blockCompilation)
+                         bool blockCompilation, unsigned int textureFormat)
     : name{iName}
     , width{-1}
     , height{-1}
@@ -73,6 +73,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
   renderTargetSamplingMode = samplingMode.value_or(Constants::TEXTURE_NEAREST_SAMPLINGMODE);
   _reusable                = reusable;
   _textureType             = textureType;
+  _textureFormat           = textureFormat;
 
   _samplers.insert(_samplers.end(), samplers.begin(), samplers.end());
   _samplers.emplace_back("textureSampler");
@@ -289,6 +290,10 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
                         std::get<PostProcessOptions>(_options).height :
                         requiredHeight;
 
+  const auto needMipMaps = renderTargetSamplingMode != Constants::TEXTURE_NEAREST_LINEAR
+                           && renderTargetSamplingMode != Constants::TEXTURE_NEAREST_NEAREST
+                           && renderTargetSamplingMode != Constants::TEXTURE_LINEAR_LINEAR;
+
   if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
 
     if (adaptScaleToCurrentViewport) {
@@ -300,7 +305,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
       }
     }
 
-    if (renderTargetSamplingMode == Constants::TEXTURE_TRILINEAR_SAMPLINGMODE || alwaysForcePOT) {
+    if (needMipMaps || alwaysForcePOT) {
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredWidth = engine->needPOTTextures() ?
                          Engine::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
@@ -324,13 +329,6 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
       width  = desiredWidth;
       height = desiredHeight;
 
-      const auto needMipMaps
-        = renderTargetSamplingMode == Constants::TEXTURE_TRILINEAR_SAMPLINGMODE
-          || renderTargetSamplingMode == Constants::TEXTURE_NEAREST_NEAREST_MIPLINEAR
-          || renderTargetSamplingMode == Constants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
-          || renderTargetSamplingMode == Constants::TEXTURE_NEAREST_LINEAR_MIPLINEAR
-          || renderTargetSamplingMode == Constants::TEXTURE_LINEAR_NEAREST_MIPLINEAR;
-
       auto textureSize = ISize(width, height);
       IRenderTargetOptions textureOptions;
       textureOptions.generateMipMaps = needMipMaps;
@@ -341,6 +339,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
           && _engine->isStencilEnable();
       textureOptions.samplingMode = renderTargetSamplingMode;
       textureOptions.type         = _textureType;
+      textureOptions.format       = _textureFormat;
 
       _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions));
 
