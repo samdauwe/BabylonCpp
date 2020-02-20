@@ -288,7 +288,7 @@ BaseTexturePtr PBRBaseMaterial::getAlphaTestTexture()
 bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
-    if (_wasPreviouslyReady) {
+    if (subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -436,8 +436,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
     return false;
   }
 
-  defines._renderId   = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  defines._renderId                      = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }
@@ -777,7 +777,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
         defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR"]               = false;
         defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"]         = false;
         defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"] = false;
-        defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]            = false;
 
         switch (reflectionTexture->coordinatesMode()) {
           case TextureConstants::EXPLICIT_MODE:
@@ -830,10 +829,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
             }
           }
         }
-        else {
-          defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]
-            = !reflectionTexture->getReflectionTextureMatrix()->isIdentity();
-        }
       }
       else {
         defines.boolDef["REFLECTION"]                                  = false;
@@ -844,7 +839,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
         defines.boolDef["USE_LOCAL_REFLECTIONMAP_CUBIC"]               = false;
         defines.boolDef["REFLECTIONMAP_PROJECTION"]                    = false;
         defines.boolDef["REFLECTIONMAP_SKYBOX"]                        = false;
-        defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]            = false;
         defines.boolDef["REFLECTIONMAP_EXPLICIT"]                      = false;
         defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR"]               = false;
         defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"]         = false;
@@ -1422,7 +1416,6 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
       MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
-                                 _lightFalloff != PBRBaseMaterial::LIGHTFALLOFF_STANDARD,
                                  _rebuildInParallel);
     }
 

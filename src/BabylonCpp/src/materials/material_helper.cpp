@@ -308,14 +308,19 @@ void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh, co
   }
 
   // Shadows
-  defines.boolDef["SHADOW" + lightIndexStr]              = false;
-  defines.boolDef["SHADOWPCF" + lightIndexStr]           = false;
-  defines.boolDef["SHADOWPCSS" + lightIndexStr]          = false;
-  defines.boolDef["SHADOWPOISSON" + lightIndexStr]       = false;
-  defines.boolDef["SHADOWESM" + lightIndexStr]           = false;
-  defines.boolDef["SHADOWCUBE" + lightIndexStr]          = false;
-  defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]    = false;
-  defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = false;
+  defines.boolDef["SHADOW" + lightIndexStr]                 = false;
+  defines.boolDef["SHADOWCSM" + lightIndexStr]              = false;
+  defines.boolDef["SHADOWCSMDEBUG" + lightIndexStr]         = false;
+  defines.boolDef["SHADOWCSMNUM_CASCADES" + lightIndexStr]  = false;
+  defines.boolDef["SHADOWCSMUSESHADOWMAXZ" + lightIndexStr] = false;
+  defines.boolDef["SHADOWCSMNOBLEND" + lightIndexStr]       = false;
+  defines.boolDef["SHADOWPCF" + lightIndexStr]              = false;
+  defines.boolDef["SHADOWPCSS" + lightIndexStr]             = false;
+  defines.boolDef["SHADOWPOISSON" + lightIndexStr]          = false;
+  defines.boolDef["SHADOWESM" + lightIndexStr]              = false;
+  defines.boolDef["SHADOWCUBE" + lightIndexStr]             = false;
+  defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]       = false;
+  defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr]    = false;
 
   if (mesh && mesh->receiveShadows() && scene->shadowsEnabled() && light->shadowEnabled) {
     const auto& shadowGenerator = light->getShadowGenerator();
@@ -379,19 +384,24 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
   for (auto index = lightIndex; index < maxSimultaneousLights; ++index) {
     const auto indexStr = std::to_string(index);
     if (stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
-      defines.boolDef["LIGHT" + indexStr]               = false;
-      defines.boolDef["HEMILIGHT" + indexStr]           = false;
-      defines.boolDef["POINTLIGHT" + indexStr]          = false;
-      defines.boolDef["DIRLIGHT" + indexStr]            = false;
-      defines.boolDef["SPOTLIGHT" + indexStr]           = false;
-      defines.boolDef["SHADOW" + indexStr]              = false;
-      defines.boolDef["SHADOWPCF" + indexStr]           = false;
-      defines.boolDef["SHADOWPCSS" + indexStr]          = false;
-      defines.boolDef["SHADOWPOISSON" + indexStr]       = false;
-      defines.boolDef["SHADOWESM" + indexStr]           = false;
-      defines.boolDef["SHADOWCUBE" + indexStr]          = false;
-      defines.boolDef["SHADOWLOWQUALITY" + indexStr]    = false;
-      defines.boolDef["SHADOWMEDIUMQUALITY" + indexStr] = false;
+      defines.boolDef["LIGHT" + indexStr]                  = false;
+      defines.boolDef["HEMILIGHT" + indexStr]              = false;
+      defines.boolDef["POINTLIGHT" + indexStr]             = false;
+      defines.boolDef["DIRLIGHT" + indexStr]               = false;
+      defines.boolDef["SPOTLIGHT" + indexStr]              = false;
+      defines.boolDef["SHADOW" + indexStr]                 = false;
+      defines.boolDef["SHADOWCSM" + indexStr]              = false;
+      defines.boolDef["SHADOWCSMDEBUG" + indexStr]         = false;
+      defines.boolDef["SHADOWCSMNUM_CASCADES" + indexStr]  = false;
+      defines.boolDef["SHADOWCSMUSESHADOWMAXZ" + indexStr] = false;
+      defines.boolDef["SHADOWCSMNOBLEND" + indexStr]       = false;
+      defines.boolDef["SHADOWPCF" + indexStr]              = false;
+      defines.boolDef["SHADOWPCSS" + indexStr]             = false;
+      defines.boolDef["SHADOWPOISSON" + indexStr]          = false;
+      defines.boolDef["SHADOWESM" + indexStr]              = false;
+      defines.boolDef["SHADOWCUBE" + indexStr]             = false;
+      defines.boolDef["SHADOWLOWQUALITY" + indexStr]       = false;
+      defines.boolDef["SHADOWMEDIUMQUALITY" + indexStr]    = false;
     }
   }
 
@@ -449,6 +459,15 @@ void MaterialHelper::PrepareUniformsAndSamplersForLight(
 
   samplersList.emplace_back("shadowSampler" + lightIndexStr);
   samplersList.emplace_back("depthSampler" + lightIndexStr);
+
+  stl_util::concat(uniformsList, {
+                                   "viewFrustumZ" + lightIndexStr,          //
+                                   "cascadeBlendFactor" + lightIndexStr,    //
+                                   "lightSizeUVCorrection" + lightIndexStr, //
+                                   "depthCorrection" + lightIndexStr,       //
+                                   "penumbraDarkness" + lightIndexStr,      //
+                                   "frustumLengths" + lightIndexStr,        //
+                                 });
 
   if (projectedLightTexture) {
     samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
@@ -633,36 +652,34 @@ void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
 }
 
 void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                               const EffectPtr& effect, bool useSpecular,
-                               bool /*usePhysicalLightFalloff*/, bool rebuildInParallel)
+                               const EffectPtr& effect, bool useSpecular, bool rebuildInParallel)
 {
   light->_bindLight(lightIndex, scene, effect, useSpecular, rebuildInParallel);
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
                                 bool defines, unsigned int maxSimultaneousLights,
-                                bool usePhysicalLightFalloff, bool rebuildInParallel)
+                                bool rebuildInParallel)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, effect, defines, usePhysicalLightFalloff, rebuildInParallel);
+    BindLight(light, i, scene, effect, defines, rebuildInParallel);
   }
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
                                 MaterialDefines& defines, unsigned int maxSimultaneousLights,
-                                bool usePhysicalLightFalloff, bool rebuildInParallel)
+                                bool rebuildInParallel)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, effect, defines["SPECULARTERM"], usePhysicalLightFalloff,
-              rebuildInParallel);
+    BindLight(light, i, scene, effect, defines["SPECULARTERM"], rebuildInParallel);
   }
 }
 

@@ -299,12 +299,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param scene The scene where the light belongs to
    * @param effect The effect we are binding the data to
    * @param useSpecular Defines if specular is supported
-   * @param usePhysicalLightFalloff Specifies whether the light falloff is defined physically or not
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                        const EffectPtr& effect, bool useSpecular,
-                        bool usePhysicalLightFalloff = false, bool rebuildInParallel = false);
+                        const EffectPtr& effect, bool useSpecular, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -313,12 +311,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param defines The generated defines for the effect
    * @param maxSimultaneousLights The maximum number of light that can be bound to the effect
-   * @param usePhysicalLightFalloff Specifies whether the light falloff is defined physically or not
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect, bool defines,
-                         unsigned int maxSimultaneousLights = 4,
-                         bool usePhysicalLightFalloff = false, bool rebuildInParallel = false);
+                         unsigned int maxSimultaneousLights = 4, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -327,12 +323,11 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param defines The generated defines for the effect
    * @param maxSimultaneousLights The maximum number of light that can be bound to the effect
-   * @param usePhysicalLightFalloff Specifies whether the light falloff is defined physically or not
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
                          MaterialDefines& defines, unsigned int maxSimultaneousLights = 4,
-                         bool usePhysicalLightFalloff = false, bool rebuildInParallel = false);
+                         bool rebuildInParallel = false);
 
   /**
    * @brief Binds the fog information from the scene to the effect for the given mesh.

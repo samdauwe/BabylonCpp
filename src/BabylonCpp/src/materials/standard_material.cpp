@@ -1211,7 +1211,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, effect, defines, _maxSimultaneousLights, false,
+      MaterialHelper::BindLights(scene, mesh, effect, defines, _maxSimultaneousLights,
                                  _rebuildInParallel);
     }
 
