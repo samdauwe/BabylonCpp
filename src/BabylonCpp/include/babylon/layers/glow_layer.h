@@ -67,44 +67,40 @@ public:
   /**
    * @brief Checks for the readiness of the element composing the layer.
    * @param subMesh the mesh to check for
-   * @param useInstances specify wether or not to use instances to render the
-   * mesh
-   * @param emissiveTexture the associated emissive texture used to generate the
-   * glow
+   * @param useInstances specify wether or not to use instances to render the mesh
+   * @param emissiveTexture the associated emissive texture used to generate the glow
    * @return true if ready otherwise, false
    */
   bool isReady(SubMesh* subMesh, bool useInstances) override;
 
   /**
-   * @brief Returns wether or nood the layer needs stencil enabled during the
-   * mesh rendering.
+   * @brief Returns whether or nood the layer needs stencil enabled during the mesh rendering.
    */
   [[nodiscard]] bool needStencil() const override;
 
   /**
-   * @brief Add a mesh in the exclusion list to prevent it to impact or being
-   * impacted by the glow layer.
+   * @brief Add a mesh in the exclusion list to prevent it to impact or being impacted by the glow
+   * layer.
    * @param mesh The mesh to exclude from the glow layer
    */
   void addExcludedMesh(Mesh* mesh);
 
   /**
-   * @brief Remove a mesh from the exclusion list to let it impact or being
-   * impacted by the glow layer.
+   * @brief Remove a mesh from the exclusion list to let it impact or being impacted by the glow
+   * layer.
    * @param mesh The mesh to remove
    */
   void removeExcludedMesh(Mesh* mesh);
 
   /**
-   * @brief Add a mesh in the inclusion list to impact or being impacted by the
-   * glow layer.
+   * @brief Add a mesh in the inclusion list to impact or being impacted by the glow layer.
    * @param mesh The mesh to include in the glow layer
    */
   void addIncludedOnlyMesh(Mesh* mesh);
 
   /**
-   * @brief Remove a mesh from the Inclusion list to prevent it to impact or
-   * being impacted by the glow layer.
+   * @brief Remove a mesh from the Inclusion list to prevent it to impact or being impacted by the
+   * glow layer.
    * @param mesh The mesh to remove
    */
   void removeIncludedOnlyMesh(Mesh* mesh);
@@ -237,7 +233,7 @@ protected:
   void _addCustomEffectDefines(std::vector<std::string>& defines) override;
 
   /**
-   * @brief Defines wether the current material of the mesh should be use to render the effect.
+   * @brief Defines whether the current material of the mesh should be use to render the effect.
    * @param mesh defines the current mesh to render
    */
   bool _useMeshMaterial(const AbstractMeshPtr& mesh) const override;

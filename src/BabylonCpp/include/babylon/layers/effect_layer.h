@@ -73,13 +73,13 @@ public:
   /**
    * @brief Checks for the readiness of the element composing the layer.
    * @param subMesh the mesh to check for
-   * @param useInstances specify wether or not to use instances to render the mesh
+   * @param useInstances specify whether or not to use instances to render the mesh
    * @return true if ready otherwise, false
    */
   virtual bool isReady(SubMesh* subMesh, bool useInstances) = 0;
 
   /**
-   * @brief Returns wether or nood the layer needs stencil enabled during the mesh rendering.
+   * @brief Returns whether or nood the layer needs stencil enabled during the mesh rendering.
    * @returns true if the effect requires stencil during the main canvas render pass.
    */
   [[nodiscard]] virtual bool needStencil() const = 0;
@@ -213,7 +213,7 @@ protected:
   /**
    * @brief Checks for the readiness of the element composing the layer.
    * @param subMesh the mesh to check for
-   * @param useInstances specify wether or not to use instances to render the mesh
+   * @param useInstances specify whether or not to use instances to render the mesh
    * @param emissiveTexture the associated emissive texture used to generate the glow
    * @return true if ready otherwise, false
    */
@@ -247,7 +247,7 @@ protected:
   void _renderSubMesh(SubMesh* subMesh, bool enableAlphaMode = false);
 
   /**
-   * @brief Defines wether the current material of the mesh should be use to render the effect.
+   * @brief Defines whether the current material of the mesh should be use to render the effect.
    * @param mesh defines the current mesh to render
    */
   virtual bool _useMeshMaterial(const AbstractMeshPtr& mesh) const;
@@ -286,7 +286,7 @@ public:
   Color4 neutralColor;
 
   /**
-   * Specifies wether the highlight layer is enabled or not.
+   * Specifies whether the highlight layer is enabled or not.
    */
   bool isEnabled;
 
