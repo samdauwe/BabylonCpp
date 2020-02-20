@@ -135,6 +135,7 @@ void Particle::_inheritParticleInfoToSubEmitters()
 void Particle::_reset()
 {
   age                           = 0.f;
+  id                            = Particle::_Count++;
   _currentColorGradient         = std::nullopt;
   _currentSizeGradient          = std::nullopt;
   _currentAngularSpeedGradient  = std::nullopt;
