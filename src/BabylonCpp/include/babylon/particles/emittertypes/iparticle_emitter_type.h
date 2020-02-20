@@ -20,14 +20,12 @@ class Vector3;
 
 /**
  * @brief Particle emitter represents a volume emitting particles.
- * This is the responsibility of the implementation to define the volume shape
- * like cone/sphere/box.
+ * This is the responsibility of the implementation to define the volume shape like cone/sphere/box.
  */
 struct BABYLON_SHARED_EXPORT IParticleEmitterType {
   virtual ~IParticleEmitterType() = default;
   /**
-   * @brief Called by the particle System when the direction is computed for the
-   * created particle.
+   * @brief Called by the particle System when the direction is computed for the created particle.
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
@@ -37,8 +35,7 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
     = 0;
 
   /**
-   * @brief Called by the particle System when the position is computed for the
-   * created particle.
+   * @brief Called by the particle System when the position is computed for the created particle.
    * @param worldMatrix is the world matrix of the particle system
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
