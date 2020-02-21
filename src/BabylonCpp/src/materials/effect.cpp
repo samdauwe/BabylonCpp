@@ -609,7 +609,7 @@ bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
 
 bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
 {
-  if (!stl_util::contains(_valueCache, uniformName)) {
+  if (!stl_util::contains(_valueCache, uniformName) || _valueCache[uniformName].size() != 2) {
     _valueCache[uniformName] = {x, y};
     return true;
   }
@@ -630,7 +630,7 @@ bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
 
 bool Effect::_cacheFloat3(const std::string& uniformName, float x, float y, float z)
 {
-  if (!stl_util::contains(_valueCache, uniformName)) {
+  if (!stl_util::contains(_valueCache, uniformName) || _valueCache[uniformName].size() != 3) {
     _valueCache[uniformName] = {x, y, z};
     return true;
   }
@@ -655,7 +655,7 @@ bool Effect::_cacheFloat3(const std::string& uniformName, float x, float y, floa
 
 bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y, float z, float w)
 {
-  if (!stl_util::contains(_valueCache, uniformName)) {
+  if (!stl_util::contains(_valueCache, uniformName) || _valueCache[uniformName].size() != 4) {
     _valueCache[uniformName] = {x, y, z, w};
     return true;
   }
