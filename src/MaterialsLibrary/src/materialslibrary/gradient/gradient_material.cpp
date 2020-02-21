@@ -90,7 +90,7 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
                                          bool useInstances)
 {
   if (isFrozen()) {
-    if (_wasPreviouslyReady && subMesh->effect()) {
+    if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -196,8 +196,8 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     return false;
   }
 
-  _renderId           = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  _renderId                              = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }

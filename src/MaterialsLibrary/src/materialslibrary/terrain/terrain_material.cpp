@@ -195,7 +195,7 @@ BaseTexturePtr TerrainMaterial::getAlphaTestTexture()
 bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
-    if (_wasPreviouslyReady && subMesh->effect()) {
+    if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -344,8 +344,8 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
     return false;
   }
 
-  _renderId           = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  _renderId                              = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }

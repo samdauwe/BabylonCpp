@@ -127,8 +127,8 @@ public:
    */
   Property<WaterMaterial, bool> bumpSuperimpose;
   /**
-   * Color refraction and reflection differently with .waterColor2 and
-   * .colorBlendFactor2. Non-linear (physically correct) fresnel
+   * Color refraction and reflection differently with .waterColor2 and .colorBlendFactor2.
+   * Non-linear (physically correct) fresnel
    */
   Property<WaterMaterial, bool> fresnelSeparate;
   /**
@@ -160,7 +160,7 @@ public:
    */
   float waveSpeed;
   /**
-   * Sets or gets wether or not automatic clipping should be enabled or not. Setting to true will
+   * Sets or gets whether or not automatic clipping should be enabled or not. Setting to true will
    * save performances and will avoid calculating useless pixels in the pixel shader of the water
    * material.
    */

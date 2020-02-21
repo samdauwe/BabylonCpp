@@ -201,7 +201,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMe
                                           bool useInstances)
 {
   if (isFrozen()) {
-    if (_wasPreviouslyReady && subMesh->effect()) {
+    if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -339,8 +339,8 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMe
     return false;
   }
 
-  _renderId           = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  _renderId                              = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }

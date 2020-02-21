@@ -62,7 +62,7 @@ BaseTexturePtr SkyMaterial::getAlphaTestTexture()
 bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool /*useInstances*/)
 {
   if (isFrozen()) {
-    if (_wasPreviouslyReady && subMesh->effect()) {
+    if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -136,8 +136,8 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bo
     return false;
   }
 
-  _renderId           = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  _renderId                              = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }
