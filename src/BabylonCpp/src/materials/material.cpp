@@ -82,7 +82,6 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , pointsCloud{this, &Material::get_pointsCloud, &Material::set_pointsCloud}
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
     , _effect{nullptr}
-    , _wasPreviouslyReady{false}
     , _indexInSceneMaterialArray{-1}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
                           &Material::set_useLogarithmicDepth}
@@ -338,14 +337,14 @@ bool Material::isFrozen() const
 
 void Material::freeze()
 {
-  _wasPreviouslyReady = false;
-  checkReadyOnlyOnce  = true;
+  markDirty();
+  checkReadyOnlyOnce = true;
 }
 
 void Material::unfreeze()
 {
-  _wasPreviouslyReady = false;
-  checkReadyOnlyOnce  = false;
+  markDirty();
+  checkReadyOnlyOnce = false;
 }
 
 bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
@@ -398,7 +397,23 @@ void Material::trackCreation(
 
 void Material::markDirty()
 {
-  _wasPreviouslyReady = false;
+  const auto& meshes = getScene()->meshes;
+  for (const auto& mesh : meshes) {
+    if (mesh->subMeshes.empty()) {
+      continue;
+    }
+    for (const auto& subMesh : mesh->subMeshes) {
+      if (subMesh->getMaterial().get() != this) {
+        continue;
+      }
+
+      if (!subMesh->effect()) {
+        continue;
+      }
+
+      subMesh->effect()->_wasPreviouslyReady = false;
+    }
+  }
 }
 
 bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> overrideOrientation)

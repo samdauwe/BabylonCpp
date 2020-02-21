@@ -508,7 +508,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
   }
 
   if (subMesh->effect() && isFrozen()) {
-    if (_wasPreviouslyReady) {
+    if (subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -635,8 +635,8 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     return false;
   }
 
-  defines->_renderId  = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  defines->_renderId                     = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }

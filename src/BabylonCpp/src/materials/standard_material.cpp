@@ -403,7 +403,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
                                          bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
-    if (_wasPreviouslyReady) {
+    if (subMesh->effect()->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -499,8 +499,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
               break;
             case TextureConstants::SKYBOX_MODE:
               defines.setReflectionMode("REFLECTIONMAP_SKYBOX");
-              defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]
-                = !_reflectionTexture->getReflectionTextureMatrix()->isIdentity();
               break;
             case TextureConstants::SPHERICAL_MODE:
               defines.setReflectionMode("REFLECTIONMAP_SPHERICAL");
@@ -895,8 +893,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     return false;
   }
 
-  defines._renderId   = scene->getRenderId();
-  _wasPreviouslyReady = true;
+  defines._renderId                      = scene->getRenderId();
+  subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
 }

@@ -19,8 +19,8 @@ using IAnimatablePtr       = std::shared_ptr<IAnimatable>;
 using StandardMaterialPtr  = std::shared_ptr<StandardMaterial>;
 
 /**
- * @brief This is the default material used in Babylon. It is the best trade off
- * between quality and performances.
+ * @brief This is the default material used in Babylon. It is the best trade off between quality and
+ * performances.
  * @see http://doc.babylonjs.com/babylon101/materials
  */
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {

@@ -61,7 +61,6 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"USE_LOCAL_REFLECTIONMAP_CUBIC", false},               //
     {"REFLECTIONMAP_PROJECTION", false},                    //
     {"REFLECTIONMAP_SKYBOX", false},                        //
-    {"REFLECTIONMAP_SKYBOX_TRANSFORMED", false},            //
     {"REFLECTIONMAP_EXPLICIT", false},                      //
     {"REFLECTIONMAP_EQUIRECTANGULAR", false},               //
     {"REFLECTIONMAP_EQUIRECTANGULAR_FIXED", false},         //

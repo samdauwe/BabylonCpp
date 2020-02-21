@@ -783,12 +783,6 @@ public:
   EffectPtr _effect;
 
   /**
-   * Specifies if the material was previously ready
-   * Hidden
-   */
-  bool _wasPreviouslyReady;
-
-  /**
    * Hidden
    */
   int _indexInSceneMaterialArray;
