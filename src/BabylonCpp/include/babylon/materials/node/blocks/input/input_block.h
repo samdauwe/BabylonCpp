@@ -251,6 +251,11 @@ public:
   float max;
 
   /**
+   * Gets or set a value indicating that this input can only get 0 and 1 values
+   */
+  bool isBoolean;
+
+  /**
    * Gets or sets a value used by the Node Material editor to determine how to configure the current
    * value if it is a matrix
    */

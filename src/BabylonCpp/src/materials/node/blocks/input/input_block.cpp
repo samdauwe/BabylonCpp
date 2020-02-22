@@ -19,6 +19,7 @@ InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarge
     : NodeMaterialBlock(iName, iTarget, false, true)
     , min{0.f}
     , max{0.f}
+    , isBoolean{false}
     , matrixMode{0}
     , _systemValue{std::nullopt}
     , visibleInInspector{false}
@@ -77,6 +78,9 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
             return _type;
           case Animation::ANIMATIONTYPE_COLOR4:
             _type = NodeMaterialBlockConnectionPointTypes::Color4;
+            return _type;
+          case Animation::ANIMATIONTYPE_MATRIX:
+            _type = NodeMaterialBlockConnectionPointTypes::Matrix;
             return _type;
           default:
             break;
@@ -157,7 +161,20 @@ AnimationValuePtr& InputBlock::get_value()
 
 void InputBlock::set_value(const AnimationValuePtr& iValue)
 {
-  _storedValue = iValue;
+  AnimationValuePtr newValue = iValue;
+  if (type == NodeMaterialBlockConnectionPointTypes::Float) {
+    if (isBoolean) {
+      newValue = std::make_shared<AnimationValue>(iValue->get<float>() != 0.f ? 1.f : 0.f);
+    }
+    else if (!stl_util::almost_equal(min, max)) {
+      auto tmpValue = iValue->get<float>();
+      tmpValue      = std::max(min, tmpValue);
+      tmpValue      = std::min(max, tmpValue);
+      newValue      = std::make_shared<AnimationValue>(tmpValue);
+    }
+  }
+
+  _storedValue = newValue;
   _mode        = NodeMaterialBlockConnectionPointMode::Uniform;
 }
 
@@ -543,13 +560,15 @@ InputBlock& InputBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string InputBlock::_dumpPropertiesCode()
 {
+  const auto& variableName = _codeVariableName;
+
   if (isAttribute()) {
-    return StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", _codeVariableName.c_str(),
+    return StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", variableName.c_str(),
                                name.c_str());
   }
   if (isSystemValue()) {
     return StringTools::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",
-                               _codeVariableName.c_str(), static_cast<unsigned int>(*_systemValue));
+                               variableName.c_str(), static_cast<unsigned int>(*_systemValue));
   }
   if (isUniform()) {
     std::string valueString = "";
@@ -557,15 +576,17 @@ std::string InputBlock::_dumpPropertiesCode()
       case NodeMaterialBlockConnectionPointTypes::Float: {
         const auto floatValue = value()->get<float>();
         auto returnValue
-          = StringTools::printf("%s.value = %f;\r\n", _codeVariableName.c_str(), floatValue);
+          = StringTools::printf("%s.value = %f;\r\n", variableName.c_str(), floatValue);
 
-        returnValue += StringTools::printf("%s.min = %f;\r\n", _codeVariableName.c_str(), min);
-        returnValue += StringTools::printf("%s.max = %f;\r\n", _codeVariableName.c_str(), max);
+        returnValue += StringTools::printf("%s.min = %f;\r\n", variableName.c_str(), min);
+        returnValue += StringTools::printf("%s.max = %f;\r\n", variableName.c_str(), max);
+        returnValue += StringTools::printf("%s.isBoolean = %s;\r\n", variableName.c_str(),
+                                           isBoolean ? "true" : "false");
         returnValue
-          += StringTools::printf("%s.matrixMode = %u;\r\n", _codeVariableName.c_str(), matrixMode);
-        returnValue += StringTools::printf("%s.animationType  = AnimatedInputBlockTypes(%u);\r\n",
-                                           _codeVariableName.c_str(),
-                                           static_cast<unsigned int>(animationType()));
+          += StringTools::printf("%s.matrixMode = %u;\r\n", variableName.c_str(), matrixMode);
+        returnValue
+          += StringTools::printf("%s.animationType  = AnimatedInputBlockTypes(%u);\r\n",
+                                 variableName.c_str(), static_cast<unsigned int>(animationType()));
 
         return returnValue;
       }
@@ -593,14 +614,17 @@ std::string InputBlock::_dumpPropertiesCode()
         valueString = StringTools::printf("Color4(%f, %f, %f, %f)", color4Value.r, color4Value.g,
                                           color4Value.b, color4Value.a);
       } break;
+      case NodeMaterialBlockConnectionPointTypes::Matrix: {
+        // const auto& matrixValue = value()->get<Matrix>();
+        // valueString = StringTools::printf("Matrix::FromArray(%s)", matrixValue.m());
+      } break;
       default:
         break;
     }
-    auto finalOutput
-      = StringTools::printf("%s.value = ${valueString};\r\n", _codeVariableName.c_str());
-    finalOutput += StringTools::printf("%s.isConstant = %s;\r\n", _codeVariableName.c_str(),
+    auto finalOutput = StringTools::printf("%s.value = ${valueString};\r\n", variableName.c_str());
+    finalOutput += StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
                                        isConstant ? "true" : "false");
-    finalOutput += StringTools::printf("%s.visibleInInspector = %s;\r\n", _codeVariableName.c_str(),
+    finalOutput += StringTools::printf("%s.visibleInInspector = %s;\r\n", variableName.c_str(),
                                        visibleInInspector ? "true" : "false");
 
     return finalOutput;
