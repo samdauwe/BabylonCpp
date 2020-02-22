@@ -83,6 +83,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_output();
 
   /**
+   * @brief Gets the instanceID component
+   */
+  NodeMaterialConnectionPointPtr& get_instanceID();
+
+  /**
    * @brief Hidden
    */
   InstancesBlock& _buildBlock(NodeMaterialBuildState& state) override;
@@ -117,6 +122,11 @@ public:
    * Gets the output component
    */
   ReadOnlyProperty<InstancesBlock, NodeMaterialConnectionPointPtr> output;
+
+  /**
+   * Gets the instanceID component
+   */
+  ReadOnlyProperty<InstancesBlock, NodeMaterialConnectionPointPtr> instanceID;
 
 }; // end of class InstancesBlock
 

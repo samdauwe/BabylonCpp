@@ -164,7 +164,6 @@ public:
 
 private:
   std::string _repeatableContentAnchor;
-  size_t _repeatebleContentGenerated;
 
 }; // end of class MorphTargetsBlock
 

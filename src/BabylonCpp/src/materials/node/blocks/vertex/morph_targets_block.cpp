@@ -25,7 +25,6 @@ MorphTargetsBlock::MorphTargetsBlock(const std::string& iName)
     , normalOutput{this, &MorphTargetsBlock::get_normalOutput}
     , tangentOutput{this, &MorphTargetsBlock::get_tangentOutput}
     , uvOutput{this, &MorphTargetsBlock::get_uvOutput}
-    , _repeatebleContentGenerated{0}
 {
   registerInput("position", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerInput("normal", NodeMaterialBlockConnectionPointTypes::Vector3);
@@ -145,7 +144,7 @@ void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr
 void MorphTargetsBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
                              Mesh* mesh)
 {
-  if (mesh && _repeatebleContentGenerated > 0) {
+  if (mesh && mesh->morphTargetManager() && mesh->morphTargetManager()->numInfluencers() > 0) {
     MaterialHelper::BindMorphTargetParameters(mesh, effect);
   }
 
@@ -166,7 +165,6 @@ void MorphTargetsBlock::replaceRepeatableContent(
   const auto& _uvOutput       = uvOutput();
   auto& _state                = vertexShaderState;
   auto repeatCount            = defines.intDef["NUM_MORPH_INFLUENCERS"];
-  _repeatebleContentGenerated = repeatCount;
 
   auto& manager    = static_cast<Mesh*>(mesh)->morphTargetManager();
   auto hasNormals  = manager && manager->supportsNormals() && defines["NORMAL"];
@@ -203,7 +201,7 @@ void MorphTargetsBlock::replaceRepeatableContent(
     if (hasUVs) {
       injectionCode += "#ifdef MORPHTARGETS_UV\r\n";
       injectionCode
-        += StringTools::printf("%s.xyz += (uv_%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
+        += StringTools::printf("%s.xy += (uv_%zu - %s.xy) * morphTargetInfluences[%zu];\r\n",
                                _uvOutput->associatedVariableName().c_str(), index,
                                _uv->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
@@ -228,6 +226,10 @@ void MorphTargetsBlock::replaceRepeatableContent(
       if (hasTangents) {
         _state.attributes.emplace_back(
           StringTools::printf("%s%zu", VertexBuffer::TangentKind, index));
+      }
+
+      if (hasUVs) {
+        _state.attributes.emplace_back(StringTools::printf("%s_%zu", VertexBuffer::UVKind, index));
       }
     }
   }
@@ -272,16 +274,25 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString
     += StringTools::printf("%s = %s;\r\n", _declareOutput(_normalOutput, state).c_str(),
                            _normal->associatedVariableName().c_str());
+  state.compilationString += "#else\r\n";
+  state.compilationString += StringTools::printf("%s = vec3(0., 0., 0.);\r\n",
+                                                 _declareOutput(_normalOutput, state).c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#ifdef TANGENT\r\n";
   state.compilationString
     += StringTools::printf("%s = %s;\r\n", _declareOutput(_tangentOutput, state).c_str(),
                            _tangent->associatedVariableName().c_str());
+  state.compilationString += "#else\r\n";
+  state.compilationString += StringTools::printf("%s = vec3(0., 0., 0.);\r\n",
+                                                 _declareOutput(_tangentOutput, state).c_str());
   state.compilationString += "#endif\r\n";
   state.compilationString += "#ifdef UV1\r\n";
   state.compilationString
     += StringTools::printf("%s = %s;\r\n", _declareOutput(_uvOutput, state).c_str(),
                            _uv->associatedVariableName().c_str());
+  state.compilationString += "#else\r\n";
+  state.compilationString
+    += StringTools::printf("%s = vec2(0., 0.);\r\n", _declareOutput(_uvOutput, state).c_str());
   state.compilationString += "#endif\r\n";
 
   // Repeatable content

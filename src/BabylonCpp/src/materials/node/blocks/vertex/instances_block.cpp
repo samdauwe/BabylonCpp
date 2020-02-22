@@ -18,6 +18,7 @@ InstancesBlock::InstancesBlock(const std::string& iName)
     , world3{this, &InstancesBlock::get_world3}
     , world{this, &InstancesBlock::get_world}
     , output{this, &InstancesBlock::get_output}
+    , instanceID{this, &InstancesBlock::get_instanceID}
 {
   registerInput("world0", NodeMaterialBlockConnectionPointTypes::Vector4);
   registerInput("world1", NodeMaterialBlockConnectionPointTypes::Vector4);
@@ -26,6 +27,7 @@ InstancesBlock::InstancesBlock(const std::string& iName)
   registerInput("world", NodeMaterialBlockConnectionPointTypes::Matrix, true);
 
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Matrix);
+  registerOutput("instanceID", NodeMaterialBlockConnectionPointTypes::Float);
 }
 
 InstancesBlock::~InstancesBlock() = default;
@@ -63,6 +65,11 @@ NodeMaterialConnectionPointPtr& InstancesBlock::get_world()
 NodeMaterialConnectionPointPtr& InstancesBlock::get_output()
 {
   return _outputs[0];
+}
+
+NodeMaterialConnectionPointPtr& InstancesBlock::get_instanceID()
+{
+  return _outputs[1];
 }
 
 void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
@@ -143,11 +150,12 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->blocksWithDefines.emplace_back(this);
 
   // Emit code
-  const auto& iOutput = _outputs[0];
-  const auto& iWorld0 = world0();
-  const auto& iWorld1 = world1();
-  const auto& iWorld2 = world2();
-  const auto& iWorld3 = world3();
+  const auto& iOutput     = _outputs[0];
+  const auto& iInstanceID = _outputs[1];
+  const auto& iWorld0     = world0();
+  const auto& iWorld1     = world1();
+  const auto& iWorld2     = world2();
+  const auto& iWorld3     = world3();
 
   state.compilationString += "#ifdef INSTANCES\r\n";
   state.compilationString += _declareOutput(iOutput, state)
@@ -156,10 +164,12 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
                                                    iWorld1->associatedVariableName().c_str(),
                                                    iWorld2->associatedVariableName().c_str(),
                                                    iWorld3->associatedVariableName().c_str());
+  state.compilationString += _declareOutput(iInstanceID, state) + " = float(gl_InstanceID);\r\n";
   state.compilationString += "#else\r\n";
   state.compilationString
     += _declareOutput(iOutput, state)
        + StringTools::printf(" = %s;\r\n", world()->associatedVariableName().c_str());
+  state.compilationString += _declareOutput(iInstanceID, state) + " = 0.0;\r\n";
   state.compilationString += "#endif\r\n";
   return *this;
 }

@@ -112,11 +112,12 @@ LightInformationBlock& LightInformationBlock::_buildBlock(NodeMaterialBuildState
   state._emitUniformFromString(_lightDataUniformName, "vec3");
   state._emitUniformFromString(_lightColorUniformName, "vec4");
 
-  state.compilationString += StringTools::printf("#if %s\r\n", _lightTypeDefineName.c_str());
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _lightTypeDefineName.c_str());
   state.compilationString
     += _declareOutput(_direction, state)
-       + StringTools::printf(" = normalize(%s - %s.xyz);\r\n", _lightDataUniformName.c_str(),
-                             worldPosition()->associatedVariableName().c_str());
+       + StringTools::printf(" = normalize(%s - %s.xyz - %s);\r\n", _lightDataUniformName.c_str(),
+                             worldPosition()->associatedVariableName().c_str(),
+                             _lightDataUniformName.c_str());
   state.compilationString += "#else\r\n";
   state.compilationString += _declareOutput(_direction, state)
                              + StringTools::printf(" = %s;\r\n", _lightDataUniformName.c_str());
