@@ -163,11 +163,13 @@ void LightBlock::updateUniformsAndSamples(NodeMaterialBuildState& state,
                                           std::vector<std::string>& uniformBuffers)
 {
   for (auto lightIndex = 0u; lightIndex < nodeMaterial->maxSimultaneousLights; ++lightIndex) {
-    if (!defines["LIGHT" + std::to_string(lightIndex)]) {
+    const auto lightIndexStr = std::to_string(lightIndex);
+    if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
-    MaterialHelper::PrepareUniformsAndSamplersForLight(lightIndex, state.uniforms, state.samplers,
-                                                       uniformBuffers, false);
+    MaterialHelper::PrepareUniformsAndSamplersForLight(
+      lightIndex, state.uniforms, state.samplers, uniformBuffers, true,
+      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
   }
 }
 
@@ -180,11 +182,10 @@ void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMateri
   auto scene = mesh->getScene();
 
   if (!light) {
-    MaterialHelper::BindLights(scene, mesh, effect, true, nodeMaterial->maxSimultaneousLights,
-                               false);
+    MaterialHelper::BindLights(scene, mesh, effect, true, nodeMaterial->maxSimultaneousLights);
   }
   else {
-    MaterialHelper::BindLight(light, _lightId, scene, effect, true, false);
+    MaterialHelper::BindLight(light, _lightId, scene, effect, true);
   }
 }
 
@@ -337,20 +338,19 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   state.compilationString
     += _declareOutput(_diffuseOutput, state)
        + StringTools::printf(
-           " = diffuseBase%s;\r\n",
-           diffuseColor()->isConnected() ?
-             StringTools::printf(" * %s", diffuseColor()->associatedVariableName().c_str())
-               .c_str() :
-             "");
+         " = diffuseBase%s;\r\n",
+         diffuseColor()->isConnected() ?
+           StringTools::printf(" * %s", diffuseColor()->associatedVariableName().c_str()).c_str() :
+           "");
   if (_specularOutput->hasEndpoints()) {
     state.compilationString
       += _declareOutput(_specularOutput, state)
          + StringTools::printf(
-             " = specularBase%s;\r\n",
-             specularColor()->isConnected() ?
-               StringTools::printf(" * %s", specularColor()->associatedVariableName().c_str())
-                 .c_str() :
-               "");
+           " = specularBase%s;\r\n",
+           specularColor()->isConnected() ?
+             StringTools::printf(" * %s", specularColor()->associatedVariableName().c_str())
+               .c_str() :
+             "");
   }
 
   if (shadow()->hasEndpoints()) {

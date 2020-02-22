@@ -32,7 +32,8 @@ ReflectionTextureBlock::ReflectionTextureBlock(const std::string& iName)
   registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4, false,
                 NodeMaterialBlockTargets::Vertex);
   registerInput("worldNormal", NodeMaterialBlockConnectionPointTypes::Vector4, false,
-                NodeMaterialBlockTargets::Vertex);
+                NodeMaterialBlockTargets::Fragment); // Flagging as fragment as the normal can be
+                                                     // changed by fragment code
   registerInput("world", NodeMaterialBlockConnectionPointTypes::Matrix, false,
                 NodeMaterialBlockTargets::Vertex);
 
@@ -233,13 +234,6 @@ void ReflectionTextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
                              worldPosition()->associatedVariableName().c_str());
   }
 
-  auto worldNormalVaryingName
-    = StringTools::printf("v_%s", worldNormal()->associatedVariableName().c_str());
-  if (state._emitVaryingFromString(worldNormalVaryingName, "vec4")) {
-    state.compilationString += StringTools::printf("%s = %s;\r\n", worldNormalVaryingName.c_str(),
-                                                   worldNormal()->associatedVariableName().c_str());
-  }
-
   _positionUVWName = state._getFreeVariableName("positionUVW");
   _directionWName  = state._getFreeVariableName("directionW");
 
@@ -347,7 +341,7 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   // Code
   auto worldPos = StringTools::printf("v_%s", worldPosition()->associatedVariableName().c_str());
   auto _worldNormal
-    = StringTools::printf("v_%s.xyz", worldNormal()->associatedVariableName().c_str());
+    = StringTools::printf("%s.xyz", worldNormal()->associatedVariableName().c_str());
   auto reflectionMatrix = _reflectionMatrixName;
   auto direction        = StringTools::printf("normalize(%s)", _directionWName.c_str());
   auto _positionUVW     = _positionUVWName;

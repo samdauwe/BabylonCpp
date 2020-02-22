@@ -17,6 +17,7 @@ namespace BABYLON {
 TextureBlock::TextureBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment}
     , texture{nullptr}
+    , convertToGammaSpace{false}
     , uv{this, &TextureBlock::get_uv}
     , rgba{this, &TextureBlock::get_rgba}
     , rgb{this, &TextureBlock::get_rgb}
@@ -164,7 +165,7 @@ void TextureBlock::initializeDefines(AbstractMesh* /*mesh*/,
   defines.setValue(_mainUVDefineName, false);
 }
 
-void TextureBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
+void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
                                   NodeMaterialDefines& defines, bool /*useInstances*/)
 {
   if (!defines._areTexturesDirty) {
@@ -177,9 +178,9 @@ void TextureBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*n
     return;
   }
 
-  defines.setValue(_linearDefineName, !texture->gammaSpace);
+  defines.setValue(_linearDefineName, convertToGammaSpace);
   if (_isMixed) {
-    if (!texture->getTextureMatrix(_getTextureBase(static_cast<Mesh*>(mesh)))->isIdentityAs3x2()) {
+    if (!texture->getTextureMatrix()->isIdentityAs3x2()) {
       defines.setValue(_defineName, true);
     }
     else {
@@ -187,23 +188,6 @@ void TextureBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*n
       defines.setValue(_mainUVDefineName, true);
     }
   }
-}
-
-int TextureBlock::_getTextureBase(Mesh* mesh)
-{
-  auto base = 1;
-  // By default textures loaded by the node material are loaded with invertY set to false. But for
-  // regular meshes (created by the MeshBuilder) we need to switch it
-  if (texture && mesh
-      && (!mesh->overrideMaterialSideOrientation.has_value()
-          || *mesh->overrideMaterialSideOrientation
-               == Constants::MATERIAL_CounterClockWiseSideOrientation)) {
-    if (!texture->invertY()) {
-      base = -1;
-    }
-  }
-
-  return base;
 }
 
 bool TextureBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
@@ -225,7 +209,7 @@ void TextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMa
 
   if (_isMixed) {
     effect->setFloat(_textureInfoName, texture->level);
-    effect->setMatrix(_textureTransformName, *texture->getTextureMatrix(_getTextureBase(mesh)));
+    effect->setMatrix(_textureTransformName, *texture->getTextureMatrix());
   }
   effect->setTexture(_samplerName, texture);
 }
@@ -266,8 +250,8 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
   state.compilationString += StringTools::printf(
     "%s = vec2(%s * vec4(%s.xy, 1.0, 0.0));\r\n", _transformedUVName.c_str(),
     _textureTransformName.c_str(), uvInput->associatedVariableName().c_str());
-  state.compilationString += "#endif\r\n";
-  state.compilationString += StringTools::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
+  state.compilationString
+    += StringTools::printf("#elif defined(%s)\r\n", _mainUVDefineName.c_str());
   state.compilationString += StringTools::printf("%s = %s.xy;\r\n", _mainUVName.c_str(),
                                                  uvInput->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
@@ -313,8 +297,8 @@ void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexM
   state.compilationString
     += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
                            _samplerName.c_str(), _transformedUVName.c_str());
-  state.compilationString += "#endif\r\n";
-  state.compilationString += StringTools::printf("#ifdef %s\r\n", _mainUVDefineName.c_str());
+  state.compilationString
+    += StringTools::printf("#elif defined(%s)\r\n", _mainUVDefineName.c_str());
   state.compilationString
     += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
                            _samplerName.c_str(), _mainUVName.c_str());
@@ -443,8 +427,8 @@ std::string TextureBlock::_dumpPropertiesCode()
                                     texture->uScale);
   codeString += StringTools::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(),
                                     texture->vScale);
-  codeString += StringTools::printf("%s.texture.gammaSpace = %d;\r\n", _codeVariableName.c_str(),
-                                    texture->gammaSpace());
+  codeString += StringTools::printf("%s.convertToGammaSpace = %d;\r\n", _codeVariableName.c_str(),
+                                    convertToGammaSpace);
 
   return codeString;
 }

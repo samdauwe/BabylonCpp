@@ -153,7 +153,6 @@ protected:
   std::string _dumpPropertiesCode() override;
 
 private:
-  int _getTextureBase(Mesh* mesh);
   void _injectVertexCode(NodeMaterialBuildState& state);
   void _writeTextureRead(NodeMaterialBuildState& state, bool vertexMode = false);
   void _writeOutput(NodeMaterialBuildState& state, const NodeMaterialConnectionPointPtr& output,
@@ -164,6 +163,11 @@ public:
    * Gets or sets the texture associated with the node
    */
   TexturePtr texture;
+
+  /**
+   * Gets or sets a boolean indicating if content needs to be converted to gamma space
+   */
+  bool convertToGammaSpace;
 
   /**
    * Gets the uv input component.
