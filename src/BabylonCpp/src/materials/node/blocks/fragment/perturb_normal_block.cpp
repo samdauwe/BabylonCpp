@@ -14,11 +14,12 @@
 namespace BABYLON {
 
 PerturbNormalBlock::PerturbNormalBlock(const std::string& iName)
-    : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Neutral}
+    : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Fragment}
     , invertX{false}
     , invertY{false}
     , worldPosition{this, &PerturbNormalBlock::get_worldPosition}
     , worldNormal{this, &PerturbNormalBlock::get_worldNormal}
+    , worldTangent{this, &PerturbNormalBlock::get_worldTangent}
     , uv{this, &PerturbNormalBlock::get_uv}
     , normalMapColor{this, &PerturbNormalBlock::get_normalMapColor}
     , strength{this, &PerturbNormalBlock::get_strength}
@@ -27,6 +28,7 @@ PerturbNormalBlock::PerturbNormalBlock(const std::string& iName)
   // Vertex
   registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4, false);
   registerInput("worldNormal", NodeMaterialBlockConnectionPointTypes::Vector4, false);
+  registerInput("worldTangent", NodeMaterialBlockConnectionPointTypes::Vector4, true);
   registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2, false);
   registerInput("normalMapColor", NodeMaterialBlockConnectionPointTypes::Color3, false);
   registerInput("strength", NodeMaterialBlockConnectionPointTypes::Float, false);
@@ -52,19 +54,24 @@ NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_worldNormal()
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_uv()
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_worldTangent()
 {
   return _inputs[2];
 }
 
-NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_normalMapColor()
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_uv()
 {
   return _inputs[3];
 }
 
-NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_strength()
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_normalMapColor()
 {
   return _inputs[4];
+}
+
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_strength()
+{
+  return _inputs[5];
 }
 
 NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_output()
@@ -118,6 +125,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
   const auto& _uv            = uv();
   const auto& _worldPosition = worldPosition();
   const auto& _worldNormal   = worldNormal();
+  const auto& _worldTangent  = worldTangent();
 
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
@@ -132,14 +140,30 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
         StringTools::printf("1.0 / %s", strength()->associatedVariableName().c_str());
 
   state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
+
+  StringsReplacement tangentReplaceString{
+    "defined\\(TANGENT\\)",                                               // search
+    _worldTangent->isConnected() ? "defined(TANGENT)" : "defined(IGNORE)" // replace
+  };
+
+  if (_worldTangent->isConnected()) {
+    state.compilationString += StringTools::printf("vec3 tbnNormal = normalize(%s.xyz);\r\n",
+                                                   _worldNormal->associatedVariableName().c_str());
+    state.compilationString += StringTools::printf("vec3 tbnTangent = normalize(%s.xyz);\r\n",
+                                                   _worldTangent->associatedVariableName().c_str());
+    state.compilationString += "vec3 tbnBitangent = cross(tbnNormal, tbnTangent);\r\n";
+    state.compilationString += "mat3 vTBN = mat3(tbnTangent, tbnBitangent, tbnNormal);\r\n";
+  }
+
   EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
   emitFunctionFromIncludeOptions.replaceStrings
     = {{"vBumpInfos.y", replaceForBumpInfos},
        {"vTangentSpaceParams", _tangentSpaceParameterName},
        {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
-       {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
+       tangentReplaceString};
   state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
                                  emitFunctionFromIncludeOptions);
+
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
   emitCodeFromIncludeOptions.replaceStrings
@@ -151,7 +175,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
        {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
        {"normalW=", output()->associatedVariableName() + ".xyz = "},
        {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
-       {"defined\\(TANGENT\\)", "defined(IGNORE)"}};
+       tangentReplaceString};
   state.compilationString
     += state._emitCodeFromInclude("bumpFragment", iComments, emitCodeFromIncludeOptions);
 

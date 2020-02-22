@@ -83,6 +83,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_worldNormal();
 
   /**
+   * @brief Gets the world tangent input component.
+   */
+  NodeMaterialConnectionPointPtr& get_worldTangent();
+
+  /**
    * @brief Gets the uv input component.
    */
   NodeMaterialConnectionPointPtr& get_uv();
@@ -132,6 +137,11 @@ public:
    * Gets the world normal input component
    */
   ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> worldNormal;
+
+  /**
+   * Gets the world tangent input component
+   */
+  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> worldTangent;
 
   /**
    * Gets the uv input component
