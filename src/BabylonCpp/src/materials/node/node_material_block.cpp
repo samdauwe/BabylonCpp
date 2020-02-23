@@ -14,7 +14,8 @@ namespace BABYLON {
 
 NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlockTargets target,
                                      bool isFinalMerger, bool isInput)
-    : isUnique{this, &NodeMaterialBlock::get_isUnique}
+    : inputsAreExclusive{false}
+    , isUnique{this, &NodeMaterialBlock::get_isUnique}
     , isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
     , isInput{this, &NodeMaterialBlock::get_isInput}
     , buildId{this, &NodeMaterialBlock::get_buildId, &NodeMaterialBlock::set_buildId}
@@ -329,7 +330,7 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
       && (block->target() != NodeMaterialBlockTargets::VertexAndFragment);
 
   if (localBlockIsFragment
-      && (((block->target() == input->target()))
+      && (((block->target() == block->_buildTarget)) || ((block->target() == input->target()))
           || (target() != NodeMaterialBlockTargets::VertexAndFragment
               && otherBlockWasGeneratedInVertexShader))) { // context switch! We need a varying
     if ((!block->isInput()
@@ -470,7 +471,9 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
 
   // Get unique name
   auto nameAsVariableName = StringTools::regexReplace(name, "[^A-Za-z_]+", "");
-  _codeVariableName       = nameAsVariableName;
+  _codeVariableName       = !nameAsVariableName.empty() ?
+                        nameAsVariableName :
+                        StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
 
   if (stl_util::contains(uniqueNames, _codeVariableName)) {
     auto index = 0;

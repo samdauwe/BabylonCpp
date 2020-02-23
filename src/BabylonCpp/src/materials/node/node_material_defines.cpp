@@ -5,6 +5,10 @@ namespace BABYLON {
 NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
 {
   boolDef = {
+    {"NORMAL", false},  //
+    {"TANGENT", false}, //
+    {"UV1", false},     //
+
     /** BONES */
     {"BONETEXTURE", false}, //
 

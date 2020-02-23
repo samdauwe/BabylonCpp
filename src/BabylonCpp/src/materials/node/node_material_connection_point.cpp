@@ -18,6 +18,7 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , direction{this, &NodeMaterialConnectionPoint::get_direction}
     , associatedVariableName{this, &NodeMaterialConnectionPoint::get_associatedVariableName,
                              &NodeMaterialConnectionPoint::set_associatedVariableName}
+    , innerType{this, &NodeMaterialConnectionPoint::get_innerType}
     , type{this, &NodeMaterialConnectionPoint::get_type, &NodeMaterialConnectionPoint::set_type}
     , isOptional{false}
     , _prioritizeVertex{false}
@@ -69,6 +70,11 @@ std::string NodeMaterialConnectionPoint::get_associatedVariableName() const
 void NodeMaterialConnectionPoint::set_associatedVariableName(std::string value)
 {
   _associatedVariableName = value;
+}
+
+NodeMaterialBlockConnectionPointTypes& NodeMaterialConnectionPoint::get_innerType()
+{
+  return _type;
 }
 
 NodeMaterialBlockConnectionPointTypes& NodeMaterialConnectionPoint::get_type()
@@ -284,7 +290,7 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
   }
 
   if (type != connectionPoint.type
-      && connectionPoint.type() != NodeMaterialBlockConnectionPointTypes::AutoDetect) {
+      && connectionPoint.innerType() != NodeMaterialBlockConnectionPointTypes::AutoDetect) {
     // Equivalents
     switch (type) {
       case NodeMaterialBlockConnectionPointTypes::Vector3: {

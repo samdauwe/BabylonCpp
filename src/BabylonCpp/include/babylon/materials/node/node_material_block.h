@@ -333,6 +333,9 @@ private:
                      const std::vector<NodeMaterialBlockPtr>& activeBlocks);
 
 public:
+  /** Gets or sets a boolean indicating that only one input can be connected at a time */
+  bool inputsAreExclusive;
+
   /** Hidden */
   std::string _codeVariableName;
 

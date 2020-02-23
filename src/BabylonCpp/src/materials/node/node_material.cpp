@@ -477,15 +477,20 @@ void NodeMaterial::optimize()
 
 void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterialDefines& defines)
 {
-  if (!defines._areAttributesDirty) {
-    return;
-  }
+  const auto oldNormal  = defines["NORMAL"];
+  const auto oldTangent = defines["TANGENT"];
+  const auto oldUV1     = defines["UV1"];
 
   defines.boolDef["NORMAL"] = mesh->isVerticesDataPresent(VertexBuffer::NormalKind);
 
   defines.boolDef["TANGENT"] = mesh->isVerticesDataPresent(VertexBuffer::TangentKind);
 
   defines.boolDef["UV1"] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
+
+  if (oldNormal != defines["NORMAL"] || oldTangent != defines["TANGENT"]
+      || oldUV1 != defines["UV1"]) {
+    defines.markAsAttributesDirty();
+  }
 }
 
 bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
@@ -689,7 +694,7 @@ void NodeMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (mustRebind) {
     const auto& sharedData = _sharedData;
-    if (effect && scene->getCachedMaterial() != this) {
+    if (effect && scene->getCachedEffect() != effect) {
       // Bindable blocks
       for (const auto& block : sharedData->bindableBlocks) {
         block->bind(effect, shared_from_this(), mesh);
@@ -709,13 +714,15 @@ std::vector<BaseTexturePtr> NodeMaterial::getActiveTextures() const
 {
   auto activeTextures = PushMaterial::getActiveTextures();
 
-  for (const auto& t : _sharedData->textureBlocks) {
-    if (std::holds_alternative<TextureBlockPtr>(t) && std::get<TextureBlockPtr>(t)) {
-      activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture);
-    }
-    else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
-             && std::get<ReflectionTextureBlockPtr>(t)) {
-      activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture);
+  if (_sharedData) {
+    for (const auto& t : _sharedData->textureBlocks) {
+      if (std::holds_alternative<TextureBlockPtr>(t) && std::get<TextureBlockPtr>(t)) {
+        activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture);
+      }
+      else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
+               && std::get<ReflectionTextureBlockPtr>(t)) {
+        activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture);
+      }
     }
   }
 
@@ -799,32 +806,32 @@ void NodeMaterial::setToDefault()
 {
   clear();
 
-  auto positionInput = InputBlock::New("position");
+  auto positionInput = InputBlock::New("Position");
   positionInput->setAsAttribute("position");
 
-  auto worldInput = InputBlock::New("world");
+  auto worldInput = InputBlock::New("World");
   worldInput->setAsSystemValue(NodeMaterialSystemValues::World);
 
-  auto worldPos = TransformBlock::New("worldPos");
+  auto worldPos = TransformBlock::New("WorldPos");
   positionInput->connectTo(worldPos);
   worldInput->connectTo(worldPos);
 
-  auto viewProjectionInput = InputBlock::New("viewProjection");
+  auto viewProjectionInput = InputBlock::New("ViewProjection");
   viewProjectionInput->setAsSystemValue(NodeMaterialSystemValues::ViewProjection);
 
   auto worldPosdMultipliedByViewProjection
-    = TransformBlock::New("worldPos * viewProjectionTransform");
+    = TransformBlock::New("WorldPos * ViewProjectionTransform");
   worldPos->connectTo(worldPosdMultipliedByViewProjection);
   viewProjectionInput->connectTo(worldPosdMultipliedByViewProjection);
 
-  auto vertexOutput = VertexOutputBlock::New("vertexOutput");
+  auto vertexOutput = VertexOutputBlock::New("VertexOutput");
   worldPosdMultipliedByViewProjection->connectTo(vertexOutput);
 
   // Pixel
   auto pixelColor   = InputBlock::New("color");
   pixelColor->value = std::make_shared<AnimationValue>(Color4(0.8f, 0.8f, 0.8f, 1.f));
 
-  auto fragmentOutput = FragmentOutputBlock::New("fragmentOutput");
+  auto fragmentOutput = FragmentOutputBlock::New("FragmentOutput");
   pixelColor->connectTo(fragmentOutput);
 
   // Add to nodes

@@ -38,6 +38,14 @@ class BABYLON_SHARED_EXPORT NodeMaterial : public PushMaterial,
                                            public std::enable_shared_from_this<NodeMaterial> {
 
 public:
+  /** Define the Url to load node editor script */
+  static constexpr const char* EditorURL
+    = "https://unpkg.com/babylonjs-node-editor@${Engine.Version}/babylon.nodeEditor.js";
+
+  /** Define the Url to load snippets */
+  static constexpr const char* SnippetUrl = "https://snippet.babylonjs.com";
+
+public:
   template <typename... Ts>
   static NodeMaterialPtr New(Ts&&... args)
   {

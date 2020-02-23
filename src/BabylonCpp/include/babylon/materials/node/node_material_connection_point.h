@@ -134,6 +134,11 @@ protected:
   void set_associatedVariableName(std::string value);
 
   /**
+   * @brief Get the inner type (ie AutoDetect for instance instead of the inferred one).
+   */
+  NodeMaterialBlockConnectionPointTypes& get_innerType();
+
+  /**
    * @brief Gets the connection point type (default is float).
    */
   NodeMaterialBlockConnectionPointTypes& get_type();
@@ -249,6 +254,11 @@ public:
    * Gets or sets the associated variable name in the shader
    */
   Property<NodeMaterialConnectionPoint, std::string> associatedVariableName;
+
+  /**
+   * Get the inner type (ie AutoDetect for isntance instead of the inferred one)
+   */
+  ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlockConnectionPointTypes> innerType;
 
   /**
    * Hidden
