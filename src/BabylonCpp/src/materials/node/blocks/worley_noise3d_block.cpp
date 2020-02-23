@@ -210,7 +210,7 @@ WorleyNoise3DBlock& WorleyNoise3DBlock::_buildBlock(NodeMaterialBuildState& stat
 
           )ShaderCode";
 
-  state._emitFunction("worley3D", functionString, "worley3D");
+  state._emitFunction("worley3D", functionString, "// Worley3D");
   state.compilationString
     += _declareOutput(_outputs[0], state)
        + StringTools::printf(" = worley(%s, %s, %d);\r\n", seed()->associatedVariableName().c_str(),

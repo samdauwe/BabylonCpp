@@ -88,7 +88,7 @@ SimplexPerlin3DBlock& SimplexPerlin3DBlock::_buildBlock(NodeMaterialBuildState& 
 
           )ShaderCode";
 
-  state._emitFunction("SimplexPerlin3D", functionString, "SimplexPerlin3D");
+  state._emitFunction("SimplexPerlin3D", functionString, "// SimplexPerlin3D");
   state.compilationString += _declareOutput(_outputs[0], state)
                              + StringTools::printf(" = SimplexPerlin3D(%s);\r\n",
                                                    seed()->associatedVariableName().c_str());

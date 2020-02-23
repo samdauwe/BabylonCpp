@@ -9,8 +9,8 @@ namespace BABYLON {
 
 GradientBlock::GradientBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Neutral}
-    , colorSteps{GradientBlockColorStep(0.f, Color3::White()),
-                 GradientBlockColorStep(1.f, Color3::Black())}
+    , colorSteps{GradientBlockColorStep(0.f, Color3::Black()),
+                 GradientBlockColorStep(1.f, Color3::White())}
     , gradient{this, &GradientBlock::get_gradient}
     , output{this, &GradientBlock::get_output}
 {

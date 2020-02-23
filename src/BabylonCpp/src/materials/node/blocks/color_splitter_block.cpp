@@ -24,6 +24,8 @@ ColorSplitterBlock::ColorSplitterBlock(const std::string& iName)
   registerOutput("g", NodeMaterialBlockConnectionPointTypes::Float);
   registerOutput("b", NodeMaterialBlockConnectionPointTypes::Float);
   registerOutput("a", NodeMaterialBlockConnectionPointTypes::Float);
+
+  inputsAreExclusive = true;
 }
 
 ColorSplitterBlock::~ColorSplitterBlock() = default;

@@ -25,7 +25,7 @@ TransformBlock::TransformBlock(const std::string& iName)
       if (other && other->ownerBlock()->isInput()) {
         const auto otherAsInput = std::static_pointer_cast<InputBlock>(other->ownerBlock());
 
-        if (otherAsInput->name == "normal") {
+        if (otherAsInput->name == "normal" || otherAsInput->name == "tangent") {
           complementW = 0.f;
         }
       }

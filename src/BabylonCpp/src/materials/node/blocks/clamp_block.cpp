@@ -14,8 +14,10 @@ ClampBlock::ClampBlock(const std::string& iName)
     , value{this, &ClampBlock::get_value}
     , output{this, &ClampBlock::get_output}
 {
-  registerInput("value", NodeMaterialBlockConnectionPointTypes::Float);
-  registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
+  registerInput("value", NodeMaterialBlockConnectionPointTypes::AutoDetect);
+  registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
+
+  _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
 ClampBlock::~ClampBlock() = default;

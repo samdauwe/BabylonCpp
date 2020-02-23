@@ -28,6 +28,8 @@ VectorSplitterBlock::VectorSplitterBlock(const std::string& iName)
   registerOutput("y", NodeMaterialBlockConnectionPointTypes::Float);
   registerOutput("z", NodeMaterialBlockConnectionPointTypes::Float);
   registerOutput("w", NodeMaterialBlockConnectionPointTypes::Float);
+
+  inputsAreExclusive = true;
 }
 
 VectorSplitterBlock::~VectorSplitterBlock() = default;
