@@ -162,7 +162,7 @@ AnimationValuePtr& InputBlock::get_value()
 void InputBlock::set_value(const AnimationValuePtr& iValue)
 {
   AnimationValuePtr newValue = iValue;
-  if (type == NodeMaterialBlockConnectionPointTypes::Float) {
+  if (type() == NodeMaterialBlockConnectionPointTypes::Float) {
     if (isBoolean) {
       newValue = std::make_shared<AnimationValue>(iValue->get<float>() != 0.f ? 1.f : 0.f);
     }

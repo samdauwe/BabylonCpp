@@ -124,8 +124,8 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
     _orthoTop    = std::numeric_limits<float>::min();
     _orthoBottom = std::numeric_limits<float>::max();
 
-    auto shadowMinZ = std::numeric_limits<float>::max();
-    auto shadowMaxZ = std::numeric_limits<float>::min();
+    auto iShadowMinZ = std::numeric_limits<float>::max();
+    auto iShadowMaxZ = std::numeric_limits<float>::min();
 
     // Check extends
     for (const auto& mesh : renderList) {
@@ -153,19 +153,19 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
           _orthoTop = tempVector3.y;
         }
         if (autoCalcShadowZBounds) {
-          if (tempVector3.z < shadowMinZ) {
-            shadowMinZ = tempVector3.z;
+          if (tempVector3.z < iShadowMinZ) {
+            iShadowMinZ = tempVector3.z;
           }
-          if (tempVector3.z > shadowMaxZ) {
-            shadowMaxZ = tempVector3.z;
+          if (tempVector3.z > iShadowMaxZ) {
+            iShadowMaxZ = tempVector3.z;
           }
         }
       }
     }
 
     if (autoCalcShadowZBounds) {
-      _shadowMinZ = shadowMinZ;
-      _shadowMaxZ = shadowMaxZ;
+      _shadowMinZ = iShadowMinZ;
+      _shadowMaxZ = iShadowMaxZ;
     }
   }
 

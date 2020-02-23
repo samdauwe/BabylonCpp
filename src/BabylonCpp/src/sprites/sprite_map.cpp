@@ -109,7 +109,7 @@ SpriteMap::SpriteMap(const std::string& iName, const ISpriteJSONAtlas& iAtlasJSO
 
   _time = 0.f;
 
-  _material->setFloat("spriteCount", spriteCount);
+  _material->setFloat("spriteCount", static_cast<float>(spriteCount));
   _material->setVector2("stageSize", options.stageSize.value_or(0.f));
   _material->setVector2("outputSize", options.outputSize.value_or(0.f));
   _material->setTexture("spriteSheet", spriteSheet);
@@ -252,8 +252,8 @@ RawTexturePtr SpriteMap::_createFrameBuffer()
     data[i * 4 + 1 + (spriteCount * 4)] = sss.y;
     data[i * 4 + 3 + (spriteCount * 4)] = sss.h;
     // sourceSize, rotated, trimmed
-    data[i * 4 + (spriteCount * 8)]     = ss.w;
-    data[i * 4 + 1 + (spriteCount * 8)] = ss.h;
+    data[i * 4 + (spriteCount * 8)]     = static_cast<float>(ss.w);
+    data[i * 4 + 1 + (spriteCount * 8)] = static_cast<float>(ss.h);
     data[i * 4 + 2 + (spriteCount * 8)] = r;
     data[i * 4 + 3 + (spriteCount * 8)] = t;
   }
