@@ -565,17 +565,15 @@ BaseTexturePtr& BaseTexture::get__lodTextureLow()
 
 void BaseTexture::dispose()
 {
-  if (!_scene) {
-    return;
+  if (_scene) {
+    // Animations
+    _scene->stopAnimation(this);
+
+    // Remove from scene
+    stl_util::remove_vector_elements_equal_sharedptr(_scene->textures, this);
+
+    _scene->onTextureRemovedObservable.notifyObservers(this);
   }
-
-  // Animations
-  _scene->stopAnimation(this);
-
-  // Remove from scene
-  stl_util::remove_vector_elements_equal_sharedptr(_scene->textures, this);
-
-  _scene->onTextureRemovedObservable.notifyObservers(this);
 
   if (_texture == nullptr) {
     return;
