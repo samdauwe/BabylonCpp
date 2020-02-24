@@ -6,13 +6,12 @@
 
 namespace BABYLON {
 
-MultiRenderTarget::MultiRenderTarget(
-  const std::string& iName, Size size, std::size_t count, Scene* scene,
-  const std::optional<IMultiRenderTargetOptions>& options)
+MultiRenderTarget::MultiRenderTarget(const std::string& iName, Size size, std::size_t count,
+                                     Scene* scene,
+                                     const std::optional<IMultiRenderTargetOptions>& options)
     : RenderTargetTexture{iName, size, scene,
-                          options && (*options).generateMipMaps ?
-                            *(*options).generateMipMaps :
-                            false,
+                          options && (*options).generateMipMaps ? *(*options).generateMipMaps :
+                                                                  false,
                           options && (*options).doNotChangeAspectRatio ?
                             *(*options).doNotChangeAspectRatio :
                             true}
@@ -23,15 +22,12 @@ MultiRenderTarget::MultiRenderTarget(
     , wrapV{this, &MultiRenderTarget::set_wrapV}
     , _nullTexture{nullptr}
 {
-  auto generateMipMaps = options && (*options).generateMipMaps ?
-                           *(*options).generateMipMaps :
-                           false;
-  auto generateDepthTexture = options && (*options).generateDepthTexture ?
-                                *(*options).generateDepthTexture :
-                                false;
-  auto doNotChangeAspectRatio = options && (*options).doNotChangeAspectRatio ?
-                                  *(*options).doNotChangeAspectRatio :
-                                  true;
+  auto generateMipMaps
+    = options && (*options).generateMipMaps ? *(*options).generateMipMaps : false;
+  auto generateDepthTexture
+    = options && (*options).generateDepthTexture ? *(*options).generateDepthTexture : false;
+  auto doNotChangeAspectRatio
+    = options && (*options).doNotChangeAspectRatio ? *(*options).doNotChangeAspectRatio : true;
 
   _engine = scene->getEngine();
 
@@ -48,9 +44,8 @@ MultiRenderTarget::MultiRenderTarget(
       types.emplace_back((*options).types[i]);
     }
     else {
-      types.emplace_back(options && (*options).defaultType ?
-                           *(*options).defaultType :
-                           Constants::TEXTURETYPE_UNSIGNED_INT);
+      types.emplace_back(options && (*options).defaultType ? *(*options).defaultType :
+                                                             Constants::TEXTURETYPE_UNSIGNED_INT);
     }
 
     if (options && i < (*options).samplingModes.size()) {
@@ -61,14 +56,12 @@ MultiRenderTarget::MultiRenderTarget(
     }
   }
 
-  const auto generateDepthBuffer
-    = !options || (*options).generateDepthBuffer == std::nullopt ?
-        true :
-        *(*options).generateDepthBuffer;
-  const auto generateStencilBuffer
-    = !options || (*options).generateStencilBuffer == std::nullopt ?
-        false :
-        *(*options).generateStencilBuffer;
+  const auto generateDepthBuffer = !options || (*options).generateDepthBuffer == std::nullopt ?
+                                     true :
+                                     *(*options).generateDepthBuffer;
+  const auto generateStencilBuffer = !options || (*options).generateStencilBuffer == std::nullopt ?
+                                       false :
+                                       *(*options).generateStencilBuffer;
 
   _size = size;
 
@@ -92,8 +85,7 @@ MultiRenderTarget::~MultiRenderTarget() = default;
 
 bool MultiRenderTarget::get_isSupported() const
 {
-  return (_engine->webGLVersion() > 1.f)
-         || (_engine->getCaps().drawBuffersExtension);
+  return (_engine->webGLVersion() > 1.f) || (_engine->getCaps().drawBuffersExtension);
 }
 
 std::vector<TexturePtr>& MultiRenderTarget::get_textures()
@@ -140,8 +132,7 @@ void MultiRenderTarget::_rebuild()
 
 void MultiRenderTarget::_createInternalTextures()
 {
-  _internalTextures
-    = _engine->createMultipleRenderTarget(_size, _multiRenderTargetOptions);
+  _internalTextures = _engine->createMultipleRenderTarget(_size, _multiRenderTargetOptions);
 }
 
 void MultiRenderTarget::_createTextures()
@@ -168,26 +159,22 @@ void MultiRenderTarget::set_samples(unsigned int value)
     return;
   }
 
-  _samples = _engine->updateMultipleRenderTargetTextureSampleCount(
-    _internalTextures, value);
+  _samples = _engine->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
 }
 
 void MultiRenderTarget::resize(Size size)
 {
   releaseInternalTextures();
-  _internalTextures
-    = _engine->createMultipleRenderTarget(size, _multiRenderTargetOptions);
+  _size = size;
   _createInternalTextures();
 }
 
-void MultiRenderTarget::unbindFrameBuffer(Engine* engine,
-                                          unsigned int faceIndex)
+void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex)
 {
-  engine->unBindMultiColorAttachmentFramebuffer(
-    _internalTextures, isCube, [&, faceIndex]() {
-      auto _faceIndex = static_cast<int>(faceIndex);
-      onAfterRenderObservable.notifyObservers(&_faceIndex);
-    });
+  engine->unBindMultiColorAttachmentFramebuffer(_internalTextures, isCube, [&, faceIndex]() {
+    auto _faceIndex = static_cast<int>(faceIndex);
+    onAfterRenderObservable.notifyObservers(&_faceIndex);
+  });
 }
 
 void MultiRenderTarget::dispose()
