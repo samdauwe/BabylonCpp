@@ -241,36 +241,68 @@ public:
   bool invertY;
 
   // Private
+  /** @hidden */
   bool _invertVScale;
+  /** @hidden */
   int _associatedChannel;
+  /** @hidden */
   InternalTextureSource _source;
+  /** @hidden */
   std::variant<std::string, ArrayBuffer, ArrayBufferView, Image> _buffer;
+  /** @hidden */
   ArrayBuffer _bufferView;
+  /** @hidden */
   std::vector<ArrayBufferView> _bufferViewArray;
+  /** @hidden */
   std::vector<std::vector<ArrayBuffer>> _bufferViewArrayArray;
+  /** @hidden */
   int _size;
+  /** @hidden */
   std::string _extension;
+  /** @hidden */
   std::vector<std::string> _files;
+  /** @hidden */
   ICanvas* _workingCanvas;
+  /** @hidden */
   ICanvasRenderingContext2D* _workingContext;
+  /** @hidden */
   WebGLFramebufferPtr _framebuffer;
+  /** @hidden */
   WebGLRenderbufferPtr _depthStencilBuffer;
+  /** @hidden */
   WebGLFramebufferPtr _MSAAFramebuffer;
+  /** @hidden */
   Uint32Array _attachments;
+  /** @hidden */
   WebGLRenderbufferPtr _MSAARenderBuffer;
+  /** @hidden */
   int _cachedCoordinatesMode;
+  /** @hidden */
   int _cachedWrapU;
+  /** @hidden */
   int _cachedWrapV;
+  /** @hidden */
   int _cachedWrapR;
+  /** @hidden */
   int _cachedAnisotropicFilteringLevel;
+  /** @hidden */
   bool _isDisabled;
+  /** @hidden */
   std::string _compression;
+  /** @hidden */
   bool _generateStencilBuffer;
+  /** @hidden */
   bool _generateDepthBuffer;
+  /** @hidden */
   int _comparisonFunction;
+  /** @hidden */
   SphericalPolynomialPtr _sphericalPolynomial;
+  /** @hidden */
   float _lodGenerationScale;
+  /** @hidden */
   float _lodGenerationOffset;
+  /** @hidden */
+  InternalTexturePtr _depthStencilTexture;
 
   // Multiview
   /** Hidden */

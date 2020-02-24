@@ -54,6 +54,7 @@ InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource sourc
     , _sphericalPolynomial{nullptr}
     , _lodGenerationScale{0}
     , _lodGenerationOffset{0}
+    , _depthStencilTexture{nullptr}
     , _colorTextureArray{nullptr}
     , _depthStencilTextureArray{nullptr}
     , _lodTextureHigh{nullptr}
