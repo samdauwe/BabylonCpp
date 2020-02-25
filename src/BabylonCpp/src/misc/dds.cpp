@@ -16,12 +16,14 @@ bool DDSTools::StoreLODInAlphaChannel = false;
 Float32Array DDSTools::_FloatView;
 Int32Array DDSTools::_Int32View;
 
-DDSInfo DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
+DDSInfo DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBufferView>& iArrayBuffer)
 {
-  const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
+  const auto dataBuffer = ToArrayBuffer(iArrayBuffer);
+  const auto byteOffset = GetByteOffset(iArrayBuffer);
 
-  auto header         = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
-  auto extendedHeader = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt + 4);
+  auto header = stl_util::to_array<int32_t>(dataBuffer, byteOffset, DDS::headerLengthInt);
+  auto extendedHeader
+    = stl_util::to_array<int32_t>(dataBuffer, byteOffset, DDS::headerLengthInt + 4);
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT) {
@@ -336,21 +338,22 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height, int dat
 }
 
 void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& texture,
-                               const std::variant<std::string, ArrayBuffer>& iArrayBuffer,
+                               const std::variant<std::string, ArrayBufferView>& iArrayBuffer,
                                DDSInfo& info, bool loadMipmaps, unsigned int faces, int lodIndex,
                                int currentFace)
 {
-  const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
-
-  bool hasSphericalPolynomialFaces = false;
+  auto hasSphericalPolynomialFaces = false;
   std::vector<ArrayBufferView> sphericalPolynomialFaces;
   if (info.sphericalPolynomial) {
     hasSphericalPolynomialFaces = true;
   }
   auto ext = engine->getCaps().s3tc;
 
-  Int32Array header = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
-  int fourCC        = 0;
+  const auto dataBuffer = ToArrayBuffer(iArrayBuffer);
+  const auto byteOffset = static_cast<int>(GetByteOffset(iArrayBuffer));
+  Int32Array header     = stl_util::to_array<int32_t>(dataBuffer, static_cast<size_t>(byteOffset),
+                                                  DDS::headerLengthInt);
+  int fourCC            = 0;
   Uint8Array byteArray;
   int blockBytes                        = 1;
   unsigned int internalCompressedFormat = 0;
@@ -461,19 +464,19 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
                                                          // issues with float and half float
                                                          // generation
             if (bpp == 128) {
-              floatArray = DDSTools::_GetFloatAsUIntRGBAArrayBuffer(width, height, dataOffset,
-                                                                    dataLength, arrayBuffer, i);
+              floatArray = DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
+                width, height, byteOffset + dataOffset, dataLength, dataBuffer, i);
               if (i == 0) {
                 sphericalPolynomialFaces.emplace_back(DDSTools::_GetFloatRGBAArrayBuffer(
-                  width, height, dataOffset, dataLength, arrayBuffer, i));
+                  width, height, byteOffset + dataOffset, dataLength, dataBuffer, i));
               }
             }
             else if (bpp == 64) {
-              floatArray = DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(width, height, dataOffset,
-                                                                        dataLength, arrayBuffer, i);
+              floatArray = DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
+                width, height, byteOffset + dataOffset, dataLength, dataBuffer, i);
               if (i == 0) {
                 sphericalPolynomialFaces.emplace_back(DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-                  width, height, dataOffset, dataLength, arrayBuffer, i));
+                  width, height, byteOffset + dataOffset, dataLength, dataBuffer, i));
               }
             }
 
@@ -482,8 +485,8 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
           else {
             if (bpp == 128) {
               texture->type = Constants::TEXTURETYPE_FLOAT;
-              floatArray = DDSTools::_GetFloatRGBAArrayBuffer(width, height, dataOffset, dataLength,
-                                                              arrayBuffer, i);
+              floatArray    = DDSTools::_GetFloatRGBAArrayBuffer(
+                width, height, byteOffset + dataOffset, dataLength, dataBuffer, i);
               if (i == 0) {
                 sphericalPolynomialFaces.emplace_back(floatArray);
               }
@@ -491,18 +494,18 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
             else if (bpp == 64 && !engine->getCaps().textureHalfFloat) {
               texture->type = Constants::TEXTURETYPE_FLOAT;
               floatArray    = DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-                width, height, dataOffset, dataLength, arrayBuffer, i);
+                width, height, byteOffset + dataOffset, dataLength, dataBuffer, i);
               if (i == 0) {
                 sphericalPolynomialFaces.emplace_back(floatArray);
               }
             }
             else { // 64
               texture->type = Constants::TEXTURETYPE_HALF_FLOAT;
-              floatArray    = DDSTools::_GetHalfFloatRGBAArrayBuffer(width, height, dataOffset,
-                                                                  dataLength, arrayBuffer, i);
+              floatArray    = DDSTools::_GetHalfFloatRGBAArrayBuffer(
+                width, height, byteOffset + dataOffset, dataLength, dataBuffer, i);
               if (i == 0) {
                 sphericalPolynomialFaces.emplace_back(DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-                  width, height, dataOffset, dataLength, arrayBuffer, i));
+                  width, height, byteOffset + dataOffset, dataLength, dataBuffer, i));
               }
             }
           }
@@ -516,16 +519,17 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
           if (bpp == 24) {
             texture->format = Constants::TEXTUREFORMAT_RGB;
             dataLength      = static_cast<size_t>(width * height * 3);
-            byteArray       = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset, dataLength,
-                                                     arrayBuffer, rOffset, gOffset, bOffset);
+            byteArray
+              = DDSTools::_GetRGBArrayBuffer(width, height, byteOffset + dataOffset, dataLength,
+                                             dataBuffer, rOffset, gOffset, bOffset);
             engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
           else { // 32
             texture->format = Constants::TEXTUREFORMAT_RGBA;
             dataLength      = static_cast<size_t>(width * height * 4);
             byteArray
-              = DDSTools::_GetRGBAArrayBuffer(width, height, dataOffset, dataLength, arrayBuffer,
-                                              rOffset, gOffset, bOffset, aOffset);
+              = DDSTools::_GetRGBAArrayBuffer(width, height, byteOffset + dataOffset, dataLength,
+                                              dataBuffer, rOffset, gOffset, bOffset, aOffset);
             engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
         }
@@ -536,8 +540,8 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
             = std::floor((width + unpackAlignment - 1) / unpackAlignment) * unpackAlignment;
           dataLength = static_cast<size_t>(paddedRowSize * (height - 1) + unpaddedRowSize);
 
-          byteArray = DDSTools::_GetLuminanceArrayBuffer(width, height, dataOffset, dataLength,
-                                                         arrayBuffer);
+          byteArray = DDSTools::_GetLuminanceArrayBuffer(width, height, byteOffset + dataOffset,
+                                                         dataLength, dataBuffer);
 
           texture->format = Constants::TEXTUREFORMAT_LUMINANCE;
           texture->type   = Constants::TEXTURETYPE_UNSIGNED_INT;
@@ -547,8 +551,8 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
         else {
           dataLength = static_cast<size_t>(std::max(4.f, width) / 4 * std::max(4.f, height) / 4
                                            * blockBytes);
-          byteArray
-            = stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
+          byteArray  = stl_util::to_array<uint8_t>(
+            dataBuffer, static_cast<size_t>(byteOffset + dataOffset), dataLength);
 
           texture->type = Constants::TEXTURETYPE_UNSIGNED_INT;
           engine->_uploadCompressedDataToTextureDirectly(
@@ -591,7 +595,7 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
   }
 }
 
-ArrayBuffer DDSTools::ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer)
+ArrayBuffer DDSTools::ToArrayBuffer(const std::variant<std::string, ArrayBufferView>& arrayBuffer)
 {
   ArrayBuffer byteArray;
   if (std::holds_alternative<std::string>(arrayBuffer)) {
@@ -599,9 +603,18 @@ ArrayBuffer DDSTools::ToArrayBuffer(const std::variant<std::string, ArrayBuffer>
     byteArray      = stl_util::to_array<uint8_t>(charArray);
   }
   else {
-    byteArray = std::get<ArrayBuffer>(arrayBuffer);
+    byteArray = std::get<ArrayBufferView>(arrayBuffer).uint8Array();
   }
   return byteArray;
+}
+
+size_t DDSTools::GetByteOffset(const std::variant<std::string, ArrayBufferView>& arrayBuffer)
+{
+  size_t byteOffset = 0;
+  if (std::holds_alternative<ArrayBufferView>(arrayBuffer)) {
+    byteOffset = std::get<ArrayBufferView>(arrayBuffer).byteOffset;
+  }
+  return byteOffset;
 }
 
 } // end of namespace BABYLON

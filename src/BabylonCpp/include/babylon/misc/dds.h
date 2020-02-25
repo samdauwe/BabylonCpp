@@ -4,6 +4,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/maths/spherical_polynomial.h>
 
 namespace BABYLON {
@@ -157,20 +158,28 @@ private:
 public:
   /**
    * @brief Gets DDS information from an array buffer.
-   * @param arrayBuffer defines the array buffer to read data from
+   * @param data defines the array buffer view to read data from
    * @returns the DDS information
    */
-  static DDSInfo GetDDSInfo(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
+  static DDSInfo GetDDSInfo(const std::variant<std::string, ArrayBufferView>& arrayBuffer);
 
   /**
    * @brief Uploads DDS Levels to a Babylon Texture.
    */
   static void UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& texture,
-                              const std::variant<std::string, ArrayBuffer>& arrayBuffer,
+                              const std::variant<std::string, ArrayBufferView>& arrayBuffer,
                               DDSInfo& info, bool loadMipmaps, unsigned int faces,
                               int lodIndex = -1, int currentFace = -1);
 
-  static ArrayBuffer ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
+  /**
+   * @brief Hidden
+   */
+  static ArrayBuffer ToArrayBuffer(const std::variant<std::string, ArrayBufferView>& arrayBuffer);
+
+  /**
+   * @brief Hidden
+   */
+  static size_t GetByteOffset(const std::variant<std::string, ArrayBufferView>& arrayBuffer);
 
 public:
   /**
