@@ -5071,10 +5071,10 @@ void Scene::markAllMaterialsAsDirty(unsigned int flag,
   }
 }
 
-IFileRequest
-Scene::_loadFile(const std::string& /*url*/,
-                 const std::function<void(const std::variant<std::string, ArrayBuffer>& /*data*/,
-                                          const std::string&)>& /*onSuccess*/)
+IFileRequest Scene::_loadFile(
+  const std::string& /*url*/,
+  const std::function<void(const std::variant<std::string, ArrayBufferView>& /*data*/,
+                           const std::string&)>& /*onSuccess*/)
 {
   return IFileRequest();
 }

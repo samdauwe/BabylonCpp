@@ -7,6 +7,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/engines/abstract_scene.h>
@@ -1726,7 +1727,7 @@ public:
    */
   IFileRequest
   _loadFile(const std::string& url,
-            const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+            const std::function<void(const std::variant<std::string, ArrayBufferView>& data,
                                      const std::string& responseURL)>& onSuccess);
 
   /**

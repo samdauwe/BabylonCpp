@@ -7,6 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/misc/dds_info.h>
 
 namespace BABYLON {
@@ -19,7 +20,7 @@ struct CubeTextureData {
   bool isDDS;
   int width;
   DDSInfo info;
-  std::vector<std::variant<std::string, ArrayBuffer>> data;
+  std::vector<std::variant<std::string, ArrayBufferView>> data;
   InternalTexturePtr texture;
 }; // End of struct CubeTextureData
 
@@ -76,7 +77,7 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param onError defines the callback to trigger in case of error
    */
   virtual void loadCubeData(
-    const std::variant<std::string, ArrayBuffer>& img, const InternalTexturePtr& texture,
+    const std::variant<std::string, ArrayBufferView>& img, const InternalTexturePtr& texture,
     bool createPolynomials,
     const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
     const std::function<void(const std::string& message, const std::string& exception)>& onError)
@@ -91,7 +92,7 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param onError defines the callback to trigger in case of error
    */
   virtual void loadCubeData(
-    const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
+    const std::vector<std::variant<std::string, ArrayBufferView>>& imgs,
     const InternalTexturePtr& texture, bool createPolynomials,
     const std::function<void(const std::optional<CubeTextureData>& datas)>& onLoad,
     const std::function<void(const std::string& message, const std::string& exception)>& onError)
@@ -105,7 +106,7 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param callback defines the method to call once ready to upload
    */
   virtual void
-  loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
+  loadData(const ArrayBufferView& data, const InternalTexturePtr& texture,
            const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
                                     const std::function<void()>& done, bool loadFailed)>& callback)
     = 0;

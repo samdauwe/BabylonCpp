@@ -2062,11 +2062,11 @@ ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::
   if (!_disposed) {
     FileTools::LoadFile(
       url,
-      [this, &data, &uri](const std::variant<std::string, ArrayBuffer>& fileData,
+      [this, &data, &uri](const std::variant<std::string, ArrayBufferView>& fileData,
                           const std::string & /*responseURL*/) -> void {
         if (!_disposed) {
-          if (std::holds_alternative<ArrayBuffer>(fileData)) {
-            data = std::get<ArrayBuffer>(fileData);
+          if (std::holds_alternative<ArrayBufferView>(fileData)) {
+            data = std::get<ArrayBufferView>(fileData).uint8Array();
             log(StringTools::printf("Loaded %s (%ld bytes)", uri.c_str(), data.size()));
           }
         }

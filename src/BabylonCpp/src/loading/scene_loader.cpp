@@ -192,7 +192,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   }
 
   const auto dataCallback
-    = [scene, onError, onSuccess, plugin](const std::variant<std::string, ArrayBuffer>& data,
+    = [scene, onError, onSuccess, plugin](const std::variant<std::string, ArrayBufferView>& data,
                                           const std::string& responseURL) {
         if (scene->isDisposed()) {
           onError("Scene has been disposed", "");

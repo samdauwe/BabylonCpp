@@ -346,7 +346,7 @@ void Effect::_loadShader(const std::string& shader, const std::string& key,
   // Vertex shader
   _engine->_loadFile(
     StringTools::printf("%s.%s.fx", shaderUrl.c_str(), StringTools::toLowerCase(key).c_str()),
-    [callback](const std::variant<std::string, ArrayBuffer>& data,
+    [callback](const std::variant<std::string, ArrayBufferView>& data,
                const std::string& /*responseURL*/) {
       if (std::holds_alternative<std::string>(data)) {
         callback(std::get<std::string>(data));

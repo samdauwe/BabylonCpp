@@ -67,7 +67,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
 
   _texture = texture;
 
-  const auto callback = [&](const std::variant<std::string, ArrayBuffer>& iText,
+  const auto callback = [&](const std::variant<std::string, ArrayBufferView>& iText,
                             const std::string & /*onSuccess*/) -> void {
     if (!std::holds_alternative<std::string>(iText)) {
       return;

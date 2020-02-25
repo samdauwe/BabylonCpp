@@ -1148,7 +1148,7 @@ public:
    */
   IFileRequest _loadFile(
     const std::string& url,
-    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+    const std::function<void(const std::variant<std::string, ArrayBufferView>& data,
                              const std::string& responseURL)>& onSuccess,
     const std::function<void(const ProgressEvent& event)>& onProgress = nullptr,
     bool useArrayBuffer                                               = false,

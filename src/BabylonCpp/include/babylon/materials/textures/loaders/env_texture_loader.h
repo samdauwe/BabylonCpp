@@ -14,8 +14,7 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
   ~_ENVTextureLoader() override; // = default
 
   /**
-   * @brief Defines wether the loader supports cascade loading the different
-   * faces.
+   * @brief Defines wether the loader supports cascade loading the different faces.
    */
   [[nodiscard]] bool supportCascades() const override;
 
@@ -58,7 +57,7 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  void loadCubeData(const std::variant<std::string, ArrayBuffer>& data,
+  void loadCubeData(const std::variant<std::string, ArrayBufferView>& data,
                     const InternalTexturePtr& texture, bool createPolynomials,
                     const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
                     const std::function<void(const std::string& message,
@@ -71,20 +70,20 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  void loadCubeData(const std::vector<std::variant<std::string, ArrayBuffer>>& data,
+  void loadCubeData(const std::vector<std::variant<std::string, ArrayBufferView>>& data,
                     const InternalTexturePtr& texture, bool createPolynomials,
                     const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
                     const std::function<void(const std::string& message,
                                              const std::string& exception)>& onError) override;
 
   /**
-   * @brief Uploads the 2D texture data to the WebGl Texture. It has alreday
-   * been bound once in the callback.
+   * @brief Uploads the 2D texture data to the WebGl Texture. It has already been bound once in the
+   * callback.
    * @param data contains the texture data
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  void loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
+  void loadData(const ArrayBufferView& data, const InternalTexturePtr& texture,
                 const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
                                          const std::function<void()>& done, bool loadFailed)>&
                   callback) override;

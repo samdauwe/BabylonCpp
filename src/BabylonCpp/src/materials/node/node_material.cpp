@@ -843,7 +843,7 @@ void NodeMaterial::loadAsync(const std::string& url)
 {
   FileTools::LoadFile(
     url,
-    [this](const std::variant<std::string, ArrayBuffer>& data,
+    [this](const std::variant<std::string, ArrayBufferView>& data,
            const std::string & /*responseURL*/) -> void {
       if (std::holds_alternative<std::string>(data)) {
         auto serializationObject = json::parse(std::get<std::string>(data));

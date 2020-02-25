@@ -57,7 +57,7 @@ struct BABYLON_SHARED_EXPORT _KTXTextureLoader : public IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  void loadCubeData(const std::variant<std::string, ArrayBuffer>& data,
+  void loadCubeData(const std::variant<std::string, ArrayBufferView>& data,
                     const InternalTexturePtr& texture, bool createPolynomials,
                     const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
                     const std::function<void(const std::string& message,
@@ -71,7 +71,7 @@ struct BABYLON_SHARED_EXPORT _KTXTextureLoader : public IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  void loadCubeData(const std::vector<std::variant<std::string, ArrayBuffer>>& data,
+  void loadCubeData(const std::vector<std::variant<std::string, ArrayBufferView>>& data,
                     const InternalTexturePtr& texture, bool createPolynomials,
                     const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
                     const std::function<void(const std::string& message,
@@ -84,7 +84,7 @@ struct BABYLON_SHARED_EXPORT _KTXTextureLoader : public IInternalTextureLoader {
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  void loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
+  void loadData(const ArrayBufferView& data, const InternalTexturePtr& texture,
                 const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
                                          const std::function<void()>& done, bool loadFailed)>&
                   callback) override;

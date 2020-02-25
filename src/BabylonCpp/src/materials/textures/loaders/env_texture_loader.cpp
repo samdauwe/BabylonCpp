@@ -38,16 +38,16 @@ std::string _ENVTextureLoader::getFallbackTextureUrl(const std::string& /*rootUr
 }
 
 void _ENVTextureLoader::loadCubeData(
-  const std::variant<std::string, ArrayBuffer>& iData, const InternalTexturePtr& texture,
+  const std::variant<std::string, ArrayBufferView>& iData, const InternalTexturePtr& texture,
   bool /*createPolynomials*/,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
 {
-  if (!std::holds_alternative<ArrayBuffer>(iData)) {
+  if (!std::holds_alternative<ArrayBufferView>(iData)) {
     return;
   }
 
-  auto data = std::get<ArrayBuffer>(iData);
+  auto data = std::get<ArrayBufferView>(iData).uint8Array();
   auto info = EnvironmentTextureTools::GetEnvInfo(data);
   if (info) {
     texture->width  = info->width;
@@ -70,7 +70,7 @@ void _ENVTextureLoader::loadCubeData(
 }
 
 void _ENVTextureLoader::loadCubeData(
-  const std::vector<std::variant<std::string, ArrayBuffer>>& /*data*/,
+  const std::vector<std::variant<std::string, ArrayBufferView>>& /*data*/,
   const InternalTexturePtr& /*texture*/, bool /*createPolynomials*/,
   const std::function<void(const std::optional<CubeTextureData>& data)>& /*onLoad*/,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
@@ -78,7 +78,7 @@ void _ENVTextureLoader::loadCubeData(
 }
 
 void _ENVTextureLoader::loadData(
-  const ArrayBuffer& /*data*/, const InternalTexturePtr& /*texture*/,
+  const ArrayBufferView& /*data*/, const InternalTexturePtr& /*texture*/,
   const std::function<void(int /*width*/, int /*height*/, bool /*loadMipmap*/,
                            bool /*isCompressed*/, const std::function<void()>& done,
                            bool loadFailed)>& /*callback*/)

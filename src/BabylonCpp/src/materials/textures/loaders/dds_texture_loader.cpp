@@ -37,7 +37,7 @@ std::string _DDSTextureLoader::getFallbackTextureUrl(const std::string& /*rootUr
 }
 
 void _DDSTextureLoader::loadCubeData(
-  const std::variant<std::string, ArrayBuffer>& img, const InternalTexturePtr& texture,
+  const std::variant<std::string, ArrayBufferView>& img, const InternalTexturePtr& texture,
   bool createPolynomials,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
@@ -82,7 +82,7 @@ void _DDSTextureLoader::loadCubeData(
 }
 
 void _DDSTextureLoader::loadCubeData(
-  const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
+  const std::vector<std::variant<std::string, ArrayBufferView>>& imgs,
   const InternalTexturePtr& texture, bool createPolynomials,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
@@ -133,7 +133,7 @@ void _DDSTextureLoader::loadCubeData(
 }
 
 void _DDSTextureLoader::loadData(
-  const ArrayBuffer& data, const InternalTexturePtr& texture,
+  const ArrayBufferView& data, const InternalTexturePtr& texture,
   const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
                            const std::function<void()>& done, bool loadFailed)>& callback)
 {

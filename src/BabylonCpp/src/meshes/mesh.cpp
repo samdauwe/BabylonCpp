@@ -1677,9 +1677,9 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 
   FileTools::LoadFile(
     delayLoadingFile,
-    [this, &scene](const std::variant<std::string, ArrayBuffer>& data,
+    [this, &scene](const std::variant<std::string, ArrayBufferView>& data,
                    const std::string & /*responseURL*/) -> void {
-      if (std::holds_alternative<ArrayBuffer>(data)) {
+      if (std::holds_alternative<ArrayBufferView>(data)) {
         // _delayLoadingFunction(data, shared_from_base<Mesh>());
       }
       else {

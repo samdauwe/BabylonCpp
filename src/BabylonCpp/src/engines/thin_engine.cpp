@@ -2265,9 +2265,9 @@ InternalTexturePtr ThinEngine::createTexture(
 
   // processing for non-image formats
   if (loader) {
-    const auto callback = [=](const std::variant<std::string, ArrayBuffer>& data,
+    const auto callback = [=](const std::variant<std::string, ArrayBufferView>& data,
                               const std::string & /*responseURL*/) -> void {
-      loader->loadData(std::get<ArrayBuffer>(data), texture,
+      loader->loadData(std::get<ArrayBufferView>(data), texture,
                        [=](int width, int height, bool loadMipmap, bool isCompressed,
                            const std::function<void()>& done, bool loadFailed) -> void {
                          if (loadFailed) {
@@ -3704,7 +3704,7 @@ unsigned int ThinEngine::_getRGBAMultiSampleBufferFormat(unsigned int type) cons
 
 IFileRequest ThinEngine::_loadFile(
   const std::string& url,
-  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+  const std::function<void(const std::variant<std::string, ArrayBufferView>& data,
                            const std::string& responseURL)>& onSuccess,
   const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)

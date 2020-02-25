@@ -111,7 +111,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   if (loader) {
     rootUrl = loader->transformUrl(rootUrl, filteredFormat);
 
-    const auto onloaddata = [=](const std::variant<std::string, ArrayBuffer>& data,
+    const auto onloaddata = [=](const std::variant<std::string, ArrayBufferView>& data,
                                 const std::string & /*responseURL*/) -> void {
       _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
       loader->loadCubeData(data, texture, createPolynomials, onLoad, onError);

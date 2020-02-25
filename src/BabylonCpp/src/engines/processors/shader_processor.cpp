@@ -397,7 +397,7 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
       ShaderProcessor::_FileToolsLoadFile(
         includeShaderUrl,
         [&options, includeFile, returnValue,
-         callback](const std::variant<std::string, ArrayBuffer>& fileContent,
+         callback](const std::variant<std::string, ArrayBufferView>& fileContent,
                    const std::string & /*responseURL*/) -> void {
           if (std::holds_alternative<std::string>(fileContent)) {
             options.includesShadersStore[includeFile] = std::get<std::string>(fileContent);
@@ -413,7 +413,7 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
 
 void ShaderProcessor::_FileToolsLoadFile(
   const std::string& url,
-  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+  const std::function<void(const std::variant<std::string, ArrayBufferView>& data,
                            const std::string& responseURL)>& onSuccess,
   const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)

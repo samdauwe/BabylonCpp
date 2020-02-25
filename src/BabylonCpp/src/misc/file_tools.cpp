@@ -340,7 +340,7 @@ constexpr const char* dummyProgressType    = "";
 
 void FileTools::LoadFile(
   const std::string& url,
-  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+  const std::function<void(const std::variant<std::string, ArrayBufferView>& data,
                            const std::string& responseURL)>& onSuccess,
   const std::function<void(const ProgressEvent& event)>& onProgress, bool useArrayBuffer,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)

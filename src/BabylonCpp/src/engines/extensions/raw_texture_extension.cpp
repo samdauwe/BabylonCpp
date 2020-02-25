@@ -284,15 +284,15 @@ InternalTexturePtr RawTextureExtension::createRawCubeTextureFromUrl(
     }
   };
 
-  const auto internalCallback = [=](const std::variant<std::string, ArrayBuffer>& data,
+  const auto internalCallback = [=](const std::variant<std::string, ArrayBufferView>& data,
                                     const std::string & /*responseURL*/) -> void {
     auto width = texture->width;
 
-    if (!std::holds_alternative<ArrayBuffer>(data)) {
+    if (!std::holds_alternative<ArrayBufferView>(data)) {
       return;
     }
 
-    auto faceDataArrays = callback(std::get<ArrayBuffer>(data));
+    auto faceDataArrays = callback(std::get<ArrayBufferView>(data).uint8Array());
 
     if (faceDataArrays.empty()) {
       return;
@@ -344,7 +344,7 @@ InternalTexturePtr RawTextureExtension::createRawCubeTextureFromUrl(
 
   _this->_loadFile(
     url,
-    [=](const std::variant<std::string, ArrayBuffer>& data,
+    [=](const std::variant<std::string, ArrayBufferView>& data,
         const std::string& responseURL) -> void { internalCallback(data, responseURL); },
     nullptr, true, onerror);
 

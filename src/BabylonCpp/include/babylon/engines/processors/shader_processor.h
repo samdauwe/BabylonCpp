@@ -8,6 +8,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
@@ -49,7 +50,7 @@ public:
    */
   static void _FileToolsLoadFile(
     const std::string& url,
-    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+    const std::function<void(const std::variant<std::string, ArrayBufferView>& data,
                              const std::string& responseURL)>& onSuccess,
     const std::function<void(const ProgressEvent& event)>& onProgress = nullptr,
     bool useArrayBuffer                                               = false,
