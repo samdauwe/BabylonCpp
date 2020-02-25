@@ -35,6 +35,8 @@ public:
   [[nodiscard]] size_t byteLength() const;
   operator bool() const;
 
+  Uint8Array& buffer();
+  const Uint8Array& buffer() const;
   Uint8Array& uint8Array();
   const Uint8Array& uint8Array() const;
   Int8Array int8Array() const;

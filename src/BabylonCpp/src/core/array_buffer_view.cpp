@@ -56,6 +56,16 @@ Int8Array ArrayBufferView::int8Array() const
   return stl_util::to_array<int8_t>(_uint8Array);
 }
 
+Uint8Array& ArrayBufferView::buffer()
+{
+  return _uint8Array;
+}
+
+const Uint8Array& ArrayBufferView::buffer() const
+{
+  return _uint8Array;
+}
+
 Uint8Array& ArrayBufferView::uint8Array()
 {
   return _uint8Array;
