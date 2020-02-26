@@ -54,7 +54,7 @@ void _ENVTextureLoader::loadCubeData(
     texture->height = info->width;
 
     EnvironmentTextureTools::UploadEnvSpherical(texture, *info);
-    EnvironmentTextureTools::UploadEnvLevels(texture, data, *info);
+    EnvironmentTextureTools::UploadEnvLevelsSync(texture, data, *info);
     {
       texture->isReady = true;
       texture->onLoadedObservable.notifyObservers(texture.get());

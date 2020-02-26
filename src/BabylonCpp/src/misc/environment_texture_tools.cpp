@@ -34,10 +34,11 @@ EnvironmentTextureTools::EnvironmentTextureTools() = default;
 
 EnvironmentTextureTools::~EnvironmentTextureTools() = default;
 
-EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
+EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBufferView& data)
 {
-  const auto& dataView = data;
-  auto pos             = 0ull;
+  const auto& dataView
+    = stl_util::to_array<int32_t>(data.buffer(), data.byteOffset, data.byteLength());
+  auto pos = 0ull;
 
   for (unsigned char magicByte : EnvironmentTextureTools::_MagicBytes) {
     if (dataView[pos++] != magicByte) {
@@ -94,7 +95,7 @@ EnvironmentTextureTools::_CreateEnvTextureIrradiance(const CubeTexturePtr& textu
 }
 
 std::vector<std::vector<ArrayBuffer>>
-EnvironmentTextureTools::CreateImageDataArrayBufferViews(const ArrayBuffer& arrayBuffer,
+EnvironmentTextureTools::CreateImageDataArrayBufferViews(const ArrayBufferView& data,
                                                          const EnvironmentTextureInfo& info)
 {
   if (info.version != 1) {
@@ -118,16 +119,17 @@ EnvironmentTextureTools::CreateImageDataArrayBufferViews(const ArrayBuffer& arra
     for (size_t face = 0; face < 6; ++face) {
       auto imageInfo     = specularInfo->mipmaps[i * 6 + face];
       imageData[i][face] = stl_util::to_array<uint8_t>(
-        arrayBuffer, *specularInfo->specularDataPosition + imageInfo.position, imageInfo.length);
+        data.buffer(), data.byteOffset + *specularInfo->specularDataPosition + imageInfo.position,
+        imageInfo.length);
     }
   }
 
   return imageData;
 }
 
-void EnvironmentTextureTools::UploadEnvLevels(const InternalTexturePtr& texture,
-                                              const ArrayBuffer& arrayBuffer,
-                                              const EnvironmentTextureInfo& info)
+void EnvironmentTextureTools::UploadEnvLevelsSync(const InternalTexturePtr& texture,
+                                                  const ArrayBufferView& data,
+                                                  const EnvironmentTextureInfo& info)
 {
   if (info.version != 1) {
     throw std::runtime_error("Unsupported babylon environment map version "
@@ -143,7 +145,7 @@ void EnvironmentTextureTools::UploadEnvLevels(const InternalTexturePtr& texture,
   texture->_lodGenerationScale = *specularInfo->lodGenerationScale;
 
   const auto imageData
-    = EnvironmentTextureTools::CreateImageDataArrayBufferViews(arrayBuffer, info);
+    = EnvironmentTextureTools::CreateImageDataArrayBufferViews(data, info);
 
   return EnvironmentTextureTools::UploadLevelsSync(texture, imageData);
 }

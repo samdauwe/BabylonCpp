@@ -49,28 +49,27 @@ public:
    * @param data The array buffer containing the .env bytes.
    * @returns the environment file info (the json header) if successfully parsed.
    */
-  static EnvironmentTextureInfoPtr GetEnvInfo(const ArrayBuffer& data);
+  static EnvironmentTextureInfoPtr GetEnvInfo(const ArrayBufferView& data);
 
   /**
    * @brief Creates the ArrayBufferViews used for initializing environment texture image data.
-   * @param arrayBuffer the underlying ArrayBuffer to which the views refer
+   * @param data the image data
    * @param info parameters that determine what views will be created for accessing the underlying
    * buffer
    * @return the views described by info providing access to the underlying buffer
    */
   static std::vector<std::vector<ArrayBuffer>>
-  CreateImageDataArrayBufferViews(const ArrayBuffer& arrayBuffer,
-                                  const EnvironmentTextureInfo& info);
+  CreateImageDataArrayBufferViews(const ArrayBufferView& data, const EnvironmentTextureInfo& info);
 
   /**
    * @brief Uploads the texture info contained in the env file to the GPU.
    * @param texture defines the internal texture to upload to
-   * @param arrayBuffer defines the buffer cotaining the data to load
+   * @param data defines the data to load
    * @param info defines the texture info retrieved through the GetEnvInfo method
    * @returns a promise
    */
-  static void UploadEnvLevels(const InternalTexturePtr& texture, const ArrayBuffer& arrayBuffer,
-                              const EnvironmentTextureInfo& info);
+  static void UploadEnvLevelsSync(const InternalTexturePtr& texture, const ArrayBufferView& data,
+                                  const EnvironmentTextureInfo& info);
 
   /**
    * @brief Uploads the levels of image data to the GPU.
