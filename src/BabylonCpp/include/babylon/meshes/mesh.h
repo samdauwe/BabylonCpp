@@ -818,14 +818,16 @@ public:
   Mesh& bakeTransformIntoVertices(const Matrix& transform);
 
   /**
-   * @brief Modifies the mesh geometry according to its own current World
-   * Matrix. The mesh World Matrix is then reset. This method returns nothing
-   * but really modifies the mesh even if it's originally not set as updatable.
-   * Note that, under the hood, this method sets a new VertexBuffer each call.
+   * @brief Modifies the mesh geometry according to its own current World Matrix.
+   * The mesh World Matrix is then reset.
+   * This method returns nothing but really modifies the mesh even if it's originally not set as
+   * updatable. Note that, under the hood, this method sets a new VertexBuffer each call.
    * @see http://doc.babylonjs.com/resources/baking_transformations
+   * @param bakeIndependenlyOfChildren indicates whether to preserve all child nodes' World Matrix
+   * during baking
    * @returns the current mesh
    */
-  Mesh& bakeCurrentTransformIntoVertices();
+  Mesh& bakeCurrentTransformIntoVertices(bool bakeIndependenlyOfChildren = true);
 
   /** Cache **/
 

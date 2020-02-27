@@ -180,7 +180,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , frustumPlanes{this, &Scene::get_frustumPlanes}
     , requireLightSorting{false}
     , useMaterialMeshMap{false}
-    , useClonedMeshhMap{false}
+    , useClonedMeshMap{false}
     , depthRenderer{this, &Scene::get_depthRenderer}
     , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
                              &Scene::set_geometryBufferRenderer}

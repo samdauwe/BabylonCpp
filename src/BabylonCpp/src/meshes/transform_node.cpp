@@ -1066,6 +1066,46 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
   return _worldMatrix;
 }
 
+void TransformNode::resetLocalMatrix(bool independentOfChildren)
+{
+  computeWorldMatrix();
+  if (independentOfChildren) {
+    auto children = getChildren();
+    for (size_t i = 0; i < children.size(); ++i) {
+      auto child = std::static_pointer_cast<TransformNode>(children[i]);
+      if (child) {
+        child->computeWorldMatrix();
+        auto& bakedMatrix = TmpVectors::MatrixArray[0];
+        child->_localMatrix.multiplyToRef(_localMatrix, bakedMatrix);
+        auto& tmpRotationQuaternion                   = TmpVectors::QuaternionArray[0];
+        std::optional<Vector3> iScaling               = child->scaling();
+        std::optional<Quaternion> iRotationQuaternion = tmpRotationQuaternion;
+        std::optional<Vector3> iPosition              = child->position();
+        bakedMatrix.decompose(iScaling, iRotationQuaternion, iPosition);
+        // Copy back
+        child->scaling        = *iScaling;
+        tmpRotationQuaternion = *iRotationQuaternion;
+        child->position       = *iPosition;
+        if (child->rotationQuaternion()) {
+          child->rotationQuaternion = tmpRotationQuaternion;
+        }
+        else {
+          tmpRotationQuaternion.toEulerAnglesToRef(child->rotation());
+        }
+      }
+    }
+  }
+  scaling().copyFromFloats(1.f, 1.f, 1.f);
+  position().copyFromFloats(0.f, 0.f, 0.f);
+  rotation().copyFromFloats(0.f, 0.f, 0.f);
+
+  // only if quaternion is already set
+  if (rotationQuaternion()) {
+    rotationQuaternion = Quaternion::Identity();
+  }
+  _worldMatrix = Matrix::Identity();
+}
+
 void TransformNode::_afterComputeWorldMatrix()
 {
 }

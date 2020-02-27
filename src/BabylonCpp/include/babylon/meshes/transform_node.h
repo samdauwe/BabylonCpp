@@ -417,6 +417,13 @@ public:
   Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false) override;
 
   /**
+   * @brief Resets this nodeTransform's local matrix to Matrix.Identity().
+   * @param independentOfChildren indicates if all child nodeTransform's world-space transform
+   * should be preserved.
+   */
+  void resetLocalMatrix(bool independentOfChildren = true);
+
+  /**
    * @brief If you'd like to be called back after the mesh position, rotation or
    * scaling has been updated.
    * @param func callback function to add

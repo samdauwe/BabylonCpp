@@ -3130,7 +3130,7 @@ public:
   /**
    * Hidden
    */
-  const bool useClonedMeshhMap;
+  const bool useClonedMeshMap;
 
   /**
    * Backing store of defined scene components

@@ -134,7 +134,7 @@ void Mesh::_initialize(Scene* scene, Node* iParent, Mesh* source, bool doNotClon
 
     // Source mesh
     _internalMeshDataInfo->_source = source;
-    if (scene->useClonedMeshhMap) {
+    if (scene->useClonedMeshMap) {
       source->_internalMeshDataInfo->meshMap[std::to_string(uniqueId)] = this;
     }
 
@@ -1055,9 +1055,10 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId, bool isReplac
   auto onlyForInstances          = isInIntermediateRendering ?
                             _internalAbstractMeshDataInfo._onlyForInstancesIntermediate :
                             _internalAbstractMeshDataInfo._onlyForInstances;
-  auto& batchCache                        = _instanceDataStorage->batchCache;
-  batchCache->mustReturn                  = false;
-  batchCache->renderSelf[subMeshId]       = !onlyForInstances && isEnabled() && isVisible;
+  auto& batchCache       = _instanceDataStorage->batchCache;
+  batchCache->mustReturn = false;
+  batchCache->renderSelf[subMeshId]
+    = isReplacementMode || (!onlyForInstances && isEnabled() && isVisible);
   batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
 
   if (_instanceDataStorage->visibleInstances && !isReplacementMode) {
@@ -1800,17 +1801,10 @@ Mesh& Mesh::bakeTransformIntoVertices(const Matrix& transform)
 }
 
 // Will apply current transform to mesh and reset world matrix
-Mesh& Mesh::bakeCurrentTransformIntoVertices()
+Mesh& Mesh::bakeCurrentTransformIntoVertices(bool bakeIndependenlyOfChildren)
 {
   bakeTransformIntoVertices(computeWorldMatrix(true));
-  scaling().copyFromFloats(1.f, 1.f, 1.f);
-  position().copyFromFloats(0.f, 0.f, 0.f);
-  rotation().copyFromFloats(0.f, 0.f, 0.f);
-  // only if quaternion is already set
-  if (rotationQuaternion()) {
-    rotationQuaternion = Quaternion::Identity();
-  }
-  _worldMatrix = Matrix::Identity();
+  resetLocalMatrix(bakeIndependenlyOfChildren);
   return *this;
 }
 
@@ -1861,7 +1855,7 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   internalDataInfo._onAfterRenderObservable.clear();
 
   // Sources
-  if (_scene->useClonedMeshhMap) {
+  if (_scene->useClonedMeshMap) {
     if (!internalDataInfo.meshMap.empty()) {
       for (const auto& item : internalDataInfo.meshMap) {
         const auto& mesh = item.second;
