@@ -193,7 +193,7 @@ private:
   /** Hidden */
   std::optional<IntersectionInfo>
   _intersectTriangles(Ray& ray, const std::vector<Vector3>& positions, const IndicesArray& indices,
-                      bool fastCheck                                    = false,
+                      unsigned int step, bool checkStopper, bool fastCheck = false,
                       const TrianglePickingPredicate& trianglePredicate = nullptr);
   /** Hidden */
   std::optional<IntersectionInfo>

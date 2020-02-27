@@ -252,6 +252,8 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions, const Uint3
   if (!material) {
     return intersectInfo;
   }
+  auto step         = 3u;
+  auto checkStopper = false;
 
   switch (material->fillMode()) {
     case Constants::MATERIAL_PointListDrawMode:
@@ -259,8 +261,13 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions, const Uint3
     case Constants::MATERIAL_LineLoopDrawMode:
     case Constants::MATERIAL_LineStripDrawMode:
     case Constants::MATERIAL_TriangleFanDrawMode:
-    case Constants::MATERIAL_TriangleStripDrawMode:
       return std::nullopt;
+    case Constants::MATERIAL_TriangleStripDrawMode:
+      step         = 1;
+      checkStopper = true;
+      break;
+    default:
+      break;
   }
 
   // LineMesh first as it's also a Mesh...
@@ -278,7 +285,8 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions, const Uint3
       return _intersectUnIndexedTriangles(ray, positions, indices, fastCheck, trianglePredicate);
     }
 
-    return _intersectTriangles(ray, positions, indices, fastCheck, trianglePredicate);
+    return _intersectTriangles(ray, positions, indices, step, checkStopper, fastCheck,
+                               trianglePredicate);
   }
 }
 
@@ -341,8 +349,8 @@ SubMesh::_intersectUnIndexedLines(Ray& ray, const std::vector<Vector3>& position
 
 std::optional<IntersectionInfo>
 SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
-                             const IndicesArray& indices, bool fastCheck,
-                             const TrianglePickingPredicate& trianglePredicate)
+                             const IndicesArray& indices, unsigned int step, bool checkStopper,
+                             bool fastCheck, const TrianglePickingPredicate& trianglePredicate)
 {
   if (positions.empty())
     return std::nullopt;
@@ -350,10 +358,21 @@ SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   // Triangles test
-  for (auto index = indexStart; index < indexStart + indexCount; index += 3) {
-    const auto& p0 = positions[indices[index]];
-    const auto& p1 = positions[indices[index + 1]];
-    const auto& p2 = positions[indices[index + 2]];
+  auto faceID = -1;
+  for (auto index = indexStart; index < indexStart + indexCount; index += step) {
+    ++faceID;
+    const auto indexA = indices[index];
+    const auto indexB = indices[index + 1];
+    const auto indexC = indices[index + 2];
+
+    if (checkStopper && indexC == 0xFFFFFFFF) {
+      index += 2;
+      continue;
+    }
+
+    const auto& p0 = positions[indexA];
+    const auto& p1 = positions[indexB];
+    const auto& p2 = positions[indexC];
 
     if (trianglePredicate && !trianglePredicate(p0, p1, p2, ray)) {
       continue;
@@ -368,7 +387,7 @@ SubMesh::_intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
 
       if (fastCheck || !intersectInfo || currentIntersectInfo->distance < intersectInfo->distance) {
         intersectInfo         = currentIntersectInfo;
-        intersectInfo->faceId = index / 3;
+        intersectInfo->faceId = static_cast<size_t>(faceID);
 
         if (fastCheck) {
           break;
