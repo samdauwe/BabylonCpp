@@ -42,7 +42,7 @@ Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
 AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     : TransformNode{iName, scene, false}
-    , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_STANDARD}
+    , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY}
     , facetNb{this, &AbstractMesh::get_facetNb}
     , partitioningSubdivisions{this, &AbstractMesh::get_partitioningSubdivisions,
                                &AbstractMesh::set_partitioningSubdivisions}
