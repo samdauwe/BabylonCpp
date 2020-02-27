@@ -52,7 +52,7 @@ public:
    * @param newGenerator use new generator object for cloned trail mesh
    * @returns a new mesh
    */
-  TrailMeshPtr clone(const std::string& name = "", const AbstractMeshPtr& newGenerator = nullptr);
+  TrailMeshPtr clone(const std::string& name = "", const TransformNodePtr& newGenerator = nullptr);
 
   /**
    * @brief Serializes this trail mesh.
@@ -72,20 +72,20 @@ protected:
   /**
    * @brief Constructor
    * @param name The value used by scene.getMeshByName() to do a lookup.
-   * @param generator The mesh to generate a trail.
+   * @param generator The mesh or transform node to generate a trail.
    * @param scene The scene to add this mesh to.
    * @param diameter Diameter of trailing mesh. Default is 1.
    * @param length Length of trailing mesh. Default is 60.
    * @param autoStart Automatically start trailing mesh. Default true.
    */
-  TrailMesh(const std::string& name, const AbstractMeshPtr& generator, Scene* scene,
+  TrailMesh(const std::string& name, const TransformNodePtr& generator, Scene* scene,
             float diameter = 1.f, float length = 60.f, bool autoStart = true);
 
 private:
   void _createMesh();
 
 private:
-  AbstractMeshPtr _generator;
+  TransformNodePtr _generator;
   bool _autoStart;
   bool _running;
   float _diameter;

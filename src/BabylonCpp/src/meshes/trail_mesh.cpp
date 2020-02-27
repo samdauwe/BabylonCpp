@@ -8,11 +8,9 @@
 
 namespace BABYLON {
 
-TrailMesh::TrailMesh(const std::string& iName, const AbstractMeshPtr& generator,
-                     Scene* scene, float diameter, float length, bool autoStart)
-    : Mesh{iName, scene}
-    , _sectionPolygonPointsCount{4}
-    , _beforeRenderObserver{nullptr}
+TrailMesh::TrailMesh(const std::string& iName, const TransformNodePtr& generator, Scene* scene,
+                     float diameter, float length, bool autoStart)
+    : Mesh{iName, scene}, _sectionPolygonPointsCount{4}, _beforeRenderObserver{nullptr}
 {
   _running   = false;
   _autoStart = autoStart;
@@ -42,41 +40,40 @@ void TrailMesh::_createMesh()
   Float32Array normals;
   IndicesArray indices;
   auto meshCenter = Vector3::Zero();
-  if (_generator->_boundingInfo) {
-    meshCenter = _generator->_boundingInfo->boundingBox.centerWorld;
+
+  auto generatorAsAbstractMesh = std::static_pointer_cast<AbstractMesh>(_generator);
+  if (generatorAsAbstractMesh && generatorAsAbstractMesh->_boundingInfo) {
+    meshCenter = generatorAsAbstractMesh->_boundingInfo->boundingBox.centerWorld;
+  }
+  else {
+    meshCenter = _generator->position();
   }
   auto alpha = 2.f * Math::PI / _sectionPolygonPointsCount;
   for (uint32_t i = 0; i < _sectionPolygonPointsCount; ++i) {
     stl_util::concat(positions, {meshCenter.x + std::cos(i * alpha) * _diameter,
-                                 meshCenter.y + std::sin(i * alpha) * _diameter,
-                                 meshCenter.z});
+                                 meshCenter.y + std::sin(i * alpha) * _diameter, meshCenter.z});
   }
   for (float i = 1.f; i <= _length; ++i) {
     for (uint32_t j = 0; j < _sectionPolygonPointsCount; ++j) {
-      stl_util::concat(positions,
-                       {meshCenter.x + std::cos(j * alpha) * _diameter,
-                        meshCenter.y + std::sin(j * alpha) * _diameter,
-                        meshCenter.z});
+      stl_util::concat(positions, {meshCenter.x + std::cos(j * alpha) * _diameter,
+                                   meshCenter.y + std::sin(j * alpha) * _diameter, meshCenter.z});
     }
-    auto l = static_cast<uint32_t>(positions.size() / 3
-                                   - 2 * _sectionPolygonPointsCount);
+    auto l = static_cast<uint32_t>(positions.size() / 3 - 2 * _sectionPolygonPointsCount);
     for (uint32_t j = 0; j < _sectionPolygonPointsCount - 1; ++j) {
       stl_util::concat(indices, {
                                   l + j,
                                   l + j + _sectionPolygonPointsCount,
                                   l + j + _sectionPolygonPointsCount + 1,
                                 });
-      stl_util::concat(
-        indices, {l + j, l + j + _sectionPolygonPointsCount + 1, l + j + 1});
+      stl_util::concat(indices, {l + j, l + j + _sectionPolygonPointsCount + 1, l + j + 1});
     }
     stl_util::concat(indices, {
                                 l + _sectionPolygonPointsCount - 1,
-                                l + _sectionPolygonPointsCount - 1
-                                  + _sectionPolygonPointsCount,
+                                l + _sectionPolygonPointsCount - 1 + _sectionPolygonPointsCount,
                                 l + _sectionPolygonPointsCount,
                               });
-    stl_util::concat(indices, {l + _sectionPolygonPointsCount - 1,
-                               l + _sectionPolygonPointsCount, l});
+    stl_util::concat(indices,
+                     {l + _sectionPolygonPointsCount - 1, l + _sectionPolygonPointsCount, l});
   }
   VertexData::ComputeNormals(positions, indices, normals);
   data->positions = std::move(positions);
@@ -111,8 +108,7 @@ void TrailMesh::update()
   auto normals   = getVerticesData(VertexBuffer::NormalKind);
   auto& wm       = _generator->getWorldMatrix();
   if (!positions.empty() && !normals.empty()) {
-    for (uint32_t i = 3 * _sectionPolygonPointsCount; i < positions.size();
-         ++i) {
+    for (uint32_t i = 3 * _sectionPolygonPointsCount; i < positions.size(); ++i) {
       positions[i - 3 * _sectionPolygonPointsCount]
         = positions[i] - normals[i] / _length * _diameter;
     }
@@ -124,12 +120,9 @@ void TrailMesh::update()
     for (uint32_t i = 0; i < _sectionPolygonPointsCount; ++i) {
       _sectionVectors[i].copyFromFloats(std::cos(i * alpha) * _diameter,
                                         std::sin(i * alpha) * _diameter, 0);
-      _sectionNormalVectors[i].copyFromFloats(std::cos(i * alpha),
-                                              std::sin(i * alpha), 0);
-      Vector3::TransformCoordinatesToRef(_sectionVectors[i], wm,
-                                         _sectionVectors[i]);
-      Vector3::TransformNormalToRef(_sectionNormalVectors[i], wm,
-                                    _sectionNormalVectors[i]);
+      _sectionNormalVectors[i].copyFromFloats(std::cos(i * alpha), std::sin(i * alpha), 0);
+      Vector3::TransformCoordinatesToRef(_sectionVectors[i], wm, _sectionVectors[i]);
+      Vector3::TransformNormalToRef(_sectionNormalVectors[i], wm, _sectionNormalVectors[i]);
     }
     for (uint32_t i = 0; i < _sectionPolygonPointsCount; ++i) {
       positions[l + 3 * i]     = _sectionVectors[i].x;
@@ -144,12 +137,10 @@ void TrailMesh::update()
   }
 }
 
-TrailMeshPtr TrailMesh::clone(const std::string& iName,
-                              const AbstractMeshPtr& newGenerator)
+TrailMeshPtr TrailMesh::clone(const std::string& iName, const TransformNodePtr& newGenerator)
 {
-  return TrailMesh::New(iName,
-                        (newGenerator == nullptr ? _generator : newGenerator),
-                        getScene(), _diameter, _length, _autoStart);
+  return TrailMesh::New(iName, (newGenerator == nullptr ? _generator : newGenerator), getScene(),
+                        _diameter, _length, _autoStart);
 }
 
 void TrailMesh::serialize(json& serializationObject) const
