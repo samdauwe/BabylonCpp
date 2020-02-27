@@ -241,7 +241,10 @@ Matrix& InstancedMesh::getWorldMatrix()
       && _currentLOD->_masterMesh != this) {
     const auto& tempMaster   = _currentLOD->_masterMesh;
     _currentLOD->_masterMesh = this;
+    TmpVectors::Vector3Array[7].copyFrom(_currentLOD->position());
+    _currentLOD->position().set(0.f, 0.f, 0.f);
     TmpVectors::MatrixArray[0].copyFrom(_currentLOD->computeWorldMatrix(true));
+    _currentLOD->position().copyFrom(TmpVectors::Vector3Array[7]);
     _currentLOD->_masterMesh = tempMaster;
     return TmpVectors::MatrixArray[0];
   }
