@@ -32,11 +32,10 @@ protected:
    * @param name defines postprocess name
    * @param options defines creation options or target ratio scale
    * @param rigCameras defines cameras using this postprocess
-   * @param samplingMode defines required sampling mode
-   * (BABYLON.Texture.NEAREST_SAMPLINGMODE by default)
+   * @param samplingMode defines required sampling mode (BABYLON.Texture.NEAREST_SAMPLINGMODE by
+   * default)
    * @param engine defines hosting engine
-   * @param reusable defines if the postprocess will be reused multiple times
-   * per frame
+   * @param reusable defines if the postprocess will be reused multiple times per frame
    */
   AnaglyphPostProcess(const std::string& name, float ratio,
                       const std::vector<CameraPtr>& rigCameras,
