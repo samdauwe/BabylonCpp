@@ -20,9 +20,8 @@ using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
 using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
- * @brief PostProcessManager is used to manage one or more post processes or
- * post process pipelines See
- * https://doc.babylonjs.com/how_to/how_to_use_postprocesses
+ * @brief PostProcessManager is used to manage one or more post processes or post process pipelines
+ * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses
  */
 class BABYLON_SHARED_EXPORT PostProcessManager {
 
@@ -43,11 +42,10 @@ public:
 
   /**
    * @brief Prepares a frame to be run through a post process.
-   * @param sourceTexture The input texture to the post procesess. (default:
-   * null)
+   * @param sourceTexture The input texture to the post procesess. (default: null)
    * @param postProcesses An array of post processes to be run. (default: null)
    * @returns True if the post processes were able to be run.
-   * Hidden
+   * @hidden
    */
   bool _prepareFrame(const InternalTexturePtr& sourceTexture          = nullptr,
                      const std::vector<PostProcessPtr>& postProcesses = {});
@@ -58,8 +56,7 @@ public:
    * @param targetTexture The target texture to render to.
    * @param forceFullscreenViewport force gl.viewport to be full screen eg.
    * 0,0,textureWidth,textureHeight
-   * @param faceIndex defines the face to render to if a cubemap is defined as
-   * the target
+   * @param faceIndex defines the face to render to if a cubemap is defined as the target
    * @param lodLevel defines which lod of the texture to render to
    */
   void directRender(const std::vector<PostProcessPtr>& postProcesses,
@@ -75,7 +72,7 @@ public:
    * @param postProcesses The array of post processes to render.
    * @param forceFullscreenViewport force gl.viewport to be full screen eg.
    * 0,0,textureWidth,textureHeight (default: false)
-   * Hidden
+   * @hidden
    */
   void _finalizeFrame(bool doNotPresent, const InternalTexturePtr& targetTexture = nullptr,
                       unsigned int faceIndex                           = 0,
