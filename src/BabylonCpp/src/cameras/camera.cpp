@@ -26,7 +26,7 @@
 #include <babylon/postprocesses/anaglyph_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
-#include <babylon/postprocesses/stereoscopic_interlace_post_process.h>
+#include <babylon/postprocesses/stereoscopic_interlace_post_process_i.h>
 
 namespace BABYLON {
 
@@ -781,10 +781,13 @@ void Camera::_setStereoscopicRigMode(Camera& camera)
     = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL
       || camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
 
+  const auto& isStereoscopicInterlaced
+    = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_INTERLACED;
   camera._rigCameras[0]->_rigPostProcess
     = PassPostProcess::New(camera.name + "_passthru", 1.f, camera._rigCameras[0]);
-  camera._rigCameras[1]->_rigPostProcess = StereoscopicInterlacePostProcess::New(
-    camera.name + "_stereoInterlace", camera._rigCameras, isStereoscopicHoriz);
+  camera._rigCameras[1]->_rigPostProcess
+    = StereoscopicInterlacePostProcessI::New(camera.name + "_stereoInterlace", camera._rigCameras,
+                                             isStereoscopicHoriz, isStereoscopicInterlaced);
 }
 
 void Camera::_setStereoscopicAnaglyphRigMode(Camera& camera)
