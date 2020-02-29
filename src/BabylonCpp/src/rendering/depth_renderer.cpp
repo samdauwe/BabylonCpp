@@ -26,6 +26,7 @@ namespace BABYLON {
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& camera,
                              bool storeNonLinearDepth)
     : isPacked{type == Constants::TEXTURETYPE_UNSIGNED_BYTE}
+    , enabled{true}
     , useOnlyInActiveCamera{false}
     , _depthMap{nullptr}
     , _effect{nullptr}
@@ -101,7 +102,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
     auto camera = (!_camera) ? _camera : scene->activeCamera;
     if (isReady(subMesh, hardwareInstancedRendering) && camera) {
       engine->enableEffect(_effect);
-      mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
+      mesh->_bind(subMesh, _effect, material->fillMode());
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
@@ -126,7 +127,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
 
       // Draw
       mesh->_processRendering(
-        subMesh, _effect, Material::TriangleFillMode, batch, hardwareInstancedRendering,
+        subMesh, _effect, static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
         [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
           _effect->setMatrix("world", world);
         });

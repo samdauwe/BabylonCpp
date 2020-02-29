@@ -19,8 +19,8 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief This represents a depth renderer in Babylon.
- * A depth renderer will render to it's depth map every frame which can be
- * displayed or used in post processing
+ * A depth renderer will render to it's depth map every frame which can be displayed or used in post
+ * processing
  */
 class BABYLON_SHARED_EXPORT DepthRenderer {
 
@@ -28,21 +28,17 @@ public:
   /**
    * @brief Instantiates a depth renderer.
    * @param scene The scene the renderer belongs to
-   * @param type The texture type of the depth map (default:
-   * Engine.TEXTURETYPE_FLOAT)
-   * @param camera The camera to be used to render the depth map (default:
-   * scene's active camera)
-   * @param storeNonLinearDepth Defines whether the depth is stored linearly
-   * like in Babylon Shadows or directly like glFragCoord.z
+   * @param type The texture type of the depth map (default: Engine.TEXTURETYPE_FLOAT)
+   * @param camera The camera to be used to render the depth map (default: scene's active camera)
+   * @param storeNonLinearDepth Defines whether the depth is stored linearly like in Babylon Shadows
+   * or directly like glFragCoord.z
    */
   DepthRenderer(Scene* scene, unsigned int type = Constants::TEXTURETYPE_FLOAT,
-                const CameraPtr& camera  = nullptr,
-                bool storeNonLinearDepth = false);
+                const CameraPtr& camera = nullptr, bool storeNonLinearDepth = false);
   virtual ~DepthRenderer(); // = default
 
   /**
-   * @brief Creates the depth rendering effect and checks if the effect is
-   * ready.
+   * @brief Creates the depth rendering effect and checks if the effect is ready.
    * @param subMesh The submesh to be used to render the depth map of
    * @param useInstances If multiple world instances should be used
    * @returns if the depth renderer is ready to render the depth map
@@ -67,7 +63,12 @@ public:
   const bool isPacked;
 
   /**
-   * Specifies that the depth renderer will only be used within
+   * Enable or disable the depth renderer. When disabled, the depth texture is not updated
+   */
+  bool enabled;
+
+  /**
+   * Specifiess that the depth renderer will only be used within
    * the camera it is created for.
    * This can help forcing its rendering during the camera processing.
    */
