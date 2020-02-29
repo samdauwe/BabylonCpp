@@ -148,6 +148,11 @@ struct MinMax {
   Vector3 max = Vector3::Zero();
 }; // end of struct MinMax
 
+struct MinMaxFloats {
+  float min = 0.f;
+  float max = 0.f;
+}; // end of struct MinMaxFloats
+
 struct MinMaxDistance {
   Vector3 min    = Vector3::Zero();
   Vector3 max    = Vector3::Zero();
