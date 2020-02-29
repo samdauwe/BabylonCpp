@@ -16,6 +16,7 @@
 #include <babylon/layers/highlight_layer.h>
 #include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/light.h>
+#include <babylon/lights/shadows/cascaded_shadow_generator.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/particles/gpu_particle_system.h>
@@ -44,7 +45,7 @@ void AbstractScene::_addIndividualParsers()
   AbstractScene::AddIndividualParser(
     SceneComponentConstants::NAME_PARTICLESYSTEM,
     [](const json& parsedParticleSystem, Scene* scene, const std::string& rootUrl) -> any {
-      if (json_util::has_key(parsedParticleSystem, "activeParticleCount")) {
+      if (json_util::has_valid_key_value(parsedParticleSystem, "activeParticleCount")) {
         auto ps = GPUParticleSystem::Parse(parsedParticleSystem, scene, rootUrl);
         return ps;
       }
@@ -62,7 +63,7 @@ void AbstractScene::_addParsers()
     SceneComponentConstants::NAME_EFFECTLAYER,
     [](const json& parsedData, Scene* scene, AssetContainer& container,
        const std::string& rootUrl) {
-      if (json_util::has_key(parsedData, "effectLayers")) {
+      if (json_util::has_valid_key_value(parsedData, "effectLayers")) {
         for (const auto& effectLayer : json_util::get_array<json>(parsedData, "effectLayers")) {
           auto parsedEffectLayer = EffectLayer::Parse(effectLayer, scene, rootUrl);
           container.effectLayers.emplace_back(parsedEffectLayer);
@@ -74,7 +75,7 @@ void AbstractScene::_addParsers()
                            [](const json& parsedData, Scene* scene, AssetContainer& container,
                               const std::string& rootUrl) {
                              // Lens flares
-                             if (json_util::has_key(parsedData, "lensFlareSystems")) {
+                             if (json_util::has_valid_key_value(parsedData, "lensFlareSystems")) {
                                for (const auto& parsedLensFlareSystem :
                                     json_util::get_array<json>(parsedData, "lensFlareSystems")) {
                                  auto lf
@@ -95,7 +96,7 @@ void AbstractScene::_addParsers()
       }
 
       // Particles Systems
-      if (json_util::has_key(parsedData, "particleSystems")) {
+      if (json_util::has_valid_key_value(parsedData, "particleSystems")) {
         for (const auto& parsedParticleSystem :
              json_util::get_array<json>(parsedData, "particleSystems")) {
           auto particleSystem
@@ -109,10 +110,16 @@ void AbstractScene::_addParsers()
                            [](const json& parsedData, Scene* scene, AssetContainer& /*container*/,
                               const std::string& /*rootUrl*/) {
                              // Shadows
-                             if (json_util::has_key(parsedData, "shadowGenerators")) {
+                             if (json_util::has_valid_key_value(parsedData, "shadowGenerators")) {
                                for (const auto& parsedShadowGenerator :
                                     json_util::get_array<json>(parsedData, "shadowGenerators")) {
-                                 ShadowGenerator::Parse(parsedShadowGenerator, scene);
+                                 if (json_util::get_string(parsedShadowGenerator, "className")
+                                     == CascadedShadowGenerator::CLASSNAME) {
+                                   CascadedShadowGenerator::Parse(parsedShadowGenerator, scene);
+                                 }
+                                 else {
+                                   ShadowGenerator::Parse(parsedShadowGenerator, scene);
+                                 }
                                  // SG would be available on their associated lights
                                }
                              }
@@ -123,12 +130,12 @@ void AbstractScene::_addParsers()
                                             AssetContainer& container, const std::string& rootUrl) {
       std::unordered_map<std::string, SoundPtr> loadedSounds;
       SoundPtr loadedSound;
-      if (json_util::has_key(parsedData, "sounds")) {
+      if (json_util::has_valid_key_value(parsedData, "sounds")) {
         for (const auto& parsedSound : json_util::get_array<json>(parsedData, "sounds")) {
           auto parsedSoundName = json_util::get_string(parsedSound, "name");
           if (Engine::audioEngine->canUseWebAudio) {
             std::string parsedSoundUrl;
-            if (!json_util::has_key(parsedSound, "url")) {
+            if (!json_util::has_valid_key_value(parsedSound, "url")) {
               parsedSoundUrl = parsedSoundName;
             }
             else {
