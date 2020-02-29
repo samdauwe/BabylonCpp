@@ -153,7 +153,7 @@ struct PbrReflectionScene : public IRenderableScene {
     mesh1->receiveShadows            = true;
     auto sg                          = ShadowGenerator::New(static_cast<int>(pow(2, 11)), light0);
     sg->usePercentageCloserFiltering = true;
-    sg->filteringQuality             = ShadowGenerator::QUALITY_HIGH();
+    sg->filteringQuality             = ShadowGenerator::QUALITY_HIGH;
     sg->addShadowCaster(plane0);
     sg->addShadowCaster(mesh0);
     sg->addShadowCaster(mesh1);

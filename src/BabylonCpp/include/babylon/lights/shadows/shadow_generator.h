@@ -34,136 +34,84 @@ using SubMeshPtr         = std::shared_ptr<SubMesh>;
  */
 class BABYLON_SHARED_EXPORT ShadowGenerator : public IShadowGenerator {
 
-private:
-  /** Statics **/
-  static constexpr unsigned int _FILTER_NONE                          = 0;
-  static constexpr unsigned int _FILTER_EXPONENTIALSHADOWMAP          = 1;
-  static constexpr unsigned int _FILTER_POISSONSAMPLING               = 2;
-  static constexpr unsigned int _FILTER_BLUREXPONENTIALSHADOWMAP      = 3;
-  static constexpr unsigned int _FILTER_CLOSEEXPONENTIALSHADOWMAP     = 4;
-  static constexpr unsigned int _FILTER_BLURCLOSEEXPONENTIALSHADOWMAP = 5;
-  static constexpr unsigned int _FILTER_PCF                           = 6;
-  static constexpr unsigned int _FILTER_PCSS                          = 7;
-
-  static constexpr unsigned int _QUALITY_HIGH   = 0;
-  static constexpr unsigned int _QUALITY_MEDIUM = 1;
-  static constexpr unsigned int _QUALITY_LOW    = 2;
-
 public:
   /**
-   * @brief Shadow generator mode None: no filtering applied.
+   * Name of the shadow generator class
    */
-  static constexpr unsigned int FILTER_NONE()
-  {
-    return ShadowGenerator::_FILTER_NONE;
-  }
+  static constexpr const char* CLASSNAME = "ShadowGenerator";
 
   /**
-   * @brief Shadow generator mode ESM: Exponential Shadow Mapping.
+   * Shadow generator mode None: no filtering applied.
+   */
+  static constexpr unsigned int FILTER_NONE = 0;
+  /**
+   * Shadow generator mode ESM: Exponential Shadow Mapping.
    * (http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
    */
-  static constexpr unsigned int FILTER_EXPONENTIALSHADOWMAP()
-  {
-    return ShadowGenerator::_FILTER_EXPONENTIALSHADOWMAP;
-  }
-
+  static constexpr unsigned int FILTER_EXPONENTIALSHADOWMAP = 1;
   /**
-   * @brief Shadow generator mode Poisson Sampling: Percentage Closer Filtering.
-   * (Multiple Tap around evenly distributed around the pixel are used to
-   * evaluate the shadow strength)
+   * Shadow generator mode Poisson Sampling: Percentage Closer Filtering.
+   * (Multiple Tap around evenly distributed around the pixel are used to evaluate the shadow
+   * strength)
    */
-  static constexpr unsigned int FILTER_POISSONSAMPLING()
-  {
-    return ShadowGenerator::_FILTER_POISSONSAMPLING;
-  }
-
+  static constexpr unsigned int FILTER_POISSONSAMPLING = 2;
   /**
-   * @brief Shadow generator mode ESM: Blurred Exponential Shadow Mapping.
+   * Shadow generator mode ESM: Blurred Exponential Shadow Mapping.
    * (http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
    */
-  static constexpr unsigned int FILTER_BLUREXPONENTIALSHADOWMAP()
-  {
-    return ShadowGenerator::_FILTER_BLUREXPONENTIALSHADOWMAP;
-  }
-
+  static constexpr unsigned int FILTER_BLUREXPONENTIALSHADOWMAP = 3;
   /**
-   * @brief Shadow generator mode ESM: Exponential Shadow Mapping using the
-   * inverse of the exponential preventing edge artifacts on steep falloff.
+   * Shadow generator mode ESM: Exponential Shadow Mapping using the inverse of the exponential
+   * preventing edge artifacts on steep falloff.
    * (http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
    */
-  static constexpr unsigned int FILTER_CLOSEEXPONENTIALSHADOWMAP()
-  {
-    return ShadowGenerator::_FILTER_CLOSEEXPONENTIALSHADOWMAP;
-  }
-
+  static constexpr unsigned int FILTER_CLOSEEXPONENTIALSHADOWMAP = 4;
   /**
-   * @brief Shadow generator mode ESM: Blurred Exponential Shadow Mapping using
-   * the inverse of the exponential preventing edge artifacts on steep falloff.
+   * Shadow generator mode ESM: Blurred Exponential Shadow Mapping using the inverse of the
+   * exponential preventing edge artifacts on steep falloff.
    * (http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
    */
-  static constexpr unsigned int FILTER_BLURCLOSEEXPONENTIALSHADOWMAP()
-  {
-    return ShadowGenerator::_FILTER_BLURCLOSEEXPONENTIALSHADOWMAP;
-  }
-
+  static constexpr unsigned int FILTER_BLURCLOSEEXPONENTIALSHADOWMAP = 5;
   /**
-   * @brief Shadow generator mode PCF: Percentage Closer Filtering.
-   * benefits from Webgl 2 shadow samplers. Fallback to Poisson Sampling in
-   * Webgl 1 (https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch11.html)
+   * Shadow generator mode PCF: Percentage Closer Filtering
+   * benefits from Webgl 2 shadow samplers. Fallback to Poisson Sampling in Webgl 1
+   * (https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch11.html)
    */
-  static constexpr unsigned int FILTER_PCF()
-  {
-    return ShadowGenerator::_FILTER_PCF;
-  }
-
+  static constexpr unsigned int FILTER_PCF = 6;
   /**
-   * @brief Shadow generator mode PCSS: Percentage Closering Soft Shadow.
-   * benefits from Webgl 2 shadow samplers. Fallback to Poisson Sampling in
-   * Webgl 1 Contact Hardening
+   * Shadow generator mode PCSS: Percentage Closering Soft Shadow.
+   * benefits from Webgl 2 shadow samplers. Fallback to Poisson Sampling in Webgl 1
+   * Contact Hardening
    */
-  static constexpr unsigned int FILTER_PCSS()
-  {
-    return ShadowGenerator::_FILTER_PCSS;
-  }
+  static constexpr unsigned int FILTER_PCSS = 7;
 
   /**
-   * @brief Reserved for PCF and PCSS.
+   * Reserved for PCF and PCSS
    * Highest Quality.
    *
    * Execute PCF on a 5*5 kernel improving a lot the shadow aliasing artifacts.
    *
    * Execute PCSS with 32 taps blocker search and 64 taps PCF.
    */
-  static constexpr unsigned int QUALITY_HIGH()
-  {
-    return ShadowGenerator::_QUALITY_HIGH;
-  }
-
+  static constexpr unsigned int QUALITY_HIGH = 0;
   /**
-   * @brief Reserved for PCF and PCSS.
+   * Reserved for PCF and PCSS
    * Good tradeoff for quality/perf cross devices
    *
    * Execute PCF on a 3*3 kernel.
    *
    * Execute PCSS with 16 taps blocker search and 32 taps PCF.
    */
-  static constexpr unsigned int QUALITY_MEDIUM()
-  {
-    return ShadowGenerator::_QUALITY_MEDIUM;
-  }
-
+  static constexpr unsigned int QUALITY_MEDIUM = 1;
   /**
-   * @brief Reserved for PCF and PCSS.
+   * Reserved for PCF and PCSS
    * The lowest quality but the fastest.
    *
    * Execute PCF on a 1*1 kernel.
    *
    * Execute PCSS with 16 taps blocker search and 16 taps PCF.
    */
-  static constexpr unsigned int QUALITY_LOW()
-  {
-    return ShadowGenerator::_QUALITY_LOW;
-  }
+  static constexpr unsigned int QUALITY_LOW = 2;
 
   template <typename... Ts>
   static ShadowGeneratorPtr New(Ts&&... args)
@@ -179,17 +127,15 @@ public:
   void addToLight(const ShadowGeneratorPtr& shadowGenerator);
 
   /**
-   * @brief Returns the darkness value (float). This can only decrease the
-   * actual darkness of a shadow. 0 means strongest and 1 would means no shadow.
+   * @brief Returns the darkness value (float). This can only decrease the actual darkness of a
+   * shadow. 0 means strongest and 1 would means no shadow.
    * @returns the darkness.
    */
   [[nodiscard]] float getDarkness() const;
 
   /**
-   * @brief Sets the darkness value (float). This can only decrease the actual
-   * darkness of a shadow.
-   * @param darkness The darkness value 0 means strongest and 1 would means no
-   * shadow.
+   * @brief Sets the darkness value (float). This can only decrease the actual darkness of a shadow.
+   * @param darkness The darkness value 0 means strongest and 1 would means no shadow.
    * @returns the shadow generator allowing fluent coding.
    */
   ShadowGenerator& setDarkness(float darkness);
@@ -202,19 +148,18 @@ public:
   ShadowGenerator& setTransparencyShadow(bool transparent);
 
   /**
-   * @brief Gets the main RTT containing the shadow map (usually storing depth
-   * from the light point of view).
+   * @brief Gets the main RTT containing the shadow map (usually storing depth from the light point
+   * of view).
    * @returns The render target texture if present otherwise, null
    */
   RenderTargetTexturePtr getShadowMap() override;
 
   /**
-   * @brief Gets the RTT used during rendering (can be a blurred version of the
-   * shadow map or the shadow map itself).
-   * @returns The render target texture if the shadow map is present otherwise,
-   * null
+   * @brief Gets the RTT used during rendering (can be a blurred version of the shadow map or the
+   * shadow map itself).
+   * @returns The render target texture if the shadow map is present otherwise, null
    */
-  RenderTargetTexturePtr getShadowMapForRendering() override;
+  RenderTargetTexturePtr getShadowMapForRendering();
 
   /**
    * @brief Gets the class name of that object.
@@ -223,21 +168,19 @@ public:
   [[nodiscard]] std::string getClassName() const;
 
   /**
-   * @brief Helper function to add a mesh and its descendants to the list of
-   * shadow casters.
+   * @brief Helper function to add a mesh and its descendants to the list of shadow casters.
    * @param mesh Mesh to add
-   * @param includeDescendants boolean indicating if the descendants should be
-   * added. Default to true
+   * @param includeDescendants boolean indicating if the descendants should be added.
+   * Default to true
    * @returns the Shadow Generator itself
    */
   ShadowGenerator& addShadowCaster(const AbstractMeshPtr& mesh, bool includeDescendants = true);
 
   /**
-   * @brief Helper function to remove a mesh and its descendants from the list
-   * of shadow casters
+   * @brief Helper function to remove a mesh and its descendants from the list of shadow casters
    * @param mesh Mesh to remove
-   * @param includeDescendants boolean indicating if the descendants should be
-   * removed. Default to true
+   * @param includeDescendants boolean indicating if the descendants should be removed.
+   * Default to true
    * @returns the Shadow Generator itself
    */
   ShadowGenerator& removeShadowCaster(const AbstractMeshPtr& mesh, bool includeDescendants = true);
@@ -249,18 +192,17 @@ public:
   IShadowLightPtr& getLight();
 
   /**
-   * @brief Forces all the attached effect to compile to enable rendering only
-   * once ready vs. lazyly compiling effects.
-   * @param onCompiled Callback triggered at the and of the effects compilation
-   * @param options Sets of optional options forcing the compilation with
-   * different modes
+   * @brief Forces all the attached effect to compile to enable rendering only once ready vs. lazyly
+   * compiling effects.
+   * @param options Sets of optional options forcing the compilation with different modes
+   * @returns A promise that resolves when the compilation completes
    */
-  void forceCompilation(const std::function<void(ShadowGenerator* generator)>& onCompiled,
-                        const ShadowGeneratorCompileOptions& options) override;
+  void forceCompilationSync(const std::function<void(IShadowGenerator* generator)>& onCompiled,
+                            const ShadowGeneratorCompileOptions& options) override;
 
   /**
-   * @brief Determine wheter the shadow generator is ready or not (mainly all
-   * effects and related post processes needs to be ready).
+   * @brief Determine wheter the shadow generator is ready or not (mainly all effects and related
+   * post processes needs to be ready).
    * @param subMesh The submesh we want to render in the shadow map
    * @param useInstances Defines wether will draw in the map using instances
    * @returns true if ready otherwise, false
@@ -268,36 +210,32 @@ public:
   bool isReady(SubMesh* subMesh, bool useInstances) override;
 
   /**
-   * @brief Prepare all the defines in a material relying on a shadow map at the
-   * specified light index.
+   * @brief Prepare all the defines in a material relying on a shadow map at the specified light
+   * index.
    * @param defines Defines of the material we want to update
-   * @param lightIndex Index of the light in the enabled light list of the
-   * material
+   * @param lightIndex Index of the light in the enabled light list of the material
    */
   void prepareDefines(MaterialDefines& defines, unsigned int lightIndex) override;
 
   /**
-   * @brief Binds the shadow related information inside of an effect
-   * (information like near, far, darkness... defined in the generator but
-   * impacting the effect).
-   * @param lightIndex Index of the light in the enabled light list of the
-   * material owning the effect
+   * @brief Binds the shadow related information inside of an effect (information like near, far,
+   * darkness... defined in the generator but impacting the effect).
+   * @param lightIndex Index of the light in the enabled light list of the material owning the
+   * effect
    * @param effect The effect we are binfing the information for
    */
   void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) override;
 
   /**
-   * @brief Gets the transformation matrix used to project the meshes into the
-   * map from the light point of view. (eq to shadow prjection matrix * light
-   * transform matrix)
+   * @brief Gets the transformation matrix used to project the meshes into the map from the light
+   * point of view. (eq to shadow prjection matrix * light transform matrix)
    * @returns The transform matrix used to create the shadow map
    */
   Matrix getTransformMatrix() override;
 
   /**
-   * @brief Recreates the shadow map dependencies like RTT and post processes.
-   * This can be used during the switch between Cube and 2D textures for
-   * instance.
+   * @brief Recreates the shadow map dependencies like RTT and post processes. This can be used
+   * during the switch between Cube and 2D textures for instance.
    */
   void recreateShadowMap() override;
 
@@ -314,13 +252,17 @@ public:
   [[nodiscard]] json serialize() const override;
 
   /**
-   * @brief Parses a serialized ShadowGenerator and returns a new
-   * ShadowGenerator.
+   * @brief Parses a serialized ShadowGenerator and returns a new ShadowGenerator.
    * @param parsedShadowGenerator The JSON object to parse
    * @param scene The scene to create the shadow map for
+   * @param constr A function that builds a shadow generator or undefined to create an instance of
+   * the default shadow generator
    * @returns The parsed shadow generator
    */
-  static ShadowGenerator* Parse(const json& parsedShadowGenerator, Scene* scene);
+  static ShadowGenerator*
+  Parse(const json& parsedShadowGenerator, Scene* scene,
+        const std::function<IShadowLightPtr(size_t mapSize, const IShadowLightPtr& light)>& constr
+        = nullptr);
 
 protected:
   /**
@@ -328,40 +270,35 @@ protected:
    * A ShadowGenerator is the required tool to use the shadows.
    * Each light casting shadows needs to use its own ShadowGenerator.
    * Documentation : https://doc.babylonjs.com/babylon101/shadows
-   * @param mapSize The size of the texture what stores the shadows. Example :
-   * 1024.
+   * @param mapSize The size of the texture what stores the shadows. Example : 1024.
    * @param light The light object generating the shadows.
-   * @param usefulFloatFirst By default the generator will try to use half float
-   * textures but if you need precision (for self shadowing for instance), you
-   * can use this option to enforce full float texture.
+   * @param usefulFloatFirst By default the generator will try to use half float textures but if you
+   * need precision (for self shadowing for instance), you can use this option to enforce full float
+   * texture.
    */
   ShadowGenerator(int mapSize, const IShadowLightPtr& light, bool usefulFloatFirst = false);
   ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
                   bool usefulFloatFirst = false);
 
   /**
-   * @brief Gets the bias: offset applied on the depth preventing acnea (in
-   * light direction).
+   * @brief Gets the bias: offset applied on the depth preventing acnea (in light direction).
    */
   [[nodiscard]] float get_bias() const;
 
   /**
-   * @brief Sets the bias: offset applied on the depth preventing acnea (in
-   * light direction).
+   * @brief Sets the bias: offset applied on the depth preventing acnea (in light direction).
    */
   void set_bias(float bias);
 
   /**
-   * @brief Gets the normalBias: offset applied on the depth preventing acnea
-   * (along side the normal direction and proportinal to the light/normal
-   * angle).
+   * @brief Gets the normalBias: offset applied on the depth preventing acnea (along side the normal
+   * direction and proportinal to the light/normal angle).
    */
   [[nodiscard]] float get_normalBias() const;
 
   /**
-   * @brief Sets the normalBias: offset applied on the depth preventing acnea
-   * (along side the normal direction and proportinal to the light/normal
-   * angle).
+   * @brief Sets the normalBias: offset applied on the depth preventing acnea (along side the normal
+   * direction and proportinal to the light/normal angle).
    */
   void set_normalBias(float normalBias);
 
@@ -378,14 +315,14 @@ protected:
   void set_blurBoxOffset(int value);
 
   /**
-   * @brief Gets the blur scale: scale of the blurred texture compared to the
-   * main shadow map. 2 means half of the size.
+   * @brief Gets the blur scale: scale of the blurred texture compared to the main shadow map. 2
+   * means half of the size.
    */
   [[nodiscard]] float get_blurScale() const;
 
   /**
-   * @brief Sets the blur scale: scale of the blurred texture compared to the
-   * main shadow map. 2 means half of the size.
+   * @brief Sets the blur scale: scale of the blurred texture compared to the main shadow map. 2
+   * means half of the size.
    */
   void set_blurScale(float value);
 
@@ -419,6 +356,11 @@ protected:
   [[nodiscard]] float get_depthScale() const;
 
   /**
+   * @brief Hidden
+   */
+  unsigned int _validateFilter(unsigned int filter);
+
+  /**
    * @brief Sets the depth scale used in ESM mode.
    * This can override the scale stored on the light.
    */
@@ -426,15 +368,15 @@ protected:
 
   /**
    * @brief Gets the current mode of the shadow generator (normal, PCF, ESM...).
-   * The returned value is a number equal to one of the available mode defined
-   * in ShadowMap.FILTER_x like _FILTER_NONE
+   * The returned value is a number equal to one of the available mode defined in ShadowMap.FILTER_x
+   * like _FILTER_NONE
    */
   [[nodiscard]] unsigned int get_filter() const;
 
   /**
    * @brief Sets the current mode of the shadow generator (normal, PCF, ESM...).
-   * The returned value is a number equal to one of the available mode defined
-   * in ShadowMap.FILTER_x like _FILTER_NONE
+   * The returned value is a number equal to one of the available mode defined in ShadowMap.FILTER_x
+   * like _FILTER_NONE
    */
   void set_filter(unsigned int value);
 
@@ -469,32 +411,31 @@ protected:
   void set_useBlurExponentialShadowMap(bool value);
 
   /**
-   * @brief Gets if the current filter is set to "close ESM" (using the inverse
-   * of the exponential to prevent steep falloff artifacts).
+   * @brief Gets if the current filter is set to "close ESM" (using the inverse of the exponential
+   * to prevent steep falloff artifacts).
    */
   [[nodiscard]] bool get_useCloseExponentialShadowMap() const;
 
   /**
-   * @brief Sets the current filter to "close ESM" (using the inverse of the
-   * exponential to prevent steep falloff artifacts).
+   * @brief Sets the current filter to "close ESM" (using the inverse of the exponential to prevent
+   * steep falloff artifacts).
    */
   void set_useCloseExponentialShadowMap(bool value);
 
   /**
-   * @brief Gets if the current filter is set to filtered "close ESM" (using the
-   * inverse of the exponential to prevent steep falloff artifacts).
+   * @brief Gets if the current filter is set to filtered "close ESM" (using the inverse of the
+   * exponential to prevent steep falloff artifacts).
    */
   [[nodiscard]] bool get_useBlurCloseExponentialShadowMap() const;
 
   /**
-   * @brief Sets the current filter to filtered "close ESM" (using the inverse
-   * of the exponential to prevent steep falloff artifacts).
+   * @brief Sets the current filter to filtered "close ESM" (using the inverse of the exponential to
+   * prevent steep falloff artifacts).
    */
   void set_useBlurCloseExponentialShadowMap(bool value);
 
   /**
-   * @brief Gets if the current filter is set to "PCF" (percentage closer
-   * filtering).
+   * @brief Gets if the current filter is set to "PCF" (percentage closer filtering).
    */
   [[nodiscard]] bool get_usePercentageCloserFiltering() const;
 
@@ -505,15 +446,13 @@ protected:
 
   /**
    * @brief Gets the PCF or PCSS Quality.
-   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
-   * is true.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering is true.
    */
   [[nodiscard]] unsigned int get_filteringQuality() const;
 
   /**
    * @brief Sets the PCF or PCSS Quality.
-   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
-   * is true.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering is true.
    */
   void set_filteringQuality(unsigned int filteringQuality);
 
@@ -528,24 +467,24 @@ protected:
   void set_useContactHardeningShadow(bool value);
 
   /**
-   * @brief Gets the Light Size (in shadow map uv unit) used in PCSS to
-   * determine the blocker search area and the penumbra size. Using a ratio
-   * helps keeping shape stability independently of the map size.
+   * @brief Gets the Light Size (in shadow map uv unit) used in PCSS to determine the blocker search
+   * area and the penumbra size. Using a ratio helps keeping shape stability independently of the
+   * map size.
    *
-   * It does not account for the light projection as it was having too much
-   * instability during the light setup or during light position changes.
+   * It does not account for the light projection as it was having too much instability during the
+   * light setup or during light position changes.
    *
    * Only valid if useContactHardeningShadow is true.
    */
   [[nodiscard]] float get_contactHardeningLightSizeUVRatio() const;
 
   /**
-   * @brief Sets the Light Size (in shadow map uv unit) used in PCSS to
-   * determine the blocker search area and the penumbra size. Using a ratio
-   * helps keeping shape stability independently of the map size.
+   * @brief Sets the Light Size (in shadow map uv unit) used in PCSS to determine the blocker search
+   * area and the penumbra size. Using a ratio helps keeping shape stability independently of the
+   * map size.
    *
-   * It does not account for the light projection as it was having too much
-   * instability during the light setup or during light position changes.
+   * It does not account for the light projection as it was having too much instability during the
+   * light setup or during light position changes.
    *
    * Only valid if useContactHardeningShadow is true.
    */
@@ -571,16 +510,22 @@ protected:
    */
   void set_transparencyShadow(bool value);
 
-private:
+  /**
+   * @brief Hiddden
+   */
   void _initializeGenerator();
+  void _createTargetRenderTexture();
   void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
   void _renderForShadowMap(const std::vector<SubMesh*>& opaqueSubMeshes,
                            const std::vector<SubMesh*>& alphaTestSubMeshes,
                            const std::vector<SubMesh*>& transparentSubMeshes,
                            const std::vector<SubMesh*>& depthOnlySubMeshes);
+  void _bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* subMesh, Effect* effect);
   void _renderSubMeshForShadowMap(SubMesh* subMesh);
   void _applyFilterValues();
+  void _isReadyCustomDefines(const std::vector<std::string>& defines, SubMesh* subMesh,
+                             bool useInstances);
   void _disposeBlurPostProcesses();
   void _disposeRTTandPostProcesses();
 
@@ -591,14 +536,12 @@ public:
   std::optional<ICustomShaderOptions> customShaderOptions;
 
   /**
-   * Observable triggered before the shadow is rendered. Can be used to update
-   * internal effect state
+   * Observable triggered before the shadow is rendered. Can be used to update internal effect state
    */
   Observable<Effect> onBeforeShadowMapRenderObservable;
 
   /**
-   * Observable triggered after the shadow is rendered. Can be used to restore
-   * internal effect state
+   * Observable triggered after the shadow is rendered. Can be used to restore internal effect state
    */
   Observable<Effect> onAfterShadowMapRenderObservable;
 
@@ -617,14 +560,13 @@ public:
   Observable<Mesh> onAfterShadowMapRenderMeshObservable;
 
   /**
-   * Gets the bias: offset applied on the depth preventing acnea (in light
-   * direction)
+   * Gets the bias: offset applied on the depth preventing acnea (in light direction)
    */
   Property<ShadowGenerator, float> bias;
 
   /**
-   * The normalBias: offset applied on the depth preventing acnea (along side
-   * the normal direction and proportinal to the light/normal angle)
+   * The normalBias: offset applied on the depth preventing acnea (along side the normal direction
+   * and proportinal to the light/normal angle)
    */
   Property<ShadowGenerator, float> normalBias;
 
@@ -635,8 +577,8 @@ public:
   Property<ShadowGenerator, int> blurBoxOffset;
 
   /**
-   * The blur scale: scale of the blurred texture compared to the main
-   * shadow map. 2 means half of the size
+   * The blur scale: scale of the blurred texture compared to the main shadow map. 2 means half of
+   * the size
    */
   Property<ShadowGenerator, float> blurScale;
 
@@ -659,8 +601,8 @@ public:
 
   /**
    * The current mode of the shadow generator (normal, PCF, ESM...)
-   * The returned value is a number equal to one of the available mode defined
-   * in ShadowMap.FILTER_x like _FILTER_NONE
+   * The returned value is a number equal to one of the available mode defined in ShadowMap.FILTER_x
+   * like _FILTER_NONE
    */
   Property<ShadowGenerator, unsigned int> filter;
 
@@ -680,14 +622,14 @@ public:
   Property<ShadowGenerator, bool> useBlurExponentialShadowMap;
 
   /**
-   * If the current filter is set to "close ESM" (using the inverse of the
-   * exponential to prevent steep falloff artifacts).
+   * If the current filter is set to "close ESM" (using the inverse of the exponential to prevent
+   * steep falloff artifacts).
    */
   Property<ShadowGenerator, bool> useCloseExponentialShadowMap;
 
   /**
-   * If the current filter is set to filtered "close ESM" (using the
-   * inverse of the exponential to prevent steep falloff artifacts).
+   * If the current filter is set to filtered "close ESM" (using the inverse of the exponential to
+   * prevent steep falloff artifacts).
    */
   Property<ShadowGenerator, bool> useBlurCloseExponentialShadowMap;
 
@@ -698,8 +640,7 @@ public:
 
   /**
    * The PCF or PCSS Quality
-   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
-   * is true.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering is true.
    */
   Property<ShadowGenerator, unsigned int> filteringQuality;
 
@@ -709,12 +650,11 @@ public:
   Property<ShadowGenerator, bool> useContactHardeningShadow;
 
   /**
-   * The Light Size (in shadow map uv unit) used in PCSS to determine the
-   * blocker search area and the penumbra size. Using a ratio helps keeping
-   * shape stability independently of the map size
+   * The Light Size (in shadow map uv unit) used in PCSS to determine the blocker search area and
+   * the penumbra size. Using a ratio helps keeping shape stability independently of the map size
    *
-   * It does not account for the light projection as it was having too much
-   * instability during the light setup or during light position changes.
+   * It does not account for the light projection as it was having too much instability during the
+   * light setup or during light position changes.
    *
    * Only valid if useContactHardeningShadow is true.
    */
@@ -731,15 +671,14 @@ public:
   Property<ShadowGenerator, bool> transparencyShadow;
 
   /**
-   * If true the shadow map is generated by rendering the back face of the mesh
-   * instead of the front face. This can help with self-shadowing as the
-   * geometry making up the back of objects is slightly offset. It might on the
-   * other hand introduce peter panning.
+   * If true the shadow map is generated by rendering the back face of the mesh instead of the front
+   * face. This can help with self-shadowing as the geometry making up the back of objects is
+   * slightly offset. It might on the other hand introduce peter panning.
    */
   float frustumEdgeFalloff;
   bool forceBackFacesOnly;
 
-private:
+protected:
   float _bias;
   float _normalBias;
   int _blurBoxOffset;
