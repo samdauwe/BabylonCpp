@@ -165,7 +165,7 @@ public:
    * @brief Gets the class name of that object.
    * @returns "ShadowGenerator"
    */
-  [[nodiscard]] std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Helper function to add a mesh and its descendants to the list of shadow casters.
@@ -358,7 +358,7 @@ protected:
   /**
    * @brief Hidden
    */
-  unsigned int _validateFilter(unsigned int filter);
+  virtual unsigned int _validateFilter(unsigned int filter) const;
 
   /**
    * @brief Sets the depth scale used in ESM mode.
@@ -513,19 +513,19 @@ protected:
   /**
    * @brief Hiddden
    */
-  void _initializeGenerator();
-  void _createTargetRenderTexture();
+  virtual void _initializeGenerator();
+  virtual void _createTargetRenderTexture();
   void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
   void _renderForShadowMap(const std::vector<SubMesh*>& opaqueSubMeshes,
                            const std::vector<SubMesh*>& alphaTestSubMeshes,
                            const std::vector<SubMesh*>& transparentSubMeshes,
                            const std::vector<SubMesh*>& depthOnlySubMeshes);
-  void _bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* subMesh, Effect* effect);
+  virtual void _bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* subMesh, Effect* effect);
   void _renderSubMeshForShadowMap(SubMesh* subMesh);
   void _applyFilterValues();
-  void _isReadyCustomDefines(const std::vector<std::string>& defines, SubMesh* subMesh,
-                             bool useInstances);
+  virtual void _isReadyCustomDefines(std::vector<std::string>& defines, SubMesh* subMesh,
+                                     bool useInstances);
   void _disposeBlurPostProcesses();
   void _disposeRTTandPostProcesses();
 

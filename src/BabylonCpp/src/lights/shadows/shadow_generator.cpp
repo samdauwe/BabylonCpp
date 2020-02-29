@@ -241,7 +241,7 @@ float ShadowGenerator::get_depthScale() const
   return _depthScale.value_or(_light->getDepthScale());
 }
 
-unsigned int ShadowGenerator::_validateFilter(unsigned int iFilter)
+unsigned int ShadowGenerator::_validateFilter(unsigned int iFilter) const
 {
   return iFilter;
 }
@@ -918,7 +918,7 @@ void ShadowGenerator::forceCompilationSync(
   checkReady();
 }
 
-void ShadowGenerator::_isReadyCustomDefines(const std::vector<std::string>& /*defines*/,
+void ShadowGenerator::_isReadyCustomDefines(std::vector<std::string>& /*defines*/,
                                             SubMesh* /*subMesh*/, bool /*useInstances*/)
 {
 }
