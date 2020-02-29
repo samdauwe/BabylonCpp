@@ -3421,6 +3421,11 @@ public:
    */
   Matrix _transformMatrixR;
 
+  /**
+   * Hidden
+   */
+  std::unordered_map<std::string, DepthRendererPtr> _depthRenderer;
+
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
@@ -3591,7 +3596,6 @@ private:
   Vector2 _unTranslatedPointer;
   AbstractMeshPtr _pointerOverMesh;
   std::unique_ptr<DebugLayer> _debugLayer;
-  std::unordered_map<std::string, DepthRendererPtr> _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
