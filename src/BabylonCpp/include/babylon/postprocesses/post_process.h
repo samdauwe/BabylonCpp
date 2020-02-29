@@ -42,11 +42,11 @@ public:
       unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
       const std::string& vertexUrl = "postprocess",
       const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-      bool blockCompilation                                                = false)
+      bool blockCompilation = false, unsigned int textureFormat = Constants::TEXTUREFORMAT_RGBA)
   {
     auto postProcess = std::shared_ptr<PostProcess>(new PostProcess(
       name, fragmentUrl, parameters, samplers, options, camera, samplingMode, engine, reusable,
-      defines, textureType, vertexUrl, indexParameters, blockCompilation));
+      defines, textureType, vertexUrl, indexParameters, blockCompilation, textureFormat));
     postProcess->add(postProcess);
 
     return postProcess;
