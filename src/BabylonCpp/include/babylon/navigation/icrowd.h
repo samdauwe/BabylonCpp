@@ -18,6 +18,7 @@ using TransformNodePtr = std::shared_ptr<TransformNode>;
  * mesh.
  */
 struct ICrowd {
+
   /**
    * @brief Destructor
    */
@@ -77,6 +78,20 @@ struct ICrowd {
   virtual void agentGoto(int index, const Vector3& destination) = 0;
 
   /**
+   * @brief Teleport the agent to a new position.
+   * @param index agent index returned by addAgent
+   * @param destination targeted world position
+   */
+  virtual void agentTeleport(int index, const Vector3& destination) = 0;
+
+  /**
+   * @brief Update agent parameters.
+   * @param index agent index returned by addAgent
+   * @param parameters agent parameters
+   */
+  virtual void updateAgentParameters(int index, const IAgentParameters& parameters) = 0;
+
+  /**
    * @brief Set the Bounding box extent for doing spatial queries (getClosestPoint,
    * getRandomPointAround, ...). The queries will try to find a solution within those bounds default
    * is (1,1,1)
@@ -94,6 +109,7 @@ struct ICrowd {
    * @brief Release all resources.
    */
   virtual void dispose() = 0;
+
 }; // end of struct ICrowd
 
 } // end of namespace BABYLON
