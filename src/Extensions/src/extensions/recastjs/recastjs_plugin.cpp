@@ -23,7 +23,7 @@ RecastJSPlugin::~RecastJSPlugin()
   dispose();
 }
 
-void RecastJSPlugin::createMavMesh(const std::vector<MeshPtr>& meshes,
+void RecastJSPlugin::createNavMesh(const std::vector<MeshPtr>& meshes,
                                    const INavMeshParameters& parameters)
 {
   rcConfig rc;

@@ -22,7 +22,7 @@ public:
    * @param meshes array of all the geometry used to compute the navigatio mesh
    * @param parameters bunch of parameters used to filter geometry
    */
-  void createMavMesh(const std::vector<MeshPtr>& meshes,
+  void createNavMesh(const std::vector<MeshPtr>& meshes,
                      const INavMeshParameters& parameters) override;
 
   /**

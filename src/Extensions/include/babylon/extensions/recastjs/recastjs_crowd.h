@@ -62,6 +62,20 @@ public:
   void agentGoto(int index, const Vector3& destination) override;
 
   /**
+   * @brief Teleport the agent to a new position.
+   * @param index agent index returned by addAgent
+   * @param destination targeted world position
+   */
+  void agentTeleport(int index, const Vector3& destination) override;
+
+  /**
+   * @brief Update agent parameters.
+   * @param index agent index returned by addAgent
+   * @param parameters agent parameters
+   */
+  void updateAgentParameters(int index, const IAgentParameters& parameters) override;
+
+  /**
    * @brief Remove a particular agent previously created.
    * @param index agent index returned by addAgent
    */

@@ -145,6 +145,9 @@ public:
   Vec3 getAgentPosition(int idx);
   Vec3 getAgentVelocity(int idx);
   void agentGoto(int idx, const Vec3& destination);
+  void agentTeleport(int idx, const Vec3& destination);
+  dtCrowdAgentParams getAgentParameters(const int idx);
+  void setAgentParameters(const int idx, const dtCrowdAgentParams* params);
   void setDefaultQueryExtent(const Vec3& extent)
   {
     m_defaultQueryExtent = extent;

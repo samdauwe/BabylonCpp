@@ -1,5 +1,6 @@
 #include <babylon/extensions/recastjs/recastjs.h>
 
+#include "DetourCommon.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshBuilder.h"
 #include "DetourNavMeshQuery.h"
@@ -614,6 +615,63 @@ void Crowd::agentGoto(int idx, const Vec3& destination)
                                               nullptr);
 
   m_crowd->requestMoveTarget(idx, polyRef, &pos.x);
+}
+
+void Crowd::agentTeleport(int idx, const Vec3& destination)
+{
+  if (idx < 0 || idx > m_crowd->getAgentCount()) {
+    return;
+  }
+
+  dtQueryFilter filter;
+  filter.setIncludeFlags(0xffff);
+  filter.setExcludeFlags(0);
+
+  dtPolyRef polyRef = 0;
+
+  Vec3 pos(destination.x, destination.y, destination.z);
+  m_crowd->getNavMeshQuery()->findNearestPoly(&pos.x, &m_defaultQueryExtent.x, &filter, &polyRef,
+                                              nullptr);
+
+  dtCrowdAgent* ag = m_crowd->getEditableAgent(idx);
+
+  float nearest[3];
+  dtVcopy(nearest, &pos.x);
+
+  ag->corridor.reset(polyRef, nearest);
+  ag->boundary.reset();
+  ag->partial = false;
+
+  ag->topologyOptTime  = 0;
+  ag->targetReplanTime = 0;
+  ag->nneis            = 0;
+
+  dtVset(ag->dvel, 0, 0, 0);
+  dtVset(ag->nvel, 0, 0, 0);
+  dtVset(ag->vel, 0, 0, 0);
+  dtVcopy(ag->npos, nearest);
+
+  ag->desiredSpeed = 0;
+
+  if (polyRef)
+    ag->state = DT_CROWDAGENT_STATE_WALKING;
+  else
+    ag->state = DT_CROWDAGENT_STATE_INVALID;
+
+  ag->targetState = DT_CROWDAGENT_TARGET_NONE;
+}
+
+dtCrowdAgentParams Crowd::getAgentParameters(const int idx)
+{
+  dtCrowdAgentParams params;
+  const dtCrowdAgent* agent = m_crowd->getAgent(idx);
+  params                    = agent->params;
+  return params;
+}
+
+void Crowd::setAgentParameters(const int idx, const dtCrowdAgentParams* params)
+{
+  m_crowd->updateAgentParameters(idx, params);
 }
 
 } // end of namespace Extensions

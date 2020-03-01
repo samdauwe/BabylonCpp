@@ -71,6 +71,40 @@ void RecastJSCrowd::agentGoto(int index, const Vector3& destination)
   recastCrowd->agentGoto(index, Vec3(destination.x, destination.y, destination.z));
 }
 
+void RecastJSCrowd::agentTeleport(int index, const Vector3& destination)
+{
+  recastCrowd->agentTeleport(index, Vec3(destination.x, destination.y, destination.z));
+}
+
+void RecastJSCrowd::updateAgentParameters(int index, const IAgentParameters& parameters)
+{
+  auto agentParams = recastCrowd->getAgentParameters(index);
+
+  if (parameters.radius >= 0.f) {
+    agentParams.radius = parameters.radius;
+  }
+  if (parameters.height > 0.f) {
+    agentParams.height = parameters.height;
+  }
+  if (parameters.maxAcceleration >= 0.f) {
+    agentParams.maxAcceleration = parameters.maxAcceleration;
+  }
+  if (parameters.maxSpeed >= 0.f) {
+    agentParams.maxSpeed = parameters.maxSpeed;
+  }
+  if (parameters.collisionQueryRange > 0.f) {
+    agentParams.collisionQueryRange = parameters.collisionQueryRange;
+  }
+  if (parameters.pathOptimizationRange > 0.f) {
+    agentParams.pathOptimizationRange = parameters.pathOptimizationRange;
+  }
+  if (parameters.separationWeight >= 0.f) {
+    agentParams.separationWeight = parameters.separationWeight;
+  }
+
+  recastCrowd->setAgentParameters(index, &agentParams);
+}
+
 void RecastJSCrowd::removeAgent(int index)
 {
   recastCrowd->removeAgent(index);
