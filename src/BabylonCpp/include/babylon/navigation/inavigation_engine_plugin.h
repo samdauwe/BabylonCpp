@@ -36,7 +36,7 @@ struct INavigationEnginePlugin {
    * @param meshes array of all the geometry used to compute the navigatio mesh
    * @param parameters bunch of parameters used to filter geometry
    */
-  virtual void createMavMesh(const std::vector<MeshPtr>& meshes,
+  virtual void createNavMesh(const std::vector<MeshPtr>& meshes,
                              const INavMeshParameters& parameters)
     = 0;
 
@@ -112,6 +112,7 @@ struct INavigationEnginePlugin {
    * @brief Release all resources.
    */
   virtual void dispose() = 0;
+
 }; // end of struct INavigationEnginePlugin
 
 } // end of namespace BABYLON

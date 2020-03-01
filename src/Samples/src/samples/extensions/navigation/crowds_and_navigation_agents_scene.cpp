@@ -69,7 +69,7 @@ public:
     navmeshParameters.detailSampleDist       = 6.f;
     navmeshParameters.detailSampleMaxError   = 1.f;
 
-    navigationPlugin.createMavMesh({staticMesh}, navmeshParameters);
+    navigationPlugin.createNavMesh({staticMesh}, navmeshParameters);
     auto navmeshdebug      = navigationPlugin.createDebugNavMesh(scene);
     navmeshdebug->position = Vector3(0.f, 0.01f, 0.f);
 
