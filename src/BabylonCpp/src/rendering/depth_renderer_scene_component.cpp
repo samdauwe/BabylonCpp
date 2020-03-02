@@ -22,8 +22,8 @@ void DepthRendererSceneComponent::_register()
       _gatherRenderTargets(renderTargets);
     });
   scene->_gatherActiveCameraRenderTargetsStage.registerStep(
-    SceneComponentConstants::STEP_GATHERACTIVECAMERARENDERTARGETS_DEPTHRENDERER,
-    this, [this](std::vector<RenderTargetTexturePtr>& renderTargets) {
+    SceneComponentConstants::STEP_GATHERACTIVECAMERARENDERTARGETS_DEPTHRENDERER, this,
+    [this](std::vector<RenderTargetTexturePtr>& renderTargets) {
       _gatherActiveCameraRenderTargets(renderTargets);
     });
 }
@@ -46,7 +46,7 @@ void DepthRendererSceneComponent::_gatherRenderTargets(
   if (!scene->depthRenderer().empty()) {
     for (const auto& item : scene->depthRenderer()) {
       const auto& depthRenderer = item.second;
-      if (!depthRenderer->useOnlyInActiveCamera) {
+      if (depthRenderer->enabled && !depthRenderer->useOnlyInActiveCamera) {
         renderTargets.emplace_back(depthRenderer->getDepthMap());
       }
     }
@@ -59,7 +59,7 @@ void DepthRendererSceneComponent::_gatherActiveCameraRenderTargets(
   if (!scene->depthRenderer().empty()) {
     for (const auto& item : scene->depthRenderer()) {
       const auto& depthRenderer = item.second;
-      if (depthRenderer->useOnlyInActiveCamera
+      if (depthRenderer->enabled && depthRenderer->useOnlyInActiveCamera
           && scene->activeCamera()->id == item.first) {
         renderTargets.emplace_back(depthRenderer->getDepthMap());
       }
