@@ -112,6 +112,8 @@ def main():
         "loadingScreen.ts",
         # Materials / Textures
         "basisTextureLoader.ts", "htmlElementTexture.ts", "videoTexture.ts",
+        # Materials / Textures / Packer
+        "frame.ts", "packer.ts",
         # Meshes / Compression
         "dracoCompression.ts",
         # Misc
