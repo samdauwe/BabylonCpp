@@ -99,7 +99,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   // Morph targets
   MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
 
-  mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
+  mesh->_bind(subMesh, _effect, material->fillMode());
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
@@ -113,7 +113,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   engine->setZOffset(-zOffset);
 
   mesh->_processRendering(
-    subMesh, _effect, Material::TriangleFillMode, batch, hardwareInstancedRendering,
+    subMesh, _effect, static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
     [this](bool, const Matrix& world, Material*) { _effect->setMatrix("world", world); });
 
   engine->setZOffset(0.f);
