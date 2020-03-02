@@ -9,44 +9,38 @@
 
 namespace BABYLON {
 
-std::shared_ptr<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultUtilityLayer
-  = nullptr;
-std::shared_ptr<UtilityLayerRenderer>
-  UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
+std::shared_ptr<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultUtilityLayer          = nullptr;
+std::shared_ptr<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
 
-std::shared_ptr<UtilityLayerRenderer>&
-UtilityLayerRenderer::DefaultUtilityLayer()
+std::shared_ptr<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultUtilityLayer()
 {
   if (UtilityLayerRenderer::_DefaultUtilityLayer == nullptr) {
     UtilityLayerRenderer::_DefaultUtilityLayer
       = UtilityLayerRenderer::New(Engine::LastCreatedScene());
-    UtilityLayerRenderer::_DefaultUtilityLayer->originalScene
-      ->onDisposeObservable.addOnce([](Scene* /*scene*/, EventState& /*es*/) {
+    UtilityLayerRenderer::_DefaultUtilityLayer->originalScene->onDisposeObservable.addOnce(
+      [](Scene* /*scene*/, EventState& /*es*/) {
         UtilityLayerRenderer::_DefaultUtilityLayer = nullptr;
       });
   }
   return UtilityLayerRenderer::_DefaultUtilityLayer;
 }
 
-std::shared_ptr<UtilityLayerRenderer>&
-UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()
+std::shared_ptr<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()
 {
   if (UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer == nullptr) {
     UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer
       = UtilityLayerRenderer::New(Engine::LastCreatedScene());
-    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer->utilityLayerScene
-      ->autoClearDepthAndStencil
+    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil
       = false;
-    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer->originalScene
-      ->onDisposeObservable.addOnce([](Scene* /*scene*/, EventState& /*es*/) {
+    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer->originalScene->onDisposeObservable.addOnce(
+      [](Scene* /*scene*/, EventState& /*es*/) {
         UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
       });
   }
   return UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer;
 }
 
-UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
-                                           bool iHandleEvents)
+UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene, bool iHandleEvents)
     : pickUtilitySceneFirst{true}
     , utilityLayerScene{nullptr}
     , shouldRender{true}
@@ -61,16 +55,15 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
     , _sceneDisposeObserver{nullptr}
     , _originalPointerObserver{nullptr}
 {
-  // Create scene which will be rendered in the foreground and remove it from
-  // being referenced by engine to avoid interfering with existing app
-  utilityLayerScene = Scene::New(iOriginalScene->getEngine());
-  utilityLayerScene->useRightHandedSystem
-    = originalScene->useRightHandedSystem();
+  // Create scene which will be rendered in the foreground and remove it from being referenced by
+  // engine to avoid interfering with existing app
+  utilityLayerScene                              = Scene::New(iOriginalScene->getEngine());
+  utilityLayerScene->useRightHandedSystem        = originalScene->useRightHandedSystem();
   utilityLayerScene->_allowPostProcessClearColor = false;
   iOriginalScene->getEngine()->scenes.pop_back();
 
-  // Detach controls on utility scene, events will be fired by logic below to
-  // handle picking priority
+  // Detach controls on utility scene, events will be fired by logic below to handle picking
+  // priority
   utilityLayerScene->detachControl();
 
   if (handleEvents) {
@@ -97,25 +90,20 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
         auto utilityScenePick
           = prePointerInfo->ray ?
               utilityLayerScene->pickWithRay(*prePointerInfo->ray) :
-              utilityLayerScene->pick(originalScene->pointerX(),
-                                      originalScene->pointerY());
+              utilityLayerScene->pick(originalScene->pointerX(), originalScene->pointerY());
         if (!prePointerInfo->ray && utilityScenePick) {
           prePointerInfo->ray = (*utilityScenePick).ray;
         }
 
         // always fire the prepointer oversvable
-        utilityLayerScene->onPrePointerObservable.notifyObservers(
-          prePointerInfo);
+        utilityLayerScene->onPrePointerObservable.notifyObservers(prePointerInfo);
 
         // allow every non pointer down event to flow to the utility layer
-        if (onlyCheckPointerDownEvents
-            && prePointerInfo->type != PointerEventTypes::POINTERDOWN) {
+        if (onlyCheckPointerDownEvents && prePointerInfo->type != PointerEventTypes::POINTERDOWN) {
           if (!prePointerInfo->skipOnPointerObservable) {
-            PointerInfo pointerInfo(prePointerInfo->type,
-                                    prePointerInfo->pointerEvent,
+            PointerInfo pointerInfo(prePointerInfo->type, prePointerInfo->pointerEvent,
                                     *utilityScenePick);
-            utilityLayerScene->onPointerObservable.notifyObservers(
-              &pointerInfo);
+            utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
           }
           if (prePointerInfo->type == PointerEventTypes::POINTERUP
               && stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
@@ -125,18 +113,15 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
           return;
         }
 
-        if (utilityLayerScene->autoClearDepthAndStencil
-            || pickUtilitySceneFirst) {
-          // If this layer is an overlay, check if this layer was hit and if so,
-          // skip pointer events for the main scene
+        if (utilityLayerScene->autoClearDepthAndStencil || pickUtilitySceneFirst) {
+          // If this layer is an overlay, check if this layer was hit and if so, skip pointer events
+          // for the main scene
           if (utilityScenePick && (*utilityScenePick).hit) {
 
             if (!prePointerInfo->skipOnPointerObservable) {
-              PointerInfo pointerInfo(prePointerInfo->type,
-                                      prePointerInfo->pointerEvent,
+              PointerInfo pointerInfo(prePointerInfo->type, prePointerInfo->pointerEvent,
                                       *utilityScenePick);
-              utilityLayerScene->onPointerObservable.notifyObservers(
-                &pointerInfo);
+              utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
             }
             prePointerInfo->skipOnPointerObservable = true;
           }
@@ -145,82 +130,65 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
           auto originalScenePick
             = prePointerInfo->ray ?
                 originalScene->pickWithRay(*prePointerInfo->ray) :
-                originalScene->pick(originalScene->pointerX(),
-                                    originalScene->pointerY());
+                originalScene->pick(originalScene->pointerX(), originalScene->pointerY());
           auto prePointerEvent = prePointerInfo->pointerEvent;
 
-          // If the layer can be occluded by the original scene, only fire
-          // pointer events to the first layer that hit they ray
+          // If the layer can be occluded by the original scene, only fire pointer events to the
+          // first layer that hit they ray
           if (originalScenePick && utilityScenePick) {
 
             // No pick in utility scene
-            if ((*utilityScenePick).distance == 0.f
-                && (*utilityScenePick).pickedMesh) {
+            if ((*utilityScenePick).distance == 0.f && (*utilityScenePick).pickedMesh) {
               if (mainSceneTrackerPredicate
-                  && mainSceneTrackerPredicate(
-                    (*originalScenePick).pickedMesh)) {
+                  && mainSceneTrackerPredicate((*originalScenePick).pickedMesh)) {
                 // We touched an utility mesh present in the main scene
-                _notifyObservers(*prePointerInfo, *originalScenePick,
-                                 prePointerEvent);
+                _notifyObservers(*prePointerInfo, *originalScenePick, prePointerEvent);
                 prePointerInfo->skipOnPointerObservable = true;
               }
               else if (prePointerInfo->type == PointerEventTypes::POINTERDOWN) {
                 _pointerCaptures[prePointerEvent.pointerId] = true;
               }
-              else if (stl_util::contains(_lastPointerEvents,
-                                          prePointerEvent.pointerId)
+              else if (stl_util::contains(_lastPointerEvents, prePointerEvent.pointerId)
                        && _lastPointerEvents[prePointerEvent.pointerId]) {
-                // We need to send a last pointerup to the utilityLayerScene to
-                // make sure animations can complete
-                onPointerOutObservable.notifyObservers(
-                  &prePointerEvent.pointerId);
+                // We need to send a last pointerup to the utilityLayerScene to make sure animations
+                // can complete
+                onPointerOutObservable.notifyObservers(&prePointerEvent.pointerId);
                 _lastPointerEvents.erase(prePointerEvent.pointerId);
               }
             }
-            else if (stl_util::contains(_pointerCaptures,
-                                        prePointerEvent.pointerId)
+            else if (stl_util::contains(_pointerCaptures, prePointerEvent.pointerId)
                      && !_pointerCaptures[prePointerEvent.pointerId]
-                     && ((*utilityScenePick).distance
-                           < (*originalScenePick).distance
+                     && ((*utilityScenePick).distance < (*originalScenePick).distance
                          || (*originalScenePick).distance == 0.f)) {
-              // We pick something in utility scene or the pick in utility is
-              // closer than the one in main scene
-              _notifyObservers(*prePointerInfo, *utilityScenePick,
-                               prePointerEvent);
+              // We pick something in utility scene or the pick in utility is closer than the one in
+              // main scene
+              _notifyObservers(*prePointerInfo, *utilityScenePick, prePointerEvent);
               // If a previous utility layer set this, do not unset this
               if (!prePointerInfo->skipOnPointerObservable) {
-                prePointerInfo->skipOnPointerObservable
-                  = (*utilityScenePick).distance > 0.f;
+                prePointerInfo->skipOnPointerObservable = (*utilityScenePick).distance > 0.f;
               }
             }
-            else if (stl_util::contains(_pointerCaptures,
-                                        prePointerEvent.pointerId)
+            else if (stl_util::contains(_pointerCaptures, prePointerEvent.pointerId)
                      && !_pointerCaptures[prePointerEvent.pointerId]
-                     && ((*utilityScenePick).distance
-                         > (*originalScenePick).distance)) {
+                     && ((*utilityScenePick).distance > (*originalScenePick).distance)) {
               // We have a pick in both scenes but main is closer than utility
 
               // We touched an utility mesh present in the main scene
               if (mainSceneTrackerPredicate
-                  && mainSceneTrackerPredicate(
-                    (*originalScenePick).pickedMesh)) {
-                _notifyObservers(*prePointerInfo, *originalScenePick,
-                                 prePointerEvent);
+                  && mainSceneTrackerPredicate((*originalScenePick).pickedMesh)) {
+                _notifyObservers(*prePointerInfo, *originalScenePick, prePointerEvent);
                 prePointerInfo->skipOnPointerObservable = true;
               }
-              else if (stl_util::contains(_lastPointerEvents,
-                                          prePointerEvent.pointerId)) {
-                // We need to send a last pointerup to the utilityLayerScene to
-                // make sure animations can complete
-                onPointerOutObservable.notifyObservers(
-                  &prePointerEvent.pointerId);
+              else if (stl_util::contains(_lastPointerEvents, prePointerEvent.pointerId)) {
+                // We need to send a last pointerup to the utilityLayerScene to make sure animations
+                // can complete
+                onPointerOutObservable.notifyObservers(&prePointerEvent.pointerId);
                 _lastPointerEvents.erase(prePointerEvent.pointerId);
               }
             }
 
             if (prePointerInfo->type == PointerEventTypes::POINTERUP
-                && stl_util::contains(_pointerCaptures,
-                                      prePointerEvent.pointerId)
+                && stl_util::contains(_pointerCaptures, prePointerEvent.pointerId)
                 && _pointerCaptures[prePointerEvent.pointerId]) {
               _pointerCaptures[prePointerEvent.pointerId] = false;
             }
@@ -228,24 +196,23 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
         }
       });
 
-    // As a newly added utility layer will be rendered over the screen last,
-    // it's pointer events should be processed first
+    // As a newly added utility layer will be rendered over the screen last, it's pointer events
+    // should be processed first
     if (_originalPointerObserver) {
-      originalScene->onPrePointerObservable.makeObserverTopPriority(
-        _originalPointerObserver);
+      originalScene->onPrePointerObservable.makeObserverTopPriority(_originalPointerObserver);
     }
   }
 
   // Render directly on top of existing scene without clearing
   utilityLayerScene->autoClear = false;
 
-  _afterRenderObserver = originalScene->onAfterCameraRenderObservable.add(
-    [this](Camera* camera, EventState& /*es*/) {
-      // Only render when the render camera finishes rendering
-      if (shouldRender && camera == getRenderCamera().get()) {
-        render();
-      }
-    });
+  _afterRenderObserver
+    = originalScene->onAfterCameraRenderObservable.add([this](Camera* camera, EventState& /*es*/) {
+        // Only render when the render camera finishes rendering
+        if (shouldRender && camera == getRenderCamera().get()) {
+          render();
+        }
+      });
 
   _sceneDisposeObserver = originalScene->onDisposeObservable.add(
     [this](Scene* /*scene*/, EventState& /*es*/) { dispose(); });
@@ -255,16 +222,20 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene,
 
 UtilityLayerRenderer::~UtilityLayerRenderer() = default;
 
-CameraPtr& UtilityLayerRenderer::getRenderCamera()
+CameraPtr UtilityLayerRenderer::getRenderCamera()
 {
   if (_renderCamera) {
     return _renderCamera;
   }
-  else if (originalScene->activeCameras.size() > 1) {
-    return originalScene->activeCameras.back();
-  }
   else {
-    return originalScene->activeCamera;
+    CameraPtr activeCam = nullptr;
+    if (originalScene->activeCameras.size() > 1) {
+      activeCam = originalScene->activeCameras.back();
+    }
+    else {
+      activeCam = originalScene->activeCamera;
+    }
+    return (activeCam && activeCam->isRigCamera) ? activeCam->rigParent : activeCam;
   }
 }
 
@@ -276,21 +247,20 @@ void UtilityLayerRenderer::setRenderCamera(const CameraPtr& cam)
 HemisphericLightPtr& UtilityLayerRenderer::_getSharedGizmoLight()
 {
   if (!_sharedGizmoLight) {
-    _sharedGizmoLight = HemisphericLight::New(
-      "shared gizmo light", Vector3(0.f, 1.f, 0.f), utilityLayerScene.get());
+    _sharedGizmoLight = HemisphericLight::New("shared gizmo light", Vector3(0.f, 1.f, 0.f),
+                                              utilityLayerScene.get());
     _sharedGizmoLight->intensity   = 2.f;
     _sharedGizmoLight->groundColor = Color3::Gray();
   }
   return _sharedGizmoLight;
 }
 
-void UtilityLayerRenderer::_notifyObservers(
-  const PointerInfoPre& prePointerInfo, const PickingInfo& pickInfo,
-  const PointerEvent& pointerEvent)
+void UtilityLayerRenderer::_notifyObservers(const PointerInfoPre& prePointerInfo,
+                                            const PickingInfo& pickInfo,
+                                            const PointerEvent& pointerEvent)
 {
   if (!prePointerInfo.skipOnPointerObservable) {
-    PointerInfo pointerInfo(prePointerInfo.type, prePointerInfo.pointerEvent,
-                            pickInfo);
+    PointerInfo pointerInfo(prePointerInfo.type, prePointerInfo.pointerEvent, pickInfo);
     utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
     _lastPointerEvents[pointerEvent.pointerId] = true;
   }
@@ -324,8 +294,7 @@ void UtilityLayerRenderer::render()
   }
 }
 
-void UtilityLayerRenderer::dispose(bool /*doNotRecurse*/,
-                                   bool /*disposeMaterialAndTextures*/)
+void UtilityLayerRenderer::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   onPointerOutObservable.clear();
 

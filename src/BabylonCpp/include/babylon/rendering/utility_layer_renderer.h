@@ -54,7 +54,7 @@ public:
    * set, this will be the last active camera).
    * @returns the camera that is used when rendering the utility layer
    */
-  CameraPtr& getRenderCamera();
+  CameraPtr getRenderCamera();
 
   /**
    * @brief Sets the camera that should be used when rendering the utility layer
