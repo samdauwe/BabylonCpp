@@ -9,6 +9,8 @@
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/pbr/pbr_material.h>
+#include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/abstract_mesh.h>
@@ -22,7 +24,8 @@
 namespace BABYLON {
 
 GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
-    : renderList{this, &GeometryBufferRenderer::set_renderList}
+    : renderTransparentMeshes{true}
+    , renderList{this, &GeometryBufferRenderer::set_renderList}
     , isSupported{this, &GeometryBufferRenderer::get_isSupported}
     , enablePosition{this, &GeometryBufferRenderer::get_enablePosition,
                      &GeometryBufferRenderer::set_enablePosition}
@@ -41,6 +44,7 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _enableReflectivity{false}
     , _positionIndex{-1}
     , _velocityIndex{-1}
+    , _reflectivityIndex{-1}
 {
   _scene = scene;
   _ratio = ratio;
@@ -66,6 +70,8 @@ int GeometryBufferRenderer::getTextureIndex(unsigned int textureType)
       return _positionIndex;
     case GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE:
       return _velocityIndex;
+    case GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE:
+      return _reflectivityIndex;
     default:
       return -1;
   }
@@ -75,7 +81,7 @@ void GeometryBufferRenderer::set_renderList(const std::vector<MeshPtr>& meshes)
 {
   _multiRenderTarget->renderList().clear();
   _multiRenderTarget->renderList().reserve(meshes.size());
-  for (auto& mesh : meshes) {
+  for (const auto& mesh : meshes) {
     _multiRenderTarget->renderList().emplace_back(mesh.get());
   }
 }
@@ -151,15 +157,44 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   auto mesh = subMesh->getMesh();
 
   // Alpha test
-  if (material && material->needAlphaTesting()) {
-    defines.emplace_back("#define ALPHATEST");
-    if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-      attribs.emplace_back(VertexBuffer::UVKind);
-      defines.emplace_back("#define UV1");
+  if (material) {
+    auto needUv = false;
+    if (material->needAlphaBlending()) {
+      defines.emplace_back("#define ALPHATEST");
+      needUv = true;
     }
-    if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-      attribs.emplace_back(VertexBuffer::UV2Kind);
-      defines.emplace_back("#define UV2");
+
+    auto asStandardMaterial = std::static_pointer_cast<StandardMaterial>(material);
+    auto asPBRMaterial      = std::static_pointer_cast<PBRMaterial>(material);
+
+    if (((asStandardMaterial && asStandardMaterial->bumpTexture())
+         || (asPBRMaterial && asPBRMaterial->bumpTexture()))
+        && StandardMaterial::BumpTextureEnabled()) {
+      defines.emplace_back("#define BUMP");
+      needUv = true;
+    }
+
+    if (_enableReflectivity) {
+      if (asStandardMaterial && asStandardMaterial->specularTexture()) {
+        defines.emplace_back("#define HAS_SPECULAR");
+        needUv = true;
+      }
+      else if (asPBRMaterial && asPBRMaterial->reflectivityTexture()) {
+        defines.emplace_back("#define HAS_REFLECTIVITY");
+        needUv = true;
+      }
+    }
+
+    if (needUv) {
+      defines.emplace_back("#define NEED_UV");
+      if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
+        attribs.emplace_back(VertexBuffer::UVKind);
+        defines.emplace_back("#define UV1");
+      }
+      if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
+        attribs.emplace_back(VertexBuffer::UV2Kind);
+        defines.emplace_back("#define UV2");
+      }
     }
   }
 
@@ -175,6 +210,11 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     if (stl_util::contains(excludedSkinnedMeshesFromVelocity, mesh)) {
       defines.emplace_back("#define BONES_VELOCITY_ENABLED");
     }
+  }
+
+  if (_enableReflectivity) {
+    defines.emplace_back("#define REFLECTIVITY");
+    defines.emplace_back("#define REFLECTIVITY_INDEX " + std::to_string(_reflectivityIndex));
   }
 
   // Bones
@@ -238,12 +278,16 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
                              "previousWorld",
                              "previousViewProjection",
                              "mPreviousBones",
-                             "morphTargetInfluences"};
-    options.samplers        = {"diffuseSampler"};
+                             "morphTargetInfluences",
+                             "bumpMatrix",
+                             "reflectivityMatrix",
+                             "vTangentSpaceParams",
+                             "vBumpInfos"};
+    options.samplers        = {"diffuseSampler", "bumpSampler", "reflectivitySampler"};
     options.defines         = std::move(join);
     options.indexParameters = std::move(indexParameters);
     options.indexParameters
-      = {{"buffersCount", _enablePosition ? 3u : 2u},
+      = {{"buffersCount", static_cast<unsigned>(_multiRenderTarget->textures().size() - 1)},
          {"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
     _effect = _scene->getEngine()->createEffect("geometry", options, _scene->getEngine());
@@ -288,6 +332,11 @@ void GeometryBufferRenderer::_createRenderTargets()
     ++count;
   }
 
+  if (_enableReflectivity) {
+    _reflectivityIndex = count;
+    ++count;
+  }
+
   // Render target
   IMultiRenderTargetOptions options;
   options.generateMipMaps      = false;
@@ -317,23 +366,29 @@ void GeometryBufferRenderer::_createRenderTargets()
   _multiRenderTarget->customRenderFunction
     = [this, engine](const std::vector<SubMesh*>& opaqueSubMeshes,
                      const std::vector<SubMesh*>& alphaTestSubMeshes,
-                     const std::vector<SubMesh*>& /*transparentSubMeshes*/,
+                     const std::vector<SubMesh*>& transparentSubMeshes,
                      const std::vector<SubMesh*>& depthOnlySubMeshes,
                      const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
-          for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+          for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
             renderSubMesh(depthOnlySubMesh);
           }
           engine->setColorWrite(true);
         }
 
-        for (auto& opaqueSubMesh : opaqueSubMeshes) {
+        for (const auto& opaqueSubMesh : opaqueSubMeshes) {
           renderSubMesh(opaqueSubMesh);
         }
 
-        for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
+        for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
           renderSubMesh(alphaTestSubMesh);
+        }
+
+        if (renderTransparentMeshes) {
+          for (const auto& transparentSubMesh : transparentSubMeshes) {
+            renderSubMesh(transparentSubMesh);
+          }
         }
       };
 }
@@ -381,17 +436,67 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
+    mesh->_bind(subMesh, _effect, material->fillMode());
 
     _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
     _effect->setMatrix("view", _scene->getViewMatrix());
 
-    // Alpha test
-    if (material && material->needAlphaTesting()) {
-      auto alphaTexture = material->getAlphaTestTexture();
-      if (alphaTexture) {
-        _effect->setTexture("diffuseSampler", alphaTexture);
-        _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+    if (material) {
+      // Alpha test
+      if (material->needAlphaTesting()) {
+        auto alphaTexture = material->getAlphaTestTexture();
+        if (alphaTexture) {
+          _effect->setTexture("diffuseSampler", alphaTexture);
+          _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+        }
+      }
+
+      auto asStandardMaterial = std::static_pointer_cast<StandardMaterial>(material);
+      auto asPBRMaterial      = std::static_pointer_cast<PBRMaterial>(material);
+
+      // Bump
+      if (scene()->getEngine()->getCaps().standardDerivatives
+          && StandardMaterial::BumpTextureEnabled()) {
+        if (asStandardMaterial) {
+          if (asStandardMaterial->bumpTexture()) {
+            _effect->setFloat3("vBumpInfos", asStandardMaterial->bumpTexture()->coordinatesIndex,
+                               1.f / asStandardMaterial->bumpTexture()->level,
+                               asStandardMaterial->parallaxScaleBias);
+            _effect->setMatrix("bumpMatrix",
+                               *asStandardMaterial->bumpTexture()->getTextureMatrix());
+            _effect->setTexture("bumpSampler", asStandardMaterial->bumpTexture());
+            _effect->setFloat2("vTangentSpaceParams",
+                               asStandardMaterial->invertNormalMapX() ? -1.f : 1.f,
+                               asStandardMaterial->invertNormalMapY ? -1.f : 1.f);
+          }
+        }
+
+        if (asPBRMaterial) {
+          if (asPBRMaterial->bumpTexture()) {
+            _effect->setFloat3("vBumpInfos", asPBRMaterial->bumpTexture()->coordinatesIndex,
+                               1.f / asPBRMaterial->bumpTexture()->level,
+                               asPBRMaterial->parallaxScaleBias);
+            _effect->setMatrix("bumpMatrix", *asPBRMaterial->bumpTexture()->getTextureMatrix());
+            _effect->setTexture("bumpSampler", asPBRMaterial->bumpTexture());
+            _effect->setFloat2("vTangentSpaceParams",
+                               asPBRMaterial->invertNormalMapX() ? -1.f : 1.f,
+                               asPBRMaterial->invertNormalMapY ? -1.f : 1.f);
+          }
+        }
+      }
+
+      // Roughness
+      if (_enableReflectivity) {
+        if (asStandardMaterial && asStandardMaterial->specularTexture()) {
+          _effect->setMatrix("reflectivityMatrix",
+                             *asStandardMaterial->specularTexture()->getTextureMatrix());
+          _effect->setTexture("reflectivitySampler", asStandardMaterial->specularTexture());
+        }
+        else if (asPBRMaterial && asPBRMaterial->reflectivityTexture()) {
+          _effect->setMatrix("reflectivityMatrix",
+                             *asPBRMaterial->reflectivityTexture()->getTextureMatrix());
+          _effect->setTexture("reflectivitySampler", asPBRMaterial->reflectivityTexture);
+        }
       }
     }
 
@@ -416,7 +521,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effect, Material::TriangleFillMode, batch, hardwareInstancedRendering,
+      subMesh, _effect, static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
       [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
         _effect->setMatrix("world", world);
       });

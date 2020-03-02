@@ -200,6 +200,11 @@ public:
   std::vector<AbstractMeshPtr> excludedSkinnedMeshesFromVelocity;
 
   /**
+   * Gets or sets a boolean indicating if transparent meshes should be rendered
+   */
+  bool renderTransparentMeshes;
+
+  /**
    * The render list (meshes to be rendered) used in the G buffer.
    */
   WriteOnlyProperty<GeometryBufferRenderer, std::vector<MeshPtr>> renderList;
@@ -255,6 +260,7 @@ private:
 
   int _positionIndex;
   int _velocityIndex;
+  int _reflectivityIndex;
 
 }; // end of class GeometryBufferRenderer
 
