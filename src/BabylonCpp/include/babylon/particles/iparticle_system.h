@@ -42,6 +42,7 @@ using ConeParticleEmitterPtr             = std::shared_ptr<ConeParticleEmitter>;
 using CylinderDirectedParticleEmitterPtr = std::shared_ptr<CylinderDirectedParticleEmitter>;
 using CylinderParticleEmitterPtr         = std::shared_ptr<CylinderParticleEmitter>;
 using HemisphericParticleEmitterPtr      = std::shared_ptr<HemisphericParticleEmitter>;
+using IParticleEmitterTypePtr            = std::shared_ptr<IParticleEmitterType>;
 using PointParticleEmitterPtr            = std::shared_ptr<PointParticleEmitter>;
 using ProceduralTexturePtr               = std::shared_ptr<ProceduralTexture>;
 using SphereDirectedParticleEmitterPtr   = std::shared_ptr<SphereDirectedParticleEmitter>;
@@ -225,7 +226,7 @@ public:
    * The particle emitter type defines the emitter used by the particle system.
    * It can be for example box, sphere, or cone...
    */
-  std::shared_ptr<IParticleEmitterType> particleEmitterType;
+  IParticleEmitterTypePtr particleEmitterType;
 
   /**
    * Defines the delay in milliseconds before starting the system (0 by default)
