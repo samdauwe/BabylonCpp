@@ -24,6 +24,7 @@
 #include <babylon/misc/color3_gradient.h>
 #include <babylon/misc/gradient_helper.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
+#include <babylon/particles/emittertypes/custom_particle_emitter.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_type.h>
 #include <babylon/particles/particle_system.h>
 
@@ -87,6 +88,7 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _scene->particleSystems.emplace_back(this);
 
   _updateEffectOptions->attributes = {"position",
+                                      "initialPosition",
                                       "age",
                                       "life",
                                       "seed",
@@ -553,11 +555,21 @@ WebGLVertexArrayObjectPtr GPUParticleSystem::_createUpdateVAO(Buffer* source)
 {
   std::unordered_map<std::string, VertexBufferPtr> updateVertexBuffers;
   updateVertexBuffers["position"] = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
-  updateVertexBuffers["age"]      = source->createVertexBuffer(VertexBuffer::AgeKind, 3, 1);
-  updateVertexBuffers["life"]     = source->createVertexBuffer(VertexBuffer::LifeKind, 4, 1);
-  updateVertexBuffers["seed"]     = source->createVertexBuffer(VertexBuffer::SeedKind, 5, 1);
-  updateVertexBuffers["size"]     = source->createVertexBuffer(VertexBuffer::SizeKind, 9, 3);
-  size_t offset                   = 12;
+
+  size_t offset = 3;
+  if (particleEmitterType->getClassName() == "CustomParticleEmitter") {
+    updateVertexBuffers["initialPosition"]
+      = source->createVertexBuffer("initialPosition", offset, 3);
+    offset += 3;
+  }
+  updateVertexBuffers["age"] = source->createVertexBuffer("age", offset, 1);
+  offset += 1;
+  updateVertexBuffers["life"] = source->createVertexBuffer("life", offset, 1);
+  offset += 1;
+  updateVertexBuffers["seed"] = source->createVertexBuffer("seed", offset, 4);
+  offset += 4;
+  updateVertexBuffers["size"] = source->createVertexBuffer("size", offset, 3);
+  offset += 3;
 
   if (!_colorGradientsTexture) {
     updateVertexBuffers["color"] = source->createVertexBuffer(VertexBuffer::ColorKind, offset, 4);
@@ -615,14 +627,19 @@ WebGLVertexArrayObjectPtr GPUParticleSystem::_createRenderVAO(Buffer* source, Bu
   auto attributesStrideSizeT = static_cast<size_t>(_attributesStrideSize);
   renderVertexBuffers["position"]
     = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3, attributesStrideSizeT, true);
+  size_t offset = 3;
+  if (particleEmitterType->getClassName() == "CustomParticleEmitter") {
+    offset += 3;
+  }
   renderVertexBuffers["age"]
-    = source->createVertexBuffer(VertexBuffer::AgeKind, 3, 1, attributesStrideSizeT, true);
+    = source->createVertexBuffer("age", offset, 1, _attributesStrideSize, true);
+  offset += 1;
   renderVertexBuffers["life"]
-    = source->createVertexBuffer(VertexBuffer::LifeKind, 4, 1, attributesStrideSizeT, true);
+    = source->createVertexBuffer("life", offset, 1, _attributesStrideSize, true);
+  offset += 5;
   renderVertexBuffers["size"]
-    = source->createVertexBuffer(VertexBuffer::SizeKind, 9, 3, attributesStrideSizeT, true);
-
-  size_t offset = 12;
+    = source->createVertexBuffer("size", offset, 3, _attributesStrideSize, true);
+  offset += 3;
 
   if (!_colorGradientsTexture) {
     renderVertexBuffers["color"]
@@ -692,6 +709,10 @@ void GPUParticleSystem::_initialize(bool force)
   _attributesStrideSize = 21;
   _targetIndex          = 0;
 
+  if (particleEmitterType->getClassName() == "CustomParticleEmitter") {
+    _attributesStrideSize += 3;
+  }
+
   if (!isBillboardBased) {
     _attributesStrideSize += 3;
   }
@@ -715,11 +736,22 @@ void GPUParticleSystem::_initialize(bool force)
     _attributesStrideSize += 6;
   }
 
+  const auto usingCustomEmitter = particleEmitterType->getClassName() == "CustomParticleEmitter";
+  auto& tmpVector               = TmpVectors::Vector3Array[0];
+
   for (size_t particleIndex = 0; particleIndex < _capacity; ++particleIndex) {
     // position
     data.emplace_back(0.f);
     data.emplace_back(0.f);
     data.emplace_back(0.f);
+
+    if (usingCustomEmitter) {
+      std::static_pointer_cast<CustomParticleEmitter>(particleEmitterType)
+        ->particlePositionGenerator(static_cast<int>(particleIndex), nullptr, tmpVector);
+      data.emplace_back(tmpVector.x);
+      data.emplace_back(tmpVector.y);
+      data.emplace_back(tmpVector.z);
+    }
 
     // Age and life
     // create the particle as a dead one to create a new one at start
@@ -746,9 +778,18 @@ void GPUParticleSystem::_initialize(bool force)
     }
 
     // direction
-    data.emplace_back(0.f);
-    data.emplace_back(0.f);
-    data.emplace_back(0.f);
+    if (usingCustomEmitter) {
+      std::static_pointer_cast<CustomParticleEmitter>(particleEmitterType)
+        ->particleDestinationGenerator(static_cast<int>(particleIndex), nullptr, tmpVector);
+      data.emplace_back(tmpVector.x);
+      data.emplace_back(tmpVector.y);
+      data.emplace_back(tmpVector.z);
+    }
+    else {
+      data.emplace_back(0.f);
+      data.emplace_back(0.f);
+      data.emplace_back(0.f);
+    }
 
     if (!isBillboardBased) {
       // initialDirection
@@ -859,8 +900,16 @@ void GPUParticleSystem::_recreateUpdateEffect()
     return;
   }
 
-  _updateEffectOptions->transformFeedbackVaryings
-    = {"outPosition", "outAge", "outLife", "outSeed", "outSize"};
+  _updateEffectOptions->transformFeedbackVaryings = {"outPosition"};
+
+  if (particleEmitterType->getClassName() == "CustomParticleEmitter") {
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back("outInitialPosition");
+  }
+
+  _updateEffectOptions->transformFeedbackVaryings.emplace_back("outAge");
+  _updateEffectOptions->transformFeedbackVaryings.emplace_back("outLife");
+  _updateEffectOptions->transformFeedbackVaryings.emplace_back("outSeed");
+  _updateEffectOptions->transformFeedbackVaryings.emplace_back("outSize");
 
   if (!_colorGradientsTexture) {
     _updateEffectOptions->transformFeedbackVaryings.emplace_back("outColor");
