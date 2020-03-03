@@ -1028,6 +1028,25 @@ void ParticleSystem::_update(int newParticles)
 
     _particles.emplace_back(particle);
 
+    // Life time
+    if (targetStopDuration && !_lifeTimeGradients.empty()) {
+      auto ratio = static_cast<float>(Scalar::Clamp(_actualFrame / targetStopDuration));
+      GradientHelper::GetCurrentGradient<FactorGradient>(
+        ratio, _lifeTimeGradients,
+        [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float /*scale*/) {
+          auto& factorGradient1 = currentGradient;
+          auto& factorGradient2 = nextGradient;
+          auto lifeTime1        = factorGradient1.getFactor();
+          auto lifeTime2        = factorGradient2.getFactor();
+          auto gradient         = (ratio - factorGradient1.gradient)
+                          / (factorGradient2.gradient - factorGradient1.gradient);
+          particle->lifeTime = Scalar::Lerp(lifeTime1, lifeTime2, gradient);
+        });
+    }
+    else {
+      particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
+    }
+
     // Emitter
     auto emitPower = Scalar::RandomRange(minEmitPower, maxEmitPower);
 
@@ -1059,25 +1078,6 @@ void ParticleSystem::_update(int newParticles)
     }
 
     particle->direction.scaleInPlace(emitPower);
-
-    // Life time
-    if (targetStopDuration && !_lifeTimeGradients.empty()) {
-      auto ratio = static_cast<float>(Scalar::Clamp(_actualFrame / targetStopDuration));
-      GradientHelper::GetCurrentGradient<FactorGradient>(
-        ratio, _lifeTimeGradients,
-        [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float /*scale*/) {
-          auto& factorGradient1 = currentGradient;
-          auto& factorGradient2 = nextGradient;
-          auto lifeTime1        = factorGradient1.getFactor();
-          auto lifeTime2        = factorGradient2.getFactor();
-          auto gradient         = (ratio - factorGradient1.gradient)
-                          / (factorGradient2.gradient - factorGradient1.gradient);
-          particle->lifeTime = Scalar::Lerp(lifeTime1, lifeTime2, gradient);
-        });
-    }
-    else {
-      particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
-    }
 
     // Size
     if (!_sizeGradients.empty()) {
