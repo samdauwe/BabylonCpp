@@ -14,11 +14,13 @@ TransformBlock::TransformBlock(const std::string& iName)
     , complementZ{0.f}
     , vector{this, &TransformBlock::get_vector}
     , output{this, &TransformBlock::get_output}
+    , xyz{this, &TransformBlock::get_xyz}
     , transform{this, &TransformBlock::get_transform}
 {
   registerInput("vector", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("transform", NodeMaterialBlockConnectionPointTypes::Matrix);
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
+  registerOutput("xyz", NodeMaterialBlockConnectionPointTypes::Vector3);
 
   _inputs[0]->onConnectionObservable.add(
     [this](NodeMaterialConnectionPoint* other, EventState & /*es*/) -> void {
@@ -49,6 +51,11 @@ NodeMaterialConnectionPointPtr& TransformBlock::get_output()
   return _outputs[0];
 }
 
+NodeMaterialConnectionPointPtr& TransformBlock::get_xyz()
+{
+  return _outputs[1];
+}
+
 NodeMaterialConnectionPointPtr& TransformBlock::get_transform()
 {
   return _inputs[1];
@@ -58,31 +65,42 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& iOutput = _outputs[0];
+  const auto& iOutput    = output();
+  const auto& iVector    = vector();
+  const auto& iTransform = transform();
+  const auto& iXyz       = xyz();
 
-  switch (vector()->connectedPoint()->type()) {
-    case NodeMaterialBlockConnectionPointTypes::Vector2:
+  if (iVector->connectedPoint()) {
+    switch (iVector->connectedPoint()->type()) {
+      case NodeMaterialBlockConnectionPointTypes::Vector2:
+        state.compilationString
+          += _declareOutput(iOutput, state)
+             + StringTools::printf(
+               " = %s * vec4(%s, %s, %s);\r\n", iTransform->associatedVariableName().c_str(),
+               iVector->associatedVariableName().c_str(), _writeFloat(complementZ).c_str(),
+               _writeFloat(complementW).c_str());
+        break;
+      case NodeMaterialBlockConnectionPointTypes::Vector3:
+      case NodeMaterialBlockConnectionPointTypes::Color3:
+        state.compilationString
+          += _declareOutput(iOutput, state)
+             + StringTools::printf(
+               " = %s * vec4(%s, %s);\r\n", iTransform->associatedVariableName().c_str(),
+               iVector->associatedVariableName().c_str(), _writeFloat(complementW).c_str());
+        break;
+      default:
+        state.compilationString
+          += _declareOutput(iOutput, state)
+             + StringTools::printf(" = %s * %s;\r\n", iTransform->associatedVariableName().c_str(),
+                                   iVector->associatedVariableName().c_str());
+        break;
+    }
+
+    if (iXyz->hasEndpoints()) {
       state.compilationString
-        += _declareOutput(iOutput, state)
-           + StringTools::printf(
-             " = %s * vec4(%s, %s, %s);\r\n", transform()->associatedVariableName().c_str(),
-             vector()->associatedVariableName().c_str(), _writeFloat(complementZ).c_str(),
-             _writeFloat(complementW).c_str());
-      break;
-    case NodeMaterialBlockConnectionPointTypes::Vector3:
-    case NodeMaterialBlockConnectionPointTypes::Color3:
-      state.compilationString
-        += _declareOutput(iOutput, state)
-           + StringTools::printf(
-             " = %s * vec4(%s, %s);\r\n", transform()->associatedVariableName().c_str(),
-             vector()->associatedVariableName().c_str(), _writeFloat(complementW).c_str());
-      break;
-    default:
-      state.compilationString
-        += _declareOutput(iOutput, state)
-           + StringTools::printf(" = %s * %s;\r\n", transform()->associatedVariableName().c_str(),
-                                 vector()->associatedVariableName().c_str());
-      break;
+        += _declareOutput(iXyz, state)
+           + StringTools::printf(" = %s.xyz;\r\n", iOutput->associatedVariableName().c_str());
+    }
   }
 
   return *this;

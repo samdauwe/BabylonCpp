@@ -176,6 +176,8 @@ void InputBlock::set_value(const AnimationValuePtr& iValue)
 
   _storedValue = newValue;
   _mode        = NodeMaterialBlockConnectionPointMode::Uniform;
+
+  onValueChangedObservable.notifyObservers(this);
 }
 
 std::function<AnimationValuePtr()>& InputBlock::get_valueCallback()
@@ -630,6 +632,13 @@ std::string InputBlock::_dumpPropertiesCode()
     return finalOutput;
   }
   return "";
+}
+
+void InputBlock::dispose()
+{
+  onValueChangedObservable.clear();
+
+  NodeMaterialBlock::dispose();
 }
 
 json InputBlock::serialize() const

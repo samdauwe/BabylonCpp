@@ -254,7 +254,7 @@ public:
   /**
    * @brief Release resources.
    */
-  void dispose();
+  virtual void dispose();
 
 protected:
   /**

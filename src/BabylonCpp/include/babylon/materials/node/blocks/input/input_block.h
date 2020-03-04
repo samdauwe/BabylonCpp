@@ -9,6 +9,7 @@
 #include <babylon/materials/node/enums/node_material_block_connection_point_mode.h>
 #include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_block.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
@@ -81,6 +82,11 @@ public:
    * @brief Hidden.
    */
   void _transmit(Effect* effect, Scene* scene);
+
+  /**
+   * @brief Release resources.
+   */
+  void dispose() override;
 
   /**
    * @brief Serializes this block in a JSON representation.
@@ -281,6 +287,11 @@ public:
    * Gets or sets the group to use to display this block in the Inspector
    */
   std::string groupInInspector;
+
+  /**
+   * Gets an observable raised when the value is changed
+   */
+  Observable<InputBlock> onValueChangedObservable;
 
   /**
    * Gets or sets the connection point type (default is float)

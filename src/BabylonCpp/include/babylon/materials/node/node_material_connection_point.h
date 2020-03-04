@@ -256,7 +256,7 @@ public:
   Property<NodeMaterialConnectionPoint, std::string> associatedVariableName;
 
   /**
-   * Get the inner type (ie AutoDetect for isntance instead of the inferred one)
+   * Get the inner type (ie AutoDetect for instance instead of the inferred one)
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialBlockConnectionPointTypes> innerType;
 

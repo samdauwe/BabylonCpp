@@ -74,6 +74,9 @@ void NodeMaterialConnectionPoint::set_associatedVariableName(std::string value)
 
 NodeMaterialBlockConnectionPointTypes& NodeMaterialConnectionPoint::get_innerType()
 {
+  if (_linkedConnectionSource && _linkedConnectionSource->isConnected()) {
+    return type();
+  }
   return _type;
 }
 
@@ -297,22 +300,26 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color3) {
           return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
-      } break;
+        break;
+      }
       case NodeMaterialBlockConnectionPointTypes::Vector4: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color4) {
           return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
-      } break;
+        break;
+      }
       case NodeMaterialBlockConnectionPointTypes::Color3: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector3) {
           return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
-      } break;
+        break;
+      }
       case NodeMaterialBlockConnectionPointTypes::Color4: {
         if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector4) {
           return NodeMaterialConnectionPointCompatibilityStates::Compatible;
         }
-      } break;
+        break;
+      }
       default:
         break;
     }

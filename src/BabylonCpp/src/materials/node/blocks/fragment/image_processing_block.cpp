@@ -121,7 +121,8 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
   state._emitFunctionFromInclude("imageProcessingDeclaration", iComments);
   state._emitFunctionFromInclude("imageProcessingFunctions", iComments);
 
-  if (iColor->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Color4) {
+  if ((iColor->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Color4)
+      || (iColor->connectedPoint()->type() == NodeMaterialBlockConnectionPointTypes::Vector4)) {
     state.compilationString
       += StringTools::printf("%s = %s;\r\n", _declareOutput(iOutput, state).c_str(),
                              iColor->associatedVariableName().c_str());

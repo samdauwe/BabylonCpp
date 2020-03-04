@@ -10,8 +10,7 @@ class TransformBlock;
 using TransformBlockPtr = std::shared_ptr<TransformBlock>;
 
 /**
- * @brief Block used to transform a vector (2, 3 or 4) with a matrix. It will
- * generate a Vector4.
+ * @brief Block used to transform a vector (2, 3 or 4) with a matrix. It will generate a Vector4.
  */
 class BABYLON_SHARED_EXPORT TransformBlock : public NodeMaterialBlock {
 
@@ -59,6 +58,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_output();
 
   /**
+   * @brief Gets the xyz output component.
+   */
+  NodeMaterialConnectionPointPtr& get_xyz();
+
+  /**
    * @brief Gets the matrix transform input.
    */
   NodeMaterialConnectionPointPtr& get_transform();
@@ -93,6 +97,11 @@ public:
    * Gets the output component
    */
   ReadOnlyProperty<TransformBlock, NodeMaterialConnectionPointPtr> output;
+
+  /**
+   * Gets the xyz output component
+   */
+  ReadOnlyProperty<TransformBlock, NodeMaterialConnectionPointPtr> xyz;
 
   /**
    * Gets the matrix transform input

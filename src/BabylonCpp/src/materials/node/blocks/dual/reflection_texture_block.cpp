@@ -50,6 +50,9 @@ ReflectionTextureBlock::ReflectionTextureBlock(const std::string& iName)
                  NodeMaterialBlockTargets::Fragment);
   registerOutput("b", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Fragment);
+
+  _inputs[0]->acceptedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Vector4);
 }
 
 ReflectionTextureBlock::~ReflectionTextureBlock() = default;
@@ -239,7 +242,7 @@ void ReflectionTextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
   if (state._emitVaryingFromString(_positionUVWName, "vec3", _defineSkyboxName)) {
     state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineSkyboxName.c_str());
-    state.compilationString += StringTools::printf("%s = %s;\r\n", _positionUVWName.c_str(),
+    state.compilationString += StringTools::printf("%s = %s.xyz;\r\n", _positionUVWName.c_str(),
                                                    position()->associatedVariableName().c_str());
     state.compilationString += "#endif\r\n";
   }
@@ -252,7 +255,7 @@ void ReflectionTextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
                                                    _defineEquirectangularFixedName.c_str(),
                                                    _defineMirroredEquirectangularFixedName.c_str());
     state.compilationString += StringTools::printf(
-      "%s = normalize(vec3(%s * vec4(%s, 0.0)));\r\n", _directionWName.c_str(),
+      "%s = normalize(vec3(%s * vec4(%s.xyz, 0.0)));\r\n", _directionWName.c_str(),
       world()->associatedVariableName().c_str(), position()->associatedVariableName().c_str());
     state.compilationString += "#endif\r\n";
   }
