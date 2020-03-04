@@ -314,6 +314,7 @@ void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh, co
   defines.boolDef["SHADOWCSMNUM_CASCADES" + lightIndexStr]  = false;
   defines.boolDef["SHADOWCSMUSESHADOWMAXZ" + lightIndexStr] = false;
   defines.boolDef["SHADOWCSMNOBLEND" + lightIndexStr]       = false;
+  defines.boolDef["SHADOWCSM_RIGHTHANDED" + lightIndexStr]  = false;
   defines.boolDef["SHADOWPCF" + lightIndexStr]              = false;
   defines.boolDef["SHADOWPCSS" + lightIndexStr]             = false;
   defines.boolDef["SHADOWPOISSON" + lightIndexStr]          = false;
@@ -395,6 +396,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
       defines.boolDef["SHADOWCSMNUM_CASCADES" + indexStr]  = false;
       defines.boolDef["SHADOWCSMUSESHADOWMAXZ" + indexStr] = false;
       defines.boolDef["SHADOWCSMNOBLEND" + indexStr]       = false;
+      defines.boolDef["SHADOWCSM_RIGHTHANDED" + indexStr]  = false;
       defines.boolDef["SHADOWPCF" + indexStr]              = false;
       defines.boolDef["SHADOWPCSS" + indexStr]             = false;
       defines.boolDef["SHADOWPOISSON" + indexStr]          = false;
