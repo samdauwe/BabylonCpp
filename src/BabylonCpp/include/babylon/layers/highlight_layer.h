@@ -130,6 +130,11 @@ public:
   void removeMesh(Mesh* mesh);
 
   /**
+   * @brief Remove all the meshes currently referenced in the highlight layer.
+   */
+  void removeAllMeshes();
+
+  /**
    * Free any resources and references associated to a mesh.
    * Internal use
    * @param mesh The mesh to free.

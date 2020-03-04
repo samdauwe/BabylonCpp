@@ -5,7 +5,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -19,6 +18,7 @@
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/glow_blur_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
@@ -458,6 +458,17 @@ void HighlightLayer::removeMesh(Mesh* mesh)
       _shouldRender = true;
       break;
     }
+  }
+}
+
+void HighlightLayer::removeAllMeshes()
+{
+  if (_meshes.empty()) {
+    return;
+  }
+
+  for (const auto& [uniqueId, mesh] : _meshes) {
+    removeMesh(mesh.mesh.get());
   }
 }
 
