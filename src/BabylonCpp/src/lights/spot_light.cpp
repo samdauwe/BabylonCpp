@@ -238,6 +238,16 @@ void SpotLight::_computeProjectionTextureMatrix()
 
   _projectionTextureViewLightMatrix.multiplyToRef(_projectionTextureProjectionLightMatrix,
                                                   _projectionTextureMatrix);
+  const auto textureInstance = std::static_pointer_cast<Texture>(_projectionTexture);
+  if (textureInstance) {
+    const auto u = textureInstance->uScale / 2.f;
+    const auto v = textureInstance->vScale / 2.f;
+    Matrix::FromValuesToRef(u, 0.f, 0.0f, 0.f,     //
+                            0.f, v, 0.0f, 0.f,     //
+                            0.f, 0.f, 0.5f, 0.f,   //
+                            0.5f, 0.5f, 0.5f, 1.f, //
+                            _projectionTextureScalingMatrix);
+  }
   _projectionTextureMatrix.multiplyToRef(_projectionTextureScalingMatrix, _projectionTextureMatrix);
 }
 
