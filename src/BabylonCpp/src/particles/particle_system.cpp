@@ -48,6 +48,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
     , _currentStartSize1{0.f}
     , _currentStartSize2{0.f}
     , _disposeEmitterOnDispose{false}
+    , isLocal{false}
     , _newPartsExcess{0}
     , _scaledColorStep{Color4(0.f, 0.f, 0.f, 0.f)}
     , _colorDiff{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -1051,18 +1052,19 @@ void ParticleSystem::_update(int newParticles)
     auto emitPower = Scalar::RandomRange(minEmitPower, maxEmitPower);
 
     if (startPositionFunction) {
-      startPositionFunction(_emitterWorldMatrix, particle->position, particle);
+      startPositionFunction(_emitterWorldMatrix, particle->position, particle, isLocal);
     }
     else {
-      particleEmitterType->startPositionFunction(_emitterWorldMatrix, particle->position, particle);
+      particleEmitterType->startPositionFunction(_emitterWorldMatrix, particle->position, particle,
+                                                 isLocal);
     }
 
     if (startDirectionFunction) {
-      startDirectionFunction(_emitterWorldMatrix, particle->direction, particle);
+      startDirectionFunction(_emitterWorldMatrix, particle->direction, particle, isLocal);
     }
     else {
       particleEmitterType->startDirectionFunction(_emitterWorldMatrix, particle->direction,
-                                                  particle);
+                                                  particle, isLocal);
     }
 
     if (emitPower == 0.f) {

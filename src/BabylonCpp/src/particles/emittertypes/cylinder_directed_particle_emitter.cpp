@@ -22,7 +22,8 @@ CylinderDirectedParticleEmitter::~CylinderDirectedParticleEmitter() = default;
 
 void CylinderDirectedParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                              Vector3& directionToUpdate,
-                                                             Particle* /*particle*/)
+                                                             Particle* /*particle*/,
+                                                             bool /*isLocal*/)
 {
   const auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);

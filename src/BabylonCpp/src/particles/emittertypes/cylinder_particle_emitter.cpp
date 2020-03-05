@@ -20,7 +20,8 @@ CylinderParticleEmitter::CylinderParticleEmitter(float iRadius, float iHeight, f
 CylinderParticleEmitter::~CylinderParticleEmitter() = default;
 
 void CylinderParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                     Vector3& directionToUpdate, Particle* particle)
+                                                     Vector3& directionToUpdate, Particle* particle,
+                                                     bool isLocal)
 {
   auto direction = particle->position.subtract(worldMatrix.getTranslation()).normalize();
   auto randY     = Scalar::RandomRange(-directionRandomizer / 2.f, directionRandomizer / 2.f);
@@ -33,13 +34,18 @@ void CylinderParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
   direction.z = std::cos(angle);
   direction.normalize();
 
+  if (isLocal) {
+    directionToUpdate.copyFrom(direction);
+    return;
+  }
+
   Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z, worldMatrix,
                                           directionToUpdate);
 }
 
 void CylinderParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                     Vector3& positionToUpdate,
-                                                    Particle* /*particle*/)
+                                                    Particle* /*particle*/, bool isLocal)
 {
   auto yPos  = Scalar::RandomRange(-height / 2.f, height / 2.f);
   auto angle = Scalar::RandomRange(0.f, Math::PI2);
@@ -50,6 +56,11 @@ void CylinderParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   auto positionRadius     = std::sqrt(radiusDistribution) * radius;
   auto xPos               = positionRadius * std::cos(angle);
   auto zPos               = positionRadius * std::sin(angle);
+
+  if (isLocal) {
+    positionToUpdate.copyFromFloats(xPos, yPos, zPos);
+    return;
+  }
 
   Vector3::TransformCoordinatesFromFloatsToRef(xPos, yPos, zPos, worldMatrix, positionToUpdate);
 }

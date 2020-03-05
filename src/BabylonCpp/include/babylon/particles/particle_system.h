@@ -517,14 +517,16 @@ public:
    * This function can be defined to specify initial direction for every new
    * particle. It by default use the emitterType defined function
    */
-  std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* particle)>
+  std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* particle,
+                     bool isLocal)>
     startDirectionFunction;
 
   /**
    * This function can be defined to specify initial position for every new
    * particle. It by default use the emitterType defined function
    */
-  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate, Particle* particle)>
+  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate, Particle* particle,
+                     bool isLocal)>
     startPositionFunction;
 
   /**
@@ -578,6 +580,11 @@ public:
    * particle system only.
    */
   std::vector<ParticleSystem*> activeSubSystems;
+
+  /**
+   * Specifies if the particles are updated in emitter local space or world space
+   */
+  bool isLocal;
 
 private:
   Observer<ParticleSystem>::Ptr _onDisposeObserver;

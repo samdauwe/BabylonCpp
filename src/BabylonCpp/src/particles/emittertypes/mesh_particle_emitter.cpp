@@ -28,7 +28,8 @@ MeshParticleEmitter::MeshParticleEmitter(const AbstractMeshPtr& iMesh)
 MeshParticleEmitter::~MeshParticleEmitter() = default;
 
 void MeshParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                 Vector3& directionToUpdate, Particle* /*particle*/)
+                                                 Vector3& directionToUpdate, Particle* /*particle*/,
+                                                 bool isLocal)
 {
   if (useMeshNormalsForDirection && !_normals.empty()) {
     Vector3::TransformNormalToRef(_storedNormal, worldMatrix, directionToUpdate);
@@ -39,11 +40,17 @@ void MeshParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   const auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
 
+  if (isLocal) {
+    directionToUpdate.copyFromFloats(randX, randY, randZ);
+    return;
+  }
+
   Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix, directionToUpdate);
 }
 
 void MeshParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                Vector3& positionToUpdate, Particle* /*particle*/)
+                                                Vector3& positionToUpdate, Particle* /*particle*/,
+                                                bool isLocal)
 {
   if (_indices.empty() || _positions.empty()) {
     return;
@@ -70,8 +77,13 @@ void MeshParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   randomVertex.y = bu * vertexA.y + bv * vertexB.y + bw * vertexC.y;
   randomVertex.z = bu * vertexA.z + bv * vertexB.z + bw * vertexC.z;
 
-  Vector3::TransformCoordinatesFromFloatsToRef(randomVertex.x, randomVertex.y, randomVertex.z,
-                                               worldMatrix, positionToUpdate);
+  if (isLocal) {
+    positionToUpdate.copyFromFloats(randomVertex.x, randomVertex.y, randomVertex.z);
+  }
+  else {
+    Vector3::TransformCoordinatesFromFloatsToRef(randomVertex.x, randomVertex.y, randomVertex.z,
+                                                 worldMatrix, positionToUpdate);
+  }
 
   if (useMeshNormalsForDirection && !_normals.empty()) {
     Vector3::FromArrayToRef(_normals, faceIndexA * 3, vertexA);

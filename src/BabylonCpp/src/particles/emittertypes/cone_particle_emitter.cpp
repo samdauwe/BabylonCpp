@@ -56,9 +56,16 @@ void ConeParticleEmitter::_buildHeight()
 }
 
 void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                 Vector3& directionToUpdate, Particle* particle)
+                                                 Vector3& directionToUpdate, Particle* particle,
+                                                 bool isLocal)
 {
   if (std::abs(std::cos(_angle)) == 1.f) {
+    if (isLocal) {
+      directionToUpdate.x = 0.f;
+      directionToUpdate.y = 1.f;
+      directionToUpdate.z = 0.f;
+      return;
+    }
     Vector3::TransformNormalFromFloatsToRef(0.f, 1.0, 0.f, worldMatrix, directionToUpdate);
   }
   else {
@@ -72,13 +79,19 @@ void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
     direction.z += randZ;
     direction.normalize();
 
+    if (isLocal) {
+      directionToUpdate.copyFrom(direction);
+      return;
+    }
+
     Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z, worldMatrix,
                                             directionToUpdate);
   }
 }
 
 void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                Vector3& positionToUpdate, Particle* /*particle*/)
+                                                Vector3& positionToUpdate, Particle* /*particle*/,
+                                                bool isLocal)
 {
   const auto s = Scalar::RandomRange(0.f, Math::PI2);
   auto h       = 0.f;
@@ -97,6 +110,13 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   const auto randX = iRadius * std::sin(s);
   const auto randZ = iRadius * std::cos(s);
   const auto randY = h * _height;
+
+  if (isLocal) {
+    positionToUpdate.x = randX;
+    positionToUpdate.y = randY;
+    positionToUpdate.z = randZ;
+    return;
+  }
 
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 }

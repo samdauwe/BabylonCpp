@@ -19,7 +19,7 @@ HemisphericParticleEmitter::~HemisphericParticleEmitter() = default;
 
 void HemisphericParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                         Vector3& directionToUpdate,
-                                                        Particle* particle)
+                                                        Particle* particle, bool isLocal)
 {
   auto direction = particle->position.subtract(worldMatrix.getTranslation()).normalize();
   auto randX     = Scalar::RandomRange(0.f, directionRandomizer);
@@ -30,13 +30,18 @@ void HemisphericParticleEmitter::startDirectionFunction(const Matrix& worldMatri
   direction.z += randZ;
   direction.normalize();
 
+  if (isLocal) {
+    directionToUpdate.copyFrom(direction);
+    return;
+  }
+
   Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z, worldMatrix,
                                           directionToUpdate);
 }
 
 void HemisphericParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                        Vector3& positionToUpdate,
-                                                       Particle* /*particle*/)
+                                                       Particle* /*particle*/, bool isLocal)
 {
   auto randRadius = radius - Scalar::RandomRange(0.f, radius * radiusRange);
   auto v          = Scalar::RandomRange(0.f, 1.f);
@@ -45,6 +50,12 @@ void HemisphericParticleEmitter::startPositionFunction(const Matrix& worldMatrix
   auto randX      = randRadius * std::cos(phi) * std::sin(theta);
   auto randY      = randRadius * std::cos(theta);
   auto randZ      = randRadius * std::sin(phi) * std::sin(theta);
+
+  if (isLocal) {
+    positionToUpdate.copyFromFloats(randX, std::abs(randY), randZ);
+    return;
+  }
+
   Vector3::TransformCoordinatesFromFloatsToRef(randX, std::abs(randY), randZ, worldMatrix,
                                                positionToUpdate);
 }

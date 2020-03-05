@@ -19,21 +19,36 @@ BoxParticleEmitter::BoxParticleEmitter()
 BoxParticleEmitter::~BoxParticleEmitter() = default;
 
 void BoxParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                Vector3& directionToUpdate, Particle* /*particle*/)
+                                                Vector3& directionToUpdate, Particle* /*particle*/,
+                                                bool isLocal)
 {
   const auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   const auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
 
+  if (isLocal) {
+    directionToUpdate.x = randX;
+    directionToUpdate.y = randY;
+    directionToUpdate.z = randZ;
+    return;
+  }
+
   Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix, directionToUpdate);
 }
 
 void BoxParticleEmitter::startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
-                                               Particle* /*particle*/)
+                                               Particle* /*particle*/, bool isLocal)
 {
   const auto randX = Scalar::RandomRange(minEmitBox.x, maxEmitBox.x);
   const auto randY = Scalar::RandomRange(minEmitBox.y, maxEmitBox.y);
   const auto randZ = Scalar::RandomRange(minEmitBox.z, maxEmitBox.z);
+
+  if (isLocal) {
+    positionToUpdate.x = randX;
+    positionToUpdate.y = randY;
+    positionToUpdate.z = randZ;
+    return;
+  }
 
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
 }

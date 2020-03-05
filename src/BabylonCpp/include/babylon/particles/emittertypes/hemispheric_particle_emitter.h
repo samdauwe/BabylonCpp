@@ -8,43 +8,42 @@ namespace BABYLON {
 
 /**
  * @brief Particle emitter emitting particles from the inside of a hemisphere.
- * It emits the particles alongside the hemisphere radius. The emission
- * direction might be randomized.
+ * It emits the particles alongside the hemisphere radius. The emission direction might be
+ * randomized.
  */
 class BABYLON_SHARED_EXPORT HemisphericParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
-   * @brief Creates a new instance HemisphericParticleEmitter.
+   * @brief Creates a new instance HemisphericParticleEmitter
    * @param radius the radius of the emission hemisphere (1 by default)
-   * @param radiusRange the range of the emission hemisphere [0-1] 0 Surface
-   * only, 1 Entire Radius (1 by default)
-   * @param directionRandomizer defines how much to randomize the particle
-   * direction [0-1]
+   * @param radiusRange the range of the emission hemisphere [0-1] 0 Surface only, 1 Entire Radius
+   * (1 by default)
+   * @param directionRandomizer defines how much to randomize the particle direction [0-1]
    */
   HemisphericParticleEmitter(float radius = 1.f, float radiusRange = 1.f,
                              float directionRandomizer = 0.f);
   ~HemisphericParticleEmitter() override; // = default
 
   /**
-   * @brief Called by the particle System when the direction is computed for the
-   * created particle.
+   * @brief Called by the particle System when the direction is computed for the created particle.
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
+   * @param isLocal defines if the direction should be set in local space
    */
   void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                              Particle* particle) override;
+                              Particle* particle, bool isLocal) override;
 
   /**
-   * @brief Called by the particle System when the position is computed for the
-   * created particle.
+   * @brief Called by the particle System when the position is computed for the created particle.
    * @param worldMatrix is the world matrix of the particle system
    * @param positionToUpdate is the position vector to update with the result
    * @param particle is the particle we are computed the position for
+   * @param isLocal defines if the position should be set in local space
    */
   void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
-                             Particle* particle) override;
+                             Particle* particle, bool isLocal) override;
 
   /**
    * @brief Clones the current emitter and returns a copy of it.

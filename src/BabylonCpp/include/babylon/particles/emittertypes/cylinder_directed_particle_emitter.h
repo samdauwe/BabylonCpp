@@ -18,12 +18,10 @@ public:
    * @brief Creates a new instance CylinderDirectedParticleEmitter.
    * @param radius the radius of the emission cylinder (1 by default)
    * @param height the height of the emission cylinder (1 by default)
-   * @param radiusRange the range of the emission cylinder [0-1] 0 Surface only,
-   * 1 Entire Radius (1 by default)
-   * @param direction1 the min limit of the emission direction (up vector by
-   * default)
-   * @param direction2 the max limit of the emission direction (up vector by
-   * default)
+   * @param radiusRange the range of the emission cylinder [0-1] 0 Surface only, 1 Entire Radius (1
+   * by default)
+   * @param direction1 the min limit of the emission direction (up vector by default)
+   * @param direction2 the max limit of the emission direction (up vector by default)
    */
   CylinderDirectedParticleEmitter(float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
                                   const Vector3& direction1 = Vector3{0.f, 1.f, 0.f},
@@ -31,14 +29,15 @@ public:
   ~CylinderDirectedParticleEmitter() override; // = default
 
   /**
-   * @brief Called by the particle System when the direction is computed for the
-   * created particle.
+   * @brief @brief Called by the particle System when the direction is computed for the created
+   * particle.
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
+   * @param isLocal defines if the direction should be set in local space
    */
   void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                              Particle* particle) override;
+                              Particle* particle, bool isLocal) override;
 
   /**
    * @brief Clones the current emitter and returns a copy of it.

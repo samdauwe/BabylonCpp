@@ -17,7 +17,8 @@ CustomParticleEmitter::~CustomParticleEmitter()
 }
 
 void CustomParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
-                                                   Vector3& directionToUpdate, Particle* particle)
+                                                   Vector3& directionToUpdate, Particle* particle,
+                                                   bool isLocal)
 {
   auto& tmpVector = TmpVectors::Vector3Array[0];
 
@@ -34,11 +35,17 @@ void CustomParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
     tmpVector.set(0.f, 0.f, 0.f);
   }
 
+  if (isLocal) {
+    directionToUpdate.copyFrom(tmpVector);
+    return;
+  }
+
   Vector3::TransformNormalToRef(tmpVector, worldMatrix, directionToUpdate);
 }
 
 void CustomParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                  Vector3& positionToUpdate, Particle* particle)
+                                                  Vector3& positionToUpdate, Particle* particle,
+                                                  bool isLocal)
 {
   auto& tmpVector = TmpVectors::Vector3Array[0];
 
@@ -47,6 +54,11 @@ void CustomParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   }
   else {
     tmpVector.set(0.f, 0.f, 0.f);
+  }
+
+  if (isLocal) {
+    positionToUpdate.copyFrom(tmpVector);
+    return;
   }
 
   Vector3::TransformCoordinatesToRef(tmpVector, worldMatrix, positionToUpdate);

@@ -15,18 +15,28 @@ PointParticleEmitter::~PointParticleEmitter() = default;
 
 void PointParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                   Vector3& directionToUpdate,
-                                                  Particle* /*particle*/)
+                                                  Particle* /*particle*/, bool isLocal)
 {
   auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
 
+  if (isLocal) {
+    directionToUpdate.copyFromFloats(randX, randY, randZ);
+    return;
+  }
+
   Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix, directionToUpdate);
 }
 
 void PointParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                 Vector3& positionToUpdate, Particle* /*particle*/)
+                                                 Vector3& positionToUpdate, Particle* /*particle*/,
+                                                 bool isLocal)
 {
+  if (isLocal) {
+    positionToUpdate.copyFromFloats(0.f, 0.f, 0.f);
+    return;
+  }
   Vector3::TransformCoordinatesFromFloatsToRef(0.f, 0.f, 0.f, worldMatrix, positionToUpdate);
 }
 
