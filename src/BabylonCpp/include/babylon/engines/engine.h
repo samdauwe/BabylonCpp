@@ -1426,6 +1426,12 @@ public:
   PerfCounter _drawCalls;
 
   /**
+   * Gets or sets the tab index to set to the rendering canvas. 1 is the minimum value to set to be
+   * able to capture keyboard events
+   */
+  int canvasTabIndex = 1;
+
+  /**
    * Turn this value on if you want to pause FPS computation when in background
    */
   bool disablePerformanceMonitorInBackground = false;
