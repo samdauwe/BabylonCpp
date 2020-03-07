@@ -27,16 +27,14 @@ class BABYLON_SHARED_EXPORT UtilityLayerRenderer : public IDisposable {
 
 public:
   /**
-   * @brief A shared utility layer that can be used to overlay objects into a
-   * scene (Depth map of the previous scene is cleared before drawing on top of
-   * it).
+   * @brief A shared utility layer that can be used to overlay objects into a scene (Depth map of
+   * the previous scene is cleared before drawing on top of it).
    */
   static std::shared_ptr<UtilityLayerRenderer>& DefaultUtilityLayer();
 
   /**
-   * @brief A shared utility layer that can be used to embed objects into a
-   * scene (Depth map of the previous scene is not cleared before drawing on top
-   * of it).
+   * @brief A shared utility layer that can be used to embed objects into a scene (Depth map of the
+   * previous scene is not cleared before drawing on top of it).
    */
   static std::shared_ptr<UtilityLayerRenderer>& DefaultKeepDepthUtilityLayer();
 
@@ -50,11 +48,13 @@ public:
   ~UtilityLayerRenderer() override; // = default
 
   /**
-   * @brief Gets the camera that is used to render the utility layer (when not
-   * set, this will be the last active camera).
+   * @brief Gets the camera that is used to render the utility layer (when not set, this will be the
+   * last active camera)
+   * @param getRigParentIfPossible if the current active camera is a rig camera, should its parent
+   * camera be returned
    * @returns the camera that is used when rendering the utility layer
    */
-  CameraPtr getRenderCamera();
+  CameraPtr getRenderCamera(bool getRigParentIfPossible = false);
 
   /**
    * @brief Sets the camera that should be used when rendering the utility layer
@@ -83,8 +83,7 @@ protected:
   /**
    * @brief Instantiates a UtilityLayerRenderer.
    * @param originalScene the original scene that will be rendered on top of
-   * @param handleEvents boolean indicating if the utility layer should handle
-   * events
+   * @param handleEvents boolean indicating if the utility layer should handle events
    */
   UtilityLayerRenderer(Scene* originalScene, bool handleEvents = true);
 
@@ -95,8 +94,7 @@ private:
 
 public:
   /**
-   * If the picking should be done on the utility layer prior to the actual
-   * scene (Default: true)
+   * If the picking should be done on the utility layer prior to the actual scene (Default: true)
    */
   bool pickUtilitySceneFirst;
 
@@ -106,20 +104,19 @@ public:
   std::unique_ptr<Scene> utilityLayerScene;
 
   /**
-   *  If the utility layer should automatically be rendered on top of existing
-   * scene
+   *  If the utility layer should automatically be rendered on top of existing scene
    */
   bool shouldRender;
 
   /**
-   * If set to true, only pointer down onPointerObservable events will be
-   * blocked when picking is occluded by original scene
+   * If set to true, only pointer down onPointerObservable events will be blocked when picking is
+   * occluded by original scene
    */
   bool onlyCheckPointerDownEvents;
 
   /**
-   * If set to false, only pointerUp, pointerDown and pointerMove will be sent
-   * to the utilityLayerScene (false by default)
+   * If set to false, only pointerUp, pointerDown and pointerMove will be sent to the
+   * utilityLayerScene (false by default)
    */
   bool processAllEvents;
 
@@ -134,14 +131,12 @@ public:
   bool handleEvents;
 
   /**
-   * Observable raised when the pointer move from the utility layer scene to the
-   * main scene
+   * Observable raised when the pointer move from the utility layer scene to the main scene
    */
   Observable<int> onPointerOutObservable;
 
   /**
-   * Gets or sets a predicate that will be used to indicate utility meshes
-   * present in the main scene
+   * Gets or sets a predicate that will be used to indicate utility meshes present in the main scene
    */
   std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
 

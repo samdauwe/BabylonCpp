@@ -222,7 +222,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene, bool iHandleEv
 
 UtilityLayerRenderer::~UtilityLayerRenderer() = default;
 
-CameraPtr UtilityLayerRenderer::getRenderCamera()
+CameraPtr UtilityLayerRenderer::getRenderCamera(bool getRigParentIfPossible)
 {
   if (_renderCamera) {
     return _renderCamera;
@@ -235,7 +235,11 @@ CameraPtr UtilityLayerRenderer::getRenderCamera()
     else {
       activeCam = originalScene->activeCamera;
     }
-    return (activeCam && activeCam->isRigCamera) ? activeCam->rigParent : activeCam;
+
+    if (getRigParentIfPossible && activeCam && activeCam->isRigCamera) {
+      return activeCam->rigParent;
+    }
+    return activeCam;
   }
 }
 
