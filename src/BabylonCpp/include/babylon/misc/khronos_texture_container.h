@@ -17,8 +17,7 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
  * @brief KhronosTextureContainer class
  *
  * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
- * for file layout see
- * https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
+ * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
  */
 class BABYLON_SHARED_EXPORT KhronosTextureContainer {
 
@@ -49,11 +48,17 @@ public:
 
   /**
    * @brief Uploads KTX content to a Babylon Texture.
-   * It is assumed that the texture has already been created & is currently
-   * bound
+   * It is assumed that the texture has already been created & is currently bound
    * Hidden
    */
   void uploadLevels(const InternalTexturePtr& texture, bool loadMipmaps);
+
+  /**
+   * @brief Checks if the given data starts with a KTX file identifier.
+   * @param data the data to check
+   * @returns true if the data is a KTX file or false otherwise
+   */
+  static bool IsValid(const ArrayBufferView& data);
 
 private:
   void _upload2DCompressedLevels(const InternalTexturePtr& texture, bool loadMipmaps);

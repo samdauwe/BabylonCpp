@@ -17,15 +17,7 @@ KhronosTextureContainer::KhronosTextureContainer(const ArrayBufferView& iData, i
     , textureArrayExpected{iTextureArrayExpected}
     , isInvalid{false}
 {
-  // Test that it is a ktx formatted file, based on the first 12 bytes,
-  // character representation is: '�', 'K', 'T', 'X', ' ', '1', '1', '�', '\r',
-  // '\n', '\x1A', '\n' 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D,
-  // 0x0A, 0x1A, 0x0A
-  auto identifier = stl_util::to_array<uint8_t>(data.uint8Array(), data.byteOffset, 12);
-  if (identifier[0] != 0xAB || identifier[1] != 0x4B || identifier[2] != 0x54
-      || identifier[3] != 0x58 || identifier[4] != 0x20 || identifier[5] != 0x31
-      || identifier[6] != 0x31 || identifier[7] != 0xBB || identifier[8] != 0x0D
-      || identifier[9] != 0x0A || identifier[10] != 0x1A || identifier[11] != 0x0A) {
+  if (!KhronosTextureContainer::IsValid(data)) {
     isInvalid = true;
     BABYLON_LOG_ERROR("KhronosTextureContainer", "texture missing KTX identifier")
     return;
@@ -150,6 +142,22 @@ void KhronosTextureContainer::_upload2DCompressedLevels(const InternalTexturePtr
     width  = static_cast<uint32_t>(std::max(1.f, width * 0.5f));
     height = static_cast<uint32_t>(std::max(1.f, height * 0.5f));
   }
+}
+
+bool KhronosTextureContainer::IsValid(const ArrayBufferView& data)
+{
+  if (data.byteLength() >= 12) {
+    // '«', 'K', 'T', 'X', ' ', '1', '1', '»', '\r', '\n', '\x1A', '\n'
+    const auto identifier = stl_util::to_array<uint8_t>(data.buffer(), data.byteOffset, 12);
+    if (identifier[0] == 0xAB && identifier[1] == 0x4B && identifier[2] == 0x54
+        && identifier[3] == 0x58 && identifier[4] == 0x20 && identifier[5] == 0x31
+        && identifier[6] == 0x31 && identifier[7] == 0xBB && identifier[8] == 0x0D
+        && identifier[9] == 0x0A && identifier[10] == 0x1A && identifier[11] == 0x0A) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 } // end of namespace BABYLON
