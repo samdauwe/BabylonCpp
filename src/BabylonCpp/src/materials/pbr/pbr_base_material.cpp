@@ -730,6 +730,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
       if (_albedoTexture && MaterialFlags::DiffuseTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_albedoTexture, defines, "ALBEDO");
+        defines.boolDef["GAMMAALBEDO"] = _albedoTexture->gammaSpace();
       }
       else {
         defines.boolDef["ALBEDO"] = false;

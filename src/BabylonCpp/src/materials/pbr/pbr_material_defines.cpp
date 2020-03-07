@@ -15,6 +15,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"UV2", false},     //
 
     {"ALBEDO", false},      //
+    {"GAMMAALBEDO", false}, //
     {"VERTEXCOLOR", false}, //
 
     {"AMBIENT", false},            //
