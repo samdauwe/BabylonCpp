@@ -21,10 +21,9 @@ using AnimationPtr       = std::shared_ptr<Animation>;
 using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 /**
- * @brief The framing behavior (FramingBehavior) is designed to automatically
- * position an ArcRotateCamera when its target is set to a mesh. It is also
- * useful if you want to prevent the camera to go under a virtual horizontal
- * plane.
+ * @brief The framing behavior (FramingBehavior) is designed to automatically position an
+ * ArcRotateCamera when its target is set to a mesh. It is also useful if you want to prevent the
+ * camera to go under a virtual horizontal plane.
  * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
  */
 class BABYLON_SHARED_EXPORT FramingBehavior : public Behavior<ArcRotateCamera> {
@@ -47,8 +46,8 @@ public:
   static constexpr unsigned int IgnoreBoundsSizeMode = 0;
 
   /**
-   * The camera is not allowed to zoom closer to the mesh than the point at
-   * which the adjusted bounding sphere touches the frustum sides
+   * The camera is not allowed to zoom closer to the mesh than the point at which the adjusted
+   * bounding sphere touches the frustum sides
    */
   static constexpr unsigned int FitFrustumSidesMode = 1;
 
@@ -82,61 +81,40 @@ public:
   /**
    * @brief Targets the given mesh and updates zoom level accordingly.
    * @param mesh  The mesh to target.
-   * @param radius Optional. If a cached radius position already exists,
-   * overrides default.
-   * @param framingPositionY Position on mesh to center camera focus where 0
-   * corresponds bottom of its bounding box and 1, the top
-   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
-   * and Z axis instead of the mesh
-   * @param onAnimationEnd Callback triggered at the end of the framing
-   * animation
+   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X and Z axis instead
+   * of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing animation
    */
   void zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ = false,
                   const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
-   * @brief Targets the given mesh with its children and updates zoom level
-   * accordingly.
+   * @brief Targets the given mesh with its children and updates zoom level accordingly.
    * @param mesh  The mesh to target.
-   * @param radius Optional. If a cached radius position already exists,
-   * overrides default.
-   * @param framingPositionY Position on mesh to center camera focus where 0
-   * corresponds bottom of its bounding box and 1, the top
-   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
-   * and Z axis instead of the mesh
-   * @param onAnimationEnd Callback triggered at the end of the framing
-   * animation
+   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X and Z axis instead
+   * of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing animation
    */
   void zoomOnMeshHierarchy(AbstractMesh* mesh, bool focusOnOriginXZ = false,
                            const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
-   * @brief Targets the given meshes with their children and updates zoom level
-   * accordingly.
+   * @brief Targets the given meshes with their children and updates zoom level accordingly.
    * @param meshes  The mesh to target.
-   * @param radius Optional. If a cached radius position already exists,
-   * overrides default.
-   * @param framingPositionY Position on mesh to center camera focus where 0
-   * corresponds bottom of its bounding box and 1, the top
-   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
-   * and Z axis instead of the mesh
-   * @param onAnimationEnd Callback triggered at the end of the framing
-   * animation
+   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X and Z axis instead
+   * of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing animation
    */
   void zoomOnMeshesHierarchy(const std::vector<AbstractMesh*>& meshes, bool focusOnOriginXZ = false,
                              const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
-   * @brief Targets the bounding box info defined by its extends and updates
-   * zoom level accordingly.
-   * @param minimumWorld Determines the smaller position of the bounding box
-   * extend
-   * @param maximumWorld Determines the bigger position of the bounding box
-   * extend
-   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
-   * and Z axis instead of the mesh
-   * @param onAnimationEnd Callback triggered at the end of the framing
-   * animation
+   * @brief Targets the bounding box info defined by its extends and updates zoom level accordingly.
+   * @param minimumWorld Determines the smaller position of the bounding box extend
+   * @param maximumWorld Determines the bigger position of the bounding box extend
+   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X and Z axis instead
+   * of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing animation
    */
   void zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
                           bool focusOnOriginXZ                        = false,
@@ -144,13 +122,11 @@ public:
 
 protected:
   /**
-   * @brief Calculates the lowest radius for the camera based on the bounding
-   * box of the mesh.
-   * @param mesh The mesh on which to base the calculation. mesh boundingInfo
-   * used to estimate necessary frustum width.
-   * @return The minimum distance from the primary mesh's center point at which
-   * the camera must be kept in order to fully enclose the mesh in the viewing
-   * frustum.
+   * @brief Calculates the lowest radius for the camera based on the bounding box of the mesh.
+   * @param mesh The mesh on which to base the calculation. mesh boundingInfo used to estimate
+   * necessary frustum width.
+   * @return The minimum distance from the primary mesh's center point at which the camera must be
+   * kept in order to fully enclose the mesh in the viewing frustum.
    */
   float _calculateLowerRadiusFromModelBoundingSphere(const Vector3& minimumWorld,
                                                      const Vector3& maximumWorld);
@@ -177,52 +153,50 @@ private:
   [[nodiscard]] float get_radiusScale() const;
 
   /**
-   * @brief Sets the scale to apply on Y axis to position camera focus. 0.5 by
-   * default which means the center of the bounding box.
+   * @brief Sets the scale to apply on Y axis to position camera focus. 0.5 by default which means
+   * the center of the bounding box.
    */
   void set_positionScale(float scale);
 
   /**
-   * @brief Gets the scale to apply on Y axis to position camera focus. 0.5 by
-   * default which means the center of the bounding box.
+   * @brief Gets the scale to apply on Y axis to position camera focus. 0.5 by default which means
+   * the center of the bounding box.
    */
   [[nodiscard]] float get_positionScale() const;
 
   /**
-   * @brief Sets the angle above/below the horizontal plane to return to when
-   * the return to default elevation idle behaviour is triggered, in radians.
+   * @brief Sets the angle above/below the horizontal plane to return to when the return to default
+   * elevation idle behaviour is triggered, in radians.
    */
   void set_defaultElevation(float elevation);
 
   /**
-   * @brief Gets the angle above/below the horizontal plane to return to when
-   * the return to default elevation idle behaviour is triggered, in radians.
+   * @brief Gets the angle above/below the horizontal plane to return to when the return to default
+   * elevation idle behaviour is triggered, in radians.
    */
   [[nodiscard]] float get_defaultElevation() const;
 
   /**
-   * @brief Sets the time (in milliseconds) taken to return to the default beta
-   * position.
+   * @brief Sets the time (in milliseconds) taken to return to the default beta position.
    * Negative value indicates camera should not return to default.
    */
   void set_elevationReturnTime(float speed);
 
   /**
-   * @brief Gets the time (in milliseconds) taken to return to the default beta
-   * position.
+   * @brief Gets the time (in milliseconds) taken to return to the default beta position.
    * Negative value indicates camera should not return to default.
    */
   [[nodiscard]] float get_elevationReturnTime() const;
 
   /**
-   * @brief Sets the delay (in milliseconds) taken before the camera returns to
-   * the default beta position.
+   * @brief Sets the delay (in milliseconds) taken before the camera returns to the default beta
+   * position.
    */
   void set_elevationReturnWaitTime(float time);
 
   /**
-   * @brief Gets the delay (in milliseconds) taken before the camera returns to
-   * the default beta position.
+   * @brief Gets the delay (in milliseconds) taken before the camera returns to the default beta
+   * position.
    */
   [[nodiscard]] float get_elevationReturnWaitTime() const;
 
@@ -237,7 +211,7 @@ private:
   [[nodiscard]] bool get_zoomStopsAnimation() const;
 
   /**
-   * Sets the transition time when framing the mesh, in milliseconds
+   * @brief Sets the transition time when framing the mesh, in milliseconds
    */
   void set_framingTime(float time);
 
@@ -247,9 +221,9 @@ private:
   [[nodiscard]] float get_framingTime() const;
 
   /**
-   * @brief Keeps the camera above the ground plane. If the user pulls the
-   * camera below the ground plane, the camera is automatically returned to its
-   * default position (expected to be above ground plane).
+   * @brief Keeps the camera above the ground plane. If the user pulls the camera below the ground
+   * plane, the camera is automatically returned to its default position (expected to be above
+   * ground plane).
    */
   void _maintainCameraAboveGround();
 
@@ -260,21 +234,19 @@ private:
   [[nodiscard]] Vector2 _getFrustumSlope() const;
 
   /**
-   * @brief Removes all animation locks. Allows new animations to be added to
-   * any of the arcCamera properties.
+   * @brief Removes all animation locks. Allows new animations to be added to any of the arcCamera
+   * properties.
    */
   void _clearAnimationLocks();
 
   /**
-   * @brief Applies any current user interaction to the camera. Takes into
-   * account
-   * maximum alpha rotation.
+   * @brief Applies any current user interaction to the camera. Takes into account maximum alpha
+   * rotation.
    */
   void _applyUserInteraction();
 
   /**
-   * @brief Stops and removes all animations that have been applied to the
-   * camera
+   * @brief Stops and removes all animations that have been applied to the camera
    */
   void stopAllAnimations();
 
@@ -295,14 +267,14 @@ public:
   Property<FramingBehavior, float> radiusScale;
 
   /**
-   * Scale to apply on Y axis to position camera focus. 0.5 by default which
-   * means the center of the bounding box.
+   * Scale to apply on Y axis to position camera focus. 0.5 by default which means the center of the
+   * bounding box.
    */
   Property<FramingBehavior, float> positionScale;
 
   /**
-   * Angle above/below the horizontal plane to return to when the return to
-   * default elevation idle behaviour is triggered, in radians.
+   * Angle above/below the horizontal plane to return to when the return to default elevation idle
+   * behaviour is triggered, in radians.
    */
   Property<FramingBehavior, float> defaultElevation;
 
@@ -313,8 +285,7 @@ public:
   Property<FramingBehavior, float> elevationReturnTime;
 
   /**
-   * Delay (in milliseconds) taken before the camera returns to the default beta
-   * position.
+   * Delay (in milliseconds) taken before the camera returns to the default beta position.
    */
   Property<FramingBehavior, float> elevationReturnWaitTime;
 
@@ -329,8 +300,8 @@ public:
   Property<FramingBehavior, float> framingTime;
 
   /**
-   * Define if the behavior should automatically change the configured
-   * camera limits and sensibilities.
+   * Define if the behavior should automatically change the configured camera limits and
+   * sensibilities.
    */
   bool autoCorrectCameraLimitsAndSensibility;
 
