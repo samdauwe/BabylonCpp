@@ -193,6 +193,9 @@ public:
   /** Hidden */
   Vector3 _randomNoiseCoordinates2;
 
+  /** @hidden */
+  std::optional<Vector3> _localPosition;
+
   /**
    * The particle system the particle belongs to.
    */

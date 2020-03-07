@@ -46,6 +46,7 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , _currentDrag1{0.f}
     , _currentDrag2{0.f}
     , _randomNoiseCoordinates1{std::nullopt}
+    , _localPosition{std::nullopt}
     , particleSystem{iParticleSystem}
     , _currentFrameCounter{0}
 {
@@ -161,6 +162,14 @@ void Particle::copyTo(Particle& other)
     other._initialDirection = std::nullopt;
   }
   other.direction.copyFrom(direction);
+  if (_localPosition) {
+    if (other._localPosition) {
+      other._localPosition->copyFrom(*_localPosition);
+    }
+    else {
+      other._localPosition = _localPosition->copy();
+    }
+  }
   other.color.copyFrom(color);
   other.colorStep.copyFrom(colorStep);
   other.lifeTime          = lifeTime;
