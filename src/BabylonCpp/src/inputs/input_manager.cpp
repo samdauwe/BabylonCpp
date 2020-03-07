@@ -110,13 +110,14 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
                                        const PointerEvent& evt)
 {
   auto& scene = *_scene;
-  auto canvas = scene.getEngine()->getInputElement();
+  auto engine = scene.getEngine();
+  auto canvas = engine->getInputElement();
 
   if (!canvas) {
     return;
   }
 
-  canvas->tabIndex = 1;
+  canvas->tabIndex = engine->canvasTabIndex;
 
   // Restore pointer
   if (!scene.doNotHandleCursors) {
@@ -420,7 +421,8 @@ bool InputManager::isPointerCaptured(int pointerId)
   return stl_util::contains(_pointerCaptures, pointerId) && _pointerCaptures[pointerId];
 }
 
-void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove)
+void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove,
+                                 ICanvas* elementToAttachTo)
 {
   _initActionManager = [this](AbstractActionManagerPtr act,
                               const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
@@ -555,8 +557,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
               _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
               cb(clickInfo, _currentPickResult);
             }
-            // if the two successive clicks are too far, it's just two simple
-            // clicks
+            // if the two successive clicks are too far, it's just two simple clicks
             else {
               _doubleClickOccured                = false;
               _previousStartingPointerTime       = _startingPointerTime;
@@ -629,12 +630,16 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     _processPointerMove(pickResult, evt);
   };
 
-  _onPointerDown = [this](PointerEvent&& evt) {
+  _onPointerDown = [this, elementToAttachTo](PointerEvent&& evt) {
     auto& scene = *_scene;
     auto engine = scene.getEngine();
-    auto canvas = engine->getInputElement();
 
-    if (!canvas) {
+    auto _elementToAttachTo = elementToAttachTo;
+    if (!_elementToAttachTo) {
+      _elementToAttachTo = engine->getInputElement();
+    }
+
+    if (!_elementToAttachTo) {
       return;
     }
 
@@ -644,9 +649,9 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
 
     _updatePointerPosition(evt);
 
-    if (scene.preventDefaultOnPointerDown && canvas) {
+    if (scene.preventDefaultOnPointerDown && _elementToAttachTo) {
       evt.preventDefault();
-      canvas->focus();
+      _elementToAttachTo->focus();
     }
 
     _startingPointerPosition.x = static_cast<float>(_pointerX);
@@ -678,7 +683,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     _processPointerDown(pickResult, evt);
   };
 
-  _onPointerUp = [this](PointerEvent&& evt) {
+  _onPointerUp = [this, elementToAttachTo](PointerEvent&& evt) {
     if (_totalPointersPressed == 0) { // We are attaching the pointer up to
                                       // windows because of a bug in FF
       return;                         // So we need to test it the pointer down was pressed before.
@@ -686,9 +691,13 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
 
     auto& scene = *_scene;
     auto engine = scene.getEngine();
-    auto canvas = engine->getInputElement();
 
-    if (!canvas) {
+    auto _elementToAttachTo = elementToAttachTo;
+    if (!_elementToAttachTo) {
+      _elementToAttachTo = engine->getInputElement();
+    }
+
+    if (!_elementToAttachTo) {
       return;
     }
 
@@ -698,9 +707,9 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
 
     _updatePointerPosition(evt);
 
-    if (scene.preventDefaultOnPointerUp && canvas) {
+    if (scene.preventDefaultOnPointerUp && elementToAttachTo) {
       evt.preventDefault();
-      canvas->focus();
+      elementToAttachTo->focus();
     }
 
     _initClickEvent(

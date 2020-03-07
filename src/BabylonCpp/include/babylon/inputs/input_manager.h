@@ -101,8 +101,11 @@ public:
    * @param attachUp defines if you want to attach events to pointerup
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove
+   * @param elementToAttachTo defines the target DOM element to attach to (will use the canvas by
+   * default)
    */
-  void attachControl(bool attachUp = true, bool attachDown = true, bool attachMove = true);
+  void attachControl(bool attachUp = true, bool attachDown = true, bool attachMove = true,
+                     ICanvas* elementToAttachTo = nullptr);
 
   /**
    * @brief Detaches all event handlers.
