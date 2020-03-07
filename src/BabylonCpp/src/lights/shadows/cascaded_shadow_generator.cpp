@@ -412,26 +412,26 @@ void CascadedShadowGenerator::_splitFrustum()
   const auto near = camera->minZ, //
     far           = camera->maxZ, //
     cameraRange   = far - near,   //
-    minDistance   = _minDistance, //
-    maxDistance   = _shadowMaxZ < far && _shadowMaxZ >= near ?
-                    std::min((_shadowMaxZ - near) / (far - near), _maxDistance) :
-                    _maxDistance;
+    iMinDistance  = _minDistance, //
+    iMaxDistance  = _shadowMaxZ < far && _shadowMaxZ >= near ?
+                     std::min((_shadowMaxZ - near) / (far - near), _maxDistance) :
+                     _maxDistance;
 
-  const auto minZ = near + minDistance * cameraRange, //
-    maxZ          = near + maxDistance * cameraRange;
+  const auto minZ = near + iMinDistance * cameraRange, //
+    maxZ          = near + iMaxDistance * cameraRange;
 
   const auto range = maxZ - minZ, //
     ratio          = maxZ / minZ;
 
   for (size_t cascadeIndex = 0; cascadeIndex < _cascades.size(); ++cascadeIndex) {
-    const float p = (cascadeIndex + 1) / _numCascades,             //
-      log         = minZ * static_cast<float>(std::pow(ratio, p)), //
+    const float p = static_cast<float>(cascadeIndex + 1) / _numCascades, //
+      log         = minZ * static_cast<float>(std::pow(ratio, p)),       //
       uniform     = minZ + range * p;
 
     const auto d = _lambda * (log - uniform) + uniform;
 
     _cascades[cascadeIndex].prevBreakDistance
-      = cascadeIndex == 0 ? minDistance : _cascades[cascadeIndex - 1].breakDistance;
+      = cascadeIndex == 0 ? iMinDistance : _cascades[cascadeIndex - 1].breakDistance;
     _cascades[cascadeIndex].breakDistance = (d - near) / cameraRange;
 
     _viewSpaceFrustumsZ[cascadeIndex] = near + _cascades[cascadeIndex].breakDistance * cameraRange;
@@ -778,8 +778,8 @@ void CascadedShadowGenerator::bindShadowLight(const std::string& lightIndex,
   // Only PCF uses depth stencil texture.
   if (_filter == ShadowGenerator::FILTER_PCF) {
     effect->setDepthStencilTexture("shadowSampler" + lightIndex, shadowMap);
-    light->_uniformBuffer->updateFloat4("shadowsInfo", getDarkness(), width, 1.f / width,
-                                        frustumEdgeFalloff, lightIndex);
+    light->_uniformBuffer->updateFloat4("shadowsInfo", getDarkness(), static_cast<float>(width),
+                                        1.f / width, frustumEdgeFalloff, lightIndex);
   }
   else if (_filter == ShadowGenerator::FILTER_PCSS) {
     for (size_t cascadeIndex = 0; cascadeIndex < _numCascades; ++cascadeIndex) {
@@ -810,8 +810,8 @@ void CascadedShadowGenerator::bindShadowLight(const std::string& lightIndex,
   }
   else {
     effect->setTexture("shadowSampler" + lightIndex, shadowMap);
-    light->_uniformBuffer->updateFloat4("shadowsInfo", getDarkness(), width, 1 / width,
-                                        frustumEdgeFalloff, lightIndex);
+    light->_uniformBuffer->updateFloat4("shadowsInfo", getDarkness(), static_cast<float>(width),
+                                        1.f / width, frustumEdgeFalloff, lightIndex);
   }
 
   light->_uniformBuffer->updateFloat2(

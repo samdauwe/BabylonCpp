@@ -459,9 +459,10 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
           && StandardMaterial::BumpTextureEnabled()) {
         if (asStandardMaterial) {
           if (asStandardMaterial->bumpTexture()) {
-            _effect->setFloat3("vBumpInfos", asStandardMaterial->bumpTexture()->coordinatesIndex,
-                               1.f / asStandardMaterial->bumpTexture()->level,
-                               asStandardMaterial->parallaxScaleBias);
+            _effect->setFloat3(
+              "vBumpInfos", static_cast<float>(asStandardMaterial->bumpTexture()->coordinatesIndex),
+              1.f / asStandardMaterial->bumpTexture()->level,
+              asStandardMaterial->parallaxScaleBias);
             _effect->setMatrix("bumpMatrix",
                                *asStandardMaterial->bumpTexture()->getTextureMatrix());
             _effect->setTexture("bumpSampler", asStandardMaterial->bumpTexture());
@@ -473,9 +474,9 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
         if (asPBRMaterial) {
           if (asPBRMaterial->bumpTexture()) {
-            _effect->setFloat3("vBumpInfos", asPBRMaterial->bumpTexture()->coordinatesIndex,
-                               1.f / asPBRMaterial->bumpTexture()->level,
-                               asPBRMaterial->parallaxScaleBias);
+            _effect->setFloat3(
+              "vBumpInfos", static_cast<float>(asPBRMaterial->bumpTexture()->coordinatesIndex),
+              1.f / asPBRMaterial->bumpTexture()->level, asPBRMaterial->parallaxScaleBias);
             _effect->setMatrix("bumpMatrix", *asPBRMaterial->bumpTexture()->getTextureMatrix());
             _effect->setTexture("bumpSampler", asPBRMaterial->bumpTexture());
             _effect->setFloat2("vTangentSpaceParams",

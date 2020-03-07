@@ -21,7 +21,7 @@ DepthRendererPtr& DepthReducer::get_depthRenderer()
   return _depthRenderer;
 }
 
-void DepthReducer::setDepthRenderer(DepthRendererPtr depthRenderer, unsigned int type,
+void DepthReducer::setDepthRenderer(DepthRendererPtr iDepthRenderer, unsigned int type,
                                     bool forceFullscreenViewport)
 {
   auto scene = _camera->getScene();
@@ -33,19 +33,19 @@ void DepthReducer::setDepthRenderer(DepthRendererPtr depthRenderer, unsigned int
     _depthRenderer = nullptr;
   }
 
-  if (depthRenderer == nullptr) {
+  if (iDepthRenderer == nullptr) {
     if (scene->_depthRenderer.empty()) {
       scene->_depthRenderer = {};
     }
 
-    depthRenderer = _depthRenderer = std::make_shared<DepthRenderer>(scene, type, _camera, false);
-    depthRenderer->enabled         = false;
+    iDepthRenderer = _depthRenderer = std::make_shared<DepthRenderer>(scene, type, _camera, false);
+    iDepthRenderer->enabled         = false;
 
     _depthRendererId                        = "minmax" + _camera->id;
-    scene->_depthRenderer[_depthRendererId] = depthRenderer;
+    scene->_depthRenderer[_depthRendererId] = iDepthRenderer;
   }
 
-  MinMaxReducer::setSourceTexture(depthRenderer->getDepthMap(), true, type,
+  MinMaxReducer::setSourceTexture(iDepthRenderer->getDepthMap(), true, type,
                                   forceFullscreenViewport);
 }
 
