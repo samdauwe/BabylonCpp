@@ -538,6 +538,8 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 {
   auto container = AssetContainer::New(scene);
 
+  scene->_blockEntityCollection = !addToScene;
+
   // Entire method running in try block, so ALWAYS logs as far as it got, only actually writes
   // details when SceneLoader.debugLogging = true (default), or exception encountered. Everything
   // stored in var log instead of writing separate lines to support only writing in exception, and
@@ -886,6 +888,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
   catch (...) {
   }
 
+  scene->_blockEntityCollection = false;
   finally("loadAssets", log, parsedData);
 
   return container;
