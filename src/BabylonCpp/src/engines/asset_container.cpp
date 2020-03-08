@@ -22,14 +22,21 @@
 
 namespace BABYLON {
 
-AssetContainer::AssetContainer(Scene* iScene) : scene{iScene}
+AssetContainer::AssetContainer(Scene* iScene) : scene{iScene}, _wasAddedToScene{false}
 {
+  scene->onDisposeObservable.add([this](Scene* /*scene*/, EventState & /*es*/) -> void {
+    if (!_wasAddedToScene) {
+      dispose();
+    }
+  });
 }
 
 AssetContainer::~AssetContainer() = default;
 
 void AssetContainer::addAllToScene()
 {
+  _wasAddedToScene = true;
+
   for (const auto& o : cameras) {
     scene->addCamera(o);
   }
@@ -84,6 +91,8 @@ void AssetContainer::addAllToScene()
 
 void AssetContainer::removeAllFromScene()
 {
+  _wasAddedToScene = false;
+
   for (const auto& o : cameras) {
     scene->removeCamera(o);
   }

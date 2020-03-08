@@ -12,8 +12,7 @@ using AssetContainerPtr = std::shared_ptr<AssetContainer>;
 using MeshPtr           = std::shared_ptr<Mesh>;
 
 /**
- * @brief Container with a set of assets that can be added or removed from a
- * scene.
+ * @brief Container with a set of assets that can be added or removed from a scene.
  */
 class BABYLON_SHARED_EXPORT AssetContainer : public AbstractScene {
 
@@ -41,9 +40,9 @@ public:
   void dispose();
 
   /**
-   * @brief Adds all meshes in the asset container to a root mesh that can be
-   * used to position all the contained meshes. The root mesh is then added to
-   * the front of the meshes in the assetContainer.
+   * @brief Adds all meshes in the asset container to a root mesh that can be used to position all
+   * the contained meshes. The root mesh is then added to the front of the meshes in the
+   * assetContainer.
    * @returns the root mesh
    */
   MeshPtr createRootMesh();
@@ -60,6 +59,9 @@ public:
    * @brief The scene the AssetContainer belongs to.
    */
   Scene* scene;
+
+private:
+  bool _wasAddedToScene;
 
 }; // end of class AssetContainer
 
