@@ -642,6 +642,12 @@ void GLRenderingContext::framebufferTexture2D(GLenum target, GLenum attachment, 
   glFramebufferTexture2D(target, attachment, textarget, texture->value, level);
 }
 
+void GLRenderingContext::framebufferTextureLayer(GLenum target, GLenum attachment,
+                                                 IGLTexture* texture, GLint level, GLint layer)
+{
+  glFramebufferTextureLayer(target, attachment, texture->value, level, layer);
+}
+
 void GLRenderingContext::framebufferTextureMultiviewOVR(GLenum /*target*/, GLenum /*attachment*/,
                                                         IGLTexture* /*texture*/, GLint /*level*/,
                                                         GLint /*baseViewIndex*/, GLint /*numViews*/)

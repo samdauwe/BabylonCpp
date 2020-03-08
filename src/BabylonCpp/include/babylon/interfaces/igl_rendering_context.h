@@ -1482,22 +1482,32 @@ public:
    * @param attachment A GLenum specifying the attachment point for the texture.
    * @param textarget A GLenum specifying the texture target.
    * @param texture An IGLTexture object whose image to attach.
-   * @param level A GLint specifying the mipmap level of the texture image to be
-   * attached. Must be 0.
+   * @param level A GLint specifying the mipmap level of the texture image to be attached. Must be
+   * 0.
    */
   virtual void framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget,
                                     IGLTexture* texture, GLint level)
     = 0;
 
   /**
-   * @brief Addresses the inefficiency of sequential multiview rendering by
-   * adding a means to render to multiple elements of a 2D texture array
-   * simultaneously.  In multiview rendering, draw calls are instanced into each
-   * corresponding element of the texture array.  The vertex program uses a new
-   * gl_ViewID_OVR variable to compute per-view values, typically the vertex
-   * position and view-dependent variables like reflection.
-   * @see
-   * https://www.khronos.org/registry/OpenGL/extensions/OVR/OVR_multiview.txt
+   * @brief Attaches a single layer of a texture to a framebuffer.
+   * @param target A GLenum specifying the binding point (target).
+   * @param attachment A GLenum specifying the attachment point for the texture.
+   * @param texture A IGLTexture object whose image to attach.
+   * @param level A GLint specifying the mipmap level of the texture image to attach.
+   * @param layer A GLint specifying the layer of the texture image to attach.
+   */
+  virtual void framebufferTextureLayer(GLenum target, GLenum attachment, IGLTexture* texture,
+                                       GLint level, GLint layer)
+    = 0;
+
+  /**
+   * @brief Addresses the inefficiency of sequential multiview rendering by adding a means to render
+   * to multiple elements of a 2D texture array simultaneously.  In multiview rendering, draw calls
+   * are instanced into each corresponding element of the texture array.  The vertex program uses a
+   * new gl_ViewID_OVR variable to compute per-view values, typically the vertex position and
+   * view-dependent variables like reflection.
+   * @see https://www.khronos.org/registry/OpenGL/extensions/OVR/OVR_multiview.txt
    */
   virtual void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment, IGLTexture* texture,
                                               GLint level, GLint baseViewIndex, GLint numViews)

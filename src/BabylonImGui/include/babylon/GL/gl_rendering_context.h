@@ -107,6 +107,8 @@ public:
                                IGLRenderbuffer* renderbuffer) override;
   void framebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, IGLTexture* texture,
                             GLint level) override;
+  void framebufferTextureLayer(GLenum target, GLenum attachment, IGLTexture* texture, GLint level,
+                               GLint layer) override;
   void framebufferTextureMultiviewOVR(GLenum target, GLenum attachment, IGLTexture* texture,
                                       GLint level, GLint baseViewIndex, GLint numViews) override;
   void frontFace(GLenum mode) override;
