@@ -290,15 +290,14 @@ public:
    * @param requiredWidth The width of the target to render to
    * @param requiredHeight The height of the target to render to
    * @param forceFullscreenViewport Forces the viewport to be the entire texture/screen if true
-   * @param depthStencilTexture The depth stencil texture to use to render
-   * @param lodLevel defines le lod level to bind to the frame buffer
+   * @param lodLevel defines the lod level to bind to the frame buffer
+   * @param layer defines the 2d array index to bind to frame buffer to
    */
-  virtual void bindFramebuffer(const InternalTexturePtr& texture,
-                               std::optional<unsigned int> faceIndex       = std::nullopt,
+  virtual void bindFramebuffer(const InternalTexturePtr& texture, unsigned int faceIndex = 0,
                                std::optional<int> requiredWidth            = std::nullopt,
                                std::optional<int> requiredHeight           = std::nullopt,
                                std::optional<bool> forceFullscreenViewport = std::nullopt,
-                               InternalTexture* depthStencilTexture = nullptr, int lodLevel = 0);
+                               int lodLevel = 0, int layer = 0);
 
   /**
    * @brief Hidden
@@ -358,6 +357,11 @@ public:
    * @param data defines the data to update
    */
   void updateArrayBuffer(const Float32Array& data);
+
+  /**
+   * @brief Hidden
+   */
+  void _bindIndexBufferWithCache(const WebGLDataBufferPtr& indexBuffer);
 
   /**
    * @brief Records a vertex array object.
@@ -431,11 +435,11 @@ public:
     std::variant<Uint32Array, std::vector<InstancingAttributeInfo>>& offsetLocations);
 
   /**
-   * @brief Bind the content of a webGL buffer used with instanciation
+   * @brief Bind the content of a webGL buffer used with instantiation.
    * @param instancesBuffer defines the webGL buffer to bind
    * @param attributesInfo defines the offsets or attributes information used to determine where
    * data must be stored in the buffer
-   * @param computeStride defines Wether to compute the strides from the info or use the default 0
+   * @param computeStride defines Whether to compute the strides from the info or use the default 0
    */
   void bindInstancesBuffer(const WebGLDataBufferPtr& instancesBuffer,
                            std::vector<InstancingAttributeInfo>& attributesInfo,
@@ -1030,6 +1034,21 @@ public:
                                             bool useTextureWidthAndHeight = false);
 
   /**
+   * @brief Update a portion of an internal texture.
+   * @param texture defines the texture to update
+   * @param imageData defines the data to store into the texture
+   * @param xOffset defines the x coordinates of the update rectangle
+   * @param yOffset defines the y coordinates of the update rectangle
+   * @param width defines the width of the update rectangle
+   * @param height defines the height of the update rectangle
+   * @param faceIndex defines the face index if texture is a cube (0 by default)
+   * @param lod defines the lod level to update (0 by default)
+   */
+  virtual void updateTextureData(const InternalTexturePtr& texture,
+                                 const ArrayBufferView& imageData, int xOffset, int yOffset,
+                                 int width, int height, unsigned int faceIndex = 0, int lod = 0);
+
+  /**
    * @brief Hidden
    */
   virtual void _uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
@@ -1096,7 +1115,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _setAnisotropicLevel(unsigned int target, const BaseTexturePtr& texture);
+  void _setAnisotropicLevel(unsigned int target, const InternalTexturePtr& internalTexture,
+                            unsigned int anisotropicFilteringLevel);
 
   /**
    * @brief Unbind all vertex attributes from the webGL context.
@@ -1156,12 +1176,12 @@ public:
     = nullptr);
 
   /**
-   * @brief Reads pixels from the current frame buffer. Please note that this function can be slow
+   * @brief Reads pixels from the current frame buffer. Please note that this function can be slow.
    * @param x defines the x coordinate of the rectangle where pixels must be read
    * @param y defines the y coordinate of the rectangle where pixels must be read
    * @param width defines the width of the rectangle where pixels must be read
    * @param height defines the height of the rectangle where pixels must be read
-   * @param hasAlpha defines wether the output should have alpha or not (defaults to true)
+   * @param hasAlpha defines whether the output should have alpha or not (defaults to true)
    * @returns a Uint8Array containing RGBA colors
    */
   Uint8Array readPixels(int x, int y, int width, int height, bool hasAlpha = true);
@@ -1618,7 +1638,6 @@ private:
   void bindBuffer(const WebGLDataBufferPtr& buffer, int target);
   void _vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
                             unsigned int type, bool normalized, int stride, int offset);
-  void _bindIndexBufferWithCache(const WebGLDataBufferPtr& indexBuffer);
   void _bindVertexBuffersAttributes(
     const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect);
   void _unbindVertexArrayObject();

@@ -419,12 +419,11 @@ void NullEngine::updateTextureSamplingMode(unsigned int samplingMode,
   texture->samplingMode = samplingMode;
 }
 
-void NullEngine::bindFramebuffer(const InternalTexturePtr& texture,
-                                 std::optional<unsigned int> /*faceIndex*/,
+void NullEngine::bindFramebuffer(const InternalTexturePtr& texture, unsigned int /*faceIndex*/,
                                  std::optional<int> requiredWidth,
                                  std::optional<int> requiredHeight,
-                                 std::optional<bool> forceFullscreenViewport,
-                                 InternalTexture* /*depthStencilTexture*/, int /*lodLevel*/)
+                                 std::optional<bool> forceFullscreenViewport, int /*lodLevel*/,
+                                 int /*layer*/)
 {
   if (_currentRenderTarget) {
     unBindFramebuffer(_currentRenderTarget);

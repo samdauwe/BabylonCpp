@@ -554,7 +554,7 @@ int RenderTargetTexture::_bestReflectionRenderTargetDimension(int renderDimensio
   return std::min(Engine::FloorPOT(renderDimension), curved);
 }
 
-void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex)
+void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex, unsigned int layer)
 {
   auto scene = getScene();
   if (!scene) {
@@ -563,12 +563,8 @@ void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex)
 
   auto engine = scene->getEngine();
   if (_texture) {
-    std::optional<unsigned int> iFaceIndex = std::nullopt;
-    if (isCube()) {
-      iFaceIndex = faceIndex;
-    }
-    engine->bindFramebuffer(_texture, iFaceIndex, std::nullopt, std::nullopt, ignoreCameraViewport,
-                            depthStencilTexture ? depthStencilTexture.get() : nullptr);
+    engine->bindFramebuffer(_texture, isCube() ? faceIndex : 0, std::nullopt, std::nullopt,
+                            ignoreCameraViewport, 0, static_cast<int>(layer));
   }
 }
 

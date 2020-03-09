@@ -428,15 +428,13 @@ public:
    * @param requiredWidth The width of the target to render to
    * @param requiredHeight The height of the target to render to
    * @param forceFullscreenViewport Forces the viewport to be the entire texture/screen if true
-   * @param depthStencilTexture The depth stencil texture to use to render
    * @param lodLevel defines le lod level to bind to the frame buffer
    */
-  void bindFramebuffer(const InternalTexturePtr& texture,
-                       std::optional<unsigned int> faceIndex       = std::nullopt,
+  void bindFramebuffer(const InternalTexturePtr& texture, unsigned int faceIndex = 0,
                        std::optional<int> requiredWidth            = std::nullopt,
                        std::optional<int> requiredHeight           = std::nullopt,
-                       std::optional<bool> forceFullscreenViewport = std::nullopt,
-                       InternalTexture* depthStencilTexture = nullptr, int lodLevel = 0) override;
+                       std::optional<bool> forceFullscreenViewport = std::nullopt, int lodLevel = 0,
+                       int layer = 0) override;
 
   /**
    * @brief Unbind the current render target texture from the webGL context.

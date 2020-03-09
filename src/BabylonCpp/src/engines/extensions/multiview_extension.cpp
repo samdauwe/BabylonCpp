@@ -39,7 +39,7 @@ void MultiviewExtension::bindMultiviewFramebuffer(const InternalTexturePtr& mult
 {
   auto& gl = *_this->_gl;
 
-  _this->bindFramebuffer(multiviewTexture, std::nullopt, std::nullopt, std::nullopt, true);
+  _this->bindFramebuffer(multiviewTexture, 0, std::nullopt, std::nullopt, true);
   gl.bindFramebuffer(GL::DRAW_FRAMEBUFFER, multiviewTexture->_framebuffer.get());
   if (multiviewTexture->_colorTextureArray && multiviewTexture->_depthStencilTextureArray) {
     gl.framebufferTextureMultiviewOVR(GL::DRAW_FRAMEBUFFER, GL::COLOR_ATTACHMENT0,

@@ -97,7 +97,7 @@ void PostProcessManager::directRender(const std::vector<PostProcessPtr>& postPro
     else {
       if (targetTexture) {
         engine->bindFramebuffer(targetTexture, faceIndex, std::nullopt, std::nullopt,
-                                forceFullscreenViewport, nullptr, lodLevel);
+                                forceFullscreenViewport, lodLevel);
       }
       else {
         engine->restoreDefaultFramebuffer();

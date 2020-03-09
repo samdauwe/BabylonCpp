@@ -781,12 +781,11 @@ void ThinEngine::setSize(int width, int height)
   _renderingCanvas->height = height;
 }
 
-void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture,
-                                 std::optional<unsigned int> faceIndex,
+void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture, unsigned int faceIndex,
                                  std::optional<int> requiredWidth,
                                  std::optional<int> requiredHeight,
-                                 std::optional<bool> forceFullscreenViewport,
-                                 InternalTexture* depthStencilTexture, int lodLevel)
+                                 std::optional<bool> forceFullscreenViewport, int lodLevel,
+                                 int layer)
 {
   if (_currentRenderTarget) {
     unBindFramebuffer(_currentRenderTarget);
@@ -794,26 +793,35 @@ void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture,
   _currentRenderTarget = texture;
   _bindUnboundFramebuffer(texture->_MSAAFramebuffer ? texture->_MSAAFramebuffer :
                                                       texture->_framebuffer);
-  auto& gl = *_gl;
-  if (texture->isCube) {
-    if (!faceIndex.has_value()) {
-      faceIndex = 0u;
-    }
-    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                            GL::TEXTURE_CUBE_MAP_POSITIVE_X + (*faceIndex),
-                            texture->_webGLTexture.get(), lodLevel);
 
-    if (depthStencilTexture) {
-      if (depthStencilTexture->_generateStencilBuffer) {
-        gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                                GL::TEXTURE_CUBE_MAP_POSITIVE_X + *faceIndex,
-                                depthStencilTexture->_webGLTexture.get(), lodLevel);
-      }
-      else {
-        gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                                GL::TEXTURE_CUBE_MAP_POSITIVE_X + *faceIndex,
-                                depthStencilTexture->_webGLTexture.get(), lodLevel);
-      }
+  auto& gl = *_gl;
+  if (texture->is2DArray) {
+    gl.framebufferTextureLayer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, texture->_webGLTexture.get(),
+                               lodLevel, layer);
+  }
+  else if (texture->isCube) {
+    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                            GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                            texture->_webGLTexture.get(), lodLevel);
+  }
+
+  const auto& depthStencilTexture = texture->_depthStencilTexture;
+  if (depthStencilTexture) {
+    const auto attachment = (depthStencilTexture->_generateStencilBuffer) ?
+                              GL::DEPTH_STENCIL_ATTACHMENT :
+                              GL::DEPTH_ATTACHMENT;
+    if (texture->is2DArray) {
+      gl.framebufferTextureLayer(GL::FRAMEBUFFER, attachment,
+                                 depthStencilTexture->_webGLTexture.get(), lodLevel, layer);
+    }
+    else if (texture->isCube) {
+      gl.framebufferTexture2D(GL::FRAMEBUFFER, attachment,
+                              GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                              depthStencilTexture->_webGLTexture.get(), lodLevel);
+    }
+    else {
+      gl.framebufferTexture2D(GL::FRAMEBUFFER, attachment, GL::TEXTURE_2D,
+                              depthStencilTexture->_webGLTexture.get(), lodLevel);
     }
   }
 
@@ -2062,7 +2070,7 @@ SamplingParameters ThinEngine::_getSamplingParameters(unsigned int samplingMode,
   GL::GLenum minFilter = GL::NEAREST;
 
   switch (samplingMode) {
-    case Constants::TEXTURE_BILINEAR_SAMPLINGMODE:
+    case Constants::TEXTURE_LINEAR_LINEAR_MIPNEAREST:
       magFilter = GL::LINEAR;
       if (generateMipMaps) {
         minFilter = GL::LINEAR_MIPMAP_NEAREST;
@@ -2071,7 +2079,7 @@ SamplingParameters ThinEngine::_getSamplingParameters(unsigned int samplingMode,
         minFilter = GL::LINEAR;
       }
       break;
-    case Constants::TEXTURE_TRILINEAR_SAMPLINGMODE:
+    case Constants::TEXTURE_LINEAR_LINEAR_MIPLINEAR:
       magFilter = GL::LINEAR;
       if (generateMipMaps) {
         minFilter = GL::LINEAR_MIPMAP_LINEAR;
@@ -2080,7 +2088,7 @@ SamplingParameters ThinEngine::_getSamplingParameters(unsigned int samplingMode,
         minFilter = GL::LINEAR;
       }
       break;
-    case Constants::TEXTURE_NEAREST_SAMPLINGMODE:
+    case Constants::TEXTURE_NEAREST_NEAREST_MIPLINEAR:
       magFilter = GL::NEAREST;
       if (generateMipMaps) {
         minFilter = GL::NEAREST_MIPMAP_LINEAR;
@@ -2297,7 +2305,7 @@ InternalTexturePtr ThinEngine::createTexture(
       }
       else {
         if (onError) {
-          onError("Unable to load: only ArrayBuffer supported here", "");
+          onError("Unable to load: only ArrayBuffer or ArrayBufferView is supported", "");
         }
       }
     }
@@ -2573,7 +2581,7 @@ unsigned int ThinEngine::_getTextureTarget(const InternalTexturePtr& texture) co
   else if (texture->is3D) {
     return GL::TEXTURE_3D;
   }
-  else if (texture->is2DArray) {
+  else if (texture->is2DArray || texture->isMultiview) {
     return GL::TEXTURE_2D_ARRAY;
   }
   return GL::TEXTURE_2D;
@@ -2615,7 +2623,7 @@ void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
                                 static_cast<int>(_getTextureWrapMode(*wrapV)), texture);
     texture->_cachedWrapV = static_cast<int>(*wrapV);
   }
-  if (wrapR) {
+  if ((texture->is2DArray || texture->is3D) && wrapR) {
     _setTextureParameterInteger(target, GL::TEXTURE_WRAP_R,
                                 static_cast<int>(_getTextureWrapMode(*wrapR)), texture);
     texture->_cachedWrapR = static_cast<int>(*wrapR);
@@ -2692,7 +2700,7 @@ void ThinEngine::_uploadDataToTextureDirectly(const InternalTexturePtr& texture,
   auto format      = _getInternalFormat(texture->format);
   auto internalFormat
     = babylonInternalFormat == -1 ?
-        static_cast<int>(_getRGBABufferInternalSizedFormat(texture->type, format)) :
+        static_cast<int>(_getRGBABufferInternalSizedFormat(texture->type, texture->format)) :
         static_cast<int>(_getInternalFormat(static_cast<unsigned int>(babylonInternalFormat)));
 
   _unpackFlipY(texture->invertY);
@@ -2713,6 +2721,26 @@ void ThinEngine::_uploadDataToTextureDirectly(const InternalTexturePtr& texture,
 
   gl.texImage2D(target, lod, internalFormat, static_cast<int>(width), static_cast<int>(height), 0,
                 format, textureType, &imageData.uint8Array());
+}
+
+void ThinEngine::updateTextureData(const InternalTexturePtr& texture,
+                                   const ArrayBufferView& imageData, int xOffset, int yOffset,
+                                   int width, int height, unsigned int faceIndex, int lod)
+{
+  auto& gl = *_gl;
+
+  const auto textureType = _getWebGLTextureType(texture->type);
+  const auto format      = _getInternalFormat(texture->format);
+
+  _unpackFlipY(texture->invertY);
+
+  unsigned int target = GL::TEXTURE_2D;
+  if (texture->isCube) {
+    target = GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex;
+  }
+
+  gl.texSubImage2D(target, lod, xOffset, yOffset, width, height, format, textureType,
+                   imageData.uint8Array());
 }
 
 void ThinEngine::_uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
@@ -2850,6 +2878,9 @@ WebGLRenderbufferPtr ThinEngine::_getDepthStencilBuffer(int width, int height, i
 
   gl.framebufferRenderbuffer(GL::FRAMEBUFFER, attachment, GL::RENDERBUFFER,
                              depthStencilBuffer.get());
+
+  gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+
   return depthStencilBuffer;
 }
 
@@ -3113,35 +3144,43 @@ bool ThinEngine::_setTexture(int channel, const BaseTexturePtr& texture, bool is
     needToBind = false;
   }
 
-  _activeChannel = channel;
-  if (internalTexture && internalTexture->isMultiview) {
-    if (needToBind) {
-      _bindTextureDirectly(GL::TEXTURE_2D_ARRAY, internalTexture, isPartOfTextureArray);
-    }
+  _activeChannel    = channel;
+  const auto target = _getTextureTarget(internalTexture);
+  if (needToBind) {
+    _bindTextureDirectly(target, internalTexture, isPartOfTextureArray);
   }
-  else if (internalTexture && (internalTexture->is3D || internalTexture->is2DArray)) {
-    auto is3D   = internalTexture->is3D;
-    auto target = is3D ? GL::TEXTURE_3D : GL::TEXTURE_2D_ARRAY;
 
-    if (needToBind) {
-      _bindTextureDirectly(target, internalTexture, isPartOfTextureArray);
+  if (internalTexture && internalTexture->isMultiview) {
+    // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes use REPEAT.
+    if (internalTexture->isCube
+        && internalTexture->_cachedCoordinatesMode
+             != static_cast<int>(texture->coordinatesMode())) {
+      internalTexture->_cachedCoordinatesMode = static_cast<int>(texture->coordinatesMode());
+
+      const auto textureWrapMode
+        = (texture->coordinatesMode() != Constants::TEXTURE_CUBIC_MODE
+           && texture->coordinatesMode() != Constants::TEXTURE_SKYBOX_MODE) ?
+            Constants::TEXTURE_WRAP_ADDRESSMODE :
+            Constants::TEXTURE_CLAMP_ADDRESSMODE;
+      texture->wrapU = textureWrapMode;
+      texture->wrapV = textureWrapMode;
     }
 
-    if (internalTexture && internalTexture->_cachedWrapU != static_cast<int>(texture->wrapU)) {
+    if (internalTexture->_cachedWrapU != static_cast<int>(texture->wrapU)) {
       internalTexture->_cachedWrapU = static_cast<int>(texture->wrapU);
       _setTextureParameterInteger(target, GL::TEXTURE_WRAP_S,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapU)),
                                   internalTexture);
     }
 
-    if (internalTexture && internalTexture->_cachedWrapV != static_cast<int>(texture->wrapV)) {
+    if (internalTexture->_cachedWrapV != static_cast<int>(texture->wrapV)) {
       internalTexture->_cachedWrapV = static_cast<int>(texture->wrapV);
       _setTextureParameterInteger(target, GL::TEXTURE_WRAP_T,
                                   static_cast<int>(_getTextureWrapMode(texture->wrapV)),
                                   internalTexture);
     }
 
-    if (is3D && internalTexture
+    if (internalTexture->is3D
         && internalTexture->_cachedWrapR != static_cast<int>(texture->wrapR)) {
       internalTexture->_cachedWrapR = static_cast<int>(texture->wrapR);
       _setTextureParameterInteger(target, GL::TEXTURE_WRAP_R,
@@ -3149,48 +3188,7 @@ bool ThinEngine::_setTexture(int channel, const BaseTexturePtr& texture, bool is
                                   internalTexture);
     }
 
-    _setAnisotropicLevel(target, texture);
-  }
-  else if (internalTexture && internalTexture->isCube) {
-    if (needToBind) {
-      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture, isPartOfTextureArray);
-    }
-
-    if (internalTexture->_cachedCoordinatesMode != static_cast<int>(texture->coordinatesMode())) {
-      internalTexture->_cachedCoordinatesMode = static_cast<int>(texture->coordinatesMode());
-      // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes use REPEAT.
-      auto textureWrapMode = (texture->coordinatesMode() != Constants::TEXTURE_CUBIC_MODE
-                              && texture->coordinatesMode() != Constants::TEXTURE_SKYBOX_MODE) ?
-                               GL::REPEAT :
-                               GL::CLAMP_TO_EDGE;
-      _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
-                                  static_cast<int>(textureWrapMode), internalTexture);
-      _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
-                                  static_cast<int>(textureWrapMode));
-    }
-
-    _setAnisotropicLevel(GL::TEXTURE_CUBE_MAP, texture);
-  }
-  else {
-    if (needToBind) {
-      _bindTextureDirectly(GL::TEXTURE_2D, internalTexture, isPartOfTextureArray);
-    }
-
-    if (internalTexture && internalTexture->_cachedWrapU != static_cast<int>(texture->wrapU)) {
-      internalTexture->_cachedWrapU = static_cast<int>(texture->wrapU);
-      _setTextureParameterInteger(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
-                                  static_cast<int>(_getTextureWrapMode(texture->wrapU)),
-                                  internalTexture);
-    }
-
-    if (internalTexture && internalTexture->_cachedWrapV != static_cast<int>(texture->wrapV)) {
-      internalTexture->_cachedWrapV = static_cast<int>(texture->wrapV);
-      _setTextureParameterInteger(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
-                                  static_cast<int>(_getTextureWrapMode(texture->wrapV)),
-                                  internalTexture);
-    }
-
-    _setAnisotropicLevel(GL::TEXTURE_2D, texture);
+    _setAnisotropicLevel(target, internalTexture, texture->anisotropicFilteringLevel);
   }
 
   return true;
@@ -3228,29 +3226,27 @@ void ThinEngine::setTextureArray(int channel, const WebGLUniformLocationPtr& uni
   }
 }
 
-void ThinEngine::_setAnisotropicLevel(unsigned int target, const BaseTexturePtr& texture)
+void ThinEngine::_setAnisotropicLevel(unsigned int target,
+                                      const InternalTexturePtr& internalTexture,
+                                      unsigned int anisotropicFilteringLevel)
 {
-  auto internalTexture = texture->getInternalTexture();
-
-  if (!internalTexture) {
-    return;
-  }
-
   auto anisotropicFilterExtension = _caps.textureAnisotropicFilterExtension;
-  auto value                      = texture->anisotropicFilteringLevel;
 
   if (internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR_MIPNEAREST
       && internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
       && internalTexture->samplingMode != Constants::TEXTURE_LINEAR_LINEAR) {
-    value = 1; // Forcing the anisotropic to 1 because else webgl will force filters to linear
+    anisotropicFilteringLevel
+      = 1; // Forcing the anisotropic to 1 because else webgl will force filters to linear
   }
 
   if (anisotropicFilterExtension
-      && internalTexture->_cachedAnisotropicFilteringLevel != static_cast<int>(value)) {
-    _setTextureParameterFloat(target, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
-                              static_cast<float>(std::min(value, _caps.maxAnisotropy)),
-                              internalTexture);
-    internalTexture->_cachedAnisotropicFilteringLevel = static_cast<int>(value);
+      && internalTexture->_cachedAnisotropicFilteringLevel
+           != static_cast<int>(anisotropicFilteringLevel)) {
+    _setTextureParameterFloat(
+      target, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
+      static_cast<float>(std::min(anisotropicFilteringLevel, _caps.maxAnisotropy)),
+      internalTexture);
+    internalTexture->_cachedAnisotropicFilteringLevel = static_cast<int>(anisotropicFilteringLevel);
   }
 }
 
@@ -3536,6 +3532,8 @@ ThinEngine::_getRGBABufferInternalSizedFormat(unsigned int type,
           return GL::LUMINANCE;
         case Constants::TEXTUREFORMAT_LUMINANCE_ALPHA:
           return GL::LUMINANCE_ALPHA;
+        case Constants::TEXTUREFORMAT_RGB:
+          return GL::RGB;
       }
     }
     return GL::RGBA;

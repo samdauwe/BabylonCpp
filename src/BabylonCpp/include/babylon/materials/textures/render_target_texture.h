@@ -164,8 +164,9 @@ public:
   /**
    * @brief Hidden
    * @param faceIndex face index to bind to if this is a cubetexture
+   * @param layer defines the index of the texture to bind in the array
    */
-  void _bindFrameBuffer(unsigned int faceIndex = 0);
+  void _bindFrameBuffer(unsigned int faceIndex = 0, unsigned int layer = 0);
 
   /**
    * @brief Overrides the default sort function applied in the renderging group to prepare the
