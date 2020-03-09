@@ -179,7 +179,7 @@ public:
   void texStorage3D(GLenum target, GLint levels, GLenum internalformat, GLsizei width,
                     GLsizei height, GLsizei depth) override;
   void texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width,
-                     GLsizei height, GLenum format, GLenum type, any pixels) override;
+                     GLsizei height, GLenum format, GLenum type, const Uint8Array& pixels) override;
   void transformFeedbackVaryings(IGLProgram* program, const std::vector<std::string>& varyings,
                                  GLenum bufferMode) override;
   void uniform1f(IGLUniformLocation* location, GLfloat v0) override;

@@ -1025,9 +1025,9 @@ void GLRenderingContext::texStorage3D(GLenum target, GLint levels, GLenum intern
 
 void GLRenderingContext::texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
                                        GLint width, GLint height, GLenum format, GLenum type,
-                                       any pixels)
+                                       const Uint8Array& pixels)
 {
-  glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+  glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, &pixels[0]);
 }
 
 void GLRenderingContext::transformFeedbackVaryings(IGLProgram* program,

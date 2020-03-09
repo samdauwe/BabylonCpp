@@ -2060,7 +2060,8 @@ public:
    * @param pixels A pixel source for the texture.
    */
   virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
-                             GLsizei width, GLsizei height, GLenum format, GLenum type, any pixels)
+                             GLsizei width, GLsizei height, GLenum format, GLenum type,
+                             const Uint8Array& pixels)
     = 0;
 
   /**
