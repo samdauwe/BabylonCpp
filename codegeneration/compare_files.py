@@ -121,12 +121,12 @@ def main():
         "canvasGenerator.ts", "customAnimationFrameRequester.ts",
         "dataReader.ts", "decorators.ts", "deepCopier.ts", "deferred.ts",
         "domManagement.ts", "fileRequest.ts", "filesInput.ts",
-        "filesInputStore.ts", "instantiationTools.ts", "logger.ts",
-        "loadFileError.ts", "precisionDate.ts", "promise.ts",
-        "retryStrategy.ts", "sceneSerializer.ts", "screenshotTools.ts",
-        "smartArray.ts", "stringDictionary.ts", "tags.ts", "typeStore.ts",
-        "videoRecorder.ts", "virtualJoystick.ts", "webRequest.ts",
-        "workerPool.ts",
+        "filesInputStore.ts", "instantiationTools.ts",
+        "khronosTextureContainer2.ts", "logger.ts", "loadFileError.ts",
+        "precisionDate.ts", "promise.ts", "retryStrategy.ts",
+        "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
+        "stringDictionary.ts", "tags.ts", "typeStore.ts", "videoRecorder.ts",
+        "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
