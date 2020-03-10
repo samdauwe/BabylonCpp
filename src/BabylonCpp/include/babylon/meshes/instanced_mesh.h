@@ -207,6 +207,11 @@ public:
   /**
    * @brief Hidden
    */
+  Mesh* _preActivateForIntermediateRendering(int renderId) override;
+
+  /**
+   * @brief Hidden
+   */
   InstancedMesh& _syncSubMeshes();
 
   /**

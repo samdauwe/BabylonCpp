@@ -700,11 +700,12 @@ void Mesh::_preActivate()
   _instanceDataStorage->visibleInstances = nullptr;
 }
 
-void Mesh::_preActivateForIntermediateRendering(int renderId)
+Mesh* Mesh::_preActivateForIntermediateRendering(int renderId)
 {
   if (_instanceDataStorage->visibleInstances) {
     _instanceDataStorage->visibleInstances->intermediateDefaultRenderId = renderId;
   }
+  return this;
 }
 
 Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)

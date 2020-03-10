@@ -863,8 +863,9 @@ void AbstractMesh::_preActivate()
 {
 }
 
-void AbstractMesh::_preActivateForIntermediateRendering(int /*renderId*/)
+Mesh* AbstractMesh::_preActivateForIntermediateRendering(int /*renderId*/)
 {
+  return nullptr;
 }
 
 bool AbstractMesh::_activate(int renderId, bool /*intermediateRendering*/)

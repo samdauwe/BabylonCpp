@@ -35,6 +35,7 @@ struct IEdgesRenderer;
 class Light;
 class Material;
 struct MaterialDefines;
+class Mesh;
 class PickingInfo;
 struct PhysicsParams;
 class RawTexture;
@@ -439,7 +440,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _preActivateForIntermediateRendering(int renderId);
+  virtual Mesh* _preActivateForIntermediateRendering(int renderId);
 
   /**
    * @brief Hidden

@@ -451,7 +451,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _preActivateForIntermediateRendering(int renderId) override;
+  Mesh* _preActivateForIntermediateRendering(int renderId) override;
 
   /**
    * @brief Hidden

@@ -32,6 +32,13 @@ InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
     rotationQuaternion = source->rotationQuaternion();
   }
 
+  animations = source->animations;
+  for (const auto& range : source->getAnimationRanges()) {
+    if (range != nullptr) {
+      createAnimationRange(range->name, range->from, range->to);
+    }
+  }
+
   infiniteDistance = source->infiniteDistance();
 
   setPivotMatrix(source->getPivotMatrix());
@@ -273,6 +280,12 @@ AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera, BoundingSphere* /*b
   }
 
   return _currentLOD;
+}
+
+Mesh* InstancedMesh::_preActivateForIntermediateRendering(int renderId)
+{
+  auto iSourceMesh = std::static_pointer_cast<Mesh>(sourceMesh());
+  return iSourceMesh ? iSourceMesh->_preActivateForIntermediateRendering(renderId) : nullptr;
 }
 
 InstancedMesh& InstancedMesh::_syncSubMeshes()
