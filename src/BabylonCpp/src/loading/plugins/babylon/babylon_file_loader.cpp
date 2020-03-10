@@ -538,8 +538,6 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
 {
   auto container = AssetContainer::New(scene);
 
-  scene->_blockEntityCollection = !addToScene;
-
   // Entire method running in try block, so ALWAYS logs as far as it got, only actually writes
   // details when SceneLoader.debugLogging = true (default), or exception encountered. Everything
   // stored in var log instead of writing separate lines to support only writing in exception, and
@@ -868,10 +866,6 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     if (json_util::has_key(parsedData, "actions") && (parsedData["actions"].is_array())) {
       ActionManager::Parse(json_util::get_array<json>(parsedData, "actions"), nullptr, scene);
     }
-
-    if (!addToScene) {
-      container->removeAllFromScene();
-    }
   }
   catch (const std::exception& err) {
     auto msg = json_util::has_key(parsedData, "producer") ?
@@ -888,7 +882,9 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
   catch (...) {
   }
 
-  scene->_blockEntityCollection = false;
+  if (!addToScene) {
+    container->removeAllFromScene();
+  }
   finally("loadAssets", log, parsedData);
 
   return container;
