@@ -31,8 +31,11 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     , fogEnabled{true}
     , onDispose{this, &SpriteManager::set_onDispose}
     , texture{this, &SpriteManager::get_texture, &SpriteManager::set_texture}
+    , blendMode{this, &SpriteManager::get_blendMode, &SpriteManager::set_blendMode}
+    , disableDepthWrite{false}
     , _packedAndReady{false}
     , _onDisposeObserver{nullptr}
+    , _blendMode{Constants::ALPHA_COMBINE}
 {
   auto component = std::static_pointer_cast<SpriteSceneComponent>(
     scene->_getComponent(SceneComponentConstants::NAME_SPRITE));
@@ -157,6 +160,16 @@ TexturePtr& SpriteManager::get_texture()
 void SpriteManager::set_texture(const TexturePtr& value)
 {
   _spriteTexture = value;
+}
+
+unsigned int SpriteManager::get_blendMode() const
+{
+  return _blendMode;
+}
+
+void SpriteManager::set_blendMode(unsigned int blendMode)
+{
+  _blendMode = blendMode;
 }
 
 void SpriteManager::_makePacked(const std::string& /*imgUrl*/, const std::string& /*spriteJSON*/)
@@ -421,13 +434,15 @@ void SpriteManager::render()
 
   // Draw order
   engine->setDepthFunctionToLessOrEqual();
-  effect->setBool("alphaTest", true);
-  engine->setColorWrite(false);
-  engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
-  engine->setColorWrite(true);
-  effect->setBool("alphaTest", false);
+  if (!disableDepthWrite) {
+    effect->setBool("alphaTest", true);
+    engine->setColorWrite(false);
+    engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
+    engine->setColorWrite(true);
+    effect->setBool("alphaTest", false);
+  }
 
-  engine->setAlphaMode(Constants::ALPHA_COMBINE);
+  engine->setAlphaMode(_blendMode);
   engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
   engine->setAlphaMode(Constants::ALPHA_DISABLE);
 }

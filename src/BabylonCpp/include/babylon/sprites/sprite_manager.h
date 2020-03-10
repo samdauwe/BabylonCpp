@@ -113,6 +113,18 @@ protected:
    */
   void set_texture(const TexturePtr& value);
 
+  /**
+   * @brief Gets theBlend mode use to render the particle, it can be any of the static
+   * Constants.ALPHA_x properties provided in this class. Default value is Constants.ALPHA_COMBINE
+   */
+  unsigned int get_blendMode() const;
+
+  /**
+   * @brief Sets theBlend mode use to render the particle, it can be any of the static
+   * Constants.ALPHA_x properties provided in this class. Default value is Constants.ALPHA_COMBINE
+   */
+  void set_blendMode(unsigned int blendMode);
+
 private:
   void _makePacked(const std::string& imgUrl, const std::string& spriteJSON);
   void _appendSpriteVertex(size_t index, Sprite& sprite, int offsetX, int offsetY,
@@ -159,6 +171,20 @@ public:
    */
   Property<SpriteManager, TexturePtr> texture;
 
+  /**
+   * Blend mode use to render the particle, it can be any of
+   * the static Constants.ALPHA_x properties provided in this class.
+   * Default value is Constants.ALPHA_COMBINE
+   */
+  Property<SpriteManager, unsigned int> blendMode;
+
+  /**
+   * Disables writing to the depth buffer when rendering the sprites.
+   * It can be handy to disable depth writing when using textures without alpha channel
+   * and setting some specific blend modes.
+   */
+  bool disableDepthWrite;
+
 private:
   /**
    * Associative array from JSON sprite data file
@@ -187,6 +213,7 @@ private:
   WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effectBase;
   EffectPtr _effectFog;
+  unsigned int _blendMode;
 
 }; // end of class Sprite
 
