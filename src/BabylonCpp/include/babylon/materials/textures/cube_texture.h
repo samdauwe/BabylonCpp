@@ -35,16 +35,17 @@ public:
   std::string getClassName() const;
 
   /**
-   * @brief Update the url (and optional buffer) of this texture if url was null
-   * during construction.
+   * @brief Update the url (and optional buffer) of this texture if url was null during
+   * construction.
    * @param url the url of the texture
    * @param forcedExtension defines the extension to use
-   * @param onLoad callback called when the texture is loaded  (defaults to
-   * null)
+   * @param onLoad callback called when the texture is loaded  (defaults to null)
+   * @param prefiltered Defines whether the updated texture is prefiltered or not
    */
   void updateURL(const std::string& url, const std::string& forcedExtension = "",
                  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad
-                 = nullptr);
+                 = nullptr,
+                 bool prefiltered = false);
 
   /**
    * @brief Delays loading of the cube texture.
@@ -177,6 +178,11 @@ protected:
 
 public:
   /**
+   * Observable triggered once the texture has been loaded.
+   */
+  Observable<CubeTexture> onLoadObservable;
+
+  /**
    * The url of the texture
    */
   std::string url;
@@ -211,6 +217,7 @@ protected:
   std::string _forcedExtension;
 
 private:
+  std::function<void()> _onLoadProcessing;
   std::function<void(const std::optional<CubeTextureData>& data)> _delayedOnLoad;
   std::optional<Vector3> _boundingBoxSize;
   float _rotationY;
