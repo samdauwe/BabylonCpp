@@ -9,36 +9,26 @@ namespace BABYLON {
 
 ColorCurves::ColorCurves()
     : globalHue{this, &ColorCurves::get_globalHue, &ColorCurves::set_globalHue}
-    , globalDensity{this, &ColorCurves::get_globalDensity,
-                    &ColorCurves::set_globalDensity}
-    , globalSaturation{this, &ColorCurves::get_globalSaturation,
-                       &ColorCurves::set_globalSaturation}
-    , globalExposure{this, &ColorCurves::get_globalExposure,
-                     &ColorCurves::set_globalExposure}
-    , highlightsHue{this, &ColorCurves::get_highlightsHue,
-                    &ColorCurves::set_highlightsHue}
+    , globalDensity{this, &ColorCurves::get_globalDensity, &ColorCurves::set_globalDensity}
+    , globalSaturation{this, &ColorCurves::get_globalSaturation, &ColorCurves::set_globalSaturation}
+    , globalExposure{this, &ColorCurves::get_globalExposure, &ColorCurves::set_globalExposure}
+    , highlightsHue{this, &ColorCurves::get_highlightsHue, &ColorCurves::set_highlightsHue}
     , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
                         &ColorCurves::set_highlightsDensity}
     , highlightsSaturation{this, &ColorCurves::get_highlightsSaturation,
                            &ColorCurves::set_highlightsSaturation}
     , highlightsExposure{this, &ColorCurves::get_highlightsExposure,
                          &ColorCurves::set_highlightsExposure}
-    , midtonesHue{this, &ColorCurves::get_midtonesHue,
-                  &ColorCurves::set_midtonesHue}
-    , midtonesDensity{this, &ColorCurves::get_midtonesDensity,
-                      &ColorCurves::set_midtonesDensity}
+    , midtonesHue{this, &ColorCurves::get_midtonesHue, &ColorCurves::set_midtonesHue}
+    , midtonesDensity{this, &ColorCurves::get_midtonesDensity, &ColorCurves::set_midtonesDensity}
     , midtonesSaturation{this, &ColorCurves::get_midtonesSaturation,
                          &ColorCurves::set_midtonesSaturation}
-    , midtonesExposure{this, &ColorCurves::get_midtonesExposure,
-                       &ColorCurves::set_midtonesExposure}
-    , shadowsHue{this, &ColorCurves::get_shadowsHue,
-                 &ColorCurves::set_shadowsHue}
-    , shadowsDensity{this, &ColorCurves::get_shadowsDensity,
-                     &ColorCurves::set_shadowsDensity}
+    , midtonesExposure{this, &ColorCurves::get_midtonesExposure, &ColorCurves::set_midtonesExposure}
+    , shadowsHue{this, &ColorCurves::get_shadowsHue, &ColorCurves::set_shadowsHue}
+    , shadowsDensity{this, &ColorCurves::get_shadowsDensity, &ColorCurves::set_shadowsDensity}
     , shadowsSaturation{this, &ColorCurves::get_shadowsSaturation,
                         &ColorCurves::set_shadowsSaturation}
-    , shadowsExposure{this, &ColorCurves::get_shadowsExposure,
-                      &ColorCurves::set_shadowsExposure}
+    , shadowsExposure{this, &ColorCurves::get_shadowsExposure, &ColorCurves::set_shadowsExposure}
     , _dirty{true}
     , _tempColor{Color4(0.f, 0.f, 0.f, 0.f)}
     , _globalCurve{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -68,36 +58,26 @@ ColorCurves::ColorCurves()
 
 ColorCurves::ColorCurves(const ColorCurves& other)
     : globalHue{this, &ColorCurves::get_globalHue, &ColorCurves::set_globalHue}
-    , globalDensity{this, &ColorCurves::get_globalDensity,
-                    &ColorCurves::set_globalDensity}
-    , globalSaturation{this, &ColorCurves::get_globalSaturation,
-                       &ColorCurves::set_globalSaturation}
-    , globalExposure{this, &ColorCurves::get_globalExposure,
-                     &ColorCurves::set_globalExposure}
-    , highlightsHue{this, &ColorCurves::get_highlightsHue,
-                    &ColorCurves::set_highlightsHue}
+    , globalDensity{this, &ColorCurves::get_globalDensity, &ColorCurves::set_globalDensity}
+    , globalSaturation{this, &ColorCurves::get_globalSaturation, &ColorCurves::set_globalSaturation}
+    , globalExposure{this, &ColorCurves::get_globalExposure, &ColorCurves::set_globalExposure}
+    , highlightsHue{this, &ColorCurves::get_highlightsHue, &ColorCurves::set_highlightsHue}
     , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
                         &ColorCurves::set_highlightsDensity}
     , highlightsSaturation{this, &ColorCurves::get_highlightsSaturation,
                            &ColorCurves::set_highlightsSaturation}
     , highlightsExposure{this, &ColorCurves::get_highlightsExposure,
                          &ColorCurves::set_highlightsExposure}
-    , midtonesHue{this, &ColorCurves::get_midtonesHue,
-                  &ColorCurves::set_midtonesHue}
-    , midtonesDensity{this, &ColorCurves::get_midtonesDensity,
-                      &ColorCurves::set_midtonesDensity}
+    , midtonesHue{this, &ColorCurves::get_midtonesHue, &ColorCurves::set_midtonesHue}
+    , midtonesDensity{this, &ColorCurves::get_midtonesDensity, &ColorCurves::set_midtonesDensity}
     , midtonesSaturation{this, &ColorCurves::get_midtonesSaturation,
                          &ColorCurves::set_midtonesSaturation}
-    , midtonesExposure{this, &ColorCurves::get_midtonesExposure,
-                       &ColorCurves::set_midtonesExposure}
-    , shadowsHue{this, &ColorCurves::get_shadowsHue,
-                 &ColorCurves::set_shadowsHue}
-    , shadowsDensity{this, &ColorCurves::get_shadowsDensity,
-                     &ColorCurves::set_shadowsDensity}
+    , midtonesExposure{this, &ColorCurves::get_midtonesExposure, &ColorCurves::set_midtonesExposure}
+    , shadowsHue{this, &ColorCurves::get_shadowsHue, &ColorCurves::set_shadowsHue}
+    , shadowsDensity{this, &ColorCurves::get_shadowsDensity, &ColorCurves::set_shadowsDensity}
     , shadowsSaturation{this, &ColorCurves::get_shadowsSaturation,
                         &ColorCurves::set_shadowsSaturation}
-    , shadowsExposure{this, &ColorCurves::get_shadowsExposure,
-                      &ColorCurves::set_shadowsExposure}
+    , shadowsExposure{this, &ColorCurves::get_shadowsExposure, &ColorCurves::set_shadowsExposure}
     , _dirty{other._dirty}
     , _tempColor{other._tempColor}
     , _globalCurve{other._globalCurve}
@@ -127,36 +107,26 @@ ColorCurves::ColorCurves(const ColorCurves& other)
 
 ColorCurves::ColorCurves(ColorCurves&& other)
     : globalHue{this, &ColorCurves::get_globalHue, &ColorCurves::set_globalHue}
-    , globalDensity{this, &ColorCurves::get_globalDensity,
-                    &ColorCurves::set_globalDensity}
-    , globalSaturation{this, &ColorCurves::get_globalSaturation,
-                       &ColorCurves::set_globalSaturation}
-    , globalExposure{this, &ColorCurves::get_globalExposure,
-                     &ColorCurves::set_globalExposure}
-    , highlightsHue{this, &ColorCurves::get_highlightsHue,
-                    &ColorCurves::set_highlightsHue}
+    , globalDensity{this, &ColorCurves::get_globalDensity, &ColorCurves::set_globalDensity}
+    , globalSaturation{this, &ColorCurves::get_globalSaturation, &ColorCurves::set_globalSaturation}
+    , globalExposure{this, &ColorCurves::get_globalExposure, &ColorCurves::set_globalExposure}
+    , highlightsHue{this, &ColorCurves::get_highlightsHue, &ColorCurves::set_highlightsHue}
     , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
                         &ColorCurves::set_highlightsDensity}
     , highlightsSaturation{this, &ColorCurves::get_highlightsSaturation,
                            &ColorCurves::set_highlightsSaturation}
     , highlightsExposure{this, &ColorCurves::get_highlightsExposure,
                          &ColorCurves::set_highlightsExposure}
-    , midtonesHue{this, &ColorCurves::get_midtonesHue,
-                  &ColorCurves::set_midtonesHue}
-    , midtonesDensity{this, &ColorCurves::get_midtonesDensity,
-                      &ColorCurves::set_midtonesDensity}
+    , midtonesHue{this, &ColorCurves::get_midtonesHue, &ColorCurves::set_midtonesHue}
+    , midtonesDensity{this, &ColorCurves::get_midtonesDensity, &ColorCurves::set_midtonesDensity}
     , midtonesSaturation{this, &ColorCurves::get_midtonesSaturation,
                          &ColorCurves::set_midtonesSaturation}
-    , midtonesExposure{this, &ColorCurves::get_midtonesExposure,
-                       &ColorCurves::set_midtonesExposure}
-    , shadowsHue{this, &ColorCurves::get_shadowsHue,
-                 &ColorCurves::set_shadowsHue}
-    , shadowsDensity{this, &ColorCurves::get_shadowsDensity,
-                     &ColorCurves::set_shadowsDensity}
+    , midtonesExposure{this, &ColorCurves::get_midtonesExposure, &ColorCurves::set_midtonesExposure}
+    , shadowsHue{this, &ColorCurves::get_shadowsHue, &ColorCurves::set_shadowsHue}
+    , shadowsDensity{this, &ColorCurves::get_shadowsDensity, &ColorCurves::set_shadowsDensity}
     , shadowsSaturation{this, &ColorCurves::get_shadowsSaturation,
                         &ColorCurves::set_shadowsSaturation}
-    , shadowsExposure{this, &ColorCurves::get_shadowsExposure,
-                      &ColorCurves::set_shadowsExposure}
+    , shadowsExposure{this, &ColorCurves::get_shadowsExposure, &ColorCurves::set_shadowsExposure}
 {
   *this = std::move(other);
 }
@@ -408,64 +378,48 @@ std::string ColorCurves::getClassName() const
   return "ColorCurves";
 }
 
-void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
-                       const std::string& positiveUniform,
-                       const std::string& neutralUniform,
-                       const std::string& negativeUniform)
+void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect, const std::string& positiveUniform,
+                       const std::string& neutralUniform, const std::string& negativeUniform)
 {
   if (colorCurves._dirty) {
     colorCurves._dirty = false;
 
     // Fill in global info.
-    colorCurves.getColorGradingDataToRef(
-      colorCurves._globalHue, colorCurves._globalDensity,
-      colorCurves._globalSaturation, colorCurves._globalExposure,
-      colorCurves._globalCurve);
+    colorCurves.getColorGradingDataToRef(colorCurves._globalHue, colorCurves._globalDensity,
+                                         colorCurves._globalSaturation, colorCurves._globalExposure,
+                                         colorCurves._globalCurve);
 
     // Compute highlights info.
-    colorCurves.getColorGradingDataToRef(
-      colorCurves._highlightsHue, colorCurves._highlightsDensity,
-      colorCurves._highlightsSaturation, colorCurves._highlightsExposure,
-      colorCurves._tempColor);
-    colorCurves._tempColor.multiplyToRef(colorCurves._globalCurve,
-                                         colorCurves._highlightsCurve);
+    colorCurves.getColorGradingDataToRef(colorCurves._highlightsHue, colorCurves._highlightsDensity,
+                                         colorCurves._highlightsSaturation,
+                                         colorCurves._highlightsExposure, colorCurves._tempColor);
+    colorCurves._tempColor.multiplyToRef(colorCurves._globalCurve, colorCurves._highlightsCurve);
 
     // Compute midtones info.
-    colorCurves.getColorGradingDataToRef(
-      colorCurves._midtonesHue, colorCurves._midtonesDensity,
-      colorCurves._midtonesSaturation, colorCurves._midtonesExposure,
-      colorCurves._tempColor);
-    colorCurves._tempColor.multiplyToRef(colorCurves._globalCurve,
-                                         colorCurves._midtonesCurve);
+    colorCurves.getColorGradingDataToRef(colorCurves._midtonesHue, colorCurves._midtonesDensity,
+                                         colorCurves._midtonesSaturation,
+                                         colorCurves._midtonesExposure, colorCurves._tempColor);
+    colorCurves._tempColor.multiplyToRef(colorCurves._globalCurve, colorCurves._midtonesCurve);
 
     // Compute shadows info.
-    colorCurves.getColorGradingDataToRef(
-      colorCurves._shadowsHue, colorCurves._shadowsDensity,
-      colorCurves._shadowsSaturation, colorCurves._shadowsExposure,
-      colorCurves._tempColor);
-    colorCurves._tempColor.multiplyToRef(colorCurves._globalCurve,
-                                         colorCurves._shadowsCurve);
+    colorCurves.getColorGradingDataToRef(colorCurves._shadowsHue, colorCurves._shadowsDensity,
+                                         colorCurves._shadowsSaturation,
+                                         colorCurves._shadowsExposure, colorCurves._tempColor);
+    colorCurves._tempColor.multiplyToRef(colorCurves._globalCurve, colorCurves._shadowsCurve);
 
     // Compute deltas (neutral is midtones).
     colorCurves._highlightsCurve.subtractToRef(colorCurves._midtonesCurve,
                                                colorCurves._positiveCurve);
-    colorCurves._midtonesCurve.subtractToRef(colorCurves._shadowsCurve,
-                                             colorCurves._negativeCurve);
+    colorCurves._midtonesCurve.subtractToRef(colorCurves._shadowsCurve, colorCurves._negativeCurve);
   }
 
   if (effect) {
-    effect->setFloat4(positiveUniform, colorCurves._positiveCurve.r,
-                      colorCurves._positiveCurve.g,
-                      colorCurves._positiveCurve.b,
-                      colorCurves._positiveCurve.a);
-    effect->setFloat4(neutralUniform, colorCurves._midtonesCurve.r,
-                      colorCurves._midtonesCurve.g,
-                      colorCurves._midtonesCurve.b,
-                      colorCurves._midtonesCurve.a);
-    effect->setFloat4(negativeUniform, colorCurves._negativeCurve.r,
-                      colorCurves._negativeCurve.g,
-                      colorCurves._negativeCurve.b,
-                      colorCurves._negativeCurve.a);
+    effect->setFloat4(positiveUniform, colorCurves._positiveCurve.r, colorCurves._positiveCurve.g,
+                      colorCurves._positiveCurve.b, colorCurves._positiveCurve.a);
+    effect->setFloat4(neutralUniform, colorCurves._midtonesCurve.r, colorCurves._midtonesCurve.g,
+                      colorCurves._midtonesCurve.b, colorCurves._midtonesCurve.a);
+    effect->setFloat4(negativeUniform, colorCurves._negativeCurve.r, colorCurves._negativeCurve.g,
+                      colorCurves._negativeCurve.b, colorCurves._negativeCurve.a);
   }
 }
 
@@ -479,9 +433,8 @@ void ColorCurves::PrepareUniforms(std::vector<std::string>& uniformsList)
                    });
 }
 
-void ColorCurves::getColorGradingDataToRef(float iHue, float iDensity,
-                                           float iSaturation, float iExposure,
-                                           Color4& result)
+void ColorCurves::getColorGradingDataToRef(float iHue, float iDensity, float iSaturation,
+                                           float iExposure, Color4& result)
 {
   auto hue        = ColorCurves::clamp(iHue, 0, 360);
   auto density    = ColorCurves::clamp(iDensity, -100, 100);
@@ -522,8 +475,7 @@ float ColorCurves::applyColorGradingSliderNonlinear(float value)
   return x;
 }
 
-void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness,
-                               Color4& result)
+void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness, Color4& result)
 {
   auto h = ColorCurves::clamp(hue, 0, 360);
   auto s = ColorCurves::clamp(saturation / 100.f, 0, 1);
