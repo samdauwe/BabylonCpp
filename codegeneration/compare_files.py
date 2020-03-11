@@ -61,7 +61,7 @@ def main():
     current, previous = "4.1.0-alpha.17", "4.0.0"
     current, previous = "4.1.0-beta.13", "4.1.0-alpha.17"
     current, previous = "4.1.0-beta.23", "4.1.0-beta.13"
-    #current, previous = "4.1.0", "4.1.0-beta.23"
+    current, previous = "4.1.0", "4.1.0-beta.23"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.0.0"         : "4.0.0_2019_04_30",
