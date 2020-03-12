@@ -48,7 +48,6 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
     , _currentStartSize1{0.f}
     , _currentStartSize2{0.f}
     , _disposeEmitterOnDispose{false}
-    , isLocal{false}
     , _newPartsExcess{0}
     , _scaledColorStep{Color4(0.f, 0.f, 0.f, 0.f)}
     , _colorDiff{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -67,6 +66,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
     , _rootParticleSystem{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
+  isLocal   = false;
   _capacity = capacity;
 
   _epsilon                 = epsilon;
@@ -213,7 +213,16 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
           });
       }
 
-      particle->position.addInPlace(_scaledDirection);
+      if (isLocal) {
+        if (particle->_localPosition) {
+          particle->_localPosition->addInPlace(_scaledDirection);
+          Vector3::TransformCoordinatesToRef(*particle->_localPosition, _emitterWorldMatrix,
+                                             particle->position);
+        }
+      }
+      else {
+        particle->position.addInPlace(_scaledDirection);
+      }
 
       // Noise
       if (noiseTextureData && noiseTextureSize && particle->_randomNoiseCoordinates1.has_value()) {
@@ -880,15 +889,33 @@ void ParticleSystem::_appendParticleVertex(unsigned int index, Particle* particl
 
   if (!_isBillboardBased) {
     if (particle->_initialDirection) {
-      auto& particleInitialDirection = *particle->_initialDirection;
-      _vertexData[offset++]          = particleInitialDirection.x;
-      _vertexData[offset++]          = particleInitialDirection.y;
-      _vertexData[offset++]          = particleInitialDirection.z;
+      auto initialDirection = *particle->_initialDirection;
+      if (isLocal) {
+        Vector3::TransformNormalToRef(initialDirection, _emitterWorldMatrix,
+                                      TmpVectors::Vector3Array[0]);
+        initialDirection = TmpVectors::Vector3Array[0];
+      }
+      if (initialDirection.x == 0.f && initialDirection.z == 0.f) {
+        initialDirection.x = 0.001f;
+      }
+
+      _vertexData[offset++] = initialDirection.x;
+      _vertexData[offset++] = initialDirection.y;
+      _vertexData[offset++] = initialDirection.z;
     }
     else {
-      _vertexData[offset++] = particle->direction.x;
-      _vertexData[offset++] = particle->direction.y;
-      _vertexData[offset++] = particle->direction.z;
+      auto direction = particle->direction;
+      if (isLocal) {
+        Vector3::TransformNormalToRef(direction, _emitterWorldMatrix, TmpVectors::Vector3Array[0]);
+        direction = TmpVectors::Vector3Array[0];
+      }
+
+      if (direction.x == 0.f && direction.z == 0.f) {
+        direction.x = 0.001f;
+      }
+      _vertexData[offset++] = direction.x;
+      _vertexData[offset++] = direction.y;
+      _vertexData[offset++] = direction.z;
     }
   }
   else if (billboardMode == ParticleSystem::BILLBOARDMODE_STRETCHED) {
@@ -1057,6 +1084,19 @@ void ParticleSystem::_update(int newParticles)
     else {
       particleEmitterType->startPositionFunction(_emitterWorldMatrix, particle->position, particle,
                                                  isLocal);
+    }
+
+    if (isLocal) {
+      if (!particle->_localPosition) {
+        particle->_localPosition = particle->position;
+      }
+      else {
+        particle->_localPosition->copyFrom(particle->position);
+      }
+      if (particle->_localPosition) {
+        Vector3::TransformCoordinatesToRef(*particle->_localPosition, _emitterWorldMatrix,
+                                           particle->position);
+      }
     }
 
     if (startDirectionFunction) {
