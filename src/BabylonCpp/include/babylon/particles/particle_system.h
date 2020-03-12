@@ -581,11 +581,6 @@ public:
    */
   std::vector<ParticleSystem*> activeSubSystems;
 
-  /**
-   * Specifies if the particles are updated in emitter local space or world space
-   */
-  bool isLocal;
-
 private:
   Observer<ParticleSystem>::Ptr _onDisposeObserver;
   std::vector<Particle*> _particles;

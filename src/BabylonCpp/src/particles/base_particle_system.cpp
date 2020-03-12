@@ -23,20 +23,15 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     , forceDepthWrite{false}
     , worldOffset{Vector3(0.f, 0.f, 0.f)}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
-    , direction1{this, &BaseParticleSystem::get_direction1,
-                 &BaseParticleSystem::set_direction1}
-    , direction2{this, &BaseParticleSystem::get_direction2,
-                 &BaseParticleSystem::set_direction2}
-    , minEmitBox{this, &BaseParticleSystem::get_minEmitBox,
-                 &BaseParticleSystem::set_minEmitBox}
-    , maxEmitBox{this, &BaseParticleSystem::get_maxEmitBox,
-                 &BaseParticleSystem::set_maxEmitBox}
+    , direction1{this, &BaseParticleSystem::get_direction1, &BaseParticleSystem::set_direction1}
+    , direction2{this, &BaseParticleSystem::get_direction2, &BaseParticleSystem::set_direction2}
+    , minEmitBox{this, &BaseParticleSystem::get_minEmitBox, &BaseParticleSystem::set_minEmitBox}
+    , maxEmitBox{this, &BaseParticleSystem::get_maxEmitBox, &BaseParticleSystem::set_maxEmitBox}
     , imageProcessingConfiguration{this, &BaseParticleSystem::get_direction1,
                                    &BaseParticleSystem::set_direction1}
     , _isSubEmitter{false}
     , _isBillboardBased{true}
-    , _imageProcessingConfigurationDefines{std::make_shared<
-        ImageProcessingConfigurationDefines>()}
+    , _imageProcessingConfigurationDefines{std::make_shared<ImageProcessingConfigurationDefines>()}
     , _noiseTexture{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
@@ -45,6 +40,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     id                    = iName;
     name                  = iName;
     renderingGroupId      = 0;
+    emitter               = Vector3::Zero();
     emitRate              = 0;
     layerMask             = 0x0FFFFFFF;
     updateSpeed           = 0.01f;
@@ -285,8 +281,7 @@ void BaseParticleSystem::set_isBillboardBased(bool value)
   _reset();
 }
 
-ImageProcessingConfigurationPtr&
-BaseParticleSystem::get_imageProcessingConfiguration()
+ImageProcessingConfigurationPtr& BaseParticleSystem::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
@@ -317,19 +312,17 @@ void BaseParticleSystem::_reset() // FIXME: should it be IParticleSystem::reset(
 {
 }
 
-BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
-  float gradient, std::vector<ColorGradient>& gradients,
-  const RawTexturePtr& texture)
+BaseParticleSystem&
+BaseParticleSystem::_removeGradientAndTexture(float gradient, std::vector<ColorGradient>& gradients,
+                                              const RawTexturePtr& texture)
 {
   if (gradients.empty()) {
     return *this;
   }
 
-  stl_util::erase_remove_if(gradients,
-    [gradient](const ColorGradient& gradientItem) {
-      return stl_util::almost_equal(gradientItem.gradient, gradient);
-    }
-  );
+  stl_util::erase_remove_if(gradients, [gradient](const ColorGradient& gradientItem) {
+    return stl_util::almost_equal(gradientItem.gradient, gradient);
+  });
 
   if (texture) {
     texture->dispose();
@@ -339,18 +332,15 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
 }
 
 BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
-  float gradient, std::vector<Color3Gradient>& gradients,
-  const RawTexturePtr& texture)
+  float gradient, std::vector<Color3Gradient>& gradients, const RawTexturePtr& texture)
 {
   if (gradients.empty()) {
     return *this;
   }
 
-  stl_util::erase_remove_if(gradients,
-    [gradient](const Color3Gradient& gradientItem) {
-      return stl_util::almost_equal(gradientItem.gradient, gradient);
-    }
-  );
+  stl_util::erase_remove_if(gradients, [gradient](const Color3Gradient& gradientItem) {
+    return stl_util::almost_equal(gradientItem.gradient, gradient);
+  });
 
   if (texture) {
     texture->dispose();
@@ -360,19 +350,15 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
 }
 
 BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
-  float gradient, std::vector<FactorGradient>& gradients,
-  const RawTexturePtr& texture)
+  float gradient, std::vector<FactorGradient>& gradients, const RawTexturePtr& texture)
 {
   if (gradients.empty()) {
     return *this;
   }
 
-  stl_util::erase_remove_if(
-    gradients,
-    [gradient](const FactorGradient& gradientItem) {
-      return stl_util::almost_equal(gradientItem.gradient, gradient);
-    }
-  );
+  stl_util::erase_remove_if(gradients, [gradient](const FactorGradient& gradientItem) {
+    return stl_util::almost_equal(gradientItem.gradient, gradient);
+  });
 
   if (texture) {
     texture->dispose();
@@ -381,9 +367,8 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
   return *this;
 }
 
-PointParticleEmitterPtr
-BaseParticleSystem::createPointEmitter(const Vector3& iDirection1,
-                                       const Vector3& iDirection2)
+PointParticleEmitterPtr BaseParticleSystem::createPointEmitter(const Vector3& iDirection1,
+                                                               const Vector3& iDirection2)
 {
   auto particleEmitter        = std::make_shared<PointParticleEmitter>();
   particleEmitter->direction1 = iDirection1;
@@ -393,46 +378,42 @@ BaseParticleSystem::createPointEmitter(const Vector3& iDirection1,
   return particleEmitter;
 }
 
-HemisphericParticleEmitterPtr
-BaseParticleSystem::createHemisphericEmitter(float radius, float radiusRange)
+HemisphericParticleEmitterPtr BaseParticleSystem::createHemisphericEmitter(float radius,
+                                                                           float radiusRange)
 {
-  auto particleEmitter
-    = std::make_shared<HemisphericParticleEmitter>(radius, radiusRange);
-  particleEmitterType = particleEmitter;
+  auto particleEmitter = std::make_shared<HemisphericParticleEmitter>(radius, radiusRange);
+  particleEmitterType  = particleEmitter;
   return particleEmitter;
 }
 
-SphereParticleEmitterPtr
-BaseParticleSystem::createSphereEmitter(float radius, float radiusRange)
+SphereParticleEmitterPtr BaseParticleSystem::createSphereEmitter(float radius, float radiusRange)
 {
-  auto particleEmitter
-    = std::make_shared<SphereParticleEmitter>(radius, radiusRange);
-  particleEmitterType = particleEmitter;
+  auto particleEmitter = std::make_shared<SphereParticleEmitter>(radius, radiusRange);
+  particleEmitterType  = particleEmitter;
   return particleEmitter;
 }
 
 SphereDirectedParticleEmitterPtr
-BaseParticleSystem::createDirectedSphereEmitter(float radius,
-                                                const Vector3& iDirection1,
+BaseParticleSystem::createDirectedSphereEmitter(float radius, const Vector3& iDirection1,
                                                 const Vector3& iDirection2)
 {
-  auto particleEmitter = std::make_shared<SphereDirectedParticleEmitter>(
-    radius, iDirection1, iDirection2);
+  auto particleEmitter
+    = std::make_shared<SphereDirectedParticleEmitter>(radius, iDirection1, iDirection2);
   particleEmitterType = particleEmitter;
   return particleEmitter;
 }
 
-CylinderParticleEmitterPtr BaseParticleSystem::createCylinderEmitter(
-  float radius, float height, float radiusRange, float directionRandomizer)
+CylinderParticleEmitterPtr BaseParticleSystem::createCylinderEmitter(float radius, float height,
+                                                                     float radiusRange,
+                                                                     float directionRandomizer)
 {
-  auto particleEmitter = std::make_shared<CylinderParticleEmitter>(
-    radius, height, radiusRange, directionRandomizer);
+  auto particleEmitter
+    = std::make_shared<CylinderParticleEmitter>(radius, height, radiusRange, directionRandomizer);
   particleEmitterType = particleEmitter;
   return particleEmitter;
 }
 
-ConeParticleEmitterPtr BaseParticleSystem::createConeEmitter(float radius,
-                                                             float angle)
+ConeParticleEmitterPtr BaseParticleSystem::createConeEmitter(float radius, float angle)
 {
   auto particleEmitter = std::make_shared<ConeParticleEmitter>(radius, angle);
   particleEmitterType  = particleEmitter;
@@ -440,8 +421,7 @@ ConeParticleEmitterPtr BaseParticleSystem::createConeEmitter(float radius,
 }
 
 CylinderDirectedParticleEmitterPtr
-BaseParticleSystem::createDirectedCylinderEmitter(float radius, float height,
-                                                  float radiusRange,
+BaseParticleSystem::createDirectedCylinderEmitter(float radius, float height, float radiusRange,
                                                   const Vector3& iDirection1,
                                                   const Vector3& iDirection2)
 {
@@ -451,9 +431,10 @@ BaseParticleSystem::createDirectedCylinderEmitter(float radius, float height,
   return particleEmitter;
 }
 
-BoxParticleEmitterPtr BaseParticleSystem::createBoxEmitter(
-  const Vector3& iDirection1, const Vector3& iDirection2,
-  const Vector3& iMinEmitBox, const Vector3& iMaxEmitBox)
+BoxParticleEmitterPtr BaseParticleSystem::createBoxEmitter(const Vector3& iDirection1,
+                                                           const Vector3& iDirection2,
+                                                           const Vector3& iMinEmitBox,
+                                                           const Vector3& iMaxEmitBox)
 {
   auto particleEmitter = std::make_shared<BoxParticleEmitter>();
   particleEmitterType  = particleEmitter;
