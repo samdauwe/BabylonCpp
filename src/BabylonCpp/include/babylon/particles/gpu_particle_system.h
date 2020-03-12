@@ -387,9 +387,31 @@ public:
                                 const std::string& rootUrl, bool doNotStart = false);
 
 protected:
+  /**
+   * @brief Gets the number of active particles.
+   */
   [[nodiscard]] size_t get_activeParticleCount() const;
+
+  /**
+   * @brief Set the number of active particles.
+   */
   void set_activeParticleCount(size_t value);
 
+  /**
+   * @brief Specifies if the particles are updated in emitter local space or world space.
+   * This is always false for GPU particles
+   */
+  bool get_isLocal() const override;
+
+  /**
+   * @brief Specifies if the particles are updated in emitter local space or world space.
+   * This is always false for GPU particles
+   */
+  void set_isLocal(bool value) override;
+
+  /**
+   * @brief Hidden
+   */
   void _reset() override;
 
   /**

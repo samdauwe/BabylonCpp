@@ -181,6 +181,16 @@ void GPUParticleSystem::set_activeParticleCount(size_t value)
   _activeCount = std::min(value, _capacity);
 }
 
+bool GPUParticleSystem::get_isLocal() const
+{
+  return false;
+}
+
+void GPUParticleSystem::set_isLocal(bool /*value*/)
+{
+  // Ignore
+}
+
 bool GPUParticleSystem::isReady()
 {
   if (!_updateEffect) {
