@@ -10,6 +10,7 @@ IParticleSystem::IParticleSystem()
     , isAnimationSheetEnabled{this, &IParticleSystem::get_isAnimationSheetEnabled,
                               &IParticleSystem::set_isAnimationSheetEnabled}
     , noiseTexture{this, &IParticleSystem::get_noiseTexture, &IParticleSystem::set_noiseTexture}
+    , isLocal{this, &IParticleSystem::get_isLocal, &IParticleSystem::set_isLocal}
     , useRampGradients{this, &IParticleSystem::get_useRampGradients,
                        &IParticleSystem::set_useRampGradients}
 {
@@ -21,6 +22,16 @@ bool IParticleSystem::hasEmitter() const
 {
   return std::holds_alternative<AbstractMeshPtr>(emitter)
          || std::holds_alternative<Vector3>(emitter);
+}
+
+bool IParticleSystem::get_isLocal() const
+{
+  return _isLocal;
+}
+
+void IParticleSystem::set_isLocal(bool value)
+{
+  _isLocal = value;
 }
 
 } // end of namespace BABYLON

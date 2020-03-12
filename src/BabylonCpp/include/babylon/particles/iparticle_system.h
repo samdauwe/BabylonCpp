@@ -350,6 +350,11 @@ public:
   bool disposeOnStop;
 
   /**
+   * Specifies if the particles are updated in emitter local space or world space
+   */
+  Property<IParticleSystem, bool> isLocal;
+
+  /**
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
@@ -918,11 +923,26 @@ protected:
   [[nodiscard]] virtual bool get_useRampGradients() const = 0;
 
   /**
-   * Not supported by GPUParticleSystem
+   * @brief Not supported by GPUParticleSystem
    * Sets a boolean indicating that ramp gradients must be used
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
   virtual void set_useRampGradients(bool value) = 0;
+
+  /**
+   * @brief Specifies if the particles are updated in emitter local space or world space.
+   * This is always false for GPU particles
+   */
+  virtual bool get_isLocal() const;
+
+  /**
+   * @brief Specifies if the particles are updated in emitter local space or world space.
+   * This is always false for GPU particles
+   */
+  virtual void set_isLocal(bool value);
+
+protected:
+  bool _isLocal;
 
 }; // end of class IParticleSystem
 
