@@ -381,13 +381,12 @@ public:
    * @param onError optional callback to be called upon failure
    * @param buffer a source of a file previously fetched as either a base64 string, an ArrayBuffer
    * (compressed or image format), HTMLImageElement (image format), or a Blob
-   * @param fallBack an internal argument in case the function must be called again, due to etc1 not
+   * @param fallback an internal argument in case the function must be called again, due to etc1 not
    * having alpha capabilities
    * @param format internal format.  Default: RGB when extension is '.jpg' else RGBA.  Ignored for
    * compressed textures
    * @param forcedExtension defines the extension to use to pick the right loader
-   * @param excludeLoaders array of texture loaders that should be excluded when picking a loader
-   * for the texture (default: empty array)
+   * @param mimeType defines an optional mime type
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   InternalTexturePtr createTexture(
@@ -398,11 +397,9 @@ public:
     = nullptr,
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
-    const InternalTexturePtr& fallBack                           = nullptr,
-    const std::optional<unsigned int>& format                    = std::nullopt,
-    const std::string& forcedExtension                           = "",
-    const std::vector<IInternalTextureLoaderPtr>& excludeLoaders = {},
-    const std::string& mimeType                                  = "") override;
+    const InternalTexturePtr& fallBack        = nullptr,
+    const std::optional<unsigned int>& format = std::nullopt,
+    const std::string& forcedExtension = "", const std::string& mimeType = "") override;
 
   /**
    * @brief Creates a new render target texture

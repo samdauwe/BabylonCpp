@@ -33,6 +33,8 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
 {
   _options = options;
 
+  Engine::Instances().emplace_back(this);
+
   // Init caps
   // We consider we are on a webgl1 capable device
 
@@ -334,8 +336,7 @@ InternalTexturePtr NullEngine::createTexture(
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
   const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format,
-  const std::string& /*forcedExtension*/,
-  const std::vector<IInternalTextureLoaderPtr>& /*excludeLoaders*/, const std::string& /*mimeType*/)
+  const std::string& /*forcedExtension*/, const std::string& /*mimeType*/)
 {
   auto texture    = InternalTexture::New(this, InternalTextureSource::Url);
   const auto& url = urlArg;
