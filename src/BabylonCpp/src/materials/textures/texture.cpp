@@ -125,7 +125,7 @@ Texture::Texture(
   if (!_texture) {
     if (!scene || !scene->useDelayedTextureLoading) {
       _texture = engine->createTexture(url, noMipmap, invertY, scene, samplingMode, _load, onError,
-                                       _buffer, nullptr, _format, "", {}, mimeType);
+                                       _buffer, nullptr, _format, "", mimeType);
       if (deleteBuffer) {
         _buffer = std::nullopt;
       }
@@ -232,7 +232,7 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
   if (!_texture) {
     _texture = scene->getEngine()->createTexture(url, _noMipmap, _invertY, getScene(), samplingMode,
                                                  _delayedOnLoad, _delayedOnError, _buffer, nullptr,
-                                                 _format, "", {}, _mimeType);
+                                                 _format, "", _mimeType);
     if (_deleteBuffer) {
       // delete _buffer;
     }
