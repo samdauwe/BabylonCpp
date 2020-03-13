@@ -814,8 +814,6 @@ public:
    * @param format internal format.  Default: RGB when extension is '.jpg' else RGBA.  Ignored for
    * compressed textures
    * @param forcedExtension defines the extension to use to pick the right loader
-   * @param excludeLoaders array of texture loaders that should be excluded when picking a loader
-   * for the texture (default: empty array)
    * @param mimeType defines an optional mime type
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
@@ -827,11 +825,9 @@ public:
     = nullptr,
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
-    const InternalTexturePtr& fallBack                           = nullptr,
-    const std::optional<unsigned int>& format                    = std::nullopt,
-    const std::string& forcedExtension                           = "",
-    const std::vector<IInternalTextureLoaderPtr>& excludeLoaders = {},
-    const std::string& mimeType                                  = "");
+    const InternalTexturePtr& fallBack        = nullptr,
+    const std::optional<unsigned int>& format = std::nullopt,
+    const std::string& forcedExtension = "", const std::string& mimeType = "");
 
   /**
    * @brief Create a cube texture from prefiltered data (ie. the mipmaps contain ready to use data

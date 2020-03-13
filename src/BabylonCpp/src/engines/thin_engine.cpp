@@ -2183,8 +2183,7 @@ InternalTexturePtr ThinEngine::createTexture(
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format,
-  const std::string& forcedExtension, const std::vector<IInternalTextureLoaderPtr>& excludeLoaders,
-  const std::string& mimeType)
+  const std::string& forcedExtension, const std::string& mimeType)
 {
   // assign a new string, so that the original is still available in case of fallback
   auto url      = urlArg;
@@ -2204,9 +2203,8 @@ InternalTexturePtr ThinEngine::createTexture(
 
   IInternalTextureLoaderPtr loader = nullptr;
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
-    if (!stl_util::contains(excludeLoaders, availableLoader)
-        && availableLoader->canLoad(extension, filteredFormat, fallback, isBase64,
-                                    buffer ? true : false)) {
+    if (availableLoader->canLoad(extension, filteredFormat, fallback, isBase64,
+                                 buffer ? true : false)) {
       loader = availableLoader;
       break;
     }
