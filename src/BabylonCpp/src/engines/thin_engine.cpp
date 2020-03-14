@@ -2203,15 +2203,10 @@ InternalTexturePtr ThinEngine::createTexture(
 
   IInternalTextureLoaderPtr loader = nullptr;
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
-    if (availableLoader->canLoad(extension, filteredFormat, fallback, isBase64,
-                                 buffer ? true : false)) {
+    if (availableLoader->canLoad(extension)) {
       loader = availableLoader;
       break;
     }
-  }
-
-  if (loader) {
-    url = loader->transformUrl(url, filteredFormat);
   }
 
   if (scene) {
@@ -2243,7 +2238,7 @@ InternalTexturePtr ThinEngine::createTexture(
 
     auto customFallback = false;
     if (loader) {
-      auto fallbackUrl = loader->getFallbackTextureUrl(url, _textureFormatInUse);
+      std::string fallbackUrl = "";
       if (!fallbackUrl.empty()) {
         // Add Back
         customFallback = true;

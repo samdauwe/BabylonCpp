@@ -97,7 +97,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   IInternalTextureLoaderPtr loader = nullptr;
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
     if (!stl_util::contains(excludeLoaders, availableLoader)
-        && availableLoader->canLoad(extension, filteredFormat, fallback, false, false)) {
+        && availableLoader->canLoad(extension)) {
       loader = availableLoader;
       break;
     }
@@ -109,8 +109,6 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   };
 
   if (loader) {
-    rootUrl = loader->transformUrl(rootUrl, filteredFormat);
-
     const auto onloaddata = [=](const std::variant<std::string, ArrayBufferView>& data,
                                 const std::string & /*responseURL*/) -> void {
       _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
