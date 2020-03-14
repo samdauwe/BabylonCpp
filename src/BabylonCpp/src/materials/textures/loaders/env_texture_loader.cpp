@@ -17,24 +17,9 @@ bool _ENVTextureLoader::supportCascades() const
   return false;
 }
 
-bool _ENVTextureLoader::canLoad(const std::string& extension,
-                                const std::string& /*textureFormatInUse*/,
-                                const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
-                                bool /*isBuffer*/)
+bool _ENVTextureLoader::canLoad(const std::string& extension)
 {
-  return StringTools::startsWith(extension, ".env");
-}
-
-std::string _ENVTextureLoader::transformUrl(const std::string& rootUrl,
-                                            const std::string& /*textureFormatInUse*/)
-{
-  return rootUrl;
-}
-
-std::string _ENVTextureLoader::getFallbackTextureUrl(const std::string& /*rootUrl*/,
-                                                     const std::string& /*textureFormatInUse*/)
-{
-  return "";
+  return StringTools::endsWith(extension, ".env");
 }
 
 void _ENVTextureLoader::loadCubeData(
