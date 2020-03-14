@@ -16,24 +16,9 @@ bool _DDSTextureLoader::supportCascades() const
   return true;
 }
 
-bool _DDSTextureLoader::canLoad(const std::string& extension,
-                                const std::string& /*textureFormatInUse*/,
-                                const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
-                                bool /*isBuffer*/)
+bool _DDSTextureLoader::canLoad(const std::string& extension)
 {
-  return StringTools::startsWith(extension, ".dds");
-}
-
-std::string _DDSTextureLoader::transformUrl(const std::string& rootUrl,
-                                            const std::string& /*textureFormatInUse*/)
-{
-  return rootUrl;
-}
-
-std::string _DDSTextureLoader::getFallbackTextureUrl(const std::string& /*rootUrl*/,
-                                                     const std::string& /*textureFormatInUse*/)
-{
-  return "";
+  return StringTools::endsWith(extension, ".dds");
 }
 
 void _DDSTextureLoader::loadCubeData(
