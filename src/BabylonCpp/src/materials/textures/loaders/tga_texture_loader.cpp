@@ -16,24 +16,9 @@ bool _TGATextureLoader::supportCascades() const
   return false;
 }
 
-bool _TGATextureLoader::canLoad(const std::string& extension,
-                                const std::string& /*textureFormatInUse*/,
-                                const InternalTexturePtr& /*fallback*/, bool /*isBase64*/,
-                                bool /*isBuffer*/)
+bool _TGATextureLoader::canLoad(const std::string& extension)
 {
-  return StringTools::startsWith(extension, ".tga");
-}
-
-std::string _TGATextureLoader::transformUrl(const std::string& rootUrl,
-                                            const std::string& /*textureFormatInUse*/)
-{
-  return rootUrl;
-}
-
-std::string _TGATextureLoader::getFallbackTextureUrl(const std::string& /*rootUrl*/,
-                                                     const std::string& /*textureFormatInUse*/)
-{
-  return "";
+  return StringTools::endsWith(extension, ".tga");
 }
 
 void _TGATextureLoader::loadCubeData(
