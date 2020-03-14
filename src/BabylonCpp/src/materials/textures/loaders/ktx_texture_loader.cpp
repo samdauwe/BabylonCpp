@@ -16,31 +16,11 @@ bool _KTXTextureLoader::supportCascades() const
   return false;
 }
 
-bool _KTXTextureLoader::canLoad(const std::string& /*extension*/,
-                                const std::string& textureFormatInUse,
-                                const InternalTexturePtr& fallback, bool isBase64, bool isBuffer)
+bool _KTXTextureLoader::canLoad(const std::string& extension)
 {
-  return !textureFormatInUse.empty() && !isBase64 && !fallback && !isBuffer;
-}
-
-std::string _KTXTextureLoader::transformUrl(const std::string& rootUrl,
-                                            const std::string& textureFormatInUse)
-{
-  auto lastDot = StringTools::lastIndexOf(rootUrl, ".");
-  if (lastDot != -1 && rootUrl.substr(static_cast<size_t>(lastDot + 1)) == "ktx") {
-    // Already transformed
-    return rootUrl;
-  }
-  return (lastDot > -1 ? rootUrl.substr(0, static_cast<size_t>(lastDot)) : rootUrl)
-         + textureFormatInUse;
-}
-
-std::string _KTXTextureLoader::getFallbackTextureUrl(const std::string& rootUrl,
-                                                     const std::string& textureFormatInUse)
-{
-  // remove the format appended to the rootUrl in the original createCubeTexture call.
-  const std::regex regex(textureFormatInUse, std::regex::optimize);
-  return StringTools::regexReplace(rootUrl, regex, [](const std::smatch& /*m*/) { return ""; });
+  // The ".ktx2" file extension is still up for debate:
+  // https://github.com/KhronosGroup/KTX-Specification/issues/18
+  return StringTools::endsWith(extension, ".ktx") || StringTools::endsWith(extension, ".ktx2");
 }
 
 void _KTXTextureLoader::loadCubeData(
@@ -91,14 +71,21 @@ void _KTXTextureLoader::loadData(
   const std::function<void(int width, int height, bool loadMipmap, bool isCompressed,
                            const std::function<void()>& done, bool loadFailed)>& callback)
 {
-  // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported by compressed texture
-  texture->_invertVScale = !texture->invertY;
-  KhronosTextureContainer ktx(data, 1);
+  if (KhronosTextureContainer::IsValid(data)) {
+    // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported by compressed
+    // texture
+    texture->_invertVScale = !texture->invertY;
+    KhronosTextureContainer ktx(data, 1);
 
-  callback(
-    static_cast<int>(ktx.pixelWidth), static_cast<int>(ktx.pixelHeight), texture->generateMipMaps,
-    true, [&ktx, &texture]() -> void { ktx.uploadLevels(texture, texture->generateMipMaps); },
-    ktx.isInvalid);
+    callback(
+      static_cast<int>(ktx.pixelWidth), static_cast<int>(ktx.pixelHeight), texture->generateMipMaps,
+      true, [&ktx, &texture]() -> void { ktx.uploadLevels(texture, texture->generateMipMaps); },
+      ktx.isInvalid);
+  }
+  else {
+    callback(
+      0, 0, false, false, []() -> void {}, true);
+  }
 }
 
 } // end of namespace BABYLON
