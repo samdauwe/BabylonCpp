@@ -304,6 +304,12 @@ struct SizeF {
   float height = 0.f;
 }; // end of struct SizeF
 
+struct SizeIAndLayersCount {
+  int width                 = 0;
+  int height                = 0;
+  std::optional<int> layers = std::nullopt;
+}; // end of struct SizeIAndLayersCount
+
 struct SolidParticleOptions {
   bool updatable  = false;
   bool isPickable = false;
