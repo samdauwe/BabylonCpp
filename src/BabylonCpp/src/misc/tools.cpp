@@ -5,6 +5,7 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/maths/color4.h>
+#include <babylon/maths/isize.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/utils/base64.h>
@@ -90,6 +91,20 @@ float Tools::ToDegrees(float angle)
 float Tools::ToRadians(float angle)
 {
   return angle * Math::PI / 180.f;
+}
+
+ISize Tools::ToISize(const std::variant<float, SizeIAndLayersCount>& size)
+{
+  ISize iSize;
+  if (std::holds_alternative<float>(size)) {
+    auto _size = static_cast<int>(std::get<float>(size));
+    iSize      = ISize{_size, _size};
+  }
+  else if (std::holds_alternative<SizeIAndLayersCount>(size)) {
+    auto _size = std::get<SizeIAndLayersCount>(size);
+    iSize      = ISize{_size.width, _size.height};
+  }
+  return iSize;
 }
 
 Image Tools::CreateCheckerboardImage(unsigned int size)

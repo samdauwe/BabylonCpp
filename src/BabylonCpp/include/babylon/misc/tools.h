@@ -13,6 +13,7 @@ namespace BABYLON {
 
 class Color4;
 class Engine;
+struct ISize;
 
 /**
  * @brief Class containing a set of static utilities functions.
@@ -100,6 +101,11 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @returns the angle in radians
    */
   static float ToRadians(float angle);
+
+  /**
+   * @brief Hidden
+   */
+  static ISize ToISize(const std::variant<float, SizeIAndLayersCount>& size);
 
   /**
    * @brief Creates a checkerboard image.
