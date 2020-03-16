@@ -200,8 +200,6 @@ void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction, bool
   options.generateStencil    = generateStencil;
   options.isCube             = isCube;
   depthStencilTexture        = engine->createDepthStencilTexture(_size, options);
-
-  engine->setFrameBufferDepthStencilTexture(shared_from_base<RenderTargetTexture>());
 }
 
 void RenderTargetTexture::_processSizeParameter(const std::variant<ISize, float>& size)
