@@ -9,7 +9,6 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/core/any.h>
 
 using json = nlohmann::json;
 

@@ -1643,7 +1643,7 @@ SkinningValidationResult Mesh::validateSkinning()
   output << "Number of Weights = " << (numWeights / 4)
          << "\nMaximum influences = " << maxUsedWeights << "\nMissing Weights = " << missingWeights
          << "\nNot Sorted = " << numberNotSorted << "\nNot Normalized = " << numberNotNormalized
-         << "\nWeightCounts = [" << usedWeightCounts << "]"
+         << "\nWeightCounts = [" << usedWeightCounts.size() << "]"
          << "\nNumber of bones = " << numBones << "\nBad Bone Indices = " << numBadBoneIndices;
 
   bool isValid = (missingWeights == 0 && numberNotNormalized == 0 && numBadBoneIndices == 0);

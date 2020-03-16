@@ -85,26 +85,25 @@ void AbstractScene::_addParsers()
                              }
                            });
   // Particle system parser
-  AbstractScene::AddParser(
-    SceneComponentConstants::NAME_PARTICLESYSTEM,
-    [](const json& parsedData, Scene* scene, AssetContainer& container,
-       const std::string& rootUrl) {
-      auto individualParser
-        = AbstractScene::GetIndividualParser(SceneComponentConstants::NAME_PARTICLESYSTEM);
-      if (!individualParser) {
-        return;
-      }
+  AbstractScene::AddParser(SceneComponentConstants::NAME_PARTICLESYSTEM,
+                           [](const json& parsedData, Scene* scene, AssetContainer& container,
+                              const std::string& rootUrl) {
+                             auto individualParser = AbstractScene::GetIndividualParser(
+                               SceneComponentConstants::NAME_PARTICLESYSTEM);
+                             if (!individualParser) {
+                               return;
+                             }
 
-      // Particles Systems
-      if (json_util::has_valid_key_value(parsedData, "particleSystems")) {
-        for (const auto& parsedParticleSystem :
-             json_util::get_array<json>(parsedData, "particleSystems")) {
-          auto particleSystem
-            = individualParser.value()(parsedParticleSystem, scene, rootUrl)._<ParticleSystem*>();
-          container.particleSystems.emplace_back(particleSystem);
-        }
-      }
-    });
+                             // Particles Systems
+                             if (json_util::has_valid_key_value(parsedData, "particleSystems")) {
+                               for (const auto& parsedParticleSystem :
+                                    json_util::get_array<json>(parsedData, "particleSystems")) {
+                                 auto particleSystem = reinterpret_cast<ParticleSystem*>(
+                                   individualParser.value()(parsedParticleSystem, scene, rootUrl));
+                                 container.particleSystems.emplace_back(particleSystem);
+                               }
+                             }
+                           });
   // Shadows parser
   AbstractScene::AddParser(SceneComponentConstants::NAME_SHADOWGENERATOR,
                            [](const json& parsedData, Scene* scene, AssetContainer& /*container*/,

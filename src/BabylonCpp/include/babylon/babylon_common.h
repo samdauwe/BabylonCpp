@@ -1,25 +1,28 @@
 #ifndef BABYLON_COMMON_H
 #define BABYLON_COMMON_H
 
-#include <vector>
 #include <chrono>
 #include <cstdint>
-#include <string>
 #include <optional>
+#include <string>
+#include <vector>
 
 namespace BABYLON {
 
 // -- Type support -- //
 
 // Time types
-using millisecond_t  = std::chrono::duration<uint64_t, std::ratio<1, 1000>>;
-using milliseconds_t = std::chrono::milliseconds;
-using microsecond_t  = std::chrono::duration<uint64_t, std::ratio<1, 1000000>>;
-using microseconds_t = std::chrono::microseconds;
+using millisecond_t         = std::chrono::duration<uint64_t, std::ratio<1, 1000>>;
+using milliseconds_t        = std::chrono::milliseconds;
+using microsecond_t         = std::chrono::duration<uint64_t, std::ratio<1, 1000000>>;
+using microseconds_t        = std::chrono::microseconds;
 using high_res_clock_t      = std::chrono::high_resolution_clock;
 using high_res_time_point_t = std::chrono::time_point<high_res_clock_t>;
 using system_clock_t        = std::chrono::system_clock;
 using system_time_point_t   = std::chrono::time_point<system_clock_t>;
+
+// Any type
+using any = void*;
 
 // Byte type
 using byte = unsigned char;
@@ -59,15 +62,13 @@ template <typename C, typename T, typename E = void>
 class ReadOnlyProperty; // undefined
 
 template <typename C, typename T>
-class ReadOnlyProperty<
-  C, T,
-  typename std::enable_if<std::is_fundamental<T>::value
-                          || std::is_same<std::string, T>::value>::type> {
+class ReadOnlyProperty<C, T,
+                       typename std::enable_if<std::is_fundamental<T>::value
+                                               || std::is_same<std::string, T>::value>::type> {
 public:
   using TGetter = T (C::*)() const;
 
-  ReadOnlyProperty(C* propObject, TGetter propGetter)
-      : _object{propObject}, _getter{propGetter}
+  ReadOnlyProperty(C* propObject, TGetter propGetter) : _object{propObject}, _getter{propGetter}
   {
   }
 
@@ -90,15 +91,13 @@ private:
 };
 
 template <typename C, typename T>
-class ReadOnlyProperty<
-  C, T,
-  typename std::enable_if<!std::is_fundamental<T>::value
-                          && !std::is_same<std::string, T>::value>::type> {
+class ReadOnlyProperty<C, T,
+                       typename std::enable_if<!std::is_fundamental<T>::value
+                                               && !std::is_same<std::string, T>::value>::type> {
 public:
   using TGetter = T& (C::*)();
 
-  ReadOnlyProperty(C* propObject, TGetter propGetter)
-      : _object{propObject}, _getter{propGetter}
+  ReadOnlyProperty(C* propObject, TGetter propGetter) : _object{propObject}, _getter{propGetter}
   {
   }
 
@@ -136,15 +135,13 @@ template <typename C, typename T, typename E = void>
 class WriteOnlyProperty; // undefined
 
 template <typename C, typename T>
-class WriteOnlyProperty<
-  C, T,
-  typename std::enable_if<std::is_fundamental<T>::value
-                          || std::is_same<std::string, T>::value>::type> {
+class WriteOnlyProperty<C, T,
+                        typename std::enable_if<std::is_fundamental<T>::value
+                                                || std::is_same<std::string, T>::value>::type> {
 public:
   using TSetter = void (C::*)(T);
 
-  WriteOnlyProperty(C* propObject, TSetter propSetter)
-      : _object{propObject}, _setter{propSetter}
+  WriteOnlyProperty(C* propObject, TSetter propSetter) : _object{propObject}, _setter{propSetter}
   {
   }
 
@@ -163,15 +160,13 @@ private:
 };
 
 template <typename C, typename T>
-class WriteOnlyProperty<
-  C, T,
-  typename std::enable_if<!std::is_fundamental<T>::value
-                          && !std::is_same<std::string, T>::value>::type> {
+class WriteOnlyProperty<C, T,
+                        typename std::enable_if<!std::is_fundamental<T>::value
+                                                && !std::is_same<std::string, T>::value>::type> {
 public:
   using TSetter = void (C::*)(const T&);
 
-  WriteOnlyProperty(C* propObject, TSetter propSetter)
-      : _object{propObject}, _setter{propSetter}
+  WriteOnlyProperty(C* propObject, TSetter propSetter) : _object{propObject}, _setter{propSetter}
   {
   }
 
@@ -195,27 +190,20 @@ template <typename C, typename T, typename E = void>
 class Property; // undefined
 
 template <typename C, typename T>
-class Property<
-  C, T,
-  typename std::enable_if<std::is_fundamental<T>::value
-                          || std::is_same<std::string, T>::value>::type> {
+class Property<C, T,
+               typename std::enable_if<std::is_fundamental<T>::value
+                                       || std::is_same<std::string, T>::value>::type> {
 public:
   using TGetter = T (C::*)() const;
   using TSetter = void (C::*)(T);
 
   Property(C* propObject, T C::*attribute)
-      : _object{propObject}
-      , _attribute{attribute}
-      , _getter{nullptr}
-      , _setter{nullptr}
+      : _object{propObject}, _attribute{attribute}, _getter{nullptr}, _setter{nullptr}
   {
   }
 
   Property(C* propObject, TGetter propGetter, TSetter propSetter)
-      : _object{propObject}
-      , _attribute{nullptr}
-      , _getter{propGetter}
-      , _setter{propSetter}
+      : _object{propObject}, _attribute{nullptr}, _getter{propGetter}, _setter{propSetter}
   {
   }
 
@@ -251,27 +239,20 @@ private:
 };
 
 template <typename C, typename T>
-class Property<
-  C, T,
-  typename std::enable_if<!std::is_fundamental<T>::value
-                          && !std::is_same<std::string, T>::value>::type> {
+class Property<C, T,
+               typename std::enable_if<!std::is_fundamental<T>::value
+                                       && !std::is_same<std::string, T>::value>::type> {
 public:
   using TGetter = T& (C::*)();
   using TSetter = void (C::*)(const T&);
 
   Property(C* propObject, T C::*attribute)
-      : _object{propObject}
-      , _attribute{attribute}
-      , _getter{nullptr}
-      , _setter{nullptr}
+      : _object{propObject}, _attribute{attribute}, _getter{nullptr}, _setter{nullptr}
   {
   }
 
   Property(C* propObject, TGetter propGetter, TSetter propSetter)
-      : _object{propObject}
-      , _attribute{nullptr}
-      , _getter{propGetter}
-      , _setter{propSetter}
+      : _object{propObject}, _attribute{nullptr}, _getter{propGetter}, _setter{propSetter}
   {
   }
 
@@ -316,12 +297,14 @@ private:
   TSetter const _setter;
 };
 
-inline std::string babylon_repo_folder() {
+inline std::string babylon_repo_folder()
+{
   static std::string repo_dir = BABYLON_REPO_FOLDER;
   return repo_dir;
 }
 
-inline std::string assets_folder() {
+inline std::string assets_folder()
+{
 #ifndef __EMSCRIPTEN__
   return babylon_repo_folder() + "/assets/";
 #else

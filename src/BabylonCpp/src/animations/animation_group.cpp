@@ -411,7 +411,7 @@ std::string AnimationGroup::toString(bool fullDetails) const
     oss << ", isStarted: " << _isStarted;
     oss << ", speedRatio: " << _speedRatio;
     oss << ", targetedAnimations length: " << _targetedAnimations.size();
-    oss << ", animatables length: " << _animatables;
+    oss << ", animatables length: " << _animatables.size();
   }
   return oss.str();
 }

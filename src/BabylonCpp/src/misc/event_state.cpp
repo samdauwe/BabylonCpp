@@ -2,8 +2,7 @@
 
 namespace BABYLON {
 
-EventState::EventState(int iMmask, bool iSkipNextObservers, any* iTarget,
-                       any* iCurrentTarget)
+EventState::EventState(int iMmask, bool iSkipNextObservers, any* iTarget, any* iCurrentTarget)
 {
   initalize(iMmask, iSkipNextObservers, iTarget, iCurrentTarget);
 }
@@ -18,8 +17,8 @@ EventState& EventState::operator=(EventState&& other) = default;
 
 EventState::~EventState() = default;
 
-EventState& EventState::initalize(int iMmask, bool iSkipNextObservers,
-                                  any* iTarget, any* iCurrentTarget)
+EventState& EventState::initalize(int iMmask, bool iSkipNextObservers, any* iTarget,
+                                  any* iCurrentTarget)
 {
   mask              = iMmask;
   skipNextObservers = iSkipNextObservers;
