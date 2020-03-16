@@ -858,13 +858,6 @@ public:
                                      unsigned int faceIndex = 0, int lod = 0);
 
   /**
-   * @brief Sets the frame buffer Depth / Stencil attachement of the render target to the defined
-   * depth stencil texture.
-   * @param renderTarget The render target to set the frame buffer for
-   */
-  void setFrameBufferDepthStencilTexture(const RenderTargetTexturePtr& renderTarget);
-
-  /**
    * @brief Update a dynamic index buffer.
    * @param indexBuffer defines the target index buffer
    * @param indices defines the data to update

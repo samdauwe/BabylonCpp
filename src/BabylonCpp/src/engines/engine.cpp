@@ -913,43 +913,6 @@ void Engine::_uploadImageToTexture(const InternalTexturePtr& texture, const Imag
   _bindTextureDirectly(bindTarget, nullptr, true);
 }
 
-void Engine::setFrameBufferDepthStencilTexture(const RenderTargetTexturePtr& renderTarget)
-{
-  // Create the framebuffer
-  auto internalTexture = renderTarget->getInternalTexture();
-  if (!internalTexture || !internalTexture->_framebuffer || !renderTarget->depthStencilTexture) {
-    return;
-  }
-
-  auto& gl                  = *_gl;
-  auto& depthStencilTexture = renderTarget->depthStencilTexture;
-
-  _bindUnboundFramebuffer(internalTexture->_framebuffer);
-  if (depthStencilTexture->isCube) {
-    if (depthStencilTexture->_generateStencilBuffer) {
-      gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                              GL::TEXTURE_CUBE_MAP_POSITIVE_X,
-                              depthStencilTexture->_webGLTexture.get(), 0);
-    }
-    else {
-      gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                              GL::TEXTURE_CUBE_MAP_POSITIVE_X,
-                              depthStencilTexture->_webGLTexture.get(), 0);
-    }
-  }
-  else {
-    if (depthStencilTexture->_generateStencilBuffer) {
-      gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT, GL::TEXTURE_2D,
-                              depthStencilTexture->_webGLTexture.get(), 0);
-    }
-    else {
-      gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT, GL::TEXTURE_2D,
-                              depthStencilTexture->_webGLTexture.get(), 0);
-    }
-  }
-  _bindUnboundFramebuffer(nullptr);
-}
-
 void Engine::updateDynamicIndexBuffer(const WebGLDataBufferPtr& indexBuffer,
                                       const IndicesArray& indices, int /*offset*/)
 {
@@ -1029,7 +992,6 @@ unsigned int Engine::updateRenderTargetTextureSampleCount(const InternalTextureP
     texture->_generateStencilBuffer, texture->_generateDepthBuffer, texture->width, texture->height,
     static_cast<int>(samples));
 
-  _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   _bindUnboundFramebuffer(nullptr);
 
   return samples;
