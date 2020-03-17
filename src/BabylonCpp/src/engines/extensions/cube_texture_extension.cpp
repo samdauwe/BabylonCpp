@@ -69,8 +69,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension, bool createPolynomials, float lodScale,
-  float lodOffset, const InternalTexturePtr& fallback,
-  const std::vector<IInternalTextureLoaderPtr>& excludeLoaders)
+  float lodOffset, const InternalTexturePtr& fallback)
 {
   auto texture    = fallback ? fallback : InternalTexture::New(_this, InternalTextureSource::Cube);
   texture->isCube = true;
@@ -91,13 +90,10 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
         (lastDot > -1 ?
            StringTools::toLowerCase(rootUrl.substr(static_cast<unsigned long>(lastDot))) :
            "");
-  const auto filteredFormat
-    = _this->excludedCompressedTextureFormats(rootUrl, _this->_textureFormatInUse);
 
   IInternalTextureLoaderPtr loader = nullptr;
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
-    if (!stl_util::contains(excludeLoaders, availableLoader)
-        && availableLoader->canLoad(extension)) {
+    if (availableLoader->canLoad(extension)) {
       loader = availableLoader;
       break;
     }
