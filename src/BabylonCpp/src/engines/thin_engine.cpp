@@ -3812,12 +3812,11 @@ InternalTexturePtr ThinEngine::createCubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension, bool createPolynomials, float lodScale,
-  float lodOffset, const InternalTexturePtr& fallback,
-  const std::vector<IInternalTextureLoaderPtr>& excludeLoaders)
+  float lodOffset, const InternalTexturePtr& fallback)
 {
   return _cubeTextureExtension->createCubeTexture(rootUrl, scene, files, noMipmap, onLoad, onError,
                                                   format, forcedExtension, createPolynomials,
-                                                  lodScale, lodOffset, fallback, excludeLoaders);
+                                                  lodScale, lodOffset, fallback);
 }
 
 void ThinEngine::_cascadeLoadImgs(

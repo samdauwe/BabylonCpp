@@ -1294,8 +1294,6 @@ public:
    * level used for IBL according to the roughness
    * @param fallback defines texture to use while falling back when (compressed) texture file not
    * found.
-   * @param excludeLoaders array of texture loaders that should be excluded when picking a loader
-   * for the texture (defualt: empty array)
    * @returns the cube texture as an InternalTexture
    */
   InternalTexturePtr createCubeTexture(
@@ -1305,8 +1303,7 @@ public:
     = nullptr,
     unsigned int format = 0, const std::string& forcedExtension = "",
     bool createPolynomials = false, float lodScale = 0.f, float lodOffset = 0.f,
-    const InternalTexturePtr& fallback                           = nullptr,
-    const std::vector<IInternalTextureLoaderPtr>& excludeLoaders = {});
+    const InternalTexturePtr& fallback = nullptr);
 
   /**
    * @brief Hidden
