@@ -35,7 +35,6 @@ HDRCubeTexture::HDRCubeTexture(
     , boundingBoxPosition{Vector3::Zero()}
     , _isBlocking{true}
     , _rotationY{0.f}
-    , _generateHarmonics{generateHarmonics}
     , _noMipmap{iNoMipmap}
     , _size{size}
     , _onLoad{onLoad}
@@ -56,8 +55,9 @@ HDRCubeTexture::HDRCubeTexture(
   gammaSpace      = iGammaSpace;
   coordinatesMode = TextureConstants::CUBIC_MODE;
 
-  _noMipmap = noMipmap;
-  _size     = size;
+  _noMipmap          = noMipmap;
+  _size              = size;
+  _generateHarmonics = generateHarmonics;
 
   _texture = _getFromCache(url, _noMipmap);
 
