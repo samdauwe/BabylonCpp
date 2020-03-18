@@ -71,6 +71,11 @@ using WebGLTexturePtr           = std::shared_ptr<GL::IGLTexture>;
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 using WebGLUniformLocationPtr   = std::shared_ptr<GL::IGLUniformLocation>;
 
+struct FramebufferDimensionsObject {
+  int framebufferWidth  = 0;
+  int framebufferHeight = 0;
+}; // end of struct framebufferDimensionsObject
+
 /**
  * @brief The base engine class (root of all engines).
  */
@@ -105,17 +110,6 @@ public:
    * @brief Sets the relative url used to load shaders if using the engine in non-minified mode
    */
   static void setShadersRepository(const std::string& value);
-
-  /**
-   * @brief Filters the compressed texture formats to only include
-   * files that are not included in the skippable list
-   *
-   * @param url the current extension
-   * @param textureFormatInUse the current compressed texture format
-   * @returns "format" string
-   */
-  std::string excludedCompressedTextureFormats(const std::string& url,
-                                               const std::string& textureFormatInUse) const;
 
 public:
   template <typename... Ts>
@@ -1535,6 +1529,14 @@ protected:
   virtual bool get__supportsHardwareTextureRescaling() const;
 
   /**
+   * @brief Sets the object from which width and height will be taken from when getting render width
+   * and height Will fallback to the gl object
+   * @param dimensions the framebuffer width and height that will be used.
+   */
+  void
+  set_framebufferDimensionsObject(const std::optional<FramebufferDimensionsObject>& dimensions);
+
+  /**
    * @brief Gets the list of texture formats supported.
    */
   std::vector<std::string>& get_texturesSupported();
@@ -1725,6 +1727,9 @@ public:
   WebGLRenderingContext* _gl = nullptr;
 
   /** @hidden */
+  float _webGLVersion = 1.f;
+
+  /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _shouldUseHighPrecisionShader;
 
   /**
@@ -1795,6 +1800,14 @@ public:
 
   /** @hidden */
   std::string _textureFormatInUse;
+
+  /**
+   * sets the object from which width and height will be taken from when getting render width and
+   * height Will fallback to the gl object
+   * @param dimensions the framebuffer width and height that will be used.
+   */
+  WriteOnlyProperty<ThinEngine, std::optional<FramebufferDimensionsObject>>
+    framebufferDimensionsObject;
 
   /**
    * Gets the list of texture formats supported
@@ -1886,14 +1899,8 @@ public:
   WebGLVertexArrayObjectPtr _coreContextVAO = nullptr;
 
 protected:
-  /**
-   * Gets or sets the textures that the engine should not attempt to load as compressed
-   */
-  std::vector<std::string> _excludedCompressedTextures;
-
   ICanvas* _renderingCanvas = nullptr;
   bool _windowIsBackground  = false;
-  float _webGLVersion       = 1.f;
   EngineOptions _creationOptions;
 
   bool _highPrecisionShadersAllowed = true;
@@ -1973,6 +1980,8 @@ private:
 
   Int32Array _nextFreeTextureSlots;
   unsigned int _maxSimultaneousTextures = 0;
+
+  std::optional<FramebufferDimensionsObject> _framebufferDimensionsObject = std::nullopt;
 
   Vector4 _viewportCached;
 

@@ -79,27 +79,6 @@ void ThinEngine::setShadersRepository(const std::string& value)
   Effect::ShadersRepository = value;
 }
 
-std::string
-ThinEngine::excludedCompressedTextureFormats(const std::string& url,
-                                             const std::string& iTextureFormatInUse) const
-{
-  const auto skipCompression = [this, &url]() -> bool {
-    for (const auto& entry : _excludedCompressedTextures) {
-      const auto strRegExPattern = "\\b" + entry + "\\b";
-      std::regex regex(strRegExPattern, std::regex::optimize);
-      std::smatch match;
-
-      if (!url.empty()
-          && (url == entry || (std::regex_search(url, match, regex) && !match.empty()))) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  return skipCompression() ? "" : iTextureFormatInUse;
-}
-
 ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     : supportsUniformBuffers{this, &ThinEngine::get_supportsUniformBuffers}
     , _shouldUseHighPrecisionShader{this, &ThinEngine::get__shouldUseHighPrecisionShader}
@@ -107,6 +86,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , doNotHandleContextLost{this, &ThinEngine::get_doNotHandleContextLost,
                              &ThinEngine::set_doNotHandleContextLost}
     , _alphaState{std::make_unique<AlphaState>()}
+    , framebufferDimensionsObject{this, &ThinEngine::set_framebufferDimensionsObject}
     , texturesSupported{this, &ThinEngine::get_texturesSupported}
     , textureFormatInUse{this, &ThinEngine::get_textureFormatInUse}
     , currentViewport{this, &ThinEngine::get_currentViewport}
@@ -217,6 +197,12 @@ void ThinEngine::set_doNotHandleContextLost(bool value)
 bool ThinEngine::get__supportsHardwareTextureRescaling() const
 {
   return false;
+}
+
+void ThinEngine::set_framebufferDimensionsObject(
+  const std::optional<FramebufferDimensionsObject>& dimensions)
+{
+  _framebufferDimensionsObject = dimensions;
 }
 
 std::vector<std::string>& ThinEngine::get_texturesSupported()
@@ -643,7 +629,8 @@ int ThinEngine::getRenderWidth(bool useScreen) const
     return _currentRenderTarget->width;
   }
 
-  return _gl->drawingBufferWidth;
+  return _framebufferDimensionsObject ? _framebufferDimensionsObject->framebufferWidth :
+                                        _gl->drawingBufferWidth;
 }
 
 int ThinEngine::getRenderHeight(bool useScreen) const
@@ -652,7 +639,8 @@ int ThinEngine::getRenderHeight(bool useScreen) const
     return _currentRenderTarget->height;
   }
 
-  return _gl->drawingBufferHeight;
+  return _framebufferDimensionsObject ? _framebufferDimensionsObject->framebufferHeight :
+                                        _gl->drawingBufferHeight;
 }
 
 void ThinEngine::runRenderLoop(const std::function<void()>& renderFunction)
@@ -2199,9 +2187,8 @@ InternalTexturePtr ThinEngine::createTexture(
     = !forcedExtension.empty() ?
         forcedExtension :
         (lastDot > -1 ? StringTools::toLowerCase(url.substr(static_cast<size_t>(lastDot))) : "");
-  auto filteredFormat = excludedCompressedTextureFormats(url, _textureFormatInUse);
-
   IInternalTextureLoaderPtr loader = nullptr;
+
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
     if (availableLoader->canLoad(extension)) {
       loader = availableLoader;
