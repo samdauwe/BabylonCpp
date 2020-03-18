@@ -774,14 +774,6 @@ public:
   std::string& setTextureFormatToUse(const std::vector<std::string>& formatsAvailable);
 
   /**
-   * @brief Set the compressed texture extensions or file names to skip.
-   *
-   * @param skippedFiles defines the list of those texture files you want to skip
-   * Example: [".dds", ".env", "myfile.png"]
-   */
-  void setCompressedTextureExclusions(const std::vector<std::string>& skippedFiles);
-
-  /**
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height

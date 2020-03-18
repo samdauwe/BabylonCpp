@@ -686,11 +686,6 @@ std::string& Engine::setTextureFormatToUse(const std::vector<std::string>& forma
   return _textureFormatInUse;
 }
 
-void Engine::setCompressedTextureExclusions(const std::vector<std::string>& skippedFiles)
-{
-  _excludedCompressedTextures = skippedFiles;
-}
-
 void Engine::setSize(int width, int height)
 {
   if (!_renderingCanvas) {
