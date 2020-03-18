@@ -8,8 +8,7 @@
 namespace BABYLON {
 
 /**
- * @brief This class is used to store clipboard related info for the
- * onClipboardObservable event.
+ * @brief This class is used to store clipboard related info for the onClipboardObservable event.
  */
 class BABYLON_SHARED_EXPORT ClipboardInfo {
 
