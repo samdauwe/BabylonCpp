@@ -670,22 +670,6 @@ void Engine::resize()
   ThinEngine::resize();
 }
 
-std::string& Engine::setTextureFormatToUse(const std::vector<std::string>& formatsAvailable)
-{
-  for (const auto& textureSupported1 : _texturesSupported) {
-    for (const auto& formatAvailable : formatsAvailable) {
-      if (textureSupported1 == StringTools::toLowerCase(formatAvailable)) {
-        _textureFormatInUse = textureSupported1;
-        return _textureFormatInUse;
-      }
-    }
-  }
-  // actively set format to nothing, to allow this to be called more than once and possibly fail the
-  // 2nd time
-  _textureFormatInUse.clear();
-  return _textureFormatInUse;
-}
-
 void Engine::setSize(int width, int height)
 {
   if (!_renderingCanvas) {
