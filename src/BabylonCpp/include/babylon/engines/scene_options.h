@@ -13,26 +13,29 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT SceneOptions {
 
   /**
-   * Defines that scene should keep up-to-date a map of geometry to enable fast
-   * look-up by uniqueId It will improve performance when the number of
-   * geometries becomes important.
+   * Defines that scene should keep up-to-date a map of geometry to enable fast look-up by uniqueId
+   * It will improve performance when the number of geometries becomes important.
    */
   std::optional<bool> useGeometryUniqueIdsMap = std::nullopt;
 
   /**
-   * Defines that each material of the scene should keep up-to-date a map of
-   * referencing meshes for fast diposing It will improve performance when the
-   * number of mesh becomes important, but might consume a bit more memory
+   * Defines that each material of the scene should keep up-to-date a map of referencing meshes for
+   * fast diposing It will improve performance when the number of mesh becomes important, but might
+   * consume a bit more memory
    */
   std::optional<bool> useMaterialMeshMap = std::nullopt;
 
   /**
-   * Defines that each mesh of the scene should keep up-to-date a map of
-   * referencing cloned meshes for fast diposing It will improve performance
-   * when the number of mesh becomes important, but might consume a bit more
-   * memory
+   * Defines that each mesh of the scene should keep up-to-date a map of referencing cloned meshes
+   * for fast diposing It will improve performance when the number of mesh becomes important, but
+   * might consume a bit more memory
    */
-  std::optional<bool> useClonedMeshhMap = std::nullopt;
+  std::optional<bool> useClonedMeshMap = std::nullopt;
+
+  /**
+   * Defines if the creation of the scene should impact the engine (Eg. UtilityLayer's scene)
+   */
+  std::optional<bool> isVirtual = std::nullopt;
 
 }; // end of struct SceneOptions
 
