@@ -300,8 +300,24 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _headphone{std::nullopt}
     , _multiviewSceneUbo{nullptr}
 {
+  SceneOptions fullOptions;
+  fullOptions.useGeometryUniqueIdsMap = true;
+  fullOptions.useMaterialMeshMap      = true;
+  fullOptions.useClonedMeshMap        = true;
+  fullOptions.isVirtual               = false;
+  if (options) {
+    fullOptions.useGeometryUniqueIdsMap
+      = options->useGeometryUniqueIdsMap.value_or(fullOptions.useGeometryUniqueIdsMap.value());
+    fullOptions.useMaterialMeshMap
+      = options->useMaterialMeshMap.value_or(fullOptions.useMaterialMeshMap.value());
+    fullOptions.useClonedMeshMap
+      = options->useClonedMeshMap.value_or(fullOptions.useClonedMeshMap.value());
+    fullOptions.isVirtual = options->isVirtual.value_or(fullOptions.isVirtual.value());
+  }
+
   _engine = engine ? engine : Engine::LastCreatedEngine();
-  if (!options) {
+
+  if (!fullOptions.isVirtual.value()) {
     EngineStore::_LastCreatedScene = this;
     _engine->scenes.emplace_back(this);
   }
@@ -328,8 +344,15 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
 
   setDefaultCandidateProviders();
 
-  if (options) {
-    geometriesById = {};
+  if (fullOptions.useGeometryUniqueIdsMap.value()) {
+    geometriesByUniqueId = {};
+  }
+
+  useMaterialMeshMap = fullOptions.useMaterialMeshMap.value();
+  useClonedMeshMap   = fullOptions.useClonedMeshMap.value();
+
+  if (!options || !options->isVirtual.value_or(false)) {
+    _engine->onNewSceneAddedObservable.notifyObservers(this);
   }
 }
 
@@ -2384,6 +2407,10 @@ size_t Scene::getUniqueId()
 
 void Scene::addMesh(const AbstractMeshPtr& newMesh, bool recursive)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
+
   meshes.emplace_back(newMesh);
 
   newMesh->_resyncLightSources();
@@ -2432,6 +2459,9 @@ int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
 
 void Scene::addTransformNode(const TransformNodePtr& newTransformNode)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   newTransformNode->_indexInSceneTransformNodesArray = static_cast<int>(transformNodes.size());
   transformNodes.emplace_back(newTransformNode);
 
@@ -2667,6 +2697,9 @@ int Scene::removeTexture(BaseTexture* toRemove)
 
 void Scene::addLight(const LightPtr& newLight)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   lights.emplace_back(newLight);
   sortLightsByPriority();
 
@@ -2674,7 +2707,7 @@ void Scene::addLight(const LightPtr& newLight)
     newLight->_addToSceneRootNodes();
   }
 
-  // Add light to all meshes (To support if the light is removed and then readded)
+  // Add light to all meshes (To support if the light is removed and then re-added)
   for (const auto& mesh : meshes) {
     if (!stl_util::contains(mesh->_lightSources, newLight)) {
       mesh->_lightSources.emplace_back(newLight);
@@ -2696,6 +2729,9 @@ void Scene::sortLightsByPriority()
 
 void Scene::addCamera(const CameraPtr& newCamera)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   cameras.emplace_back(newCamera);
   onNewCameraAddedObservable.notifyObservers(newCamera.get());
 
@@ -2706,42 +2742,66 @@ void Scene::addCamera(const CameraPtr& newCamera)
 
 void Scene::addSkeleton(const SkeletonPtr& newSkeleton)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   skeletons.emplace_back(newSkeleton);
 }
 
 void Scene::addParticleSystem(const IParticleSystemPtr& newParticleSystem)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   particleSystems.emplace_back(newParticleSystem);
 }
 
 void Scene::addAnimation(const AnimationPtr& newAnimation)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   animations.emplace_back(newAnimation);
 }
 
 void Scene::addAnimationGroup(const AnimationGroupPtr& newAnimationGroup)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   animationGroups.emplace_back(newAnimationGroup);
 }
 
 void Scene::addMultiMaterial(const MultiMaterialPtr& newMultiMaterial)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   multiMaterials.emplace_back(newMultiMaterial);
 }
 
 void Scene::addMaterial(const MaterialPtr& newMaterial)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   materials.emplace_back(newMaterial);
   onNewMaterialAddedObservable.notifyObservers(newMaterial.get());
 }
 
 void Scene::addMorphTargetManager(const MorphTargetManagerPtr& newMorphTargetManager)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   morphTargetManagers.emplace_back(newMorphTargetManager);
 }
 
 void Scene::addGeometry(const GeometryPtr& newGeometry)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   geometriesById[newGeometry->id] = geometries.size();
   geometries.emplace_back(newGeometry);
 }
@@ -2753,6 +2813,9 @@ void Scene::addActionManager(const AbstractActionManagerPtr& newActionManager)
 
 void Scene::addTexture(const BaseTexturePtr& newTexture)
 {
+  if (_blockEntityCollection) {
+    return;
+  }
   textures.emplace_back(newTexture);
   onNewTextureAddedObservable.notifyObservers(newTexture.get());
 }

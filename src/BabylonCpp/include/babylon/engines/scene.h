@@ -2683,7 +2683,7 @@ public:
   std::string defaultCursor;
 
   /**
-   * Defines wether cursors are handled by the scene.
+   * Defines whether cursors are handled by the scene.
    */
   bool doNotHandleCursors;
 
@@ -3125,12 +3125,12 @@ public:
   /**
    * Hidden
    */
-  const bool useMaterialMeshMap;
+  bool useMaterialMeshMap;
 
   /**
    * Hidden
    */
-  const bool useClonedMeshMap;
+  bool useClonedMeshMap;
 
   /**
    * Backing store of defined scene components
@@ -3365,6 +3365,11 @@ public:
    * Hidden
    */
   Stage<PointerUpDownStageAction> _pointerUpStage;
+
+  /**
+   * An optional map from Geometry Id to Geometry index in the 'geometries' array
+   */
+  std::unordered_map<std::string, std::optional<int>> geometriesByUniqueId;
 
   /**
    * Defines the actions happening when Geometries are rebuilding.
