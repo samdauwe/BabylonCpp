@@ -7,17 +7,15 @@
 
 namespace BABYLON {
 
-MeshPtr PolygonBuilder::CreatePolygon(const std::string& name,
-                                      PolygonOptions& options, Scene* scene)
+MeshPtr PolygonBuilder::CreatePolygon(const std::string& name, PolygonOptions& options,
+                                      Scene* scene)
 {
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
-  const auto& shape    = options.shape;
-  const auto& holes    = options.holes;
-  const auto depth     = options.depth.value_or(0.f);
-  const auto updatable = options.updatable.value_or(false);
-  const auto sideOrientation
-    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  options.sideOrientation    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  const auto& shape          = options.shape;
+  const auto& holes          = options.holes;
+  const auto depth           = options.depth.value_or(0.f);
+  const auto updatable       = options.updatable.value_or(false);
+  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
   std::vector<Vector2> contours(shape.size());
   std::vector<Vector2> hole;
 
@@ -37,18 +35,18 @@ MeshPtr PolygonBuilder::CreatePolygon(const std::string& name,
     }
     polygonTriangulation.addHole(hole);
   }
-  auto polygon = polygonTriangulation.build(updatable, depth);
+  auto polygon                             = polygonTriangulation.build(updatable, depth);
   polygon->_originalBuilderSideOrientation = sideOrientation;
-  auto vertexData                          = VertexData::CreatePolygon(
-    polygon.get(), sideOrientation, options.faceUV, options.faceColors,
-    options.frontUVs, options.backUVs);
+  auto vertexData
+    = VertexData::CreatePolygon(polygon.get(), sideOrientation, options.faceUV, options.faceColors,
+                                options.frontUVs, options.backUVs);
   vertexData->applyToMesh(*polygon, options.updatable);
 
   return polygon;
 }
 
-MeshPtr PolygonBuilder::ExtrudePolygon(const std::string& name,
-                                       PolygonOptions& options, Scene* scene)
+MeshPtr PolygonBuilder::ExtrudePolygon(const std::string& name, PolygonOptions& options,
+                                       Scene* scene)
 {
   return PolygonBuilder::CreatePolygon(name, options, scene);
 }

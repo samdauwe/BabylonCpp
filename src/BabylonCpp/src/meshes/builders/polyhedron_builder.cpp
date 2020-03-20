@@ -5,14 +5,12 @@
 
 namespace BABYLON {
 
-MeshPtr PolyhedronBuilder::CreatePolyhedron(const std::string& name,
-                                            PolyhedronOptions& options,
+MeshPtr PolyhedronBuilder::CreatePolyhedron(const std::string& name, PolyhedronOptions& options,
                                             Scene* scene)
 {
   auto polyhedron = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   polyhedron->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreatePolyhedron(options);

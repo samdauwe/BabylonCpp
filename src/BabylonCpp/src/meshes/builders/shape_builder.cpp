@@ -9,19 +9,18 @@
 
 namespace BABYLON {
 
-MeshPtr ShapeBuilder::ExtrudeShape(const std::string& name,
-                                   ExtrudeShapeOptions& options, Scene* scene)
+MeshPtr ShapeBuilder::ExtrudeShape(const std::string& name, ExtrudeShapeOptions& options,
+                                   Scene* scene)
 {
-  const auto& path      = options.path;
-  const auto& shape     = options.shape;
-  const auto scale      = options.scale.value_or(1.f);
-  const auto rotation   = options.rotation.value_or(0.f);
-  const auto cap        = options.cap.value_or(Mesh::NO_CAP);
-  const auto& updatable = options.updatable;
-  const auto sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
-  const auto& instance = options.instance;
-  const auto invertUV  = options.invertUV.value_or(false);
+  const auto& path           = options.path;
+  const auto& shape          = options.shape;
+  const auto scale           = options.scale.value_or(1.f);
+  const auto rotation        = options.rotation.value_or(0.f);
+  const auto cap             = options.cap.value_or(Mesh::NO_CAP);
+  const auto& updatable      = options.updatable;
+  const auto sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  const auto& instance       = options.instance;
+  const auto invertUV        = options.invertUV.value_or(false);
 
   return ShapeBuilder::_ExtrudeShapeGeneric(
     name, shape, path, scale, rotation, nullptr, nullptr, false, false, cap, false, scene,
@@ -29,27 +28,23 @@ MeshPtr ShapeBuilder::ExtrudeShape(const std::string& name,
 }
 
 MeshPtr ShapeBuilder::ExtrudeShapeCustom(const std::string& name,
-                                         ExtrudeShapeCustomOptions& options,
-                                         Scene* scene)
+                                         ExtrudeShapeCustomOptions& options, Scene* scene)
 {
-  const auto& path  = options.path;
-  const auto& shape = options.shape;
-  const auto scaleFunction
-    = options.scaleFunction ?
-        options.scaleFunction :
-        ([](float /*i*/, float /*distance*/) -> float { return 1.f; });
-  const auto rotationFunction
-    = options.rotationFunction ?
-        options.rotationFunction :
-        ([](float /*i*/, float /*distance*/) -> float { return 0.f; });
+  const auto& path         = options.path;
+  const auto& shape        = options.shape;
+  const auto scaleFunction = options.scaleFunction ?
+                               options.scaleFunction :
+                               ([](float /*i*/, float /*distance*/) -> float { return 1.f; });
+  const auto rotationFunction = options.rotationFunction ?
+                                  options.rotationFunction :
+                                  ([](float /*i*/, float /*distance*/) -> float { return 0.f; });
   const auto ribbonCloseArray = options.ribbonCloseArray.value_or(false);
   const auto ribbonClosePath  = options.ribbonClosePath.value_or(false);
   const auto cap              = options.cap.value_or(Mesh::NO_CAP);
   const auto& updatable       = options.updatable;
-  const auto sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
-  const auto& instance = options.instance;
-  const auto invertUV  = options.invertUV.value_or(false);
+  const auto sideOrientation  = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  const auto& instance        = options.instance;
+  const auto invertUV         = options.invertUV.value_or(false);
   return ShapeBuilder::_ExtrudeShapeGeneric(
     name, shape, path, std::nullopt, std::nullopt, scaleFunction, rotationFunction,
     ribbonCloseArray, ribbonClosePath, cap, true, scene, updatable.has_value(), sideOrientation,
@@ -57,24 +52,21 @@ MeshPtr ShapeBuilder::ExtrudeShapeCustom(const std::string& name,
 }
 
 MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
-  const std::string& name, const std::vector<Vector3>& shape,
-  const std::vector<Vector3>& curve, const std::optional<float>& scale,
-  const std::optional<float>& rotation,
+  const std::string& name, const std::vector<Vector3>& shape, const std::vector<Vector3>& curve,
+  const std::optional<float>& scale, const std::optional<float>& rotation,
   const std::function<float(float i, float distance)>& scaleFunction,
-  const std::function<float(float i, float distance)>& rotateFunction,
-  bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
-  bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
-  const std::optional<Vector4>& frontUVs, const std::optional<Vector4>& backUVs)
+  const std::function<float(float i, float distance)>& rotateFunction, bool rbCA, bool rbCP,
+  unsigned int cap, bool custom, Scene* scene, bool updtbl, unsigned int side, MeshPtr instance,
+  bool invertUV, const std::optional<Vector4>& frontUVs, const std::optional<Vector4>& backUVs)
 {
   // extrusion geometry
   const auto extrusionPathArray
-    = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
-         Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
-         const std::optional<float>& _scale,
+    = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve, Path3D& path3D,
+         std::vector<std::vector<Vector3>> shapePaths, const std::optional<float>& _scale,
          const std::optional<float>& _rotation,
          const std::function<float(float i, float distance)>& _scaleFunction,
-         const std::function<float(float i, float distance)>& _rotateFunction,
-         unsigned int _cap, bool _custom) {
+         const std::function<float(float i, float distance)>& _rotateFunction, unsigned int _cap,
+         bool _custom) {
         auto& tangents        = path3D.getTangents();
         const auto& normals   = path3D.getNormals();
         const auto& binormals = path3D.getBinormals();
@@ -87,9 +79,9 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
         auto returnRotation = [_rotation](float /*i*/, float /*distance*/) {
           return _rotation.has_value() ? *_rotation : 0.f;
         };
-        auto rotate = _custom ? _rotateFunction : returnRotation;
-        auto scl    = _custom ? _scaleFunction : returnScale;
-        auto index  = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0u : 2u;
+        auto rotate          = _custom ? _rotateFunction : returnRotation;
+        auto scl             = _custom ? _scaleFunction : returnScale;
+        auto index           = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0u : 2u;
         auto& rotationMatrix = TmpVectors::MatrixArray[0];
         shapePaths.resize(_curve.size());
 
@@ -151,11 +143,10 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
   if (instance) { // instance update
     auto& storage = instance->_creationDataStorage;
     path3D        = storage->path3D.update(curve);
-    pathArray     = extrusionPathArray(
-      shape, curve, storage->path3D, storage->pathArray, scale, rotation,
-      scaleFunction, rotateFunction, storage->cap, custom);
-    instance = Mesh::CreateRibbon("", pathArray, false, false, 0, scene, false,
-                                  Mesh::DEFAULTSIDE, instance);
+    pathArray     = extrusionPathArray(shape, curve, storage->path3D, storage->pathArray, scale,
+                                   rotation, scaleFunction, rotateFunction, storage->cap, custom);
+    instance = Mesh::CreateRibbon("", pathArray, false, false, 0, scene, false, Mesh::DEFAULTSIDE,
+                                  instance);
 
     return instance;
   }
@@ -163,9 +154,8 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
   path3D = Path3D(curve);
   std::vector<std::vector<Vector3>> newShapePaths;
   uint32_t _cap = (cap > 3) ? 0 : cap;
-  pathArray
-    = extrusionPathArray(shape, curve, path3D, newShapePaths, scale, rotation,
-                         scaleFunction, rotateFunction, _cap, custom);
+  pathArray     = extrusionPathArray(shape, curve, path3D, newShapePaths, scale, rotation,
+                                 scaleFunction, rotateFunction, _cap, custom);
   RibbonOptions ribbonOptions;
   ribbonOptions.pathArray       = pathArray;
   ribbonOptions.closeArray      = rbCA;
@@ -175,8 +165,7 @@ MeshPtr ShapeBuilder::_ExtrudeShapeGeneric(
   ribbonOptions.invertUV        = invertUV;
   ribbonOptions.frontUVs        = frontUVs;
   ribbonOptions.backUVs         = backUVs;
-  auto extrudedGeneric
-    = RibbonBuilder::CreateRibbon(name, ribbonOptions, scene);
+  auto extrudedGeneric          = RibbonBuilder::CreateRibbon(name, ribbonOptions, scene);
   extrudedGeneric->_creationDataStorage->pathArray = pathArray;
   extrudedGeneric->_creationDataStorage->path3D    = path3D;
   extrudedGeneric->_creationDataStorage->cap       = _cap;

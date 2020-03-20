@@ -7,13 +7,11 @@
 
 namespace BABYLON {
 
-MeshPtr PlaneBuilder::CreatePlane(const std::string& name,
-                                  PlaneOptions& options, Scene* scene)
+MeshPtr PlaneBuilder::CreatePlane(const std::string& name, PlaneOptions& options, Scene* scene)
 {
   auto plane = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   plane->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreatePlane(options);

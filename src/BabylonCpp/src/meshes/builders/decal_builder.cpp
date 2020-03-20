@@ -10,30 +10,27 @@
 
 namespace BABYLON {
 
-MeshPtr DecalBuilder::CreateDecal(const std::string& name,
-                                  const AbstractMeshPtr& sourceMesh,
+MeshPtr DecalBuilder::CreateDecal(const std::string& name, const AbstractMeshPtr& sourceMesh,
                                   DecalOptions& options)
 {
-  const auto indices = sourceMesh->getIndices();
-  const auto positions
-    = sourceMesh->getVerticesData(VertexBuffer::PositionKind);
-  const auto normals  = sourceMesh->getVerticesData(VertexBuffer::NormalKind);
-  const auto position = options.position.value_or(Vector3::Zero());
-  const auto normal   = options.normal.value_or(Vector3::Up());
-  const auto size     = options.size.value_or(Vector3::One());
-  const auto angle    = options.angle.value_or(0.f);
+  const auto indices   = sourceMesh->getIndices();
+  const auto positions = sourceMesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto normals   = sourceMesh->getVerticesData(VertexBuffer::NormalKind);
+  const auto position  = options.position.value_or(Vector3::Zero());
+  const auto normal    = options.normal.value_or(Vector3::Up());
+  const auto size      = options.size.value_or(Vector3::One());
+  const auto angle     = options.angle.value_or(0.f);
 
   auto yaw   = -std::atan2(normal.z, normal.x) - Math::PI_2;
   auto len   = std::sqrt(normal.x * normal.x + normal.z * normal.z);
   auto pitch = std::atan2(normal.y, len);
 
   // Matrix
-  auto decalWorldMatrix
-    = Matrix::RotationYawPitchRoll(yaw, pitch, angle)
-        .multiply(Matrix::Translation(position.x, position.y, position.z));
+  auto decalWorldMatrix = Matrix::RotationYawPitchRoll(yaw, pitch, angle)
+                            .multiply(Matrix::Translation(position.x, position.y, position.z));
   auto inverseDecalWorldMatrix = Matrix::Invert(decalWorldMatrix);
   auto meshWorldMatrix         = sourceMesh->getWorldMatrix();
-  auto transformMatrix = meshWorldMatrix.multiply(inverseDecalWorldMatrix);
+  auto transformMatrix         = meshWorldMatrix.multiply(inverseDecalWorldMatrix);
 
   auto vertexData = std::make_unique<VertexData>();
   vertexData->indices.clear();
@@ -50,17 +47,14 @@ MeshPtr DecalBuilder::CreateDecal(const std::string& name,
     }
     const auto& vertexId = indices[indexId];
     result.position
-      = Vector3(positions[vertexId * 3], positions[vertexId * 3 + 1],
-                positions[vertexId * 3 + 2]);
+      = Vector3(positions[vertexId * 3], positions[vertexId * 3 + 1], positions[vertexId * 3 + 2]);
 
     // Send vector to decal local world
-    result.position
-      = Vector3::TransformCoordinates(result.position, transformMatrix);
+    result.position = Vector3::TransformCoordinates(result.position, transformMatrix);
 
     // Get normal
     result.normal
-      = Vector3(normals[vertexId * 3 + 0], normals[vertexId * 3 + 1],
-                normals[vertexId * 3 + 2]);
+      = Vector3(normals[vertexId * 3 + 0], normals[vertexId * 3 + 1], normals[vertexId * 3 + 2]);
     result.normal = Vector3::TransformNormal(result.normal, transformMatrix);
     return result;
   };
@@ -75,15 +69,12 @@ MeshPtr DecalBuilder::CreateDecal(const std::string& name,
 
     auto clipSize = 0.5f * std::abs(Vector3::Dot(size, axis));
 
-    const auto clipVertices
-      = [&](const PositionNormalVertex& v0, const PositionNormalVertex& v1) {
-          auto clipFactor
-            = Vector3::GetClipFactor(v0.position, v1.position, axis, clipSize);
+    const auto clipVertices = [&](const PositionNormalVertex& v0, const PositionNormalVertex& v1) {
+      auto clipFactor = Vector3::GetClipFactor(v0.position, v1.position, axis, clipSize);
 
-          return PositionNormalVertex(
-            Vector3::Lerp(v0.position, v1.position, clipFactor),
-            Vector3::Lerp(v0.normal, v1.normal, clipFactor));
-        };
+      return PositionNormalVertex(Vector3::Lerp(v0.position, v1.position, clipFactor),
+                                  Vector3::Lerp(v0.normal, v1.normal, clipFactor));
+    };
 
     std::vector<PositionNormalVertex> result;
 
@@ -214,8 +205,7 @@ MeshPtr DecalBuilder::CreateDecal(const std::string& name,
     // Add UVs and get back to world
     for (auto& vertex : faceVertices) {
       vertexData->indices.emplace_back(currentVertexDataIndex);
-      vertex.position.toArray(vertexData->positions,
-                              currentVertexDataIndex * 3);
+      vertex.position.toArray(vertexData->positions, currentVertexDataIndex * 3);
       vertex.normal.toArray(vertexData->normals, currentVertexDataIndex * 3);
       vertexData->uvs.emplace_back(0.5f + vertex.position.x / size.x);
       vertexData->uvs.emplace_back(0.5f + vertex.position.y / size.y);

@@ -6,13 +6,12 @@
 
 namespace BABYLON {
 
-MeshPtr CylinderBuilder::CreateCylinder(const std::string& name,
-                                        CylinderOptions& options, Scene* scene)
+MeshPtr CylinderBuilder::CreateCylinder(const std::string& name, CylinderOptions& options,
+                                        Scene* scene)
 {
   auto cylinder = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   cylinder->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreateCylinder(options);

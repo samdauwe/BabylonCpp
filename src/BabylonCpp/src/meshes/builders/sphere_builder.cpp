@@ -6,13 +6,11 @@
 
 namespace BABYLON {
 
-MeshPtr SphereBuilder::CreateSphere(const std::string& name,
-                                    SphereOptions& options, Scene* scene)
+MeshPtr SphereBuilder::CreateSphere(const std::string& name, SphereOptions& options, Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   sphere->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreateSphere(options);

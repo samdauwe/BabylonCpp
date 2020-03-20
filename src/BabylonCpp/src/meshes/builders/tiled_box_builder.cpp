@@ -6,13 +6,12 @@
 
 namespace BABYLON {
 
-MeshPtr TiledBoxBuilder::CreateTiledBox(const std::string& name,
-                                        TiledBoxOptions& options, Scene* scene)
+MeshPtr TiledBoxBuilder::CreateTiledBox(const std::string& name, TiledBoxOptions& options,
+                                        Scene* scene)
 {
   auto box = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation              = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   box->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreateTiledBox(options);
