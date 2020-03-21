@@ -27,21 +27,17 @@ using TexturePtr          = std::shared_ptr<Texture>;
 
 struct BABYLON_SHARED_EXPORT SerializationHelper {
 
-  static CubeTexturePtr
-  Parse(const std::function<CubeTexturePtr()>& creationFunction,
-        const json& source, Scene* scene, const std::string& rootUrl = "");
-  static TexturePtr Parse(const std::function<TexturePtr()>& creationFunction,
-                          const json& source, Scene* scene,
-                          const std::string& rootUrl = "");
-  static CameraPtr Parse(const std::function<CameraPtr()>& creationFunction,
-                         const json& source, Scene* scene,
-                         const std::string& rootUrl = "");
-  static LightPtr Parse(const std::function<LightPtr()>& creationFunction,
-                        const json& source, Scene* scene,
-                        const std::string& rootUrl = "");
-  static StandardMaterialPtr
-  Parse(const std::function<StandardMaterialPtr()>& creationFunction,
-        const json& source, Scene* scene, const std::string& rootUrl = "");
+  static CubeTexturePtr Parse(const std::function<CubeTexturePtr()>& creationFunction,
+                              const json& source, Scene* scene, const std::string& rootUrl = "");
+  static TexturePtr Parse(const std::function<TexturePtr()>& creationFunction, const json& source,
+                          Scene* scene, const std::string& rootUrl = "");
+  static CameraPtr Parse(const std::function<CameraPtr()>& creationFunction, const json& source,
+                         Scene* scene, const std::string& rootUrl = "");
+  static LightPtr Parse(const std::function<LightPtr()>& creationFunction, const json& source,
+                        Scene* scene, const std::string& rootUrl = "");
+  static StandardMaterialPtr Parse(const std::function<StandardMaterialPtr()>& creationFunction,
+                                   const json& source, Scene* scene,
+                                   const std::string& rootUrl = "");
 
 }; // end of struct SerializationHelper
 
