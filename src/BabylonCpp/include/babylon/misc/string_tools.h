@@ -19,7 +19,7 @@ namespace BABYLON {
 namespace StringTools {
 
 /**
- * Variadic template for concatenating a string.
+ * @brief Variadic template for concatenating a string.
  */
 inline void toString(std::ostream& /*o*/)
 {
@@ -57,8 +57,7 @@ inline bool contains(const std::string& s, const std::string& toCheck)
 }
 
 /**
- * @brief Returns the number of occurrences of the string str in the other
- * string s.
+ * @brief Returns the number of occurrences of the string str in the other string s.
  * @param s. The source string.
  * @param str. The string to search for and count.
  * @return A number, representing the number of occurrences of the string str.
@@ -75,7 +74,7 @@ inline size_t count(const std::string& s, const std::string& str)
 }
 
 /**
- * Variadic template for concatenating a string.
+ * @brief Variadic template for concatenating a string.
  */
 inline void charCodeToString(std::ostream& /*o*/)
 {
@@ -138,8 +137,7 @@ inline std::vector<std::string> escape(const std::vector<std::string>& ss)
  * @brief Checks for a matching suffix at the beginning of a string.
  * @param str Source string
  * @param prefix prefix to search for in the source string
- * @returns Boolean indicating whether the prefix was found (true) or not
- * (false)
+ * @returns Boolean indicating whether the prefix was found (true) or not (false)
  */
 inline bool startsWith(const std::string& s, const std::string& prefix)
 {
@@ -153,8 +151,7 @@ inline bool startsWith(const std::string& s, const std::string& prefix)
  * @brief Checks for a matching suffix at the end of a string.
  * @param str Source string
  * @param suffix Suffix to search for in the source string
- * @returns Boolean indicating whether the suffix was found (true) or not
- * (false)
+ * @returns Boolean indicating whether the suffix was found (true) or not (false)
  */
 inline bool endsWith(const std::string& s, const std::string& postfix)
 {
@@ -167,8 +164,7 @@ inline bool endsWith(const std::string& s, const std::string& postfix)
 /**
  * @brief Converts Unicode values to characters.
  * @param t0, t1, ..., tn Required. One or more Unicode values to be converted.
- * @return A String, representing the character(s) representing the specified
- * unicode number(s).
+ * @return A String, representing the character(s) representing the specified unicode number(s).
  */
 template <class... T>
 inline std::string fromCharCode(const T&... t0)
@@ -179,13 +175,10 @@ inline std::string fromCharCode(const T&... t0)
 }
 
 /**
- * @brief Returns the Unicode of the character at the specified index in a
- * string.
+ * @brief Returns the Unicode of the character at the specified index in a string.
  * @param str The source string to select from.
- * @param index A number representing the index of the character you want to
- * return
- * @return A Number, representing the unicode of the character at the specified
- * index.
+ * @param index A number representing the index of the character you want to return
+ * @return A Number, representing the unicode of the character at the specified index.
  */
 inline uint8_t charCodeAt(const std::string& str, size_t index)
 {
@@ -213,13 +206,12 @@ inline std::vector<uint8_t> toCharCodes(const std::string& str)
 }
 
 /**
- * @brief Returns the position of the first occurrence of a specified value in a
- * string.
+ * @brief Returns the position of the first occurrence of a specified value in a string.
  * @param src The string to search in.
  * @param searchvalue The string to search for.
  * @param start At which position to start the search. Default 0.
- * @return A Number, representing the position where the specified searchvalue
- * occurs for the first time, or -1 if it never occurs.
+ * @return A Number, representing the position where the specified searchvalue occurs for the first
+ * time, or -1 if it never occurs.
  */
 inline int indexOf(const std::string& src, const std::string& searchvalue, size_t start = 0)
 {
@@ -267,14 +259,13 @@ inline std::string join(const T& v, char delim)
 }
 
 /**
- * @brief Returns the position of the last occurrence of a specified value in a
- * string.
+ * @brief Returns the position of the last occurrence of a specified value in a string.
  * @param src The string to search in.
  * @param searchvalue The string to search for.
- * @param start The position where to start the search (searching backwards). If
- * omitted, the default value is the length of the string.
- * @return A Number, representing the position where the specified searchvalue
- * occurs for the first time, or -1 if it never occurs.
+ * @param start The position where to start the search (searching backwards). If omitted, the
+ * default value is the length of the string.
+ * @return A Number, representing the position where the specified searchvalue occurs for the first
+ * time, or -1 if it never occurs.
  */
 inline int lastIndexOf(const std::string& src, const std::string& searchvalue, size_t start)
 {
@@ -305,8 +296,7 @@ inline char nthChar(const char (&arr)[N], unsigned i)
 }
 
 /**
- * Pads a string with a number of occurrences of some character to a certain
- * width.
+ * @brief Pads a string with a number of occurrences of some character to a certain width.
  */
 template <typename T>
 void pad(std::basic_string<T>& s, typename std::basic_string<T>::size_type n, T c)
@@ -369,8 +359,8 @@ inline std::string& removeSubstring(std::string& s, const std::string& subStr)
 }
 
 /**
- * @brief Searches a string for a match against a regular expression, and
- * returns the matches, as a vector object.
+ * @brief Searches a string for a match against a regular expression, and returns the matches, as a
+ * vector object.
  * @param s The source string.
  * @param re The value to search for, as a regular expression.
  * @return List with matches.
@@ -424,11 +414,9 @@ std::basic_string<CharT> inline regexReplace(BidirIt first, BidirIt last,
 }
 
 /**
- * @brief Uses a regular expression to perform substitution on a sequence of
- * characters.
+ * @brief Uses a regular expression to perform substitution on a sequence of characters.
  * @param source The input character sequence.
- * @param reSearch The regular expression string that will be matched against
- * the input sequence.
+ * @param reSearch The regular expression string that will be matched against the input sequence.
  * @param replace The regex replacement format string.
  * @return Result of the replacement.
  */
@@ -464,11 +452,9 @@ inline std::string regexReplace_Cached(const std::string& source, const std::str
 }
 
 /**
- * @brief Uses a regular expression to perform substitution on a sequence of
- * characters.
+ * @brief Uses a regular expression to perform substitution on a sequence of characters.
  * @param source The input character sequence.
- * @param reSearch The regular expression that will be matched against the input
- * sequence.
+ * @param reSearch The regular expression that will be matched against the input sequence.
  * @param replace The regex replacement format string.
  * @return Result of the replacement.
  */
@@ -480,11 +466,9 @@ inline std::string regexReplace(const std::string& source,
 }
 
 /**
- * @brief Returns a new string with a specified number of copies of the string
- * it was called on.
+ * @brief Returns a new string with a specified number of copies of the string it was called on.
  * @param str The string to repeat.
- * @param count The number of times the original string value should be repeated
- * in the new string.
+ * @param count The number of times the original string value should be repeated in the new string.
  * @return A String, a new string containing copies of the original string.
  */
 inline std::string repeat(const std::string& str, size_t count)
@@ -498,10 +482,8 @@ inline std::string repeat(const std::string& str, size_t count)
 }
 
 /**
- * @brief Searches a string for a specified value and replaces the specified
- * values.
- * @param source The source string where the specified value(s) should replaced
- * by the new value.
+ * @brief Searches a string for a specified value and replaces the specified values.
+ * @param source The source string where the specified value(s) should replaced by the new value.
  * @param search Required. The value that will be replaced by the replace value.
  * @param replace Required. The value to replace the search value with.
  * @return A string in which the specified value has been replaced.
@@ -518,10 +500,8 @@ inline std::string replace(std::string source, const std::string& search,
 }
 
 /**
- * @brief Searches a string for a specified value and replaces the specified
- * values.
- * @param source The source string where the specified value(s) should replaced
- * by the new value.
+ * @brief Searches a string for a specified value and replaces the specified values.
+ * @param source The source string where the specified value(s) should replaced by the new value.
  * @param search Required. The value that will be replaced by the replace value.
  * @param replace Required. The value to replace the search value with.
  */
@@ -543,8 +523,7 @@ inline std::string slice(const std::string& s, size_t start = 0)
 /**
  * @brief Splits a string into an array of substrings.
  * @param value Required. The string to split.
- * @param separator Required. Specifies the character to use for splitting the
- * string.
+ * @param separator Required. Specifies the character to use for splitting the string.
  * @return An Array, containing the splitted values.
  */
 inline std::vector<std::string> split(const std::string& value, char separator)
@@ -704,8 +683,7 @@ inline std::string& trim(std::string& str)
 /**
  * @brief Removes leading and trailing whitespace characters from a string.
  * @param str The input string.
- * @return A copy of the string with whitespace stripped from the beginning end
- * of str.
+ * @return A copy of the string with whitespace stripped from the beginning end of str.
  */
 inline std::string trimCopy(const std::string& str)
 {
