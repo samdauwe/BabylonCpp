@@ -2,8 +2,7 @@
 
 namespace BABYLON {
 
-RollingAverage::RollingAverage(std::size_t length)
-    : _samples{Float32Array(length)}
+RollingAverage::RollingAverage(std::size_t length) : _samples{Float32Array(length)}
 {
   reset();
 }

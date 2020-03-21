@@ -9,8 +9,7 @@ namespace BABYLON {
 /**
  * @brief RollingAverage
  *
- * Utility to efficiently compute the rolling average and variance over a
- * sliding window of samples
+ * Utility to efficiently compute the rolling average and variance over a sliding window of samples
  */
 class BABYLON_SHARED_EXPORT RollingAverage {
 
@@ -29,17 +28,16 @@ public:
   void add(float v);
 
   /**
-   * @brief Returns previously added values or null if outside of history or
-   * outside the sliding window domain
-   * @param i Index in history. For example, pass 0 for the most recent value
-   * and 1 for the value before that
+   * @brief Returns previously added values or null if outside of history or outside the sliding
+   * window domain
+   * @param i Index in history. For example, pass 0 for the most recent value and 1 for the value
+   * before that
    * @return Value previously recorded with add() or null if outside of range
    */
   [[nodiscard]] float history(size_t i) const;
 
   /**
-   * @brief Returns true if enough samples have been taken to completely fill
-   * the sliding window
+   * @brief Returns true if enough samples have been taken to completely fill the sliding window
    * @return true if sample-set saturated
    */
   [[nodiscard]] bool isSaturated() const;
@@ -52,8 +50,8 @@ public:
 protected:
   /**
    * @brief Wraps a value around the sample range boundaries
-   * @param i Position in sample range, for example if the sample length is 5,
-   * and i is -3, then 2 will be returned.
+   * @param i Position in sample range, for example if the sample length is 5, and i is -3, then 2
+   * will be returned.
    * @return Wrapped position in sample range
    */
   [[nodiscard]] std::size_t _wrapPosition(std::size_t i) const;
