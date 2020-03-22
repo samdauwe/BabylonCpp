@@ -15,9 +15,8 @@ RenderTargetExtension::RenderTargetExtension(ThinEngine* engine) : _this{engine}
 
 RenderTargetExtension::~RenderTargetExtension() = default;
 
-InternalTexturePtr
-RenderTargetExtension::createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                                 const IRenderTargetOptions& options)
+InternalTexturePtr RenderTargetExtension::createRenderTargetTexture(
+  const std::variant<int, RenderTargetSize, float>& size, const IRenderTargetOptions& options)
 {
   RenderTargetCreationOptions fullOptions;
   fullOptions.generateMipMaps = options.generateMipMaps;
@@ -40,25 +39,6 @@ RenderTargetExtension::createRenderTargetTexture(const std::variant<ISize, float
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
     fullOptions.samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
-  auto& gl = *_this->_gl;
-
-  auto texture = InternalTexture::New(_this, InternalTextureSource::RenderTarget);
-  _this->_bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-
-  int width = 0, height = 0;
-  if (std::holds_alternative<ISize>(size)) {
-    auto textureSize = std::get<ISize>(size);
-    width            = textureSize.width;
-    height           = textureSize.height;
-  }
-  else if (std::holds_alternative<float>(size)) {
-    auto textureSize = std::get<float>(size);
-    width            = static_cast<int>(textureSize);
-    height           = static_cast<int>(textureSize);
-  }
-
-  auto filters = _this->_getSamplingParameters(fullOptions.samplingMode.value(),
-                                               fullOptions.generateMipMaps.value());
 
   if (fullOptions.type.value() == Constants::TEXTURETYPE_FLOAT && !_this->_caps.textureFloat) {
     fullOptions.type = Constants::TEXTURETYPE_UNSIGNED_INT;
@@ -67,42 +47,74 @@ RenderTargetExtension::createRenderTargetTexture(const std::variant<ISize, float
       "Float textures are not supported. Render target forced to TEXTURETYPE_UNSIGNED_BYTE type")
   }
 
-  gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
-  gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
-  gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
-  gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+  auto& gl     = *_this->_gl;
+  auto texture = InternalTexture::New(_this, InternalTextureSource::RenderTarget);
+  const auto width
+    = std::holds_alternative<RenderTargetSize>(size) ?
+        std::get<RenderTargetSize>(size).width :
+        std::holds_alternative<int>(size) ?
+        std::get<int>(size) :
+        std::holds_alternative<float>(size) ? static_cast<int>(std::get<float>(size)) : 0;
+  const auto height
+    = std::holds_alternative<RenderTargetSize>(size) ?
+        std::get<RenderTargetSize>(size).height :
+        std::holds_alternative<int>(size) ?
+        std::get<int>(size) :
+        std::holds_alternative<float>(size) ? static_cast<int>(std::get<float>(size)) : 0;
+  const auto layers = std::holds_alternative<RenderTargetSize>(size) ?
+                        std::get<RenderTargetSize>(size).layers.value_or(0) :
+                        0;
+  const auto filters     = _this->_getSamplingParameters(*fullOptions.samplingMode,
+                                                     fullOptions.generateMipMaps.value_or(false));
+  const auto target      = layers != 0 ? GL::TEXTURE_2D_ARRAY : GL::TEXTURE_2D;
+  const auto sizedFormat = static_cast<int>(
+    _this->_getRGBABufferInternalSizedFormat(*fullOptions.type, fullOptions.format));
+  const auto internalFormat = _this->_getInternalFormat(*fullOptions.format);
+  const auto type           = _this->_getWebGLTextureType(*fullOptions.type);
 
-  gl.texImage2D(GL::TEXTURE_2D, 0,
-                static_cast<GL::GLint>(_this->_getRGBABufferInternalSizedFormat(
-                  fullOptions.type.value(), fullOptions.format.value())),
-                width, height, 0, _this->_getInternalFormat(fullOptions.format.value()),
-                _this->_getWebGLTextureType(fullOptions.type.value()), nullptr);
+  // Bind
+  _this->_bindTextureDirectly(target, texture);
+
+  if (layers != 0) {
+    texture->is2DArray = true;
+    gl.texImage3D(target, 0, sizedFormat, width, height, layers, 0, internalFormat, type, {});
+  }
+  else {
+    gl.texImage2D(target, 0, sizedFormat, width, height, 0, internalFormat, type, {});
+  }
+
+  gl.texParameteri(target, GL::TEXTURE_MAG_FILTER, filters.mag);
+  gl.texParameteri(target, GL::TEXTURE_MIN_FILTER, filters.min);
+  gl.texParameteri(target, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+  gl.texParameteri(target, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+
+  // MipMaps
+  if (fullOptions.generateMipMaps) {
+    gl.generateMipmap(target);
+  }
+
+  _this->_bindTextureDirectly(target, nullptr);
 
   // Create the framebuffer
-  auto currentFrameBuffer = _this->_currentFramebuffer;
-  auto framebuffer        = gl.createFramebuffer();
+  auto framebuffer = gl.createFramebuffer();
   _this->_bindUnboundFramebuffer(framebuffer);
-  gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::TEXTURE_2D,
-                          texture->_webGLTexture.get(), 0);
-
   texture->_depthStencilBuffer = _this->_setupFramebufferDepthAttachments(
     fullOptions.generateStencilBuffer.value(), fullOptions.generateDepthBuffer.value(), width,
     height);
 
-  if (fullOptions.generateMipMaps.value()) {
-    gl.generateMipmap(GL::TEXTURE_2D);
+  // No need to rebind on every frame
+  if (!texture->is2DArray) {
+    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::TEXTURE_2D,
+                            texture->_webGLTexture.get(), 0);
   }
 
-  // Unbind
-  _this->_bindTextureDirectly(GL::TEXTURE_2D, nullptr);
-  gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
-  _this->_bindUnboundFramebuffer(currentFrameBuffer);
-
+  _this->_bindUnboundFramebuffer(nullptr);
   texture->_framebuffer           = std::move(framebuffer);
   texture->baseWidth              = width;
   texture->baseHeight             = height;
   texture->width                  = width;
   texture->height                 = height;
+  texture->depth                  = layers;
   texture->isReady                = true;
   texture->samples                = 1;
   texture->generateMipMaps        = fullOptions.generateMipMaps.value();
@@ -112,20 +124,18 @@ RenderTargetExtension::createRenderTargetTexture(const std::variant<ISize, float
   texture->_generateDepthBuffer   = fullOptions.generateDepthBuffer.value();
   texture->_generateStencilBuffer = fullOptions.generateStencilBuffer.value();
 
-  // resetTextureCache();
-
   _this->_internalTexturesCache.emplace_back(texture);
 
   return texture;
 }
 
 InternalTexturePtr
-RenderTargetExtension::createDepthStencilTexture(const std::variant<int, ISize>& size,
+RenderTargetExtension::createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                                  const DepthTextureCreationOptions& options)
 {
   if (options.isCube.value_or(false)) {
-    auto width
-      = std::holds_alternative<int>(size) ? std::get<int>(size) : std::get<ISize>(size).width;
+    auto width = std::holds_alternative<int>(size) ? std::get<int>(size) :
+                                                     std::get<RenderTargetSize>(size).width;
     return _this->_createDepthStencilCubeTexture(width, options);
   }
   else {
@@ -134,9 +144,14 @@ RenderTargetExtension::createDepthStencilTexture(const std::variant<int, ISize>&
 }
 
 InternalTexturePtr
-RenderTargetExtension::_createDepthStencilTexture(const std::variant<int, ISize>& size,
+RenderTargetExtension::_createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                                   const DepthTextureCreationOptions& options)
 {
+  auto& gl          = *_this->_gl;
+  const auto layers = std::holds_alternative<RenderTargetSize>(size) ?
+                        std::get<RenderTargetSize>(size).layers.value_or(0) :
+                        0;
+  const auto target    = layers != 0 ? GL::TEXTURE_2D_ARRAY : GL::TEXTURE_2D;
   auto internalTexture = InternalTexture::New(_this, InternalTextureSource::Depth);
 
   if (!_this->_caps.depthTextureExtension) {
@@ -150,35 +165,32 @@ RenderTargetExtension::_createDepthStencilTexture(const std::variant<int, ISize>
   internalOptions.comparisonFunction = options.comparisonFunction.value_or(0);
   internalOptions.generateStencil    = options.generateStencil.value_or(false);
 
-  auto& gl = *_this->_gl;
-  _this->_bindTextureDirectly(GL::TEXTURE_2D, internalTexture, true);
+  _this->_bindTextureDirectly(target, internalTexture, true);
 
   _this->_setupDepthStencilTexture(internalTexture, size, *internalOptions.generateStencil,
                                    *internalOptions.bilinearFiltering,
                                    *internalOptions.comparisonFunction);
 
+  const auto type
+    = internalOptions.generateStencil.value_or(false) ? GL::UNSIGNED_INT_24_8 : GL::UNSIGNED_INT;
+  const auto internalFormat
+    = internalOptions.generateStencil.value_or(false) ? GL::DEPTH_STENCIL : GL::DEPTH_COMPONENT;
+  auto sizedFormat = internalFormat;
   if (_this->webGLVersion() > 1.f) {
-    if (internalOptions.generateStencil.value_or(false)) {
-      gl.texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH24_STENCIL8, internalTexture->width,
-                    internalTexture->height, 0, GL::DEPTH_STENCIL, GL::UNSIGNED_INT_24_8, nullptr);
-    }
-    else {
-      gl.texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_COMPONENT24, internalTexture->width,
-                    internalTexture->height, 0, GL::DEPTH_COMPONENT, GL::UNSIGNED_INT, nullptr);
-    }
-  }
-  else {
-    if (internalOptions.generateStencil.value_or(false)) {
-      gl.texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_STENCIL, internalTexture->width,
-                    internalTexture->height, 0, GL::DEPTH_STENCIL, GL::UNSIGNED_INT_24_8, nullptr);
-    }
-    else {
-      gl.texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_COMPONENT, internalTexture->width,
-                    internalTexture->height, 0, GL::DEPTH_COMPONENT, GL::UNSIGNED_INT, nullptr);
-    }
+    sizedFormat = internalOptions.generateStencil.value_or(false) ? GL::DEPTH24_STENCIL8 :
+                                                                    GL::DEPTH_COMPONENT24;
   }
 
-  _this->_bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+  if (internalTexture->is2DArray) {
+    gl.texImage3D(target, 0, static_cast<int>(sizedFormat), internalTexture->width,
+                  internalTexture->height, layers, 0, internalFormat, type, {});
+  }
+  else {
+    gl.texImage2D(target, 0, static_cast<int>(sizedFormat), internalTexture->width,
+                  internalTexture->height, 0, internalFormat, type, {});
+  }
+
+  _this->_bindTextureDirectly(target, nullptr);
 
   return internalTexture;
 }

@@ -5,7 +5,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
-#include <babylon/maths/isize.h>
+#include <babylon/core/structs.h>
 #include <babylon/meshes/abstract_mesh_constants.h>
 
 namespace BABYLON {
@@ -31,8 +31,9 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                               const IRenderTargetOptions& options);
+  InternalTexturePtr
+  createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
+                            const IRenderTargetOptions& options);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -41,13 +42,13 @@ public:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  InternalTexturePtr createDepthStencilTexture(const std::variant<int, ISize>& size,
+  InternalTexturePtr createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                                const DepthTextureCreationOptions& options);
 
   /**
    * @brief Hidden
    */
-  InternalTexturePtr _createDepthStencilTexture(const std::variant<int, ISize>& size,
+  InternalTexturePtr _createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                                 const DepthTextureCreationOptions& options);
 
 private:
