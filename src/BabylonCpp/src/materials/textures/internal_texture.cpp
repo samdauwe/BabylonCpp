@@ -171,8 +171,16 @@ void InternalTexture::_rebuild()
         proxy     = _engine->createRenderTargetCubeTexture(size, options);
       }
       else {
-        auto size = ISize{width, height};
-        proxy     = _engine->createRenderTargetTexture(size, options);
+        std::optional<int> layers = std::nullopt;
+        if (is2DArray) {
+          layers = depth;
+        }
+        const auto size = RenderTargetSize{
+          width,  // width
+          height, //  height
+          layers  // layers
+        };
+        proxy = _engine->createRenderTargetTexture(size, options);
       }
       proxy->_swapAndDie(shared_from_this());
 
@@ -187,8 +195,15 @@ void InternalTexture::_rebuild()
       depthTextureOptions.generateStencil    = _generateStencilBuffer;
       depthTextureOptions.isCube             = isCube;
 
-      auto size = ISize{width, height};
-      // TODO FIXME
+      std::optional<int> layers = std::nullopt;
+      if (is2DArray) {
+        layers = depth;
+      }
+      const auto size = RenderTargetSize{
+        width,  // width
+        height, //  height
+        layers  // layers
+      };
       proxy = _engine->createDepthStencilTexture(size, depthTextureOptions);
       proxy->_swapAndDie(shared_from_this());
 
@@ -252,6 +267,8 @@ void InternalTexture::_swapAndDie(const InternalTexturePtr& target)
   if (_depthStencilBuffer) {
     target->_depthStencilBuffer = _depthStencilBuffer;
   }
+
+  target->_depthStencilTexture = _depthStencilTexture;
 
   if (_lodTextureHigh) {
     if (target->_lodTextureHigh) {
