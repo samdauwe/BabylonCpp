@@ -93,20 +93,6 @@ float Tools::ToRadians(float angle)
   return angle * Math::PI / 180.f;
 }
 
-ISize Tools::ToISize(const std::variant<float, SizeIAndLayersCount>& size)
-{
-  ISize iSize;
-  if (std::holds_alternative<float>(size)) {
-    auto _size = static_cast<int>(std::get<float>(size));
-    iSize      = ISize{_size, _size};
-  }
-  else if (std::holds_alternative<SizeIAndLayersCount>(size)) {
-    auto _size = std::get<SizeIAndLayersCount>(size);
-    iSize      = ISize{_size.width, _size.height};
-  }
-  return iSize;
-}
-
 Image Tools::CreateCheckerboardImage(unsigned int size)
 {
   const int width         = static_cast<int>(size);

@@ -103,11 +103,6 @@ struct BABYLON_SHARED_EXPORT Tools {
   static float ToRadians(float angle);
 
   /**
-   * @brief Hidden
-   */
-  static ISize ToISize(const std::variant<float, SizeIAndLayersCount>& size);
-
-  /**
    * @brief Creates a checkerboard image.
    * @param size size of the image
    * @return an image

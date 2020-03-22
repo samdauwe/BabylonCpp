@@ -1,7 +1,5 @@
 #include <babylon/maths/isize.h>
 
-#include <babylon/core/structs.h>
-
 namespace BABYLON {
 
 ISize::ISize() : width{0}, height{0}
@@ -87,15 +85,6 @@ ISize ISize::operator/(float scale) const
 ISize& ISize::operator/=(float scale)
 {
   return operator*=(1.f / scale);
-}
-
-SizeIAndLayersCount ISize::toSizeIAndLayersCount() const
-{
-  return SizeIAndLayersCount{
-    width,        // width
-    height,       // height
-    std::nullopt, // layers
-  };
 }
 
 } // end of namespace BABYLON

@@ -37,12 +37,6 @@ struct BABYLON_SHARED_EXPORT ISize {
   ISize& operator/=(float scale);
 
   /**
-   * @brief Conversion function to SizeIAndLayersCount struct.
-   * @return the converted value
-   */
-  SizeIAndLayersCount toSizeIAndLayersCount() const;
-
-  /**
    * Width
    */
   int width;
