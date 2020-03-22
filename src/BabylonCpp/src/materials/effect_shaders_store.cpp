@@ -47,6 +47,7 @@
 #include <babylon/shaders/lens_highlights_fragment_fx.h>
 #include <babylon/shaders/line_fragment_fx.h>
 #include <babylon/shaders/line_vertex_fx.h>
+#include <babylon/shaders/minmax_redux_fragment_fx.h>
 #include <babylon/shaders/motion_blur_fragment_fx.h>
 #include <babylon/shaders/noise_fragment_fx.h>
 #include <babylon/shaders/outline_fragment_fx.h>
@@ -62,6 +63,7 @@
 #include <babylon/shaders/refraction_fragment_fx.h>
 #include <babylon/shaders/rgbd_decode_fragment_fx.h>
 #include <babylon/shaders/rgbd_encode_fragment_fx.h>
+#include <babylon/shaders/screen_space_reflection_fragment_fx.h>
 #include <babylon/shaders/shadow_map_fragment_fx.h>
 #include <babylon/shaders/shadow_map_vertex_fx.h>
 #include <babylon/shaders/sharpen_fragment_fx.h>
@@ -146,6 +148,7 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
   {"lensHighlightsPixelShader", lensHighlightsPixelShader},
   {"linePixelShader", linePixelShader},
   {"lineVertexShader", lineVertexShader},
+  {"minmaxReduxPixelShader", minmaxReduxPixelShader},
   {"motionBlurPixelShader", motionBlurPixelShader},
   {"noisePixelShader", noisePixelShader},
   {"outlinePixelShader", outlinePixelShader},
@@ -161,6 +164,7 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
   {"refractionPixelShader", refractionPixelShader},
   {"rgbdDecodePixelShader", rgbdDecodePixelShader},
   {"rgbdEncodePixelShader", rgbdEncodePixelShader},
+  {"screenSpaceReflectionPixelShader", screenSpaceReflectionPixelShader},
   {"shadowMapPixelShader", shadowMapPixelShader},
   {"shadowMapVertexShader", shadowMapVertexShader},
   {"sharpenPixelShader", sharpenPixelShader},

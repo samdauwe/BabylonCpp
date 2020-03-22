@@ -165,11 +165,7 @@ void main(void) {
 #include<morphTargetsVertex>[0..maxSimultaneousMorphTargets]
 
 #ifdef REFLECTIONMAP_SKYBOX
-    #ifdef REFLECTIONMAP_SKYBOX_TRANSFORMED
-        vPositionUVW = (reflectionMatrix * vec4(positionUpdated, 1.0)).xyz;
-    #else
-        vPositionUVW = positionUpdated;
-    #endif
+    vPositionUVW = positionUpdated;
 #endif
 
 #define CUSTOM_VERTEX_UPDATE_POSITION
@@ -358,14 +354,14 @@ void main(void) {
 #endif
 
 #ifdef SHEEN
-
-)ShaderCode"
-R"ShaderCode(
-
     #if defined(SHEEN_TEXTURE) && SHEEN_TEXTUREDIRECTUV == 0
         if (vSheenInfos.x == 0.)
         {
             vSheenUV = vec2(sheenMatrix * vec4(uvUpdated, 1.0, 0.0));
+
+)ShaderCode"
+R"ShaderCode(
+
         }
         else
         {

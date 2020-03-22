@@ -80,6 +80,9 @@ uniform float directionRandomizer;
 
 // Particles state
 in vec3 position;
+#ifdef CUSTOMEMITTER
+in vec3 initialPosition;
+#endif
 in float age;
 in float life;
 in vec4 seed;
@@ -109,6 +112,9 @@ in vec3 noiseCoordinates2;
 
 // Output
 out vec3 outPosition;
+#ifdef CUSTOMEMITTER
+out vec3 outInitialPosition;
+#endif
 out float outAge;
 out float outLife;
 out vec4 outSeed;
@@ -180,15 +186,15 @@ void main() {
 
   // If particle is dead and system is not stopped, spawn as new particle
   if (newAge >= life && stopFactor != 0.) {
-    vec3 position;
-    vec3 direction;
+    vec3 newPosition;
+    vec3 newDirection;
 
     // Let's get some random values
     vec4 randoms = getRandomVec4(seed.x);
 
     // Age and life
     outLife = lifeTime.x + (lifeTime.y - lifeTime.x) * randoms.r;
-    outAge = mod(newAge, outLife);
+    outAge = newAge - life;
 
     // Seed
     outSeed = seed;
@@ -220,16 +226,16 @@ void main() {
     vec3 randoms2 = getRandomVec3(seed.y);
     vec3 randoms3 = getRandomVec3(seed.z);
 
-    position = vec3(0, 0, 0);
+    newPosition = vec3(0, 0, 0);
 
-    direction = direction1 + (direction2 - direction1) * randoms3;
+    newDirection = direction1 + (direction2 - direction1) * randoms3;
 #elif defined(BOXEMITTER)
     vec3 randoms2 = getRandomVec3(seed.y);
     vec3 randoms3 = getRandomVec3(seed.z);
 
-    position = minEmitBox + (maxEmitBox - minEmitBox) * randoms2;
+    newPosition = minEmitBox + (maxEmitBox - minEmitBox) * randoms2;
 
-    direction = direction1 + (direction2 - direction1) * randoms3;
+    newDirection = direction1 + (direction2 - direction1) * randoms3;
 #elif defined(HEMISPHERICEMITTER)
     vec3 randoms2 = getRandomVec3(seed.y);
     vec3 randoms3 = getRandomVec3(seed.z);
@@ -241,8 +247,8 @@ void main() {
     float randY = cos(theta);
     float randZ = sin(phi) * sin(theta);
 
-    position = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, abs(randY), randZ);
-    direction = position + directionRandomizer * randoms3;
+    newPosition = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, abs(randY), randZ);
+    newDirection = newPosition + directionRandomizer * randoms3;
 #elif defined(SPHEREEMITTER)
     vec3 randoms2 = getRandomVec3(seed.y);
     vec3 randoms3 = getRandomVec3(seed.z);
@@ -254,13 +260,13 @@ void main() {
     float randY = cos(theta);
     float randZ = sin(phi) * sin(theta);
 
-    position = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, randY, randZ);
+    newPosition = (radius - (radius * radiusRange * randoms2.z)) * vec3(randX, randY, randZ);
 
     #ifdef DIRECTEDSPHEREEMITTER
-      direction = direction1 + (direction2 - direction1) * randoms3;
+      newDirection = direction1 + (direction2 - direction1) * randoms3;
     #else
       // Direction
-      direction = position + directionRandomizer * randoms3;
+      newDirection = newPosition + directionRandomizer * randoms3;
     #endif
 #elif defined(CYLINDEREMITTER)
     vec3 randoms2 = getRandomVec3(seed.y);
@@ -273,15 +279,15 @@ void main() {
     float positionRadius = radius*sqrt(inverseRadiusRangeSquared + (randoms2.z * (1.-inverseRadiusRangeSquared)));
     float xPos = positionRadius * cos(angle);
     float zPos = positionRadius * sin(angle);
-    position = vec3(xPos, yPos, zPos);
+    newPosition = vec3(xPos, yPos, zPos);
 
     #ifdef DIRECTEDCYLINDEREMITTER
-      direction = direction1 + (direction2 - direction1) * randoms3;
+      newDirection = direction1 + (direction2 - direction1) * randoms3;
     #else
       // Direction
       angle = angle + ((randoms3.x-0.5) * PI);
-      direction = vec3(cos(angle), randoms3.y-0.5, sin(angle));
-      direction = normalize(direction);
+      newDirection = vec3(cos(angle), randoms3.y-0.5, sin(angle));
+      newDirection = normalize(newDirection);
     #endif
 #elif defined(CONEEMITTER)
     vec3 randoms2 = getRandomVec3(seed.y);
@@ -304,30 +310,45 @@ void main() {
     float randZ = lRadius * cos(s);
     float randY = h  * height.x;
 
-    position = vec3(randX, randY, randZ);
+    newPosition = vec3(randX, randY, randZ);
 
     // Direction
     if (abs(cos(coneAngle)) == 1.0) {
-        direction = vec3(0., 1.0, 0.);
+        newDirection = vec3(0., 1.0, 0.);
     } else {
         vec3 randoms3 = getRandomVec3(seed.z);
-        direction = normalize(position + directionRandomizer * randoms3);
+        newDirection = normalize(newPosition + directionRandomizer * randoms3);
     }
+#elif defined(CUSTOMEMITTER)
+      newPosition = initialPosition;
+      outInitialPosition = initialPosition;
 #else
     // Create the particle at origin
-    position = vec3(0., 0., 0.);
+    newPosition = vec3(0., 0., 0.);
 
     // Spread in all directions
-    direction = 2.0 * (getRandomVec3(seed.w) - vec3(0.5, 0.5, 0.5));
+    newDirection = 2.0 * (getRandomVec3(seed.w) - vec3(0.5, 0.5, 0.5));
 #endif
 
     float power = emitPower.x + (emitPower.y - emitPower.x) * randoms.a;
 
-    outPosition = (emitterWM * vec4(position, 1.)).xyz;
-    vec3 initial = (emitterWM * vec4(direction, 0.)).xyz;
+    outPosition = (emitterWM * vec4(newPosition, 1.)).xyz;
+
+#ifdef CUSTOMEMITTER
+
+)ShaderCode"
+R"ShaderCode(
+
+    outDirection = direction;
+    #ifndef BILLBOARD
+        outInitialDirection = direction;
+    #endif
+#else
+    vec3 initial = (emitterWM * vec4(newDirection, 0.)).xyz;
     outDirection = initial * power;
-#ifndef BILLBOARD
-    outInitialDirection = initial;
+    #ifndef BILLBOARD
+        outInitialDirection = initial;
+    #endif
 #endif
 #ifdef ANIMATESHEET
     outCellIndex = cellInfos.x;
@@ -336,10 +357,6 @@ void main() {
     outCellStartOffset = randoms.a * outLife;
 #endif
 #endif
-
-
-)ShaderCode"
-R"ShaderCode(
 
 #ifdef NOISE
     outNoiseCoordinates1 = noiseCoordinates1;
@@ -359,7 +376,12 @@ R"ShaderCode(
     directionScale *= 1.0 - texture(dragGradientSampler, vec2(ageGradient, 0)).r;
 #endif
 
+#if defined(CUSTOMEMITTER)
+    outPosition = position + (direction - position) * ageGradient;
+    outInitialPosition = initialPosition;
+#else
     outPosition = position + direction * directionScale;
+#endif
 
     outLife = life;
     outSeed = seed;
@@ -378,34 +400,37 @@ R"ShaderCode(
     outInitialDirection = initialDirection;
 #endif
 
+#ifdef CUSTOMEMITTER
+    outDirection = direction;
+#else
     vec3 updatedDirection = direction + gravity * timeDelta;
 
-#ifdef LIMITVELOCITYGRADIENTS
-    float limitVelocity = texture(limitVelocityGradientSampler, vec2(ageGradient, 0)).r;
+    #ifdef LIMITVELOCITYGRADIENTS
+        float limitVelocity = texture(limitVelocityGradientSampler, vec2(ageGradient, 0)).r;
 
-    float currentVelocity = length(updatedDirection);
+        float currentVelocity = length(updatedDirection);
 
-    if (currentVelocity > limitVelocity) {
-        updatedDirection = updatedDirection * limitVelocityDamping;
-    }
-#endif
+        if (currentVelocity > limitVelocity) {
+            updatedDirection = updatedDirection * limitVelocityDamping;
+        }
+    #endif
 
     outDirection = updatedDirection;
 
-#ifdef NOISE
-    vec3 localPosition = outPosition - emitterWM[3].xyz;
+    #ifdef NOISE
+        vec3 localPosition = outPosition - emitterWM[3].xyz;
 
-    float fetchedR = texture(noiseSampler, vec2(noiseCoordinates1.x, noiseCoordinates1.y) * vec2(0.5) + vec2(0.5)).r;
-    float fetchedG = texture(noiseSampler, vec2(noiseCoordinates1.z, noiseCoordinates2.x) * vec2(0.5) + vec2(0.5)).r;
-    float fetchedB = texture(noiseSampler, vec2(noiseCoordinates2.y, noiseCoordinates2.z) * vec2(0.5) + vec2(0.5)).r;
+        float fetchedR = texture(noiseSampler, vec2(noiseCoordinates1.x, noiseCoordinates1.y) * vec2(0.5) + vec2(0.5)).r;
+        float fetchedG = texture(noiseSampler, vec2(noiseCoordinates1.z, noiseCoordinates2.x) * vec2(0.5) + vec2(0.5)).r;
+        float fetchedB = texture(noiseSampler, vec2(noiseCoordinates2.y, noiseCoordinates2.z) * vec2(0.5) + vec2(0.5)).r;
 
-    vec3 force = vec3(2. * fetchedR - 1., 2. * fetchedG - 1., 2. * fetchedB - 1.) * noiseStrength;
+        vec3 force = vec3(2. * fetchedR - 1., 2. * fetchedG - 1., 2. * fetchedB - 1.) * noiseStrength;
 
-    outDirection = outDirection + force * timeDelta;
+        outDirection = outDirection + force * timeDelta;
 
-    outNoiseCoordinates1 = noiseCoordinates1;
-    outNoiseCoordinates2 = noiseCoordinates2;
-
+        outNoiseCoordinates1 = noiseCoordinates1;
+        outNoiseCoordinates2 = noiseCoordinates2;
+    #endif
 #endif
 
 #ifdef ANGULARSPEEDGRADIENTS
@@ -422,6 +447,8 @@ R"ShaderCode(
 #ifdef ANIMATESHEETRANDOMSTART
     outCellStartOffset = cellStartOffset;
     offsetAge += cellStartOffset;
+#else
+    float cellStartOffset = 0.;
 #endif
 
     float ratio = clamp(mod(cellStartOffset + cellInfos.z * offsetAge, life) / life, 0., 1.0);

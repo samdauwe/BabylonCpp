@@ -60,7 +60,7 @@ const char* lightFragment
             #ifdef HEMILIGHT{X}
                 preInfo.roughness = roughness;
             #else
-                preInfo.roughness = adjustRoughnessFromLightProperties(roughness, light{X}.vLightDiffuse.a, preInfo.lightDistance);
+                preInfo.roughness = adjustRoughnessFromLightProperties(roughness, light{X}.vLightSpecular.a, preInfo.lightDistance);
             #endif
 
             // Diffuse contribution
@@ -96,7 +96,7 @@ const char* lightFragment
                 #ifdef HEMILIGHT{X}
                     preInfo.roughness = clearCoatRoughness;
                 #else
-                    preInfo.roughness = adjustRoughnessFromLightProperties(clearCoatRoughness, light{X}.vLightDiffuse.a, preInfo.lightDistance);
+                    preInfo.roughness = adjustRoughnessFromLightProperties(clearCoatRoughness, light{X}.vLightSpecular.a, preInfo.lightDistance);
                 #endif
 
                 info.clearCoat = computeClearCoatLighting(preInfo, clearCoatNormalW, clearCoatAARoughnessFactors.x, clearCoatIntensity, light{X}.vLightDiffuse.rgb);
@@ -121,11 +121,11 @@ const char* lightFragment
             #endif
         #else
             #ifdef SPOTLIGHT{X}
-                info = computeSpotLighting(viewDirectionW, normalW, light{X}.vLightData, light{X}.vLightDirection, light{X}.vLightDiffuse.rgb, light{X}.vLightSpecular, light{X}.vLightDiffuse.a, glossiness);
+                info = computeSpotLighting(viewDirectionW, normalW, light{X}.vLightData, light{X}.vLightDirection, light{X}.vLightDiffuse.rgb, light{X}.vLightSpecular.rgb, light{X}.vLightDiffuse.a, glossiness);
             #elif defined(HEMILIGHT{X})
-                info = computeHemisphericLighting(viewDirectionW, normalW, light{X}.vLightData, light{X}.vLightDiffuse.rgb, light{X}.vLightSpecular, light{X}.vLightGround, glossiness);
+                info = computeHemisphericLighting(viewDirectionW, normalW, light{X}.vLightData, light{X}.vLightDiffuse.rgb, light{X}.vLightSpecular.rgb, light{X}.vLightGround, glossiness);
             #elif defined(POINTLIGHT{X}) || defined(DIRLIGHT{X})
-                info = computeLighting(viewDirectionW, normalW, light{X}.vLightData, light{X}.vLightDiffuse.rgb, light{X}.vLightSpecular, light{X}.vLightDiffuse.a, glossiness);
+                info = computeLighting(viewDirectionW, normalW, light{X}.vLightData, light{X}.vLightDiffuse.rgb, light{X}.vLightSpecular.rgb, light{X}.vLightDiffuse.a, glossiness);
             #endif
         #endif
 
@@ -135,7 +135,87 @@ const char* lightFragment
     #endif
 
     #ifdef SHADOW{X}
-        #ifdef SHADOWCLOSEESM{X}
+        #ifdef SHADOWCSM{X}
+            for (int i = 0; i < SHADOWCSMNUM_CASCADES{X}; i++)
+            {
+                #ifdef SHADOWCSM_RIGHTHANDED{X}
+                    diff{X} = viewFrustumZ{X}[i] + vPositionFromCamera{X}.z;
+                #else
+                    diff{X} = viewFrustumZ{X}[i] - vPositionFromCamera{X}.z;
+                #endif
+                if (diff{X} >= 0.) {
+                    index{X} = i;
+                    break;
+                }
+            }
+
+            #ifdef SHADOWCSMUSESHADOWMAXZ{X}
+            if (index{X} >= 0)
+            #endif
+            {
+                #if defined(SHADOWPCF{X})
+                    #if defined(SHADOWLOWQUALITY{X})
+
+)ShaderCode"
+R"ShaderCode(
+
+                        shadow = computeShadowWithCSMPCF1(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                    #elif defined(SHADOWMEDIUMQUALITY{X})
+                        shadow = computeShadowWithCSMPCF3(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                    #else
+                        shadow = computeShadowWithCSMPCF5(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                    #endif
+                #elif defined(SHADOWPCSS{X})
+                    #if defined(SHADOWLOWQUALITY{X})
+                        shadow = computeShadowWithCSMPCSS16(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w, lightSizeUVCorrection{X}[index{X}], depthCorrection{X}[index{X}], penumbraDarkness{X});
+                    #elif defined(SHADOWMEDIUMQUALITY{X})
+                        shadow = computeShadowWithCSMPCSS32(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w, lightSizeUVCorrection{X}[index{X}], depthCorrection{X}[index{X}], penumbraDarkness{X});
+                    #else
+                        shadow = computeShadowWithCSMPCSS64(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w, lightSizeUVCorrection{X}[index{X}], depthCorrection{X}[index{X}], penumbraDarkness{X});
+                    #endif
+                #else
+                    shadow = computeShadowCSM(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                #endif
+
+                #ifdef SHADOWCSMDEBUG{X}
+                    shadowDebug{X} = vec3(shadow) * vCascadeColorsMultiplier{X}[index{X}];
+                #endif
+
+                #ifndef SHADOWCSMNOBLEND{X}
+                    float frustumLength = frustumLengths{X}[index{X}];
+                    float diffRatio = clamp(diff{X} / frustumLength, 0., 1.) * cascadeBlendFactor{X};
+                    if (index{X} < (SHADOWCSMNUM_CASCADES{X} - 1) && diffRatio < 1.)
+                    {
+                        index{X} += 1;
+                        float nextShadow = 0.;
+                        #if defined(SHADOWPCF{X})
+                            #if defined(SHADOWLOWQUALITY{X})
+                                nextShadow = computeShadowWithCSMPCF1(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                            #elif defined(SHADOWMEDIUMQUALITY{X})
+                                nextShadow = computeShadowWithCSMPCF3(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                            #else
+                                nextShadow = computeShadowWithCSMPCF5(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                            #endif
+                        #elif defined(SHADOWPCSS{X})
+                            #if defined(SHADOWLOWQUALITY{X})
+                                nextShadow = computeShadowWithCSMPCSS16(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w, lightSizeUVCorrection{X}[index{X}], depthCorrection{X}[index{X}], penumbraDarkness{X});
+                            #elif defined(SHADOWMEDIUMQUALITY{X})
+                                nextShadow = computeShadowWithCSMPCSS32(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w, lightSizeUVCorrection{X}[index{X}], depthCorrection{X}[index{X}], penumbraDarkness{X});
+                            #else
+                                nextShadow = computeShadowWithCSMPCSS64(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w, lightSizeUVCorrection{X}[index{X}], depthCorrection{X}[index{X}], penumbraDarkness{X});
+                            #endif
+                        #else
+                            nextShadow = computeShadowCSM(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+                        #endif
+
+                        shadow = mix(nextShadow, shadow, diffRatio);
+                        #ifdef SHADOWCSMDEBUG{X}
+                            shadowDebug{X} = mix(vec3(nextShadow) * vCascadeColorsMultiplier{X}[index{X}], shadowDebug{X}, diffRatio);
+                        #endif
+                    }
+                #endif
+            }
+        #elif defined(SHADOWCLOSEESM{X})
             #if defined(SHADOWCUBE{X})
                 shadow = computeShadowWithCloseESMCube(light{X}.vLightData.xyz, shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z, light{X}.depthValues);
             #else
@@ -144,10 +224,6 @@ const char* lightFragment
         #elif defined(SHADOWESM{X})
             #if defined(SHADOWCUBE{X})
                 shadow = computeShadowWithESMCube(light{X}.vLightData.xyz, shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z, light{X}.depthValues);
-
-)ShaderCode"
-R"ShaderCode(
-
             #else
                 shadow = computeShadowWithESM(vPositionFromLight{X}, vDepthMetric{X}, shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z, light{X}.shadowsInfo.w);
             #endif
@@ -170,6 +246,10 @@ R"ShaderCode(
                 shadow = computeShadowWithPCSS16(vPositionFromLight{X}, vDepthMetric{X}, depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
             #elif defined(SHADOWMEDIUMQUALITY{X})
                 shadow = computeShadowWithPCSS32(vPositionFromLight{X}, vDepthMetric{X}, depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+
+)ShaderCode"
+R"ShaderCode(
+
             #else
                 shadow = computeShadowWithPCSS64(vPositionFromLight{X}, vDepthMetric{X}, depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
             #endif
@@ -216,7 +296,11 @@ R"ShaderCode(
                 #endif
             #endif
         #else
-            diffuseBase += info.diffuse * shadow;
+            #ifdef SHADOWCSMDEBUG{X}
+                diffuseBase += info.diffuse * shadowDebug{X};
+            #else
+                diffuseBase += info.diffuse * shadow;
+            #endif
             #ifdef SPECULARTERM
                 specularBase += info.specular * shadow;
             #endif

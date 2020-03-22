@@ -109,7 +109,12 @@ void main(void) {
         alpha *= albedoTexture.a;
     #endif
 
-    surfaceAlbedo *= toLinearSpace(albedoTexture.rgb);
+    #ifdef GAMMAALBEDO
+        surfaceAlbedo *= toLinearSpace(albedoTexture.rgb);
+    #else
+        surfaceAlbedo *= albedoTexture.rgb;
+    #endif
+
     surfaceAlbedo *= vAlbedoInfos.y;
 #endif
 
@@ -451,7 +456,7 @@ R"ShaderCode(
         #if defined(LODINREFLECTIONALPHA) && !defined(REFLECTIONMAP_SKYBOX)
             float reflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, alphaG, NdotVUnclamped);
         #elif defined(LINEARSPECULARREFLECTION)
-            float refractionLOD = getLinearLodFromRoughness(vReflectionMicrosurfaceInfos.x, roughness);
+            float reflectionLOD = getLinearLodFromRoughness(vReflectionMicrosurfaceInfos.x, roughness);
         #else
             float reflectionLOD = getLodFromAlphaG(vReflectionMicrosurfaceInfos.x, alphaG);
         #endif
@@ -687,7 +692,7 @@ R"ShaderCode(
                 clearCoatNormalW = normalize(texture2D(clearCoatBumpSampler, vClearCoatBumpUV + uvOffset).xyz  * 2.0 - 1.0);
                 clearCoatNormalW = normalize(mat3(normalMatrix) * clearCoatNormalW);
             #else
-                clearCoatNormalW = perturbNormal(TBN, texture2D(clearCoatBumpSampler, vClearCoatBumpUV + uvOffset).xyz, vClearCoatBumpInfos.y);
+                clearCoatNormalW = perturbNormal(TBNClearCoat, texture2D(clearCoatBumpSampler, vClearCoatBumpUV + uvOffset).xyz, vClearCoatBumpInfos.y);
             #endif
         #endif
 
@@ -706,6 +711,14 @@ R"ShaderCode(
         float clearCoatNdotVUnclamped = dot(clearCoatNormalW, viewDirectionW);
         // The order 1886 page 3.
         float clearCoatNdotV = absEps(clearCoatNdotVUnclamped);
+
+        #ifdef CLEARCOAT_TINT
+            // Used later on in the light fragment and ibl.
+            vec3 clearCoatVRefract = -refract(vPositionW, clearCoatNormalW, vClearCoatRefractionParams.y);
+            // The order 1886 page 3.
+            float clearCoatNdotVRefract = absEps(dot(clearCoatNormalW, clearCoatVRefract));
+            vec3 absorption = vec3(0.);
+        #endif
 
         // Clear Coat Reflection
         #if defined(REFLECTION)
@@ -770,22 +783,14 @@ R"ShaderCode(
 
             #ifdef RGBDREFLECTION
                 environmentClearCoatRadiance.rgb = fromRGBD(environmentClearCoatRadiance);
-            #endif
-
-            #ifdef GAMMAREFLECTION
-                environmentClearCoatRadiance.rgb = toLinearSpace(environmentClearCoatRadiance.rgb);
-            #endif
-
-            #ifdef CLEARCOAT_TINT
-                // Used later on in the light fragment and ibl.
-                vec3 clearCoatVRefract = -refract(vPositionW, clearCoatNormalW, vClearCoatRefractionParams.y);
 
 )ShaderCode"
 R"ShaderCode(
 
-                // The order 1886 page 3.
-                float clearCoatNdotVRefract = absEps(dot(clearCoatNormalW, clearCoatVRefract));
-                vec3 absorption = vec3(0.);
+            #endif
+
+            #ifdef GAMMAREFLECTION
+                environmentClearCoatRadiance.rgb = toLinearSpace(environmentClearCoatRadiance.rgb);
             #endif
 
             // _____________________________ Levels _____________________________________
@@ -952,16 +957,16 @@ R"ShaderCode(
 
         clearCoatEnvironmentReflectance *= clearCoatIntensity;
 
-        #if defined(REFLECTION) && defined(CLEARCOAT_TINT)
+        #if defined(CLEARCOAT_TINT)
             // NdotL = NdotV in IBL
             absorption = computeClearCoatAbsorption(clearCoatNdotVRefract, clearCoatNdotVRefract, clearCoatColor, clearCoatThickness, clearCoatIntensity);
 
             #ifdef REFLECTION
                 environmentIrradiance *= absorption;
-            #endif
 
-            #ifdef SHEEN
-                sheenEnvironmentReflectance *= absorption;
+                #ifdef SHEEN
+                    sheenEnvironmentReflectance *= absorption;
+                #endif
             #endif
 
             specularEnvironmentReflectance *= absorption;
@@ -975,10 +980,10 @@ R"ShaderCode(
 
         #ifdef REFLECTION
             environmentIrradiance *= conservationFactor;
-        #endif
 
-        #ifdef SHEEN
-            sheenEnvironmentReflectance *= conservationFactor;
+            #ifdef SHEEN
+                sheenEnvironmentReflectance *= conservationFactor;
+            #endif
         #endif
 
         specularEnvironmentReflectance *= conservationFactor;
