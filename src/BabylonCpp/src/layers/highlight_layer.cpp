@@ -152,9 +152,9 @@ void HighlightLayer::_createTextureAndPostProcesses()
     textureType = Constants::TEXTURETYPE_UNSIGNED_INT;
   }
 
-  _blurTexture
-    = RenderTargetTexture::New("HighlightLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight},
-                               _scene, false, true, textureType);
+  _blurTexture                            = RenderTargetTexture::New("HighlightLayerBlurRTT",
+                                          RenderTargetSize{blurTextureWidth, blurTextureHeight},
+                                          _scene, false, true, textureType);
   _blurTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->anisotropicFilteringLevel = 16;

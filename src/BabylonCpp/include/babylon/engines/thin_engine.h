@@ -1003,8 +1003,9 @@ public:
    * @brief Hidden
    */
   void _setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
-                                 const std::variant<int, ISize>& size, bool generateStencil,
-                                 bool bilinearFiltering, int comparisonFunction);
+                                 const std::variant<int, RenderTargetSize>& size,
+                                 bool generateStencil, bool bilinearFiltering,
+                                 int comparisonFunction);
 
   /**
    * @brief Hidden
@@ -1392,8 +1393,9 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  virtual InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                                       const IRenderTargetOptions& options);
+  virtual InternalTexturePtr
+  createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
+                            const IRenderTargetOptions& options);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -1402,13 +1404,13 @@ public:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  InternalTexturePtr createDepthStencilTexture(const std::variant<int, ISize>& size,
+  InternalTexturePtr createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                                const DepthTextureCreationOptions& options);
 
   /**
    * @brief Hidden
    */
-  InternalTexturePtr _createDepthStencilTexture(const std::variant<int, ISize>& size,
+  InternalTexturePtr _createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                                 const DepthTextureCreationOptions& options);
 
   //------------------------------------------------------------------------------------------------

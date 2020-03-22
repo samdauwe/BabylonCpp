@@ -2613,14 +2613,14 @@ void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
 }
 
 void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
-                                           const std::variant<int, ISize>& size,
+                                           const std::variant<int, RenderTargetSize>& size,
                                            bool generateStencil, bool bilinearFiltering,
                                            int comparisonFunction)
 {
-  auto width
-    = std::holds_alternative<int>(size) ? std::get<int>(size) : std::get<ISize>(size).width;
-  auto height
-    = std::holds_alternative<int>(size) ? std::get<int>(size) : std::get<ISize>(size).height;
+  auto width = std::holds_alternative<int>(size) ? std::get<int>(size) :
+                                                   std::get<RenderTargetSize>(size).width;
+  auto height = std::holds_alternative<int>(size) ? std::get<int>(size) :
+                                                    std::get<RenderTargetSize>(size).height;
   internalTexture->baseWidth              = width;
   internalTexture->baseHeight             = height;
   internalTexture->width                  = width;
@@ -3867,20 +3867,22 @@ unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
 //                              Render Target Extension
 //--------------------------------------------------------------------------------------------------
 
-InternalTexturePtr ThinEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                                         const IRenderTargetOptions& options)
+InternalTexturePtr
+ThinEngine::createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
+                                      const IRenderTargetOptions& options)
 {
   return _renderTargetExtension->createRenderTargetTexture(size, options);
 }
 
-InternalTexturePtr ThinEngine::createDepthStencilTexture(const std::variant<int, ISize>& size,
-                                                         const DepthTextureCreationOptions& options)
+InternalTexturePtr
+ThinEngine::createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
+                                      const DepthTextureCreationOptions& options)
 {
   return _renderTargetExtension->createDepthStencilTexture(size, options);
 }
 
 InternalTexturePtr
-ThinEngine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
+ThinEngine::_createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
                                        const DepthTextureCreationOptions& options)
 {
   return _renderTargetExtension->_createDepthStencilTexture(size, options);

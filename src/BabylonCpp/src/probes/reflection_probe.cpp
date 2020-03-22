@@ -11,15 +11,12 @@
 
 namespace BABYLON {
 
-ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size,
-                                 Scene* scene, bool generateMipMaps,
-                                 bool useFloat)
+ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Scene* scene,
+                                 bool generateMipMaps, bool useFloat)
     : name{iName}
     , position{Vector3::Zero()}
-    , samples{this, &ReflectionProbe::get_samples,
-              &ReflectionProbe::set_samples}
-    , refreshRate{this, &ReflectionProbe::get_refreshRate,
-                  &ReflectionProbe::set_refreshRate}
+    , samples{this, &ReflectionProbe::get_samples, &ReflectionProbe::set_samples}
+    , refreshRate{this, &ReflectionProbe::get_refreshRate, &ReflectionProbe::set_refreshRate}
     , renderList{this, &ReflectionProbe::get_renderList}
     , _scene{scene}
     , _viewMatrix{Matrix::Identity()}
@@ -28,11 +25,9 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size,
     , _attachedMesh{nullptr}
     , _invertYAxis{false}
 {
-  _renderTargetTexture
-    = RenderTargetTexture::New(iName, size, scene, generateMipMaps, true,
-                               useFloat ? Constants::TEXTURETYPE_FLOAT :
-                                          Constants::TEXTURETYPE_UNSIGNED_INT,
-                               true);
+  _renderTargetTexture = RenderTargetTexture::New(
+    iName, RenderTargetSize{size.width, size.height}, scene, generateMipMaps, true,
+    useFloat ? Constants::TEXTURETYPE_FLOAT : Constants::TEXTURETYPE_UNSIGNED_INT, true);
 
   _renderTargetTexture->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
     switch (*faceIndex) {
@@ -75,11 +70,10 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size,
     _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
   });
 
-  _renderTargetTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture*, EventState&) {
-      _scene->_forcedViewPosition = nullptr;
-      _scene->updateTransformMatrix(true);
-    });
+  _renderTargetTexture->onAfterUnbindObservable.add([this](RenderTargetTexture*, EventState&) {
+    _scene->_forcedViewPosition = nullptr;
+    _scene->updateTransformMatrix(true);
+  });
 }
 
 ReflectionProbe::~ReflectionProbe() = default;
@@ -129,11 +123,10 @@ void ReflectionProbe::attachToMesh(AbstractMesh* mesh)
   _attachedMesh = mesh;
 }
 
-void ReflectionProbe::setRenderingAutoClearDepthStencil(
-  unsigned int renderingGroupId, bool autoClearDepthStencil)
+void ReflectionProbe::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
+                                                        bool autoClearDepthStencil)
 {
-  _renderTargetTexture->setRenderingAutoClearDepthStencil(
-    renderingGroupId, autoClearDepthStencil);
+  _renderTargetTexture->setRenderingAutoClearDepthStencil(renderingGroupId, autoClearDepthStencil);
 }
 
 void ReflectionProbe::dispose()
@@ -172,8 +165,7 @@ void ReflectionProbe::serialize(json& /*serializationObject*/)
 {
 }
 
-ReflectionProbePtr ReflectionProbe::Parse(const json& /*parsedReflectionProbe*/,
-                                          Scene* /*scene*/,
+ReflectionProbePtr ReflectionProbe::Parse(const json& /*parsedReflectionProbe*/, Scene* /*scene*/,
                                           const std::string& /*rootUrl*/)
 {
   return nullptr;

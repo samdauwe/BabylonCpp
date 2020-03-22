@@ -68,8 +68,8 @@ protected:
    * @param samplingMode
    * @param generateDepthBuffer
    */
-  MirrorTexture(const std::string& name, const std::variant<ISize, float>& size, Scene* scene,
-                bool generateMipMaps      = false,
+  MirrorTexture(const std::string& name, const std::variant<int, RenderTargetSize, float>& size,
+                Scene* scene, bool generateMipMaps = false,
                 unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT,
                 unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
                 bool generateDepthBuffer  = true);

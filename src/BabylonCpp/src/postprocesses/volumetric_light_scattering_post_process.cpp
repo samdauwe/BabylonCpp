@@ -195,8 +195,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
 
   _volumetricLightScatteringRTT = RenderTargetTexture::New(
     "volumetricLightScatteringMap",
-    ISize(static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
-          static_cast<int>(static_cast<float>(engine->getRenderHeight()) * ratio)),
+    RenderTargetSize{static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
+                     static_cast<int>(static_cast<float>(engine->getRenderHeight()) * ratio)},
     scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT);
   _volumetricLightScatteringRTT->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;

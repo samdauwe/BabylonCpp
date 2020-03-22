@@ -24,8 +24,7 @@ using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 struct BABYLON_SHARED_EXPORT TextureLineComponent {
 
-  static void renderImage(const Uint8Array& /*imageData*/, int /*width*/,
-                          int /*height*/)
+  static void renderImage(const Uint8Array& /*imageData*/, int /*width*/, int /*height*/)
   {
     // TODO IMPLEMENT
   }
@@ -43,14 +42,14 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
     PostProcessPtr passPostProcess = nullptr;
 
     if (!texture->isCube) {
-      passPostProcess = PassPostProcess::New(
-        "pass", 1.f, nullptr, TextureConstants::NEAREST_SAMPLINGMODE, engine,
-        false, Constants::TEXTURETYPE_UNSIGNED_INT);
+      passPostProcess
+        = PassPostProcess::New("pass", 1.f, nullptr, TextureConstants::NEAREST_SAMPLINGMODE, engine,
+                               false, Constants::TEXTURETYPE_UNSIGNED_INT);
     }
     else {
-      auto passCubePostProcess = PassCubePostProcess::New(
-        "pass", 1.f, nullptr, TextureConstants::NEAREST_SAMPLINGMODE, engine,
-        false, Constants::TEXTURETYPE_UNSIGNED_INT);
+      auto passCubePostProcess
+        = PassCubePostProcess::New("pass", 1.f, nullptr, TextureConstants::NEAREST_SAMPLINGMODE,
+                                   engine, false, Constants::TEXTURETYPE_UNSIGNED_INT);
       passCubePostProcess->face = textureReservedDataStore.face;
 
       passPostProcess = passCubePostProcess;
@@ -63,21 +62,19 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
     }
 
     auto rtt = RenderTargetTexture::New("temp",
-                                        ISize{
+                                        RenderTargetSize{
                                           width, // width,
                                           height // height
                                         },
                                         scene, false);
 
-    passPostProcess->onApply = [&texture](Effect* effect, EventState&) {
-      effect->setTexture("textureSampler", texture);
-    };
+    passPostProcess->onApply
+      = [&texture](Effect* effect, EventState&) { effect->setTexture("textureSampler", texture); };
 
     auto internalTexture = rtt->getInternalTexture();
 
     if (internalTexture) {
-      scene->postProcessManager->directRender({passPostProcess},
-                                              internalTexture);
+      scene->postProcessManager->directRender({passPostProcess}, internalTexture);
 
       // Read the contents of the framebuffer
       auto numberOfChannelsByLine = static_cast<size_t>(width * 4);
@@ -87,11 +84,9 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
       auto data = engine->readPixels(0, 0, width, height);
 
       if (!texture->isCube) {
-        if (!textureReservedDataStore.displayRed
-            || !textureReservedDataStore.displayGreen
+        if (!textureReservedDataStore.displayRed || !textureReservedDataStore.displayGreen
             || !textureReservedDataStore.displayBlue) {
-          for (size_t i = 0; i < static_cast<size_t>(width * height * 4);
-               i += 4) {
+          for (size_t i = 0; i < static_cast<size_t>(width * height * 4); i += 4) {
 
             if (!textureReservedDataStore.displayRed) {
               data[i] = 0;
@@ -196,8 +191,8 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
     else {
       // control
       // R
-      bool commandSelected = (textureReservedDataStore.displayRed
-                              && !textureReservedDataStore.displayGreen);
+      bool commandSelected
+        = (textureReservedDataStore.displayRed && !textureReservedDataStore.displayGreen);
       if (ImGui::Checkbox("R", &commandSelected)) {
         if (commandSelected) {
           textureReservedDataStore.displayRed   = true;
@@ -208,8 +203,8 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
       }
       ImGui::SameLine();
       // G
-      commandSelected = (textureReservedDataStore.displayGreen
-                         && !textureReservedDataStore.displayBlue);
+      commandSelected
+        = (textureReservedDataStore.displayGreen && !textureReservedDataStore.displayBlue);
       if (ImGui::Checkbox("G", &commandSelected)) {
         if (commandSelected) {
           textureReservedDataStore.displayRed   = false;
@@ -220,8 +215,8 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
       }
       ImGui::SameLine();
       // B
-      commandSelected = (textureReservedDataStore.displayBlue
-                         && !textureReservedDataStore.displayAlpha);
+      commandSelected
+        = (textureReservedDataStore.displayBlue && !textureReservedDataStore.displayAlpha);
       if (ImGui::Checkbox("B", &commandSelected)) {
         if (commandSelected) {
           textureReservedDataStore.displayRed   = false;
@@ -232,8 +227,8 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
       }
       ImGui::SameLine();
       // A
-      commandSelected = (textureReservedDataStore.displayAlpha
-                         && !textureReservedDataStore.displayRed);
+      commandSelected
+        = (textureReservedDataStore.displayAlpha && !textureReservedDataStore.displayRed);
       if (ImGui::Checkbox("A", &commandSelected)) {
         if (commandSelected) {
           textureReservedDataStore.displayRed   = false;
@@ -244,8 +239,8 @@ struct BABYLON_SHARED_EXPORT TextureLineComponent {
       }
       ImGui::SameLine();
       // ALL
-      commandSelected = (textureReservedDataStore.displayRed
-                         && textureReservedDataStore.displayGreen);
+      commandSelected
+        = (textureReservedDataStore.displayRed && textureReservedDataStore.displayGreen);
       if (ImGui::Checkbox("ALL", &commandSelected)) {
         if (commandSelected) {
           textureReservedDataStore.displayRed   = true;

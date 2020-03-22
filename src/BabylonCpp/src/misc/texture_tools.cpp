@@ -10,21 +10,21 @@
 
 namespace BABYLON {
 
-TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
-                                           int height, bool useBilinearMode)
+TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width, int height,
+                                           bool useBilinearMode)
 {
   auto scene  = texture->getScene();
   auto engine = scene->getEngine();
 
-  auto rtt = RenderTargetTexture::New("resized" + texture->name, //
-                                      ISize{width, height},      //
-                                      scene,                     //
-                                      !texture->noMipmap(),      //
-                                      true,                      //
-                                      texture->_texture->type,   //
-                                      false,                     //
-                                      texture->samplingMode(),   //
-                                      false                      //
+  auto rtt = RenderTargetTexture::New("resized" + texture->name,       //
+                                      RenderTargetSize{width, height}, //
+                                      scene,                           //
+                                      !texture->noMipmap(),            //
+                                      true,                            //
+                                      texture->_texture->type,         //
+                                      false,                           //
+                                      texture->samplingMode(),         //
+                                      false                            //
   );
 
   rtt->wrapU                     = texture->wrapU;
@@ -44,21 +44,19 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
   texture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   texture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
-  auto passPostProcess = PassPostProcess::New(
-    "pass", 1.f, nullptr,
-    useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
-                      TextureConstants::NEAREST_SAMPLINGMODE,
-    engine, false, Constants::TEXTURETYPE_UNSIGNED_INT);
+  auto passPostProcess
+    = PassPostProcess::New("pass", 1.f, nullptr,
+                           useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
+                                             TextureConstants::NEAREST_SAMPLINGMODE,
+                           engine, false, Constants::TEXTURETYPE_UNSIGNED_INT);
   passPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
-    passPostProcess->onApply = [&](Effect* effect, EventState&) {
-      effect->setTexture("textureSampler", texture);
-    };
+    passPostProcess->onApply
+      = [&](Effect* effect, EventState&) { effect->setTexture("textureSampler", texture); };
 
     auto internalTexture = rtt->getInternalTexture();
 
     if (internalTexture) {
-      scene->postProcessManager->directRender({passPostProcess},
-                                              internalTexture);
+      scene->postProcessManager->directRender({passPostProcess}, internalTexture);
 
       engine->unBindFramebuffer(internalTexture);
       rtt->disposeFramebufferObjects();

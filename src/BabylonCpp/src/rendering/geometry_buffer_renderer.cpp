@@ -344,8 +344,8 @@ void GeometryBufferRenderer::_createRenderTargets()
   options.defaultType          = Constants::TEXTURETYPE_FLOAT;
   _multiRenderTarget           = std::make_shared<MultiRenderTarget>(
     "gBuffer",
-    Size{static_cast<int>(engine->getRenderWidth() * _ratio),
-         static_cast<int>(engine->getRenderHeight() * _ratio)},
+    RenderTargetSize{static_cast<int>(engine->getRenderWidth() * _ratio),
+                     static_cast<int>(engine->getRenderHeight() * _ratio)},
     count, _scene, options);
   if (!isSupported()) {
     return;

@@ -37,9 +37,10 @@ public:
   /**
    * @brief Hidden
    */
-  static MirrorTexturePtr _CreateMirror(const std::string& name,
-                                        const std::variant<ISize, float>& renderTargetSize,
-                                        Scene* scene, bool generateMipMaps);
+  static MirrorTexturePtr
+  _CreateMirror(const std::string& name,
+                const std::variant<int, RenderTargetSize, float>& renderTargetSize, Scene* scene,
+                bool generateMipMaps);
 
   /**
    * Gets or sets a boolean which defines if the texture url must be build from the serialized URL

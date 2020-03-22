@@ -485,7 +485,7 @@ void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& 
     _boundUniforms[channel] = uniform;
   }
 
-  if (!texture || !texture->depthStencilTexture) {
+  if (!texture || !texture->depthStencilTexture()) {
     _setTexture(channel, nullptr);
   }
   else {
@@ -823,7 +823,8 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
   options.generateDepthBuffer   = false;
   options.generateStencilBuffer = false;
 
-  auto rtt = createRenderTargetTexture(ISize(destination->width, destination->height), options);
+  auto rtt
+    = createRenderTargetTexture(RenderTargetSize{destination->width, destination->height}, options);
 
   if (!_rescalePostProcess && Engine::_RescalePostProcessFactory) {
     _rescalePostProcess = Engine::_RescalePostProcessFactory(this);

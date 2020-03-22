@@ -144,8 +144,9 @@ void EffectLayer::_setMainTextureSize()
 void EffectLayer::_createMainTexture()
 {
   _mainTexture = RenderTargetTexture::New(
-    "HighlightLayerMainRTT", ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
-    _scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT);
+    "HighlightLayerMainRTT",
+    RenderTargetSize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height}, _scene, false,
+    true, Constants::TEXTURETYPE_UNSIGNED_INT);
   _mainTexture->activeCamera              = _effectLayerOptions.camera;
   _mainTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _mainTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;

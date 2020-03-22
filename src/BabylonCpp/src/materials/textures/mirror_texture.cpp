@@ -12,9 +12,10 @@
 
 namespace BABYLON {
 
-MirrorTexture::MirrorTexture(const std::string& iName, const std::variant<ISize, float>& size,
-                             Scene* iScene, bool generateMipMaps, unsigned int type,
-                             unsigned int iSamplingMode, bool generateDepthBuffer)
+MirrorTexture::MirrorTexture(const std::string& iName,
+                             const std::variant<int, RenderTargetSize, float>& size, Scene* iScene,
+                             bool generateMipMaps, unsigned int type, unsigned int iSamplingMode,
+                             bool generateDepthBuffer)
 
     : RenderTargetTexture{iName, size,  iScene,        generateMipMaps,    true,
                           type,  false, iSamplingMode, generateDepthBuffer}
@@ -209,13 +210,13 @@ MirrorTexturePtr MirrorTexture::clone()
   }
 
   auto textureSize = getSize();
-  auto newTexture  = MirrorTexture::New(name,                                            //
-                                       Size(textureSize.width, textureSize.height),     //
-                                       iScene,                                          //
-                                       _renderTargetOptions.generateMipMaps.value(),    //
-                                       _renderTargetOptions.type.value(),               //
-                                       _renderTargetOptions.samplingMode.value(),       //
-                                       _renderTargetOptions.generateDepthBuffer.value() //
+  auto newTexture  = MirrorTexture::New(name,                                                    //
+                                       RenderTargetSize{textureSize.width, textureSize.height}, //
+                                       iScene,                                                  //
+                                       _renderTargetOptions.generateMipMaps.value(),            //
+                                       _renderTargetOptions.type.value(),                       //
+                                       _renderTargetOptions.samplingMode.value(),               //
+                                       _renderTargetOptions.generateDepthBuffer.value()         //
   );
 
   // Base texture

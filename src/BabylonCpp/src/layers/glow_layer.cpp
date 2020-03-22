@@ -127,9 +127,9 @@ void GlowLayer::_createTextureAndPostProcesses()
     textureType = Constants::TEXTURETYPE_UNSIGNED_INT;
   }
 
-  _blurTexture1
-    = RenderTargetTexture::New("GlowLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight},
-                               _scene, false, true, textureType);
+  _blurTexture1        = RenderTargetTexture::New("GlowLayerBlurRTT",
+                                           RenderTargetSize{blurTextureWidth, blurTextureHeight},
+                                           _scene, false, true, textureType);
   _blurTexture1->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture1->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture1->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
@@ -139,9 +139,9 @@ void GlowLayer::_createTextureAndPostProcesses()
   auto blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
   auto blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
 
-  _blurTexture2
-    = RenderTargetTexture::New("GlowLayerBlurRTT2", ISize{blurTextureWidth2, blurTextureHeight2},
-                               _scene, false, true, textureType);
+  _blurTexture2        = RenderTargetTexture::New("GlowLayerBlurRTT2",
+                                           RenderTargetSize{blurTextureWidth2, blurTextureHeight2},
+                                           _scene, false, true, textureType);
   _blurTexture2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture2->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture2->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);

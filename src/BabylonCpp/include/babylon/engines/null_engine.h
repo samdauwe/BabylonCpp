@@ -407,8 +407,9 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  InternalTexturePtr createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                               const IRenderTargetOptions& options) override;
+  InternalTexturePtr
+  createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
+                            const IRenderTargetOptions& options) override;
 
   /**
    * @brief Update the sampling mode of a given texture.

@@ -105,7 +105,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , _boxBlurPostprocess{nullptr}
     , _kernelBlurXPostprocess{nullptr}
     , _kernelBlurYPostprocess{nullptr}
-    , _mapSize{mapSize}
+    , _mapSize{RenderTargetSize{mapSize.width, mapSize.height}}
     , _currentFaceIndex{0}
     , _currentFaceIndexCache{0}
     , _useFullFloat{true}
@@ -654,9 +654,9 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   auto targetSize = static_cast<int>(_mapSize.width / blurScale());
 
   if (!useKernelBlur() || blurScale() != 1.f) {
-    _shadowMap2
-      = RenderTargetTexture::New(_light->name + "_shadowMap2", ISize{targetSize, targetSize},
-                                 _scene, false, true, _textureType);
+    _shadowMap2        = RenderTargetTexture::New(_light->name + "_shadowMap2",
+                                           RenderTargetSize{targetSize, targetSize}, _scene, false,
+                                           true, _textureType);
     _shadowMap2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
     _shadowMap2->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
     _shadowMap2->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);

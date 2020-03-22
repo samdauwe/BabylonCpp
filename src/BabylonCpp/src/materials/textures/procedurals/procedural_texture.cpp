@@ -60,7 +60,8 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
   else {
     IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
-    _texture                = _engine->createRenderTargetTexture(size, options);
+    _texture
+      = _engine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
   }
 
   // VBO
@@ -123,7 +124,8 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     options.generateMipMaps       = generateMipMaps;
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
-    _texture                      = _engine->createRenderTargetTexture(size, options);
+    _texture
+      = _engine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
   }
 
   // VBO
@@ -334,7 +336,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
   releaseInternalTexture();
   IRenderTargetOptions options;
   options.generateMipMaps = generateMipMaps;
-  _texture                = _engine->createRenderTargetTexture(size, options);
+  _texture = _engine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
 
   // Update properties
   _size            = size;

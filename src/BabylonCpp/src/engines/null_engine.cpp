@@ -365,8 +365,9 @@ InternalTexturePtr NullEngine::createTexture(
   return texture;
 }
 
-InternalTexturePtr NullEngine::createRenderTargetTexture(const std::variant<ISize, float>& size,
-                                                         const IRenderTargetOptions& options)
+InternalTexturePtr
+NullEngine::createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
+                                      const IRenderTargetOptions& options)
 {
   RenderTargetCreationOptions fullOptions;
 
@@ -383,8 +384,8 @@ InternalTexturePtr NullEngine::createRenderTargetTexture(const std::variant<ISiz
   auto texture = InternalTexture::New(this, InternalTextureSource::RenderTarget);
 
   int width = 0, height = 0;
-  if (std::holds_alternative<ISize>(size)) {
-    auto textureSize = std::get<ISize>(size);
+  if (std::holds_alternative<RenderTargetSize>(size)) {
+    auto textureSize = std::get<RenderTargetSize>(size);
     width            = textureSize.width;
     height           = textureSize.height;
   }
@@ -392,6 +393,11 @@ InternalTexturePtr NullEngine::createRenderTargetTexture(const std::variant<ISiz
     auto textureSize = std::get<float>(size);
     width            = static_cast<int>(textureSize);
     height           = static_cast<int>(textureSize);
+  }
+  else if (std::holds_alternative<int>(size)) {
+    auto textureSize = std::get<int>(size);
+    width            = textureSize;
+    height           = textureSize;
   }
 
   texture->_depthStencilBuffer    = std::make_shared<GL::IGLRenderbuffer>(0);

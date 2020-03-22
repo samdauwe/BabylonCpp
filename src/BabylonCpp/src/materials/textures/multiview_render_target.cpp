@@ -9,7 +9,7 @@ namespace BABYLON {
 MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
     : RenderTargetTexture{
       "multiview rtt",                                           // name
-      size,                                                      // size
+      RenderTargetSize{size.width, size.height},                 // size
       scene,                                                     // scene
       false,                                                     // generateMipMaps
       true,                                                      // doNotChangeAspectRatio

@@ -2,6 +2,7 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/structs.h>
 #include <babylon/lights/shadows/icustom_shader_options.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
 #include <babylon/maths/isize.h>
@@ -709,7 +710,7 @@ protected:
   PostProcessPtr _kernelBlurXPostprocess;
   PostProcessPtr _kernelBlurYPostprocess;
   std::vector<PostProcessPtr> _blurPostProcesses;
-  ISize _mapSize;
+  RenderTargetSize _mapSize;
   unsigned int _currentFaceIndex;
   unsigned int _currentFaceIndexCache;
   bool _useFullFloat;

@@ -6,17 +6,17 @@
 
 namespace BABYLON {
 
-RefractionTexture::RefractionTexture(const std::string& iName, ISize size,
-                                     Scene* scene, bool generateMipMaps)
-    : RenderTargetTexture(iName, size, scene, generateMipMaps, true)
+RefractionTexture::RefractionTexture(const std::string& iName, ISize size, Scene* scene,
+                                     bool generateMipMaps)
+    : RenderTargetTexture(iName, RenderTargetSize{size.width, size.height}, scene, generateMipMaps,
+                          true)
     , refractionPlane{Plane(0.f, 1.f, 0.f, 1.f)}
     , depth{2.f}
 {
   onBeforeRenderObservable.add(
     [this](int*, EventState&) { getScene()->clipPlane = refractionPlane; });
 
-  onAfterRenderObservable.add(
-    [this](int*, EventState&) { getScene()->clipPlane = std::nullopt; });
+  onAfterRenderObservable.add([this](int*, EventState&) { getScene()->clipPlane = std::nullopt; });
 }
 
 RefractionTexture::~RefractionTexture() = default;

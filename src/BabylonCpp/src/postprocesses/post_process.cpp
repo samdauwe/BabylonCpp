@@ -329,7 +329,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
       width  = desiredWidth;
       height = desiredHeight;
 
-      auto textureSize = ISize(width, height);
+      auto textureSize = RenderTargetSize{width, height};
       IRenderTargetOptions textureOptions;
       textureOptions.generateMipMaps = needMipMaps;
       textureOptions.generateDepthBuffer

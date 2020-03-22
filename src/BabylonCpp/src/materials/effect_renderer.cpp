@@ -24,7 +24,7 @@ TexturePtr EffectRenderer::_getNextFrameBuffer(bool incrementIndex)
     _ringScreenBuffer = {};
     for (auto i = 0; i < 2; ++i) {
       auto internalTexture = engine->createRenderTargetTexture(
-        ISize{
+        RenderTargetSize{
           engine->getRenderWidth(true),  // width
           engine->getRenderHeight(true), // height
         },

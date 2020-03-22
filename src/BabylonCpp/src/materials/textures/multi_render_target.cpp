@@ -6,8 +6,9 @@
 
 namespace BABYLON {
 
-MultiRenderTarget::MultiRenderTarget(const std::string& iName, Size size, std::size_t count,
-                                     Scene* scene,
+MultiRenderTarget::MultiRenderTarget(const std::string& iName,
+                                     const std::variant<int, RenderTargetSize, float>& size,
+                                     std::size_t count, Scene* scene,
                                      const std::optional<IMultiRenderTargetOptions>& options)
     : RenderTargetTexture{iName, size, scene,
                           options && (*options).generateMipMaps ? *(*options).generateMipMaps :
@@ -62,8 +63,6 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName, Size size, std::s
   const auto generateStencilBuffer = !options || (*options).generateStencilBuffer == std::nullopt ?
                                        false :
                                        *(*options).generateStencilBuffer;
-
-  _size = size;
 
   _multiRenderTargetOptions = IMultiRenderTargetOptions{
     generateMipMaps,                    // generateMipMaps
@@ -132,7 +131,9 @@ void MultiRenderTarget::_rebuild()
 
 void MultiRenderTarget::_createInternalTextures()
 {
-  _internalTextures = _engine->createMultipleRenderTarget(_size, _multiRenderTargetOptions);
+
+  _internalTextures = _engine->createMultipleRenderTarget(ISize{_size.width, _size.height},
+                                                          _multiRenderTargetOptions);
 }
 
 void MultiRenderTarget::_createTextures()
@@ -165,7 +166,7 @@ void MultiRenderTarget::set_samples(unsigned int value)
 void MultiRenderTarget::resize(Size size)
 {
   releaseInternalTextures();
-  _size = size;
+  _size = RenderTargetSize{size.width, size.height};
   _createInternalTextures();
 }
 

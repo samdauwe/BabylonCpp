@@ -55,8 +55,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
   const auto format = (isPacked || engine->webGLVersion() == 1.f) ? Constants::TEXTUREFORMAT_RGBA :
                                                                     Constants::TEXTUREFORMAT_R;
   _depthMap = RenderTargetTexture::New(
-    "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()}, _scene, false, true,
-    type, false, TextureConstants::TRILINEAR_SAMPLINGMODE, true, false, false, format);
+    "depthMap", RenderTargetSize{engine->getRenderWidth(), engine->getRenderHeight()}, _scene,
+    false, true, type, false, TextureConstants::TRILINEAR_SAMPLINGMODE, true, false, false, format);
   _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->refreshRate     = 1;
