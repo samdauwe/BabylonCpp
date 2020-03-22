@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/structs.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/misc/observable.h>
@@ -112,7 +113,7 @@ public:
    * @brief Gets the actual render size of the texture.
    * @returns the width of the render size
    */
-  ISize& getRenderSize();
+  RenderTargetSize& getRenderSize();
 
   /**
    * @brief Gets the actual render width of the texture.
@@ -125,6 +126,12 @@ public:
    * @returns the height of the render size
    */
   int getRenderHeight() const;
+
+  /**
+   * @brief Gets the actual number of layers of the texture.
+   * @returns the number of layers
+   */
+  int getRenderLayers() const;
 
   /**
    * @brief Get if the texture can be rescaled or not.
@@ -151,7 +158,7 @@ public:
    *   - an object containing { width: number, height: number }
    *   - or an object containing a ratio { ratio: number }
    */
-  void resize(const std::variant<ISize, float>& size);
+  void resize(const std::variant<int, RenderTargetSize, float>& size);
 
   /**
    * @brief Renders all the objects from the render list into the texture.
@@ -256,7 +263,8 @@ protected:
    * @param format The internal format of the buffer in the RTT (RED, RG, RGB, RGBA, ALPHA...)
    * @param delayAllocation if the texture allocation should be delayed (default: false)
    */
-  RenderTargetTexture(const std::string& name, const std::variant<ISize, float>& size, Scene* scene,
+  RenderTargetTexture(const std::string& name,
+                      const std::variant<int, RenderTargetSize, float>& size, Scene* scene,
                       bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
                       unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT, bool isCube = false,
                       unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
@@ -280,6 +288,12 @@ protected:
   void set_boundingBoxSize(const std::optional<Vector3>& value) override;
   std::optional<Vector3>& get_boundingBoxSize() override;
 
+  /**
+   * @brief In case the RTT has been created with a depth texture, get the associated depth texture.
+   * Otherwise, return null.
+   */
+  InternalTexturePtr& get_depthStencilTexture();
+
   /** Events **/
   void set_onAfterUnbind(const std::function<void(RenderTargetTexture*, EventState&)>& callback);
   void set_onBeforeRender(const std::function<void(int* faceIndex, EventState&)>& callback);
@@ -295,10 +309,12 @@ protected:
   void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
 
 private:
-  void _processSizeParameter(const std::variant<ISize, float>& size);
+  void _processSizeParameter(const std::variant<int, RenderTargetSize, float>& size);
   int _bestReflectionRenderTargetDimension(int renderDimension, float scale) const;
-  void renderToTarget(unsigned int faceIndex, const std::vector<AbstractMesh*>& currentRenderList,
-                      bool useCameraPostProcess, bool dumpForDebug);
+  void _prepareRenderingManager(const std::vector<AbstractMesh*>& currentRenderList,
+                                const CameraPtr& camera, bool checkLayerMask);
+  void renderToTarget(unsigned int faceIndex, bool useCameraPostProcess, bool dumpForDebug,
+                      unsigned int layer = 0, const CameraPtr& camera = nullptr);
 
 public:
   /**
@@ -311,6 +327,18 @@ public:
    * Use this list to define the list of mesh you want to render
    */
   Property<RenderTargetTexture, std::vector<AbstractMesh*>> renderList;
+
+  /**
+   * Use this function to overload the renderList array at rendering time.
+   * Return null to render with the curent renderList, else return the list of meshes to use for
+   * rendering. For 2DArray RTT, layerOrFace is the index of the layer that is going to be rendered,
+   * else it is the faceIndex of the cube (if the RTT is a cube, else layerOrFace=0). The renderList
+   * passed to the function is the current render list (the one that will be used if the function
+   * returns null)
+   */
+  std::function<std::vector<AbstractMesh*>(unsigned int layerOrFace,
+                                           const std::vector<AbstractMesh*>& renderList)>
+    getCustomRenderList;
 
   /**
    * Define if particles should be rendered in your texture.
@@ -340,7 +368,7 @@ public:
   /**
    * Define if camera post processes should be use while rendering the texture.
    */
-  bool useCameraPostProcesses;
+  std::optional<bool> useCameraPostProcesses;
   bool ignoreCameraViewport;
 
   /**
@@ -357,8 +385,6 @@ public:
    * Hidden
    */
   std::vector<std::string> _waitingRenderList;
-  // std::function<void()> onAfterRender;
-  // std::function<void()> onBeforeRender;
 
   /**
    * Gets or sets the center of the bounding box associated with the texture (when in cube mode)
@@ -371,7 +397,7 @@ public:
    * depth texture.
    * Otherwise, return null.
    */
-  InternalTexturePtr depthStencilTexture;
+  ReadOnlyProperty<RenderTargetTexture, InternalTexturePtr> depthStencilTexture;
 
   /**
    * An event triggered when the texture is unbind.
@@ -445,8 +471,8 @@ public:
 
 protected:
   IRenderTargetOptions _renderTargetOptions;
-  ISize _size;
-  std::variant<ISize, float> _initialSizeParameter;
+  RenderTargetSize _size;
+  std::variant<int, RenderTargetSize, float> _initialSizeParameter;
   float _sizeRatio;
   std::unique_ptr<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;
@@ -469,6 +495,8 @@ private:
   // Properties
   int _faceIndex;
   std::optional<Vector3> _boundingBoxSize;
+  bool _defaultRenderListPrepared;
+  InternalTexturePtr _nullInternalTexture;
 
 }; // end of class RenderTargetTexture
 
