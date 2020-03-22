@@ -103,7 +103,7 @@ This code results in the following scene:
 Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
 
 # Status
-The master branch code is in sync with [Babylon.js 4.1.0-beta.13](https://doc.babylonjs.com/whats-new) of 2019/12/13.
+The master branch code is in sync with the last [Babylon.js v4.1.0](https://doc.babylonjs.com/whats-new) release of 2020/02/27.
 
 The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working for [Babylon.js 4.0.0](https://doc.babylonjs.com/whats-new).
 
