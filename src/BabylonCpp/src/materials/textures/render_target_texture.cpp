@@ -542,7 +542,8 @@ int RenderTargetTexture::_bestReflectionRenderTargetDimension(int renderDimensio
 }
 
 void RenderTargetTexture::_prepareRenderingManager(
-  const std::vector<AbstractMesh*>& currentRenderList, const CameraPtr& camera, bool checkLayerMask)
+  const std::vector<AbstractMesh*>& currentRenderList, size_t currentRenderListLength,
+  const CameraPtr& camera, bool checkLayerMask)
 {
   auto scene = getScene();
 
@@ -551,8 +552,6 @@ void RenderTargetTexture::_prepareRenderingManager(
   }
 
   _renderingManager->reset();
-
-  auto currentRenderListLength = currentRenderList.size();
 
   auto sceneRenderId = scene->getRenderId();
   for (size_t meshIndex = 0; meshIndex < currentRenderListLength; ++meshIndex) {
@@ -669,9 +668,12 @@ void RenderTargetTexture::renderToTarget(unsigned int faceIndex, bool useCameraP
   // Get the list of meshes to render
   std::vector<AbstractMesh*> currentRenderList;
   auto defaultRenderList = !renderList().empty() ? renderList() : scene->getActiveMeshes();
+  auto defaultRenderListLength
+    = !renderList().empty() ? renderList().size() : scene->getActiveMeshes().size();
 
   if (getCustomRenderList) {
-    currentRenderList = getCustomRenderList(is2DArray ? layer : faceIndex, defaultRenderList);
+    currentRenderList = getCustomRenderList(is2DArray ? layer : faceIndex, defaultRenderList,
+                                            defaultRenderListLength);
   }
 
   if (currentRenderList.empty()) {
@@ -679,14 +681,15 @@ void RenderTargetTexture::renderToTarget(unsigned int faceIndex, bool useCameraP
     // first if we did not already performed the preparation before so as to avoid re-doing it
     // several times
     if (!_defaultRenderListPrepared) {
-      _prepareRenderingManager(defaultRenderList, camera, renderList().empty());
+      _prepareRenderingManager(defaultRenderList, defaultRenderListLength, camera,
+                               renderList().empty());
       _defaultRenderListPrepared = true;
     }
     currentRenderList = defaultRenderList;
   }
   else {
     // Prepare the rendering for the custom render list provided
-    _prepareRenderingManager(currentRenderList, camera, false);
+    _prepareRenderingManager(currentRenderList, defaultRenderListLength, camera, false);
   }
 
   // Clear

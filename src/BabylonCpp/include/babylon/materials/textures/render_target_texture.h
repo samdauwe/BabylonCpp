@@ -312,7 +312,8 @@ private:
   void _processSizeParameter(const std::variant<int, RenderTargetSize, float>& size);
   int _bestReflectionRenderTargetDimension(int renderDimension, float scale) const;
   void _prepareRenderingManager(const std::vector<AbstractMesh*>& currentRenderList,
-                                const CameraPtr& camera, bool checkLayerMask);
+                                size_t currentRenderListLength, const CameraPtr& camera,
+                                bool checkLayerMask);
   void renderToTarget(unsigned int faceIndex, bool useCameraPostProcess, bool dumpForDebug,
                       unsigned int layer = 0, const CameraPtr& camera = nullptr);
 
@@ -332,12 +333,16 @@ public:
    * Use this function to overload the renderList array at rendering time.
    * Return null to render with the curent renderList, else return the list of meshes to use for
    * rendering. For 2DArray RTT, layerOrFace is the index of the layer that is going to be rendered,
-   * else it is the faceIndex of the cube (if the RTT is a cube, else layerOrFace=0). The renderList
+   * else it is the faceIndex of the cube (if the RTT is a cube, else layerOrFace=0).
+   * The renderList
    * passed to the function is the current render list (the one that will be used if the function
-   * returns null)
+   * returns null).
+   * The length of this list is passed through renderListLength: don't use renderList.length
+   * directly because the array can hold dummy elements!
    */
   std::function<std::vector<AbstractMesh*>(unsigned int layerOrFace,
-                                           const std::vector<AbstractMesh*>& renderList)>
+                                           const std::vector<AbstractMesh*>& renderList,
+                                           size_t renderListLength)>
     getCustomRenderList;
 
   /**
