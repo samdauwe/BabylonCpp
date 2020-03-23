@@ -17,9 +17,7 @@ class PointsCloudSystem;
 class PointsGroup;
 class Vector2;
 class Vector3;
-using MeshPtr              = std::shared_ptr<Mesh>;
-using PointsCloudSystemPtr = std::shared_ptr<PointsCloudSystem>;
-using PointsGroupPtr       = std::shared_ptr<PointsGroup>;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Represents one particle of a points cloud system.
@@ -38,8 +36,8 @@ public:
    * 10th point of addPoints(30))
    * @param pcs defines the PCS it is associated to
    */
-  CloudPoint(size_t particleIndex, const PointsGroupPtr& group, size_t groupId, size_t idxInGroup,
-             const PointsCloudSystemPtr& pcs);
+  CloudPoint(size_t particleIndex, PointsGroup* group, size_t groupId, size_t idxInGroup,
+             PointsCloudSystem* pcs);
   ~CloudPoint(); // default
 
   /**
@@ -142,7 +140,7 @@ public:
   /**
    * Group this particle belongs to
    */
-  PointsGroupPtr _group;
+  PointsGroup* _group;
 
   /**
    * Group id of this particle
@@ -162,7 +160,7 @@ public:
   /**
    * @hidden Reference to the PCS that the particle belongs to (Internal use)
    */
-  PointsCloudSystemPtr _pcs;
+  PointsCloudSystem* _pcs;
 
   /**
    * @hidden Still set as invisible in order to skip useless computations (Internal use)

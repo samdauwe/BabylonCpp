@@ -6,8 +6,8 @@
 
 namespace BABYLON {
 
-CloudPoint::CloudPoint(size_t particleIndex, const PointsGroupPtr& group, size_t iGroupId,
-                       size_t iIdxInGroup, const PointsCloudSystemPtr& pcs)
+CloudPoint::CloudPoint(size_t particleIndex, PointsGroup* group, size_t iGroupId,
+                       size_t iIdxInGroup, PointsCloudSystem* pcs)
     : idx{0}
     , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
