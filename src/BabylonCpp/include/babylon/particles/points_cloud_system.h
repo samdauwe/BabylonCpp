@@ -6,11 +6,11 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/maths/color4.h>
 
 namespace BABYLON {
 
 class CloudPoint;
-class Color4;
 class Mesh;
 class PointsGroup;
 class Scene;
@@ -21,6 +21,32 @@ struct PointsCloudSystemOptions {
   std::optional<bool> updatable = std::nullopt;
 }; // end of struct PointsCloudSystemOptions
 
+/**
+ * @brief Defines the 4 color options
+ */
+enum class PointColor {
+  /** color value */
+  Color = 2,
+  /** uv value */
+  UV = 1,
+  /** random value */
+  Random = 0,
+  /** stated value */
+  Stated = 3
+}; // end of enum class PointColor
+
+/**
+ * @brief The PointCloudSystem (PCS) is a single updatable mesh. The points corresponding to the
+ * vertices of this big mesh. As it is just a mesh, the PointCloudSystem has all the same properties
+ * as any other BJS mesh : not more, not less. It can be scaled, rotated, translated, enlighted,
+ * textured, moved, etc.
+ *
+ * The PointCloudSytem is also a particle system, with each point being a particle. It provides some
+ * methods to manage the particles. However it is behavior agnostic. This means it has no emitter,
+ * no particle physics, no particle recycler. You have to implement your own behavior.
+ *
+ * Full documentation here : TO BE ENTERED
+ */
 class BABYLON_SHARED_EXPORT PointsCloudSystem : public IDisposable {
 
 public:
@@ -57,6 +83,11 @@ private:
   void _randomUnitVector(CloudPoint& particle);
   Color4 _getColorIndicesForCoord(const PointsGroup& pointsGroup, uint32_t x, uint32_t y,
                                   uint32_t width) const;
+  void _setPointsColorOrUV(const MeshPtr& mesh, PointsGroup* pointsGroup, bool isVolume,
+                           const std::optional<bool>& colorFromTexture = std::nullopt,
+                           const std::optional<bool>& hasTexture       = std::nullopt,
+                           const std::optional<Color4>& color          = std::nullopt,
+                           std::optional<int> range                    = std::nullopt);
 
 public:
   /**
