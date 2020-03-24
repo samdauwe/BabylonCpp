@@ -101,8 +101,7 @@ Color3 Color3::multiply(const Color3& otherColor) const
   return Color3(r * otherColor.r, g * otherColor.g, b * otherColor.b);
 }
 
-const Color3& Color3::multiplyToRef(const Color3& otherColor,
-                                    Color3& result) const
+const Color3& Color3::multiplyToRef(const Color3& otherColor, Color3& result) const
 {
   result.r = r * otherColor.r;
   result.g = g * otherColor.g;
@@ -113,8 +112,7 @@ const Color3& Color3::multiplyToRef(const Color3& otherColor,
 
 bool Color3::equals(const Color3& otherColor) const
 {
-  return stl_util::almost_equal(r, otherColor.r)
-         && stl_util::almost_equal(g, otherColor.g)
+  return stl_util::almost_equal(r, otherColor.r) && stl_util::almost_equal(g, otherColor.g)
          && stl_util::almost_equal(b, otherColor.b);
 }
 
@@ -174,8 +172,7 @@ Color3 Color3::subtract(const Color3& otherColor) const
   return Color3(r - otherColor.r, g - otherColor.g, b - otherColor.b);
 }
 
-const Color3& Color3::subtractToRef(const Color3& otherColor,
-                                    Color3& result) const
+const Color3& Color3::subtractToRef(const Color3& otherColor, Color3& result) const
 {
   result.r = r - otherColor.r;
   result.g = g - otherColor.g;
@@ -214,8 +211,7 @@ std::string Color3::toHexString() const
   const int intB = static_cast<int>(b * 255) | 0;
 
   std::ostringstream ostream;
-  ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG)
-          << Scalar::ToHex(intB);
+  ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG) << Scalar::ToHex(intB);
   return ostream.str();
 }
 
@@ -224,6 +220,50 @@ Color3 Color3::toLinearSpace()
   Color3 convertedColor;
   toLinearSpaceToRef(convertedColor);
   return convertedColor;
+}
+
+Color3 Color3::toHSV() const
+{
+  Color3 result;
+
+  toHSVToRef(result);
+
+  return result;
+}
+
+void Color3::toHSVToRef(Color3& result) const
+{
+  const auto max = stl_util::max(r, g, b);
+  const auto min = stl_util::min(r, g, b);
+  auto h         = 0.f;
+  auto s         = 0.f;
+  const auto v   = max;
+
+  const auto dm = max - min;
+
+  if (max != 0.f) {
+    s = dm / max;
+  }
+
+  if (!stl_util::almost_equal(max, min)) {
+    if (stl_util::almost_equal(max, r)) {
+      h = (g - b) / dm;
+      if (g < b) {
+        h += 6;
+      }
+    }
+    else if (stl_util::almost_equal(max, g)) {
+      h = (b - r) / dm + 2.f;
+    }
+    else if (stl_util::almost_equal(max, b)) {
+      h = (r - g) / dm + 4.f;
+    }
+    h *= 60.f;
+  }
+
+  result.r = h;
+  result.g = s;
+  result.b = v;
 }
 
 Color3& Color3::toLinearSpaceToRef(Color3& convertedColor)
@@ -254,8 +294,7 @@ Color3& Color3::toGammaSpaceToRef(Color3& convertedColor)
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Color3& color)
 {
-  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
-     << "}";
+  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b << "}";
   return os;
 }
 
@@ -295,16 +334,54 @@ Color3 Color3::operator/(float iscale) const
 }
 
 /** Statics **/
+
+void Color3::HSVtoRGBToRef(float hue, float saturation, float value, Color3& result)
+{
+  const auto chroma = value * saturation;
+  const auto h      = hue / 60.f;
+  const auto x      = chroma * (1.f - std::abs(std::fmod(h, 2.f) - 1.f));
+  auto r            = 0.f;
+  auto g            = 0.f;
+  auto b            = 0.f;
+
+  if (h >= 0 && h <= 1) {
+    r = chroma;
+    g = x;
+  }
+  else if (h >= 1 && h <= 2) {
+    r = x;
+    g = chroma;
+  }
+  else if (h >= 2 && h <= 3) {
+    g = chroma;
+    b = x;
+  }
+  else if (h >= 3 && h <= 4) {
+    g = x;
+    b = chroma;
+  }
+  else if (h >= 4 && h <= 5) {
+    r = x;
+    b = chroma;
+  }
+  else if (h >= 5 && h <= 6) {
+    r = chroma;
+    b = x;
+  }
+
+  const auto m = value - chroma;
+  result.set((r + m), (g + m), (b + m));
+}
+
 Color3 Color3::FromHexString(const std::string& hex)
 {
   if (hex.substr(0, 1) != "#" || hex.size() != 7) {
     return Color3(0.f, 0.f, 0.f);
   }
 
-  return Color3::FromInts(
-    static_cast<int>(strtol(hex.substr(1, 2).c_str(), nullptr, 16)),
-    static_cast<int>(strtol(hex.substr(3, 2).c_str(), nullptr, 16)),
-    static_cast<int>(strtol(hex.substr(5, 2).c_str(), nullptr, 16)));
+  return Color3::FromInts(static_cast<int>(strtol(hex.substr(1, 2).c_str(), nullptr, 16)),
+                          static_cast<int>(strtol(hex.substr(3, 2).c_str(), nullptr, 16)),
+                          static_cast<int>(strtol(hex.substr(5, 2).c_str(), nullptr, 16)));
 }
 
 Color3 Color3::FromArray(const Float32Array& array, unsigned int offset)
@@ -330,8 +407,7 @@ Color3 Color3::Lerp(const Color3& start, const Color3& end, float amount)
   return result;
 }
 
-void Color3::LerpToRef(const Color3& left, const Color3& right, float amount,
-                       Color3& result)
+void Color3::LerpToRef(const Color3& left, const Color3& right, float amount, Color3& result)
 {
   result.r = left.r + ((right.r - left.r) * amount);
   result.g = left.g + ((right.g - left.g) * amount);

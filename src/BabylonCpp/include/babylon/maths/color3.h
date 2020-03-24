@@ -235,6 +235,18 @@ public:
   Color3 toLinearSpace();
 
   /**
+   * @brief Converts current color in rgb space to HSV values.
+   * @returns a new color3 representing the HSV values
+   */
+  Color3 toHSV() const;
+
+  /**
+   * @brief Converts current color in rgb space to HSV values.
+   * @param result defines the Color3 where to store the HSV values
+   */
+  void toHSVToRef(Color3& result) const;
+
+  /**
    * @brief Converts the Color3 values to linear space and stores the result in
    * "convertedColor".
    * @param convertedColor defines the Color3 object where to store the linear
@@ -269,8 +281,16 @@ public:
   /** Statics **/
 
   /**
-   * @brief Creates a new Color3 from the string containing valid hexadecimal
-   * values.
+   * @brief Convert Hue, saturation and value to a Color3 (RGB).
+   * @param hue defines the hue
+   * @param saturation defines the saturation
+   * @param value defines the value
+   * @param result defines the Color3 where to store the RGB values
+   */
+  static void HSVtoRGBToRef(float hue, float saturation, float value, Color3& result);
+
+  /**
+   * @brief Creates a new Color3 from the string containing valid hexadecimal values.
    * @param hex defines a string containing valid hexadecimal values
    * @returns a new Color3 object
    */
