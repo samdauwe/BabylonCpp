@@ -157,7 +157,6 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, PointsGroup* po
 
   size_t idxPoints = 0;
 
-  auto index   = 0;
   auto id0     = 0u;
   auto id1     = 0u;
   auto id2     = 0u;
@@ -390,6 +389,90 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, PointsGroup* po
       }
     }
   }
+}
+
+Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32Array& positions,
+                                                  const IndicesArray& indices)
+{
+  Float32Array density;
+  auto id0     = 0u;
+  auto id1     = 0u;
+  auto id2     = 0u;
+  auto v0X     = 0.f;
+  auto v0Y     = 0.f;
+  auto v0Z     = 0.f;
+  auto v1X     = 0.f;
+  auto v1Y     = 0.f;
+  auto v1Z     = 0.f;
+  auto v2X     = 0.f;
+  auto v2Y     = 0.f;
+  auto v2Z     = 0.f;
+  auto vertex0 = Vector3::Zero();
+  auto vertex1 = Vector3::Zero();
+  auto vertex2 = Vector3::Zero();
+  auto vec0    = Vector3::Zero();
+  auto vec1    = Vector3::Zero();
+  auto vec2    = Vector3::Zero();
+
+  auto a    = 0.f; // length of side of triangle
+  auto b    = 0.f; // length of side of triangle
+  auto c    = 0.f; // length of side of triangle
+  auto p    = 0.f; // perimeter of triangle
+  auto area = 0.f;
+  Float32Array areas;
+  auto surfaceArea = 0.f;
+
+  auto nbFacets = indices.size() / 3;
+
+  // surface area
+  for (size_t index = 0; index < nbFacets; index++) {
+    id0 = indices[3 * index];
+    id1 = indices[3 * index + 1];
+    id2 = indices[3 * index + 2];
+    v0X = positions[3 * id0];
+    v0Y = positions[3 * id0 + 1];
+    v0Z = positions[3 * id0 + 2];
+    v1X = positions[3 * id1];
+    v1Y = positions[3 * id1 + 1];
+    v1Z = positions[3 * id1 + 2];
+    v2X = positions[3 * id2];
+    v2Y = positions[3 * id2 + 1];
+    v2Z = positions[3 * id2 + 2];
+    vertex0.set(v0X, v0Y, v0Z);
+    vertex1.set(v1X, v1Y, v1Z);
+    vertex2.set(v2X, v2Y, v2Z);
+    vertex1.subtractToRef(vertex0, vec0);
+    vertex2.subtractToRef(vertex1, vec1);
+    vertex2.subtractToRef(vertex0, vec2);
+    a    = vec0.length();
+    b    = vec1.length();
+    c    = vec2.length();
+    p    = (a + b + c) / 2.f;
+    area = std::sqrt(p * (p - a) * (p - b) * (p - c));
+    surfaceArea += area;
+    areas[index] = area;
+  }
+  auto pointCount = 0ull;
+  for (size_t index = 0; index < nbFacets; index++) {
+    density[index] = std::floor(nbPoints * areas[index] / surfaceArea);
+    pointCount += static_cast<uint32_t>(density[index]);
+  }
+
+  auto diff           = nbPoints - pointCount;
+  auto pointsPerFacet = std::floor(static_cast<float>(diff) / nbFacets);
+  auto extraPoints    = diff % nbFacets;
+
+  if (pointsPerFacet > 0) {
+    for (size_t i; i < density.size(); ++i) {
+      density[i] += pointsPerFacet;
+    }
+  }
+
+  for (size_t index = 0; index < extraPoints; index++) {
+    density[index] += 1;
+  }
+
+  return density;
 }
 
 } // end of namespace BABYLON

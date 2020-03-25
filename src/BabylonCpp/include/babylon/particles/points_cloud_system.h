@@ -89,6 +89,12 @@ private:
                            const std::optional<Color4>& color          = std::nullopt,
                            std::optional<int> range                    = std::nullopt);
 
+  /**
+   * @brief Calculates the point density per facet of a mesh for surface points.
+   */
+  Float32Array _calculateDensity(size_t nbPoints, const Float32Array& positions,
+                                 const IndicesArray& indices);
+
 public:
   /**
    *  The PCS array of cloud point objects. Just access each particle as with any classic array.
