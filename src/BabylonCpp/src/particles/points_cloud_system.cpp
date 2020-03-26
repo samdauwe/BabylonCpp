@@ -2,10 +2,12 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/picking_info.h>
+#include <babylon/core/logging.h>
 #include <babylon/core/random.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/base_texture.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
@@ -92,8 +94,8 @@ MeshPtr PointsCloudSystem::_buildMesh()
   return iMesh;
 }
 
-CloudPointPtr PointsCloudSystem::_addParticle(size_t idx, PointsGroup* group, size_t groupId,
-                                              size_t idxInGroup)
+CloudPointPtr PointsCloudSystem::_addParticle(size_t idx, const PointsGroupPtr& group,
+                                              size_t groupId, size_t idxInGroup)
 {
   auto cp = std::make_shared<CloudPoint>(idx, group, groupId, idxInGroup, this);
   particles.emplace_back(cp);
@@ -123,7 +125,7 @@ Color4 PointsCloudSystem::_getColorIndicesForCoord(const PointsGroup& pointsGrou
   return Color4(redForCoord / 255.f, greenForCoord / 255.f, blueForCoord / 255.f, alphaForCoord);
 }
 
-void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, PointsGroup* pointsGroup,
+void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup,
                                             bool isVolume,
                                             const std::optional<bool>& colorFromTexture,
                                             const std::optional<bool>& hasTexture,
@@ -391,6 +393,41 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, PointsGroup* po
   }
 }
 
+void PointsCloudSystem::_colorFromTexture(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup,
+                                          bool isVolume)
+{
+  if (mesh->material() == nullptr) {
+    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no material.", mesh->name.c_str())
+    pointsGroup->_groupImageData.clear();
+    _setPointsColorOrUV(mesh, pointsGroup, isVolume, true, false);
+    return;
+  }
+
+  auto mat         = mesh->material();
+  auto textureList = mat->getActiveTextures();
+  if (textureList.size() == 0) {
+    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no useable texture.", mesh->name.c_str())
+    pointsGroup->_groupImageData.clear();
+    _setPointsColorOrUV(mesh, pointsGroup, isVolume, true, false);
+    return;
+  }
+
+  auto clone = mesh->clone();
+  clone->setEnabled(false);
+  {
+    auto n = pointsGroup->_textureNb;
+    if (n > textureList.size() - 1) {
+      n = textureList.size() - 1;
+    }
+    pointsGroup->_groupImageData = textureList[n]->readPixels();
+    pointsGroup->_groupImgWidth  = static_cast<size_t>(textureList[n]->getSize().width);
+    pointsGroup->_groupImgHeight = static_cast<size_t>(textureList[n]->getSize().height);
+    _setPointsColorOrUV(clone, pointsGroup, isVolume, true, true);
+    clone->dispose();
+  }
+  return;
+}
+
 Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32Array& positions,
                                                   const IndicesArray& indices)
 {
@@ -473,6 +510,78 @@ Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32
   }
 
   return density;
+}
+
+size_t PointsCloudSystem::addPoints(
+  size_t nb, const std::function<void(CloudPoint* particle, size_t i, size_t s)>& pointFunction)
+{
+  auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, pointFunction);
+  CloudPointPtr cp = nullptr;
+
+  // particles
+  auto idx = nbParticles;
+  for (size_t i = 0; i < nb; ++i) {
+    cp = _addParticle(idx, pointsGroup, _groupCounter, i);
+    if (pointsGroup && pointsGroup->_positionFunction) {
+      pointsGroup->_positionFunction(cp.get(), idx, i);
+    }
+    stl_util::concat(_positions, {cp->position.x, cp->position.y, cp->position.z});
+    if (cp->color) {
+      stl_util::concat(_colors, {cp->color->r, cp->color->g, cp->color->b, cp->color->a});
+    }
+    if (cp->uv) {
+      stl_util::concat(_uvs, {cp->uv->x, cp->uv->y});
+    }
+    idx++;
+  }
+  nbParticles += nb;
+  ++_groupCounter;
+  return this->_groupCounter;
+}
+
+size_t PointsCloudSystem::addSurfacePoints(
+  const MeshPtr& mesh, size_t nb, const std::optional<PointColor> colorWith,
+  const std::optional<std::variant<Color4, size_t>>& iColor, const std::optional<int> range)
+{
+  auto colored = colorWith.value_or(PointColor::Random);
+  if (static_cast<int>(colored) < 0 || static_cast<int>(colored) > 3) {
+    colored = PointColor::Random;
+  }
+
+  auto meshPos = mesh->getVerticesData(VertexBuffer::PositionKind);
+  auto meshInd = mesh->getIndices();
+
+  _groups.emplace_back(_groupCounter);
+  auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, nullptr);
+
+  pointsGroup->_groupDensity = _calculateDensity(nb, meshPos, meshInd);
+  Color4 color;
+  if (colored == PointColor::Color) {
+    pointsGroup->_textureNb
+      = iColor ? (std::holds_alternative<size_t>(*iColor) ? std::get<size_t>(*iColor) : 0) : 0;
+  }
+  else {
+    color = iColor ? (std::holds_alternative<Color4>(*iColor) ? std::get<Color4>(*iColor) :
+                                                                Color4(1.f, 1.f, 1.f, 1.f)) :
+                     Color4(1.f, 1.f, 1.f, 1.f);
+  }
+  switch (colored) {
+    case PointColor::Color:
+      _colorFromTexture(mesh, pointsGroup, false);
+      break;
+    case PointColor::UV:
+      _setPointsColorOrUV(mesh, pointsGroup, false, false, false);
+      break;
+    case PointColor::Random:
+      _setPointsColorOrUV(mesh, pointsGroup, false);
+      break;
+    case PointColor::Stated:
+      _setPointsColorOrUV(mesh, pointsGroup, false, std::nullopt, std::nullopt, color, range);
+      break;
+  }
+  nbParticles += nb;
+  ++_groupCounter;
+  return _groupCounter - 1;
 }
 
 } // end of namespace BABYLON

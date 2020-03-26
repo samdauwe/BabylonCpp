@@ -24,7 +24,7 @@ public:
    * @hidden
    */
   PointsGroup(size_t id,
-              const std::function<void(CloudPoint* particle, int i, int s)>& posFunction);
+              const std::function<void(CloudPoint* particle, size_t i, size_t s)>& posFunction);
   ~PointsGroup(); // default
 
 public:
@@ -56,7 +56,7 @@ public:
    * Custom position function (internal use)
    * @hidden
    */
-  std::function<void(CloudPoint* particle, int i, int s)> _positionFunction;
+  std::function<void(CloudPoint* particle, size_t i, size_t s)> _positionFunction;
 
   /**
    * Density per facet for surface points

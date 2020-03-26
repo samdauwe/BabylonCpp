@@ -2,8 +2,9 @@
 
 namespace BABYLON {
 
-PointsGroup::PointsGroup(size_t id,
-                         const std::function<void(CloudPoint* particle, int i, int s)>& posFunction)
+PointsGroup::PointsGroup(
+  size_t id, const std::function<void(CloudPoint* particle, size_t i, size_t s)>& posFunction)
+    : _textureNb{0}
 {
   groupID           = id;
   _positionFunction = posFunction;

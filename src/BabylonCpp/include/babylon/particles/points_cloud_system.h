@@ -1,7 +1,9 @@
 #ifndef BABYLON_PARTICLES_POINTS_CLOUD_SYSTEM_H
 #define BABYLON_PARTICLES_POINTS_CLOUD_SYSTEM_H
 
+#include <functional>
 #include <memory>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -14,8 +16,9 @@ class CloudPoint;
 class Mesh;
 class PointsGroup;
 class Scene;
-using CloudPointPtr = std::shared_ptr<CloudPoint>;
-using MeshPtr       = std::shared_ptr<Mesh>;
+using CloudPointPtr  = std::shared_ptr<CloudPoint>;
+using MeshPtr        = std::shared_ptr<Mesh>;
+using PointsGroupPtr = std::shared_ptr<PointsGroup>;
 
 struct PointsCloudSystemOptions {
   std::optional<bool> updatable = std::nullopt;
@@ -69,6 +72,35 @@ public:
    */
   MeshPtr buildMeshSync();
 
+  /**
+   * @brief Adds points to the PCS in random positions within a unit sphere.
+   * @param nb (positive integer) the number of particles to be created from this model
+   * @param pointFunction is an optional javascript function to be called for each particle on PCS
+   * creation
+   * @returns the number of groups in the system
+   */
+  size_t
+  addPoints(size_t nb,
+            const std::function<void(CloudPoint* particle, size_t i, size_t s)>& pointFunction
+            = nullptr);
+
+  /**
+   * @brief Adds points to the PCS from the surface of the model shape.
+   * @param mesh is any Mesh object that will be used as a surface model for the points
+   * @param nb (positive integer) the number of particles to be created from this model
+   * @param colorWith determines whether a point is colored using color (default), uv, random,
+   * stated or none (invisible)
+   * @param color (color4) to be used when colorWith is stated or color (number) when used to
+   * specify texture position
+   * @param range (number from 0 to 1) to determine the variation in shape and tone for a stated
+   * color
+   * @returns the number of groups in the system
+   */
+  size_t addSurfacePoints(const MeshPtr& mesh, size_t nb,
+                          const std::optional<PointColor> colorWith                = std::nullopt,
+                          const std::optional<std::variant<Color4, size_t>>& color = std::nullopt,
+                          const std::optional<int> range                           = std::nullopt);
+
 private:
   /**
    * @hidden
@@ -78,16 +110,23 @@ private:
   /**
    * @brief Adds a new particle object in the particles array.
    */
-  CloudPointPtr _addParticle(size_t idx, PointsGroup* group, size_t groupId, size_t idxInGroup);
+  CloudPointPtr _addParticle(size_t idx, const PointsGroupPtr& group, size_t groupId,
+                             size_t idxInGroup);
 
   void _randomUnitVector(CloudPoint& particle);
   Color4 _getColorIndicesForCoord(const PointsGroup& pointsGroup, uint32_t x, uint32_t y,
                                   uint32_t width) const;
-  void _setPointsColorOrUV(const MeshPtr& mesh, PointsGroup* pointsGroup, bool isVolume,
+  void _setPointsColorOrUV(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup, bool isVolume,
                            const std::optional<bool>& colorFromTexture = std::nullopt,
                            const std::optional<bool>& hasTexture       = std::nullopt,
                            const std::optional<Color4>& color          = std::nullopt,
                            std::optional<int> range                    = std::nullopt);
+
+  /**
+   * @brief Stores mesh texture in dynamic texture for color pixel retrievalwhen pointColor type is
+   * color for surface points
+   */
+  void _colorFromTexture(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup, bool isVolume);
 
   /**
    * @brief Calculates the point density per facet of a mesh for surface points.
