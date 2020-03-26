@@ -32,7 +32,8 @@ public:
   ArrayBufferView& operator=(ArrayBufferView&& other);
   ~ArrayBufferView(); // = default
 
-  [[nodiscard]] size_t byteLength() const;
+  void clear();
+  size_t byteLength() const;
   operator bool() const;
 
   Uint8Array& buffer();
@@ -50,13 +51,7 @@ public:
   size_t byteOffset = 0;
 
 private:
-  Int8Array _int8Array;
   Uint8Array _uint8Array;
-  Int16Array _int16Array;
-  Uint16Array _uint16Array;
-  Int32Array _int32Array;
-  Uint32Array _uint32Array;
-  Float32Array _float32Array;
 
 }; // end of class ArrayBufferView
 

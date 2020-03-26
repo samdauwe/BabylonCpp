@@ -41,6 +41,11 @@ ArrayBufferView& ArrayBufferView::operator=(ArrayBufferView&& other) = default;
 
 ArrayBufferView::~ArrayBufferView() = default;
 
+void ArrayBufferView::clear()
+{
+  _uint8Array.clear();
+}
+
 size_t ArrayBufferView::byteLength() const
 {
   return _uint8Array.size();
