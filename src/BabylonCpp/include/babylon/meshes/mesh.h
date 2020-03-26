@@ -855,8 +855,8 @@ public:
    * `true`)
    * @returns a new mesh
    */
-  MeshPtr clone(const std::string& name, Node* newParent = nullptr, bool doNotCloneChildren = false,
-                bool clonePhysicsImpostor = true);
+  MeshPtr clone(const std::string& name = "", Node* newParent = nullptr,
+                bool doNotCloneChildren = false, bool clonePhysicsImpostor = true);
 
   /** Dispose **/
 
