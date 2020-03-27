@@ -63,7 +63,7 @@ public:
    */
   PointsCloudSystem(const std::string& name, size_t pointSize, Scene* scene,
                     const std::optional<PointsCloudSystemOptions>& options = std::nullopt);
-  ~PointsCloudSystem(); // = default;
+  ~PointsCloudSystem() override; // = default;
 
   /**
    * @brief Builds the PCS underlying mesh. Returns a standard Mesh.
@@ -100,6 +100,115 @@ public:
                           const std::optional<PointColor> colorWith                = std::nullopt,
                           const std::optional<std::variant<Color4, size_t>>& color = std::nullopt,
                           const std::optional<int> range                           = std::nullopt);
+
+  /**
+   * @brief Adds points to the PCS inside the model shape.
+   * @param mesh is any Mesh object that will be used as a surface model for the points
+   * @param nb (positive integer) the number of particles to be created from this model
+   * @param colorWith determines whether a point is colored using color (default), uv, random,
+   * stated or none (invisible)
+   * @param color (color4) to be used when colorWith is stated or color (number) when used to
+   * specify texture position
+   * @param range (number from 0 to 1) to determine the variation in shape and tone for a stated
+   * color
+   * @returns the number of groups in the system
+   */
+  size_t addVolumePoints(const MeshPtr& mesh, size_t nb,
+                         const std::optional<PointColor> colorWith                = std::nullopt,
+                         const std::optional<std::variant<Color4, size_t>>& color = std::nullopt,
+                         const std::optional<int> range                           = std::nullopt);
+
+  /**
+   * @brief Sets all the particles : this method actually really updates the mesh according to the
+   * particle positions, rotations, colors, textures, etc. This method calls `updateParticle()` for
+   * each particle of the SPS. For an animated SPS, it is usually called within the render loop.
+   * @param start The particle index in the particle array where to start to compute the particle
+   * property values _(default 0)_
+   * @param end The particle index in the particle array where to stop to compute the particle
+   * property values _(default nbParticle - 1)_
+   * @param update If the mesh must be finally updated on this call after all the particle
+   * computations _(default true)_
+   * @returns the PCS.
+   */
+  PointsCloudSystem& setParticles(size_t start = 0, size_t end = 0, bool update = true);
+
+  /**
+   * @brief Disposes the PCS.
+   */
+  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Visibilty helper : Recomputes the visible size according to the mesh bounding box.
+   * doc :
+   * @returns the PCS.
+   */
+  PointsCloudSystem& refreshVisibleSize();
+
+  /**
+   * @brief Visibility helper : Sets the size of a visibility box, this sets the underlying mesh
+   * bounding box.
+   * @param size the size (float) of the visibility box
+   * note : this doesn't lock the PCS mesh bounding box.
+   * doc :
+   */
+  void setVisibilityBox(float size);
+
+  // =======================================================================
+  // Particle behavior logic
+  // these following methods may be overwritten by users to fit their needs
+
+  /**
+   * @brief This function does nothing. It may be overwritten to set all the particle first values.
+   * The PCS doesn't call this function, you may have to call it by your own.
+   * doc :
+   */
+  virtual void initParticles();
+
+  /**
+   * @brief This function does nothing. It may be overwritten to recycle a particle
+   * The PCS doesn't call this function, you can to call it
+   * doc :
+   * @param particle The particle to recycle
+   * @returns the recycled particle
+   */
+  virtual CloudPointPtr recycleParticle(const CloudPointPtr& particle);
+
+  /**
+   * @brief Updates a particle : this function should  be overwritten by the user.
+   * It is called on each particle by `setParticles()`. This is the place to code each particle
+   * behavior. doc :
+   * @example : just set a particle position or velocity and recycle conditions
+   * @param particle The particle to update
+   * @returns the updated particle
+   */
+  virtual CloudPointPtr updateParticle(const CloudPointPtr& particle);
+
+  /**
+   * @brief This will be called before any other treatment by `setParticles()` and will be passed
+   * three parameters. This does nothing and may be overwritten by the user.
+   * @param start the particle index in the particle array where to start to iterate, same than the
+   * value passed to setParticle()
+   * @param stop the particle index in the particle array where to stop to iterate, same than the
+   * value passed to setParticle()
+   * @param update the boolean update value actually passed to setParticles()
+   */
+  virtual void beforeUpdateParticles(std::optional<size_t> start = std::nullopt,
+                                     std::optional<size_t> stop  = std::nullopt,
+                                     std::optional<bool> update  = std::nullopt);
+
+  /**
+   * @brief This will be called  by `setParticles()` after all the other treatments and just before
+   * the actual mesh update. This will be passed three parameters. This does nothing and may be
+   * overwritten by the user.
+   * @param start the particle index in the particle array where to start to iterate, same than the
+   * value passed to setParticle()
+   * @param stop the particle index in the particle array where to stop to iterate, same than the
+   * value passed to setParticle()
+   * @param update the boolean update value actually passed to setParticles()
+   */
+  virtual void afterUpdateParticles(std::optional<size_t> start = std::nullopt,
+                                    std::optional<size_t> stop  = std::nullopt,
+                                    std::optional<bool> update  = std::nullopt);
 
 private:
   /**

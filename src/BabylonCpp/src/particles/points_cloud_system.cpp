@@ -9,6 +9,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/cloud_point.h>
@@ -548,8 +549,8 @@ size_t PointsCloudSystem::addSurfacePoints(
     colored = PointColor::Random;
   }
 
-  auto meshPos = mesh->getVerticesData(VertexBuffer::PositionKind);
-  auto meshInd = mesh->getIndices();
+  const auto meshPos = mesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd = mesh->getIndices();
 
   _groups.emplace_back(_groupCounter);
   auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, nullptr);
@@ -582,6 +583,322 @@ size_t PointsCloudSystem::addSurfacePoints(
   nbParticles += nb;
   ++_groupCounter;
   return _groupCounter - 1;
+}
+
+size_t PointsCloudSystem::addVolumePoints(const MeshPtr& mesh, size_t nb,
+                                          const std::optional<PointColor> colorWith,
+                                          const std::optional<std::variant<Color4, size_t>>& iColor,
+                                          const std::optional<int> range)
+{
+  auto colored = colorWith.value_or(PointColor::Random);
+  if (static_cast<int>(colored) < 0 || static_cast<int>(colored) > 3) {
+    colored = PointColor::Random;
+  }
+
+  const auto meshPos = mesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd = mesh->getIndices();
+
+  _groups.emplace_back(_groupCounter);
+  auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, nullptr);
+
+  pointsGroup->_groupDensity = _calculateDensity(nb, meshPos, meshInd);
+  Color4 color;
+  if (colored == PointColor::Color) {
+    pointsGroup->_textureNb
+      = iColor ? (std::holds_alternative<size_t>(*iColor) ? std::get<size_t>(*iColor) : 0) : 0;
+  }
+  else {
+    color = iColor ? (std::holds_alternative<Color4>(*iColor) ? std::get<Color4>(*iColor) :
+                                                                Color4(1.f, 1.f, 1.f, 1.f)) :
+                     Color4(1.f, 1.f, 1.f, 1.f);
+  }
+  switch (colored) {
+    case PointColor::Color:
+      _colorFromTexture(mesh, pointsGroup, true);
+      break;
+    case PointColor::UV:
+      _setPointsColorOrUV(mesh, pointsGroup, true, false, false);
+      break;
+    case PointColor::Random:
+      _setPointsColorOrUV(mesh, pointsGroup, true);
+      break;
+    case PointColor::Stated:
+      _setPointsColorOrUV(mesh, pointsGroup, true, std::nullopt, std::nullopt, color, range);
+      break;
+  }
+  nbParticles += nb;
+  ++_groupCounter;
+  return _groupCounter - 1;
+}
+
+PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, bool update)
+{
+  if (!_updatable || !_isReady) {
+    return *this;
+  }
+
+  // custom beforeUpdate
+  beforeUpdateParticles(start, end, update);
+
+  auto& rotMatrix  = TmpVectors::MatrixArray[0];
+  MeshPtr mesh     = nullptr;
+  auto colors32    = _colors32;
+  auto positions32 = _positions32;
+  auto uvs32       = _uvs32;
+
+  auto& tempVectors = TmpVectors::Vector3Array;
+  auto& camAxisX    = tempVectors[5].copyFromFloats(1.0, 0.0, 0.0);
+  auto& camAxisY    = tempVectors[6].copyFromFloats(0.0, 1.0, 0.0);
+  auto& camAxisZ    = tempVectors[7].copyFromFloats(0.0, 0.0, 1.0);
+  auto& minimum     = tempVectors[8].setAll(std::numeric_limits<float>::max());
+  auto& maximum     = tempVectors[9].setAll(std::numeric_limits<float>::lowest());
+
+  Matrix::IdentityToRef(rotMatrix);
+  size_t idx = 0; // current index of the particle
+
+  if (mesh->isFacetDataEnabled()) {
+    _computeBoundingBox = true;
+  }
+
+  end = (end == 0) ? nbParticles - 1 : end;
+  end = (end >= nbParticles) ? nbParticles - 1 : end;
+  if (_computeBoundingBox) {
+    if (start != 0
+        || end != nbParticles - 1) { // only some particles are updated, then use the current
+                                     // existing BBox basis. Note : it can only increase.
+      const auto& boundingInfo = mesh->_boundingInfo;
+      if (boundingInfo) {
+        minimum.copyFrom(boundingInfo->minimum);
+        maximum.copyFrom(boundingInfo->maximum);
+      }
+    }
+  }
+
+  idx           = 0; // particle index
+  size_t pindex = 0; // index in positions array
+  size_t cindex = 0; // index in color array
+  size_t uindex = 0; // index in uv array
+
+  // particle loop
+  for (size_t p = start; p <= end; ++p) {
+    const auto& particle = particles[p];
+    idx                  = particle->idx;
+    pindex               = 3 * idx;
+    cindex               = 4 * idx;
+    uindex               = 2 * idx;
+
+    // call to custom user function to update the particle properties
+    updateParticle(particle);
+
+    auto& particleRotationMatrix = particle->_rotationMatrix;
+    const auto& particlePosition = particle->position;
+    auto& particleGlobalPosition = particle->_globalPosition;
+
+    if (_computeParticleRotation) {
+      particle->getRotationMatrix(rotMatrix);
+    }
+
+    const auto particleHasParent = (particle->parentId.has_value());
+    if (particleHasParent) {
+      const auto& parent               = particles[*particle->parentId];
+      const auto& parentRotationMatrix = parent->_rotationMatrix;
+      const auto& parentGlobalPosition = parent->_globalPosition;
+
+      const auto& rotatedY = particlePosition.x * parentRotationMatrix[1]
+                             + particlePosition.y * parentRotationMatrix[4]
+                             + particlePosition.z * parentRotationMatrix[7];
+      const auto& rotatedX = particlePosition.x * parentRotationMatrix[0]
+                             + particlePosition.y * parentRotationMatrix[3]
+                             + particlePosition.z * parentRotationMatrix[6];
+      const auto& rotatedZ = particlePosition.x * parentRotationMatrix[2]
+                             + particlePosition.y * parentRotationMatrix[5]
+                             + particlePosition.z * parentRotationMatrix[8];
+
+      particleGlobalPosition.x = parentGlobalPosition.x + rotatedX;
+      particleGlobalPosition.y = parentGlobalPosition.y + rotatedY;
+      particleGlobalPosition.z = parentGlobalPosition.z + rotatedZ;
+
+      if (_computeParticleRotation) {
+        const auto& rotMatrixValues = rotMatrix.m();
+        particleRotationMatrix[0]   = rotMatrixValues[0] * parentRotationMatrix[0]
+                                    + rotMatrixValues[1] * parentRotationMatrix[3]
+                                    + rotMatrixValues[2] * parentRotationMatrix[6];
+        particleRotationMatrix[1] = rotMatrixValues[0] * parentRotationMatrix[1]
+                                    + rotMatrixValues[1] * parentRotationMatrix[4]
+                                    + rotMatrixValues[2] * parentRotationMatrix[7];
+        particleRotationMatrix[2] = rotMatrixValues[0] * parentRotationMatrix[2]
+                                    + rotMatrixValues[1] * parentRotationMatrix[5]
+                                    + rotMatrixValues[2] * parentRotationMatrix[8];
+        particleRotationMatrix[3] = rotMatrixValues[4] * parentRotationMatrix[0]
+                                    + rotMatrixValues[5] * parentRotationMatrix[3]
+                                    + rotMatrixValues[6] * parentRotationMatrix[6];
+        particleRotationMatrix[4] = rotMatrixValues[4] * parentRotationMatrix[1]
+                                    + rotMatrixValues[5] * parentRotationMatrix[4]
+                                    + rotMatrixValues[6] * parentRotationMatrix[7];
+        particleRotationMatrix[5] = rotMatrixValues[4] * parentRotationMatrix[2]
+                                    + rotMatrixValues[5] * parentRotationMatrix[5]
+                                    + rotMatrixValues[6] * parentRotationMatrix[8];
+        particleRotationMatrix[6] = rotMatrixValues[8] * parentRotationMatrix[0]
+                                    + rotMatrixValues[9] * parentRotationMatrix[3]
+                                    + rotMatrixValues[10] * parentRotationMatrix[6];
+        particleRotationMatrix[7] = rotMatrixValues[8] * parentRotationMatrix[1]
+                                    + rotMatrixValues[9] * parentRotationMatrix[4]
+                                    + rotMatrixValues[10] * parentRotationMatrix[7];
+        particleRotationMatrix[8] = rotMatrixValues[8] * parentRotationMatrix[2]
+                                    + rotMatrixValues[9] * parentRotationMatrix[5]
+                                    + rotMatrixValues[10] * parentRotationMatrix[8];
+      }
+    }
+    else {
+      particleGlobalPosition.x = 0;
+      particleGlobalPosition.y = 0;
+      particleGlobalPosition.z = 0;
+
+      if (_computeParticleRotation) {
+        const auto& rotMatrixValues = rotMatrix.m();
+        particleRotationMatrix[0]   = rotMatrixValues[0];
+        particleRotationMatrix[1]   = rotMatrixValues[1];
+        particleRotationMatrix[2]   = rotMatrixValues[2];
+        particleRotationMatrix[3]   = rotMatrixValues[4];
+        particleRotationMatrix[4]   = rotMatrixValues[5];
+        particleRotationMatrix[5]   = rotMatrixValues[6];
+        particleRotationMatrix[6]   = rotMatrixValues[8];
+        particleRotationMatrix[7]   = rotMatrixValues[9];
+        particleRotationMatrix[8]   = rotMatrixValues[10];
+      }
+    }
+
+    auto& pivotBackTranslation = tempVectors[11];
+    if (particle->translateFromPivot) {
+      pivotBackTranslation.setAll(0.f);
+    }
+    else {
+      pivotBackTranslation.copyFrom(particle->pivot);
+    }
+
+    // positions
+    auto& tmpVertex = tempVectors[0];
+    tmpVertex.copyFrom(particle->position);
+    const auto vertexX = tmpVertex.x - particle->pivot.x;
+    const auto vertexY = tmpVertex.y - particle->pivot.y;
+    const auto vertexZ = tmpVertex.z - particle->pivot.z;
+
+    auto rotatedX = vertexX * particleRotationMatrix[0] + vertexY * particleRotationMatrix[3]
+                    + vertexZ * particleRotationMatrix[6];
+    auto rotatedY = vertexX * particleRotationMatrix[1] + vertexY * particleRotationMatrix[4]
+                    + vertexZ * particleRotationMatrix[7];
+    auto rotatedZ = vertexX * particleRotationMatrix[2] + vertexY * particleRotationMatrix[5]
+                    + vertexZ * particleRotationMatrix[8];
+
+    rotatedX += pivotBackTranslation.x;
+    rotatedY += pivotBackTranslation.y;
+    rotatedZ += pivotBackTranslation.z;
+
+    const auto px = positions32[pindex] = particleGlobalPosition.x + camAxisX.x * rotatedX
+                                          + camAxisY.x * rotatedY + camAxisZ.x * rotatedZ;
+    const auto py = positions32[pindex + 1] = particleGlobalPosition.y + camAxisX.y * rotatedX
+                                              + camAxisY.y * rotatedY + camAxisZ.y * rotatedZ;
+    const auto pz = positions32[pindex + 2] = particleGlobalPosition.z + camAxisX.z * rotatedX
+                                              + camAxisY.z * rotatedY + camAxisZ.z * rotatedZ;
+
+    if (_computeBoundingBox) {
+      minimum.minimizeInPlaceFromFloats(px, py, pz);
+      maximum.maximizeInPlaceFromFloats(px, py, pz);
+    }
+
+    if (_computeParticleColor && particle->color) {
+      const auto& color    = *particle->color;
+      auto& colors32       = _colors32;
+      colors32[cindex]     = color.r;
+      colors32[cindex + 1] = color.g;
+      colors32[cindex + 2] = color.b;
+      colors32[cindex + 3] = color.a;
+    }
+    if (_computeParticleTexture && particle->uv) {
+      const auto& uv    = *particle->uv;
+      auto& uvs32       = _uvs32;
+      uvs32[uindex]     = uv.x;
+      uvs32[uindex + 1] = uv.y;
+    }
+  }
+
+  // if the VBO must be updated
+  if (update) {
+    if (_computeParticleColor) {
+      mesh->updateVerticesData(VertexBuffer::ColorKind, colors32, false, false);
+    }
+    if (_computeParticleTexture) {
+      mesh->updateVerticesData(VertexBuffer::UVKind, uvs32, false, false);
+    }
+    mesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false, false);
+  }
+
+  if (_computeBoundingBox) {
+    if (mesh->_boundingInfo) {
+      mesh->_boundingInfo->reConstruct(minimum, maximum, mesh->_worldMatrix);
+    }
+    else {
+      mesh->_boundingInfo = std::make_shared<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
+    }
+  }
+  afterUpdateParticles(start, end, update);
+  return *this;
+}
+
+void PointsCloudSystem::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
+{
+  mesh->dispose();
+  // drop references to internal big arrays for the GC
+  _positions.clear();
+  _indices.clear();
+  _normals.clear();
+  _uvs.clear();
+  _colors.clear();
+  _indices32.clear();
+  _positions32.clear();
+  _uvs32.clear();
+  _colors32.clear();
+}
+
+PointsCloudSystem& PointsCloudSystem::refreshVisibleSize()
+{
+  if (!_isVisibilityBoxLocked) {
+    mesh->refreshBoundingInfo();
+  }
+  return *this;
+}
+
+void PointsCloudSystem::setVisibilityBox(float size)
+{
+  auto vis = size / 2.f;
+  mesh->_boundingInfo
+    = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
+}
+
+void PointsCloudSystem::initParticles()
+{
+}
+
+CloudPointPtr PointsCloudSystem::recycleParticle(const CloudPointPtr& particle)
+{
+  return particle;
+}
+
+CloudPointPtr PointsCloudSystem::updateParticle(const CloudPointPtr& particle)
+{
+  return particle;
+}
+
+void PointsCloudSystem::beforeUpdateParticles(std::optional<size_t> /*start*/,
+                                              std::optional<size_t> /*stop*/,
+                                              std::optional<bool> /*update*/)
+{
+}
+
+void PointsCloudSystem::afterUpdateParticles(std::optional<size_t> /*start*/,
+                                             std::optional<size_t> /*stop*/,
+                                             std::optional<bool> /*update*/)
+{
 }
 
 } // end of namespace BABYLON
