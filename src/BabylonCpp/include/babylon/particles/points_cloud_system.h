@@ -210,6 +210,72 @@ public:
                                     std::optional<size_t> stop  = std::nullopt,
                                     std::optional<bool> update  = std::nullopt);
 
+protected:
+  /**
+   * @brief Gets whether the PCS is always visible or not.
+   * doc :
+   */
+  bool get_isAlwaysVisible() const;
+
+  /**
+   * @brief Sets the PCS as always visible or not.
+   * doc :
+   */
+  void set_isAlwaysVisible(bool val);
+
+  /**
+   * @brief Tells to `setParticles()` to compute the particle rotations or not.
+   * Default value : false. The PCS is faster when it's set to false
+   * Note : particle rotations are only applied to parent particles
+   * Note : the particle rotations aren't stored values, so setting `computeParticleRotation` to
+   * false will prevents the particle to rotate
+   */
+  void set_computeParticleRotation(bool val);
+
+  /**
+   * @brief Tells to `setParticles()` to compute the particle colors or not.
+   * Default value : true. The PCS is faster when it's set to false.
+   * Note : the particle colors are stored values, so setting `computeParticleColor` to false will
+   * keep yet the last colors set.
+   */
+  void set_computeParticleColor(bool val);
+
+  /**
+   * @brief Sets if `setParticles()` computes the particle textures or not.
+   * Default value : false. The PCS is faster when it's set to false.
+   * Note : the particle textures are stored values, so setting `computeParticleTexture` to false
+   * will keep yet the last colors set.
+   */
+  void set_computeParticleTexture(bool val);
+
+  /**
+   * @brief Gets if `setParticles()` computes the particle colors or not.
+   * Default value : false. The PCS is faster when it's set to false.
+   * Note : the particle colors are stored values, so setting `computeParticleColor` to false will
+   * keep yet the last colors set.
+   */
+  bool get_computeParticleColor() const;
+
+  /**
+   * @brief Gets if `setParticles()` computes the particle textures or not.
+   * Default value : false. The PCS is faster when it's set to false.
+   * Note : the particle textures are stored values, so setting `computeParticleTexture` to false
+   * will keep yet the last colors set.
+   */
+  bool get_computeParticleTexture() const;
+
+  /**
+   * @brief Tells to `setParticles()` to compute or not the mesh bounding box when computing the
+   * particle positions.
+   */
+  void set_computeBoundingBox(bool val);
+
+  /**
+   * @brief Gets if `setParticles()` computes or not the mesh bounding box when computing the
+   * particle positions.
+   */
+  bool get_computeBoundingBox() const;
+
 private:
   /**
    * @hidden
@@ -275,6 +341,42 @@ public:
    * @hidden
    */
   size_t _size; // size of each point particle
+
+  /**
+   * Gets or sets whether the PCS is always visible or not
+   */
+  Property<PointsCloudSystem, bool> isAlwaysVisible;
+
+  /**
+   * Tells to `setParticles()` to compute the particle rotations or not
+   * Default value : false. The PCS is faster when it's set to false
+   * Note : particle rotations are only applied to parent particles
+   * Note : the particle rotations aren't stored values, so setting `computeParticleRotation` to
+   * false will prevents the particle to rotate
+   */
+  WriteOnlyProperty<PointsCloudSystem, bool> computeParticleRotation;
+
+  /**
+   * Gets or sets if `setParticles()` computes the particle colors or not
+   * Default value : false. The PCS is faster when it's set to false.
+   * Note : the particle colors are stored values, so setting `computeParticleColor` to false will
+   * keep yet the last colors set.
+   */
+  Property<PointsCloudSystem, bool> computeParticleColor;
+
+  /**
+   * Gets or sets if `setParticles()` computes the particle textures or not
+   * Default value : false. The PCS is faster when it's set to false.
+   * Note : the particle textures are stored values, so setting `computeParticleTexture` to false
+   * will keep yet the last colors set.
+   */
+  Property<PointsCloudSystem, bool> computeParticleTexture;
+
+  /**
+   * Gets or sets if `setParticles()` computes or not the mesh bounding box when computing the
+   * particle positions.
+   */
+  Property<PointsCloudSystem, bool> computeBoundingBox;
 
 private:
   Scene* _scene;

@@ -22,6 +22,15 @@ PointsCloudSystem::PointsCloudSystem(const std::string& iName, size_t pointSize,
     : nbParticles{0}
     , counter{0}
     , mesh{nullptr}
+    , isAlwaysVisible{this, &PointsCloudSystem::get_isAlwaysVisible,
+                      &PointsCloudSystem::set_isAlwaysVisible}
+    , computeParticleRotation{this, &PointsCloudSystem::set_computeParticleRotation}
+    , computeParticleColor{this, &PointsCloudSystem::get_computeParticleColor,
+                           &PointsCloudSystem::set_computeParticleColor}
+    , computeParticleTexture{this, &PointsCloudSystem::get_computeParticleTexture,
+                             &PointsCloudSystem::set_computeParticleTexture}
+    , computeBoundingBox{this, &PointsCloudSystem::get_computeBoundingBox,
+                         &PointsCloudSystem::set_computeBoundingBox}
     , _updatable{true}
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
@@ -54,7 +63,7 @@ MeshPtr PointsCloudSystem::buildMeshSync()
 MeshPtr PointsCloudSystem::_buildMesh()
 {
   if (nbParticles == 0) {
-    // addPoints(1);
+    addPoints(1);
   }
 
   _positions32 = Float32Array(_positions);
@@ -873,6 +882,52 @@ void PointsCloudSystem::setVisibilityBox(float size)
   auto vis = size / 2.f;
   mesh->_boundingInfo
     = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
+}
+
+bool PointsCloudSystem::get_isAlwaysVisible() const
+{
+  return _alwaysVisible;
+}
+
+void PointsCloudSystem::set_isAlwaysVisible(bool val)
+{
+  _alwaysVisible                 = val;
+  mesh->alwaysSelectAsActiveMesh = val;
+}
+
+void PointsCloudSystem::set_computeParticleRotation(bool val)
+{
+  _computeParticleRotation = val;
+}
+
+void PointsCloudSystem::set_computeParticleColor(bool val)
+{
+  _computeParticleColor = val;
+}
+
+void PointsCloudSystem::set_computeParticleTexture(bool val)
+{
+  _computeParticleTexture = val;
+}
+
+bool PointsCloudSystem::get_computeParticleColor() const
+{
+  return _computeParticleColor;
+}
+
+bool PointsCloudSystem::get_computeParticleTexture() const
+{
+  return _computeParticleTexture;
+}
+
+void PointsCloudSystem::set_computeBoundingBox(bool val)
+{
+  _computeBoundingBox = val;
+}
+
+bool PointsCloudSystem::get_computeBoundingBox() const
+{
+  return _computeBoundingBox;
 }
 
 void PointsCloudSystem::initParticles()
