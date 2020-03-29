@@ -25,7 +25,7 @@ struct PointsCloudSystemOptions {
 }; // end of struct PointsCloudSystemOptions
 
 /**
- * @brief Defines the 4 color options
+ * @brief Defines the 4 color options.
  */
 enum class PointColor {
   /** color value */

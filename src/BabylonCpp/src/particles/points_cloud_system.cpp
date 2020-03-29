@@ -147,7 +147,7 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
   }
 
   const auto& boundInfo = mesh->getBoundingInfo();
-  const auto diameter   = 2 * boundInfo->boundingSphere.radius;
+  const auto diameter   = 2.f * boundInfo->boundingSphere.radius;
 
   auto meshPos       = mesh->getVerticesData(VertexBuffer::PositionKind);
   const auto meshInd = mesh->getIndices();
@@ -158,7 +158,7 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
   mesh->computeWorldMatrix();
   auto meshMatrix = mesh->getWorldMatrix();
   if (!meshMatrix.isIdentity()) {
-    for (size_t p = 0; p < meshPos.size() / 3; p++) {
+    for (size_t p = 0; p < meshPos.size() / 3; ++p) {
       Vector3::TransformCoordinatesFromFloatsToRef(meshPos[3 * p], meshPos[3 * p + 1],
                                                    meshPos[3 * p + 2], meshMatrix, place);
       meshPos[3 * p]     = place.x;
@@ -237,7 +237,7 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
   PickingInfo pickInfo;
   auto direction = Vector3::Zero();
 
-  for (auto index = 0u; index < meshInd.size() / 3; index++) {
+  for (auto index = 0u; index < meshInd.size() / 3; ++index) {
     id0 = meshInd[3 * index];
     id1 = meshInd[3 * index + 1];
     id2 = meshInd[3 * index + 2];
@@ -312,10 +312,10 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
       mu         = Scalar::RandomRange(0.f, 1.f);
       facetPoint = vertex0.add(vec0.scale(lamda)).add(vec1.scale(lamda * mu));
       if (isVolume) {
-        norm          = mesh->getFacetNormal(index).normalize().scale(-1);
+        norm          = mesh->getFacetNormal(index).normalize().scale(-1.f);
         tang          = vec0.clone()->normalize();
         biNorm        = Vector3::Cross(norm, tang);
-        angle         = Scalar::RandomRange(0.f, 2.f * Math::PI);
+        angle         = Scalar::RandomRange(0.f, Math::PI_2);
         facetPlaneVec = tang.scale(std::cos(angle)).add(biNorm.scale(std::sin(angle)));
         angle         = Scalar::RandomRange(0.1f, Math::PI_2);
         direction     = facetPlaneVec.scale(std::cos(angle)).add(norm.scale(std::sin(angle)));
@@ -472,7 +472,7 @@ Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32
   auto nbFacets = indices.size() / 3;
 
   // surface area
-  for (size_t index = 0; index < nbFacets; index++) {
+  for (size_t index = 0; index < nbFacets; ++index) {
     id0 = indices[3 * index];
     id1 = indices[3 * index + 1];
     id2 = indices[3 * index + 2];
@@ -500,7 +500,7 @@ Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32
     areas[index] = area;
   }
   auto pointCount = 0ull;
-  for (size_t index = 0; index < nbFacets; index++) {
+  for (size_t index = 0; index < nbFacets; ++index) {
     density[index] = std::floor(nbPoints * areas[index] / surfaceArea);
     pointCount += static_cast<uint32_t>(density[index]);
   }
@@ -509,7 +509,7 @@ Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32
   auto pointsPerFacet = std::floor(static_cast<float>(diff) / nbFacets);
   auto extraPoints    = diff % nbFacets;
 
-  if (pointsPerFacet > 0) {
+  if (pointsPerFacet > 0.f) {
     for (size_t i; i < density.size(); ++i) {
       density[i] += pointsPerFacet;
     }
@@ -525,7 +525,12 @@ Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32
 size_t PointsCloudSystem::addPoints(
   size_t nb, const std::function<void(CloudPoint* particle, size_t i, size_t s)>& pointFunction)
 {
-  auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, pointFunction);
+  auto pointsGroup = std::make_shared<PointsGroup>(
+    _groupCounter,
+    pointFunction ? pointFunction :
+                    [this](CloudPoint* particle, size_t /*i*/, size_t /*s*/) -> void {
+      _randomUnitVector(*particle);
+    });
   CloudPointPtr cp = nullptr;
 
   // particles
@@ -759,9 +764,9 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
       }
     }
     else {
-      particleGlobalPosition.x = 0;
-      particleGlobalPosition.y = 0;
-      particleGlobalPosition.z = 0;
+      particleGlobalPosition.x = 0.f;
+      particleGlobalPosition.y = 0.f;
+      particleGlobalPosition.z = 0.f;
 
       if (_computeParticleRotation) {
         const auto& rotMatrixValues = rotMatrix.m();
