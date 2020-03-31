@@ -10,8 +10,7 @@ Color3Gradient::~Color3Gradient() = default;
 
 bool operator==(const Color3Gradient& lhs, const Color3Gradient& rhs)
 {
-  return stl_util::almost_equal(lhs.gradient, rhs.gradient)
-         && lhs.color == rhs.color;
+  return stl_util::almost_equal(lhs.gradient, rhs.gradient) && lhs.color == rhs.color;
 }
 
 bool operator!=(const Color3Gradient& lhs, const Color3Gradient& rhs)
