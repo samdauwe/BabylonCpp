@@ -7,16 +7,20 @@ namespace BABYLON {
 EnvironmentTextureIrradianceInfoV1::EnvironmentTextureIrradianceInfoV1() = default;
 
 EnvironmentTextureIrradianceInfoV1::EnvironmentTextureIrradianceInfoV1(
-  const EnvironmentTextureIrradianceInfoV1& other) = default;
+  const EnvironmentTextureIrradianceInfoV1& other)
+  = default;
 
 EnvironmentTextureIrradianceInfoV1::EnvironmentTextureIrradianceInfoV1(
-  EnvironmentTextureIrradianceInfoV1&& other) = default;
+  EnvironmentTextureIrradianceInfoV1&& other)
+  = default;
 
-EnvironmentTextureIrradianceInfoV1& EnvironmentTextureIrradianceInfoV1::
-operator=(const EnvironmentTextureIrradianceInfoV1& other) = default;
+EnvironmentTextureIrradianceInfoV1&
+EnvironmentTextureIrradianceInfoV1::operator=(const EnvironmentTextureIrradianceInfoV1& other)
+  = default;
 
-EnvironmentTextureIrradianceInfoV1& EnvironmentTextureIrradianceInfoV1::
-operator=(EnvironmentTextureIrradianceInfoV1&& other) = default;
+EnvironmentTextureIrradianceInfoV1&
+EnvironmentTextureIrradianceInfoV1::operator=(EnvironmentTextureIrradianceInfoV1&& other)
+  = default;
 
 EnvironmentTextureIrradianceInfoV1::~EnvironmentTextureIrradianceInfoV1() = default;
 
