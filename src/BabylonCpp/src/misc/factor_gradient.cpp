@@ -24,8 +24,7 @@ float FactorGradient::getFactor() const
 bool operator==(const FactorGradient& lhs, const FactorGradient& rhs)
 {
   return stl_util::almost_equal(lhs.gradient, rhs.gradient)
-         && stl_util::almost_equal(lhs.factor1, rhs.factor1)
-         && lhs.factor2 == rhs.factor2;
+         && stl_util::almost_equal(lhs.factor1, rhs.factor1) && lhs.factor2 == rhs.factor2;
 }
 
 bool operator!=(const FactorGradient& lhs, const FactorGradient& rhs)
