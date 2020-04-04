@@ -540,6 +540,26 @@ inline std::vector<std::string> split(const std::string& value, char separator)
 }
 
 /**
+ * @brief Splits a string into an array of substrings.
+ * @param str Required. The string to split.
+ * @param delims Required. Specifies the characters to use for splitting the string.
+ * @return An Array, containing the splitted values.
+ */
+inline std::vector<std::string> split(const std::string& str, const std::string& delims)
+{
+  std::vector<std::string> result;
+  std::size_t current, previous = 0;
+  current = str.find_first_of(delims);
+  while (current != std::string::npos) {
+    result.emplace_back(str.substr(previous, current - previous));
+    previous = current + 1;
+    current  = str.find_first_of(delims, previous);
+  }
+  result.emplace_back(str.substr(previous, current - previous));
+  return result;
+}
+
+/**
  * @brief Strips the white characters from the end of the line.
  * @param input the input string
  * @return The sripped result string
