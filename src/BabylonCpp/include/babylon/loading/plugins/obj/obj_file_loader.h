@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/loading/plugins/obj/mtl_file_loader.h>
+#include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
 
 namespace BABYLON {
@@ -120,8 +121,131 @@ public:
   OBJFileLoader(const std::optional<MeshLoadOptions>& meshLoadOptions = std::nullopt);
   ~OBJFileLoader() = default;
 
+  /**
+   * @brief If the data string can be loaded directly.
+   *
+   * @param data string containing the file data
+   * @returns if the data can be loaded directly
+   */
+  bool canDirectLoad(const std::string& data);
+
 private:
   static MeshLoadOptions currentMeshLoadOptions();
+
+  /**
+   * @brief This function set the data for each triangle.
+   * Data are position, normals and uvs
+   * If a tuple of (position, normal) is not set, add the data into the corresponding array
+   * If the tuple already exist, add only their indice
+   *
+   * @param indicePositionFromObj Integer The index in positions array
+   * @param indiceUvsFromObj Integer The index in uvs array
+   * @param indiceNormalFromObj Integer The index in normals array
+   * @param positionVectorFromOBJ Vector3 The value of position at index objIndice
+   * @param textureVectorFromOBJ Vector3 The value of uvs
+   * @param normalsVectorFromOBJ Vector3 The value of normals at index objNormale
+   */
+  void _setData(size_t indicePositionFromObj, size_t indiceUvsFromObj, size_t indiceNormalFromObj,
+                const Vector3& positionVectorFromOBJ, const Vector2& textureVectorFromOBJ,
+                const Vector3& normalsVectorFromOBJ,
+                const std::optional<Color4>& positionColorsFromOBJ = std::nullopt);
+
+  /**
+   * @brief Create triangles from polygons
+   * It is important to notice that a triangle is a polygon
+   * We get 5 patterns of face defined in OBJ File :
+   * facePattern1 = ["1","2","3","4","5","6"]
+   * facePattern2 = ["1/1","2/2","3/3","4/4","5/5","6/6"]
+   * facePattern3 = ["1/1/1","2/2/2","3/3/3","4/4/4","5/5/5","6/6/6"]
+   * facePattern4 = ["1//1","2//2","3//3","4//4","5//5","6//6"]
+   * facePattern5 = ["-1/-1/-1","-2/-2/-2","-3/-3/-3","-4/-4/-4","-5/-5/-5","-6/-6/-6"]
+   * Each pattern is divided by the same method
+   * @param face Array[String] The indices of elements
+   * @param v Integer The variable to increment
+   * @param triangles
+   */
+  void _getTriangles(const std::vector<std::string>& faces, size_t v,
+                     std::vector<std::string>& triangles);
+
+  /**
+   * @brief Create triangles and push the data for each polygon for the pattern 1.
+   * In this pattern we get vertice positions
+   * @param face
+   * @param v
+   * @param triangles
+   * @param positions
+   * @param colors
+   */
+  void _setDataForCurrentFaceWithPattern1(const std::vector<std::string>& face, size_t v,
+                                          std::vector<std::string>& triangles,
+                                          const std::vector<Vector3>& positions,
+                                          const std::vector<Color4>& colors);
+
+  /**
+   * @brief Create triangles and push the data for each polygon for the pattern 2.
+   * In this pattern we get vertice positions and uvsu
+   * @param face
+   * @param v
+   * @param triangles
+   * @param positions
+   * @param uvs
+   * @param colors
+   */
+  void _setDataForCurrentFaceWithPattern2(const std::vector<std::string>& face, size_t v,
+                                          std::vector<std::string>& triangles,
+                                          const std::vector<Vector3>& positions,
+                                          const std::vector<Vector2>& uvs,
+                                          const std::vector<Color4>& colors);
+
+  /**
+   * @brief Create triangles and push the data for each polygon for the pattern 3.
+   * In this pattern we get vertice positions, uvs and normals
+   * @param face
+   * @param v
+   * @param triangles
+   * @param positions
+   * @param normals
+   * @param colors
+   */
+  void _setDataForCurrentFaceWithPattern3(const std::vector<std::string>& face, size_t v,
+                                          std::vector<std::string>& triangles,
+                                          const std::vector<Vector3>& positions,
+                                          const std::vector<Vector3>& normals,
+                                          const std::vector<Vector2>& uvs);
+
+  /**
+   * @brief Create triangles and push the data for each polygon for the pattern 4.
+   * In this pattern we get vertice positions and normals
+   * @param face
+   * @param v
+   * @param triangles
+   * @param positions
+   * @param normals
+   * @param colors
+   */
+  void _setDataForCurrentFaceWithPattern4(const std::vector<std::string>& face, size_t v,
+                                          std::vector<std::string>& triangles,
+                                          const std::vector<Vector3>& positions,
+                                          const std::vector<Vector3>& normals,
+                                          const std::vector<Color4>& colors);
+
+  /**
+   * @brief Create triangles and push the data for each polygon for the pattern 3
+   * In this pattern we get vertice positions, uvs and normals
+   * @param face
+   * @param v
+   * @param triangles
+   * @param positions
+   * @param normals
+   * @param uvs
+   * @param colors
+   */
+  void _setDataForCurrentFaceWithPattern5(const std::vector<std::string>& face, size_t v,
+                                          std::vector<std::string>& triangles,
+                                          const std::vector<Vector3>& positions,
+                                          const std::vector<Vector3>& normals,
+                                          const std::vector<Vector2>& uvs,
+                                          const std::vector<Color4>& colors);
 
 public:
   /**
