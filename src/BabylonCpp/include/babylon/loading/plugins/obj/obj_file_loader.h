@@ -9,7 +9,7 @@
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT MeshObject {
+struct MeshObject {
   std::string name;
   IndicesArray indices;
   Float32Array positions;
@@ -18,6 +18,47 @@ struct BABYLON_SHARED_EXPORT MeshObject {
   Float32Array uvs;
   std::string materialName;
 }; // end of struct MeshObject
+
+/**
+ * @brief Tuple with indice of Position, Normal, UV  [pos, norm, uvs]
+ */
+struct TuplePosNormEntry {
+  std::vector<size_t> normals = {};
+  std::vector<size_t> idx     = {};
+  std::vector<size_t> uv      = {};
+}; // end of struct MeshObject
+
+struct OBJParseSolidState {
+  std::vector<Vector3> positions; // values for the positions of vertices
+  std::vector<Vector3> normals;   // Values for the normals
+  std::vector<Vector2> uvs;       // Values for the textures
+  std::vector<Color4> colors;
+  std::vector<MeshObject> meshesFromObj;          // [mesh] Contains all the obj meshes
+  MeshObject handledMesh;                         // The current mesh of meshes array
+  std::vector<uint32_t> indicesForBabylon;        // The list of indices for VertexData
+  std::vector<Vector3> wrappedPositionForBabylon; // The list of position in vectors
+  std::vector<Vector2> wrappedUvsForBabylon;      // Array with all value of uvs to match with the
+                                                  // indices
+  std::vector<Color4>
+    wrappedColorsForBabylon; // Array with all color values to match with the indices
+  std::vector<Vector3>
+    wrappedNormalsForBabylon; // Array with all value of normals to match with the indices
+  std::vector<TuplePosNormEntry>
+    tuplePosNorm; // Create a tuple with indice of Position, Normal, UV  [pos, norm, uvs]
+  size_t curPositionInIndices = 0;
+  bool hasMeshes;                            // Meshes are defined in the file
+  Float32Array unwrappedPositionsForBabylon; // Value of positionForBabylon w/o Vector3() [x,y,z]
+  Float32Array unwrappedColorsForBabylon;    // Value of colorForBabylon w/o Color4() [r,g,b,a]
+  Float32Array unwrappedNormalsForBabylon;   // Value of normalsForBabylon w/o Vector3()  [x,y,z]
+  Float32Array unwrappedUVForBabylon;        // Value of uvsForBabylon w/o Vector3()      [x,y,z]
+  std::vector<std::string> triangles;        // Indices from new triangles coming from polygons
+  std::string materialNameFromObj;           // The name of the current material
+  std::string fileToLoad;                    // The name of the mtlFile to load
+  std::string objMeshName;                   // The name of the current obj mesh
+  size_t increment;                          // Id for meshes created by the multimaterial
+  bool isFirstMaterial;
+  Color4 grayColor = Color4(0.5f, 0.5f, 0.5f, 1.f);
+};
 
 /**
  * @brief Options for loading OBJ/MTL files.
@@ -133,11 +174,34 @@ private:
   static MeshLoadOptions currentMeshLoadOptions();
 
   /**
+   * @brief Search for obj in the given array.
+   * This function is called to check if a couple of data already exists in an array.
+   *
+   * If found, returns the index of the founded tuple index. Returns -1 if not found
+   * @param arr Array<{ normals: Array<number>, idx: Array<number> }>
+   * @param obj Array<number>
+   * @returns {boolean}
+   */
+  int _isInArray(std::vector<TuplePosNormEntry>& arr, const std::vector<size_t>& obj);
+
+  /**
+   * @brief Search for obj in the given array.
+   * This function is called to check if a couple of data already exists in an array.
+   *
+   * If found, returns the index of the founded tuple index. Returns -1 if not found
+   * @param arr Array<{ normals: Array<number>, idx: Array<number> }>
+   * @param obj Array<number>
+   * @returns {boolean}
+   */
+  int _isInArrayUV(std::vector<TuplePosNormEntry>& arr, const std::vector<size_t>& obj);
+
+  /**
    * @brief This function set the data for each triangle.
    * Data are position, normals and uvs
    * If a tuple of (position, normal) is not set, add the data into the corresponding array
    * If the tuple already exist, add only their indice
    *
+   * @param tuplePosNorm Tuples with indice of Position, Normal, UV  [pos, norm, uvs]
    * @param indicePositionFromObj Integer The index in positions array
    * @param indiceUvsFromObj Integer The index in uvs array
    * @param indiceNormalFromObj Integer The index in normals array
@@ -147,8 +211,14 @@ private:
    */
   void _setData(size_t indicePositionFromObj, size_t indiceUvsFromObj, size_t indiceNormalFromObj,
                 const Vector3& positionVectorFromOBJ, const Vector2& textureVectorFromOBJ,
-                const Vector3& normalsVectorFromOBJ,
+                const Vector3& normalsVectorFromOBJ, OBJParseSolidState& state,
                 const std::optional<Color4>& positionColorsFromOBJ = std::nullopt);
+
+  /**
+   * @brief Transform Vector() and BABYLON.Color() objects into numbers in an array.
+   * @param state
+   */
+  void _unwrapData(OBJParseSolidState& state);
 
   /**
    * @brief Create triangles from polygons
@@ -162,90 +232,64 @@ private:
    * Each pattern is divided by the same method
    * @param face Array[String] The indices of elements
    * @param v Integer The variable to increment
-   * @param triangles
+   * @param state
    */
-  void _getTriangles(const std::vector<std::string>& faces, size_t v,
-                     std::vector<std::string>& triangles);
+  void _getTriangles(const std::vector<std::string>& face, size_t v, OBJParseSolidState& state);
 
   /**
    * @brief Create triangles and push the data for each polygon for the pattern 1.
    * In this pattern we get vertice positions
    * @param face
    * @param v
-   * @param triangles
-   * @param positions
-   * @param colors
+   * @param state
    */
   void _setDataForCurrentFaceWithPattern1(const std::vector<std::string>& face, size_t v,
-                                          std::vector<std::string>& triangles,
-                                          const std::vector<Vector3>& positions,
-                                          const std::vector<Color4>& colors);
+                                          OBJParseSolidState& state);
 
   /**
    * @brief Create triangles and push the data for each polygon for the pattern 2.
    * In this pattern we get vertice positions and uvsu
    * @param face
    * @param v
-   * @param triangles
-   * @param positions
-   * @param uvs
-   * @param colors
+   * @param state
    */
   void _setDataForCurrentFaceWithPattern2(const std::vector<std::string>& face, size_t v,
-                                          std::vector<std::string>& triangles,
-                                          const std::vector<Vector3>& positions,
-                                          const std::vector<Vector2>& uvs,
-                                          const std::vector<Color4>& colors);
+                                          OBJParseSolidState& state);
 
   /**
    * @brief Create triangles and push the data for each polygon for the pattern 3.
    * In this pattern we get vertice positions, uvs and normals
    * @param face
    * @param v
-   * @param triangles
-   * @param positions
-   * @param normals
-   * @param colors
+   * @param state
    */
   void _setDataForCurrentFaceWithPattern3(const std::vector<std::string>& face, size_t v,
-                                          std::vector<std::string>& triangles,
-                                          const std::vector<Vector3>& positions,
-                                          const std::vector<Vector3>& normals,
-                                          const std::vector<Vector2>& uvs);
+                                          OBJParseSolidState& state);
 
   /**
    * @brief Create triangles and push the data for each polygon for the pattern 4.
    * In this pattern we get vertice positions and normals
    * @param face
    * @param v
-   * @param triangles
-   * @param positions
-   * @param normals
-   * @param colors
+   * @param state
    */
   void _setDataForCurrentFaceWithPattern4(const std::vector<std::string>& face, size_t v,
-                                          std::vector<std::string>& triangles,
-                                          const std::vector<Vector3>& positions,
-                                          const std::vector<Vector3>& normals,
-                                          const std::vector<Color4>& colors);
+                                          OBJParseSolidState& state);
 
   /**
    * @brief Create triangles and push the data for each polygon for the pattern 3
    * In this pattern we get vertice positions, uvs and normals
    * @param face
    * @param v
-   * @param triangles
-   * @param positions
-   * @param normals
-   * @param uvs
-   * @param colors
+   * @param state
    */
   void _setDataForCurrentFaceWithPattern5(const std::vector<std::string>& face, size_t v,
-                                          std::vector<std::string>& triangles,
-                                          const std::vector<Vector3>& positions,
-                                          const std::vector<Vector3>& normals,
-                                          const std::vector<Vector2>& uvs,
-                                          const std::vector<Color4>& colors);
+                                          OBJParseSolidState& state);
+
+  /**
+   * @brief Hidden
+   */
+  void _addPreviousObjMesh(OBJParseSolidState& state);
 
 public:
   /**
