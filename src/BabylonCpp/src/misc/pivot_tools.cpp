@@ -20,8 +20,7 @@ void PivotTools::_RemoveAndStorePivotPoint(const AbstractMeshPtr& mesh)
                                                PivotTools::_PivotTranslation);
       PivotTools::_PivotTmpVector.copyFromFloats(1.f, 1.f, 1.f);
       PivotTools::_PivotTmpVector.subtractInPlace(mesh->scaling());
-      PivotTools::_PivotTmpVector.multiplyInPlace(
-        PivotTools::_PivotTranslation);
+      PivotTools::_PivotTmpVector.multiplyInPlace(PivotTools::_PivotTranslation);
       mesh->position().addInPlace(PivotTools::_PivotTmpVector);
     }
   }
