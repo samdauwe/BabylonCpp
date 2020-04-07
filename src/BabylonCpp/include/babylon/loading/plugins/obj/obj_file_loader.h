@@ -100,6 +100,9 @@ struct BABYLON_SHARED_EXPORT MeshLoadOptions {
   bool MaterialLoadingFailsSilently;
 }; // end of struct MeshLoadOptions
 
+class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+
 /**
  * @brief Class reading and parsing the MTL file bundled with the obj file.
  */
@@ -172,6 +175,23 @@ public:
 
 private:
   static MeshLoadOptions currentMeshLoadOptions();
+
+  /**
+   * @brief Read the OBJ file and create an Array of meshes.
+   * Each mesh contains all information given by the OBJ and the MTL file.
+   * i.e. vertices positions and indices, optional normals values, optional UV values, optional
+   * material
+   *
+   * @param meshesNames
+   * @param scene Scene The scene where are displayed the data
+   * @param data String The content of the obj file
+   * @param rootUrl String The path to the folder
+   * @returns Array<AbstractMesh>
+   * @private
+   */
+  std::vector<AbstractMeshPtr> _parseSolid(const std::vector<std::string>& meshesNames,
+                                           Scene* scene, const std::string& data,
+                                           const std::string& rootUrl);
 
   /**
    * @brief Search for obj in the given array.

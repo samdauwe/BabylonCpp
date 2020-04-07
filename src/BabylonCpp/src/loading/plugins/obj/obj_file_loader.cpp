@@ -341,4 +341,152 @@ void OBJFileLoader::_addPreviousObjMesh(OBJParseSolidState& state)
   }
 }
 
+std::vector<AbstractMeshPtr>
+OBJFileLoader::_parseSolid(const std::vector<std::string>& /*meshesNames*/, Scene* /*scene*/,
+                           const std::string& data, const std::string& /*rootUrl*/)
+{
+  OBJParseSolidState state = {};
+
+  // Split the file into lines
+  auto lines = StringTools::split(data, '\n');
+  const std::string regex{"\\s\\s"};
+  // Look at each line
+  for (auto line : lines) {
+    line = StringTools::regexReplace(StringTools::trim(line), regex, " ");
+    std::vector<std::string> result;
+
+    // Comment or newLine
+    if (line.empty() || line[0] == '#') {
+      continue;
+
+      // Get information about one position possible for the vertices
+    }
+    else if (!StringTools::regexMatch(line, std::regex(vertexPattern, std::regex::optimize))
+                .empty()) {
+      result = StringTools::regexMatch(line, std::regex(R"([^ ]+)", std::regex::optimize));
+
+      // Value of result with line: "v 1.0 2.0 3.0"
+      // ["v", "1.0", "2.0", "3.0"]
+      // Create a Vector3 with the position x, y, z
+      state.positions.emplace_back(Vector3(StringTools::toNumber<float>(result[1]), //
+                                           StringTools::toNumber<float>(result[2]), //
+                                           StringTools::toNumber<float>(result[3])  //
+                                           ));
+
+      if (_meshLoadOptions.ImportVertexColors == true) {
+        if (result.size() >= 7) {
+          // TODO: if these numbers are > 1 we can use Color4.FromInts(r,g,b,a)
+          state.colors.emplace_back(Color4(StringTools::toNumber<float>(result[4]), //
+                                           StringTools::toNumber<float>(result[5]), //
+                                           StringTools::toNumber<float>(result[6]), //
+                                           (result.size() == 7 /* || result[7] == undefined */) ?
+                                             1.f :
+                                             StringTools::toNumber<float>(result[7])));
+        }
+        else {
+          // TODO: maybe push NULL and if all are NULL to skip (and remove grayColor var).
+          state.colors.emplace_back(state.grayColor);
+        }
+      }
+    }
+    else if (!(result
+               = StringTools::regexMatch(line, std::regex(normalPattern, std::regex::optimize)))
+                .empty()) {
+      // Create a Vector3 with the normals x, y, z
+      // Value of result
+      //  ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+      // Add the Vector in the list of normals
+      state.normals.emplace_back(Vector3(StringTools::toNumber<float>(result[1]), //
+                                         StringTools::toNumber<float>(result[2]), //
+                                         StringTools::toNumber<float>(result[3])  //
+                                         ));
+    }
+    else if (!(result = StringTools::regexMatch(line, std::regex(uvPattern, std::regex::optimize)))
+                .empty()) {
+      // Create a Vector2 with the normals u, v
+      // Value of result
+      //  ["vt 0.1 0.2 0.3", "0.1", "0.2"]
+      // Add the Vector in the list of uvs
+      state.uvs.emplace_back(
+        Vector2(StringTools::toNumber<float>(result[1]) * OBJFileLoader::UV_SCALING.x,
+                StringTools::toNumber<float>(result[2]) * OBJFileLoader::UV_SCALING.y));
+
+      // Identify patterns of faces
+      // Face could be defined in different type of pattern
+    }
+    else if (!(result
+               = StringTools::regexMatch(line, std::regex(facePattern3, std::regex::optimize)))
+                .empty()) {
+      // Value of result:
+      // ["f 1/1/1 2/2/2 3/3/3", "1/1/1 2/2/2 3/3/3"...]
+
+      // Set the data for this face
+      _setDataForCurrentFaceWithPattern3(
+        StringTools::split(StringTools::trim(result[1]), " "), // ["1/1/1", "2/2/2", "3/3/3"]
+        1,                                                     // v
+        state                                                  // state
+      );
+    }
+    else if (!(result
+               = StringTools::regexMatch(line, std::regex(facePattern4, std::regex::optimize)))
+                .empty()) {
+      // Value of result:
+      // ["f 1//1 2//2 3//3", "1//1 2//2 3//3"...]
+
+      // Set the data for this face
+      _setDataForCurrentFaceWithPattern4(
+        StringTools::split(StringTools::trim(result[1]), " "), // ["1//1", "2//2", "3//3"]
+        1,                                                     // v
+        state                                                  // state
+      );
+    }
+    else if (!(result
+               = StringTools::regexMatch(line, std::regex(facePattern5, std::regex::optimize)))
+                .empty()) {
+      // Value of result:
+      // ["f -1/-1/-1 -2/-2/-2 -3/-3/-3", "-1/-1/-1 -2/-2/-2 -3/-3/-3"...]
+
+      // Set the data for this face
+      _setDataForCurrentFaceWithPattern5(
+        StringTools::split(StringTools::trim(result[1]),
+                           " "), // ["-1/-1/-1", "-2/-2/-2", "-3/-3/-3"]
+        1,                       // v
+        state                    // state
+      );
+    }
+    else if (!(result
+               = StringTools::regexMatch(line, std::regex(facePattern2, std::regex::optimize)))
+                .empty()) {
+      // Value of result:
+      //["f 1/1 2/2 3/3", "1/1 2/2 3/3"...]
+
+      // Set the data for this face
+      _setDataForCurrentFaceWithPattern2(
+        StringTools::split(StringTools::trim(result[1]), " "), // ["1/1", "2/2", "3/3"]
+        1,                                                     // v
+        state                                                  // state
+      );
+    }
+    else if (!(result
+               = StringTools::regexMatch(line, std::regex(facePattern2, std::regex::optimize)))
+                .empty()) {
+      // Value of result
+      //["f 1 2 3", "1 2 3"...]
+
+      // Set the data for this face
+      _setDataForCurrentFaceWithPattern1(
+        StringTools::split(StringTools::trim(result[1]), " "), // ["1", "2", "3"]
+        1,                                                     // v
+        state                                                  // state
+      );
+
+      // Define a mesh or an object
+      // Each time this keyword is analysed, create a new Object with all data for creating a
+      // babylonMesh
+    }
+  }
+
+  return {};
+}
+
 } // end of namespace BABYLON
