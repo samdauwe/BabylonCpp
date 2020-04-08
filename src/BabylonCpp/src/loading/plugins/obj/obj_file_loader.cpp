@@ -1,7 +1,13 @@
 #include <babylon/loading/plugins/obj/obj_file_loader.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/logging.h>
+#include <babylon/engines/scene.h>
+#include <babylon/materials/standard_material.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/meshes/geometry.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
@@ -341,9 +347,9 @@ void OBJFileLoader::_addPreviousObjMesh(OBJParseSolidState& state)
   }
 }
 
-std::vector<AbstractMeshPtr>
-OBJFileLoader::_parseSolid(const std::vector<std::string>& /*meshesNames*/, Scene* /*scene*/,
-                           const std::string& data, const std::string& /*rootUrl*/)
+std::vector<AbstractMeshPtr> OBJFileLoader::_parseSolid(const std::vector<std::string>& meshesNames,
+                                                        Scene* scene, const std::string& data,
+                                                        const std::string& /*rootUrl*/)
 {
   OBJParseSolidState state = {};
 
@@ -484,9 +490,180 @@ OBJFileLoader::_parseSolid(const std::vector<std::string>& /*meshesNames*/, Scen
       // Each time this keyword is analysed, create a new Object with all data for creating a
       // babylonMesh
     }
+    else if ((!StringTools::regexMatch(line, std::regex(group, std::regex::optimize)).empty())
+             || (!StringTools::regexMatch(obj, std::regex(group, std::regex::optimize)).empty())) {
+      // Create a new mesh corresponding to the name of the group.
+      // Definition of the mesh
+      auto substr = line.substr(2);
+      MeshObject objMesh{
+        StringTools::trim(substr), // Set the name of the current obj mesh
+        {},                        // indices
+        {},                        // positions
+        {},                        // normals
+        {},                        // uvs
+        {},                        // colors
+        ""                         // materialName
+      };
+      _addPreviousObjMesh(state);
+
+      // Push the last mesh created with only the name
+      state.meshesFromObj.emplace_back(objMesh);
+
+      // Set this variable to indicate that now meshesFromObj has objects defined inside
+      state.hasMeshes       = true;
+      state.isFirstMaterial = true;
+      state.increment       = 1;
+      // Keyword for applying a material
+    }
+    else if (!StringTools::regexMatch(line, std::regex(usemtl, std::regex::optimize)).empty()) {
+      // Get the name of the material
+      auto substr               = line.substr(7);
+      state.materialNameFromObj = StringTools::trim(substr);
+
+      // If this new material is in the same mesh
+
+      if (!state.isFirstMaterial || !state.hasMeshes) {
+        // Set the data for the previous mesh
+        _addPreviousObjMesh(state);
+        // Create a new mesh
+        MeshObject objMesh
+          // Set the name of the current obj mesh
+          {
+            StringTools::printf("%s_mm%zu",
+                                (!state.objMeshName.empty() ? state.objMeshName.c_str() : "mesh"),
+                                state.increment), // Set the name of the current obj mesh
+            {},                                   // indices
+            {},                                   // positions
+            {},                                   // normals
+            {},                                   // uvs
+            {},                                   // colors
+            state.materialNameFromObj             // materialName
+          };
+        ++state.increment;
+        // If meshes are already defined
+        state.meshesFromObj.emplace_back(objMesh);
+        state.hasMeshes = true;
+      }
+      // Set the material name if the previous line define a mesh
+
+      if (state.hasMeshes && state.isFirstMaterial) {
+        // Set the material name to the previous mesh (1 material per mesh)
+        state.meshesFromObj.back().materialName = state.materialNameFromObj;
+        state.isFirstMaterial                   = false;
+      }
+      // Keyword for loading the mtl file
+    }
+    else if (!StringTools::regexMatch(line, std::regex(mtllib, std::regex::optimize)).empty()) {
+      // Get the name of mtl file
+      auto substr      = line.substr(7);
+      state.fileToLoad = StringTools::trim(substr);
+
+      // Apply smoothing
+    }
+    else if (!StringTools::regexMatch(line, std::regex(smooth, std::regex::optimize)).empty()) {
+      // smooth shading => apply smoothing
+      // Today I don't know it work with babylon and with obj.
+      // With the obj file  an integer is set
+    }
+    else {
+      // If there is another possibility
+      BABYLON_LOG_ERROR("OBJFileLoader", "Unhandled expression at line : %s", line.c_str())
+    }
   }
 
-  return {};
+  // At the end of the file, add the last mesh into the meshesFromObj array
+  if (state.hasMeshes) {
+    // Set the data for the last mesh
+    state.handledMesh = state.meshesFromObj.back();
+
+    // Reverse indices for displaying faces in the good sense
+    std::reverse(state.indicesForBabylon.begin(), state.indicesForBabylon.end());
+    // Get the good array
+    _unwrapData(state);
+    // Set array
+    state.handledMesh.indices   = state.indicesForBabylon;
+    state.handledMesh.positions = state.unwrappedPositionsForBabylon;
+    state.handledMesh.normals   = state.unwrappedNormalsForBabylon;
+    state.handledMesh.uvs       = state.unwrappedUVForBabylon;
+
+    if (_meshLoadOptions.ImportVertexColors == true) {
+      state.handledMesh.colors = state.unwrappedColorsForBabylon;
+    }
+  }
+
+  // If any o or g keyword found, create a mesh with a random id
+  if (!state.hasMeshes) {
+    // reverse tab of indices
+    std::reverse(state.indicesForBabylon.begin(), state.indicesForBabylon.end());
+    // Get positions normals uvs
+    _unwrapData(state);
+    // Set data for one mesh
+    state.meshesFromObj.emplace_back(MeshObject{
+      Geometry::RandomId(),               // name
+      state.indicesForBabylon,            // indices
+      state.unwrappedPositionsForBabylon, // positions
+      state.unwrappedColorsForBabylon,    // colors
+      state.unwrappedNormalsForBabylon,   // normals
+      state.unwrappedUVForBabylon,        // uvs
+      state.materialNameFromObj           // materialName
+    });
+  }
+
+  // Create a Mesh list
+  std::vector<AbstractMeshPtr> babylonMeshesArray; // The mesh for babylon
+  std::vector<std::string> materialToUse;
+
+  // Set data for each mesh
+  for (const auto& meshFromObj : state.meshesFromObj) {
+
+    // check meshesNames (stlFileLoader)
+    if (!meshesNames.empty() && !meshFromObj.name.empty()) {
+      if (!stl_util::contains(meshesNames, meshFromObj.name)) {
+        continue;
+      }
+    }
+
+    // Get the current mesh
+    // Set the data with VertexBuffer for each mesh
+    state.handledMesh = meshFromObj;
+    // Create a Mesh with the name of the obj mesh
+
+    scene->_blockEntityCollection = _forAssetContainer;
+    auto babylonMesh              = Mesh::New(meshFromObj.name, scene);
+    scene->_blockEntityCollection = false;
+
+    // Push the name of the material to an array
+    // This is indispensable for the importMesh function
+    materialToUse.emplace_back(meshFromObj.materialName);
+
+    auto vertexData = std::make_unique<VertexData>(); // The container for the values
+    // Set the data for the babylonMesh
+    vertexData->uvs       = state.handledMesh.uvs;
+    vertexData->indices   = state.handledMesh.indices;
+    vertexData->positions = state.handledMesh.positions;
+    if (_meshLoadOptions.ComputeNormals == true) {
+      Float32Array normals;
+      VertexData::ComputeNormals(state.handledMesh.positions, state.handledMesh.indices, normals);
+      vertexData->normals = normals;
+    }
+    else {
+      vertexData->normals = state.handledMesh.normals;
+    }
+    if (_meshLoadOptions.ImportVertexColors == true) {
+      vertexData->colors = state.handledMesh.colors;
+    }
+    // Set the data from the VertexBuffer to the current Mesh
+    vertexData->applyToMesh(*babylonMesh);
+    if (_meshLoadOptions.InvertY) {
+      babylonMesh->scaling().y *= -1.f;
+    }
+
+    // Push the mesh into an array
+    babylonMeshesArray.emplace_back(babylonMesh);
+  }
+
+  // Return an array with all Mesh
+  return babylonMeshesArray;
 }
 
 } // end of namespace BABYLON

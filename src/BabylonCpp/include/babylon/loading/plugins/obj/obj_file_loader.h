@@ -54,6 +54,7 @@ struct OBJParseSolidState {
   std::vector<std::string> triangles;        // Indices from new triangles coming from polygons
   std::string materialNameFromObj;           // The name of the current material
   std::string fileToLoad;                    // The name of the mtlFile to load
+  MTLFileLoader materialsFromMTLFile;        // Used for reading and parsing the MTL file
   std::string objMeshName;                   // The name of the current obj mesh
   size_t increment;                          // Id for meshes created by the multimaterial
   bool isFirstMaterial;
