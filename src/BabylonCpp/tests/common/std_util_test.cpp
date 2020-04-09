@@ -290,10 +290,22 @@ TEST(TestStdUtil, index_of)
 {
   using namespace BABYLON;
 
-  std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
-  EXPECT_EQ(stl_util::index_of(v, "DIFFUSE"), 0);
-  EXPECT_EQ(stl_util::index_of(v, "FOG"), 3);
-  EXPECT_EQ(stl_util::index_of(v, "VERTEXALPHA"), -1);
+  {
+    const std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
+    EXPECT_EQ(stl_util::index_of(v, "DIFFUSE"), 0);
+    EXPECT_EQ(stl_util::index_of(v, "FOG"), 3);
+    EXPECT_EQ(stl_util::index_of(v, "VERTEXALPHA"), -1);
+  }
+
+  // Test optional start index
+  {
+    const std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG",
+                                     "DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
+    EXPECT_EQ(stl_util::index_of(v, "POINTSIZE", 0), 2);
+    EXPECT_EQ(stl_util::index_of(v, "POINTSIZE", 4), 6);
+    EXPECT_EQ(stl_util::index_of(v, "POINTSIZE", -2), 6);
+    EXPECT_EQ(stl_util::index_of(v, "POINTSIZE", -1), -1);
+  }
 }
 
 TEST(TestStdUtil, min)

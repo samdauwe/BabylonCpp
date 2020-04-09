@@ -452,19 +452,21 @@ std::vector<T> remove_duplicates(const std::vector<T>& v)
 }
 
 /**
- * Searches the array for the specified item, and returns its position.
+ * @brief Searches the array for the specified item, and returns its position.
  * Returns -1 if the item is not found.
  * If the item is present more than once, the indexOf method returns the
  * position of the first occurence.
  * @param c Required. The container to search in.
  * @param elem Required. The item to search for.
+ * @param start Optional. Where to start the search. Negative values will start
+ * at the given position counting from the end, and search to the end.
  * @return A Number, representing the position of the specified item, otherwise
  * -1
  */
 template <typename C, typename T>
-inline int index_of(C& c, const T& elem)
+inline int index_of(C& c, const T& elem, int start = 0)
 {
-  auto i = std::find(c.begin(), c.end(), elem);
+  auto i = std::find((start >= 0 ? c.begin() : c.end()) + start, c.end(), elem);
   if (i != c.end()) {
     return static_cast<int>(i - c.begin());
   }
@@ -698,25 +700,22 @@ template <typename BaseClass, typename DerivedClass>
 inline void remove_vector_elements_equal_ptr(std::vector<BaseClass*>& vec,
                                              const DerivedClass* const pointer_to_remove)
 {
-  erase_remove_if(vec, 
-    [pointer_to_remove](const BaseClass* const v) { return v == pointer_to_remove; }
-  );
+  erase_remove_if(vec,
+                  [pointer_to_remove](const BaseClass* const v) { return v == pointer_to_remove; });
 }
 
 template <typename BaseClass, typename DerivedClass>
 inline void remove_vector_elements_equal_sharedptr(std::vector<std::shared_ptr<BaseClass>>& vec,
                                                    const DerivedClass* const pointer_to_remove)
 {
-  erase_remove_if(
-    vec,
-    [pointer_to_remove](const std::shared_ptr<BaseClass>& v) { return v.get() == pointer_to_remove; }
-  );
+  erase_remove_if(vec, [pointer_to_remove](const std::shared_ptr<BaseClass>& v) {
+    return v.get() == pointer_to_remove;
+  });
 }
 
 template <typename T, typename SharePtrVectorWrapper>
-inline void remove_vector_elements_equal_sharedptr_wrapped(
-  SharePtrVectorWrapper& wrapped_vector,
-  const T* const pointer_to_remove)
+inline void remove_vector_elements_equal_sharedptr_wrapped(SharePtrVectorWrapper& wrapped_vector,
+                                                           const T* const pointer_to_remove)
 {
   auto& vec = static_cast<std::vector<std::shared_ptr<T>>&>(wrapped_vector);
   remove_vector_elements_equal_sharedptr(vec, pointer_to_remove);
@@ -726,14 +725,12 @@ template <typename T, typename SharePtrVectorWrapper>
 inline void remove_vector_elements_equal_ptr_wrapped(SharePtrVectorWrapper& wrapped_vector,
                                                      const T* const pointer_to_remove)
 {
-  auto& vec = static_cast<std::vector<T *>&>(wrapped_vector);
+  auto& vec = static_cast<std::vector<T*>&>(wrapped_vector);
   remove_vector_elements_equal_ptr(vec, pointer_to_remove);
 }
 //////////////////////////////////////////
 //  end of erase_remove helpers         //
 //////////////////////////////////////////
-
-
 
 template <typename Container, typename JsStyleSortFunction>
 void sort_js_style(Container container, JsStyleSortFunction fn)
