@@ -3,7 +3,7 @@
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/lights/light.h>
-#include <babylon/loading/glTF/gltf_file_loader.h>
+#include <babylon/loading/plugins/gltf/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/samples/babylon_register_sample.h>
 

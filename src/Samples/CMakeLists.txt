@@ -46,7 +46,6 @@ target_link_libraries(${TARGET}
     Extensions
     MaterialsLibrary
     ProceduralTexturesLibrary
-    Loaders
     json_hpp
     subprocess_h
     magic_enum
