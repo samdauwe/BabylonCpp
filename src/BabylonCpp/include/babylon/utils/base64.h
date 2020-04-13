@@ -28,15 +28,13 @@
 #ifndef BABYLON_UTILS_BASE64_H
 #define BABYLON_UTILS_BASE64_H
 
+#include <babylon/babylon_api.h>
 #include <iostream>
 #include <string>
-
-#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT Base64 {
-
   static const std::string base64_chars;
 
   static inline bool is_base64(unsigned char c)
@@ -44,15 +42,13 @@ struct BABYLON_SHARED_EXPORT Base64 {
     return (isalnum(c) || (c == '+') || (c == '/'));
   }
 
-  static std::string encode(unsigned char const* bytes_to_encode,
-                            unsigned int in_len);
+  static std::string encode(unsigned char const* bytes_to_encode, unsigned int in_len);
 
   static std::string decode(std::string const& encoded_string);
 
   /**
-   * @brief Encodes a string in base-64. This method uses the "A-Z", "a-z",
-   * "0-9",
-   * "+", "/" and "=" characters to encode the string.
+   * @brief Encodes a string in base-64. This method uses the "A-Z", "a-z", "0-9", "+", "/" and "="
+   * characters to encode the string.
    * @param str The string to be encoded.
    * @return A String, representing the base-64 encoded string.
    */
