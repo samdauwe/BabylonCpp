@@ -36,13 +36,11 @@ TGAHeader TGATools::GetTGAHeader(const Uint8Array& data)
   return header;
 }
 
-void TGATools::UploadContent(const InternalTexturePtr& texture,
-                             const Uint8Array& data)
+void TGATools::UploadContent(const InternalTexturePtr& texture, const Uint8Array& data)
 {
   // Not enough data to contain header ?
   if (data.size() < 19) {
-    BABYLON_LOG_ERROR(
-      "TGATools", "Unable to load TGA file - Not enough data to contain header")
+    BABYLON_LOG_ERROR("TGATools", "Unable to load TGA file - Not enough data to contain header")
     return;
   }
 
@@ -94,9 +92,8 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
   Uint8Array pixel_data;
 
   // var numAlphaBits = header.flags & 0xf;
-  auto pixel_size = header.pixel_size >> 3;
-  auto pixel_total
-    = static_cast<uint32_t>(header.width * header.height) * pixel_size;
+  auto pixel_size  = header.pixel_size >> 3;
+  auto pixel_total = static_cast<uint32_t>(header.width * header.height) * pixel_size;
 
   // Read palettes
   Uint8Array palettes;
@@ -129,8 +126,7 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
 
         // Copy pixel array
         for (i = 0; i < count; ++i) {
-          stl_util::array_set(pixel_data, pixels,
-                              static_cast<int>(localOffset + i * pixel_size));
+          stl_util::array_set(pixel_data, pixels, static_cast<int>(localOffset + i * pixel_size));
         }
 
         localOffset += pixel_size * count;
@@ -148,8 +144,7 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
   // RAW Pixels
   else {
     const auto start = static_cast<int>(offset);
-    offset += (use_pal ? static_cast<uint32_t>(header.width * header.height) :
-                         pixel_total);
+    offset += (use_pal ? static_cast<uint32_t>(header.width * header.height) : pixel_total);
     const auto end = static_cast<int>(offset);
     pixel_data     = stl_util::subarray(data, start, end);
   }
@@ -200,31 +195,30 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
   Uint8Array imageData;
   if (use_grey) {
     if (header.pixel_size == 8) {
-      imageData = _getImageDataGrey8bits(header, palettes, pixel_data, y_start,
-                                         y_step, y_end, x_start, x_step, x_end);
+      imageData = _getImageDataGrey8bits(header, palettes, pixel_data, y_start, y_step, y_end,
+                                         x_start, x_step, x_end);
     }
     else if (header.pixel_size == 16) {
-      imageData
-        = _getImageDataGrey16bits(header, palettes, pixel_data, y_start, y_step,
-                                  y_end, x_start, x_step, x_end);
+      imageData = _getImageDataGrey16bits(header, palettes, pixel_data, y_start, y_step, y_end,
+                                          x_start, x_step, x_end);
     }
   }
   else {
     if (header.pixel_size == 8) {
-      imageData = _getImageDataGrey8bits(header, palettes, pixel_data, y_start,
-                                         y_step, y_end, x_start, x_step, x_end);
+      imageData = _getImageDataGrey8bits(header, palettes, pixel_data, y_start, y_step, y_end,
+                                         x_start, x_step, x_end);
     }
     else if (header.pixel_size == 16) {
-      imageData = _getImageData16bits(header, palettes, pixel_data, y_start,
-                                      y_step, y_end, x_start, x_step, x_end);
+      imageData = _getImageData16bits(header, palettes, pixel_data, y_start, y_step, y_end, x_start,
+                                      x_step, x_end);
     }
     else if (header.pixel_size == 24) {
-      imageData = _getImageData24bits(header, palettes, pixel_data, y_start,
-                                      y_step, y_end, x_start, x_step, x_end);
+      imageData = _getImageData24bits(header, palettes, pixel_data, y_start, y_step, y_end, x_start,
+                                      x_step, x_end);
     }
     else if (header.pixel_size == 32) {
-      imageData = _getImageData32bits(header, palettes, pixel_data, y_start,
-                                      y_step, y_end, x_start, x_step, x_end);
+      imageData = _getImageData32bits(header, palettes, pixel_data, y_start, y_step, y_end, x_start,
+                                      x_step, x_end);
     }
   }
 
@@ -232,11 +226,9 @@ void TGATools::UploadContent(const InternalTexturePtr& texture,
   engine->_uploadDataToTextureDirectly(texture, imageData);
 }
 
-Uint8Array TGATools::_getImageData8bits(const TGAHeader& header,
-                                        const Uint8Array& palettes,
-                                        const Uint8Array& pixel_data,
-                                        int32_t y_start, int32_t y_step,
-                                        int32_t y_end, int32_t x_start,
+Uint8Array TGATools::_getImageData8bits(const TGAHeader& header, const Uint8Array& palettes,
+                                        const Uint8Array& pixel_data, int32_t y_start,
+                                        int32_t y_step, int32_t y_end, int32_t x_start,
                                         int32_t x_step, int32_t x_end)
 {
   const auto& image    = pixel_data;
@@ -262,11 +254,9 @@ Uint8Array TGATools::_getImageData8bits(const TGAHeader& header,
   return imageData;
 }
 
-Uint8Array TGATools::_getImageData16bits(const TGAHeader& header,
-                                         const Uint8Array& /*palettes*/,
-                                         const Uint8Array& pixel_data,
-                                         int32_t y_start, int32_t y_step,
-                                         int32_t y_end, int32_t x_start,
+Uint8Array TGATools::_getImageData16bits(const TGAHeader& header, const Uint8Array& /*palettes*/,
+                                         const Uint8Array& pixel_data, int32_t y_start,
+                                         int32_t y_step, int32_t y_end, int32_t x_start,
                                          int32_t x_step, int32_t x_end)
 {
   const auto& image = pixel_data;
@@ -280,8 +270,7 @@ Uint8Array TGATools::_getImageData16bits(const TGAHeader& header,
     for (x = x_start; x != x_end; x += x_step, i += 2) {
       const auto xwy = static_cast<uint32_t>(x + width * y);
       const auto _i  = static_cast<uint32_t>(i);
-      color          = static_cast<uint8_t>(image[_i + 0]
-                                   + (image[_i + 1] << 8)); // Inversed ?
+      color          = static_cast<uint8_t>(image[_i + 0] + (image[_i + 1] << 8)); // Inversed ?
       uint8_t r      = (((color & 0x7C00) >> 10) * 255) / 0x1F | 0;
       uint8_t g      = (((color & 0x03E0) >> 5) * 255) / 0x1F | 0;
       uint8_t b      = ((color & 0x001F) * 255) / 0x1F | 0;
@@ -296,11 +285,9 @@ Uint8Array TGATools::_getImageData16bits(const TGAHeader& header,
   return imageData;
 }
 
-Uint8Array TGATools::_getImageData24bits(const TGAHeader& header,
-                                         const Uint8Array& /*palettes*/,
-                                         const Uint8Array& pixel_data,
-                                         int32_t y_start, int32_t y_step,
-                                         int32_t y_end, int32_t x_start,
+Uint8Array TGATools::_getImageData24bits(const TGAHeader& header, const Uint8Array& /*palettes*/,
+                                         const Uint8Array& pixel_data, int32_t y_start,
+                                         int32_t y_step, int32_t y_end, int32_t x_start,
                                          int32_t x_step, int32_t x_end)
 {
   const auto& image = pixel_data;
@@ -323,11 +310,9 @@ Uint8Array TGATools::_getImageData24bits(const TGAHeader& header,
   return imageData;
 }
 
-Uint8Array TGATools::_getImageData32bits(const TGAHeader& header,
-                                         const Uint8Array& /*palettes*/,
-                                         const Uint8Array& pixel_data,
-                                         int32_t y_start, int32_t y_step,
-                                         int32_t y_end, int32_t x_start,
+Uint8Array TGATools::_getImageData32bits(const TGAHeader& header, const Uint8Array& /*palettes*/,
+                                         const Uint8Array& pixel_data, int32_t y_start,
+                                         int32_t y_step, int32_t y_end, int32_t x_start,
                                          int32_t x_step, int32_t x_end)
 {
   const auto& image = pixel_data;
@@ -350,11 +335,9 @@ Uint8Array TGATools::_getImageData32bits(const TGAHeader& header,
   return imageData;
 }
 
-Uint8Array TGATools::_getImageDataGrey8bits(const TGAHeader& header,
-                                            const Uint8Array& /*palettes*/,
-                                            const Uint8Array& pixel_data,
-                                            int32_t y_start, int32_t y_step,
-                                            int32_t y_end, int32_t x_start,
+Uint8Array TGATools::_getImageDataGrey8bits(const TGAHeader& header, const Uint8Array& /*palettes*/,
+                                            const Uint8Array& pixel_data, int32_t y_start,
+                                            int32_t y_step, int32_t y_end, int32_t x_start,
                                             int32_t x_step, int32_t x_end)
 {
   const auto& image = pixel_data;
@@ -381,9 +364,8 @@ Uint8Array TGATools::_getImageDataGrey8bits(const TGAHeader& header,
 
 Uint8Array TGATools::_getImageDataGrey16bits(const TGAHeader& header,
                                              const Uint8Array& /*palettes*/,
-                                             const Uint8Array& pixel_data,
-                                             int32_t y_start, int32_t y_step,
-                                             int32_t y_end, int32_t x_start,
+                                             const Uint8Array& pixel_data, int32_t y_start,
+                                             int32_t y_step, int32_t y_end, int32_t x_start,
                                              int32_t x_step, int32_t x_end)
 {
   const auto& image = pixel_data;
