@@ -236,15 +236,14 @@ Matrix& Matrix::addToSelf(const Matrix& other)
   return *this;
 }
 
-Matrix& Matrix::invertToRef(Matrix& other)
+const Matrix& Matrix::invertToRef(Matrix& other) const
 {
   if (_isIdentity) {
     Matrix::IdentityToRef(other);
     return *this;
   }
 
-  // the inverse of a Matrix is the transpose of cofactor matrix divided by the
-  // determinant
+  // the inverse of a Matrix is the transpose of cofactor matrix divided by the determinant
   const auto& m  = _m;
   const auto m00 = m[0], m01 = m[1], m02 = m[2], m03 = m[3];
   const auto m10 = m[4], m11 = m[5], m12 = m[6], m13 = m[7];

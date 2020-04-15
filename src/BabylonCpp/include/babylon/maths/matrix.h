@@ -141,7 +141,7 @@ public:
    * @param other defines the target matrix
    * @returns the unmodified current matrix
    */
-  Matrix& invertToRef(Matrix& other);
+  const Matrix& invertToRef(Matrix& other) const;
 
   /**
    * @brief Add a value at the specified position in the current Matrix.
