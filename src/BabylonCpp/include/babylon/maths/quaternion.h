@@ -363,6 +363,14 @@ public:
   static Quaternion FromArray(const Float32Array& array, unsigned int offset = 0);
 
   /**
+   * @brief Updates the given quaternion "result" from the starting index of the given array.
+   * @param array the array to pull values from
+   * @param offset the offset into the array to start at
+   * @param result the quaternion to store the result in
+   */
+  static void FromArrayToRef(const Float32Array& array, unsigned int offset, Quaternion& result);
+
+  /**
    * @brief Create a quaternion from Euler rotation angles.
    * @param x Pitch
    * @param y Yaw

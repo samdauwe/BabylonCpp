@@ -434,6 +434,14 @@ Quaternion Quaternion::FromArray(const Float32Array& array, unsigned int offset)
   return Quaternion(array[offset], array[offset + 1], array[offset + 2], array[offset + 3]);
 }
 
+void Quaternion::FromArrayToRef(const Float32Array& array, unsigned int offset, Quaternion& result)
+{
+  result.x = array[offset];
+  result.y = array[offset + 1];
+  result.z = array[offset + 2];
+  result.w = array[offset + 3];
+}
+
 Quaternion Quaternion::FromEulerAngles(float x, float y, float z)
 {
   Quaternion q;
