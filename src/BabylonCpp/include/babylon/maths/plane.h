@@ -19,8 +19,8 @@ class BABYLON_SHARED_EXPORT Plane {
 
 public:
   /**
-   * @brief Creates a Plane object according to the given floats a, b, c, d and
-   * the plane equation : ax + by + cz + d = 0
+   * @brief Creates a Plane object according to the given floats a, b, c, d and the plane equation :
+   * ax + by + cz + d = 0
    * @param a a component of the plane
    * @param b b component of the plane
    * @param c c component of the plane
@@ -75,16 +75,14 @@ public:
   [[nodiscard]] Plane transform(const Matrix& transformation) const;
 
   /**
-   * @brief Calculate the dot product between the point and the plane normal
+   * @brief Compute the dot product between the point and the plane normal
    * @param point point to calculate the dot product with
-   * @returns the dot product (float) of the point coordinates and the plane
-   * normal.
+   * @returns the dot product (float) of the point coordinates and the plane normal.
    */
   [[nodiscard]] float dotCoordinate(const Vector3& point) const;
 
   /**
-   * @brief Updates the current Plane from the plane defined by the three given
-   * points.
+   * @brief Updates the current Plane from the plane defined by the three given points.
    * @param point1 one of the points used to contruct the plane
    * @param point2 one of the points used to contruct the plane
    * @param point3 one of the points used to contruct the plane
@@ -95,8 +93,7 @@ public:
   /**
    * @brief Checks if the plane is facing a given direction
    * @param direction the direction to check if the plane is facing
-   * @param epsilon value the dot product is compared against (returns true if
-   * dot <= epsilon)
+   * @param epsilon value the dot product is compared against (returns true if dot <= epsilon)
    * @returns True is the vector "direction"  is the same side than the plane
    * normal.
    */
@@ -141,8 +138,8 @@ public:
    * @param origin origin of the plane to be constructed
    * @param normal normal of the plane to be constructed
    * @param point point to calculate distance to
-   * @returns the signed distance between the plane defined by the normal vector
-   * at the "origin"" point and the given other point.
+   * @returns the signed distance between the plane defined by the normal vector at the "origin""
+   * point and the given other point.
    */
   static float SignedDistanceToPlaneFromPositionAndNormal(const Vector3& origin,
                                                           const Vector3& normal,

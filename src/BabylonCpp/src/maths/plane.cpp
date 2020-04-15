@@ -14,8 +14,7 @@ Plane::Plane(Vector3 _normal, float _d) : normal{_normal}, d{_d}
 {
 }
 
-Plane::Plane(float a, float b, float c, float id)
-    : normal{Vector3(a, b, c)}, d{id}
+Plane::Plane(float a, float b, float c, float id) : normal{Vector3(a, b, c)}, d{id}
 {
 }
 
@@ -65,9 +64,8 @@ std::array<float, 4> Plane::asArray() const
 // Methods
 Plane& Plane::normalize()
 {
-  const float norm = sqrtf((normal.x * normal.x) + (normal.y * normal.y)
-                           + (normal.z * normal.z));
-  float magnitude  = 0.f;
+  const float norm = sqrtf((normal.x * normal.x) + (normal.y * normal.y) + (normal.z * normal.z));
+  auto magnitude   = 0.f;
 
   if (!stl_util::almost_equal(norm, 0.f)) {
     magnitude = 1.f / norm;
@@ -84,9 +82,10 @@ Plane& Plane::normalize()
 
 Plane Plane::transform(const Matrix& transformation) const
 {
-  auto& transposedMatrix = MathTmp::MatrixArray[0];
-  Matrix::TransposeToRef(transformation, transposedMatrix);
-  const auto& m = transposedMatrix.m();
+  auto& invertedMatrix = MathTmp::MatrixArray[0];
+
+  transformation.invertToRef(invertedMatrix);
+  const auto& m = invertedMatrix.m();
   const auto x  = normal.x;
   const auto y  = normal.y;
   const auto z  = normal.z;
@@ -101,12 +100,10 @@ Plane Plane::transform(const Matrix& transformation) const
 
 float Plane::dotCoordinate(const Vector3& point) const
 {
-  return ((((normal.x * point.x) + (normal.y * point.y)) + (normal.z * point.z))
-          + d);
+  return ((((normal.x * point.x) + (normal.y * point.y)) + (normal.z * point.z)) + d);
 }
 
-Plane& Plane::copyFromPoints(const Vector3& point1, const Vector3& point2,
-                             const Vector3& point3)
+Plane& Plane::copyFromPoints(const Vector3& point1, const Vector3& point2, const Vector3& point3)
 {
   const auto x1   = point2.x - point1.x;
   const auto y1   = point2.y - point1.y;
@@ -130,7 +127,7 @@ Plane& Plane::copyFromPoints(const Vector3& point1, const Vector3& point2,
   normal.x = yz * invPyth;
   normal.y = xz * invPyth;
   normal.z = xy * invPyth;
-  d = -((normal.x * point1.x) + (normal.y * point1.y) + (normal.z * point1.z));
+  d        = -((normal.x * point1.x) + (normal.y * point1.y) + (normal.z * point1.z));
 
   return *this;
 }
@@ -153,8 +150,7 @@ Plane Plane::FromArray(const Float32Array& array)
   return Plane(array[0], array[1], array[2], array[3]);
 }
 
-Plane Plane::FromPoints(const Vector3& point1, const Vector3& point2,
-                        const Vector3& point3)
+Plane Plane::FromPoints(const Vector3& point1, const Vector3& point2, const Vector3& point3)
 {
   Plane result(0.f, 0.f, 0.f, 0.f);
   result.copyFromPoints(point1, point2, point3);
@@ -166,16 +162,14 @@ Plane Plane::FromPositionAndNormal(const Vector3& origin, Vector3 normal)
   Plane result(0.f, 0.f, 0.f, 0.f);
   normal.normalize();
   result.normal = normal;
-  result.d = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
+  result.d      = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
   return result;
 }
 
 float Plane::SignedDistanceToPlaneFromPositionAndNormal(const Vector3& origin,
-                                                        const Vector3& normal,
-                                                        const Vector3& point)
+                                                        const Vector3& normal, const Vector3& point)
 {
-  const auto id
-    = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
+  const auto id = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
 
   return Vector3::Dot(point, normal) + id;
 }
