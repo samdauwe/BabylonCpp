@@ -209,10 +209,10 @@ public:
 
   /**
    * @brief Compute the Color4 hexadecimal code as a string.
-   * @returns a string containing the hexadecimal representation of the Color4
-   * object
+   * @param returnAsColor3 defines if the string should only contains RGB values (off by default)
+   * @returns a string containing the hexadecimal representation of the Color4 object
    */
-  [[nodiscard]] std::string toHexString() const;
+  [[nodiscard]] std::string toHexString(bool returnAsColor3 = false) const;
 
   /**
    * @brief Computes a new Color4 converted from the current one to linear

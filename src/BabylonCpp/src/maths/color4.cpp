@@ -12,14 +12,13 @@ Color4::Color4(float red, float green, float blue, float alpha)
 {
 }
 
-Color4::Color4(const Color3& otherColor)
-    : r{otherColor.r}, g{otherColor.g}, b{otherColor.b}, a{1.f}
+Color4::Color4(const Color3& otherColor) : r{otherColor.r}, g{otherColor.g}, b{otherColor.b}, a{1.f}
 {
 }
 
 Color4::Color4(const Color4&) = default;
 
-Color4::Color4(Color3&& otherColor) 
+Color4::Color4(Color3&& otherColor)
 {
   r = otherColor.r;
   g = otherColor.g;
@@ -114,10 +113,8 @@ const Color4& Color4::toArray(Float32Array& array, unsigned int index) const
 
 bool Color4::equals(const Color4& otherColor) const
 {
-  return stl_util::almost_equal(r, otherColor.r)
-         && stl_util::almost_equal(g, otherColor.g)
-         && stl_util::almost_equal(b, otherColor.b)
-         && stl_util::almost_equal(a, otherColor.a);
+  return stl_util::almost_equal(r, otherColor.r) && stl_util::almost_equal(g, otherColor.g)
+         && stl_util::almost_equal(b, otherColor.b) && stl_util::almost_equal(a, otherColor.a);
 }
 
 Color4 Color4::add(const Color4& right) const
@@ -232,16 +229,22 @@ Color4& Color4::set(float red, float green, float blue, float alpha)
   return copyFromFloats(red, green, blue, alpha);
 }
 
-std::string Color4::toHexString() const
+std::string Color4::toHexString(bool returnAsColor3) const
 {
   const int intR = static_cast<int>(r * 255) | 0;
   const int intG = static_cast<int>(g * 255) | 0;
   const int intB = static_cast<int>(b * 255) | 0;
-  const int intA = static_cast<int>(a * 255) | 0;
 
+  if (returnAsColor3) {
+    std::ostringstream ostream;
+    ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG) << Scalar::ToHex(intB);
+    return ostream.str();
+  }
+
+  const int intA = static_cast<int>(a * 255) | 0;
   std::ostringstream ostream;
-  ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG)
-          << Scalar::ToHex(intB) << Scalar::ToHex(intA);
+  ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG) << Scalar::ToHex(intB)
+          << Scalar::ToHex(intA);
   return ostream.str();
 }
 
@@ -280,8 +283,8 @@ const Color4& Color4::toGammaSpaceToRef(Color4& convertedColor) const
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Color4& color)
 {
-  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
-     << ",\"A\":" << color.a << "}";
+  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b << ",\"A\":" << color.a
+     << "}";
   return os;
 }
 
@@ -336,8 +339,7 @@ Color4 Color4::Lerp(const Color4& left, const Color4& right, float amount)
   return result;
 }
 
-void Color4::LerpToRef(const Color4& left, const Color4& right, float amount,
-                       Color4& result)
+void Color4::LerpToRef(const Color4& left, const Color4& right, float amount, Color4& result)
 {
   result.r = left.r + (right.r - left.r) * amount;
   result.g = left.g + (right.g - left.g) * amount;
@@ -353,8 +355,7 @@ Color4 Color4::FromColor3(const Color3& color3, float alpha)
 Color4 Color4::FromArray(const Float32Array& array, unsigned int offset)
 {
   if ((size_t)(offset + 3) < array.size())
-    return Color4(array[offset], array[offset + 1], array[offset + 2],
-                  array[offset + 3]);
+    return Color4(array[offset], array[offset + 1], array[offset + 2], array[offset + 3]);
   else
     return Color4(array[offset], array[offset + 1], array[offset + 2], 1.f);
 }
