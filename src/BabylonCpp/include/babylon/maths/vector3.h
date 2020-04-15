@@ -11,6 +11,7 @@
 namespace BABYLON {
 
 class Matrix;
+class Plane;
 class Quaternion;
 class Viewport;
 
@@ -261,6 +262,24 @@ public:
    * @returns the unmodified current Vector3
    */
   const Vector3& scaleAndAddToRef(float iscale, Vector3& result) const;
+
+  /**
+   * @brief Projects the current vector3 to a plane along a ray starting from a specified origin and
+   * directed towards the point.
+   * @param origin defines the origin of the projection ray
+   * @param plane defines the plane to project to
+   * @returns the projected vector3
+   */
+  Vector3 projectOnPlane(const Plane& plane, const Vector3& origin) const;
+
+  /**
+   * @brief Projects the current vector3 to a plane along a ray starting from a specified origin and
+   * directed towards the point.
+   * @param origin defines the origin of the projection ray
+   * @param plane defines the plane to project to
+   * @param result defines the Vector3 where to store the result
+   */
+  void projectOnPlaneToRef(const Plane& plane, const Vector3& origin, Vector3& result) const;
 
   /**
    * @brief Returns true if the current Vector3 and the given vector coordinates are strictly equal.
@@ -649,15 +668,17 @@ public:
 
   /**
    * @brief Returns a new Vector3 set to (0.0, 0.0, 1.0).
+   * @param rightHandedSystem is the scene right-handed (negative z)
    * @returns a new forward Vector3
    */
-  static Vector3 Forward();
+  static Vector3 Forward(bool rightHandedSystem = false);
 
   /**
    * @brief Returns a new Vector3 set to (0.0, 0.0, -1.0).
+   * @param rightHandedSystem is the scene right-handed (negative-z)
    * @returns a new forward Vector3
    */
-  static Vector3 Backward();
+  static Vector3 Backward(bool rightHandedSystem = false);
 
   /**
    * @brief Returns a new Vector3 set to (1.0, 0.0, 0.0).

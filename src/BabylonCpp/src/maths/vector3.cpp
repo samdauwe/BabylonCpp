@@ -1,9 +1,10 @@
-#include <babylon/maths/vector3.h>
+﻿#include <babylon/maths/vector3.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/maths/axis.h>
 #include <babylon/maths/math_tmp.h>
 #include <babylon/maths/matrix.h>
+#include <babylon/maths/plane.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/vector3.h>
@@ -209,6 +210,35 @@ const Vector3& Vector3::scaleAndAddToRef(int iscale, Vector3& result) const
 const Vector3& Vector3::scaleAndAddToRef(float iscale, Vector3& result) const
 {
   return result.addInPlaceFromFloats(x * iscale, y * iscale, z * iscale);
+}
+
+Vector3 Vector3::projectOnPlane(const Plane& plane, const Vector3& origin) const
+{
+  auto result = Vector3::Zero();
+
+  projectOnPlaneToRef(plane, origin, result);
+
+  return result;
+}
+
+void Vector3::projectOnPlaneToRef(const Plane& plane, const Vector3& origin, Vector3& result) const
+{
+  const auto& n = plane.normal;
+  const auto d  = plane.d;
+
+  auto& V = MathTmp::Vector3Array[0];
+
+  // ray direction
+  subtractToRef(origin, V);
+
+  V.normalize();
+
+  const auto denom = Vector3::Dot(V, n);
+  const auto t     = -(Vector3::Dot(origin, n) + d) / denom;
+
+  // P = P0 + t*V
+  const auto scaledV = V.scaleInPlace(t);
+  origin.addToRef(scaledV, result);
 }
 
 bool Vector3::equals(const Vector3& otherVector) const
@@ -650,14 +680,14 @@ Vector3 Vector3::Down()
   return Vector3(0.f, -1.f, 0.f);
 }
 
-Vector3 Vector3::Forward()
+Vector3 Vector3::Forward(bool rightHandedSystem)
 {
-  return Vector3(0.f, 0.f, 1.f);
+  return Vector3(0.f, 0.f, (rightHandedSystem ? -1.f : 1.f));
 }
 
-Vector3 Vector3::Backward()
+Vector3 Vector3::Backward(bool rightHandedSystem)
 {
-  return Vector3(0.f, 0.f, -1.f);
+  return Vector3(0.f, 0.f, (rightHandedSystem ? 1.f : -1.f));
 }
 
 Vector3 Vector3::Right()
