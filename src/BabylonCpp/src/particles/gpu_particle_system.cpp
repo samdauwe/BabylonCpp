@@ -287,9 +287,7 @@ GPUParticleSystem::_removeGradientAndTexture(float gradient, std::vector<FactorG
 GPUParticleSystem& GPUParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
                                                        const std::optional<Color4>& /*color2*/)
 {
-  ColorGradient colorGradient;
-  colorGradient.gradient = gradient;
-  colorGradient.color1   = iColor1;
+  ColorGradient colorGradient(gradient, iColor1);
   _colorGradients.emplace_back(colorGradient);
 
   BABYLON::stl_util::sort_js_style(_colorGradients,
@@ -325,9 +323,7 @@ GPUParticleSystem& GPUParticleSystem::removeColorGradient(float gradient)
 void GPUParticleSystem::_addFactorGradient(std::vector<FactorGradient>& factorGradients,
                                            float gradient, float factor)
 {
-  FactorGradient valueGradient;
-  valueGradient.gradient = gradient;
-  valueGradient.factor1  = factor;
+  FactorGradient valueGradient(gradient, factor);
   factorGradients.emplace_back(valueGradient);
 
   BABYLON::stl_util::sort_js_style(factorGradients,
@@ -1099,7 +1095,7 @@ void GPUParticleSystem::_createFactorGradientTexture(const std::vector<T>& facto
 
     GradientHelper::GetCurrentGradient<FactorGradient>(
       ratio, factorGradients,
-      [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+      [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient, float scale) {
         data[x] = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
       });
   }
@@ -1148,7 +1144,7 @@ void GPUParticleSystem::_createColorGradientTexture()
 
     GradientHelper::GetCurrentGradient<ColorGradient>(
       ratio, _colorGradients,
-      [&](ColorGradient& currentGradient, ColorGradient& nextGradient, float scale) {
+      [&](const ColorGradient& currentGradient, const ColorGradient& nextGradient, float scale) {
         Color4::LerpToRef(currentGradient.color1, nextGradient.color1, scale, tmpColor);
         data[x * 4]     = static_cast<uint8_t>(tmpColor.r * 255);
         data[x * 4 + 1] = static_cast<uint8_t>(tmpColor.g * 255);

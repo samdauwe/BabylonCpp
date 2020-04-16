@@ -121,11 +121,12 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
       if (!_colorGradients.empty()) {
         GradientHelper::GetCurrentGradient<ColorGradient>(
           ratio, _colorGradients,
-          [&](ColorGradient& currentGradient, ColorGradient& nextGradient, float scale) {
+          [&](const ColorGradient& currentGradient, const ColorGradient& nextGradient,
+              float scale) {
             if (currentGradient != *particle->_currentColorGradient) {
               particle->_currentColor1.copyFrom(particle->_currentColor2);
-              static_cast<ColorGradient&>(nextGradient).getColorToRef(particle->_currentColor2);
-              particle->_currentColorGradient = static_cast<ColorGradient&>(currentGradient);
+              const_cast<ColorGradient&>(nextGradient).getColorToRef(particle->_currentColor2);
+              particle->_currentColorGradient = const_cast<ColorGradient&>(currentGradient);
             }
             Color4::LerpToRef(particle->_currentColor1, particle->_currentColor2, scale,
                               particle->color);
@@ -144,7 +145,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
       if (!_angularSpeedGradients.empty()) {
         GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _angularSpeedGradients,
-          [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+          [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+              float scale) {
             if (currentGradient != particle->_currentAngularSpeedGradient) {
               particle->_currentAngularSpeed1        = particle->_currentAngularSpeed2;
               particle->_currentAngularSpeed2        = nextGradient.getFactor();
@@ -163,7 +165,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
       if (!_velocityGradients.empty()) {
         GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _velocityGradients,
-          [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+          [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+              float scale) {
             if (currentGradient != particle->_currentVelocityGradient) {
               particle->_currentVelocity1        = particle->_currentVelocity2;
               particle->_currentVelocity2        = nextGradient.getFactor();
@@ -179,7 +182,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
       if (!_limitVelocityGradients.empty()) {
         GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _limitVelocityGradients,
-          [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+          [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+              float scale) {
             if (currentGradient != particle->_currentLimitVelocityGradient) {
               particle->_currentLimitVelocity1        = particle->_currentLimitVelocity2;
               particle->_currentLimitVelocity2        = nextGradient.getFactor();
@@ -200,7 +204,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
       if (!_dragGradients.empty()) {
         GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _dragGradients,
-          [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+          [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+              float scale) {
             if (currentGradient != particle->_currentDragGradient) {
               particle->_currentDrag1        = particle->_currentDrag2;
               particle->_currentDrag2        = nextGradient.getFactor();
@@ -258,7 +263,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
       if (!_sizeGradients.empty()) {
         GradientHelper::GetCurrentGradient<FactorGradient>(
           ratio, _sizeGradients,
-          [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+          [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+              float scale) {
             if (currentGradient != particle->_currentSizeGradient) {
               particle->_currentSize1        = particle->_currentSize2;
               particle->_currentSize2        = nextGradient.getFactor();
@@ -273,7 +279,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
         if (!_colorRemapGradients.empty()) {
           GradientHelper::GetCurrentGradient<FactorGradient>(
             ratio, _colorRemapGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+            [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+                float scale) {
               auto min = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
               auto max = Scalar::Lerp(*currentGradient.factor2, *nextGradient.factor2, scale);
 
@@ -285,7 +292,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
         if (!_alphaRemapGradients.empty()) {
           GradientHelper::GetCurrentGradient<FactorGradient>(
             ratio, _alphaRemapGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+            [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+                float scale) {
               auto min = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
               auto max = Scalar::Lerp(*currentGradient.factor2, *nextGradient.factor2, scale);
 
@@ -362,10 +370,7 @@ void ParticleSystem::_addFactorGradient(std::vector<FactorGradient>& factorGradi
                                         float gradient, float factor,
                                         const std::optional<float>& factor2)
 {
-  FactorGradient newGradient;
-  newGradient.gradient = gradient;
-  newGradient.factor1  = factor;
-  newGradient.factor2  = factor2;
+  FactorGradient newGradient(gradient, factor, factor2);
   factorGradients.emplace_back(newGradient);
 
   BABYLON::stl_util::sort_js_style(factorGradients,
@@ -554,7 +559,7 @@ void ParticleSystem::_createRampGradientTexture()
 
     GradientHelper::GetCurrentGradient<Color3Gradient>(
       ratio, _rampGradients,
-      [&](Color3Gradient& currentGradient, Color3Gradient& nextGradient, float scale) {
+      [&](const Color3Gradient& currentGradient, const Color3Gradient& nextGradient, float scale) {
         Color3::LerpToRef(currentGradient.color, nextGradient.color, scale, tmpColor);
         data[x * 4]     = static_cast<uint8_t>(tmpColor.r * 255);
         data[x * 4 + 1] = static_cast<uint8_t>(tmpColor.g * 255);
@@ -574,9 +579,7 @@ std::vector<Color3Gradient>& ParticleSystem::getRampGradients()
 
 IParticleSystem& ParticleSystem::addRampGradient(float gradient, const Color3& color)
 {
-  Color3Gradient rampGradient;
-  rampGradient.gradient = gradient;
-  rampGradient.color    = color;
+  Color3Gradient rampGradient(gradient, color);
   _rampGradients.emplace_back(rampGradient);
 
   BABYLON::stl_util::sort_js_style(_rampGradients,
@@ -616,10 +619,7 @@ IParticleSystem& ParticleSystem::removeRampGradient(float gradient)
 IParticleSystem& ParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
                                                   const std::optional<Color4>& iColor2)
 {
-  ColorGradient colorGradient;
-  colorGradient.gradient = gradient;
-  colorGradient.color1   = iColor1;
-  colorGradient.color2   = iColor2;
+  ColorGradient colorGradient(gradient, iColor1, iColor2);
   _colorGradients.emplace_back(colorGradient);
 
   BABYLON::stl_util::sort_js_style(_colorGradients,
@@ -1061,7 +1061,8 @@ void ParticleSystem::_update(int newParticles)
       auto ratio = static_cast<float>(Scalar::Clamp(_actualFrame / targetStopDuration));
       GradientHelper::GetCurrentGradient<FactorGradient>(
         ratio, _lifeTimeGradients,
-        [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float /*scale*/) {
+        [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+            float /*scale*/) {
           auto& factorGradient1 = currentGradient;
           auto& factorGradient2 = nextGradient;
           auto lifeTime1        = factorGradient1.getFactor();
@@ -1146,7 +1147,8 @@ void ParticleSystem::_update(int newParticles)
       auto ratio = static_cast<float>(_actualFrame) / static_cast<float>(targetStopDuration);
       GradientHelper::GetCurrentGradient<FactorGradient>(
         ratio, _startSizeGradients,
-        [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+        [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+            float scale) {
           if (currentGradient != _currentStartSizeGradient) {
             _currentStartSize1        = _currentStartSize2;
             _currentStartSize2        = nextGradient.getFactor();
@@ -1443,7 +1445,8 @@ void ParticleSystem::animate(bool preWarmOnly)
       auto ratio = static_cast<float>(_actualFrame) / static_cast<float>(targetStopDuration);
       GradientHelper::GetCurrentGradient<FactorGradient>(
         ratio, _emitRateGradients,
-        [&](FactorGradient& currentGradient, FactorGradient& nextGradient, float scale) {
+        [&](const FactorGradient& currentGradient, const FactorGradient& nextGradient,
+            float scale) {
           if (currentGradient != _currentEmitRateGradient) {
             _currentEmitRate1        = _currentEmitRate2;
             _currentEmitRate2        = nextGradient.getFactor();
