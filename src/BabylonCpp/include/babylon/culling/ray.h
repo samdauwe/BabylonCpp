@@ -44,10 +44,10 @@ public:
   /** Methods **/
   /**
    * @brief Checks if the ray intersects a box.
+   * This does not account for the ray lenght by design to improve perfs.
    * @param minimum bound of the box
    * @param maximum bound of the box
-   * @param intersectionTreshold extra extend to be added to the box in all
-   * direction
+   * @param intersectionTreshold extra extend to be added to the box in all direction
    * @returns if the box was hit
    */
   [[nodiscard]] bool intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
@@ -55,9 +55,9 @@ public:
 
   /**
    * @brief Checks if the ray intersects a box.
+   * This does not account for the ray lenght by design to improve perfs.
    * @param box the bounding box to check
-   * @param intersectionTreshold extra extend to be added to the BoundingBox in
-   * all direction
+   * @param intersectionTreshold extra extend to be added to the BoundingBox in all direction
    * @returns if the box was hit
    */
   [[nodiscard]] bool intersectsBox(const BoundingBox& box, float intersectionTreshold = 0.f) const;
@@ -98,9 +98,9 @@ public:
   std::optional<Vector3> intersectsAxis(const std::string& axis, float offset = 0.f);
 
   /**
-   * @brief Checks if ray intersects a mesh.
+   * @brief Checks if ray intersects a mesh
    * @param mesh the mesh to check
-   * @param fastCheck if only the bounding box should checked
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @returns picking info of the intersecton
    */
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
@@ -108,7 +108,7 @@ public:
   /**
    * @brief Checks if ray intersects a mesh.
    * @param meshes the meshes to check
-   * @param fastCheck if only the bounding box should checked
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @returns Array of picking infos
    */
   std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
@@ -117,7 +117,7 @@ public:
   /**
    * @brief Checks if ray intersects a mesh.
    * @param meshes the meshes to check
-   * @param fastCheck if only the bounding box should checked
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @param results array to store result in
    * @returns Array of picking infos
    */
