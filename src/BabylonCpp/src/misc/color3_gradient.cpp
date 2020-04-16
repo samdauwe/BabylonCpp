@@ -4,7 +4,10 @@
 
 namespace BABYLON {
 
-Color3Gradient::Color3Gradient() = default;
+Color3Gradient::Color3Gradient(float iGradient, const Color3& iColor)
+    : IValueGradient{iGradient}, color{iColor}
+{
+}
 
 Color3Gradient::~Color3Gradient() = default;
 

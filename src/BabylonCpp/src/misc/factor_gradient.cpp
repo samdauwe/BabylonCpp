@@ -6,7 +6,8 @@
 
 namespace BABYLON {
 
-FactorGradient::FactorGradient() : factor2{std::nullopt}
+FactorGradient::FactorGradient(float iGradient, float iFactor1, std::optional<float> iFactor2)
+    : IValueGradient{iGradient}, factor1{iFactor1}, factor2{iFactor2}
 {
 }
 
@@ -14,7 +15,7 @@ FactorGradient::~FactorGradient() = default;
 
 float FactorGradient::getFactor() const
 {
-  if (!factor2.has_value()) {
+  if (!factor2.has_value() || stl_util::almost_equal(*factor2, factor1)) {
     return factor1;
   }
 

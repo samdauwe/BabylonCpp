@@ -5,7 +5,9 @@
 
 namespace BABYLON {
 
-ColorGradient::ColorGradient() : color2{std::nullopt}
+ColorGradient::ColorGradient(float iGradient, const Color4& iColor1,
+                             const std::optional<Color4>& iColor2)
+    : IValueGradient{iGradient}, color1{iColor1}, color2{iColor2}
 {
 }
 

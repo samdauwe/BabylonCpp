@@ -13,7 +13,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ColorGradient : public IValueGradient {
 
 public:
-  ColorGradient();
+  /**
+   * @brief Creates a new color4 gradient.
+   * @param gradient gets or sets the gradient value (between 0 and 1)
+   * @param color1 gets or sets first associated color
+   * @param color2 gets or sets first second color
+   */
+  ColorGradient(float gradient, const Color4& color1,
+                const std::optional<Color4>& color2 = std::nullopt);
   ~ColorGradient(); // = default
 
   /**

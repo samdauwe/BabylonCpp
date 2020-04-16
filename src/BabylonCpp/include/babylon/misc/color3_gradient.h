@@ -12,7 +12,12 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT Color3Gradient : public IValueGradient {
 
-  Color3Gradient();
+  /**
+   * @brief Creates a new color3 gradient.
+   * @param gradient gets or sets the gradient value (between 0 and 1)
+   * @param color gets or sets associated color
+   */
+  Color3Gradient(float gradient, const Color3& color);
   ~Color3Gradient(); // = default
 
   /**

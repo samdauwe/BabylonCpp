@@ -13,7 +13,13 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
 
-  FactorGradient();
+  /**
+   * @brief Creates a new factor gradient.
+   * @param gradient gets or sets the gradient value (between 0 and 1)
+   * @param factor1 gets or sets first associated factor
+   * @param factor2 gets or sets second associated factor
+   */
+  FactorGradient(float gradient, float factor1, std::optional<float> factor2 = std::nullopt);
   ~FactorGradient(); // = default
 
   /**
