@@ -12,7 +12,7 @@ namespace BABYLON {
 ImageProcessingPostProcess::ImageProcessingPostProcess(
   const std::string& iName, float renderRatio, const CameraPtr& camera,
   const std::optional<unsigned int>& samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType, ImageProcessingConfiguration* imageProcessingConfiguration)
+  unsigned int textureType, const ImageProcessingConfigurationPtr& iImageProcessingConfiguration)
     : PostProcess{iName,  "imageProcessing", {}, {},          renderRatio,   camera, samplingMode,
                   engine, reusable,          "", textureType, "postprocess", {},     true}
     , imageProcessingConfiguration{this,
@@ -55,12 +55,11 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
     , _imageProcessingObserver{nullptr}
     , _fromLinearSpace{false}
 {
-  // Setup the configuration as forced by the constructor. This would then not
-  // force the scene materials output in linear space and let untouched the
-  // default forward pass.
-  if (imageProcessingConfiguration) {
-    imageProcessingConfiguration->applyByPostProcess = true;
-    _attachImageProcessingConfiguration(imageProcessingConfiguration, true);
+  // Setup the configuration as forced by the constructor. This would then not force the scene
+  // materials output in linear space and let untouched the default forward pass.
+  if (iImageProcessingConfiguration) {
+    iImageProcessingConfiguration->applyByPostProcess = true;
+    _attachImageProcessingConfiguration(iImageProcessingConfiguration, true);
     // This will cause the shader to be compiled
     fromLinearSpace = false;
   }
@@ -83,13 +82,13 @@ std::string ImageProcessingPostProcess::getClassName() const
   return "ImageProcessingPostProcess";
 }
 
-ImageProcessingConfiguration*& ImageProcessingPostProcess::get_imageProcessingConfiguration()
+ImageProcessingConfigurationPtr& ImageProcessingPostProcess::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
 
 void ImageProcessingPostProcess::set_imageProcessingConfiguration(
-  ImageProcessingConfiguration* const& value)
+  const ImageProcessingConfigurationPtr& value)
 {
   // We are almost sure it is applied by post process as
   // We are in the post process :-)
@@ -98,7 +97,7 @@ void ImageProcessingPostProcess::set_imageProcessingConfiguration(
 }
 
 void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
-  ImageProcessingConfiguration* configuration, bool doNotBuild)
+  const ImageProcessingConfigurationPtr& configuration, bool doNotBuild)
 {
   if (configuration == _imageProcessingConfiguration) {
     return;
@@ -126,7 +125,12 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
       scene = Engine::LastCreatedScene();
     }
 
-    _imageProcessingConfiguration = scene->imageProcessingConfiguration().get();
+    if (scene) {
+      _imageProcessingConfiguration = scene->imageProcessingConfiguration();
+    }
+    else {
+      _imageProcessingConfiguration = std::make_shared<ImageProcessingConfiguration>();
+    }
   }
   else {
     _imageProcessingConfiguration = configuration;

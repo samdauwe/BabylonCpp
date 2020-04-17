@@ -19,9 +19,8 @@ using PostProcessRenderEffectPtr = std::shared_ptr<PostProcessRenderEffect>;
 
 /**
  * @brief This represents a set of one or more post processes in Babylon.
- * A post process can be used to apply a shader to a texture after it is
- * rendered. Example:
- * https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
+ * A post process can be used to apply a shader to a texture after it is rendered.
+ * Example: https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
  */
 class BABYLON_SHARED_EXPORT PostProcessRenderEffect {
 

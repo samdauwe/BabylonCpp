@@ -12,13 +12,13 @@ class BaseTexture;
 class ColorCurves;
 class ImageProcessingConfiguration;
 class ImageProcessingPostProcess;
-using BaseTexturePtr                = std::shared_ptr<BaseTexture>;
-using ImageProcessingPostProcessPtr = std::shared_ptr<ImageProcessingPostProcess>;
+using BaseTexturePtr                  = std::shared_ptr<BaseTexture>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using ImageProcessingPostProcessPtr   = std::shared_ptr<ImageProcessingPostProcess>;
 
 /**
  * @brief ImageProcessingPostProcess
- * @see
- * https://doc.babylonjs.com/how_to/how_to_use_postprocesses#imageprocessing
+ * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses#imageprocessing
  */
 class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
@@ -47,21 +47,20 @@ protected:
                              const std::optional<unsigned int>& samplingMode = std::nullopt,
                              Engine* engine = nullptr, bool reusable = false,
                              unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                             ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
+                             const ImageProcessingConfigurationPtr& imageProcessingConfiguration
+                             = nullptr);
 
   /**
-   * @brief Gets the image processing configuration used either in this
-   * material.
+   * @brief Gets the image processing configuration used either in this material.
    */
-  ImageProcessingConfiguration*& get_imageProcessingConfiguration();
+  ImageProcessingConfigurationPtr& get_imageProcessingConfiguration();
 
   /**
-   * @brief Sets the Default image processing configuration used either in the
-   * this material.
+   * @brief Sets the Default image processing configuration used either in the this material.
    *
    * If sets to null, the scene one is in use.
    */
-  void set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
+  void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
    * @brief Gets Color curves setup used in the effect if colorCurvesEnabled is
@@ -70,8 +69,7 @@ protected:
   std::shared_ptr<ColorCurves>& get_colorCurves();
 
   /**
-   * Sets Color curves setup used in the effect if colorCurvesEnabled is set to
-   * true .
+   * Sets Color curves setup used in the effect if colorCurvesEnabled is set to true .
    */
   void set_colorCurves(const std::shared_ptr<ColorCurves>& value);
 
@@ -86,14 +84,12 @@ protected:
   void set_colorCurvesEnabled(bool value);
 
   /**
-   * @brief Gets Color grading LUT texture used in the effect if
-   * colorGradingEnabled is set to true.
+   * @brief Gets Color grading LUT texture used in the effect if colorGradingEnabled is set to true.
    */
   BaseTexturePtr& get_colorGradingTexture();
 
   /**
-   * @brief Sets Color grading LUT texture used in the effect if
-   * colorGradingEnabled is set to true.
+   * @brief Sets Color grading LUT texture used in the effect if colorGradingEnabled is set to true.
    */
   void set_colorGradingTexture(const BaseTexturePtr& value);
 
@@ -194,8 +190,8 @@ protected:
   Color4& get_vignetteColor();
 
   /**
-   * @brief Sets Color of the vignette applied on the screen through the chosen
-   * blend mode (vignetteBlendMode) if vignetteEnabled is set to true.
+   * @brief Sets Color of the vignette applied on the screen through the chosen blend mode
+   * (vignetteBlendMode) if vignetteEnabled is set to true.
    */
   void set_vignetteColor(const Color4& value);
 
@@ -243,7 +239,7 @@ protected:
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
    */
-  void _attachImageProcessingConfiguration(ImageProcessingConfiguration* configuration,
+  void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration,
                                            bool doNotBuild = false);
 
   void _updateParameters();
@@ -252,7 +248,8 @@ public:
   /**
    * Image processing configuration used either in this material.
    */
-  Property<ImageProcessingPostProcess, ImageProcessingConfiguration*> imageProcessingConfiguration;
+  Property<ImageProcessingPostProcess, ImageProcessingConfigurationPtr>
+    imageProcessingConfiguration;
 
   /**
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
@@ -266,8 +263,7 @@ public:
   Property<ImageProcessingPostProcess, bool> colorCurvesEnabled;
 
   /**
-   * Color grading LUT texture used in the effect if colorGradingEnabled is set
-   * to true.
+   * Color grading LUT texture used in the effect if colorGradingEnabled is set to true.
    */
   Property<ImageProcessingPostProcess, BaseTexturePtr> colorGradingTexture;
 
@@ -317,8 +313,8 @@ public:
   Property<ImageProcessingPostProcess, float> vignetteWeight;
 
   /**
-   * Color of the vignette applied on the screen through the chosen blend mode
-   * (vignetteBlendMode) if vignetteEnabled is set to true.
+   * Color of the vignette applied on the screen through the chosen blend mode (vignetteBlendMode)
+   * if vignetteEnabled is set to true.
    */
   Property<ImageProcessingPostProcess, Color4> vignetteColor;
 
@@ -347,7 +343,7 @@ protected:
    * Default configuration related to image processing available in the PBR
    * Material.
    */
-  ImageProcessingConfiguration* _imageProcessingConfiguration;
+  ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 
 private:
   /**

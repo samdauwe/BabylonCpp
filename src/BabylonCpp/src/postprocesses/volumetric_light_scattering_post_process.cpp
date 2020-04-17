@@ -97,7 +97,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
     return _mesh->material()->isReady(mesh.get());
   }
 
-  std::vector<std::string> defines;
+  std::vector<std::string> defines{};
   std::vector<std::string> attribs{VertexBuffer::PositionKind};
   auto material = subMesh->getMaterial();
 
@@ -214,12 +214,16 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
 
   // Custom render function for submeshes
   auto renderSubMesh = [this](SubMesh* subMesh) {
-    auto _mesh = subMesh->getRenderingMesh();
-    if (_meshExcluded(_mesh)) {
+    auto ownerMesh = subMesh->getMesh();
+    auto replacementMesh
+      = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
+    auto renderingMesh = subMesh->getRenderingMesh();
+    auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+    if (_meshExcluded(renderingMesh)) {
       return;
     }
 
-    mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
+    effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
     auto material = subMesh->getMaterial();
 
@@ -227,14 +231,14 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
       return;
     }
 
-    auto scene_  = _mesh->getScene();
+    auto scene_  = renderingMesh->getScene();
     auto engine_ = scene_->getEngine();
 
     // Culling
     engine_->setState(material->backFaceCulling());
 
     // Managing instances
-    auto batch = _mesh->_getInstancesRenderList(subMesh->_id);
+    auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
 
     if (batch->mustReturn) {
       return;
@@ -246,15 +250,15 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
 
     if (_isReady(subMesh, hardwareInstancedRendering)) {
       auto effect = _volumetricLightScatteringPass;
-      if (_mesh == mesh) {
+      if (renderingMesh == mesh) {
         effect = material->getEffect();
       }
 
       engine_->enableEffect(effect);
-      _mesh->_bind(subMesh, effect, material->fillMode());
+      renderingMesh->_bind(subMesh, effect, material->fillMode());
 
-      if (_mesh == mesh) {
-        material->bind(_mesh->getWorldMatrix(), _mesh.get());
+      if (renderingMesh == mesh) {
+        material->bind(effectiveMesh->getWorldMatrix(), renderingMesh.get());
       }
       else {
         auto iMterial = subMesh->getMaterial();
@@ -274,17 +278,18 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
         }
 
         // Bones
-        if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
+        if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+            && renderingMesh->skeleton()) {
           _volumetricLightScatteringPass->setMatrices(
-            "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
+            "mBones", renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
         }
       }
 
       // Draw
-      mesh->_processRendering(
-        subMesh, _volumetricLightScatteringPass, Material::TriangleFillMode, batch,
+      renderingMesh->_processRendering(
+        effectiveMesh, subMesh, _volumetricLightScatteringPass, Material::TriangleFillMode, batch,
         hardwareInstancedRendering,
-        [effect](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
+        [effect](bool /*isInstance*/, Matrix world, Material * /*effectiveMaterial*/) -> void {
           effect->setMatrix("world", world);
         });
     }

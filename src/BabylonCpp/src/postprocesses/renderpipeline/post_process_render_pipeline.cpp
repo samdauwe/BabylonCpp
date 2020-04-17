@@ -88,6 +88,10 @@ void PostProcessRenderPipeline::_attachCameras(const std::vector<CameraPtr>& iCa
 
   std::vector<CameraPtr> camerasToDelete;
   for (const auto& camera : cams) {
+    if (!camera) {
+      continue;
+    }
+
     const auto& cameraName = camera->name;
 
     auto it
@@ -146,6 +150,9 @@ void PostProcessRenderPipeline::_update()
   }
 
   for (const auto& camera : _cameras) {
+    if (!camera) {
+      continue;
+    }
     const auto& cameraName = camera->name;
     if (stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName]->_update();
