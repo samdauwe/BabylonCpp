@@ -1184,8 +1184,8 @@ void Mesh::_processInstancedBuffers(const std::vector<InstancedMesh*>& /*visible
 }
 
 Mesh& Mesh::_processRendering(
-  SubMesh* subMesh, const EffectPtr& effect, int fillMode, const _InstancesBatchPtr& batch,
-  bool hardwareInstancedRendering,
+  const AbstractMeshPtr& /*renderingMesh*/, SubMesh* subMesh, const EffectPtr& effect, int fillMode,
+  const _InstancesBatchPtr& batch, bool hardwareInstancedRendering,
   std::function<void(bool isInstance, const Matrix& world, Material* effectiveMaterial)>
     iOnBeforeDraw,
   Material* effectiveMaterial)
@@ -1400,7 +1400,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
   if (!_effectiveMaterial->backFaceCulling() && _effectiveMaterial->separateCullingPass) {
     engine->setState(true, _effectiveMaterial->zOffset, false, !reverse);
     _processRendering(
-      subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
+      nullptr, subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
       [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
         _onBeforeDraw(isInstance, world, effectiveMaterial);
       },
@@ -1409,7 +1409,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
   }
 
   // Draw
-  _processRendering(subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
+  _processRendering(nullptr, subMesh, effect, static_cast<int>(fillMode), batch,
+                    hardwareInstancedRendering,
                     [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
                       _onBeforeDraw(isInstance, world, effectiveMaterial);
                     });

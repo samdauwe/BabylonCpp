@@ -831,7 +831,8 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effect, static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
+      nullptr, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+      hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
         _effect->setMatrix("world", world);
       });

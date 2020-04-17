@@ -127,7 +127,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
 
       // Draw
       mesh->_processRendering(
-        subMesh, _effect, static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
+        nullptr, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+        hardwareInstancedRendering,
         [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
           _effect->setMatrix("world", world);
         });
