@@ -17,6 +17,12 @@ using BaseTexturePtr = std::shared_ptr<BaseTexture>;
  */
 class BABYLON_SHARED_EXPORT BRDFTextureTools {
 
+private:
+  /**
+   * Prevents texture cache collision
+   */
+  static size_t _instanceNumber;
+
 public:
   /**
    * @brief Gets a default environment BRDF for MS-BRDF Height Correlated BRDF

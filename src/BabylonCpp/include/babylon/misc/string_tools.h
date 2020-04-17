@@ -139,12 +139,12 @@ inline std::vector<std::string> escape(const std::vector<std::string>& ss)
  * @param prefix prefix to search for in the source string
  * @returns Boolean indicating whether the prefix was found (true) or not (false)
  */
-inline bool startsWith(const std::string& s, const std::string& prefix)
+inline bool startsWith(const std::string& str, const std::string& prefix)
 {
-  if (prefix.size() > s.size()) {
+  if (str.empty() || (prefix.size() > str.size())) {
     return false;
   }
-  return std::equal(prefix.begin(), prefix.end(), s.begin());
+  return std::equal(prefix.begin(), prefix.end(), str.begin());
 }
 
 /**
@@ -188,6 +188,29 @@ inline uint8_t charCodeAt(const std::string& str, size_t index)
   }
 
   return 0;
+}
+
+/**
+ * @brief Converts a number to string and pads with preceeding zeroes until it is of specified
+ * length.
+ * @param num the number to convert and pad
+ * @param length the expected length of the string
+ * @returns the padded string
+ */
+template <typename T>
+inline std::string PadNumber(T num, size_t length)
+{
+  auto str = std::to_string(num);
+  if (length > str.size()) {
+    std::ostringstream oss;
+    const auto len = length - str.size();
+    for (size_t i = 0; i < len; ++i) {
+      oss << "0";
+    }
+    oss << str;
+    str = oss.str();
+  }
+  return str;
 }
 
 /**

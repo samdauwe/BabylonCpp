@@ -8,6 +8,8 @@
 
 namespace BABYLON {
 
+size_t BRDFTextureTools::_instanceNumber = 0;
+
 BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
 {
 
@@ -18,9 +20,9 @@ BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
 
     const auto previousState      = scene->_blockEntityCollection;
     scene->_blockEntityCollection = false;
-    auto texture                  = Texture::CreateFromBase64String(_environmentBRDFBase64Texture,
-                                                   "EnvironmentBRDFTexture", scene, true, false,
-                                                   TextureConstants::BILINEAR_SAMPLINGMODE);
+    auto texture                  = Texture::CreateFromBase64String(
+      _environmentBRDFBase64Texture, "EnvironmentBRDFTexture" + std::to_string(_instanceNumber++),
+      scene, true, false, TextureConstants::BILINEAR_SAMPLINGMODE);
     scene->_blockEntityCollection = previousState;
     // BRDF Texture should not be cached here due to pre processing and redundant scene caches.
     auto& texturesCache = scene->getEngine()->getLoadedTexturesCache();
