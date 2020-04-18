@@ -8,10 +8,10 @@
 #include <babylon/cameras/universal_camera.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/collisions/icollision_coordinator.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -19,17 +19,16 @@ bool FreeCamera::NodeConstructorAdded = false;
 
 void FreeCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "FreeCamera", [](const std::string& iName, Scene* scene,
-                     const std::optional<json>& /*options*/) {
-      // Forcing to use the Universal camera
-      return UniversalCamera::New(iName, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("FreeCamera", [](const std::string& iName, Scene* scene,
+                                            const std::optional<json>& /*options*/) {
+    // Forcing to use the Universal camera
+    return UniversalCamera::New(iName, Vector3::Zero(), scene);
+  });
   FreeCamera::NodeConstructorAdded = true;
 }
 
-FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
-                       Scene* scene, bool setActiveOnSceneIfNoneActive)
+FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition, Scene* scene,
+                       bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, iPosition, scene, setActiveOnSceneIfNoneActive}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , ellipsoidOffset{Vector3(0.f, 0.f, 0.f)}
@@ -39,11 +38,12 @@ FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
     , angularSensibility{this, &FreeCamera::get_angularSensibility,
                          &FreeCamera::set_angularSensibility}
     , keysUp{this, &FreeCamera::get_keysUp, &FreeCamera::set_keysUp}
+    , keysUpward{this, &FreeCamera::get_keysUpward, &FreeCamera::set_keysUpward}
     , keysDown{this, &FreeCamera::get_keysDown, &FreeCamera::set_keysDown}
+    , keysDownward{this, &FreeCamera::get_keysDownward, &FreeCamera::set_keysDownward}
     , keysLeft{this, &FreeCamera::get_keysLeft, &FreeCamera::set_keysLeft}
     , keysRight{this, &FreeCamera::get_keysRight, &FreeCamera::set_keysRight}
-    , collisionMask{this, &FreeCamera::get_collisionMask,
-                    &FreeCamera::set_collisionMask}
+    , collisionMask{this, &FreeCamera::get_collisionMask, &FreeCamera::set_collisionMask}
     , _collider{nullptr}
     , _collisionMask{-1}
     , _needMoveForGravity{false}
@@ -64,8 +64,7 @@ Type FreeCamera::type() const
 float FreeCamera::get_angularSensibility() const
 {
   if (stl_util::contains(inputs->attached, "mouse")) {
-    auto mouse = std::static_pointer_cast<FreeCameraMouseInput>(
-      inputs->attached["mouse"]);
+    auto mouse = std::static_pointer_cast<FreeCameraMouseInput>(inputs->attached["mouse"]);
     if (mouse) {
       return mouse->angularSensibility;
     }
@@ -77,8 +76,7 @@ float FreeCamera::get_angularSensibility() const
 void FreeCamera::set_angularSensibility(float value)
 {
   if (stl_util::contains(inputs->attached, "mouse")) {
-    auto mouse = std::static_pointer_cast<FreeCameraMouseInput>(
-      inputs->attached["mouse"]);
+    auto mouse = std::static_pointer_cast<FreeCameraMouseInput>(inputs->attached["mouse"]);
     if (mouse) {
       mouse->angularSensibility = value;
     }
@@ -88,8 +86,8 @@ void FreeCamera::set_angularSensibility(float value)
 Int32Array& FreeCamera::get_keysUp()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysUp;
     }
@@ -101,10 +99,34 @@ Int32Array& FreeCamera::get_keysUp()
 void FreeCamera::set_keysUp(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysUp = value;
+    }
+  }
+}
+
+Int32Array& FreeCamera::get_keysUpward()
+{
+  if (stl_util::contains(inputs->attached, "keyboard")) {
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
+    if (keyboard) {
+      return keyboard->keysUpward;
+    }
+  }
+
+  return _emptyKeyboardKeys;
+}
+
+void FreeCamera::set_keysUpward(const Int32Array& value)
+{
+  if (stl_util::contains(inputs->attached, "keyboard")) {
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
+    if (keyboard) {
+      keyboard->keysUpward = value;
     }
   }
 }
@@ -112,8 +134,8 @@ void FreeCamera::set_keysUp(const Int32Array& value)
 Int32Array& FreeCamera::get_keysDown()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysDown;
     }
@@ -125,10 +147,34 @@ Int32Array& FreeCamera::get_keysDown()
 void FreeCamera::set_keysDown(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysDown = value;
+    }
+  }
+}
+
+Int32Array& FreeCamera::get_keysDownward()
+{
+  if (stl_util::contains(inputs->attached, "keyboard")) {
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
+    if (keyboard) {
+      return keyboard->keysDownward;
+    }
+  }
+
+  return _emptyKeyboardKeys;
+}
+
+void FreeCamera::set_keysDownward(const Int32Array& value)
+{
+  if (stl_util::contains(inputs->attached, "keyboard")) {
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
+    if (keyboard) {
+      keyboard->keysDownward = value;
     }
   }
 }
@@ -136,8 +182,8 @@ void FreeCamera::set_keysDown(const Int32Array& value)
 Int32Array& FreeCamera::get_keysLeft()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysLeft;
     }
@@ -149,8 +195,8 @@ Int32Array& FreeCamera::get_keysLeft()
 void FreeCamera::set_keysLeft(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysLeft = value;
     }
@@ -160,8 +206,8 @@ void FreeCamera::set_keysLeft(const Int32Array& value)
 Int32Array& FreeCamera::get_keysRight()
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       return keyboard->keysRight;
     }
@@ -173,8 +219,8 @@ Int32Array& FreeCamera::get_keysRight()
 void FreeCamera::set_keysRight(const Int32Array& value)
 {
   if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(
-      inputs->attached["keyboard"]);
+    auto keyboard
+      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
     if (keyboard) {
       keyboard->keysRight = value;
     }
@@ -182,8 +228,7 @@ void FreeCamera::set_keysRight(const Int32Array& value)
 }
 
 /** Controls **/
-void FreeCamera::attachControl(ICanvas* canvas, bool noPreventDefault,
-                               bool /*useCtrlForPanning*/,
+void FreeCamera::attachControl(ICanvas* canvas, bool noPreventDefault, bool /*useCtrlForPanning*/,
                                MouseButtonType /*panningMouseButton*/)
 {
   inputs->attachElement(canvas, noPreventDefault);
@@ -212,8 +257,7 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
   Vector3 globalPosition_;
 
   if (parent()) {
-    globalPosition_
-      = Vector3::TransformCoordinates(position, parent()->getWorldMatrix());
+    globalPosition_ = Vector3::TransformCoordinates(position, parent()->getWorldMatrix());
   }
   else {
     globalPosition_ = position;
@@ -242,15 +286,13 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
 
   coordinator->getNewPosition(
     _oldPosition, actualDisplacement, _collider, 3, nullptr,
-    [this](size_t collisionIndex, Vector3& newPosition,
-           const AbstractMeshPtr& collidedMesh) {
+    [this](size_t collisionIndex, Vector3& newPosition, const AbstractMeshPtr& collidedMesh) {
       _onCollisionPositionChange(collisionIndex, newPosition, collidedMesh);
     },
     uniqueId);
 }
 
-void FreeCamera::_onCollisionPositionChange(size_t /*collisionId*/,
-                                            Vector3& newPosition,
+void FreeCamera::_onCollisionPositionChange(size_t /*collisionId*/, Vector3& newPosition,
                                             const AbstractMeshPtr& collidedMesh)
 {
   auto updatePosition = [&](Vector3& newPos) {
@@ -284,8 +326,7 @@ void FreeCamera::_checkInputs()
 bool FreeCamera::_decideIfNeedsToMove()
 {
   return _needMoveForGravity || std::abs(cameraDirection->x) > 0.f
-         || std::abs(cameraDirection->y) > 0.f
-         || std::abs(cameraDirection->z) > 0.f;
+         || std::abs(cameraDirection->y) > 0.f || std::abs(cameraDirection->z) > 0.f;
 }
 
 void FreeCamera::_updatePosition()

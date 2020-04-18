@@ -27,6 +27,8 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     , rotationQuaternion{nullptr}
     , speed{2.f}
     , noRotationConstraint{false}
+    , invertRotation{false}
+    , inverseRotationSpeed{0.2f}
     , lockedTarget{nullptr}
     , _currentTarget{Vector3::Zero()}
     , _initialFocalDistance{1.f}
@@ -308,8 +310,9 @@ void TargetCamera::_updatePosition()
 
 void TargetCamera::_checkInputs()
 {
-  bool needToMove   = _decideIfNeedsToMove();
-  bool needToRotate = std::abs(cameraRotation->x) > 0.f || std::abs(cameraRotation->y) > 0.f;
+  const auto directionMultiplier = invertRotation ? -inverseRotationSpeed : 1.f;
+  const auto needToMove          = _decideIfNeedsToMove();
+  const auto needToRotate = std::abs(cameraRotation->x) > 0.f || std::abs(cameraRotation->y) > 0.f;
 
   // Move
   if (needToMove) {
@@ -318,8 +321,8 @@ void TargetCamera::_checkInputs()
 
   // Rotate
   if (needToRotate) {
-    _rotation->x += cameraRotation->x;
-    _rotation->y += cameraRotation->y;
+    _rotation->x += cameraRotation->x * directionMultiplier;
+    _rotation->y += cameraRotation->y * directionMultiplier;
 
     // Rotate, if quaternion is set and rotation was used
     if (rotationQuaternion) {
@@ -528,8 +531,8 @@ void TargetCamera::_getRigCamPositionAndTarget(float halfSpace, TargetCamera& ri
 
   Matrix::TranslationToRef(-newFocalTarget.x, -newFocalTarget.y, -newFocalTarget.z,
                            TargetCamera::_TargetTransformMatrix);
-  TargetCamera::_TargetTransformMatrix.multiplyToRef(Matrix::RotationY(halfSpace),
-                                                     TargetCamera::_RigCamTransformMatrix);
+  TargetCamera::_TargetTransformMatrix.multiplyToRef(
+    Matrix::RotationAxis(rigCamera.upVector, halfSpace), TargetCamera::_RigCamTransformMatrix);
   Matrix::TranslationToRef(newFocalTarget.x, newFocalTarget.y, newFocalTarget.z,
                            TargetCamera::_TargetTransformMatrix);
 

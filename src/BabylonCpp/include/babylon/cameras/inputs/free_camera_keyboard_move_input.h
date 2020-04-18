@@ -40,9 +40,9 @@ public:
   void detachControl(ICanvas* canvas) override;
 
   /**
-   * @brief Update the current camera state depending on the inputs that have
-   * been used this frame. This is a dynamically created lambda to avoid the
-   * performance penalty of looping for inputs in the render loop.
+   * @brief Update the current camera state depending on the inputs that have been used this frame.
+   * This is a dynamically created lambda to avoid the performance penalty of looping for inputs in
+   * the render loop.
    */
   void checkInputs() override;
 
@@ -63,26 +63,32 @@ public:
 
 public:
   /**
-   * Gets or Set the list of keyboard keys used to control the forward move of
-   * the camera.
+   * Gets or Set the list of keyboard keys used to control the forward move of the camera.
    */
   Int32Array keysUp;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the backward move of
-   * the camera.
+   * Gets or Set the list of keyboard keys used to control the upward move of the camera.
+   */
+  Int32Array keysUpward;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the backward move of the camera.
    */
   Int32Array keysDown;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the left strafe move
-   * of the camera.
+   * Gets or Set the list of keyboard keys used to control the downward move of the camera.
+   */
+  Int32Array keysDownward;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the left strafe move of the camera.
    */
   Int32Array keysLeft;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the right strafe move
-   * of the camera.
+   * Gets or Set the list of keyboard keys used to control the right strafe move of the camera.
    */
   Int32Array keysRight;
 

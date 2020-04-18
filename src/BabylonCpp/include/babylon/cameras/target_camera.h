@@ -214,6 +214,16 @@ public:
   bool noRotationConstraint;
 
   /**
+   * Reverses mouselook direction to 'natural' panning as opposed to traditional direct panning
+   */
+  bool invertRotation;
+
+  /**
+   * Speed multiplier for inverse camera panning
+   */
+  float inverseRotationSpeed;
+
+  /**
    * Define the current target of the camera as an object or a position.
    */
   Vector3* lockedTarget;

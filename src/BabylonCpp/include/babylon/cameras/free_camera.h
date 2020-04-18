@@ -14,9 +14,9 @@ using ColliderPtr   = std::shared_ptr<Collider>;
 using FreeCameraPtr = std::shared_ptr<FreeCamera>;
 
 /**
- * @brief This represents a free type of camera. It can be useful in First
- * Person Shooter game for instance. Please consider using the new
- * UniversalCamera instead as it adds more functionality like the gamepad.
+ * @brief This represents a free type of camera. It can be useful in First Person Shooter game for
+ * instance. Please consider using the new UniversalCamera instead as it adds more functionality
+ * like the gamepad.
  * @see http://doc.babylonjs.com/features/cameras#universal-camera
  */
 class BABYLON_SHARED_EXPORT FreeCamera : public TargetCamera {
@@ -96,15 +96,15 @@ private:
 protected:
   /**
    * @brief Instantiates a Free Camera.
-   * This represents a free type of camera. It can be useful in First Person
-   * Shooter game for instance. Please consider using the new UniversalCamera
-   * instead as it adds more functionality like touch to this camera.
+   * This represents a free type of camera. It can be useful in First Person Shooter game for
+   * instance. Please consider using the new UniversalCamera instead as it adds more functionality
+   * like touch to this camera.
    * @see http://doc.babylonjs.com/features/cameras#universal-camera
    * @param name Define the name of the camera in the scene
    * @param position Define the start position of the camera in the scene
    * @param scene Define the scene the camera belongs to
-   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be
-   * marked as active if not other active cameras have been defined
+   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be marked as active if not
+   * other active cameras have been defined
    */
   FreeCamera(const std::string& name, const Vector3& position, Scene* scene,
              bool setActiveOnSceneIfNoneActive = true);
@@ -122,73 +122,82 @@ protected:
   void set_angularSensibility(float value);
 
   /**
-   * @brief Gets the list of keyboard keys used to control the forward move of
-   * the camera.
+   * @brief Gets the list of keyboard keys used to control the forward move of the camera.
    */
   Int32Array& get_keysUp();
 
   /**
-   * @brief Sets the list of keyboard keys used to control the forward move of
-   * the camera.
+   * @brief Sets the list of keyboard keys used to control the forward move of the camera.
    */
   void set_keysUp(const Int32Array& value);
 
   /**
-   * @brief Gets the list of keyboard keys used to control the backward move of
-   * the camera.
+   * @brief Gets the list of keyboard keys used to control the upward move of the camera.
+   */
+  Int32Array& get_keysUpward();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the upward move of the camera.
+   */
+  void set_keysUpward(const Int32Array& value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the backward move of the camera.
    */
   Int32Array& get_keysDown();
 
   /**
-   * @brief Sets the list of keyboard keys used to control the backward move of
-   * the camera.
+   * @brief Sets the list of keyboard keys used to control the backward move of the camera.
    */
   void set_keysDown(const Int32Array& value);
 
   /**
-   * @brief Gets the list of keyboard keys used to control the left strafe move
-   * of the camera.
+   *@brief Gets the list of keyboard keys used to control the downward move of the camera.
+   */
+  Int32Array& get_keysDownward();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the backward move of the camera.
+   */
+  void set_keysDownward(const Int32Array& value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the left strafe move of the camera.
    */
   Int32Array& get_keysLeft();
 
   /**
-   * @brief Sets the list of keyboard keys used to control the left strafe move
-   * of the camera.
+   * @brief Sets the list of keyboard keys used to control the left strafe move of the camera.
    */
   void set_keysLeft(const Int32Array& value);
 
   /**
-   * @brief Gets the list of keyboard keys used to control the right strafe move
-   * of the camera.
+   * @brief Gets the list of keyboard keys used to control the right strafe move of the camera.
    */
   Int32Array& get_keysRight();
 
   /**
-   * @brief Sets the list of keyboard keys used to control the right strafe move
-   * of the camera.
+   * @brief Sets the list of keyboard keys used to control the right strafe move of the camera.
    */
   void set_keysRight(const Int32Array& value);
 
 public:
   /**
    * Define the collision ellipsoid of the camera.
-   * This is helpful to simulate a camera body like the player body around the
-   * camera
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#arcrotatecamera
+   * This is helpful to simulate a camera body like the player body around the camera
+   * @see http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#arcrotatecamera
    */
   Vector3 ellipsoid;
 
   /**
    * Define an offset for the position of the ellipsoid around the camera.
-   * This can be helpful to determine the center of the body near the gravity
-   * center of the body instead of its head.
+   * This can be helpful to determine the center of the body near the gravity center of the body
+   * instead of its head.
    */
   Vector3 ellipsoidOffset;
 
   /**
-   * Enable or disable collisions of the camera with the rest of the scene
-   * objects.
+   * Enable or disable collisions of the camera with the rest of the scene objects.
    */
   bool checkCollisions;
 
@@ -209,26 +218,32 @@ public:
   Property<FreeCamera, float> angularSensibility;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the forward move of
-   * the camera.
+   * Gets or Set the list of keyboard keys used to control the forward move of the camera.
    */
   Property<FreeCamera, Int32Array> keysUp;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the backward move of
-   * the camera.
+   * Gets or Set the list of keyboard keys used to control the upward move of the camera.
+   */
+  Property<FreeCamera, Int32Array> keysUpward;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the backward move of the camera.
    */
   Property<FreeCamera, Int32Array> keysDown;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the left strafe move
-   * of the camera.
+   * Gets or Set the list of keyboard keys used to control the downward move of the camera.
+   */
+  Property<FreeCamera, Int32Array> keysDownward;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the left strafe move of the camera.
    */
   Property<FreeCamera, Int32Array> keysLeft;
 
   /**
-   * Gets or Set the list of keyboard keys used to control the right strafe move
-   * of the camera.
+   * Gets or Set the list of keyboard keys used to control the right strafe move of the camera.
    */
   Property<FreeCamera, Int32Array> keysRight;
 
@@ -248,8 +263,7 @@ public:
   Vector3 _transformedDirection;
 
   /**
-   * Define a collision mask to limit the list of object the camera can collide
-   * with
+   * Define a collision mask to limit the list of object the camera can collide with
    */
   Property<FreeCamera, int> collisionMask;
 
