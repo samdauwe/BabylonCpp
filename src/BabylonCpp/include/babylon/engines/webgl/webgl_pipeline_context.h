@@ -31,18 +31,29 @@ public:
   ~WebGLPipelineContext() override; // = default
 
   /**
-   * Gets a boolean indicating that this pipeline context is supporting asynchronous creating.
+   * @brief Gets a boolean indicating that this pipeline context is supporting asynchronous
+   * creating.
    */
   bool isAsync() override;
 
   /**
-   * Gets a boolean indicating that the context is ready to be used (like shaders / pipelines are
-   * compiled and ready for instance).
+   * @brief Gets a boolean indicating that the context is ready to be used (like shaders / pipelines
+   * are compiled and ready for instance).
    */
   bool isReady() override;
 
   void _handlesSpectorRebuildCallback(
     const std::function<void(const WebGLProgramPtr& program)>& onCompiled);
+
+  /**
+   * @brief Hidden
+   */
+  std::string _getVertexShaderCode() const override;
+
+  /**
+   * @brief Hidden
+   */
+  std::string _getFragmentShaderCode() const override;
 
 public:
   ThinEngine* engine;

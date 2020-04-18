@@ -538,6 +538,11 @@ public:
     const std::function<void(const EffectPtr& effect)>& onCompiled = nullptr);
 
   /**
+   * @brief Hidden
+   */
+  std::string _getShaderSource(const WebGLShaderPtr& shader);
+
+  /**
    * @brief Directly creates a webGL program.
    * @param pipelineContext  defines the pipeline context to attach to
    * @param vertexCode defines the vertex shader code to use

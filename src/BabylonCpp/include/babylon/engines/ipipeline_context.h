@@ -34,6 +34,16 @@ public:
   virtual bool isReady();
 
   /**
+   * @brief Hidden
+   */
+  virtual std::string _getVertexShaderCode() const = 0;
+
+  /**
+   * @brief Hidden
+   */
+  virtual std::string _getFragmentShaderCode() const = 0;
+
+  /**
    * Hidden
    */
   std::function<void(

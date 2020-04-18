@@ -1573,6 +1573,11 @@ WebGLShaderPtr ThinEngine::_compileRawShader(const std::string& source, const st
   return shader;
 }
 
+std::string ThinEngine::_getShaderSource(const WebGLShaderPtr& shader)
+{
+  return _gl->getShaderSource(shader.get());
+}
+
 WebGLProgramPtr
 ThinEngine::createRawShaderProgram(const IPipelineContextPtr& pipelineContext,
                                    const std::string& vertexCode, const std::string& fragmentCode,

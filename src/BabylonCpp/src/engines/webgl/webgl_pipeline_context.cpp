@@ -44,4 +44,14 @@ void WebGLPipelineContext::_handlesSpectorRebuildCallback(
   }
 }
 
+std::string WebGLPipelineContext::_getVertexShaderCode() const
+{
+  return vertexShader ? engine->_getShaderSource(vertexShader) : "";
+}
+
+std::string WebGLPipelineContext::_getFragmentShaderCode() const
+{
+  return fragmentShader ? engine->_getShaderSource(fragmentShader) : "";
+}
+
 } // end of namespace BABYLON
