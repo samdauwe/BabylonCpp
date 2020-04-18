@@ -21,16 +21,15 @@ using CameraPtr       = std::shared_ptr<Camera>;
 using MeshPtr         = std::shared_ptr<Mesh>;
 
 /**
- * @brief A behavior that when attached to a mesh will allow the mesh to be
- * dragged around based on directions and origin of the pointer's ray.
+ * @brief A behavior that when attached to a mesh will allow the mesh to be dragged around based on
+ * directions and origin of the pointer's ray.
  */
 class BABYLON_SHARED_EXPORT SixDofDragBehavior : public Behavior<Mesh> {
 
 public:
   /**
-   * @brief Instantiates a behavior that when attached to a mesh will allow the
-   * mesh to be dragged around based on directions and origin of the pointer's
-   * ray.
+   * @brief Instantiates a behavior that when attached to a mesh will allow the mesh to be dragged
+   * around based on directions and origin of the pointer's ray.
    */
   SixDofDragBehavior();
   ~SixDofDragBehavior() override; // = default
@@ -114,6 +113,7 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   bool _moving;
   Quaternion _startingOrientation;
+  ICanvas* _attachedElement;
 
   /**
    * In the case of multiplea active cameras, the cameraToUseForPointers should
