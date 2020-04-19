@@ -688,15 +688,17 @@ public:
   /**
    * @brief Checks if the passed Ray intersects with the mesh.
    * @param ray defines the ray to use
-   * @param fastCheck defines if fast mode (but less precise) must be used
-   * (false by default)
-   * @param trianglePredicate defines an optional predicate used to select faces
-   * when a mesh intersection is detected
+   * @param fastCheck defines if fast mode (but less precise) must be used (false by default)
+   * @param trianglePredicate defines an optional predicate used to select faces when a mesh
+   * intersection is detected
+   * @param onlyBoundingInfo defines a boolean indicating if picking should only happen using
+   * bounding info (false by default)
    * @returns the picking info
    * @see http://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
   virtual PickingInfo intersects(Ray& ray, bool fastCheck = true,
-                                 const TrianglePickingPredicate& trianglePredicate = nullptr);
+                                 const TrianglePickingPredicate& trianglePredicate = nullptr,
+                                 bool onlyBoundingInfo                             = false);
 
   /**
    * @brief Clones the current mesh.
@@ -1252,6 +1254,28 @@ protected:
   void set_collisionGroup(int mask);
 
   /**
+   * @brief Gets the current surrounding meshes (null by default).
+   *
+   * By default collision detection is tested against every mesh in the scene.
+   * It is possible to set surroundingMeshes to a defined list of meshes and then only these
+   * specified meshes will be tested for the collision.
+   *
+   * Note: if set to an empty array no collision will happen when this mesh is moved.
+   */
+  std::vector<AbstractMeshPtr>& get_surroundingMeshes();
+
+  /**
+   * @brief Sets current surrounding meshes (null by default).
+   *
+   * By default collision detection is tested against every mesh in the scene.
+   * It is possible to set surroundingMeshes to a defined list of meshes and then only these
+   * specified meshes will be tested for the collision.
+   *
+   * Note: if set to an empty array no collision will happen when this mesh is moved.
+   */
+  void set_surroundingMeshes(const std::vector<AbstractMeshPtr>& meshes);
+
+  /**
    * @brief Gets the list of lights affecting that mesh
    */
   std::vector<LightPtr>& get_lightSources();
@@ -1754,6 +1778,17 @@ public:
    * B will happen if A.collisionGroup & b.collisionMask !== 0
    */
   Property<AbstractMesh, int> collisionGroup;
+
+  /**
+   * Gets or sets current surrounding meshes (null by default).
+   *
+   * By default collision detection is tested against every mesh in the scene.
+   * It is possible to set surroundingMeshes to a defined list of meshes and then only these
+   * specified meshes will be tested for the collision.
+   *
+   * Note: if set to an empty array no collision will happen when this mesh is moved.
+   */
+  Property<AbstractMesh, std::vector<AbstractMeshPtr>> surroundingMeshes;
 
   // Edges
 

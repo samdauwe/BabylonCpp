@@ -56,7 +56,8 @@ public:
              bool alternate = false) override;
 
   PickingInfo intersects(Ray& ray, bool fastCheck = true,
-                         const TrianglePickingPredicate& trianglePredicate = nullptr) override;
+                         const TrianglePickingPredicate& trianglePredicate = nullptr,
+                         bool onlyBoundingInfo                             = false) override;
 
   /**
    * @brief Disposes of the line mesh.

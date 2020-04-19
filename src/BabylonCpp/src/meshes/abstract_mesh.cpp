@@ -105,6 +105,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , ellipsoidOffset{Vector3(0, 0, 0)}
     , collisionMask{this, &AbstractMesh::get_collisionMask, &AbstractMesh::set_collisionMask}
     , collisionGroup{this, &AbstractMesh::get_collisionGroup, &AbstractMesh::set_collisionGroup}
+    , surroundingMeshes{this, &AbstractMesh::get_surroundingMeshes,
+                        &AbstractMesh::set_surroundingMeshes}
     , edgesWidth{1.f}
     , edgesColor{Color4(1.f, 0.f, 0.f, 1.f)}
     , _edgesRenderer{nullptr}
@@ -499,6 +501,16 @@ void AbstractMesh::set_collisionGroup(int mask)
   _meshCollisionData._collisionGroup = !isNan(mask) ? mask : -1;
 }
 
+std::vector<AbstractMeshPtr>& AbstractMesh::get_surroundingMeshes()
+{
+  return _meshCollisionData._surroundingMeshes;
+}
+
+void AbstractMesh::set_surroundingMeshes(const std::vector<AbstractMeshPtr>& meshes)
+{
+  _meshCollisionData._surroundingMeshes = meshes;
+}
+
 std::vector<LightPtr>& AbstractMesh::get_lightSources()
 {
   return _lightSources;
@@ -609,6 +621,7 @@ void AbstractMesh::_resyncLightSource(const LightPtr& light)
 
   auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
 
+  auto removed = false;
   if (index == _lightSources.end()) {
     if (!isIn) {
       return;
@@ -619,10 +632,11 @@ void AbstractMesh::_resyncLightSource(const LightPtr& light)
     if (isIn) {
       return;
     }
+    removed = true;
     _lightSources.erase(index);
   }
 
-  _markSubMeshesAsLightDirty();
+  _markSubMeshesAsLightDirty(removed);
 }
 
 void AbstractMesh::_unBindEffect()
@@ -1399,7 +1413,8 @@ bool AbstractMesh::_generatePointsArray()
 }
 
 PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck,
-                                     const TrianglePickingPredicate& trianglePredicate)
+                                     const TrianglePickingPredicate& trianglePredicate,
+                                     bool onlyBoundingInfo)
 {
   PickingInfo pickingInfo;
 
@@ -1411,6 +1426,14 @@ PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck,
   if (subMeshes.empty() || !boundingInfo
       || !ray.intersectsSphere(boundingInfo->boundingSphere, intersectionThreshold)
       || !ray.intersectsBox(boundingInfo->boundingBox, intersectionThreshold)) {
+    return pickingInfo;
+  }
+
+  if (onlyBoundingInfo) {
+    pickingInfo.hit        = true;
+    pickingInfo.pickedMesh = shared_from_base<AbstractMesh>();
+    pickingInfo.distance   = Vector3::Distance(ray.origin, boundingInfo->boundingSphere.center);
+    pickingInfo.subMeshId  = 0;
     return pickingInfo;
   }
 
