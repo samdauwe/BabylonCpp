@@ -23,6 +23,7 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , angle{0.f}
     , angularSpeed{0.f}
     , cellIndex{0}
+    , remapData{std::nullopt}
     , _randomCellOffset{std::nullopt}
     , _initialDirection{std::nullopt}
     , _initialStartSpriteCellID{0}
@@ -112,7 +113,9 @@ void Particle::_inheritParticleInfoToSubEmitter(const SubEmitterPtr& subEmitter)
     auto emitterMesh = std::get<AbstractMeshPtr>(subEmitter->particleSystem->emitter);
     emitterMesh->position().copyFrom(position);
     if (subEmitter->inheritDirection) {
-      emitterMesh->setDirection(direction.normalize(), 0, Math::PI_2);
+      auto& temp = TmpVectors::Vector3Array[0];
+      direction.normalizeToRef(temp);
+      emitterMesh->setDirection(temp, 0.f, Math::PI_2);
     }
   }
   else if (std::holds_alternative<Vector3>(subEmitter->particleSystem->emitter)) {
@@ -218,7 +221,12 @@ void Particle::copyTo(Particle& other)
     other._initialEndSpriteCellID   = _initialEndSpriteCellID;
   }
   if (particleSystem->useRampGradients) {
-    other.remapData.copyFrom(remapData);
+    if (other.remapData && remapData) {
+      other.remapData->copyFrom(*remapData);
+    }
+    else {
+      other.remapData = Vector4(0.f, 0.f, 0.f, 0.f);
+    }
   }
   if (_randomNoiseCoordinates1) {
     if (other._randomNoiseCoordinates1) {

@@ -130,7 +130,7 @@ public:
   /**
    * The information required to support color remapping
    */
-  Vector4 remapData;
+  std::optional<Vector4> remapData;
 
   /** @hidden */
   std::optional<float> _randomCellOffset;

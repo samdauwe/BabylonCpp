@@ -284,8 +284,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
               auto min = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
               auto max = Scalar::Lerp(*currentGradient.factor2, *nextGradient.factor2, scale);
 
-              particle->remapData.x = min;
-              particle->remapData.y = max - min;
+              particle->remapData->x = min;
+              particle->remapData->y = max - min;
             });
         }
 
@@ -297,8 +297,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
               auto min = Scalar::Lerp(currentGradient.factor1, nextGradient.factor1, scale);
               auto max = Scalar::Lerp(*currentGradient.factor2, *nextGradient.factor2, scale);
 
-              particle->remapData.z = min;
-              particle->remapData.w = max - min;
+              particle->remapData->z = min;
+              particle->remapData->w = max - min;
             });
         }
       }
@@ -925,10 +925,10 @@ void ParticleSystem::_appendParticleVertex(unsigned int index, Particle* particl
   }
 
   if (_useRampGradients) {
-    _vertexData[offset++] = particle->remapData.x;
-    _vertexData[offset++] = particle->remapData.y;
-    _vertexData[offset++] = particle->remapData.z;
-    _vertexData[offset++] = particle->remapData.w;
+    _vertexData[offset++] = particle->remapData->x;
+    _vertexData[offset++] = particle->remapData->y;
+    _vertexData[offset++] = particle->remapData->z;
+    _vertexData[offset++] = particle->remapData->w;
   }
 
   if (!_useInstancing) {
