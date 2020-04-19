@@ -12,7 +12,8 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Collider;
-using ColliderPtr = std::shared_ptr<Collider>;
+using ColliderPtr     = std::shared_ptr<Collider>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Hidden
@@ -31,6 +32,7 @@ public:
   bool _checkCollisions;
   int _collisionMask;
   int _collisionGroup;
+  std::vector<AbstractMeshPtr> _surroundingMeshes;
   ColliderPtr _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
