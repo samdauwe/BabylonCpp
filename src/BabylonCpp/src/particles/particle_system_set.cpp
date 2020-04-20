@@ -77,7 +77,7 @@ void ParticleSystemSet::dispose(bool doNotRecurse, bool disposeMaterialAndTextur
   }
 }
 
-json ParticleSystemSet::serialize() const
+json ParticleSystemSet::serialize(bool /*serializeTexture*/) const
 {
   return nullptr;
 }

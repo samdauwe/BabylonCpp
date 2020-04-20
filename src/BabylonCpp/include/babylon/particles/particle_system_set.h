@@ -56,9 +56,10 @@ public:
 
   /**
    * @brief Serialize the set into a JSON compatible object.
+   * @param serializeTexture defines if the texture must be serialized as well
    * @returns a JSON compatible representation of the set
    */
-  [[nodiscard]] json serialize() const;
+  [[nodiscard]] json serialize(bool serializeTexture = false) const;
 
   /**
    * @brief Parse a new ParticleSystemSet from a serialized source.
