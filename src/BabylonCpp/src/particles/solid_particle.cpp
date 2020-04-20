@@ -27,6 +27,7 @@ SolidParticle::SolidParticle(size_t particleIndex, int particleId, size_t positi
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
     , parentId{std::nullopt}
     , materialIndex{std::nullopt}
+    , props{nullptr}
     , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY}
     , _globalPosition{Vector3::Zero()}
 {

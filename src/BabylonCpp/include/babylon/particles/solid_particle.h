@@ -3,12 +3,16 @@
 
 #include <variant>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/maths/vector4.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -194,6 +198,10 @@ public:
    * The particle material identifier (integer) when MultiMaterials are enabled in the SPS.
    */
   std::optional<size_t> materialIndex;
+  /**
+   * Custom object or properties.
+   */
+  std::unique_ptr<json> props;
   /**
    * The culling strategy to use to check whether the solid particle must be
    * culled or not when using isInFrustum(). The possible values are :
