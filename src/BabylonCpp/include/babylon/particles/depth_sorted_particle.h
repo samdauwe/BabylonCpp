@@ -12,6 +12,10 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT DepthSortedParticle {
   /**
+   * Particle index
+   */
+  size_t idx = 0;
+  /**
    * Index of the particle in the "indices" array
    */
   size_t ind = 0;
@@ -32,8 +36,8 @@ struct BABYLON_SHARED_EXPORT DepthSortedParticle {
    * @brief Creates a new sorted particle.
    * @param materialIndex
    */
-  DepthSortedParticle(size_t iInd, size_t indLength, size_t iMaterialIndex)
-      : ind{iInd}, indicesLength{indLength}, materialIndex{iMaterialIndex}
+  DepthSortedParticle(size_t iIdx, size_t iInd, size_t indLength, size_t iMaterialIndex)
+      : idx{iIdx}, ind{iInd}, indicesLength{indLength}, materialIndex{iMaterialIndex}
   {
   }
   DepthSortedParticle(const DepthSortedParticle& other) = default;

@@ -499,7 +499,8 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
 
   if (_depthSort || _multimaterialEnabled) {
     auto matIndex = copy.materialIndex.has_value() ? copy.materialIndex : 0;
-    depthSortedParticles.emplace_back(DepthSortedParticle(ind, meshInd.size(), matIndex.value()));
+    depthSortedParticles.emplace_back(
+      DepthSortedParticle(idx, ind, meshInd.size(), matIndex.value()));
   }
 
   return &copy;
