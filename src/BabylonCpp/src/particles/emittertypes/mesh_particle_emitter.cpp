@@ -15,17 +15,39 @@ MeshParticleEmitter::MeshParticleEmitter(const AbstractMeshPtr& iMesh)
     : direction1{Vector3(0.f, 1.f, 0.f)}
     , direction2{Vector3(0.f, 1.f, 0.f)}
     , useMeshNormalsForDirection{true}
-    , mesh{iMesh}
+    , mesh{this, &MeshParticleEmitter::get_mesh, &MeshParticleEmitter::set_mesh}
     , _storedNormal{Vector3::Zero()}
+    , _mesh{nullptr}
 {
-  if (mesh) {
-    _indices   = mesh->getIndices();
-    _positions = mesh->getVerticesData(VertexBuffer::PositionKind);
-    _normals   = mesh->getVerticesData(VertexBuffer::NormalKind);
-  }
+  mesh = iMesh;
 }
 
 MeshParticleEmitter::~MeshParticleEmitter() = default;
+
+AbstractMeshPtr& MeshParticleEmitter::get_mesh()
+{
+  return _mesh;
+}
+
+void MeshParticleEmitter::set_mesh(const AbstractMeshPtr& value)
+{
+  if (_mesh == value) {
+    return;
+  }
+
+  _mesh = value;
+
+  if (value) {
+    _indices   = value->getIndices();
+    _positions = value->getVerticesData(VertexBuffer::PositionKind);
+    _normals   = value->getVerticesData(VertexBuffer::NormalKind);
+  }
+  else {
+    _indices.clear();
+    _positions.clear();
+    _normals.clear();
+  }
+}
 
 void MeshParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Vector3& directionToUpdate, Particle* /*particle*/,

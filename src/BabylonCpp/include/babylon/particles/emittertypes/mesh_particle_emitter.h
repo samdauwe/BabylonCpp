@@ -83,6 +83,17 @@ public:
    */
   void parse(const json& serializationObject, Scene* scene) override;
 
+protected:
+  /**
+   * @brief Gets the mesh to use as source.
+   */
+  AbstractMeshPtr& get_mesh();
+
+  /**
+   * @brief Sets the mesh to use as source.
+   */
+  void set_mesh(const AbstractMeshPtr& value);
+
 public:
   /**
    * Random direction of each particle after it has been emitted, between direction1 and direction2
@@ -103,13 +114,14 @@ public:
   /**
    * Defines the mesh to use as source
    */
-  AbstractMeshPtr mesh;
+  Property<MeshParticleEmitter, AbstractMeshPtr> mesh;
 
 private:
   IndicesArray _indices;
   Float32Array _positions;
   Float32Array _normals;
   Vector3 _storedNormal;
+  AbstractMeshPtr _mesh;
 
 }; // end of class MeshParticleEmitter
 
