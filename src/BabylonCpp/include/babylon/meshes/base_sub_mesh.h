@@ -57,6 +57,11 @@ public:
   EffectPtr _materialEffect;
 
   /**
+   * Hidden
+   */
+  EffectPtr _effectOverride;
+
+  /**
    * Gets or sets material defines used by the effect associated to the sub mesh
    */
   Property<BaseSubMesh, MaterialDefinesPtr> materialDefines;

@@ -7,6 +7,7 @@ namespace BABYLON {
 BaseSubMesh::BaseSubMesh()
     : _materialDefines{nullptr}
     , _materialEffect{nullptr}
+    , _effectOverride{nullptr}
     , materialDefines{this, &BaseSubMesh::get_materialDefines, &BaseSubMesh::set_materialDefines}
     , effect{this, &BaseSubMesh::get_effect}
 {
@@ -26,7 +27,7 @@ void BaseSubMesh::set_materialDefines(const MaterialDefinesPtr& defines)
 
 EffectPtr& BaseSubMesh::get_effect()
 {
-  return _materialEffect;
+  return _effectOverride ? _effectOverride : _materialEffect;
 }
 
 void BaseSubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines)
