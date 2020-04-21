@@ -119,7 +119,7 @@ public:
    * @param ray defines the ray to test
    * @param positions defines mesh's positions array
    * @param indices defines mesh's indices array
-   * @param fastCheck defines if only bounding info should be used
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @param trianglePredicate defines an optional predicate used to select faces when a mesh
    * intersection is detected
    * @returns intersection info or null if no intersection
