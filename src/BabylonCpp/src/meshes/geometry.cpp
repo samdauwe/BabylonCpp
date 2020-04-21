@@ -27,6 +27,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
                    Mesh* mesh)
     : delayLoadState{Constants::DELAYLOADSTATE_NONE}
     , boundingBias(this, &Geometry::get_boundingBias, &Geometry::set_boundingBias)
+    , meshes(this, &Geometry::get_meshes)
     , extend(this, &Geometry::get_extend)
     , doNotSerialize(this, &Geometry::get_doNotSerialize)
     , _totalVertices{0}
@@ -97,6 +98,11 @@ GeometryPtr Geometry::CreateGeometryForMesh(Mesh* mesh)
   geometry->applyToMesh(mesh);
 
   return geometry;
+}
+
+std::vector<Mesh*>& Geometry::get_meshes()
+{
+  return _meshes;
 }
 
 MinMax& Geometry::get_extend()

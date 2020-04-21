@@ -382,6 +382,11 @@ protected:
   void set_boundingBias(const std::optional<Vector2>& value);
 
   /**
+   *  @brief Get the list of meshes using this geometry.
+   */
+  std::vector<Mesh*>& get_meshes();
+
+  /**
    * @brief Gets the current extend of the geometry.
    */
   MinMax& get_extend();
@@ -450,6 +455,11 @@ public:
    * -= v * bias.x + bias.y
    */
   Property<Geometry, std::optional<Vector2>> boundingBias;
+
+  /**
+   *  Get the list of meshes using this geometry
+   */
+  ReadOnlyProperty<Geometry, std::vector<Mesh*>> meshes;
 
   std::unordered_map<std::string, WebGLVertexArrayObjectPtr> _vertexArrayObjects;
   bool _updatable;
