@@ -1,26 +1,25 @@
 #include <babylon/materials/fresnel_parameters.h>
 
-#include <nlohmann/json.hpp>
-
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
+#include <babylon/materials/ifresnel_parameters_serialized.h>
 
 namespace BABYLON {
 
-FresnelParameters::FresnelParameters()
-    : isEnabled{this, &FresnelParameters::get_isEnabled,
-                &FresnelParameters::set_isEnabled}
-    , leftColor{Color3::White()}
-    , rightColor{Color3::Black()}
-    , bias{0.f}
-    , power{1.f}
-    , _isEnabled{true}
+FresnelParameters::FresnelParameters(
+  const std::optional<IFresnelParametersCreationOptions>& options)
+    : isEnabled{this, &FresnelParameters::get_isEnabled, &FresnelParameters::set_isEnabled}
 {
+  bias       = (!options || !options->bias) ? 0.f : *options->bias;
+  power      = (!options || !options->power) ? 1.f : *options->power;
+  leftColor  = (!options || !options->leftColor) ? Color3::White() : *options->leftColor;
+  rightColor = (!options || !options->rightColor) ? Color3::Black() : *options->rightColor;
+  isEnabled  = (!options || !options->isEnabled) ? true : *options->isEnabled;
 }
 
 FresnelParameters::FresnelParameters(const FresnelParameters& other)
-    : isEnabled{this, &FresnelParameters::get_isEnabled,
-                &FresnelParameters::set_isEnabled}
+    : isEnabled{this, &FresnelParameters::get_isEnabled, &FresnelParameters::set_isEnabled}
     , leftColor{other.leftColor}
     , rightColor{other.rightColor}
     , bias{other.bias}
@@ -30,8 +29,7 @@ FresnelParameters::FresnelParameters(const FresnelParameters& other)
 }
 
 FresnelParameters::FresnelParameters(FresnelParameters&& other)
-    : isEnabled{this, &FresnelParameters::get_isEnabled,
-                &FresnelParameters::set_isEnabled}
+    : isEnabled{this, &FresnelParameters::get_isEnabled, &FresnelParameters::set_isEnabled}
     , leftColor{std::move(other.leftColor)}
     , rightColor{std::move(other.rightColor)}
     , bias{std::move(other.bias)}
@@ -90,15 +88,36 @@ std::unique_ptr<FresnelParameters> FresnelParameters::clone() const
   return std::make_unique<FresnelParameters>(*this);
 }
 
-json FresnelParameters::serialize() const
+bool FresnelParameters::equals(const FresnelParameters& otherFresnelParameters) const
 {
-  return nullptr;
+  return (stl_util::almost_equal(bias, otherFresnelParameters.bias))
+         && (stl_util::almost_equal(power, otherFresnelParameters.power))
+         && (leftColor.equals(otherFresnelParameters.leftColor))
+         && (rightColor.equals(otherFresnelParameters.rightColor))
+         && (isEnabled == otherFresnelParameters.isEnabled);
+}
+
+IFresnelParametersSerialized FresnelParameters::serialize() const
+{
+  return {
+    leftColor.asArray(),  // leftColor
+    rightColor.asArray(), // rightColor
+    bias,                 // bias
+    power,                // power
+    isEnabled             // isEnabled
+  };
 }
 
 std::unique_ptr<FresnelParameters>
-FresnelParameters::Parse(const json& /*parsedFresnelParameters*/)
+FresnelParameters::Parse(const IFresnelParametersSerialized& parsedFresnelParameters)
 {
-  return nullptr;
+  return std::make_unique<FresnelParameters>(IFresnelParametersCreationOptions{
+    Color3::FromArray(parsedFresnelParameters.leftColor),  // leftColor
+    Color3::FromArray(parsedFresnelParameters.rightColor), // rightColor
+    parsedFresnelParameters.bias,                          // bias
+    parsedFresnelParameters.power.value_or(1.f),           // power
+    parsedFresnelParameters.isEnabled,                     // isEnabled
+  });
 }
 
 } // end of namespace BABYLON

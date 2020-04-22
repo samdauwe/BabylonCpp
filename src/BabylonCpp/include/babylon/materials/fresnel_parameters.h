@@ -1,25 +1,27 @@
 #ifndef BABYLON_MATERIALS_FRESNEL_PARAMETERS_H
 #define BABYLON_MATERIALS_FRESNEL_PARAMETERS_H
 
-#include <map>
-#include <nlohmann/json_fwd.hpp>
-
 #include <babylon/babylon_api.h>
+#include <babylon/materials/ifresnel_parameters_creation_options.h>
 #include <babylon/maths/color3.h>
-
-using json = nlohmann::json;
 
 namespace BABYLON {
 
+struct IFresnelParametersSerialized;
+
 /**
- * @brief This represents all the required information to add a fresnel effect
- * on a material:
+ * @brief This represents all the required information to add a fresnel effect on a material:
  * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
  */
 class BABYLON_SHARED_EXPORT FresnelParameters {
 
 public:
-  FresnelParameters();
+  /**
+   * @brief Creates a new FresnelParameters object.
+   *
+   * @param options provide your own settings to optionally to override defaults
+   */
+  FresnelParameters(const std::optional<IFresnelParametersCreationOptions>& options = std::nullopt);
   FresnelParameters(const FresnelParameters& other);
   FresnelParameters(FresnelParameters&& other);
   FresnelParameters& operator=(const FresnelParameters& other);
@@ -33,18 +35,26 @@ public:
   [[nodiscard]] std::unique_ptr<FresnelParameters> clone() const;
 
   /**
+   * @brief Determines equality between FresnelParameters objects.
+   * @param otherFresnelParameters defines the second operand
+   * @returns true if the power, bias, leftColor, rightColor and isEnabled values are equal to the
+   * given ones
+   */
+  bool equals(const FresnelParameters& otherFresnelParameters) const;
+
+  /**
    * @brief Serializes the current fresnel parameters to a JSON representation.
    * @return the JSON serialization
    */
-  [[nodiscard]] json serialize() const;
+  IFresnelParametersSerialized serialize() const;
 
   /**
-   * @brief Parse a JSON object and deserialize it to a new Fresnel parameter
-   * object.
+   * @brief Parse a JSON object and deserialize it to a new Fresnel parameter object.
    * @param parsedFresnelParameters Define the JSON representation
    * @returns the parsed parameters
    */
-  static std::unique_ptr<FresnelParameters> Parse(const json& parsedFresnelParameters);
+  static std::unique_ptr<FresnelParameters>
+  Parse(const IFresnelParametersSerialized& parsedFresnelParameters);
 
 protected:
   /**
