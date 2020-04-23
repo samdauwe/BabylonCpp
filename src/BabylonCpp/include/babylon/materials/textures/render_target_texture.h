@@ -361,6 +361,11 @@ public:
   CameraPtr activeCamera;
 
   /**
+   * Override the mesh isReady function with your own one.
+   */
+  std::function<bool(AbstractMesh* mesh, int refreshRate)> customIsReadyFunction;
+
+  /**
    * Override the render function of the texture with your own one.
    */
   std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,

@@ -507,7 +507,10 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
 
           if (Texture::UseSerializedUrlIfAny
               && json_util::has_valid_key_value(parsedTexture, "url")) {
-            url2 = json_util::get_string(parsedTexture, "url");
+            const auto parsedUrl = json_util::get_string(parsedTexture, "url");
+            if (StringTools::startsWith(url2, "data:")) {
+              url2 = parsedUrl;
+            }
           }
           texture = Texture::New(url2, scene, !generateMipMaps,
                                  json_util::get_bool(parsedTexture, "invertY", true));

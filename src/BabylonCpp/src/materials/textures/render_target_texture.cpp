@@ -34,6 +34,7 @@ RenderTargetTexture::RenderTargetTexture(const std::string& iName,
     , renderParticles{true}
     , renderSprites{false}
     , activeCamera{nullptr}
+    , customIsReadyFunction{nullptr}
     , customRenderFunction{nullptr}
     , useCameraPostProcesses{std::nullopt}
     , ignoreCameraViewport{false}
@@ -558,7 +559,13 @@ void RenderTargetTexture::_prepareRenderingManager(
     auto mesh = currentRenderList[meshIndex];
 
     if (mesh) {
-      if (!mesh->isReady(refreshRate() == 0)) {
+      if (customIsReadyFunction) {
+        if (!customIsReadyFunction(mesh, refreshRate())) {
+          resetRefreshCounter();
+          continue;
+        }
+      }
+      else if (!mesh->isReady(refreshRate() == 0)) {
         resetRefreshCounter();
         continue;
       }
@@ -580,7 +587,9 @@ void RenderTargetTexture::_prepareRenderingManager(
             mesh->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate = false;
           }
           else {
-            mesh = static_cast<InstancedMesh*>(mesh);
+            if (!mesh->_internalAbstractMeshDataInfo._actAsRegularMesh) {
+              mesh = static_cast<InstancedMesh*>(mesh);
+            }
           }
           mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = true;
 
@@ -604,7 +613,7 @@ void RenderTargetTexture::_prepareRenderingManager(
       _renderingManager->dispatchParticles(particleSystem.get());
     }
   }
-}
+} // namespace BABYLON
 
 void RenderTargetTexture::_bindFrameBuffer(unsigned int faceIndex, unsigned int layer)
 {
