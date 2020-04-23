@@ -52,6 +52,29 @@ json NoiseProceduralTexture::serialize() const
   return nullptr;
 }
 
+NoiseProceduralTexturePtr NoiseProceduralTexture::clone()
+{
+  const auto textureSize = getSize();
+  auto newTexture
+    = NoiseProceduralTexture::New(name, textureSize.width, getScene(),
+                                  _fallbackTexture ? _fallbackTexture : nullptr, _generateMipMaps);
+
+  // Base texture
+  newTexture->hasAlpha = hasAlpha();
+  newTexture->level    = level;
+
+  // RenderTarget Texture
+  newTexture->coordinatesMode = coordinatesMode();
+
+  // Noise Specifics
+  newTexture->brightness           = brightness;
+  newTexture->octaves              = octaves;
+  newTexture->persistence          = persistence;
+  newTexture->animationSpeedFactor = animationSpeedFactor;
+
+  return newTexture;
+}
+
 NoiseProceduralTexturePtr NoiseProceduralTexture::Parse(const json& /*serializationObject*/,
                                                         Scene* /*scene*/)
 {

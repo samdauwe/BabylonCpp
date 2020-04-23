@@ -23,10 +23,12 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     : Texture("", scene, !generateMipMaps)
     , isEnabled{true}
     , autoClear{true}
+    , onGenerated{nullptr}
     , _generateMipMaps{generateMipMaps}
     , _isCube{iIsCube}
     , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
+    , _fallbackTexture{nullptr}
     , _currentRefreshId{-1}
     , _frameId{-1}
     , _refreshRate{1}

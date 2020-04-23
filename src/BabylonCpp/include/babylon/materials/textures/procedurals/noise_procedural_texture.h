@@ -42,6 +42,12 @@ public:
   json serialize() const;
 
   /**
+   * @brief Clone the texture.
+   * @returns the cloned texture
+   */
+  NoiseProceduralTexturePtr clone();
+
+  /**
    * @brief Creates a NoiseProceduralTexture from parsed noise procedural
    * texture data
    * @param parsedTexture defines parsed texture data

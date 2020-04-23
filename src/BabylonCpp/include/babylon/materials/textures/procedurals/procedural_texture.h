@@ -299,6 +299,12 @@ public:
    */
   Property<ProceduralTexture, float> refreshRate;
 
+protected:
+  /**
+   * Hidden
+   */
+  Texture* _fallbackTexture;
+
 private:
   Size _size;
   bool _doNotChangeAspectRatio;
@@ -318,7 +324,6 @@ private:
   std::unordered_map<std::string, Vector2> _vectors2;
   std::unordered_map<std::string, Vector3> _vectors3;
   std::unordered_map<std::string, Matrix> _matrices;
-  Texture* _fallbackTexture;
   bool _fallbackTextureUsed;
   Engine* _engine;
   std::string _cachedDefines;
