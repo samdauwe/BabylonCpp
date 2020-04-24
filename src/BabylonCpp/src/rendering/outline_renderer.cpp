@@ -71,8 +71,12 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
     return;
   }
 
-  auto mesh     = subMesh->getRenderingMesh();
-  auto material = subMesh->getMaterial();
+  auto ownerMesh = subMesh->getMesh();
+  auto replacementMesh
+    = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
+  auto renderingMesh = subMesh->getRenderingMesh();
+  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+  auto material      = subMesh->getMaterial();
 
   if (!material || !scene->activeCamera()) {
     return;
@@ -86,20 +90,23 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
                       2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
   }
 
-  _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
-  _effect->setColor4("color", useOverlay ? mesh->overlayColor : mesh->outlineColor,
-                     useOverlay ? mesh->overlayAlpha : material->alpha());
+  _effect->setFloat("offset", useOverlay ? 0 : renderingMesh->outlineWidth);
+  _effect->setColor4("color",
+                     useOverlay ? renderingMesh->overlayColor : renderingMesh->outlineColor,
+                     useOverlay ? renderingMesh->overlayAlpha : material->alpha());
   _effect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
-    _effect->setMatrices("mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
+  if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+      && renderingMesh->skeleton()) {
+    _effect->setMatrices("mBones",
+                         renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
   }
 
   // Morph targets
-  MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
+  MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
 
-  mesh->_bind(subMesh, _effect, material->fillMode());
+  renderingMesh->_bind(subMesh, _effect, material->fillMode());
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
@@ -112,10 +119,10 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
 
   engine->setZOffset(-zOffset);
 
-  mesh->_processRendering(nullptr, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
-                          hardwareInstancedRendering, [this](bool, const Matrix& world, Material*) {
-                            _effect->setMatrix("world", world);
-                          });
+  renderingMesh->_processRendering(
+    effectiveMesh, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+    hardwareInstancedRendering,
+    [this](bool, const Matrix& world, Material*) { _effect->setMatrix("world", world); });
 
   engine->setZOffset(0.f);
 }

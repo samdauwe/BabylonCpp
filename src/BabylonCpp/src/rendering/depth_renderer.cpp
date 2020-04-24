@@ -74,12 +74,16 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
 
   // Custom render function
   auto renderSubMesh = [this](SubMesh* subMesh) {
-    auto mesh     = subMesh->getRenderingMesh();
-    auto scene    = _scene;
-    auto engine   = scene->getEngine();
-    auto material = subMesh->getMaterial();
+    auto ownerMesh = subMesh->getMesh();
+    auto replacementMesh
+      = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
+    auto renderingMesh = subMesh->getRenderingMesh();
+    auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+    auto scene         = _scene;
+    auto engine        = scene->getEngine();
+    auto material      = subMesh->getMaterial();
 
-    mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
+    effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
     if (!material) {
       return;
@@ -89,7 +93,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
     engine->setState(material->backFaceCulling(), 0, false, scene->useRightHandedSystem());
 
     // Managing instances
-    auto batch = mesh->_getInstancesRenderList(subMesh->_id);
+    auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
 
     if (batch->mustReturn) {
       return;
@@ -102,7 +106,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
     auto camera = (!_camera) ? _camera : scene->activeCamera;
     if (isReady(subMesh, hardwareInstancedRendering) && camera) {
       engine->enableEffect(_effect);
-      mesh->_bind(subMesh, _effect, material->fillMode());
+      renderingMesh->_bind(subMesh, _effect, material->fillMode());
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
@@ -118,16 +122,18 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
       }
 
       // Bones
-      if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
-        _effect->setMatrices("mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
+      if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+          && renderingMesh->skeleton()) {
+        _effect->setMatrices("mBones",
+                             renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
       }
 
       // Morph targets
-      MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
+      MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
 
       // Draw
-      mesh->_processRendering(
-        nullptr, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+      renderingMesh->_processRendering(
+        effectiveMesh, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
         hardwareInstancedRendering,
         [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
           _effect->setMatrix("world", world);
