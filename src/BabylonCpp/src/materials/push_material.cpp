@@ -2,15 +2,14 @@
 
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_defines.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 
 namespace BABYLON {
 
 PushMaterial::PushMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}
-    , allowShaderHotSwapping{true}
-    , _activeEffect{nullptr}
+    : Material{iName, scene}, allowShaderHotSwapping{true}, _activeEffect{nullptr}
 {
   _storeEffectOnSubMeshes = true;
 }
@@ -45,6 +44,18 @@ bool PushMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   return isReadyForSubMesh(mesh, mesh->subMeshes[0].get(), useInstances);
 }
 
+bool PushMaterial::_isReadyForSubMesh(BaseSubMesh* subMesh)
+{
+  const auto& defines = subMesh->_materialDefines;
+  if (!checkReadyOnEveryCall && subMesh->effect() && defines) {
+    if (defines->_renderId == getScene()->getRenderId()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 void PushMaterial::bindOnlyWorldMatrix(Matrix& world)
 {
   _activeEffect->setMatrix("world", world);
@@ -70,8 +81,7 @@ void PushMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
   getScene()->_cachedEffect = effect;
 }
 
-bool PushMaterial::_mustRebind(Scene* scene, const EffectPtr& effect,
-                               float visibility)
+bool PushMaterial::_mustRebind(Scene* scene, const EffectPtr& effect, float visibility)
 {
   return scene->isCachedMaterialInvalid(this, effect, visibility);
 }

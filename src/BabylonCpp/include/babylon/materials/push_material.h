@@ -55,6 +55,7 @@ public:
 protected:
   PushMaterial(const std::string& name, Scene* scene);
 
+  bool _isReadyForSubMesh(BaseSubMesh* subMesh);
   void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr);
   bool _mustRebind(Scene* scene, const EffectPtr& effect, float visibility = 1.f);
 
