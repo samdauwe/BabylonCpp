@@ -597,10 +597,9 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subM
   auto scene      = getScene();
   auto definesPtr = std::static_pointer_cast<BackgroundMaterialDefines>(subMesh->_materialDefines);
   auto& defines   = *definesPtr;
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (defines._renderId == scene->getRenderId()) {
-      return true;
-    }
+
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
