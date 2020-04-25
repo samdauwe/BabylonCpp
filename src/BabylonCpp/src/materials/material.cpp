@@ -53,7 +53,8 @@ const Material::MaterialDefinesCallback Material::_RunDirtyCallBacks
 };
 
 Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
-    : id{!iName.empty() ? iName : GUID::RandomId()}
+    : customShaderNameResolve{nullptr}
+    , id{!iName.empty() ? iName : GUID::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
@@ -69,6 +70,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , onBindObservable{this, &Material::get_onBindObservable}
     , onBind{this, &Material::set_onBind}
     , onUnBindObservable{this, &Material::get_onUnBindObservable}
+    , onEffectCreatedObservable{this, &Material::get_onEffectCreatedObservable}
     , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
     , needDepthPrePass{this, &Material::get_needDepthPrePass, &Material::set_needDepthPrePass}
     , disableDepthWrite{false}
@@ -83,13 +85,16 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
     , _effect{nullptr}
     , _indexInSceneMaterialArray{-1}
+    , transparencyMode{this, &Material::get_transparencyMode, &Material::set_transparencyMode}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
     , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _forceAlphaTest{false}
+    , _transparencyMode{std::nullopt}
+    , _disableAlphaBlending{this, &Material::get__disableAlphaBlending}
     , _onDisposeObserver{nullptr}
-    , _onUnBindObservable{nullptr}
     , _onBindObserver{nullptr}
     , _alphaMode{Constants::ALPHA_COMBINE}
     , _needDepthPrePass{false}
@@ -267,6 +272,11 @@ Observable<Material>& Material::get_onUnBindObservable()
   return _onUnBindObservable;
 }
 
+Observable<OnCreatedEffectParameters>& Material::get_onEffectCreatedObservable()
+{
+  return _onEffectCreatedObservable;
+}
+
 void Material::set_wireframe(bool value)
 {
   fillMode = value ? Material::WireFrameFillMode : Material::TriangleFillMode;
@@ -366,6 +376,31 @@ EffectPtr& Material::getEffect()
 Scene* Material::getScene() const
 {
   return _scene;
+}
+
+std::optional<unsigned int>& Material::get_transparencyMode()
+{
+  return _transparencyMode;
+}
+
+void Material::set_transparencyMode(const std::optional<unsigned int>& value)
+{
+  if (_transparencyMode == value) {
+    return;
+  }
+
+  _transparencyMode = value;
+
+  _forceAlphaTest = value && (*value == Material::MATERIAL_ALPHATESTANDBLEND);
+
+  _markAllSubMeshesAsTexturesAndMiscDirty();
+}
+
+bool Material::get__disableAlphaBlending() const
+{
+  return (_transparencyMode
+          && (*_transparencyMode == Material::MATERIAL_OPAQUE
+              || *_transparencyMode == Material::MATERIAL_ALPHATEST));
 }
 
 bool Material::needAlphaBlending() const

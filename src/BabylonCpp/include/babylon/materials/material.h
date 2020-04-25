@@ -49,7 +49,12 @@ struct BABYLON_SHARED_EXPORT IMaterialCompilationOptions {
    * Defines whether instances are enabled.
    */
   bool useInstances = false;
-};
+}; // end of struct IMaterialCompilationOptions
+
+struct BABYLON_SHARED_EXPORT OnCreatedEffectParameters {
+  Effect* effect       = nullptr;
+  BaseSubMesh* subMesh = nullptr;
+}; // end of struct OnCreatedEffectParameters
 
 /**
  * @brief Base class for the main features of a material in Babylon.js.
@@ -147,6 +152,30 @@ public:
    */
   static constexpr unsigned int AllDirtyFlag = Constants::MATERIAL_AllDirtyFlag;
 
+  /**
+   * MaterialTransparencyMode: No transparency mode, Alpha channel is not use.
+   */
+  static constexpr unsigned int MATERIAL_OPAQUE = 0;
+
+  /**
+   * MaterialTransparencyMode: Alpha Test mode, pixel are discarded below a certain threshold
+   * defined by the alpha cutoff value.
+   */
+  static constexpr unsigned int MATERIAL_ALPHATEST = 1;
+
+  /**
+   * MaterialTransparencyMode: Pixels are blended (according to the alpha mode) with the already
+   * drawn pixels in the current frame buffer.
+   */
+  static constexpr unsigned int MATERIAL_ALPHABLEND = 2;
+
+  /**
+   * MaterialTransparencyMode: Pixels are blended (according to the alpha mode) with the already
+   * drawn pixels in the current frame buffer. They are also discarded below the alpha cutoff
+   * threshold to improve performances.
+   */
+  static constexpr unsigned int MATERIAL_ALPHATESTANDBLEND = 3;
+
   ~Material() override; // = default
 
   [[nodiscard]] Type type() const override;
@@ -220,6 +249,24 @@ public:
    * @returns a Scene
    */
   [[nodiscard]] Scene* getScene() const;
+
+  /**
+   * @brief Gets the current transparency mode.
+   */
+  std::optional<unsigned int>& get_transparencyMode();
+
+  /**
+   * @brief Sets the transparency mode of the material.
+   *
+   * | Value | Type                                | Description |
+   * | ----- | ----------------------------------- | ----------- |
+   * | 0     | OPAQUE                              |             |
+   * | 1     | ALPHATEST                           |             |
+   * | 2     | ALPHABLEND                          |             |
+   * | 3     | ALPHATESTANDBLEND                   |             |
+   *
+   */
+  void set_transparencyMode(const std::optional<unsigned int>& value);
 
   /**
    * @brief Specifies if the material will require alpha blending.
@@ -402,6 +449,11 @@ protected:
    */
   Material(const std::string& name, Scene* scene, bool doNotAdd = false);
 
+  /**
+   * @brief Returns true if alpha blending should be disabled.
+   */
+  bool get__disableAlphaBlending() const;
+
 protected:
   /**
    * @brief Sets the alpha value of the material.
@@ -448,6 +500,11 @@ protected:
    * @brief An event triggered when the material is unbound.
    */
   Observable<Material>& get_onUnBindObservable();
+
+  /**
+   * @brief An event triggered when the effect is (re)created.
+   */
+  Observable<OnCreatedEffectParameters>& get_onEffectCreatedObservable();
 
   /**
    * @brief Sets the value of the alpha mode.
@@ -616,6 +673,16 @@ public:
   Observable<Material> onDisposeObservable;
 
   /**
+   * Custom callback helping to override the default shader used in the
+   * material.
+   */
+  std::function<std::string(const std::string& shaderName, std::vector<std::string>& uniforms,
+                            std::vector<std::string>& uniformBuffers,
+                            std::vector<std::string>& samplers, MaterialDefines& defines,
+                            std::vector<std::string>& attributes)>
+    customShaderNameResolve;
+
+  /**
    * The ID of the material
    */
   std::string id;
@@ -717,6 +784,11 @@ public:
   ReadOnlyProperty<Material, Observable<Material>> onUnBindObservable;
 
   /**
+   * An event triggered when the effect is (re)created
+   */
+  ReadOnlyProperty<Material, Observable<OnCreatedEffectParameters>> onEffectCreatedObservable;
+
+  /**
    * The value of the alpha mode
    */
   Property<Material, unsigned int> alphaMode;
@@ -793,6 +865,11 @@ public:
   std::unordered_map<std::string, AbstractMeshPtr> meshMap;
 
   /**
+   * Gets or sets the current transparency mode.
+   */
+  Property<Material, std::optional<unsigned int>> transparencyMode;
+
+  /**
    * The logarithmic depth setting.
    */
   Property<Material, bool> useLogarithmicDepth;
@@ -809,9 +886,30 @@ protected:
   bool _backFaceCulling;
 
   /**
+   * An event triggered when the effect is (re)created
+   */
+  Observable<OnCreatedEffectParameters> _onEffectCreatedObservable;
+
+  /**
    * Stores the uniform buffer
    */
   std::unique_ptr<UniformBuffer> _uniformBuffer;
+
+  /**
+   * Enforces alpha test in opaque or blend mode in order to improve the performances of some
+   * situations.
+   */
+  bool _forceAlphaTest;
+
+  /**
+   * The transparency mode of the material.
+   */
+  std::optional<unsigned int> _transparencyMode;
+
+  /**
+   * Returns true if alpha blending should be disabled.
+   */
+  ReadOnlyProperty<Material, bool> _disableAlphaBlending;
 
 private:
   /**
