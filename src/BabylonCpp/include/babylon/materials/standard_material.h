@@ -701,15 +701,6 @@ public:
   Property<StandardMaterial, bool> twoSidedLighting;
 
   /**
-   * Custom callback helping to override the default shader used in the
-   * material.
-   */
-  std::function<std::string(const std::string& shaderName, std::vector<std::string>& uniforms,
-                            std::vector<std::string>& uniformBuffers,
-                            std::vector<std::string>& samplers, StandardMaterialDefines& defines)>
-    customShaderNameResolve;
-
-  /**
    * The image processing configuration used either in this material
    */
   Property<StandardMaterial, ImageProcessingConfiguration*> imageProcessingConfiguration;
@@ -775,6 +766,7 @@ protected:
   ImageProcessingConfiguration* _imageProcessingConfiguration;
 
 private:
+  OnCreatedEffectParameters onCreatedEffectParameters;
   BaseTexturePtr _diffuseTexture;
   BaseTexturePtr _ambientTexture;
   BaseTexturePtr _opacityTexture;

@@ -120,7 +120,6 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
                        &StandardMaterial::set_invertNormalMapY}
     , twoSidedLighting{this, &StandardMaterial::get_twoSidedLighting,
                        &StandardMaterial::set_twoSidedLighting}
-    , customShaderNameResolve{nullptr}
     , imageProcessingConfiguration{this, &StandardMaterial::get_imageProcessingConfiguration,
                                    &StandardMaterial::set_imageProcessingConfiguration}
     , cameraColorCurvesEnabled{this, &StandardMaterial::get_cameraColorCurvesEnabled,
@@ -380,18 +379,29 @@ void StandardMaterial::set_useLogarithmicDepth(bool value)
 
 bool StandardMaterial::needAlphaBlending() const
 {
+  if (_disableAlphaBlending()) {
+    return false;
+  }
+
   return (alpha() < 1.f) || (_opacityTexture != nullptr) || _shouldUseAlphaFromDiffuseTexture()
          || (_opacityFresnelParameters && _opacityFresnelParameters->isEnabled());
 }
 
 bool StandardMaterial::needAlphaTesting() const
 {
-  return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha();
+  if (_forceAlphaTest) {
+    return true;
+  }
+
+  return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha()
+         && (_transparencyMode.has_value() && *_transparencyMode == Material::MATERIAL_ALPHATEST);
 }
 
 bool StandardMaterial::_shouldUseAlphaFromDiffuseTexture() const
 {
-  return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha() && _useAlphaFromDiffuseTexture;
+  return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha() && _useAlphaFromDiffuseTexture
+         && (!_transparencyMode
+             || (_transparencyMode.has_value() && *_transparencyMode != Material::MATERIAL_OPAQUE));
 }
 
 BaseTexturePtr StandardMaterial::getAlphaTestTexture()
@@ -415,10 +425,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
   auto scene      = getScene();
   auto definesPtr = std::static_pointer_cast<StandardMaterialDefines>(subMesh->_materialDefines);
   auto& defines   = *definesPtr;
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (defines._renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -622,6 +630,12 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     defines.boolDef["PREMULTIPLYALPHA"]
       = (alphaMode() == Constants::ALPHA_PREMULTIPLIED
          || alphaMode() == Constants::ALPHA_PREMULTIPLIED_PORTERDUFF);
+
+    defines.boolDef["ALPHATEST_AFTERALLALPHACOMPUTATIONS"] = transparencyMode().has_value();
+
+    defines.boolDef["ALPHABLEND"]
+      = !transparencyMode().has_value()
+        || needAlphaBlendingForMesh(*mesh); // check on null for backward compatibility
   }
 
   if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
@@ -671,7 +685,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
 
   // Misc.
   MaterialHelper::PrepareDefinesForMisc(mesh, scene, _useLogarithmicDepth, pointsCloud(),
-                                        fogEnabled(), _shouldTurnAlphaTestOn(mesh), defines);
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true, true, true);
@@ -861,13 +876,20 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
     if (customShaderNameResolve) {
-      shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines);
+      shaderName
+        = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines, attribs);
     }
 
     auto& previousEffect = subMesh->effect();
     auto effect          = scene->getEngine()->createEffect(shaderName, options, engine);
 
     if (effect) {
+      /*if (_onEffectCreatedObservable) */ {
+        onCreatedEffectParameters.effect  = effect.get();
+        onCreatedEffectParameters.subMesh = subMesh;
+        _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
+      }
+
       // Use previous effect while new one is compiling
       if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
         effect             = previousEffect;
@@ -1581,7 +1603,7 @@ void StandardMaterial::set_useAlphaFromDiffuseTexture(bool value)
   }
 
   _useAlphaFromDiffuseTexture = value;
-  _markAllSubMeshesAsTexturesDirty();
+  _markAllSubMeshesAsTexturesAndMiscDirty();
 }
 
 bool StandardMaterial::get_useEmissiveAsIllumination() const
