@@ -76,8 +76,10 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"MORPHTARGETS_NORMAL", false},                         //
     {"MORPHTARGETS_TANGENT", false},                        //
     {"MORPHTARGETS_UV", false},                             //
-    {"NONUNIFORMSCALING", false}, // https://playground.babylonjs.com#V6DWIH
-    {"PREMULTIPLYALPHA", false},  // https://playground.babylonjs.com#LNVJJ7
+    {"NONUNIFORMSCALING", false},                   // https://playground.babylonjs.com#V6DWIH
+    {"PREMULTIPLYALPHA", false},                    // https://playground.babylonjs.com#LNVJJ7
+    {"ALPHATEST_AFTERALLALPHACOMPUTATIONS", false}, //
+    {"ALPHABLEND", true},                           //
 
     {"IMAGEPROCESSING", false},            //
     {"VIGNETTE", false},                   //
