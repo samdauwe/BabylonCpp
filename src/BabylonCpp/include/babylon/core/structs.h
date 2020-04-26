@@ -11,6 +11,8 @@
 
 namespace BABYLON {
 
+class BaseSubMesh;
+class Effect;
 class ICanvas;
 class Node;
 
@@ -53,6 +55,12 @@ struct DeviceOrientationEvent {
   float gamma = 0.f;
   float beta  = 0.f;
 }; // end of struct DeviceOrientationEvent
+
+struct DepthEffect {
+  Effect* depthEffect      = nullptr;
+  std::string depthDefines = "";
+  std::string token        = "";
+}; // end of struct DepthEffect
 
 struct DragMoveEvent {
   Vector3 delta;
@@ -211,6 +219,11 @@ struct NodeCache {
   float radius = 0.f;
   Vector2 targetScreenOffset;
 }; // end of struct NodeCache
+
+struct OnCreatedEffectParameters {
+  Effect* effect       = nullptr;
+  BaseSubMesh* subMesh = nullptr;
+}; // end of struct OnCreatedEffectParameters
 
 struct PickedParticle {
   size_t idx;
