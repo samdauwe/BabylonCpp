@@ -54,6 +54,7 @@ const Material::MaterialDefinesCallback Material::_RunDirtyCallBacks
 
 Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     : customShaderNameResolve{nullptr}
+    , shadowDepthWrapper{nullptr}
     , id{!iName.empty() ? iName : GUID::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
@@ -74,6 +75,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
     , needDepthPrePass{this, &Material::get_needDepthPrePass, &Material::set_needDepthPrePass}
     , disableDepthWrite{false}
+    , disableColorWrite{false}
     , forceDepthWrite{false}
     , depthFunction{0}
     , separateCullingPass{false}
@@ -103,6 +105,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _fillMode{Material::TriangleFillMode}
     , _cachedDepthWriteState{false}
+    , _cachedColorWriteState{false}
     , _cachedDepthFunctionState{0}
 {
   uniqueId = _scene->getUniqueId();
@@ -405,17 +408,34 @@ bool Material::get__disableAlphaBlending() const
 
 bool Material::needAlphaBlending() const
 {
+  if (_disableAlphaBlending) {
+    return false;
+  }
+
   return (_alpha < 1.f);
 }
 
 bool Material::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
 {
+  if (_disableAlphaBlending && mesh.visibility >= 1.f) {
+    return false;
+  }
+
   return needAlphaBlending() || (mesh.visibility() < 1.f) || mesh.hasVertexAlpha();
 }
 
 bool Material::needAlphaTesting() const
 {
+  if (_forceAlphaTest) {
+    return true;
+  }
+
   return false;
+}
+
+bool Material::_shouldTurnAlphaTestOn(AbstractMesh* mesh) const
+{
+  return (!needAlphaBlendingForMesh(*mesh) && needAlphaTesting());
 }
 
 BaseTexturePtr Material::getAlphaTestTexture()
@@ -501,11 +521,6 @@ void Material::bindViewProjection(const EffectPtr& effect)
   }
 }
 
-bool Material::_shouldTurnAlphaTestOn(AbstractMesh* mesh) const
-{
-  return (!needAlphaBlendingForMesh(*mesh) && needAlphaTesting());
-}
-
 void Material::_afterBind(Mesh* mesh)
 {
   _scene->_cachedMaterial = this;
@@ -524,6 +539,12 @@ void Material::_afterBind(Mesh* mesh)
     auto engine            = _scene->getEngine();
     _cachedDepthWriteState = engine->getDepthWrite();
     engine->setDepthWrite(false);
+  }
+
+  if (disableColorWrite) {
+    auto engine            = _scene->getEngine();
+    _cachedColorWriteState = engine->getColorWrite();
+    engine->setColorWrite(false);
   }
 
   if (depthFunction != 0) {
@@ -545,6 +566,11 @@ void Material::unbind()
   if (disableDepthWrite) {
     auto engine = _scene->getEngine();
     engine->setDepthWrite(_cachedDepthWriteState);
+  }
+
+  if (disableColorWrite) {
+    auto engine = _scene->getEngine();
+    engine->setColorWrite(_cachedColorWriteState);
   }
 }
 
@@ -813,6 +839,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, b
   onDisposeObservable.clear();
   _onBindObservable.clear();
   _onUnBindObservable.clear();
+  _onEffectCreatedObservable.clear();
 }
 
 void Material::releaseVertexArrayObject(const AbstractMeshPtr& iMesh, bool forceDisposeEffect)

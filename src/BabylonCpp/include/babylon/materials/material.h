@@ -7,6 +7,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/iinspectable.h>
@@ -27,6 +28,7 @@ class Mesh;
 class MultiMaterial;
 class RenderTargetTexture;
 class Scene;
+class ShadowDepthWrapper;
 class SubMesh;
 class UniformBuffer;
 using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
@@ -35,6 +37,7 @@ using EffectPtr              = std::shared_ptr<Effect>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using ShadowDepthWrapperPtr  = std::shared_ptr<ShadowDepthWrapper>;
 
 /**
  * @brief Options for compiling materials.
@@ -50,11 +53,6 @@ struct BABYLON_SHARED_EXPORT IMaterialCompilationOptions {
    */
   bool useInstances = false;
 }; // end of struct IMaterialCompilationOptions
-
-struct BABYLON_SHARED_EXPORT OnCreatedEffectParameters {
-  Effect* effect       = nullptr;
-  BaseSubMesh* subMesh = nullptr;
-}; // end of struct OnCreatedEffectParameters
 
 /**
  * @brief Base class for the main features of a material in Babylon.js.
@@ -282,7 +280,7 @@ public:
   [[nodiscard]] virtual bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const;
 
   /**
-   * @brief Specifies if this material should be rendered in alpha test mode.
+   * @brief Specifies whether or not this material should be rendered in alpha test mode.
    * @returns a boolean specifying if an alpha test is needed.
    */
   [[nodiscard]] virtual bool needAlphaTesting() const;
@@ -593,8 +591,7 @@ protected:
 
 protected:
   /**
-   * @brief Specifies if material alpha testing should be turned on for the
-   * mesh.
+   * @brief Specifies if material alpha testing should be turned on for the mesh.
    * @param mesh defines the mesh to check
    */
   bool _shouldTurnAlphaTestOn(AbstractMesh* mesh) const;
@@ -681,6 +678,11 @@ public:
                             std::vector<std::string>& samplers, MaterialDefines& defines,
                             std::vector<std::string>& attributes)>
     customShaderNameResolve;
+
+  /**
+   * Custom shadow depth material to use for shadow rendering instead of the in-built one
+   */
+  ShadowDepthWrapperPtr shadowDepthWrapper;
 
   /**
    * The ID of the material
@@ -802,6 +804,11 @@ public:
    * Specifies if depth writing should be disabled
    */
   bool disableDepthWrite;
+
+  /**
+   * Specifies if color writing should be disabled
+   */
+  bool disableColorWrite;
 
   /**
    * Specifies if depth writing should be forced
@@ -961,6 +968,11 @@ private:
    * Specifies if the depth write state should be cached
    */
   bool _cachedDepthWriteState;
+
+  /**
+   * Specifies if the color write state should be cached
+   */
+  bool _cachedColorWriteState;
 
   /**
    * Specifies if the depth function state should be cached
