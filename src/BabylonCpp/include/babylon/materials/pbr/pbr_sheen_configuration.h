@@ -149,6 +149,10 @@ protected:
   void set_linkSheenWithAlbedo(bool value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);
+  std::optional<float>& get_roughness();
+  void set_roughness(const std::optional<float>& value);
+  bool get_albedoScaling() const;
+  void set_albedoScaling(bool value);
 
 public:
   /**
@@ -178,10 +182,26 @@ public:
    */
   Property<PBRSheenConfiguration, BaseTexturePtr> texture;
 
+  /**
+   * Defines the sheen roughness.
+   * It is not taken into account if linkSheenWithAlbedo is true.
+   * To stay backward compatible, material roughness is used instead if sheen roughness = null
+   */
+  Property<PBRSheenConfiguration, std::optional<float>> roughness;
+
+  /**
+   * If true, the sheen effect is layered above the base BRDF with the albedo-scaling technique.
+   * It allows the strength of the sheen effect to not depend on the base color of the material,
+   * making it easier to setup and tweak the effect
+   */
+  Property<PBRSheenConfiguration, bool> albedoScaling;
+
 private:
   bool _isEnabled;
   bool _linkSheenWithAlbedo;
   BaseTexturePtr _texture;
+  std::optional<float> _roughness;
+  bool _albedoScaling;
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;
 
 }; // end of class PBRSheenConfiguration
