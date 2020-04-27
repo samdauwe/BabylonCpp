@@ -11,6 +11,8 @@ IMaterialSheenDefines::IMaterialSheenDefines()
     {"SHEEN_TEXTURE", false},         //
     {"SHEEN_TEXTUREDIRECTUV", false}, //
     {"SHEEN_LINKWITHALBEDO", false},  //
+    {"SHEEN_ROUGHNESS", false},       //
+    {"SHEEN_ALBEDOSCALING", false},   //
   };
 }
 
