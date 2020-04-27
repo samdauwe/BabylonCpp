@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/loaders/ktx_texture_loader.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/misc/khronos_texture_container.h>
@@ -83,6 +84,7 @@ void _KTXTextureLoader::loadData(
       ktx.isInvalid);
   }
   else {
+    BABYLON_LOG_ERROR("_KTXTextureLoader", "texture missing KTX identifier")
     callback(
       0, 0, false, false, []() -> void {}, true);
   }
