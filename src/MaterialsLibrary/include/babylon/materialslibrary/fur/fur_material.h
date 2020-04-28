@@ -106,7 +106,6 @@ private:
   BaseTexturePtr _heightTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  int _renderId;
   float _furTime;
   FurMaterialDefines _defines;
 
