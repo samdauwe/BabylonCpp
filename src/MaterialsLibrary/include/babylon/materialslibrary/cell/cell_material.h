@@ -75,7 +75,6 @@ private:
   unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;
   Color3 _scaledDiffuse;
-  int _renderId;
 
 }; // end of class CellMaterial
 
