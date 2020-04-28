@@ -78,7 +78,6 @@ private:
   BaseTexturePtr _distortionTexture;
   BaseTexturePtr _opacityTexture;
   Color3 _scaledDiffuse;
-  int _renderId;
   FireMaterialDefines _defines;
   float _lastTime;
 
