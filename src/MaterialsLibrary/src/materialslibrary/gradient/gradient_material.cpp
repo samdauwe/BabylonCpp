@@ -34,7 +34,6 @@ GradientMaterial::GradientMaterial(const std::string& iName, Scene* scene)
                       &GradientMaterial::set_disableLighting}
     , _maxSimultaneousLights{4}
     , _disableLighting{false}
-    , _renderId{-1}
 {
   // Vertex shader
   Effect::ShadersStore()["gradientVertexShader"] = gradientVertexShader;
@@ -103,10 +102,8 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
   auto& defines   = *definesPtr.get();
   auto scene      = getScene();
 
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (_renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -196,7 +193,7 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     return false;
   }
 
-  _renderId                              = scene->getRenderId();
+  defines._renderId                      = scene->getRenderId();
   subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;

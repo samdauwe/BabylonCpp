@@ -79,7 +79,6 @@ public:
 private:
   unsigned int _maxSimultaneousLights;
   bool _disableLighting;
-  int _renderId;
 
 }; // end of class GradientMaterial
 
