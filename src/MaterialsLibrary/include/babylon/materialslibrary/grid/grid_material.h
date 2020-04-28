@@ -115,7 +115,6 @@ public:
 private:
   BaseTexturePtr _opacityTexture;
   Vector4 _gridControl;
-  int _renderId;
 
 }; // end of class GridMaterial
 

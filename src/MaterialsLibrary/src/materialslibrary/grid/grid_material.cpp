@@ -33,7 +33,6 @@ GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
     , opacityTexture{this, &GridMaterial::get_opacityTexture, &GridMaterial::set_opacityTexture}
     , _opacityTexture{nullptr}
     , _gridControl{Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility, opacity)}
-    , _renderId{-1}
 {
   // Vertex shader
   Effect::ShadersStore()["gridVertexShader"] = gridVertexShader;
@@ -83,10 +82,8 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
   auto& defines   = *definesPtr.get();
   auto scene      = getScene();
 
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (_renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -170,7 +167,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     return false;
   }
 
-  _renderId                              = scene->getRenderId();
+  defines._renderId                      = scene->getRenderId();
   subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
