@@ -68,7 +68,6 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _reflectionTransform{Matrix::Zero()}
     , _lastTime{0.f}
     , _lastDeltaTime{0.f}
-    , _renderId{-1}
     , _isVisible{false}
     , _clipPlane{std::nullopt}
     , _savedViewMatrix{Matrix::Zero()}
@@ -279,10 +278,8 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, 
   auto& defines   = *definesPtr.get();
   auto scene      = getScene();
 
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (_renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -438,7 +435,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, 
     return false;
   }
 
-  _renderId                              = scene->getRenderId();
+  defines._renderId                      = scene->getRenderId();
   subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;

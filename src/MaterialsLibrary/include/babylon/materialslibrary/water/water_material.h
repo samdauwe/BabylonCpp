@@ -202,7 +202,6 @@ private:
   Matrix _reflectionTransform;
   float _lastTime;
   float _lastDeltaTime;
-  int _renderId;
   // Needed for callbacks
   bool _isVisible;
   std::optional<Plane> _clipPlane;
