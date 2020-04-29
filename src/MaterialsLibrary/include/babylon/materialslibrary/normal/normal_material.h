@@ -71,7 +71,6 @@ private:
   BaseTexturePtr _diffuseTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  int _renderId;
 
 }; // end of class NormalMaterial
 
