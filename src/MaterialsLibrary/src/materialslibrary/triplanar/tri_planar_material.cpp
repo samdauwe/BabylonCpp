@@ -54,7 +54,6 @@ TriPlanarMaterial::TriPlanarMaterial(const std::string& iName, Scene* scene)
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
     , _worldViewProjectionMatrix{Matrix::Zero()}
-    , _renderId{-1}
 {
   // Vertex shader
   Effect::ShadersStore()["triPlanarVertexShader"] = triPlanarVertexShader;
@@ -214,12 +213,9 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMe
   auto& defines   = *definesPtr.get();
   auto scene      = getScene();
 
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (_renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
-
   auto engine = scene->getEngine();
 
   // Textures
@@ -339,7 +335,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMe
     return false;
   }
 
-  _renderId                              = scene->getRenderId();
+  defines._renderId                      = scene->getRenderId();
   subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;

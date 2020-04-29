@@ -103,7 +103,6 @@ private:
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;
-  int _renderId;
 
 }; // end of class TriPlanarMaterial
 
