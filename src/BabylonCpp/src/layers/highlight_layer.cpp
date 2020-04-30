@@ -312,6 +312,11 @@ bool HighlightLayer::_shouldRenderMesh(AbstractMesh* mesh) const
   return true;
 }
 
+void HighlightLayer::_addCustomEffectDefines(std::vector<std::string>& defines)
+{
+  defines.emplace_back("#define HIGHLIGHT");
+}
+
 void HighlightLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* /*subMesh*/,
                                                  const MaterialPtr& material)
 {

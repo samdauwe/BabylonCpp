@@ -208,6 +208,12 @@ protected:
   bool _shouldRenderMesh(AbstractMesh* mesh) const override;
 
   /**
+   * @brief Adds specific effects defines.
+   * @param defines The defines to add specifics to.
+   */
+  void _addCustomEffectDefines(std::vector<std::string>& defines) override;
+
+  /**
    * @brief Sets the required values for both the emissive texture and and the
    * main color.
    */
