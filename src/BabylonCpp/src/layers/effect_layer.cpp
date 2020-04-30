@@ -467,17 +467,23 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     return;
   }
 
-  auto material = subMesh->getMaterial();
-  auto mesh     = subMesh->getRenderingMesh();
-  auto scene    = _scene;
-  auto engine   = scene->getEngine();
+  auto material  = subMesh->getMaterial();
+  auto ownerMesh = subMesh->getMesh();
+  auto replacementMesh
+    = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
+  auto renderingMesh = subMesh->getRenderingMesh();
+  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+  auto scene         = _scene;
+  auto engine        = scene->getEngine();
+
+  effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
   if (!material) {
     return;
   }
 
   // Do not block in blend mode.
-  if (!_canRenderMesh(mesh, material)) {
+  if (!_canRenderMesh(renderingMesh, material)) {
     return;
   }
 
@@ -485,13 +491,13 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
   engine->setState(material->backFaceCulling());
 
   // Managing instances
-  auto batch = mesh->_getInstancesRenderList(subMesh->_id);
+  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
   if (!batch || batch->mustReturn) {
     return;
   }
 
   // Early Exit per mesh
-  if (!_shouldRenderMesh(mesh.get())) {
+  if (!_shouldRenderMesh(renderingMesh.get())) {
     return;
   }
 
@@ -499,16 +505,17 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
                                     && (stl_util::contains(batch->visibleInstances, subMesh->_id))
                                     && (!batch->visibleInstances[subMesh->_id].empty());
 
-  _setEmissiveTextureAndColor(mesh, subMesh, material);
+  _setEmissiveTextureAndColor(renderingMesh, subMesh, material);
 
-  onBeforeRenderMeshToEffect.notifyObservers(mesh.get());
+  onBeforeRenderMeshToEffect.notifyObservers(ownerMesh.get());
 
-  if (_useMeshMaterial(mesh)) {
-    mesh->render(subMesh, hardwareInstancedRendering);
+  if (_useMeshMaterial(renderingMesh)) {
+    renderingMesh->render(subMesh, hardwareInstancedRendering,
+                          replacementMesh ? replacementMesh : nullptr);
   }
   else if (_isReady(subMesh, hardwareInstancedRendering, _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
-    mesh->_bind(subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode);
+    renderingMesh->_bind(subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode);
 
     _effectLayerMapGenerationEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
@@ -555,11 +562,12 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
-      auto& skeleton = mesh->skeleton();
+    if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+        && renderingMesh->skeleton()) {
+      auto& skeleton = renderingMesh->skeleton();
 
       if (skeleton->isUsingTextureForMatrices()) {
-        auto boneTexture = skeleton->getTransformMatrixTexture(mesh.get());
+        auto boneTexture = skeleton->getTransformMatrixTexture(renderingMesh.get());
         if (!boneTexture) {
           return;
         }
@@ -569,13 +577,13 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
           "boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
       }
       else {
-        _effectLayerMapGenerationEffect->setMatrices("mBones",
-                                                     skeleton->getTransformMatrices((mesh.get())));
+        _effectLayerMapGenerationEffect->setMatrices(
+          "mBones", skeleton->getTransformMatrices((renderingMesh.get())));
       }
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(mesh.get(), _effectLayerMapGenerationEffect);
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effectLayerMapGenerationEffect);
 
     // Alpha mode
     if (enableAlphaMode) {
@@ -583,9 +591,9 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     }
 
     // Draw
-    mesh->_processRendering(
-      nullptr, subMesh, _effectLayerMapGenerationEffect, static_cast<int>(material->fillMode()),
-      batch, hardwareInstancedRendering,
+    renderingMesh->_processRendering(
+      effectiveMesh, subMesh, _effectLayerMapGenerationEffect,
+      static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
         _effectLayerMapGenerationEffect->setMatrix("world", world);
       });
@@ -595,7 +603,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     _mainTexture->resetRefreshCounter();
   }
 
-  onAfterRenderMeshToEffect.notifyObservers(mesh.get());
+  onAfterRenderMeshToEffect.notifyObservers(ownerMesh.get());
 }
 
 bool EffectLayer::_useMeshMaterial(const AbstractMeshPtr& /*mesh*/) const
