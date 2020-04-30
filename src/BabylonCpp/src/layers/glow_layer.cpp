@@ -373,7 +373,7 @@ void GlowLayer::referenceMeshToUseItsOwnMaterial(const AbstractMeshPtr& mesh)
 void GlowLayer::unReferenceMeshFromUsingItsOwnMaterial(const AbstractMeshPtr& mesh)
 {
   auto index = stl_util::index_of(_meshesUsingTheirOwnMaterials, mesh->uniqueId);
-  while (index > 0) {
+  while (index >= 0) {
     stl_util::slice_in_place(_meshesUsingTheirOwnMaterials, index, index + 1);
     index = stl_util::index_of(_meshesUsingTheirOwnMaterials, mesh->uniqueId);
   }
