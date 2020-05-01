@@ -54,7 +54,6 @@ public:
   Property<ShadowOnlyMaterial, IShadowLightPtr> activeLight;
 
 private:
-  int _renderId;
   IShadowLightPtr _activeLight;
 
 }; // end of class ShadowOnlyMaterial
