@@ -101,7 +101,6 @@ private:
   TexturePtr _bumpTexture3;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  int _renderId;
 
 }; // end of class TerrainMaterial
 

@@ -49,7 +49,6 @@ TerrainMaterial::TerrainMaterial(const std::string& iName, Scene* scene)
     , _bumpTexture3{nullptr}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
-    , _renderId{-1}
 {
   // Vertex shader
   Effect::ShadersStore()["terrainVertexShader"] = terrainVertexShader;
@@ -208,10 +207,8 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
   auto& defines   = *definesPtr.get();
   auto scene      = getScene();
 
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (_renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -344,7 +341,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
     return false;
   }
 
-  _renderId                              = scene->getRenderId();
+  defines._renderId                      = scene->getRenderId();
   subMesh->effect()->_wasPreviouslyReady = true;
 
   return true;
