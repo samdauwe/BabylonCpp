@@ -190,7 +190,6 @@ public:
 
 private:
   Vector3 _cameraPosition;
-  int _renderId;
 
 }; // end of class SkyMaterial
 
