@@ -70,7 +70,6 @@ private:
   TexturePtr _diffuseTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  int _renderId;
 
 }; // end of class SimpleMaterial
 
