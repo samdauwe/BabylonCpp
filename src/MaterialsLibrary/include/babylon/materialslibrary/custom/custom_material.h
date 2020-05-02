@@ -33,9 +33,11 @@ public:
   std::vector<std::string> ReviewUniform(const std::string& name, std::vector<std::string> arr);
   std::string Builder(const std::string& shaderName, const std::vector<std::string>& uniforms,
                       const std::vector<std::string>& uniformBuffers,
-                      const std::vector<std::string>& samplers, StandardMaterialDefines& defines);
+                      const std::vector<std::string>& samplers, StandardMaterialDefines& defines,
+                      std::vector<std::string> attributes = {});
   CustomMaterial& AddUniform(const std::string& name, const std::string& kind,
-                             const std::optional<UniformInstance>& param);
+                             const std::optional<std::variant<UniformInstance, TexturePtr>>& param);
+  CustomMaterial& AddAttribute(const std::string& name);
   CustomMaterial& Fragment_Begin(const std::string& shaderPart);
   CustomMaterial& Fragment_Definitions(const std::string& shaderPart);
   CustomMaterial& Fragment_MainBegin(const std::string& shaderPart);
@@ -49,6 +51,7 @@ public:
   CustomMaterial& Vertex_MainBegin(const std::string& shaderPart);
   CustomMaterial& Vertex_Before_PositionUpdated(const std::string& shaderPart);
   CustomMaterial& Vertex_Before_NormalUpdated(const std::string& shaderPart);
+  CustomMaterial& Vertex_After_WorldPosComputed(const std::string& shaderPart);
   CustomMaterial& Vertex_MainEnd(const std::string& shaderPart);
 
 private:
@@ -63,6 +66,7 @@ public:
   std::vector<std::string> _newUniforms;
   std::unordered_map<std::string, UniformInstance> _newUniformInstances;
   std::unordered_map<std::string, TexturePtr> _newSamplerInstances;
+  std::vector<std::string> _customAttributes;
 
   std::string FragmentShader;
   std::string VertexShader;

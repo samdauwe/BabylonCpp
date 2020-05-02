@@ -39,6 +39,9 @@ struct BABYLON_SHARED_EXPORT ShaderSpecialParts {
   // normalUpdated
   std::string Vertex_Before_NormalUpdated;
 
+  // worldPosComputed
+  std::string Vertex_After_WorldPosComputed;
+
   // mainEnd
   std::string Vertex_MainEnd;
 
