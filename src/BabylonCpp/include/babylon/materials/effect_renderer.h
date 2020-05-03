@@ -25,6 +25,7 @@ using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Helper class to render one or more effects.
+ * You can access the previous rendering in your shader by declaring a sampler named textureSampler
  */
 class BABYLON_SHARED_EXPORT EffectRenderer {
 
@@ -74,8 +75,8 @@ public:
 
   /**
    * @brief Renders one or more effects to a specified texture.
-   * @param effectWrappers list of effects to renderer
-   * @param outputTexture texture to draw to, if null it will render to the screen
+   * @param effectWrapper the effect to renderer
+   * @param outputTexture texture to draw to, if null it will render to the screen.
    */
   void render(const std::vector<EffectWrapperPtr>& effectWrappers,
               const TexturePtr& outputTexture = nullptr);
@@ -85,9 +86,6 @@ public:
    */
   void dispose();
 
-private:
-  TexturePtr _getNextFrameBuffer(bool incrementIndex = true);
-
 public:
   ThinEngine* engine;
 
@@ -95,8 +93,6 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
 
-  size_t _ringBufferIndex;
-  std::vector<TexturePtr> _ringScreenBuffer;
   std::unique_ptr<Viewport> _fullscreenViewport;
 
 }; // end of class EffectRenderer

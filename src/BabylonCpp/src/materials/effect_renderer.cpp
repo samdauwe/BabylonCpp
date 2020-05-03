@@ -15,38 +15,8 @@ namespace BABYLON {
 
 IEffectRendererOptions EffectRenderer::_DefaultOptions = IEffectRendererOptions{
   {1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f}, // positions
-  {0, 1, 2, 0, 2, 3}                            // indices
+  {0, 1, 2, 0, 2, 3},                           // indices
 };
-
-TexturePtr EffectRenderer::_getNextFrameBuffer(bool incrementIndex)
-{
-  if (_ringScreenBuffer.empty()) {
-    _ringScreenBuffer = {};
-    for (auto i = 0; i < 2; ++i) {
-      auto internalTexture = engine->createRenderTargetTexture(
-        RenderTargetSize{
-          engine->getRenderWidth(true),  // width
-          engine->getRenderHeight(true), // height
-        },
-        IRenderTargetOptions{
-          false,                              // generateMipMaps
-          false,                              // generateDepthBuffer
-          false,                              // generateStencilBuffer
-          std::nullopt,                       // type
-          std::nullopt,                       // format
-          Constants::TEXTURE_NEAREST_NEAREST, // samplingMode
-        });
-      auto texture      = Texture::New("", nullptr);
-      texture->_texture = internalTexture;
-      _ringScreenBuffer.emplace_back(texture);
-    }
-  }
-  auto ret = _ringScreenBuffer[_ringBufferIndex];
-  if (incrementIndex) {
-    _ringBufferIndex = (_ringBufferIndex + 1) % 2;
-  }
-  return ret;
-}
 
 EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions& options)
     : engine{iEngine}, _fullscreenViewport{std::make_unique<Viewport>(0.f, 0.f, 1.f, 1.f)}
@@ -57,10 +27,6 @@ EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions
                                     VertexBuffer::PositionKind, false, false, 2)},
   };
   _indexBuffer = engine->createIndexBuffer(options.indices);
-
-  // No need here for full screen render.
-  iEngine->depthCullingState()->depthTest = false;
-  iEngine->stencilState()->stencilTest    = false;
 }
 
 EffectRenderer::~EffectRenderer() = default;
@@ -82,6 +48,8 @@ void EffectRenderer::bindBuffers(const EffectPtr& effect)
 
 void EffectRenderer::applyEffectWrapper(const EffectWrapperPtr& effectWrapper)
 {
+  engine->depthCullingState()->depthTest = false;
+  engine->stencilState()->stencilTest    = false;
   engine->enableEffect(effectWrapper->effect);
   bindBuffers(effectWrapper->effect);
   effectWrapper->onApplyObservable.notifyObservers(nullptr);
@@ -105,7 +73,7 @@ void EffectRenderer::render(const std::vector<EffectWrapperPtr>& effectWrappers,
   for (auto i = 0ull; i < effectWrappers.size(); ++i) {
     const auto& effectWrapper = effectWrappers[i];
     auto renderTo             = outputTexture;
-
+#if 0
     // for any next effect make it's input the output of the previous effect
     if (i != 0) {
       effectWrapper->effect->onBindObservable().addOnce(
@@ -121,7 +89,7 @@ void EffectRenderer::render(const std::vector<EffectWrapperPtr>& effectWrappers,
     else {
       renderTo = outputTexture;
     }
-
+#endif
     // Reset state
     setViewport();
     applyEffectWrapper(effectWrapper);
@@ -140,13 +108,6 @@ void EffectRenderer::render(const std::vector<EffectWrapperPtr>& effectWrappers,
 
 void EffectRenderer::dispose()
 {
-  if (!_ringScreenBuffer.empty()) {
-    for (const auto& b : _ringScreenBuffer) {
-      b->dispose();
-    }
-    _ringScreenBuffer.clear();
-  }
-
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
     auto vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (vertexBuffer) {
