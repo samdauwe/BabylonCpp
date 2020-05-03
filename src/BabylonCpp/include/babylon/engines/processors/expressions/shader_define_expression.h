@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <babylon/babylon_api.h>
 
@@ -11,13 +12,21 @@ namespace BABYLON {
 /**
  * @brief Hidden
  */
-struct BABYLON_SHARED_EXPORT ShaderDefineExpression {
+class BABYLON_SHARED_EXPORT ShaderDefineExpression {
+
+public:
   virtual ~ShaderDefineExpression() = default;
 
-  [[nodiscard]] virtual bool
-  isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const;
+  virtual bool isTrue(const std::unordered_map<std::string, std::string>& preprocessors) const;
 
-}; // end of struct ShaderDefineExpression
+  static std::string postfixToInfix(const std::vector<std::string>& postfix);
+  static std::vector<std::string> infixToPostfix(const std::string& infix);
+
+private:
+  static std::unordered_map<std::string, uint32_t> _OperatorPriority;
+  static std::vector<std::string> _Stack;
+
+}; // end of class ShaderDefineExpression
 
 } // end of namespace BABYLON
 
