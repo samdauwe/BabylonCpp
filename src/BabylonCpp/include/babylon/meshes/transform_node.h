@@ -445,7 +445,7 @@ public:
    * @param camera defines the camera to use
    * @returns a position
    */
-  Vector3 getPositionInCameraSpace(const CameraPtr& camera = nullptr) const;
+  Vector3 getPositionInCameraSpace(const CameraPtr& camera = nullptr);
 
   /**
    * @brief Returns the distance from the mesh to the active camera.

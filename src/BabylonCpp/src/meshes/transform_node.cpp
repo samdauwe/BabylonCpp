@@ -496,6 +496,8 @@ TransformNode& TransformNode::setAbsolutePosition(const std::optional<Vector3>& 
     position().y = absolutePositionY;
     position().z = absolutePositionZ;
   }
+
+  _absolutePosition.copyFrom(*iAbsolutePosition);
   return *this;
 }
 
@@ -1124,24 +1126,24 @@ TransformNode& TransformNode::unregisterAfterWorldMatrixUpdate(
   return *this;
 }
 
-Vector3 TransformNode::getPositionInCameraSpace(const CameraPtr& camera) const
+Vector3 TransformNode::getPositionInCameraSpace(const CameraPtr& camera)
 {
   if (!camera) {
-    return Vector3::TransformCoordinates(absolutePosition(),
+    return Vector3::TransformCoordinates(getAbsolutePosition(),
                                          getScene()->activeCamera()->getViewMatrix());
   }
   else {
-    return Vector3::TransformCoordinates(absolutePosition(), camera->getViewMatrix());
+    return Vector3::TransformCoordinates(getAbsolutePosition(), camera->getViewMatrix());
   }
 }
 
 float TransformNode::getDistanceToCamera(const CameraPtr& camera)
 {
   if (!camera) {
-    return absolutePosition().subtract(getScene()->activeCamera()->globalPosition()).length();
+    return getAbsolutePosition().subtract(getScene()->activeCamera()->globalPosition()).length();
   }
   else {
-    return absolutePosition().subtract(camera->globalPosition()).length();
+    return getAbsolutePosition().subtract(camera->globalPosition()).length();
   }
 }
 
