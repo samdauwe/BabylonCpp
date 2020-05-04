@@ -11,18 +11,13 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 6> Ray::TmpVector3{Vector3::Zero(), Vector3::Zero(),
-                                       Vector3::Zero(), Vector3::Zero(),
-                                       Vector3::Zero(), Vector3::Zero()};
+std::array<Vector3, 6> Ray::TmpVector3{Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+                                       Vector3::Zero(), Vector3::Zero(), Vector3::Zero()};
 
 const float Ray::smallnum = 0.00000001f;
 const float Ray::rayl     = 10e8f;
 
-Ray::Ray()
-    : origin{Vector3::Zero()}
-    , direction{Vector3::Zero()}
-    , length{0.f}
-    , _tmpRay{nullptr}
+Ray::Ray() : origin{Vector3::Zero()}, direction{Vector3::Zero()}, length{0.f}, _tmpRay{nullptr}
 {
 }
 
@@ -32,9 +27,7 @@ Ray::Ray(const Vector3& iOrigin, const Vector3& iDirection, float iLength)
 }
 
 Ray::Ray(const Ray& otherRay)
-    : origin{otherRay.origin}
-    , direction{otherRay.direction}
-    , length{otherRay.length}
+    : origin{otherRay.origin}, direction{otherRay.direction}, length{otherRay.length}
 {
 }
 
@@ -82,17 +75,17 @@ std::ostream& operator<<(std::ostream& os, const Ray& ray)
 bool Ray::intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
                               float intersectionTreshold) const
 {
-  const auto& newMinimum = Ray::TmpVector3[0].copyFromFloats(
-    minimum.x - intersectionTreshold, minimum.y - intersectionTreshold,
-    minimum.z - intersectionTreshold);
-  const auto& newMaximum = Ray::TmpVector3[1].copyFromFloats(
-    maximum.x + intersectionTreshold, maximum.y + intersectionTreshold,
-    maximum.z + intersectionTreshold);
-  auto d        = 0.f;
-  auto maxValue = std::numeric_limits<float>::max();
-  auto inv      = 0.f;
-  auto min      = 0.f;
-  auto max      = 0.f;
+  const auto& newMinimum = Ray::TmpVector3[0].copyFromFloats(minimum.x - intersectionTreshold,
+                                                             minimum.y - intersectionTreshold,
+                                                             minimum.z - intersectionTreshold);
+  const auto& newMaximum = Ray::TmpVector3[1].copyFromFloats(maximum.x + intersectionTreshold,
+                                                             maximum.y + intersectionTreshold,
+                                                             maximum.z + intersectionTreshold);
+  auto d                 = 0.f;
+  auto maxValue          = std::numeric_limits<float>::max();
+  auto inv               = 0.f;
+  auto min               = 0.f;
+  auto max               = 0.f;
   if (std::abs(direction.x) < 0.0000001f) {
     if (origin.x < newMinimum.x || origin.x > newMaximum.x) {
       return false;
@@ -172,14 +165,12 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
   return true;
 }
 
-bool Ray::intersectsBox(const BoundingBox& box,
-                        float intersectionTreshold) const
+bool Ray::intersectsBox(const BoundingBox& box, float intersectionTreshold) const
 {
   return intersectsBoxMinMax(box.minimum, box.maximum, intersectionTreshold);
 }
 
-bool Ray::intersectsSphere(const BoundingSphere& sphere,
-                           float intersectionTreshold) const
+bool Ray::intersectsSphere(const BoundingSphere& sphere, float intersectionTreshold) const
 {
   const auto x      = sphere.center.x - origin.x;
   const auto y      = sphere.center.y - origin.y;
@@ -202,9 +193,8 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere,
   return temp <= rr;
 }
 
-std::optional<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
-                                                        const Vector3& vertex1,
-                                                        const Vector3& vertex2)
+std::optional<IntersectionInfo>
+Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
 {
   auto& edge1 = Ray::TmpVector3[0];
   auto& edge2 = Ray::TmpVector3[1];
@@ -271,39 +261,35 @@ std::optional<float> Ray::intersectsPlane(const Plane& plane)
   }
 }
 
-std::optional<Vector3> Ray::intersectsAxis(const std::string& axis,
-                                           float offset)
+std::optional<Vector3> Ray::intersectsAxis(const std::string& axis, float offset)
 {
   if (axis == "y") {
     const auto t = (origin.y - offset) / direction.y;
     if (t > 0.f) {
       return std::nullopt;
     }
-    return Vector3(origin.x + (direction.x * -t), offset,
-                   origin.z + (direction.z * -t));
+    return Vector3(origin.x + (direction.x * -t), offset, origin.z + (direction.z * -t));
   }
   if (axis == "x") {
     const auto t = (origin.x - offset) / direction.x;
     if (t > 0.f) {
       return std::nullopt;
     }
-    return Vector3(offset, origin.y + (direction.y * -t),
-                   origin.z + (direction.z * -t));
+    return Vector3(offset, origin.y + (direction.y * -t), origin.z + (direction.z * -t));
   }
   if (axis == "z") {
     const auto t = (origin.z - offset) / direction.z;
     if (t > 0.f) {
       return std::nullopt;
     }
-    return Vector3(origin.x + (direction.x * -t), origin.y + (direction.y * -t),
-                   offset);
+    return Vector3(origin.x + (direction.x * -t), origin.y + (direction.y * -t), offset);
   }
   else {
     return std::nullopt;
   }
 }
 
-PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
+PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, const std::optional<bool>& fastCheck)
 {
   auto& tm = TmpVectors::MatrixArray[0];
 
@@ -319,17 +305,17 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
   return mesh->intersects(*_tmpRay, fastCheck);
 }
 
-std::vector<PickingInfo>
-Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck)
+std::vector<PickingInfo> Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes,
+                                               const std::optional<bool>& fastCheck)
 {
   std::vector<PickingInfo> results;
   results = intersectsMeshes(meshes, fastCheck, results);
   return results;
 }
 
-std::vector<PickingInfo>
-Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
-                      std::vector<PickingInfo>& results)
+std::vector<PickingInfo> Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes,
+                                               const std::optional<bool>& fastCheck,
+                                               std::vector<PickingInfo>& results)
 {
   for (auto& mesh : meshes) {
     auto pickInfo = intersectsMesh(mesh, fastCheck);
@@ -344,8 +330,7 @@ Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
   return results;
 }
 
-int Ray::_comparePickingInfo(const PickingInfo& pickingInfoA,
-                             const PickingInfo& pickingInfoB)
+int Ray::_comparePickingInfo(const PickingInfo& pickingInfoA, const PickingInfo& pickingInfoB)
 {
   if (pickingInfoA.distance < pickingInfoB.distance) {
     return -1;
@@ -358,8 +343,7 @@ int Ray::_comparePickingInfo(const PickingInfo& pickingInfoA,
   }
 }
 
-float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
-                               float threshold) const
+float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb, float threshold) const
 {
   const auto& o = origin;
   auto& u       = TmpVectors::Vector3Array[0];
@@ -448,8 +432,7 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
 
   const auto isIntersected
     = (tc > 0) && (tc <= length)
-      && (dP.lengthSquared()
-          < (threshold * threshold)); // return intersection result
+      && (dP.lengthSquared() < (threshold * threshold)); // return intersection result
 
   if (isIntersected) {
     return qsc.length();
@@ -457,11 +440,10 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
   return -1;
 }
 
-Ray& Ray::update(float x, float y, float viewportWidth, float viewportHeight,
-                 Matrix& world, Matrix& view, Matrix& projection)
+Ray& Ray::update(float x, float y, float viewportWidth, float viewportHeight, Matrix& world,
+                 Matrix& view, Matrix& projection)
 {
-  unprojectRayToRef(x, y, viewportWidth, viewportHeight, world, view,
-                    projection);
+  unprojectRayToRef(x, y, viewportWidth, viewportHeight, world, view, projection);
   return *this;
 }
 
@@ -470,22 +452,19 @@ Ray Ray::Zero()
   return Ray(Vector3::Zero(), Vector3::Zero());
 }
 
-Ray Ray::CreateNew(float x, float y, float viewportWidth, float viewportHeight,
-                   Matrix& world, Matrix& view, Matrix& projection)
+Ray Ray::CreateNew(float x, float y, float viewportWidth, float viewportHeight, Matrix& world,
+                   Matrix& view, Matrix& projection)
 {
   auto result = Ray::Zero();
 
-  return result.update(x, y, viewportWidth, viewportHeight, world, view,
-                       projection);
+  return result.update(x, y, viewportWidth, viewportHeight, world, view, projection);
 }
 
-Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end,
-                         const Matrix& world)
+Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end, const Matrix& world)
 {
-  auto direction = end.subtract(origin);
-  const auto length
-    = std::sqrt((direction.x * direction.x) + (direction.y * direction.y)
-                + (direction.z * direction.z));
+  auto direction    = end.subtract(origin);
+  const auto length = std::sqrt((direction.x * direction.x) + (direction.y * direction.y)
+                                + (direction.z * direction.z));
   direction.normalize();
 
   return Ray::Transform(Ray(origin, direction, length), world);
@@ -517,9 +496,8 @@ void Ray::TransformToRef(const Ray& ray, const Matrix& matrix, Ray& result)
   }
 }
 
-void Ray::unprojectRayToRef(float sourceX, float sourceY, float viewportWidth,
-                            float viewportHeight, Matrix& world,
-                            const Matrix& view, const Matrix& projection)
+void Ray::unprojectRayToRef(float sourceX, float sourceY, float viewportWidth, float viewportHeight,
+                            Matrix& world, const Matrix& view, const Matrix& projection)
 {
   auto& matrix = TmpVectors::MatrixArray[0];
   world.multiplyToRef(view, matrix);
@@ -529,12 +507,11 @@ void Ray::unprojectRayToRef(float sourceX, float sourceY, float viewportWidth,
   nearScreenSource.x     = sourceX / viewportWidth * 2.f - 1.f;
   nearScreenSource.y     = -(sourceY / viewportHeight * 2.f - 1.f);
   nearScreenSource.z     = -1.f;
-  auto& farScreenSource  = TmpVectors::Vector3Array[1].copyFromFloats(
-    nearScreenSource.x, nearScreenSource.y, 1.f);
+  auto& farScreenSource
+    = TmpVectors::Vector3Array[1].copyFromFloats(nearScreenSource.x, nearScreenSource.y, 1.f);
   auto& nearVec3 = TmpVectors::Vector3Array[2];
   auto& farVec3  = TmpVectors::Vector3Array[3];
-  Vector3::_UnprojectFromInvertedMatrixToRef(nearScreenSource, matrix,
-                                             nearVec3);
+  Vector3::_UnprojectFromInvertedMatrixToRef(nearScreenSource, matrix, nearVec3);
   Vector3::_UnprojectFromInvertedMatrixToRef(farScreenSource, matrix, farVec3);
 
   origin.copyFrom(nearVec3);

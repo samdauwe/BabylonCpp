@@ -98,12 +98,13 @@ public:
   std::optional<Vector3> intersectsAxis(const std::string& axis, float offset = 0.f);
 
   /**
-   * @brief Checks if ray intersects a mesh
+   * @brief Checks if ray intersects a mesh.
    * @param mesh the mesh to check
    * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @returns picking info of the intersecton
    */
-  PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
+  PickingInfo intersectsMesh(AbstractMesh* mesh,
+                             const std::optional<bool>& fastCheck = std::nullopt);
 
   /**
    * @brief Checks if ray intersects a mesh.
@@ -112,7 +113,7 @@ public:
    * @returns Array of picking infos
    */
   std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
-                                            bool fastCheck = false);
+                                            const std::optional<bool>& fastCheck = std::nullopt);
 
   /**
    * @brief Checks if ray intersects a mesh.
@@ -121,7 +122,8 @@ public:
    * @param results array to store result in
    * @returns Array of picking infos
    */
-  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
+  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
+                                            const std::optional<bool>& fastCheck,
                                             std::vector<PickingInfo>& results);
 
   /**
