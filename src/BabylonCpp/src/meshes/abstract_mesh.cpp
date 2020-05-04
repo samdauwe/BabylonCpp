@@ -1412,10 +1412,11 @@ bool AbstractMesh::_generatePointsArray()
   return false;
 }
 
-PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck,
+PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastCheck,
                                      const TrianglePickingPredicate& trianglePredicate,
                                      bool onlyBoundingInfo)
 {
+  const auto fastCheck = iFastCheck.value_or(true);
   PickingInfo pickingInfo;
 
   auto intersectionThreshold

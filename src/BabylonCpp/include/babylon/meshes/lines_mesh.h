@@ -55,7 +55,7 @@ public:
   void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
              bool alternate = false) override;
 
-  PickingInfo intersects(Ray& ray, bool fastCheck = true,
+  PickingInfo intersects(Ray& ray, const std::optional<bool>& fastCheck = std::nullopt,
                          const TrianglePickingPredicate& trianglePredicate = nullptr,
                          bool onlyBoundingInfo                             = false) override;
 

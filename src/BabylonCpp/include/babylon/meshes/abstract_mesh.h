@@ -696,7 +696,7 @@ public:
    * @returns the picking info
    * @see http://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
-  virtual PickingInfo intersects(Ray& ray, bool fastCheck = true,
+  virtual PickingInfo intersects(Ray& ray, const std::optional<bool>& fastCheck = std::nullopt,
                                  const TrianglePickingPredicate& trianglePredicate = nullptr,
                                  bool onlyBoundingInfo                             = false);
 
