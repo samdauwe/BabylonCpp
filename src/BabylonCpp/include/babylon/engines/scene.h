@@ -1815,7 +1815,9 @@ private:
   /** Picking **/
   std::optional<PickingInfo>
   _internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
-                const std::function<bool(const AbstractMeshPtr& mesh)>& predicate, bool fastCheck);
+                const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
+                const std::optional<bool>& fastCheck        = std::nullopt,
+                const std::optional<bool>& onlyBoundingInfo = std::nullopt);
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(AbstractMesh* mesh)>& predicate);

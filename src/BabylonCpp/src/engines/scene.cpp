@@ -4527,8 +4527,10 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, Came
 std::optional<PickingInfo>
 Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-                     bool fastCheck)
+                     const std::optional<bool>& iFastCheck,
+                     const std::optional<bool>& /*onlyBoundingInfo*/)
 {
+  const auto fastCheck                   = iFastCheck.value_or(true);
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
   for (const auto& mesh : meshes) {
