@@ -35,56 +35,35 @@ std::array<std::array<float, 3>, 16> SimplexNoise::grad3lut{
    {{0.0f, 1.0f, -1.0f}},
    {{0.0f, -1.0f, -1.0f}}}};
 std::array<std::array<float, 4>, 32> SimplexNoise::grad4lut{
-  {{{0.0f, 1.0f, 1.0f, 1.0f}},
-   {{0.0f, 1.0f, 1.0f, -1.0f}},
-   {{0.0f, 1.0f, -1.0f, 1.0f}},
+  {{{0.0f, 1.0f, 1.0f, 1.0f}},    {{0.0f, 1.0f, 1.0f, -1.0f}},   {{0.0f, 1.0f, -1.0f, 1.0f}},
    {{0.0f, 1.0f, -1.0f, -1.0f}}, // 32 tesseract edges
-   {{0.0f, -1.0f, 1.0f, 1.0f}},
-   {{0.0f, -1.0f, 1.0f, -1.0f}},
-   {{0.0f, -1.0f, -1.0f, 1.0f}},
-   {{0.0f, -1.0f, -1.0f, -1.0f}},
-   {{1.0f, 0.0f, 1.0f, 1.0f}},
-   {{1.0f, 0.0f, 1.0f, -1.0f}},
-   {{1.0f, 0.0f, -1.0f, 1.0f}},
-   {{1.0f, 0.0f, -1.0f, -1.0f}},
-   {{-1.0f, 0.0f, 1.0f, 1.0f}},
-   {{-1.0f, 0.0f, 1.0f, -1.0f}},
-   {{-1.0f, 0.0f, -1.0f, 1.0f}},
-   {{-1.0f, 0.0f, -1.0f, -1.0f}},
-   {{1.0f, 1.0f, 0.0f, 1.0f}},
-   {{1.0f, 1.0f, 0.0f, -1.0f}},
-   {{1.0f, -1.0f, 0.0f, 1.0f}},
-   {{1.0f, -1.0f, 0.0f, -1.0f}},
-   {{-1.0f, 1.0f, 0.0f, 1.0f}},
-   {{-1.0f, 1.0f, 0.0f, -1.0f}},
-   {{-1.0f, -1.0f, 0.0f, 1.0f}},
-   {{-1.0f, -1.0f, 0.0f, -1.0f}},
-   {{1.0f, 1.0f, 1.0f, 0.0f}},
-   {{1.0f, 1.0f, -1.0f, 0.0f}},
-   {{1.0f, -1.0f, 1.0f, 0.0f}},
-   {{1.0f, -1.0f, -1.0f, 0.0f}},
-   {{-1.0f, 1.0f, 1.0f, 0.0f}},
-   {{-1.0f, 1.0f, -1.0f, 0.0f}},
-   {{-1.0f, -1.0f, 1.0f, 0.0f}},
+   {{0.0f, -1.0f, 1.0f, 1.0f}},   {{0.0f, -1.0f, 1.0f, -1.0f}},  {{0.0f, -1.0f, -1.0f, 1.0f}},
+   {{0.0f, -1.0f, -1.0f, -1.0f}}, {{1.0f, 0.0f, 1.0f, 1.0f}},    {{1.0f, 0.0f, 1.0f, -1.0f}},
+   {{1.0f, 0.0f, -1.0f, 1.0f}},   {{1.0f, 0.0f, -1.0f, -1.0f}},  {{-1.0f, 0.0f, 1.0f, 1.0f}},
+   {{-1.0f, 0.0f, 1.0f, -1.0f}},  {{-1.0f, 0.0f, -1.0f, 1.0f}},  {{-1.0f, 0.0f, -1.0f, -1.0f}},
+   {{1.0f, 1.0f, 0.0f, 1.0f}},    {{1.0f, 1.0f, 0.0f, -1.0f}},   {{1.0f, -1.0f, 0.0f, 1.0f}},
+   {{1.0f, -1.0f, 0.0f, -1.0f}},  {{-1.0f, 1.0f, 0.0f, 1.0f}},   {{-1.0f, 1.0f, 0.0f, -1.0f}},
+   {{-1.0f, -1.0f, 0.0f, 1.0f}},  {{-1.0f, -1.0f, 0.0f, -1.0f}}, {{1.0f, 1.0f, 1.0f, 0.0f}},
+   {{1.0f, 1.0f, -1.0f, 0.0f}},   {{1.0f, -1.0f, 1.0f, 0.0f}},   {{1.0f, -1.0f, -1.0f, 0.0f}},
+   {{-1.0f, 1.0f, 1.0f, 0.0f}},   {{-1.0f, 1.0f, -1.0f, 0.0f}},  {{-1.0f, -1.0f, 1.0f, 0.0f}},
    {{-1.0f, -1.0f, -1.0f, 0.0f}}}};
 
-std::array<std::array<float, 3>, 16> SimplexNoise::grad3u{
-  {{{1.0f, 0.0f, 1.0f}},
-   {{0.0f, 1.0f, 1.0f}}, // 12 cube edges
-   {{-1.0f, 0.0f, 1.0f}},
-   {{0.0f, -1.0f, 1.0f}},
-   {{1.0f, 0.0f, -1.0f}},
-   {{0.0f, 1.0f, -1.0f}},
-   {{-1.0f, 0.0f, -1.0f}},
-   {{0.0f, -1.0f, -1.0f}},
-   {{a, a, a}},
-   {{-a, a, -a}},
-   {{-a, -a, a}},
-   {{a, -a, -a}},
-   {{-a, a, a}},
-   {{a, -a, a}},
-   {{a, -a, -a}},
-   {{-a, a, -a}}}};
+std::array<std::array<float, 3>, 16> SimplexNoise::grad3u{{{{1.0f, 0.0f, 1.0f}},
+                                                           {{0.0f, 1.0f, 1.0f}}, // 12 cube edges
+                                                           {{-1.0f, 0.0f, 1.0f}},
+                                                           {{0.0f, -1.0f, 1.0f}},
+                                                           {{1.0f, 0.0f, -1.0f}},
+                                                           {{0.0f, 1.0f, -1.0f}},
+                                                           {{-1.0f, 0.0f, -1.0f}},
+                                                           {{0.0f, -1.0f, -1.0f}},
+                                                           {{a, a, a}},
+                                                           {{-a, a, -a}},
+                                                           {{-a, -a, a}},
+                                                           {{a, -a, -a}},
+                                                           {{-a, a, a}},
+                                                           {{a, -a, a}},
+                                                           {{a, -a, -a}},
+                                                           {{-a, a, -a}}}};
 std::array<std::array<float, 3>, 32> SimplexNoise::grad3v{
   {{{-a, a, a}},
    {{-a, -a, a}},
@@ -104,61 +83,48 @@ std::array<std::array<float, 3>, 32> SimplexNoise::grad3v{
    {{0.0f, -1.0f, -1.0f}}}};
 
 std::array<std::array<float, 4>, 64> SimplexNoise::sSimplexLut{
-  {{{0, 1, 2, 3}}, {{0, 1, 3, 2}}, {{0, 0, 0, 0}}, {{0, 2, 3, 1}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{1, 2, 3, 0}},
-   {{0, 2, 1, 3}}, {{0, 0, 0, 0}}, {{0, 3, 1, 2}}, {{0, 3, 2, 1}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{1, 3, 2, 0}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
-   {{1, 2, 0, 3}}, {{0, 0, 0, 0}}, {{1, 3, 0, 2}}, {{0, 0, 0, 0}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{2, 3, 0, 1}}, {{2, 3, 1, 0}},
-   {{1, 0, 2, 3}}, {{1, 0, 3, 2}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
-   {{0, 0, 0, 0}}, {{2, 0, 3, 1}}, {{0, 0, 0, 0}}, {{2, 1, 3, 0}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
-   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
-   {{2, 0, 1, 3}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
-   {{3, 0, 1, 2}}, {{3, 0, 2, 1}}, {{0, 0, 0, 0}}, {{3, 1, 2, 0}},
-   {{2, 1, 0, 3}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+  {{{0, 1, 2, 3}}, {{0, 1, 3, 2}}, {{0, 0, 0, 0}}, {{0, 2, 3, 1}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{0, 0, 0, 0}}, {{1, 2, 3, 0}}, {{0, 2, 1, 3}}, {{0, 0, 0, 0}}, {{0, 3, 1, 2}}, {{0, 3, 2, 1}},
+   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{1, 3, 2, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{1, 2, 0, 3}}, {{0, 0, 0, 0}}, {{1, 3, 0, 2}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{2, 3, 0, 1}}, {{2, 3, 1, 0}}, {{1, 0, 2, 3}}, {{1, 0, 3, 2}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{0, 0, 0, 0}}, {{2, 0, 3, 1}}, {{0, 0, 0, 0}}, {{2, 1, 3, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
+   {{2, 0, 1, 3}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{3, 0, 1, 2}}, {{3, 0, 2, 1}},
+   {{0, 0, 0, 0}}, {{3, 1, 2, 0}}, {{2, 1, 0, 3}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}}, {{0, 0, 0, 0}},
    {{3, 1, 0, 2}}, {{0, 0, 0, 0}}, {{3, 2, 0, 1}}, {{3, 2, 1, 0}}}};
 
 SimplexNoise::SimplexNoise()
 {
   perm = {
-    {151, 160, 137, 91,  90,  15,  131, 13,  201, 95,  96,  53,  194, 233, 7,
-     225, 140, 36,  103, 30,  69,  142, 8,   99,  37,  240, 21,  10,  23,  190,
-     6,   148, 247, 120, 234, 75,  0,   26,  197, 62,  94,  252, 219, 203, 117,
-     35,  11,  32,  57,  177, 33,  88,  237, 149, 56,  87,  174, 20,  125, 136,
-     171, 168, 68,  175, 74,  165, 71,  134, 139, 48,  27,  166, 77,  146, 158,
-     231, 83,  111, 229, 122, 60,  211, 133, 230, 220, 105, 92,  41,  55,  46,
-     245, 40,  244, 102, 143, 54,  65,  25,  63,  161, 1,   216, 80,  73,  209,
-     76,  132, 187, 208, 89,  18,  169, 200, 196, 135, 130, 116, 188, 159, 86,
-     164, 100, 109, 198, 173, 186, 3,   64,  52,  217, 226, 250, 124, 123, 5,
-     202, 38,  147, 118, 126, 255, 82,  85,  212, 207, 206, 59,  227, 47,  16,
-     58,  17,  182, 189, 28,  42,  223, 183, 170, 213, 119, 248, 152, 2,   44,
-     154, 163, 70,  221, 153, 101, 155, 167, 43,  172, 9,   129, 22,  39,  253,
-     19,  98,  108, 110, 79,  113, 224, 232, 178, 185, 112, 104, 218, 246, 97,
-     228, 251, 34,  242, 193, 238, 210, 144, 12,  191, 179, 162, 241, 81,  51,
-     145, 235, 249, 14,  239, 107, 49,  192, 214, 31,  181, 199, 106, 157, 184,
-     84,  204, 176, 115, 121, 50,  45,  127, 4,   150, 254, 138, 236, 205, 93,
-     222, 114, 67,  29,  24,  72,  243, 141, 128, 195, 78,  66,  215, 61,  156,
-     180, 151, 160, 137, 91,  90,  15,  131, 13,  201, 95,  96,  53,  194, 233,
-     7,   225, 140, 36,  103, 30,  69,  142, 8,   99,  37,  240, 21,  10,  23,
-     190, 6,   148, 247, 120, 234, 75,  0,   26,  197, 62,  94,  252, 219, 203,
-     117, 35,  11,  32,  57,  177, 33,  88,  237, 149, 56,  87,  174, 20,  125,
-     136, 171, 168, 68,  175, 74,  165, 71,  134, 139, 48,  27,  166, 77,  146,
-     158, 231, 83,  111, 229, 122, 60,  211, 133, 230, 220, 105, 92,  41,  55,
-     46,  245, 40,  244, 102, 143, 54,  65,  25,  63,  161, 1,   216, 80,  73,
-     209, 76,  132, 187, 208, 89,  18,  169, 200, 196, 135, 130, 116, 188, 159,
-     86,  164, 100, 109, 198, 173, 186, 3,   64,  52,  217, 226, 250, 124, 123,
-     5,   202, 38,  147, 118, 126, 255, 82,  85,  212, 207, 206, 59,  227, 47,
-     16,  58,  17,  182, 189, 28,  42,  223, 183, 170, 213, 119, 248, 152, 2,
-     44,  154, 163, 70,  221, 153, 101, 155, 167, 43,  172, 9,   129, 22,  39,
-     253, 19,  98,  108, 110, 79,  113, 224, 232, 178, 185, 112, 104, 218, 246,
-     97,  228, 251, 34,  242, 193, 238, 210, 144, 12,  191, 179, 162, 241, 81,
-     51,  145, 235, 249, 14,  239, 107, 49,  192, 214, 31,  181, 199, 106, 157,
-     184, 84,  204, 176, 115, 121, 50,  45,  127, 4,   150, 254, 138, 236, 205,
-     93,  222, 114, 67,  29,  24,  72,  243, 141, 128, 195, 78,  66,  215, 61,
-     156, 180}};
+    {151, 160, 137, 91,  90,  15,  131, 13,  201, 95,  96,  53,  194, 233, 7,   225, 140, 36,  103,
+     30,  69,  142, 8,   99,  37,  240, 21,  10,  23,  190, 6,   148, 247, 120, 234, 75,  0,   26,
+     197, 62,  94,  252, 219, 203, 117, 35,  11,  32,  57,  177, 33,  88,  237, 149, 56,  87,  174,
+     20,  125, 136, 171, 168, 68,  175, 74,  165, 71,  134, 139, 48,  27,  166, 77,  146, 158, 231,
+     83,  111, 229, 122, 60,  211, 133, 230, 220, 105, 92,  41,  55,  46,  245, 40,  244, 102, 143,
+     54,  65,  25,  63,  161, 1,   216, 80,  73,  209, 76,  132, 187, 208, 89,  18,  169, 200, 196,
+     135, 130, 116, 188, 159, 86,  164, 100, 109, 198, 173, 186, 3,   64,  52,  217, 226, 250, 124,
+     123, 5,   202, 38,  147, 118, 126, 255, 82,  85,  212, 207, 206, 59,  227, 47,  16,  58,  17,
+     182, 189, 28,  42,  223, 183, 170, 213, 119, 248, 152, 2,   44,  154, 163, 70,  221, 153, 101,
+     155, 167, 43,  172, 9,   129, 22,  39,  253, 19,  98,  108, 110, 79,  113, 224, 232, 178, 185,
+     112, 104, 218, 246, 97,  228, 251, 34,  242, 193, 238, 210, 144, 12,  191, 179, 162, 241, 81,
+     51,  145, 235, 249, 14,  239, 107, 49,  192, 214, 31,  181, 199, 106, 157, 184, 84,  204, 176,
+     115, 121, 50,  45,  127, 4,   150, 254, 138, 236, 205, 93,  222, 114, 67,  29,  24,  72,  243,
+     141, 128, 195, 78,  66,  215, 61,  156, 180, 151, 160, 137, 91,  90,  15,  131, 13,  201, 95,
+     96,  53,  194, 233, 7,   225, 140, 36,  103, 30,  69,  142, 8,   99,  37,  240, 21,  10,  23,
+     190, 6,   148, 247, 120, 234, 75,  0,   26,  197, 62,  94,  252, 219, 203, 117, 35,  11,  32,
+     57,  177, 33,  88,  237, 149, 56,  87,  174, 20,  125, 136, 171, 168, 68,  175, 74,  165, 71,
+     134, 139, 48,  27,  166, 77,  146, 158, 231, 83,  111, 229, 122, 60,  211, 133, 230, 220, 105,
+     92,  41,  55,  46,  245, 40,  244, 102, 143, 54,  65,  25,  63,  161, 1,   216, 80,  73,  209,
+     76,  132, 187, 208, 89,  18,  169, 200, 196, 135, 130, 116, 188, 159, 86,  164, 100, 109, 198,
+     173, 186, 3,   64,  52,  217, 226, 250, 124, 123, 5,   202, 38,  147, 118, 126, 255, 82,  85,
+     212, 207, 206, 59,  227, 47,  16,  58,  17,  182, 189, 28,  42,  223, 183, 170, 213, 119, 248,
+     152, 2,   44,  154, 163, 70,  221, 153, 101, 155, 167, 43,  172, 9,   129, 22,  39,  253, 19,
+     98,  108, 110, 79,  113, 224, 232, 178, 185, 112, 104, 218, 246, 97,  228, 251, 34,  242, 193,
+     238, 210, 144, 12,  191, 179, 162, 241, 81,  51,  145, 235, 249, 14,  239, 107, 49,  192, 214,
+     31,  181, 199, 106, 157, 184, 84,  204, 176, 115, 121, 50,  45,  127, 4,   150, 254, 138, 236,
+     205, 93,  222, 114, 67,  29,  24,  72,  243, 141, 128, 195, 78,  66,  215, 61,  156, 180}};
 }
 
 SimplexNoise::~SimplexNoise() = default;
@@ -226,8 +192,7 @@ float SimplexNoise::noise(const Vector2& v)
 
   float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
   float y1 = y0 - j1 + G2;
-  float x2
-    = x0 - 1.0f + 2.0f * G2; // Offsets for last corner in (x,y) unskewed coords
+  float x2 = x0 - 1.0f + 2.0f * G2; // Offsets for last corner in (x,y) unskewed coords
   float y2 = y0 - 1.0f + 2.0f * G2;
 
   // Wrap the integer indices at 256, to avoid indexing perm[] out of
@@ -383,8 +348,7 @@ float SimplexNoise::noise(const Vector3& v)
     n1 = 0.0f;
   else {
     t1 *= t1;
-    n1 = t1 * t1
-         * grad(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], x1, y1, z1);
+    n1 = t1 * t1 * grad(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], x1, y1, z1);
   }
 
   float t2 = 0.6f - x2 * x2 - y2 * y2 - z2 * z2;
@@ -392,8 +356,7 @@ float SimplexNoise::noise(const Vector3& v)
     n2 = 0.0f;
   else {
     t2 *= t2;
-    n2 = t2 * t2
-         * grad(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], x2, y2, z2);
+    n2 = t2 * t2 * grad(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], x2, y2, z2);
   }
 
   float t3 = 0.6f - x3 * x3 - y3 * y3 - z3 * z3;
@@ -425,7 +388,7 @@ float SimplexNoise::noise(const Vector4& v)
   int l    = fastfloor(ws);
 
   float t  = (i + j + k + l) * G4; // Factor for 4D unskewing
-  float X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
+  float X0 = i - t;                // Unskew the cell origin back to (x,y,z,w) space
   float Y0 = j - t;
   float Z0 = k - t;
   float W0 = l - t;
@@ -488,18 +451,15 @@ float SimplexNoise::noise(const Vector4& v)
   float y1 = y0 - j1 + G4;
   float z1 = z0 - k1 + G4;
   float w1 = w0 - l1 + G4;
-  float x2
-    = x0 - i2 + 2.0f * G4; // Offsets for third corner in (x,y,z,w) coords
+  float x2 = x0 - i2 + 2.0f * G4; // Offsets for third corner in (x,y,z,w) coords
   float y2 = y0 - j2 + 2.0f * G4;
   float z2 = z0 - k2 + 2.0f * G4;
   float w2 = w0 - l2 + 2.0f * G4;
-  float x3
-    = x0 - i3 + 3.0f * G4; // Offsets for fourth corner in (x,y,z,w) coords
+  float x3 = x0 - i3 + 3.0f * G4; // Offsets for fourth corner in (x,y,z,w) coords
   float y3 = y0 - j3 + 3.0f * G4;
   float z3 = z0 - k3 + 3.0f * G4;
   float w3 = w0 - l3 + 3.0f * G4;
-  float x4
-    = x0 - 1.0f + 4.0f * G4; // Offsets for last corner in (x,y,z,w) coords
+  float x4 = x0 - 1.0f + 4.0f * G4; // Offsets for last corner in (x,y,z,w) coords
   float y4 = y0 - 1.0f + 4.0f * G4;
   float z4 = z0 - 1.0f + 4.0f * G4;
   float w4 = w0 - 1.0f + 4.0f * G4;
@@ -517,8 +477,7 @@ float SimplexNoise::noise(const Vector4& v)
     n0 = 0.0f;
   else {
     t0 *= t0;
-    n0 = t0 * t0
-         * grad(perm[ii + perm[jj + perm[kk + perm[ll]]]], x0, y0, z0, w0);
+    n0 = t0 * t0 * grad(perm[ii + perm[jj + perm[kk + perm[ll]]]], x0, y0, z0, w0);
   }
 
   float t1 = 0.6f - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
@@ -527,8 +486,7 @@ float SimplexNoise::noise(const Vector4& v)
   else {
     t1 *= t1;
     n1 = t1 * t1
-         * grad(perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]],
-                x1, y1, z1, w1);
+         * grad(perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]], x1, y1, z1, w1);
   }
 
   float t2 = 0.6f - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
@@ -537,8 +495,7 @@ float SimplexNoise::noise(const Vector4& v)
   else {
     t2 *= t2;
     n2 = t2 * t2
-         * grad(perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]],
-                x2, y2, z2, w2);
+         * grad(perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]], x2, y2, z2, w2);
   }
 
   float t3 = 0.6f - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
@@ -547,8 +504,7 @@ float SimplexNoise::noise(const Vector4& v)
   else {
     t3 *= t3;
     n3 = t3 * t3
-         * grad(perm[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]],
-                x3, y3, z3, w3);
+         * grad(perm[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]], x3, y3, z3, w3);
   }
 
   float t4 = 0.6f - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
@@ -556,14 +512,11 @@ float SimplexNoise::noise(const Vector4& v)
     n4 = 0.0f;
   else {
     t4 *= t4;
-    n4 = t4 * t4
-         * grad(perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]], x4,
-                y4, z4, w4);
+    n4 = t4 * t4 * grad(perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]], x4, y4, z4, w4);
   }
 
   // Sum up and scale the result to cover the range [-1,1]
-  return 27.0f
-         * (n0 + n1 + n2 + n3 + n4); // TODO: The scale factor is preliminary!
+  return 27.0f * (n0 + n1 + n2 + n3 + n4); // TODO: The scale factor is preliminary!
 }
 
 // -----------------------------------------------------------------------------
@@ -670,8 +623,7 @@ Vector3 SimplexNoise::dnoise(const Vector2& v)
 
   float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
   float y1 = y0 - j1 + G2;
-  float x2
-    = x0 - 1.0f + 2.0f * G2; // Offsets for last corner in (x,y) unskewed coords
+  float x2 = x0 - 1.0f + 2.0f * G2; // Offsets for last corner in (x,y) unskewed coords
   float y2 = y0 - 1.0f + 2.0f * G2;
 
   // Wrap the integer indices at 256, to avoid indexing perm[] out of
@@ -760,14 +712,13 @@ Vector3 SimplexNoise::dnoise(const Vector2& v)
 
 Vector4 SimplexNoise::dnoise(const Vector3& v)
 {
-  float n0, n1, n2, n3; /* Noise contributions from the four simplex corners */
-  float noise;          /* Return value */
+  float n0, n1, n2, n3;               /* Noise contributions from the four simplex corners */
+  float noise;                        /* Return value */
   float gx0, gy0, gz0, gx1, gy1, gz1; /* Gradients at simplex corners */
   float gx2, gy2, gz2, gx3, gy3, gz3;
 
   /* Skew the input space to determine which simplex cell we're in */
-  float s
-    = (v.x + v.y + v.z) * F3; /* Very nice and simple skew factor for 3D */
+  float s  = (v.x + v.y + v.z) * F3; /* Very nice and simple skew factor for 3D */
   float xs = v.x + s;
   float ys = v.y + s;
   float zs = v.z + s;
@@ -785,10 +736,8 @@ Vector4 SimplexNoise::dnoise(const Vector3& v)
 
   /* For the 3D case, the simplex shape is a slightly irregular tetrahedron.
    * Determine which simplex we are in. */
-  unsigned int i1, j1,
-    k1; /* Offsets for second corner of simplex in (i,j,k) coords */
-  unsigned int i2, j2,
-    k2; /* Offsets for third corner of simplex in (i,j,k) coords */
+  unsigned int i1, j1, k1; /* Offsets for second corner of simplex in (i,j,k) coords */
+  unsigned int i2, j2, k2; /* Offsets for third corner of simplex in (i,j,k) coords */
 
   /* TODO: This code would benefit from a backport from the GLSL version! */
   if (x0 >= y0) {
@@ -852,12 +801,10 @@ Vector4 SimplexNoise::dnoise(const Vector3& v)
   float x1 = x0 - i1 + G3; /* Offsets for second corner in (x,y,z) coords */
   float y1 = y0 - j1 + G3;
   float z1 = z0 - k1 + G3;
-  float x2
-    = x0 - i2 + 2.0f * G3; /* Offsets for third corner in (x,y,z) coords */
+  float x2 = x0 - i2 + 2.0f * G3; /* Offsets for third corner in (x,y,z) coords */
   float y2 = y0 - j2 + 2.0f * G3;
   float z2 = z0 - k2 + 2.0f * G3;
-  float x3
-    = x0 - 1.0f + 3.0f * G3; /* Offsets for last corner in (x,y,z) coords */
+  float x3 = x0 - 1.0f + 3.0f * G3; /* Offsets for last corner in (x,y,z) coords */
   float y3 = y0 - 1.0f + 3.0f * G3;
   float z3 = z0 - 1.0f + 3.0f * G3;
 
@@ -979,10 +926,9 @@ Vector4 SimplexNoise::dnoise(const Vector3& v)
 
 SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
 {
-  float n0, n1, n2, n3, n4; // Noise contributions from the five corners
-  float noise;              // Return value
-  float gx0, gy0, gz0, gw0, gx1, gy1, gz1,
-    gw1; /* Gradients at simplex corners */
+  float n0, n1, n2, n3, n4;                     // Noise contributions from the five corners
+  float noise;                                  // Return value
+  float gx0, gy0, gz0, gw0, gx1, gy1, gz1, gw1; /* Gradients at simplex corners */
   float gx2, gy2, gz2, gw2, gx3, gy3, gz3, gw3, gx4, gy4, gz4, gw4;
   float t20, t21, t22, t23, t24;
   float t40, t41, t42, t43, t44;
@@ -999,7 +945,7 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   int l    = fastfloor(ws);
 
   float t  = (i + j + k + l) * G4; // Factor for 4D unskewing
-  float X0 = i - t; // Unskew the cell origin back to (x,y,z,w) space
+  float X0 = i - t;                // Unskew the cell origin back to (x,y,z,w) space
   float Y0 = j - t;
   float Z0 = k - t;
   float W0 = l - t;
@@ -1023,7 +969,7 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   unsigned int c4 = (x0 > w0) ? 4 : 0;
   unsigned int c5 = (y0 > w0) ? 2 : 0;
   unsigned int c6 = (z0 > w0) ? 1 : 0;
-  unsigned int c = c1 | c2 | c3 | c4 | c5 | c6; // '|' is mostly faster than '+'
+  unsigned int c  = c1 | c2 | c3 | c4 | c5 | c6; // '|' is mostly faster than '+'
 
   unsigned int i1, j1, k1,
     l1; // The integer offsets for the second simplex corner
@@ -1059,18 +1005,15 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   float y1 = y0 - j1 + G4;
   float z1 = z0 - k1 + G4;
   float w1 = w0 - l1 + G4;
-  float x2
-    = x0 - i2 + 2.0f * G4; // Offsets for third corner in (x,y,z,w) coords
+  float x2 = x0 - i2 + 2.0f * G4; // Offsets for third corner in (x,y,z,w) coords
   float y2 = y0 - j2 + 2.0f * G4;
   float z2 = z0 - k2 + 2.0f * G4;
   float w2 = w0 - l2 + 2.0f * G4;
-  float x3
-    = x0 - i3 + 3.0f * G4; // Offsets for fourth corner in (x,y,z,w) coords
+  float x3 = x0 - i3 + 3.0f * G4; // Offsets for fourth corner in (x,y,z,w) coords
   float y3 = y0 - j3 + 3.0f * G4;
   float z3 = z0 - k3 + 3.0f * G4;
   float w3 = w0 - l3 + 3.0f * G4;
-  float x4
-    = x0 - 1.0f + 4.0f * G4; // Offsets for last corner in (x,y,z,w) coords
+  float x4 = x0 - 1.0f + 4.0f * G4; // Offsets for last corner in (x,y,z,w) coords
   float y4 = y0 - 1.0f + 4.0f * G4;
   float z4 = z0 - 1.0f + 4.0f * G4;
   float w4 = w0 - 1.0f + 4.0f * G4;
@@ -1098,8 +1041,7 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   else {
     t21 = t1 * t1;
     t41 = t21 * t21;
-    grad4(perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]], &gx1,
-          &gy1, &gz1, &gw1);
+    grad4(perm[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]], &gx1, &gy1, &gz1, &gw1);
     n1 = t41 * (gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1);
   }
 
@@ -1109,8 +1051,7 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   else {
     t22 = t2 * t2;
     t42 = t22 * t22;
-    grad4(perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]], &gx2,
-          &gy2, &gz2, &gw2);
+    grad4(perm[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]], &gx2, &gy2, &gz2, &gw2);
     n2 = t42 * (gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2);
   }
 
@@ -1120,8 +1061,7 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   else {
     t23 = t3 * t3;
     t43 = t23 * t23;
-    grad4(perm[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]], &gx3,
-          &gy3, &gz3, &gw3);
+    grad4(perm[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]], &gx3, &gy3, &gz3, &gw3);
     n3 = t43 * (gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3);
   }
 
@@ -1131,14 +1071,12 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
   else {
     t24 = t4 * t4;
     t44 = t24 * t24;
-    grad4(perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]], &gx4, &gy4,
-          &gz4, &gw4);
+    grad4(perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]], &gx4, &gy4, &gz4, &gw4);
     n4 = t44 * (gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4);
   }
 
   // Sum up and scale the result to cover the range [-1,1]
-  noise = 27.0f
-          * (n0 + n1 + n2 + n3 + n4); // TODO: The scale factor is preliminary!
+  noise = 27.0f * (n0 + n1 + n2 + n3 + n4); // TODO: The scale factor is preliminary!
 
   /* Compute derivative, if requested by supplying non-null pointers
    * for the last four arguments */
@@ -1230,9 +1168,9 @@ SimplexNoise::vec5 SimplexNoise::dnoise(const Vector4& v)
 
 float SimplexNoise::flowNoise(const Vector2& v, float angle)
 {
-  float n0, n1, n2; /* Noise contributions from the three simplex corners */
+  float n0, n1, n2;                   /* Noise contributions from the three simplex corners */
   float gx0, gy0, gx1, gy1, gx2, gy2; /* Gradients at simplex corners */
-  float sin_t, cos_t; /* Sine and cosine for the gradient rotation angle */
+  float sin_t, cos_t;                 /* Sine and cosine for the gradient rotation angle */
   sin_t = std::sin(angle);
   cos_t = std::cos(angle);
 
@@ -1251,8 +1189,7 @@ float SimplexNoise::flowNoise(const Vector2& v, float angle)
 
   /* For the 2D case, the simplex shape is an equilateral triangle.
    * Determine which simplex we are in. */
-  unsigned int i1,
-    j1; /* Offsets for second (middle) corner of simplex in (i,j) coords */
+  unsigned int i1, j1; /* Offsets for second (middle) corner of simplex in (i,j) coords */
   if (x0 > y0) {
     i1 = 1;
     j1 = 0;
@@ -1265,11 +1202,9 @@ float SimplexNoise::flowNoise(const Vector2& v, float angle)
   /* A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
    * a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
    * c = (3-sqrt(3))/6   */
-  float x1
-    = x0 - i1 + G2; /* Offsets for middle corner in (x,y) unskewed coords */
+  float x1 = x0 - i1 + G2; /* Offsets for middle corner in (x,y) unskewed coords */
   float y1 = y0 - j1 + G2;
-  float x2 = x0 - 1.0f
-             + 2.0f * G2; /* Offsets for last corner in (x,y) unskewed coords */
+  float x2 = x0 - 1.0f + 2.0f * G2; /* Offsets for last corner in (x,y) unskewed coords */
   float y2 = y0 - 1.0f + 2.0f * G2;
 
   /* Wrap the integer indices at 256, to avoid indexing perm[] out of
@@ -1317,7 +1252,7 @@ float SimplexNoise::flowNoise(const Vector2& v, float angle)
 }
 float SimplexNoise::flowNoise(const Vector3& v, float angle)
 {
-  float n0, n1, n2, n3; /* Noise contributions from the four simplex corners */
+  float n0, n1, n2, n3;               /* Noise contributions from the four simplex corners */
   float gx0, gy0, gz0, gx1, gy1, gz1; /* Gradients at simplex corners */
   float gx2, gy2, gz2, gx3, gy3, gz3;
   float sin_t, cos_t; /* Sine and cosine for the gradient rotation angle */
@@ -1325,8 +1260,7 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
   cos_t = std::cos(angle);
 
   /* Skew the input space to determine which simplex cell we're in */
-  float s
-    = (v.x + v.y + v.z) * F3; /* Very nice and simple skew factor for 3D */
+  float s  = (v.x + v.y + v.z) * F3; /* Very nice and simple skew factor for 3D */
   float xs = v.x + s;
   float ys = v.y + s;
   float zs = v.z + s;
@@ -1344,10 +1278,8 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
 
   /* For the 3D case, the simplex shape is a slightly irregular tetrahedron.
    * Determine which simplex we are in. */
-  unsigned int i1, j1,
-    k1; /* Offsets for second corner of simplex in (i,j,k) coords */
-  unsigned int i2, j2,
-    k2; /* Offsets for third corner of simplex in (i,j,k) coords */
+  unsigned int i1, j1, k1; /* Offsets for second corner of simplex in (i,j,k) coords */
+  unsigned int i2, j2, k2; /* Offsets for third corner of simplex in (i,j,k) coords */
 
   /* TODO: This code would benefit from a backport from the GLSL version! */
   if (x0 >= y0) {
@@ -1411,12 +1343,10 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
   float x1 = x0 - i1 + G3; /* Offsets for second corner in (x,y,z) coords */
   float y1 = y0 - j1 + G3;
   float z1 = z0 - k1 + G3;
-  float x2
-    = x0 - i2 + 2.0f * G3; /* Offsets for third corner in (x,y,z) coords */
+  float x2 = x0 - i2 + 2.0f * G3; /* Offsets for third corner in (x,y,z) coords */
   float y2 = y0 - j2 + 2.0f * G3;
   float z2 = z0 - k2 + 2.0f * G3;
-  float x3
-    = x0 - 1.0f + 3.0f * G3; /* Offsets for last corner in (x,y,z) coords */
+  float x3 = x0 - 1.0f + 3.0f * G3; /* Offsets for last corner in (x,y,z) coords */
   float y3 = y0 - 1.0f + 3.0f * G3;
   float z3 = z0 - 1.0f + 3.0f * G3;
 
@@ -1443,8 +1373,7 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
   if (t1 < 0.0f)
     n1 = t1 = t21 = t41 = gx1 = gy1 = gz1 = 0.0f;
   else {
-    gradrot3(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], sin_t, cos_t, &gx1,
-             &gy1, &gz1);
+    gradrot3(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], sin_t, cos_t, &gx1, &gy1, &gz1);
     t21 = t1 * t1;
     t41 = t21 * t21;
     n1  = t41 * graddotp3(gx1, gy1, gz1, x1, y1, z1);
@@ -1455,8 +1384,7 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
   if (t2 < 0.0f)
     n2 = t2 = t22 = t42 = gx2 = gy2 = gz2 = 0.0f;
   else {
-    gradrot3(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], sin_t, cos_t, &gx2,
-             &gy2, &gz2);
+    gradrot3(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], sin_t, cos_t, &gx2, &gy2, &gz2);
     t22 = t2 * t2;
     t42 = t22 * t22;
     n2  = t42 * graddotp3(gx2, gy2, gz2, x2, y2, z2);
@@ -1467,8 +1395,7 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
   if (t3 < 0.0f)
     n3 = t3 = t23 = t43 = gx3 = gy3 = gz3 = 0.0f;
   else {
-    gradrot3(perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]], sin_t, cos_t, &gx3,
-             &gy3, &gz3);
+    gradrot3(perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]], sin_t, cos_t, &gx3, &gy3, &gz3);
     t23 = t3 * t3;
     t43 = t23 * t23;
     n3  = t43 * graddotp3(gx3, gy3, gz3, x3, y3, z3);
@@ -1484,9 +1411,9 @@ float SimplexNoise::flowNoise(const Vector3& v, float angle)
 Vector3 SimplexNoise::dFlowNoise(const Vector2& v, float angle)
 {
 
-  float n0, n1, n2; /* Noise contributions from the three simplex corners */
+  float n0, n1, n2;                   /* Noise contributions from the three simplex corners */
   float gx0, gy0, gx1, gy1, gx2, gy2; /* Gradients at simplex corners */
-  float sin_t, cos_t; /* Sine and cosine for the gradient rotation angle */
+  float sin_t, cos_t;                 /* Sine and cosine for the gradient rotation angle */
   sin_t = std::sin(angle);
   cos_t = std::cos(angle);
 
@@ -1505,8 +1432,7 @@ Vector3 SimplexNoise::dFlowNoise(const Vector2& v, float angle)
 
   /* For the 2D case, the simplex shape is an equilateral triangle.
    * Determine which simplex we are in. */
-  unsigned int i1,
-    j1; /* Offsets for second (middle) corner of simplex in (i,j) coords */
+  unsigned int i1, j1; /* Offsets for second (middle) corner of simplex in (i,j) coords */
   if (x0 > y0) {
     i1 = 1;
     j1 = 0;
@@ -1519,11 +1445,9 @@ Vector3 SimplexNoise::dFlowNoise(const Vector2& v, float angle)
   /* A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
    * a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
    * c = (3-sqrt(3))/6   */
-  float x1
-    = x0 - i1 + G2; /* Offsets for middle corner in (x,y) unskewed coords */
+  float x1 = x0 - i1 + G2; /* Offsets for middle corner in (x,y) unskewed coords */
   float y1 = y0 - j1 + G2;
-  float x2 = x0 - 1.0f
-             + 2.0f * G2; /* Offsets for last corner in (x,y) unskewed coords */
+  float x2 = x0 - 1.0f + 2.0f * G2; /* Offsets for last corner in (x,y) unskewed coords */
   float y2 = y0 - 1.0f + 2.0f * G2;
 
   /* Wrap the integer indices at 256, to avoid indexing perm[] out of
@@ -1609,8 +1533,8 @@ Vector3 SimplexNoise::dFlowNoise(const Vector2& v, float angle)
 
 Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
 {
-  float n0, n1, n2, n3; /* Noise contributions from the four simplex corners */
-  float noise;          /* Return value */
+  float n0, n1, n2, n3;               /* Noise contributions from the four simplex corners */
+  float noise;                        /* Return value */
   float gx0, gy0, gz0, gx1, gy1, gz1; /* Gradients at simplex corners */
   float gx2, gy2, gz2, gx3, gy3, gz3;
   float sin_t, cos_t; /* Sine and cosine for the gradient rotation angle */
@@ -1618,8 +1542,7 @@ Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
   cos_t = std::cos(angle);
 
   /* Skew the input space to determine which simplex cell we're in */
-  float s
-    = (v.x + v.y + v.z) * F3; /* Very nice and simple skew factor for 3D */
+  float s  = (v.x + v.y + v.z) * F3; /* Very nice and simple skew factor for 3D */
   float xs = v.x + s;
   float ys = v.y + s;
   float zs = v.z + s;
@@ -1637,10 +1560,8 @@ Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
 
   /* For the 3D case, the simplex shape is a slightly irregular tetrahedron.
    * Determine which simplex we are in. */
-  unsigned int i1, j1,
-    k1; /* Offsets for second corner of simplex in (i,j,k) coords */
-  unsigned int i2, j2,
-    k2; /* Offsets for third corner of simplex in (i,j,k) coords */
+  unsigned int i1, j1, k1; /* Offsets for second corner of simplex in (i,j,k) coords */
+  unsigned int i2, j2, k2; /* Offsets for third corner of simplex in (i,j,k) coords */
 
   /* TODO: This code would benefit from a backport from the GLSL version! */
   if (x0 >= y0) {
@@ -1704,12 +1625,10 @@ Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
   float x1 = x0 - i1 + G3; /* Offsets for second corner in (x,y,z) coords */
   float y1 = y0 - j1 + G3;
   float z1 = z0 - k1 + G3;
-  float x2
-    = x0 - i2 + 2.0f * G3; /* Offsets for third corner in (x,y,z) coords */
+  float x2 = x0 - i2 + 2.0f * G3; /* Offsets for third corner in (x,y,z) coords */
   float y2 = y0 - j2 + 2.0f * G3;
   float z2 = z0 - k2 + 2.0f * G3;
-  float x3
-    = x0 - 1.0f + 3.0f * G3; /* Offsets for last corner in (x,y,z) coords */
+  float x3 = x0 - 1.0f + 3.0f * G3; /* Offsets for last corner in (x,y,z) coords */
   float y3 = y0 - 1.0f + 3.0f * G3;
   float z3 = z0 - 1.0f + 3.0f * G3;
 
@@ -1736,8 +1655,7 @@ Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
   if (t1 < 0.0f)
     n1 = t1 = t21 = t41 = gx1 = gy1 = gz1 = 0.0f;
   else {
-    gradrot3(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], sin_t, cos_t, &gx1,
-             &gy1, &gz1);
+    gradrot3(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], sin_t, cos_t, &gx1, &gy1, &gz1);
     t21 = t1 * t1;
     t41 = t21 * t21;
     n1  = t41 * graddotp3(gx1, gy1, gz1, x1, y1, z1);
@@ -1748,8 +1666,7 @@ Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
   if (t2 < 0.0f)
     n2 = t2 = t22 = t42 = gx2 = gy2 = gz2 = 0.0f;
   else {
-    gradrot3(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], sin_t, cos_t, &gx2,
-             &gy2, &gz2);
+    gradrot3(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], sin_t, cos_t, &gx2, &gy2, &gz2);
     t22 = t2 * t2;
     t42 = t22 * t22;
     n2  = t42 * graddotp3(gx2, gy2, gz2, x2, y2, z2);
@@ -1760,8 +1677,7 @@ Vector4 SimplexNoise::dFlowNoise(const Vector3& v, float angle)
   if (t3 < 0.0f)
     n3 = t3 = t23 = t43 = gx3 = gy3 = gz3 = 0.0f;
   else {
-    gradrot3(perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]], sin_t, cos_t, &gx3,
-             &gy3, &gz3);
+    gradrot3(perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]], sin_t, cos_t, &gx3, &gy3, &gz3);
     t23 = t3 * t3;
     t43 = t23 * t23;
     n3  = t43 * graddotp3(gx3, gy3, gz3, x3, y3, z3);
@@ -1845,8 +1761,7 @@ Vector2 SimplexNoise::curlNoise(const Vector2& v, float t)
   return Vector2(derivative.z, -derivative.y);
 }
 
-Vector2 SimplexNoise::curlNoise(const Vector2& v, uint8_t octaves,
-                                float lacunarity, float gain)
+Vector2 SimplexNoise::curlNoise(const Vector2& v, uint8_t octaves, float lacunarity, float gain)
 {
   const Vector3 derivative = dfBm(v, octaves, lacunarity, gain);
   return Vector2(derivative.z, -derivative.y);
@@ -1863,30 +1778,23 @@ Vector3 SimplexNoise::curlNoise(const Vector3& v)
 Vector3 SimplexNoise::curlNoise(const Vector3& v, float t)
 {
   const Vector4 derivX = dFlowNoise(v, t);
-  const Vector4 derivY
-    = dFlowNoise(v + Vector3(123.456f, 789.012f, 345.678f), t);
-  const Vector4 derivZ
-    = dFlowNoise(v + Vector3(901.234f, 567.891f, 234.567f), t);
+  const Vector4 derivY = dFlowNoise(v + Vector3(123.456f, 789.012f, 345.678f), t);
+  const Vector4 derivZ = dFlowNoise(v + Vector3(901.234f, 567.891f, 234.567f), t);
   return Vector3(derivZ.z - derivY.w, derivX.w - derivZ.y, derivY.y - derivX.z);
 }
 
-Vector3 SimplexNoise::curlNoise(const Vector3& v, uint8_t octaves,
-                                float lacunarity, float gain)
+Vector3 SimplexNoise::curlNoise(const Vector3& v, uint8_t octaves, float lacunarity, float gain)
 {
   const Vector4 derivX = dfBm(v, octaves, lacunarity, gain);
-  const Vector4 derivY = dfBm(v + Vector3(123.456f, 789.012f, 345.678f),
-                              octaves, lacunarity, gain);
-  const Vector4 derivZ = dfBm(v + Vector3(901.234f, 567.891f, 234.567f),
-                              octaves, lacunarity, gain);
+  const Vector4 derivY = dfBm(v + Vector3(123.456f, 789.012f, 345.678f), octaves, lacunarity, gain);
+  const Vector4 derivZ = dfBm(v + Vector3(901.234f, 567.891f, 234.567f), octaves, lacunarity, gain);
   return Vector3(derivZ.z - derivY.w, derivX.w - derivZ.y, derivY.y - derivX.z);
 }
 
 // -----------------------------------------------------------------------------
 
-Vector2
-SimplexNoise::curl(const Vector2& v,
-                   const std::function<float(const Vector2&)>& potential,
-                   float delta)
+Vector2 SimplexNoise::curl(const Vector2& v, const std::function<float(const Vector2&)>& potential,
+                           float delta)
 {
   const Vector2 deltaX = Vector2(delta, 0.0f);
   const Vector2 deltaY = Vector2(0.0f, delta);
@@ -1895,10 +1803,8 @@ SimplexNoise::curl(const Vector2& v,
          / (2.0f * delta);
 }
 
-Vector3
-SimplexNoise::curl(const Vector3& v,
-                   const std::function<Vector3(const Vector3&)>& potential,
-                   float delta)
+Vector3 SimplexNoise::curl(const Vector3& v,
+                           const std::function<Vector3(const Vector3&)>& potential, float delta)
 {
   const Vector3 deltaX = Vector3(delta, 0.0f, 0.0f);
   const Vector3 deltaY = Vector3(0.0f, delta, 0.0f);
@@ -1919,28 +1825,24 @@ float SimplexNoise::fBm(float x, uint8_t octaves, float lacunarity, float gain)
   return fBm_t(x, octaves, lacunarity, gain);
 }
 
-float SimplexNoise::fBm(const Vector2& v, uint8_t octaves, float lacunarity,
-                        float gain)
+float SimplexNoise::fBm(const Vector2& v, uint8_t octaves, float lacunarity, float gain)
 {
   return fBm_t(v, octaves, lacunarity, gain);
 }
 
-float SimplexNoise::fBm(const Vector3& v, uint8_t octaves, float lacunarity,
-                        float gain)
+float SimplexNoise::fBm(const Vector3& v, uint8_t octaves, float lacunarity, float gain)
 {
   return fBm_t(v, octaves, lacunarity, gain);
 }
 
-float SimplexNoise::fBm(const Vector4& v, uint8_t octaves, float lacunarity,
-                        float gain)
+float SimplexNoise::fBm(const Vector4& v, uint8_t octaves, float lacunarity, float gain)
 {
   return fBm_t(v, octaves, lacunarity, gain);
 }
 
 // -----------------------------------------------------------------------------
 
-Vector2 SimplexNoise::dfBm(float x, uint8_t octaves, float lacunarity,
-                           float gain)
+Vector2 SimplexNoise::dfBm(float x, uint8_t octaves, float lacunarity, float gain)
 {
   Vector2 sum = Vector2(0.0f);
   float freq  = 1.0f;
@@ -1955,8 +1857,7 @@ Vector2 SimplexNoise::dfBm(float x, uint8_t octaves, float lacunarity,
 
   return sum;
 }
-Vector3 SimplexNoise::dfBm(const Vector2& v, uint8_t octaves, float lacunarity,
-                           float gain)
+Vector3 SimplexNoise::dfBm(const Vector2& v, uint8_t octaves, float lacunarity, float gain)
 {
   Vector3 sum = Vector3(0.f, 0.f, 0.f);
   float freq  = 1.0f;
@@ -1971,8 +1872,7 @@ Vector3 SimplexNoise::dfBm(const Vector2& v, uint8_t octaves, float lacunarity,
 
   return sum;
 }
-Vector4 SimplexNoise::dfBm(const Vector3& v, uint8_t octaves, float lacunarity,
-                           float gain)
+Vector4 SimplexNoise::dfBm(const Vector3& v, uint8_t octaves, float lacunarity, float gain)
 {
   Vector4 sum = Vector4(0.0f);
   float freq  = 1.0f;
@@ -1988,8 +1888,8 @@ Vector4 SimplexNoise::dfBm(const Vector3& v, uint8_t octaves, float lacunarity,
   return sum;
 }
 
-SimplexNoise::vec5 SimplexNoise::dfBm(const Vector4& v, uint8_t octaves,
-                                      float lacunarity, float gain)
+SimplexNoise::vec5 SimplexNoise::dfBm(const Vector4& v, uint8_t octaves, float lacunarity,
+                                      float gain)
 {
   vec5 sum   = {{0.0f, 0.0f, 0.0f, 0.0f, 0.0f}};
   float freq = 1.0f;
@@ -2011,34 +1911,33 @@ SimplexNoise::vec5 SimplexNoise::dfBm(const Vector4& v, uint8_t octaves,
 
 // -----------------------------------------------------------------------------
 
-float SimplexNoise::ridgedMF(float x, float ridgeOffset, uint8_t octaves,
-                             float lacunarity, float gain)
+float SimplexNoise::ridgedMF(float x, float ridgeOffset, uint8_t octaves, float lacunarity,
+                             float gain)
 {
   return ridgedMF_t(x, ridgeOffset, octaves, lacunarity, gain);
 }
 
-float SimplexNoise::ridgedMF(const Vector2& v, float ridgeOffset,
-                             uint8_t octaves, float lacunarity, float gain)
+float SimplexNoise::ridgedMF(const Vector2& v, float ridgeOffset, uint8_t octaves, float lacunarity,
+                             float gain)
 {
   return ridgedMF_t(v, ridgeOffset, octaves, lacunarity, gain);
 }
 
-float SimplexNoise::ridgedMF(const Vector3& v, float ridgeOffset,
-                             uint8_t octaves, float lacunarity, float gain)
+float SimplexNoise::ridgedMF(const Vector3& v, float ridgeOffset, uint8_t octaves, float lacunarity,
+                             float gain)
 {
   return ridgedMF_t(v, ridgeOffset, octaves, lacunarity, gain);
 }
 
-float SimplexNoise::ridgedMF(const Vector4& v, float ridgeOffset,
-                             uint8_t octaves, float lacunarity, float gain)
+float SimplexNoise::ridgedMF(const Vector4& v, float ridgeOffset, uint8_t octaves, float lacunarity,
+                             float gain)
 {
   return ridgedMF_t(v, ridgeOffset, octaves, lacunarity, gain);
 }
 
 // -----------------------------------------------------------------------------
 
-float SimplexNoise::iqfBm(const Vector2& v, uint8_t octaves, float lacunarity,
-                          float gain)
+float SimplexNoise::iqfBm(const Vector2& v, uint8_t octaves, float lacunarity, float gain)
 {
   float sum  = 0.0f;
   float amp  = 0.5f;
@@ -2056,8 +1955,7 @@ float SimplexNoise::iqfBm(const Vector2& v, uint8_t octaves, float lacunarity,
 
   return sum;
 }
-float SimplexNoise::iqfBm(const Vector3& v, uint8_t octaves, float lacunarity,
-                          float gain)
+float SimplexNoise::iqfBm(const Vector3& v, uint8_t octaves, float lacunarity, float gain)
 {
   float sum  = 0.0;
   float amp  = 0.5;
@@ -2114,8 +2012,7 @@ float SimplexNoise::grad(int hash, float x, float y, float z) const
 {
   int h   = hash & 15;     // Convert low 4 bits of hash code into 12 simple
   float u = h < 8 ? x : y; // gradient directions, and compute dot product.
-  float v
-    = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
+  float v = h < 4 ? y : h == 12 || h == 14 ? x : z; // Fix repeats at h = 12 to 15
   return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
 }
 
@@ -2164,8 +2061,7 @@ void SimplexNoise::grad4(int hash, float* gx, float* gy, float* gz, float* gw)
   return;
 }
 
-void SimplexNoise::gradrot2(int hash, float sin_t, float cos_t, float* gx,
-                            float* gy)
+void SimplexNoise::gradrot2(int hash, float sin_t, float cos_t, float* gx, float* gy)
 {
   unsigned int h = hash & 7;
   float gx0      = grad2lut[h][0];
@@ -2175,8 +2071,7 @@ void SimplexNoise::gradrot2(int hash, float sin_t, float cos_t, float* gx,
   return;
 }
 
-void SimplexNoise::gradrot3(int hash, float sin_t, float cos_t, float* gx,
-                            float* gy, float* gz)
+void SimplexNoise::gradrot3(int hash, float sin_t, float cos_t, float* gx, float* gy, float* gz)
 {
   unsigned int h = hash & 15;
   float gux      = grad3u[h][0];
@@ -2196,8 +2091,7 @@ float SimplexNoise::graddotp2(float gx, float gy, float x, float y) const
   return gx * x + gy * y;
 }
 
-float SimplexNoise::graddotp3(float gx, float gy, float gz, float x, float y,
-                              float z) const
+float SimplexNoise::graddotp3(float gx, float gy, float gz, float x, float y, float z) const
 {
   return gx * x + gy * y + gz * z;
 }
