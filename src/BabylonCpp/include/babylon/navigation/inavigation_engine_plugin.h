@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <babylon/babylon_common.h>
+
 namespace BABYLON {
 
 struct ICrowd;
@@ -55,6 +57,13 @@ struct INavigationEnginePlugin {
   virtual Vector3 getClosestPoint(const Vector3& position) = 0;
 
   /**
+   * @brief Get a navigation mesh constrained position, closest to the parameter position.
+   * @param position world position
+   * @param result output the closest point to position constrained by the navigation mesh
+   */
+  virtual void getClosestPointToRef(const Vector3& position, Vector3& result) = 0;
+
+  /**
    * @brief Get a navigation mesh constrained position, within a particular radius.
    * @param position world position
    * @param maxRadius the maximum distance to the constrained world position
@@ -63,12 +72,30 @@ struct INavigationEnginePlugin {
   virtual Vector3 getRandomPointAround(const Vector3& position, float maxRadius) = 0;
 
   /**
+   * @brief Get a navigation mesh constrained position, within a particular radius.
+   * @param position world position
+   * @param maxRadius the maximum distance to the constrained world position
+   * @param result output the closest point to position constrained by the navigation mesh
+   */
+  virtual void getRandomPointAroundToRef(const Vector3& position, float maxRadius, Vector3& result)
+    = 0;
+
+  /**
    * @brief Compute the final position from a segment made of destination-position.
    * @param position world position
    * @param destination world position
    * @returns the resulting point along the navmesh
    */
   virtual Vector3 moveAlong(const Vector3& position, const Vector3& destination) = 0;
+
+  /**
+   * @brief Compute the final position from a segment made of destination-position.
+   * @param position world position
+   * @param destination world position
+   * @param result output the resulting point along the navmesh
+   */
+  virtual void moveAlongToRef(const Vector3& position, const Vector3& destination, Vector3& result)
+    = 0;
 
   /**
    * @brief Compute a navigation path from start to end. Returns an empty array if no path can be
@@ -107,6 +134,25 @@ struct INavigationEnginePlugin {
    * @returns the box extent values
    */
   virtual Vector3 getDefaultQueryExtent() const = 0;
+
+  /**
+   * @brief build the navmesh from a previously saved state using getNavmeshData.
+   * @param data the Uint8Array returned by getNavmeshData
+   */
+  virtual void buildFromNavmeshData(const Uint8Array& data) = 0;
+
+  /**
+   * @brief returns the navmesh data that can be used later. The navmesh must be built before
+   * retrieving the data.
+   * @returns data the Uint8Array that can be saved and reused
+   */
+  virtual Uint8Array getNavmeshData() = 0;
+
+  /**
+   * @brief Get the Bounding box extent result specified by setDefaultQueryExtent.
+   * @param result output the box extent values
+   */
+  virtual void getDefaultQueryExtentToRef(Vector3& result) = 0;
 
   /**
    * @brief Release all resources.

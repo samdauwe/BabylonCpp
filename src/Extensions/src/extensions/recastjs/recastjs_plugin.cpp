@@ -114,11 +114,26 @@ Vector3 RecastJSPlugin::getClosestPoint(const Vector3& position)
   return Vector3(ret.x, ret.y, ret.z);
 }
 
+void RecastJSPlugin::getClosestPointToRef(const Vector3& position, Vector3& result)
+{
+  const Vec3 p(position.x, position.y, position.z);
+  const auto ret = navMesh->getClosestPoint(p);
+  result.set(ret.x, ret.y, ret.z);
+}
+
 Vector3 RecastJSPlugin::getRandomPointAround(const Vector3& position, float maxRadius)
 {
   const Vec3 p(position.x, position.y, position.z);
   const auto ret = navMesh->getRandomPointAround(p, maxRadius);
   return Vector3(ret.x, ret.y, ret.z);
+}
+
+void RecastJSPlugin::getRandomPointAroundToRef(const Vector3& position, float maxRadius,
+                                               Vector3& result)
+{
+  const Vec3 p(position.x, position.y, position.z);
+  const auto ret = navMesh->getRandomPointAround(p, maxRadius);
+  result.set(ret.x, ret.y, ret.z);
 }
 
 Vector3 RecastJSPlugin::moveAlong(const Vector3& position, const Vector3& destination)
@@ -127,6 +142,15 @@ Vector3 RecastJSPlugin::moveAlong(const Vector3& position, const Vector3& destin
   const Vec3 d(destination.x, destination.y, destination.z);
   const auto ret = navMesh->moveAlong(p, d);
   return Vector3(ret.x, ret.y, ret.z);
+}
+
+void RecastJSPlugin::moveAlongToRef(const Vector3& position, const Vector3& destination,
+                                    Vector3& result)
+{
+  const Vec3 p(position.x, position.y, position.z);
+  const Vec3 d(destination.x, destination.y, destination.z);
+  const auto ret = navMesh->moveAlong(p, d);
+  result.set(ret.x, ret.y, ret.z);
 }
 
 std::vector<Vector3> RecastJSPlugin::computePath(const Vector3& start, const Vector3& end)
@@ -159,6 +183,36 @@ Vector3 RecastJSPlugin::getDefaultQueryExtent() const
 {
   const auto p = navMesh->getDefaultQueryExtent();
   return Vector3(p.x, p.y, p.z);
+}
+
+void RecastJSPlugin::buildFromNavmeshData(const Uint8Array& data)
+{
+  const auto nDataBytes = data.size() * sizeof(uint8_t);
+  Uint8Array dataStack(nDataBytes);
+
+  std::memcpy(dataStack.data(), data.data(), nDataBytes);
+
+  NavmeshData buf{};
+  buf.dataPointer = dataStack.data();
+  buf.size        = static_cast<int>(data.size());
+  navMesh         = std::make_unique<NavMesh>();
+  navMesh->buildFromNavmeshData(&buf);
+}
+
+Uint8Array RecastJSPlugin::getNavmeshData()
+{
+  auto navmeshData           = navMesh->getNavmeshData();
+  const auto navmeshDataSize = static_cast<size_t>(navmeshData.size);
+  Uint8Array ret(navmeshDataSize);
+  std::memcpy(ret.data(), navmeshData.dataPointer, navmeshDataSize);
+  navMesh->freeNavmeshData(&navmeshData);
+  return ret;
+}
+
+void RecastJSPlugin::getDefaultQueryExtentToRef(Vector3& result)
+{
+  const auto p = navMesh->getDefaultQueryExtent();
+  result.set(p.x, p.y, p.z);
 }
 
 void RecastJSPlugin::dispose()

@@ -40,6 +40,13 @@ public:
   Vector3 getClosestPoint(const Vector3& position) override;
 
   /**
+   * @brief Get a navigation mesh constrained position, closest to the parameter position.
+   * @param position world position
+   * @param result output the closest point to position constrained by the navigation mesh
+   */
+  void getClosestPointToRef(const Vector3& position, Vector3& result) override;
+
+  /**
    * @brief Get a navigation mesh constrained position, within a particular radius.
    * @param position world position
    * @param maxRadius the maximum distance to the constrained world position
@@ -48,12 +55,30 @@ public:
   Vector3 getRandomPointAround(const Vector3& position, float maxRadius) override;
 
   /**
+   * @brief Get a navigation mesh constrained position, within a particular radius.
+   * @param position world position
+   * @param maxRadius the maximum distance to the constrained world position
+   * @param result output the closest point to position constrained by the navigation mesh
+   */
+  void getRandomPointAroundToRef(const Vector3& position, float maxRadius,
+                                 Vector3& result) override;
+
+  /**
    * @brief Compute the final position from a segment made of destination-position
    * @param position world position
    * @param destination world position
    * @returns the resulting point along the navmesh
    */
   Vector3 moveAlong(const Vector3& position, const Vector3& destination) override;
+
+  /**
+   * @brief Compute the final position from a segment made of destination-position.
+   * @param position world position
+   * @param destination world position
+   * @param result output the resulting point along the navmesh
+   */
+  void moveAlongToRef(const Vector3& position, const Vector3& destination,
+                      Vector3& result) override;
 
   /**
    * @brief Compute a navigation path from start to end. Returns an empty array if no path can be
@@ -86,6 +111,25 @@ public:
    * @returns the box extent values
    */
   Vector3 getDefaultQueryExtent() const override;
+
+  /**
+   * @brief build the navmesh from a previously saved state using getNavmeshData.
+   * @param data the Uint8Array returned by getNavmeshData
+   */
+  void buildFromNavmeshData(const Uint8Array& data) override;
+
+  /**
+   * @brief returns the navmesh data that can be used later. The navmesh must be built before
+   * retrieving the data.
+   * @returns data the Uint8Array that can be saved and reused
+   */
+  Uint8Array getNavmeshData() override;
+
+  /**
+   * @brief Get the Bounding box extent result specified by setDefaultQueryExtent.
+   * @param result output the box extent values
+   */
+  void getDefaultQueryExtentToRef(Vector3& result) override;
 
   /**
    * @brief Disposes
