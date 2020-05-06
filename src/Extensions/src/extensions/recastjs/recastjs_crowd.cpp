@@ -60,10 +60,22 @@ Vector3 RecastJSCrowd::getAgentPosition(int index)
   return Vector3(agentPos.x, agentPos.y, agentPos.z);
 }
 
+void RecastJSCrowd::getAgentPositionToRef(int index, Vector3& result)
+{
+  const auto agentPos = recastCrowd->getAgentPosition(index);
+  result.set(agentPos.x, agentPos.y, agentPos.z);
+}
+
 Vector3 RecastJSCrowd::getAgentVelocity(int index)
 {
   const auto agentVel = recastCrowd->getAgentVelocity(index);
   return Vector3(agentVel.x, agentVel.y, agentVel.z);
+}
+
+void RecastJSCrowd::getAgentVelocityToRef(int index, Vector3& result)
+{
+  const auto agentVel = recastCrowd->getAgentVelocity(index);
+  result.set(agentVel.x, agentVel.y, agentVel.z);
 }
 
 void RecastJSCrowd::agentGoto(int index, const Vector3& destination)
@@ -142,6 +154,12 @@ Vector3 RecastJSCrowd::getDefaultQueryExtent() const
 {
   const auto p = recastCrowd->getDefaultQueryExtent();
   return Vector3(p.x, p.y, p.z);
+}
+
+void RecastJSCrowd::getDefaultQueryExtentToRef(Vector3& result)
+{
+  const auto p = recastCrowd->getDefaultQueryExtent();
+  result.set(p.x, p.y, p.z);
 }
 
 void RecastJSCrowd::dispose()

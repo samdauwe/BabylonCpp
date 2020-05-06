@@ -47,11 +47,25 @@ public:
   Vector3 getAgentPosition(int index) override;
 
   /**
+   * @brief Returns the agent position result in world space.
+   * @param index agent index returned by addAgent
+   * @param result output world space position
+   */
+  void getAgentPositionToRef(int index, Vector3& result) override;
+
+  /**
    * @brief Returns the agent velocity in world space.
    * @param index agent index returned by addAgent
    * @returns world space velocity
    */
   Vector3 getAgentVelocity(int index) override;
+
+  /**
+   * @brief Returns the agent velocity result in world space.
+   * @param index agent index returned by addAgent
+   * @param result output world space velocity
+   */
+  void getAgentVelocityToRef(int index, Vector3& result) override;
 
   /**
    * @brief Asks a particular agent to go to a destination. That destination is constrained by the
@@ -107,6 +121,12 @@ public:
    * @returns the box extent values
    */
   Vector3 getDefaultQueryExtent() const override;
+
+  /**
+   * @brief Get the Bounding box extent result specified by setDefaultQueryExtent.
+   * @param result output the box extent values
+   */
+  void getDefaultQueryExtentToRef(Vector3& result) override;
 
   /**
    * @brief Release all resources.

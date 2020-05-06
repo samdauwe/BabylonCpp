@@ -44,11 +44,25 @@ struct ICrowd {
   virtual Vector3 getAgentPosition(int index) = 0;
 
   /**
+   * @brief Gets the agent position result in world space.
+   * @param index agent index returned by addAgent
+   * @param result output world space position
+   */
+  virtual void getAgentPositionToRef(int index, Vector3& result) = 0;
+
+  /**
    * @brief Gets the agent velocity in world space.
    * @param index agent index returned by addAgent
    * @returns world space velocity
    */
   virtual Vector3 getAgentVelocity(int index) = 0;
+
+  /**
+   * @brief Gets the agent velocity result in world space.
+   * @param index agent index returned by addAgent
+   * @param result output world space velocity
+   */
+  virtual void getAgentVelocityToRef(int index, Vector3& result) = 0;
 
   /**
    * @brief remove a particular agent previously created.
@@ -104,6 +118,12 @@ struct ICrowd {
    * @returns the box extent values
    */
   virtual Vector3 getDefaultQueryExtent() const = 0;
+
+  /**
+   * @brief Get the Bounding box extent result specified by setDefaultQueryExtent.
+   * @param result output the box extent values
+   */
+  virtual void getDefaultQueryExtentToRef(Vector3& result) = 0;
 
   /**
    * @brief Release all resources.
