@@ -6,7 +6,6 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/multiview_extension.h>
 #include <babylon/engines/extensions/occlusion_query_extension.h>
-#include <babylon/engines/extensions/raw_texture_extension.h>
 #include <babylon/engines/extensions/transform_feedback_extension.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
@@ -69,7 +68,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
     , _multiviewExtension{std::make_unique<MultiviewExtension>(this)}
     , _occlusionQueryExtension{std::make_unique<OcclusionQueryExtension>(this)}
-    , _rawTextureExtension{std::make_unique<RawTextureExtension>(this)}
     , _transformFeedbackExtension{std::make_unique<TransformFeedbackExtension>(this)}
 {
   Engine::Instances().emplace_back(this);
@@ -502,52 +500,6 @@ void Engine::setTextureFromPostProcess(int channel, const PostProcessPtr& postPr
 void Engine::setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess)
 {
   _bindTexture(channel, postProcess ? postProcess->_outputTexture : nullptr);
-}
-
-ArrayBufferView Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
-                                                     int height, unsigned int textureType)
-{
-  // Create new RGBA data container.
-  if (textureType == Constants::TEXTURETYPE_FLOAT) {
-    Float32Array rgbaData(static_cast<size_t>(width * height * 4));
-    const auto rgbDataFloat32Array = rgbData.float32Array();
-    // Convert each pixel.
-    for (int x = 0; x < width; ++x) {
-      for (int y = 0; y < height; ++y) {
-        auto index    = static_cast<size_t>((y * width + x) * 3);
-        auto newIndex = static_cast<size_t>((y * width + x) * 4);
-
-        // Map Old Value to new value.
-        rgbaData[newIndex + 0] = rgbDataFloat32Array[index + 0];
-        rgbaData[newIndex + 1] = rgbDataFloat32Array[index + 1];
-        rgbaData[newIndex + 2] = rgbDataFloat32Array[index + 2];
-
-        // Add fully opaque alpha channel.
-        rgbaData[newIndex + 3] = 1.f;
-      }
-    }
-    return ArrayBufferView(rgbaData);
-  }
-  else {
-    Uint32Array rgbaData(static_cast<size_t>(width * height * 4));
-    const auto rgbDataUint32Array = rgbData.uint32Array();
-    // Convert each pixel.
-    for (int x = 0; x < width; ++x) {
-      for (int y = 0; y < height; ++y) {
-        auto index    = static_cast<size_t>((y * width + x) * 3);
-        auto newIndex = static_cast<size_t>((y * width + x) * 4);
-
-        // Map Old Value to new value.
-        rgbaData[newIndex + 0] = rgbDataUint32Array[index + 0];
-        rgbaData[newIndex + 1] = rgbDataUint32Array[index + 1];
-        rgbaData[newIndex + 2] = rgbDataUint32Array[index + 2];
-
-        // Add fully opaque alpha channel.
-        rgbaData[newIndex + 3] = 1;
-      }
-    }
-    return ArrayBufferView(rgbaData);
-  }
 }
 
 void Engine::_rebuildBuffers()
@@ -1281,99 +1233,6 @@ unsigned int Engine::_getTimeQueryResult(const WebGLQueryPtr& query)
 bool Engine::_getTimeQueryAvailability(const WebGLQueryPtr& query)
 {
   return _occlusionQueryExtension->_getTimeQueryAvailability(query);
-}
-
-//--------------------------------------------------------------------------------------------------
-//                              Raw Texture Extension
-//--------------------------------------------------------------------------------------------------
-
-InternalTexturePtr Engine::createRawTexture(const Uint8Array& data, int width, int height,
-                                            unsigned int format, bool generateMipMaps, bool invertY,
-                                            unsigned int samplingMode,
-                                            const std::string& compression, unsigned int type)
-{
-  return _rawTextureExtension->createRawTexture(data, width, height, format, generateMipMaps,
-                                                invertY, samplingMode, compression, type);
-}
-
-void Engine::updateRawTexture(const InternalTexturePtr& texture, const Uint8Array& data,
-                              unsigned int format, bool invertY, const std::string& compression,
-                              unsigned int type)
-{
-  _rawTextureExtension->updateRawTexture(texture, data, format, invertY, compression, type);
-}
-
-InternalTexturePtr Engine::createRawCubeTexture(const std::vector<ArrayBufferView>& data, int size,
-                                                unsigned int format, unsigned int type,
-                                                bool generateMipMaps, bool invertY,
-                                                unsigned int samplingMode,
-                                                const std::string& compression)
-{
-  return _rawTextureExtension->createRawCubeTexture(data, size, format, type, generateMipMaps,
-                                                    invertY, samplingMode, compression);
-}
-
-void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
-                                  const std::vector<ArrayBufferView>& data, unsigned int format,
-                                  unsigned int type, bool invertY, const std::string& compression,
-                                  unsigned int level)
-{
-  _rawTextureExtension->updateRawCubeTexture(texture, data, format, type, invertY, compression,
-                                             level);
-}
-
-InternalTexturePtr Engine::createRawCubeTextureFromUrl(
-  const std::string& url, Scene* scene, int size, unsigned int format, unsigned int type,
-  bool noMipmap,
-  const std::function<ArrayBufferViewArray(const ArrayBuffer& arrayBuffer)>& callback,
-  const std::function<std::vector<ArrayBufferViewArray>(const ArrayBufferViewArray& faces)>&
-    mipmapGenerator,
-  const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message, const std::string& exception)>& onError,
-  unsigned int samplingMode, bool invertY)
-{
-  return _rawTextureExtension->createRawCubeTextureFromUrl(url, scene, size, format, type, noMipmap,
-                                                           callback, mipmapGenerator, onLoad,
-                                                           onError, samplingMode, invertY);
-}
-
-InternalTexturePtr Engine::createRawTexture3D(const ArrayBufferView& data, int width, int height,
-                                              int depth, unsigned int format, bool generateMipMaps,
-                                              bool invertY, unsigned int samplingMode,
-                                              const std::string& compression,
-                                              unsigned int textureType)
-{
-  return _rawTextureExtension->createRawTexture3D(data, width, height, depth, format,
-                                                  generateMipMaps, invertY, samplingMode,
-                                                  compression, textureType);
-}
-
-void Engine::updateRawTexture3D(const InternalTexturePtr& texture, const ArrayBufferView& data,
-                                unsigned int format, bool invertY, const std::string& compression,
-                                unsigned int textureType)
-{
-  _rawTextureExtension->updateRawTexture3D(texture, data, format, invertY, compression,
-                                           textureType);
-}
-
-InternalTexturePtr Engine::createRawTexture2DArray(const ArrayBufferView& data, int width,
-                                                   int height, int depth, unsigned int format,
-                                                   bool generateMipMaps, bool invertY,
-                                                   unsigned int samplingMode,
-                                                   const std::string& compression,
-                                                   unsigned int textureType)
-{
-  return _rawTextureExtension->createRawTexture2DArray(data, width, height, depth, format,
-                                                       generateMipMaps, invertY, samplingMode,
-                                                       compression, textureType);
-}
-
-void Engine::updateRawTexture2DArray(const InternalTexturePtr& texture, const ArrayBufferView& data,
-                                     unsigned int format, bool invertY,
-                                     const std::string& compression, unsigned int textureType)
-{
-  _rawTextureExtension->updateRawTexture2DArray(texture, data, format, invertY, compression,
-                                                textureType);
 }
 
 //--------------------------------------------------------------------------------------------------

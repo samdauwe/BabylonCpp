@@ -8,6 +8,7 @@
 #include <babylon/engines/extensions/cube_texture_extension.h>
 #include <babylon/engines/extensions/dynamic_texture_extension.h>
 #include <babylon/engines/extensions/multi_render_extension.h>
+#include <babylon/engines/extensions/raw_texture_extension.h>
 #include <babylon/engines/extensions/render_target_cube_extension.h>
 #include <babylon/engines/extensions/render_target_extension.h>
 #include <babylon/engines/extensions/uniform_buffer_extension.h>
@@ -106,6 +107,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , _cubeTextureExtension{std::make_unique<CubeTextureExtension>(this)}
     , _dynamicTextureExtension{std::make_unique<DynamicTextureExtension>(this)}
     , _multiRenderExtension{std::make_unique<MultiRenderExtension>(this)}
+    , _rawTextureExtension{std::make_unique<RawTextureExtension>(this)}
     , _renderTargetExtension{std::make_unique<RenderTargetExtension>(this)}
     , _renderTargetCubeExtension{std::make_unique<RenderTargetCubeExtension>(this)}
     , _uniformBufferExtension{std::make_unique<UniformBufferExtension>(this)}
@@ -2505,43 +2507,6 @@ void ThinEngine::_rescaleTexture(const InternalTexturePtr& /*source*/,
 {
 }
 
-InternalTexturePtr ThinEngine::createRawTexture(const Uint8Array& /*data*/, int /*width*/,
-                                                int /*height*/, unsigned int /*format*/,
-                                                bool /*generateMipMaps*/, bool /*invertY*/,
-                                                unsigned int /*samplingMode*/,
-                                                const std::string& /*compression*/,
-                                                unsigned int /*type*/)
-{
-  return nullptr;
-}
-
-InternalTexturePtr ThinEngine::createRawCubeTexture(const std::vector<ArrayBufferView>& /*data*/,
-                                                    int /*size*/, unsigned int /*format*/,
-                                                    unsigned int /*type*/, bool /*generateMipMaps*/,
-                                                    bool /*invertY*/, unsigned int /*samplingMode*/,
-                                                    const std::string& /*compression*/)
-{
-  return nullptr;
-}
-
-InternalTexturePtr ThinEngine::createRawTexture3D(const ArrayBufferView& /*data*/, int /*width*/,
-                                                  int /*height*/, int /*depth*/,
-                                                  unsigned int /*format*/, bool /*generateMipMaps*/,
-                                                  bool /*invertY*/, unsigned int /*samplingMode*/,
-                                                  const std::string& /*compression*/,
-                                                  unsigned int /*textureType*/)
-{
-  return nullptr;
-}
-
-InternalTexturePtr ThinEngine::createRawTexture2DArray(
-  const ArrayBufferView& /*data*/, int /*width*/, int /*height*/, int /*depth*/,
-  unsigned int /*format*/, bool /*generateMipMaps*/, bool /*invertY*/,
-  unsigned int /*samplingMode*/, const std::string& /*compression*/, unsigned int /*textureType*/)
-{
-  return nullptr;
-}
-
 void ThinEngine::_unpackFlipY(bool value)
 {
   if (!_unpackFlipYCached.has_value() || *_unpackFlipYCached != value) {
@@ -3866,6 +3831,101 @@ unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
   const std::vector<InternalTexturePtr>& textures, unsigned int samples)
 {
   return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Raw Texture Extension
+//--------------------------------------------------------------------------------------------------
+
+InternalTexturePtr ThinEngine::createRawTexture(const Uint8Array& data, int width, int height,
+                                                unsigned int format, bool generateMipMaps,
+                                                bool invertY, unsigned int samplingMode,
+                                                const std::string& compression, unsigned int type)
+{
+  return _rawTextureExtension->createRawTexture(data, width, height, format, generateMipMaps,
+                                                invertY, samplingMode, compression, type);
+}
+
+void ThinEngine::updateRawTexture(const InternalTexturePtr& texture, const Uint8Array& data,
+                                  unsigned int format, bool invertY, const std::string& compression,
+                                  unsigned int type)
+{
+  _rawTextureExtension->updateRawTexture(texture, data, format, invertY, compression, type);
+}
+
+InternalTexturePtr ThinEngine::createRawCubeTexture(const std::vector<ArrayBufferView>& data,
+                                                    int size, unsigned int format,
+                                                    unsigned int type, bool generateMipMaps,
+                                                    bool invertY, unsigned int samplingMode,
+                                                    const std::string& compression)
+{
+  return _rawTextureExtension->createRawCubeTexture(data, size, format, type, generateMipMaps,
+                                                    invertY, samplingMode, compression);
+}
+
+void ThinEngine::updateRawCubeTexture(const InternalTexturePtr& texture,
+                                      const std::vector<ArrayBufferView>& data, unsigned int format,
+                                      unsigned int type, bool invertY,
+                                      const std::string& compression, unsigned int level)
+{
+  _rawTextureExtension->updateRawCubeTexture(texture, data, format, type, invertY, compression,
+                                             level);
+}
+
+InternalTexturePtr ThinEngine::createRawCubeTextureFromUrl(
+  const std::string& url, Scene* scene, int size, unsigned int format, unsigned int type,
+  bool noMipmap,
+  const std::function<ArrayBufferViewArray(const ArrayBuffer& arrayBuffer)>& callback,
+  const std::function<std::vector<ArrayBufferViewArray>(const ArrayBufferViewArray& faces)>&
+    mipmapGenerator,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  unsigned int samplingMode, bool invertY)
+{
+  return _rawTextureExtension->createRawCubeTextureFromUrl(url, scene, size, format, type, noMipmap,
+                                                           callback, mipmapGenerator, onLoad,
+                                                           onError, samplingMode, invertY);
+}
+
+InternalTexturePtr ThinEngine::createRawTexture3D(const ArrayBufferView& data, int width,
+                                                  int height, int depth, unsigned int format,
+                                                  bool generateMipMaps, bool invertY,
+                                                  unsigned int samplingMode,
+                                                  const std::string& compression,
+                                                  unsigned int textureType)
+{
+  return _rawTextureExtension->createRawTexture3D(data, width, height, depth, format,
+                                                  generateMipMaps, invertY, samplingMode,
+                                                  compression, textureType);
+}
+
+void ThinEngine::updateRawTexture3D(const InternalTexturePtr& texture, const ArrayBufferView& data,
+                                    unsigned int format, bool invertY,
+                                    const std::string& compression, unsigned int textureType)
+{
+  _rawTextureExtension->updateRawTexture3D(texture, data, format, invertY, compression,
+                                           textureType);
+}
+
+InternalTexturePtr ThinEngine::createRawTexture2DArray(const ArrayBufferView& data, int width,
+                                                       int height, int depth, unsigned int format,
+                                                       bool generateMipMaps, bool invertY,
+                                                       unsigned int samplingMode,
+                                                       const std::string& compression,
+                                                       unsigned int textureType)
+{
+  return _rawTextureExtension->createRawTexture2DArray(data, width, height, depth, format,
+                                                       generateMipMaps, invertY, samplingMode,
+                                                       compression, textureType);
+}
+
+void ThinEngine::updateRawTexture2DArray(const InternalTexturePtr& texture,
+                                         const ArrayBufferView& data, unsigned int format,
+                                         bool invertY, const std::string& compression,
+                                         unsigned int textureType)
+{
+  _rawTextureExtension->updateRawTexture2DArray(texture, data, format, invertY, compression,
+                                                textureType);
 }
 
 //--------------------------------------------------------------------------------------------------
