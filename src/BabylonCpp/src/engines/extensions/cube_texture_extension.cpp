@@ -83,8 +83,13 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
     texture->_files     = files;
   }
 
-  auto lastDot = StringTools::lastIndexOf(rootUrl, ".");
-  auto extension
+  const auto originalRootUrl = rootUrl;
+  if (_this->_transformTextureUrl && !fallback) {
+    rootUrl = _this->_transformTextureUrl(rootUrl);
+  }
+
+  const auto lastDot = StringTools::lastIndexOf(rootUrl, ".");
+  const auto extension
     = !forcedExtension.empty() ?
         forcedExtension :
         (lastDot > -1 ?
@@ -100,8 +105,19 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   }
 
   const auto onInternalError
-    = [](const std::string& /*message*/, const std::string & /*exception*/) -> void {
-
+    = [=](const std::string& message, const std::string& exception) -> void {
+    if (rootUrl == originalRootUrl) {
+      if (onError) {
+        onError(message, exception);
+      }
+    }
+    else {
+      // fall back to the original url if the transformed url fails to load
+      BABYLON_LOGF_WARN("CubeTextureExtension", "Failed to load %s, falling back to the %s",
+                        rootUrl.c_str(), originalRootUrl.c_str())
+      createCubeTexture(originalRootUrl, scene, files, noMipmap, onLoad, onError, format,
+                        forcedExtension, createPolynomials, lodScale, lodOffset, texture);
+    }
   };
 
   if (loader) {
@@ -131,13 +147,13 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
     _cascadeLoadImgs(
       rootUrl, scene,
       [=](const std::vector<Image>& imgs) {
-        auto width
+        const auto width
           = _this->needPOTTextures() ?
               ThinEngine::GetExponentOfTwo(imgs[0].width, _this->_caps.maxCubemapTextureSize) :
               imgs[0].width;
-        auto height = width;
+        const auto height = width;
 
-        std::vector<GL::GLenum> faces{
+        const std::vector<GL::GLenum> faces{
           GL::TEXTURE_CUBE_MAP_POSITIVE_X, GL::TEXTURE_CUBE_MAP_POSITIVE_Y,
           GL::TEXTURE_CUBE_MAP_POSITIVE_Z, GL::TEXTURE_CUBE_MAP_NEGATIVE_X,
           GL::TEXTURE_CUBE_MAP_NEGATIVE_Y, GL::TEXTURE_CUBE_MAP_NEGATIVE_Z};
@@ -145,7 +161,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
         _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
         _this->_unpackFlipY(false);
 
-        auto internalFormat = format ? _this->_getInternalFormat(format) : GL::RGBA;
+        const auto internalFormat = format ? _this->_getInternalFormat(format) : GL::RGBA;
         for (size_t index = 0; index < faces.size(); index++) {
 #if 0
           _workingContext->drawImage(imgs[index], 0, 0, imgs[index].width,

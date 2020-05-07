@@ -1899,6 +1899,9 @@ public:
   int _frameHandler = -1;
 
   /** @hidden */
+  std::function<std::string(const std::string& url)> _transformTextureUrl = nullptr;
+
+  /** @hidden */
   std::string _textureFormatInUse;
 
   /**
