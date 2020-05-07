@@ -13,9 +13,9 @@ namespace BABYLON {
 
 class ArrayBufferView;
 using ArrayBufferViewArray = std::vector<ArrayBufferView>;
-class Engine;
 class InternalTexture;
 class Scene;
+class ThinEngine;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 /**
@@ -24,7 +24,7 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 class BABYLON_SHARED_EXPORT RawTextureExtension {
 
 public:
-  RawTextureExtension(Engine* engine);
+  RawTextureExtension(ThinEngine* engine);
   ~RawTextureExtension();
 
   /**
@@ -232,8 +232,14 @@ private:
                          unsigned int textureType       = Constants::TEXTURETYPE_UNSIGNED_INT,
                          bool is3D                      = false);
 
+  /**
+   * @brief Hidden
+   */
+  ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
+                                               int height, unsigned int textureType);
+
 private:
-  Engine* _this;
+  ThinEngine* _this;
 
 }; // end of class RawTextureExtension
 

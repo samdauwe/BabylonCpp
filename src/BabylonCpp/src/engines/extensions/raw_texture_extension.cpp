@@ -1,14 +1,14 @@
 #include <babylon/engines/extensions/raw_texture_extension.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/thin_engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
-RawTextureExtension::RawTextureExtension(Engine* engine) : _this{engine}
+RawTextureExtension::RawTextureExtension(ThinEngine* engine) : _this{engine}
 {
 }
 
@@ -235,7 +235,7 @@ void RawTextureExtension::updateRawCubeTexture(const InternalTexturePtr& texture
     else {
       if (needConversion) {
         auto convertedFaceData
-          = _this->_convertRGBtoRGBATextureData(faceData, texture->width, texture->height, type)
+          = _convertRGBtoRGBATextureData(faceData, texture->width, texture->height, type)
               .uint8Array();
         gl.texImage2D(facesIndex[index], static_cast<int>(level),
                       static_cast<int>(internalSizedFomat), texture->width, texture->height, 0,
@@ -319,7 +319,7 @@ InternalTexturePtr RawTextureExtension::createRawCubeTextureFromUrl(
         for (unsigned int faceIndex = 0; faceIndex < 6; ++faceIndex) {
           auto mipFaceData = mipData[level][faceIndex];
           if (needConversion) {
-            mipFaceData = _this->_convertRGBtoRGBATextureData(mipFaceData, mipSize, mipSize, type);
+            mipFaceData = _convertRGBtoRGBATextureData(mipFaceData, mipSize, mipSize, type);
           }
           _this->_gl->texImage2D(faceIndex, static_cast<int>(level),
                                  static_cast<int>(internalSizedFomat), mipSize, mipSize, 0,
@@ -482,6 +482,53 @@ void RawTextureExtension::updateRawTexture2DArray(const InternalTexturePtr& text
                                                   unsigned int textureType)
 {
   return _updateRawTexture(texture, data, format, invertY, compression, textureType, false);
+}
+
+ArrayBufferView RawTextureExtension::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
+                                                                  int width, int height,
+                                                                  unsigned int textureType)
+{
+  // Create new RGBA data container.
+  if (textureType == Constants::TEXTURETYPE_FLOAT) {
+    Float32Array rgbaData(static_cast<size_t>(width * height * 4));
+    const auto rgbDataFloat32Array = rgbData.float32Array();
+    // Convert each pixel.
+    for (int x = 0; x < width; ++x) {
+      for (int y = 0; y < height; ++y) {
+        auto index    = static_cast<size_t>((y * width + x) * 3);
+        auto newIndex = static_cast<size_t>((y * width + x) * 4);
+
+        // Map Old Value to new value.
+        rgbaData[newIndex + 0] = rgbDataFloat32Array[index + 0];
+        rgbaData[newIndex + 1] = rgbDataFloat32Array[index + 1];
+        rgbaData[newIndex + 2] = rgbDataFloat32Array[index + 2];
+
+        // Add fully opaque alpha channel.
+        rgbaData[newIndex + 3] = 1.f;
+      }
+    }
+    return ArrayBufferView(rgbaData);
+  }
+  else {
+    Uint32Array rgbaData(static_cast<size_t>(width * height * 4));
+    const auto rgbDataUint32Array = rgbData.uint32Array();
+    // Convert each pixel.
+    for (int x = 0; x < width; ++x) {
+      for (int y = 0; y < height; ++y) {
+        auto index    = static_cast<size_t>((y * width + x) * 3);
+        auto newIndex = static_cast<size_t>((y * width + x) * 4);
+
+        // Map Old Value to new value.
+        rgbaData[newIndex + 0] = rgbDataUint32Array[index + 0];
+        rgbaData[newIndex + 1] = rgbDataUint32Array[index + 1];
+        rgbaData[newIndex + 2] = rgbDataUint32Array[index + 2];
+
+        // Add fully opaque alpha channel.
+        rgbaData[newIndex + 3] = 1;
+      }
+    }
+    return ArrayBufferView(rgbaData);
+  }
 }
 
 } // end of namespace BABYLON
