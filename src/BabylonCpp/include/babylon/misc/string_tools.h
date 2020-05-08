@@ -265,11 +265,11 @@ inline bool isDigit(T x)
 /**
  * @brief Joins the list using the delimiter character.
  * @param v Required. The list to join.
- * @param delim Required. The delimiter character.
+ * @param delim Required. The delimiter character(s).
  * @return A new String, containing the joined list.
  */
-template <typename T>
-inline std::string join(const T& v, char delim)
+template <typename T, typename dT>
+inline std::string join(const T& v, dT delim)
 {
   std::ostringstream s;
   for (const auto& i : v) {
