@@ -573,25 +573,15 @@ std::string InputBlock::_dumpPropertiesCode()
                                variableName.c_str(), static_cast<unsigned int>(*_systemValue));
   }
   if (isUniform()) {
+    std::vector<std::string> codes;
+
     std::string valueString = "";
+
     switch (type) {
       case NodeMaterialBlockConnectionPointTypes::Float: {
         const auto floatValue = value()->get<float>();
-        auto returnValue
-          = StringTools::printf("%s.value = %f;\r\n", variableName.c_str(), floatValue);
-
-        returnValue += StringTools::printf("%s.min = %f;\r\n", variableName.c_str(), min);
-        returnValue += StringTools::printf("%s.max = %f;\r\n", variableName.c_str(), max);
-        returnValue += StringTools::printf("%s.isBoolean = %s;\r\n", variableName.c_str(),
-                                           isBoolean ? "true" : "false");
-        returnValue
-          += StringTools::printf("%s.matrixMode = %u;\r\n", variableName.c_str(), matrixMode);
-        returnValue
-          += StringTools::printf("%s.animationType  = AnimatedInputBlockTypes(%u);\r\n",
-                                 variableName.c_str(), static_cast<unsigned int>(animationType()));
-
-        return returnValue;
-      }
+        valueString           = StringTools::printf("%f", floatValue);
+      } break;
       case NodeMaterialBlockConnectionPointTypes::Vector2: {
         const auto& vector2Value = value()->get<Vector2>();
         valueString = StringTools::printf("Vector2(%f, %f)", vector2Value.x, vector2Value.y);
@@ -623,13 +613,32 @@ std::string InputBlock::_dumpPropertiesCode()
       default:
         break;
     }
-    auto finalOutput = StringTools::printf("%s.value = ${valueString};\r\n", variableName.c_str());
-    finalOutput += StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
-                                       isConstant ? "true" : "false");
-    finalOutput += StringTools::printf("%s.visibleInInspector = %s;\r\n", variableName.c_str(),
-                                       visibleInInspector ? "true" : "false");
 
-    return finalOutput;
+    // Common Property "Value"
+    codes.emplace_back(
+      StringTools::printf("%s.value = %s", variableName.c_str(), valueString.c_str()));
+
+    // Float-Value-Specific Properties
+    if (type == NodeMaterialBlockConnectionPointTypes::Float) {
+      stl_util::concat(
+        codes,
+        {StringTools::printf("%s.min = %f;\r\n", variableName.c_str(), min),
+         StringTools::printf("%s.max = %f;\r\n", variableName.c_str(), max),
+         StringTools::printf("%s.isBoolean = %s;\r\n", variableName.c_str(),
+                             isBoolean ? "true" : "false"),
+         StringTools::printf("%s.matrixMode = %u;\r\n", variableName.c_str(), matrixMode),
+         StringTools::printf("%s.animationType  = AnimatedInputBlockTypes(%u);\r\n",
+                             variableName.c_str(), static_cast<unsigned int>(animationType()))});
+    }
+
+    // Common Property "Type"
+    stl_util::concat(codes,
+                     {StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
+                                          isConstant ? "true" : "false"),
+                      StringTools::printf("%s.visibleInInspector = %s;\r\n", variableName.c_str(),
+                                          visibleInInspector ? "true" : "false")});
+
+    return StringTools::join(codes, ";\r\n");
   }
   return "";
 }
