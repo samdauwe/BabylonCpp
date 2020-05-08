@@ -154,6 +154,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"SHEEN", false},                //
     {"SHEEN_TEXTURE", false},        //
     {"SHEEN_LINKWITHALBEDO", false}, //
+    {"SHEEN_ROUGHNESS", false},      //
+    {"SHEEN_ALBEDOSCALING", false},  //
 
     {"SUBSURFACE", false}, //
 
