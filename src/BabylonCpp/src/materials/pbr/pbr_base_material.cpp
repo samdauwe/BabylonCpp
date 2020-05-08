@@ -54,7 +54,6 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , subSurface{std::make_shared<PBRSubSurfaceConfiguration>(
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , customShaderNameResolve{nullptr}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}
@@ -109,7 +108,6 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _forceAlphaTest{false}
     , _useAlphaFresnel{false}
     , _useLinearAlphaFresnel{false}
-    , _transparencyMode{std::nullopt}
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
@@ -217,24 +215,6 @@ void PBRBaseMaterial::set_useLogarithmicDepth(bool value)
   _useLogarithmicDepth = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
 }
 
-std::optional<unsigned int>& PBRBaseMaterial::get_transparencyMode()
-{
-  return _transparencyMode;
-}
-
-void PBRBaseMaterial::set_transparencyMode(const std::optional<unsigned int>& value)
-{
-  if (_transparencyMode == value) {
-    return;
-  }
-
-  _transparencyMode = value;
-
-  _forceAlphaTest = (*value == PBRBaseMaterial::PBRMATERIAL_ALPHATESTANDBLEND);
-
-  _markAllSubMeshesAsTexturesAndMiscDirty();
-}
-
 bool PBRBaseMaterial::_disableAlphaBlending() const
 {
   return (subSurface->disableAlphaBlending()
@@ -248,15 +228,6 @@ bool PBRBaseMaterial::needAlphaBlending() const
     return false;
   }
   return (alpha() < 1.f) || (_opacityTexture != nullptr) || _shouldUseAlphaFromAlbedoTexture();
-}
-
-bool PBRBaseMaterial::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
-{
-  if (_disableAlphaBlending() && mesh.visibility() >= 1.f) {
-    return false;
-  }
-
-  return PushMaterial::needAlphaBlendingForMesh(mesh);
 }
 
 bool PBRBaseMaterial::needAlphaTesting() const
@@ -300,10 +271,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
   auto scene      = getScene();
   auto definesPtr = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
   auto& defines   = *definesPtr;
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (defines._renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -412,6 +381,12 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh
   auto effect              = _prepareEffect(mesh, defines, onCompiled, onError, useInstances);
 
   if (effect) {
+    /* if (_onEffectCreatedObservable) */ {
+      onCreatedEffectParameters.effect  = effect.get();
+      onCreatedEffectParameters.subMesh = subMesh;
+      _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
+    }
+
     // Use previous effect while new one is compiling
     if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
       effect             = previousEffect;
@@ -681,7 +656,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
   if (customShaderNameResolve) {
-    shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines);
+    shaderName
+      = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines, attribs);
   }
 
   auto join = defines.toString();
@@ -1025,6 +1001,11 @@ void PBRBaseMaterial::forceCompilation(AbstractMesh* mesh,
   PBRMaterialDefines defines;
   auto effect = _prepareEffect(mesh, defines, nullptr, nullptr, localOptions.useInstances,
                                localOptions.clipPlane);
+  /* if (_onEffectCreatedObservable) */ {
+    onCreatedEffectParameters.effect  = effect.get();
+    onCreatedEffectParameters.subMesh = nullptr;
+    _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
+  }
   if (effect->isReady()) {
     if (iOnCompiled) {
       iOnCompiled(this);

@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_PBR_PBR_BASE_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/structs.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/maths/vector4.h>
 
@@ -39,26 +40,27 @@ public:
    * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
    * use.
    */
-  static constexpr unsigned int PBRMATERIAL_OPAQUE = 0;
+  static constexpr unsigned int PBRMATERIAL_OPAQUE = Material::MATERIAL_OPAQUE;
 
   /**
    * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
    * certain threshold defined by the alpha cutoff value.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATEST = 1;
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST = Material::MATERIAL_ALPHATEST;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
    * mode) with the already drawn pixels in the current frame buffer.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = 2;
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = Material::MATERIAL_ALPHABLEND;
 
   /**
    * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
    * mode) with the already drawn pixels in the current frame buffer. They are
    * also discarded below the alpha cutoff threshold to improve performances.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
+  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND
+    = Material::MATERIAL_ALPHATESTANDBLEND;
 
   /**
    * Defines the default value of how much AO map is occluding the analytical
@@ -109,12 +111,6 @@ public:
    * blend mode.
    */
   [[nodiscard]] bool needAlphaBlending() const override;
-
-  /**
-   * @brief Specifies if the mesh will require alpha blending.
-   * @param mesh - BJS mesh.
-   */
-  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
@@ -223,24 +219,6 @@ protected:
   void set_useLogarithmicDepth(bool value) override;
 
   /**
-   * @brief Gets the current transparency mode.
-   */
-  std::optional<unsigned int>& get_transparencyMode();
-
-  /**
-   * @brief Sets the transparency mode of the material.
-   *
-   * | Value | Type                                | Description |
-   * | ----- | ----------------------------------- | ----------- |
-   * | 0     | OPAQUE                              |             |
-   * | 1     | ALPHATEST                           |             |
-   * | 2     | ALPHABLEND                          |             |
-   * | 3     | ALPHATESTANDBLEND                   |             |
-   *
-   */
-  void set_transparencyMode(const std::optional<unsigned int>& value);
-
-  /**
    * @brief hidden
    * This is reserved for the inspector.
    * Defines the material debug mode.
@@ -305,16 +283,6 @@ public:
    * Defines the SubSurface parameters for the material.
    */
   PBRSubSurfaceConfigurationPtr subSurface;
-
-  /**
-   * Custom callback helping to override the default shader used in the
-   * material.
-   */
-  std::function<std::string(const std::string& shaderName, const std::vector<std::string>& uniforms,
-                            const std::vector<std::string>& uniformBuffers,
-                            const std::vector<std::string>& samplers,
-                            const PBRMaterialDefines& defines)>
-    customShaderNameResolve;
 
 protected:
   /**
@@ -637,11 +605,6 @@ protected:
   bool _useLinearAlphaFresnel;
 
   /**
-   * The transparency mode of the material.
-   */
-  std::optional<unsigned int> _transparencyMode;
-
-  /**
    * Specifies the environment BRDF texture used to comput the scale and offset
    * roughness values
    * from cos thetav and roughness:
@@ -684,6 +647,8 @@ protected:
   bool _rebuildInParallel;
 
 private:
+  OnCreatedEffectParameters onCreatedEffectParameters;
+
   /**
    * This stores the direct, emissive, environment, and specular light
    * intensities into a Vector4.
