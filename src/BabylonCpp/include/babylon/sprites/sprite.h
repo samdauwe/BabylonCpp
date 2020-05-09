@@ -150,6 +150,32 @@ public:
   bool isPickable;
 
   /**
+   * Gets or sets a boolean indicating that sprite texture alpha will be used for precise picking
+   * (false by default).
+   */
+  bool useAlphaForPicking;
+
+  /**
+   * Hidden
+   */
+  int _xOffset;
+
+  /**
+   * Hidden
+   */
+  int _yOffset;
+
+  /**
+   * Hidden
+   */
+  size_t _xSize;
+
+  /**
+   * Hidden
+   */
+  size_t _ySize;
+
+  /**
    * Gets or sets the associated action manager
    */
   ActionManager* actionManager;

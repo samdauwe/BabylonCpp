@@ -20,6 +20,7 @@ Sprite::Sprite(const std::string& iName, const ISpriteManagerPtr& manager)
     , invertU{0}
     , invertV{0}
     , isPickable{false}
+    , useAlphaForPicking{false}
     , actionManager{nullptr}
     , isVisible{true}
     , size{this, &Sprite::get_size, &Sprite::set_size}
