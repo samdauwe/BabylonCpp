@@ -45,6 +45,12 @@ public:
   /** Define the Url to load snippets */
   static constexpr const char* SnippetUrl = "https://snippet.babylonjs.com";
 
+  /**
+   * Gets or sets a boolean indicating that node materials should not deserialize textures from
+   * json / snippet content
+   */
+  static bool IgnoreTexturesAtLoadTime;
+
 public:
   template <typename... Ts>
   static NodeMaterialPtr New(Ts&&... args)
@@ -253,6 +259,12 @@ public:
   void loadFromSerialization(const json& source, const std::string& rootUrl = "");
 
   /**
+   * @brief Makes a duplicate of the current material.
+   * @param name - name to use for the new material.
+   */
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+
+  /**
    * @brief Creates a node material from parsed material data.
    * @param source defines the JSON representation of the material
    * @param scene defines the hosting scene
@@ -326,6 +338,11 @@ private:
 
 public:
   /**
+   * Snippet ID if the material was created from the snippet server
+   */
+  std::string snippetId;
+
+  /**
    * Gets or sets a boolean indicating that alpha value must be ignored (This will turn alpha
    * blending off even if an alpha value is produced by the material)
    */
@@ -374,6 +391,7 @@ protected:
 
 private:
   static size_t _BuildIdGenerator;
+  OnCreatedEffectParameters onCreatedEffectParameters;
   INodeMaterialOptionsPtr _options;
   NodeMaterialBuildStatePtr _vertexCompilationState;
   NodeMaterialBuildStatePtr _fragmentCompilationState;

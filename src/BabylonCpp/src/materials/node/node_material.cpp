@@ -30,7 +30,8 @@
 
 namespace BABYLON {
 
-size_t NodeMaterial::_BuildIdGenerator = 0;
+bool NodeMaterial::IgnoreTexturesAtLoadTime = false;
+size_t NodeMaterial::_BuildIdGenerator      = 0;
 
 NodeMaterial::NodeMaterial(const std::string& iName, Scene* iScene,
                            const INodeMaterialOptionsPtr& options)
@@ -117,13 +118,21 @@ void NodeMaterial::_attachImageProcessingConfiguration(
 
 NodeMaterialBlockPtr NodeMaterial::getBlockByName(const std::string& iName) const
 {
+  NodeMaterialBlockPtr result = nullptr;
   for (const auto& block : attachedBlocks) {
     if (block->name == iName) {
-      return block;
+      if (!result) {
+        result = block;
+      }
+      else {
+        BABYLON_LOGF_WARN("NodeMaterial", "More than one block was found with the name '%s'",
+                          name.c_str())
+        return result;
+      }
     }
   }
 
-  return nullptr;
+  return result;
 }
 
 NodeMaterialBlockPtr NodeMaterial::getBlockByPredicate(
@@ -523,10 +532,8 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
   }
 
   auto defines = std::static_pointer_cast<NodeMaterialDefines>(subMesh->_materialDefines);
-  if (!checkReadyOnEveryCall && subMesh->effect()) {
-    if (defines->_renderId == scene->getRenderId()) {
-      return true;
-    }
+  if (_isReadyForSubMesh(subMesh)) {
+    return true;
   }
 
   auto engine = scene->getEngine();
@@ -624,6 +631,12 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, b
     auto effect = scene->getEngine()->createEffect(baseName, iOptions, engine);
 
     if (effect) {
+      /* if (_onEffectCreatedObservable()) */ {
+        onCreatedEffectParameters.effect  = effect.get();
+        onCreatedEffectParameters.subMesh = subMesh;
+        _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
+      }
+
       // Use previous effect while new one is compiling
       if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
         effect = previousEffect;
@@ -968,6 +981,11 @@ void NodeMaterial::_restoreConnections(const NodeMaterialBlockPtr& block, const 
 
 void NodeMaterial::loadFromSerialization(const json& /*source*/, const std::string& /*rootUrl*/)
 {
+}
+
+MaterialPtr NodeMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
+{
+  return nullptr;
 }
 
 NodeMaterialPtr NodeMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
