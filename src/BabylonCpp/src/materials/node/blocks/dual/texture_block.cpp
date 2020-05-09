@@ -407,7 +407,7 @@ std::string TextureBlock::_dumpPropertiesCode()
     return "";
   }
 
-  auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\");\r\n",
+  auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", nullptr);\r\n",
                                         _codeVariableName.c_str(), texture->name.c_str());
   codeString
     += StringTools::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(), texture->wrapU);
