@@ -1409,7 +1409,7 @@ public:
    * @param y position on screen
    * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
    * this case, a sprite must have isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null.
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @param camera camera to use for computing the picking ray. Can be set to null. In this case,
    * the scene.activeCamera will be used
    * @returns a PickingInfo
@@ -1423,7 +1423,7 @@ public:
    * @param ray The ray (in world space) to use to pick meshes
    * @param predicate Predicate function used to determine eligible sprites. Can be set to null. In
    * this case, a sprite must have isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null.
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @param camera camera to use. Can be set to null. In this case, the scene.activeCamera will be
    * used
    * @returns a PickingInfo
