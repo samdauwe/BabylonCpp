@@ -129,6 +129,8 @@ private:
   void _makePacked(const std::string& imgUrl, const std::string& spriteJSON);
   void _appendSpriteVertex(size_t index, Sprite& sprite, int offsetX, int offsetY,
                            const ISize& baseSize);
+  bool _checkTextureAlpha(Sprite& sprite, const Ray& ray, float distance, const Vector3& min,
+                          const Vector3& max);
 
 public:
   /**
@@ -200,6 +202,8 @@ private:
    * True when packed cell data from JSON file is ready
    */
   bool _packedAndReady;
+
+  Uint8Array _textureContent;
 
   Observer<SpriteManager>::Ptr _onDisposeObserver;
   size_t _capacity;

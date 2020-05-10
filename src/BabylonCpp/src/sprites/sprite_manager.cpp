@@ -17,6 +17,7 @@
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/sprites/sprite_scene_component.h>
 
@@ -159,7 +160,8 @@ TexturePtr& SpriteManager::get_texture()
 
 void SpriteManager::set_texture(const TexturePtr& value)
 {
-  _spriteTexture = value;
+  _spriteTexture  = value;
+  _textureContent = {};
 }
 
 unsigned int SpriteManager::get_blendMode() const
@@ -214,22 +216,79 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offset
   _vertexData[arrayOffset + 9] = sprite.invertV ? 1.f : 0.f;
   // CellIfo
   if (_packedAndReady) {
-    // TODO implement
+    if (sprite.cellRef.empty()) {
+      sprite.cellIndex = 0;
+    }
+    auto num = sprite.cellIndex;
+    if (StringTools::isDigit(num)) {
+      sprite.cellRef = _spriteMap[static_cast<size_t>(sprite.cellIndex)];
+    }
+    /*
+    const auto spriteCellRef = StringTools::toNumber<size_t>(sprite.cellRef);
+    sprite._xOffset = _cellData[spriteCellRef].frame.x / baseSize.width;
+    sprite._yOffset = _cellData[spriteCellRef].frame.y / baseSize.height;
+    sprite._xSize = _cellData[spriteCellRef].frame.w;
+    sprite._ySize = _cellData[spriteCellRef].frame.h;
+    */
+    _vertexData[arrayOffset + 10] = sprite._xOffset;
+    _vertexData[arrayOffset + 11] = sprite._yOffset;
+    _vertexData[arrayOffset + 12] = static_cast<float>(sprite._xSize) / baseSize.width;
+    _vertexData[arrayOffset + 13] = static_cast<float>(sprite._ySize) / baseSize.height;
   }
   else {
-    auto rowSize = baseSize.width / cellWidth;
-    auto offset  = (rowSize == 0) ? 0 : sprite.cellIndex / rowSize;
-    _vertexData[arrayOffset + 10]
-      = static_cast<float>((sprite.cellIndex - offset * rowSize) * cellWidth / baseSize.width);
-    _vertexData[arrayOffset + 11] = static_cast<float>(offset * cellHeight / baseSize.height);
-    _vertexData[arrayOffset + 12] = static_cast<float>(cellWidth / baseSize.width);
-    _vertexData[arrayOffset + 13] = static_cast<float>(cellHeight / baseSize.height);
+    auto rowSize    = baseSize.width / cellWidth;
+    auto offset     = (rowSize == 0) ? 0 : sprite.cellIndex / rowSize;
+    sprite._xOffset = (sprite.cellIndex - offset * rowSize) * cellWidth / baseSize.width;
+    sprite._yOffset = offset * cellHeight / baseSize.height;
+    sprite._xSize   = cellWidth;
+    sprite._ySize   = cellHeight;
+    _vertexData[arrayOffset + 10] = static_cast<float>(sprite._xOffset);
+    _vertexData[arrayOffset + 11] = static_cast<float>(sprite._yOffset);
+    _vertexData[arrayOffset + 12] = static_cast<float>(cellWidth) / baseSize.width;
+    _vertexData[arrayOffset + 13] = static_cast<float>(cellHeight) / baseSize.height;
   }
   // Color
   _vertexData[arrayOffset + 14] = sprite.color->r;
   _vertexData[arrayOffset + 15] = sprite.color->g;
   _vertexData[arrayOffset + 16] = sprite.color->b;
   _vertexData[arrayOffset + 17] = sprite.color->a;
+}
+
+bool SpriteManager::_checkTextureAlpha(Sprite& sprite, const Ray& ray, float distance,
+                                       const Vector3& min, const Vector3& max)
+{
+  if (!sprite.useAlphaForPicking || !_spriteTexture) {
+    return true;
+  }
+
+  const auto textureSize = _spriteTexture->getSize();
+  if (_textureContent.empty()) {
+    _textureContent = Uint8Array(static_cast<size_t>(textureSize.width * textureSize.height * 4));
+    _spriteTexture->readPixels(0, 0, _textureContent);
+  }
+
+  auto& contactPoint = TmpVectors::Vector3Array[0];
+
+  contactPoint.copyFrom(ray.direction);
+
+  contactPoint.normalize();
+  contactPoint.scaleInPlace(distance);
+  contactPoint.addInPlace(ray.origin);
+
+  const auto contactPointU = ((contactPoint.x - min.x) / (max.x - min.x)) - 0.5f;
+  const auto contactPointV = (1.f - (contactPoint.y - min.y) / (max.y - min.y)) - 0.5f;
+
+  // Rotate
+  const auto angle    = sprite.angle;
+  const auto rotatedU = 0.5f + (contactPointU * std::cos(angle) - contactPointV * std::sin(angle));
+  const auto rotatedV = 0.5f + (contactPointU * std::sin(angle) + contactPointV * std::cos(angle));
+
+  const auto u = sprite._xOffset * textureSize.width + rotatedU * sprite._xSize;
+  const auto v = sprite._yOffset * textureSize.height + rotatedV * sprite._ySize;
+
+  const auto alpha = _textureContent[static_cast<size_t>(u + v * textureSize.width) * 4 + 3];
+
+  return (alpha > 0.5f);
 }
 
 std::optional<PickingInfo>
@@ -273,6 +332,11 @@ SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
       auto currentDistance = Vector3::Distance(cameraSpacePosition, ray.origin);
 
       if (distance > currentDistance) {
+
+        if (!_checkTextureAlpha(*sprite, ray, currentDistance, min, max)) {
+          continue;
+        }
+
         distance      = currentDistance;
         currentSprite = sprite;
 
@@ -343,6 +407,10 @@ SpriteManager::multiIntersects(const Ray& ray, const CameraPtr& camera,
 
     if (ray.intersectsBoxMinMax(min, max)) {
       distance = Vector3::Distance(cameraSpacePosition, ray.origin);
+
+      if (!_checkTextureAlpha(*sprite, ray, distance, min, max)) {
+        continue;
+      }
 
       PickingInfo result;
       results.emplace_back(result);
@@ -463,6 +531,8 @@ void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndText
     _spriteTexture->dispose();
     _spriteTexture = nullptr;
   }
+
+  _textureContent = {};
 
   // Remove from scene
   stl_util::remove_vector_elements_equal_sharedptr(_scene->spriteManagers, this);
