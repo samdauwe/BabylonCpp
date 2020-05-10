@@ -168,12 +168,12 @@ public:
   /**
    * Hidden
    */
-  size_t _xSize;
+  int _xSize;
 
   /**
    * Hidden
    */
-  size_t _ySize;
+  int _ySize;
 
   /**
    * Gets or sets the associated action manager
