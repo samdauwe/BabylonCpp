@@ -53,7 +53,7 @@ public:
   [[nodiscard]] std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
-   * @brief Called by the GPUParticleSystem to setup the update shader
+   * @brief Called by the GPUParticleSystem to setup the update shader.
    * @param effect defines the update shader
    */
   void applyToShader(Effect* effect) override;
