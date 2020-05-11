@@ -5,6 +5,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/ishadow_light.h>
@@ -61,8 +62,9 @@ CascadedShadowGenerator::CascadedShadowGenerator(int mapSize, const DirectionalL
     , _depthRenderer{nullptr}
     , _depthReducer{nullptr}
 {
-  if (_scene->getEngine()->webGLVersion == 1.f) {
-    throw std::runtime_error("CSM can only be used in WebGL2");
+  if (!CascadedShadowGenerator::IsSupported()) {
+    BABYLON_LOG_ERROR("CascadedShadowGenerator", "CascadedShadowMap needs WebGL 2 support.")
+    return;
   }
 
   usePercentageCloserFiltering = true;
@@ -515,9 +517,9 @@ void CascadedShadowGenerator::_computeMatrices()
                          std::round(tmpv1.z));                       // tmpv2 = roundedOrigin
     tmpv2.subtractInPlace(tmpv1).scaleInPlace(2.f / _mapSize.width); // tmpv2 = roundOffset
 
-    Matrix::TranslationToRef(tmpv2.x, tmpv2.y, 0.f, matrix);
+    Matrix::TranslationToRef(tmpv2.x, tmpv2.y, 0.f, tmpMatrix);
 
-    _projectionMatrices[cascadeIndex].multiplyToRef(matrix, _projectionMatrices[cascadeIndex]);
+    _projectionMatrices[cascadeIndex].multiplyToRef(tmpMatrix, _projectionMatrices[cascadeIndex]);
     _viewMatrices[cascadeIndex].multiplyToRef(_projectionMatrices[cascadeIndex],
                                               _transformMatrices[cascadeIndex]);
 
@@ -607,18 +609,27 @@ void CascadedShadowGenerator::_computeCascadeFrustum(unsigned int cascadeIndex)
 
     _frustumCenter[cascadeIndex].addToRef(_lightDirection, tmpv1); // tmpv1 = look at
 
-    Matrix::LookAtLHToRef(lightCameraPos, tmpv1, UpDir, matrix); // matrix = lightView
+    Matrix::LookAtLHToRef(lightCameraPos, tmpv1, UpDir, tmpMatrix); // matrix = lightView
 
     // Calculate an AABB around the frustum corners
     for (size_t cornerIndex = 0; cornerIndex < _frustumCornersWorldSpace[cascadeIndex].size();
          ++cornerIndex) {
       Vector3::TransformCoordinatesToRef(_frustumCornersWorldSpace[cascadeIndex][cornerIndex],
-                                         matrix, tmpv1);
+                                         tmpMatrix, tmpv1);
 
       _cascadeMinExtents[cascadeIndex].minimizeInPlace(tmpv1);
       _cascadeMaxExtents[cascadeIndex].maximizeInPlace(tmpv1);
     }
   }
+}
+
+bool CascadedShadowGenerator::IsSupported()
+{
+  const auto engine = EngineStore::LastCreatedEngine();
+  if (!engine) {
+    return false;
+  }
+  return engine->webGLVersion != 1.f;
 }
 
 void CascadedShadowGenerator::_initializeGenerator()
@@ -690,8 +701,15 @@ void CascadedShadowGenerator::_createTargetRenderTexture()
     }
   }
 
-  _shadowMap->onBeforeRenderObservable.add(
-    [this](int* layer, EventState & /*es*/) -> void { _currentLayer = *layer; });
+  _shadowMap->onBeforeRenderObservable.add([this](int* layer, EventState & /*es*/) -> void {
+    _currentLayer = *layer;
+    if (_scene->getSceneUniformBuffer()->useUbo()) {
+      const auto sceneUBO = _scene->getSceneUniformBuffer();
+      // sceneUBO->updateMatrix("viewProjection", getCascadeTransformMatrix(*layer));
+      // sceneUBO->updateMatrix("view", getCascadeViewMatrix(*layer));
+      sceneUBO->update();
+    }
+  });
 
   _shadowMap->onBeforeBindObservable.add(
     [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
@@ -707,6 +725,7 @@ void CascadedShadowGenerator::_createTargetRenderTexture()
 void CascadedShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* /*subMesh*/,
                                                                             Effect* effect)
 {
+  // TODO FIXME
   effect->setMatrix("viewProjection",
                     *getCascadeTransformMatrix(static_cast<unsigned>(_currentLayer)));
 }
@@ -714,9 +733,9 @@ void CascadedShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(SubM
 void CascadedShadowGenerator::_isReadyCustomDefines(std::vector<std::string>& defines,
                                                     SubMesh* /*subMesh*/, bool /*useInstances*/)
 {
-  if (_depthClamp && _filter != ShadowGenerator::FILTER_PCSS) {
-    defines.emplace_back("#define DEPTHCLAMP");
-  }
+  defines.emplace_back(
+    "#define SM_DEPTHCLAMP "
+    + std::string(_depthClamp && _filter != ShadowGenerator::FILTER_PCSS ? "1" : "0"));
 }
 
 void CascadedShadowGenerator::prepareDefines(MaterialDefines& defines, unsigned int lightIndex)

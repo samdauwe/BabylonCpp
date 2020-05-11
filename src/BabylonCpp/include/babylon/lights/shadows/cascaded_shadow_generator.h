@@ -117,6 +117,11 @@ public:
   void splitFrustum();
 
   /**
+   * @brief Support test.
+   */
+  static bool IsSupported();
+
+  /**
    * @brief Prepare all the defines in a material relying on a shadow map at the specified light
    * index.
    * @param defines Defines of the material we want to update
@@ -485,7 +490,8 @@ private:
   const Vector3 ZeroVec;
   Vector3 tmpv1;
   Vector3 tmpv2;
-  Matrix matrix;
+  Matrix tmpMatrix;
+  Matrix tmpMatrix2;
   static const std::vector<Vector3> frustumCornersNDCSpace;
   unsigned int _numCascades;
   bool _freezeShadowCastersBoundingInfo;
