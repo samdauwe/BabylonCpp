@@ -358,20 +358,20 @@ public:
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
-  [[nodiscard]] virtual bool hasEmitter() const = 0;
+  virtual bool hasEmitter() const = 0;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
    * @returns The max number of active particles.
    */
-  [[nodiscard]] virtual size_t getCapacity() const = 0;
+  virtual size_t getCapacity() const = 0;
 
   /**
    * @brief Gets if the system has been started. (Note: this will still be true
    * after stop is called).
    * @returns True if it has been started, otherwise false.
    */
-  [[nodiscard]] virtual bool isStarted() const = 0;
+  virtual bool isStarted() const = 0;
 
   /**
    * @brief Animates the particle system for this frame.
@@ -407,7 +407,7 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  [[nodiscard]] virtual json serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Rebuild the particle system.
@@ -878,14 +878,14 @@ public:
    * @brief Get hosting scene.
    * @returns the scene
    */
-  [[nodiscard]] virtual Scene* getScene() const = 0;
+  virtual Scene* getScene() const = 0;
 
 protected:
   /**
    * @brief Gets or sets a boolean indicating if the particles must be rendered
    * as billboard or aligned with the direction.
    */
-  [[nodiscard]] virtual bool get_isBillboardBased() const = 0;
+  virtual bool get_isBillboardBased() const = 0;
 
   /**
    * @brief Sets a boolean indicating if the particles must be rendered as
@@ -897,7 +897,7 @@ protected:
    * @brief Gets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
-  [[nodiscard]] virtual bool get_isAnimationSheetEnabled() const = 0;
+  virtual bool get_isAnimationSheetEnabled() const = 0;
 
   /**
    * @brief Sets whether an animation sprite sheet is enabled or not on the
@@ -920,7 +920,7 @@ protected:
    * Gets a boolean indicating that ramp gradients must be used
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
-  [[nodiscard]] virtual bool get_useRampGradients() const = 0;
+  virtual bool get_useRampGradients() const = 0;
 
   /**
    * @brief Not supported by GPUParticleSystem
