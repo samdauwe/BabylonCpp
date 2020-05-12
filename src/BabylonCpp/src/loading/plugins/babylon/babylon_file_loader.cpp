@@ -457,55 +457,6 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data, const std::s
       scene->setActiveCameraByID(json_util::get_string(parsedData, "activeCameraID"));
     }
 
-    // Environment texture
-    if (json_util::has_valid_key_value(parsedData, "environmentTexture")) {
-      const auto environmentTextureStr = json_util::get_string(parsedData, "environmentTexture");
-      // PBR needed for both HDR texture (gamma space) & a sky box
-      auto isPBR = json_util::get_bool(parsedData, "isPBR", true);
-      if (json_util::has_valid_key_value(parsedData, "environmentTextureType")
-          && json_util::get_string(parsedData, "environmentTextureType")
-               == "BABYLON.HDRCubeTexture") {
-        size_t hdrSize = (json_util::has_valid_key_value(parsedData, "environmentTextureSize")) ?
-                           json_util::get_number<size_t>(parsedData, "environmentTextureSize") :
-                           128;
-        auto hdrTexture
-          = HDRCubeTexture::New(rootUrl + environmentTextureStr, scene, hdrSize, true, !isPBR);
-        if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
-          hdrTexture->rotationY
-            = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
-        }
-        scene->environmentTexture = hdrTexture;
-      }
-      else {
-        if (StringTools::endsWith(environmentTextureStr, ".env")) {
-          auto compressedTexture = CubeTexture::New(rootUrl + environmentTextureStr, scene);
-          if (json_util::has_valid_key_value(parsedData, "environmentTextureRotationY")) {
-            compressedTexture->rotationY
-              = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
-          }
-          scene->environmentTexture = compressedTexture;
-        }
-        else {
-          auto cubeTexture
-            = CubeTexture::CreateFromPrefilteredData(rootUrl + environmentTextureStr, scene);
-          if (json_util::has_key(parsedData, "environmentTextureRotationY")) {
-            cubeTexture->rotationY
-              = json_util::get_number<float>(parsedData, "environmentTextureRotationY");
-          }
-          scene->environmentTexture = cubeTexture;
-        }
-      }
-      if (json_util::has_key(parsedData, "createDefaultSkybox")
-          && json_util::get_bool(parsedData, "createDefaultSkybox")) {
-        auto skyboxScale = (scene->activeCamera() != nullptr) ?
-                             (scene->activeCamera()->maxZ - scene->activeCamera()->minZ) / 2.f :
-                             1000.f;
-        auto skyboxBlurLevel = json_util::get_number<float>(parsedData, "skyboxBlurLevel", 0.f);
-        scene->createDefaultSkybox(scene->environmentTexture(), isPBR, skyboxScale,
-                                   skyboxBlurLevel);
-      }
-    }
-
     // Finish
     finally("importScene", log, parsedData);
 
