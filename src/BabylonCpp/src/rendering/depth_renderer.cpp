@@ -133,7 +133,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
 
       // Draw
       renderingMesh->_processRendering(
-        effectiveMesh, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+        effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
         hardwareInstancedRendering,
         [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
           _effect->setMatrix("world", world);

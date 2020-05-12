@@ -592,7 +592,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
     // Draw
     renderingMesh->_processRendering(
-      effectiveMesh, subMesh, _effectLayerMapGenerationEffect,
+      effectiveMesh.get(), subMesh, _effectLayerMapGenerationEffect,
       static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
         _effectLayerMapGenerationEffect->setMatrix("world", world);

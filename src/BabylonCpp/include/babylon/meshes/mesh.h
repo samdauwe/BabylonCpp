@@ -705,7 +705,7 @@ public:
    * @brief Hidden
    */
   Mesh& _processRendering(
-    const AbstractMeshPtr& renderingMesh, SubMesh* subMesh, const EffectPtr& effect, int fillMode,
+    AbstractMesh* renderingMesh, SubMesh* subMesh, const EffectPtr& effect, int fillMode,
     const _InstancesBatchPtr& batch, bool hardwareInstancedRendering,
     std::function<void(bool isInstance, const Matrix& world, Material* effectiveMaterial)>
       onBeforeDraw,

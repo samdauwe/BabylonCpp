@@ -20,6 +20,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -647,7 +648,9 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
   for (const auto& light : _lightSources) {
     auto generator = light->getShadowGenerator();
 
-    if (generator) {
+    if (generator
+        && (generator->getShadowMap()->renderList().empty()
+            || stl_util::contains(generator->getShadowMap()->renderList(), this))) {
       for (const auto& subMesh : subMeshes) {
         if (!generator->isReady(subMesh.get(), hardwareInstancedRendering)) {
           return false;
@@ -760,12 +763,12 @@ SubMeshPtr Mesh::_createGlobalSubMesh(bool force)
     }
     else {
       for (const auto& submesh : subMeshes) {
-        if (submesh->indexStart + submesh->indexCount >= totalIndices) {
+        if (submesh->indexStart + submesh->indexCount > totalIndices) {
           needToRecreate = true;
           break;
         }
 
-        if (submesh->verticesStart + submesh->verticesCount >= totalVertices) {
+        if (submesh->verticesStart + submesh->verticesCount > totalVertices) {
           needToRecreate = true;
           break;
         }
@@ -908,6 +911,11 @@ Mesh& Mesh::makeGeometryUnique()
   if (!_geometry) {
     return *this;
   }
+
+  if (_geometry->meshes().size() == 1) {
+    return *this;
+  }
+
   auto oldGeometry = _geometry;
   auto geometry_   = _geometry->copy(Geometry::RandomId());
   oldGeometry->releaseForMesh(this, true);
@@ -1184,7 +1192,7 @@ void Mesh::_processInstancedBuffers(const std::vector<InstancedMesh*>& /*visible
 }
 
 Mesh& Mesh::_processRendering(
-  const AbstractMeshPtr& /*renderingMesh*/, SubMesh* subMesh, const EffectPtr& effect, int fillMode,
+  AbstractMesh* renderingMesh, SubMesh* subMesh, const EffectPtr& effect, int fillMode,
   const _InstancesBatchPtr& batch, bool hardwareInstancedRendering,
   std::function<void(bool isInstance, const Matrix& world, Material* effectiveMaterial)>
     iOnBeforeDraw,
@@ -1201,7 +1209,7 @@ Mesh& Mesh::_processRendering(
     if (batch->renderSelf[subMesh->_id]) {
       // Draw
       if (iOnBeforeDraw) {
-        iOnBeforeDraw(false, _effectiveMesh()->getWorldMatrix(), effectiveMaterial);
+        iOnBeforeDraw(false, renderingMesh->_effectiveMesh()->getWorldMatrix(), effectiveMaterial);
       }
       ++instanceCount;
 
@@ -1400,7 +1408,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
   if (!_effectiveMaterial->backFaceCulling() && _effectiveMaterial->separateCullingPass) {
     engine->setState(true, _effectiveMaterial->zOffset, false, !reverse);
     _processRendering(
-      nullptr, subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
+      this, subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
       [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
         _onBeforeDraw(isInstance, world, effectiveMaterial);
       },
@@ -1409,7 +1417,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
   }
 
   // Draw
-  _processRendering(nullptr, subMesh, effect, static_cast<int>(fillMode), batch,
+  _processRendering(this, subMesh, effect, static_cast<int>(fillMode), batch,
                     hardwareInstancedRendering,
                     [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
                       _onBeforeDraw(isInstance, world, effectiveMaterial);
@@ -2410,11 +2418,26 @@ void Mesh::forceSharedVertices()
 
 InstancedMeshPtr Mesh::createInstance(const std::string& iName)
 {
+  const auto& iGeometry = geometry();
+
+  if (iGeometry && iGeometry->meshes().size() > 1) {
+    for (const auto& other : iGeometry->meshes()) {
+      if (other == this) {
+        continue;
+      }
+      other->makeGeometryUnique();
+    }
+  }
+
   return InstancedMesh::New(iName, shared_from_base<Mesh>());
 }
 
 Mesh& Mesh::synchronizeInstances()
 {
+  if (_geometry && _geometry->meshes().size() != 1 && instances.size()) {
+    makeGeometryUnique();
+  }
+
   for (const auto& instance : instances) {
     instance->_syncSubMeshes();
   }
@@ -3653,7 +3676,8 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource
   vertexData->applyToMesh(*meshSubclass);
 
   // Setting properties
-  meshSubclass->checkCollisions = source->checkCollisions();
+  meshSubclass->checkCollisions                 = source->checkCollisions();
+  meshSubclass->overrideMaterialSideOrientation = source->overrideMaterialSideOrientation;
 
   // Cleaning
   if (disposeSource) {

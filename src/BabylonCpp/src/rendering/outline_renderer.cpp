@@ -120,7 +120,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   engine->setZOffset(-zOffset);
 
   renderingMesh->_processRendering(
-    effectiveMesh, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+    effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
     hardwareInstancedRendering,
     [this](bool, const Matrix& world, Material*) { _effect->setMatrix("world", world); });
 
