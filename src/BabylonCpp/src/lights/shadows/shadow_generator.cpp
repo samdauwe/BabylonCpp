@@ -740,12 +740,16 @@ void ShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* /*s
 
 void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 {
-  auto mesh     = subMesh->getRenderingMesh();
-  auto scene    = _scene;
-  auto engine   = scene->getEngine();
-  auto material = subMesh->getMaterial();
+  auto ownerMesh = subMesh->getMesh();
+  auto replacementMesh
+    = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
+  auto renderingMesh = subMesh->getRenderingMesh();
+  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+  auto scene         = _scene;
+  auto engine        = scene->getEngine();
+  auto material      = subMesh->getMaterial();
 
-  mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
+  effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
   if (!material || subMesh->verticesCount == 0) {
     return;
@@ -755,7 +759,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
   engine->setState(material->backFaceCulling());
 
   // Managing instances
-  auto batch = mesh->_getInstancesRenderList(subMesh->_id);
+  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id);
   if (batch->mustReturn) {
     return;
   }
@@ -765,7 +769,8 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
                                     && (!batch->visibleInstances[subMesh->_id].empty());
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, material->fillMode());
+
+    renderingMesh->_bind(subMesh, _effect, material->fillMode());
 
     _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
 
@@ -795,11 +800,12 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
-      const auto& skeleton = mesh->skeleton();
+    if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+        && renderingMesh->skeleton()) {
+      const auto& skeleton = renderingMesh->skeleton();
 
       if (skeleton->isUsingTextureForMatrices) {
-        const auto& boneTexture = skeleton->getTransformMatrixTexture(mesh.get());
+        const auto& boneTexture = skeleton->getTransformMatrixTexture(renderingMesh.get());
 
         if (!boneTexture) {
           return;
@@ -809,12 +815,12 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
         _effect->setFloat("boneTextureWidth", 4.f * (skeleton->bones.size() + 1));
       }
       else {
-        _effect->setMatrices("mBones", skeleton->getTransformMatrices((mesh.get())));
+        _effect->setMatrices("mBones", skeleton->getTransformMatrices((renderingMesh.get())));
       }
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
 
     // Clip planes
     MaterialHelper::BindClipPlane(_effect, scene);
@@ -826,12 +832,12 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     }
 
     // Observables
-    onBeforeShadowMapRenderMeshObservable.notifyObservers(mesh.get());
+    onBeforeShadowMapRenderMeshObservable.notifyObservers(renderingMesh.get());
     onBeforeShadowMapRenderObservable.notifyObservers(_effect.get());
 
     // Draw
-    mesh->_processRendering(
-      nullptr, subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+    renderingMesh->_processRendering(
+      effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
       hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
         _effect->setMatrix("world", world);
@@ -843,7 +849,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 
     // Observables
     onAfterShadowMapRenderObservable.notifyObservers(_effect.get());
-    onAfterShadowMapRenderMeshObservable.notifyObservers(mesh.get());
+    onAfterShadowMapRenderMeshObservable.notifyObservers(renderingMesh.get());
   }
   else {
     // Need to reset refresh rate of the shadowMap
