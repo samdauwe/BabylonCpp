@@ -25,11 +25,10 @@ using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief This represents a particle system in Babylon.
- * Particles are often small sprites used to simulate hard-to-reproduce
- * phenomena like fire, smoke, water, or abstract visual effects like magic
- * glitter and faery dust. Particles can take different shapes while emitted
- * like box, sphere, cone or you can write your custom function.
- * Example: https://doc.babylonjs.com/babylon101/particles
+ * Particles are often small sprites used to simulate hard-to-reproduce phenomena like fire, smoke,
+ * water, or abstract visual effects like magic glitter and faery dust. Particles can take different
+ * shapes while emitted like box, sphere, cone or you can write your custom function.
+ * @example https://doc.babylonjs.com/babylon101/particles
  */
 class BABYLON_SHARED_EXPORT ParticleSystem : public BaseParticleSystem, public IAnimatable {
 
@@ -52,16 +51,14 @@ public:
 public:
   /**
    * @brief Instantiates a particle system.
-   * Particles are often small sprites used to simulate hard-to-reproduce
-   * phenomena like fire, smoke, water, or abstract visual effects like magic
-   * glitter and faery dust.
+   * Particles are often small sprites used to simulate hard-to-reproduce phenomena like fire,
+   * smoke, water, or abstract visual effects like magic glitter and faery dust.
    * @param name The name of the particle system
    * @param capacity The max number of particles alive at the same time
    * @param scene The scene the particle system belongs to
-   * @param customEffect a custom effect used to change the way particles are
-   * rendered by default
-   * @param isAnimationSheetEnabled Must be true if using a spritesheet to
-   * animate the particles texture
+   * @param customEffect a custom effect used to change the way particles are rendered by default
+   * @param isAnimationSheetEnabled Must be true if using a spritesheet to animate the particles
+   * texture
    * @param epsilon Offset used to render the particles
    */
   ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
@@ -269,6 +266,11 @@ public:
   std::vector<Color3Gradient>& getRampGradients() override;
 
   /**
+   * @brief Force the system to rebuild all gradients that need to be resync
+   */
+  void forceRefreshGradients() override;
+
+  /**
    * @brief Adds a new ramp gradient used to remap particle colors.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param color defines the color to affect to the specified gradient
@@ -307,10 +309,22 @@ public:
   std::vector<Particle*>& particles();
 
   /**
+   * @brief Gets the number of particles active at the same time.
+   * @returns The number of active particles.
+   */
+  size_t getActiveCount() const override;
+
+  /**
    * @brief Returns the string "ParticleSystem".
    * @returns a string containing the class name
    */
-  [[nodiscard]] const char* getClassName() const;
+  [[nodiscard]] std::string getClassName() const override;
+
+  /**
+   * @brief Gets a boolean indicating that the system is stopping
+   * @returns true if the system is currently stopping
+   */
+  bool isStopping() const override;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
@@ -433,9 +447,10 @@ public:
 
   /**
    * @brief Serializes the particle system to a JSON object.
+   * @param serializeTexture defines if the texture must be serialized as well
    * @returns the JSON object
    */
-  [[nodiscard]] json serialize() const override;
+  [[nodiscard]] json serialize(bool serializeTexture = false) const override;
 
   /**
    * @brief Hidden
@@ -483,6 +498,7 @@ private:
                           float factor, const std::optional<float>& factor2 = std::nullopt);
   void _removeFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient);
   void _createRampGradientTexture();
+  void _syncRampGradientTexture();
   void _resetEffect();
   void _createVertexBuffers();
   void _createIndexBuffer();

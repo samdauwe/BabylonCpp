@@ -246,7 +246,7 @@ void GPUParticleSystem::reset()
   _targetIndex        = 0;
 }
 
-const char* GPUParticleSystem::getClassName() const
+std::string GPUParticleSystem::getClassName() const
 {
   return "GPUParticleSystem";
 }
@@ -1478,7 +1478,7 @@ IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/, Mesh* /*n
   return nullptr;
 }
 
-json GPUParticleSystem::serialize() const
+json GPUParticleSystem::serialize(bool /*serializeTexture*/) const
 {
   return nullptr;
 }

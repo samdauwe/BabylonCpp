@@ -53,6 +53,20 @@ public:
                     bool isAnimationSheetEnabled = false);
   ~GPUParticleSystem() override; // = default
 
+  /**/
+  size_t getActiveCount() const override
+  {
+    return 0;
+  }
+  void forceRefreshGradients() override
+  {
+  }
+  bool isStopping() const override
+  {
+    return false;
+  }
+  /**/
+
   /**
    * @brief Returns the object type.
    * @return the object type
@@ -98,7 +112,7 @@ public:
    * @brief Returns the string "GPUParticleSystem".
    * @returns a string containing the class name
    */
-  [[nodiscard]] const char* getClassName() const;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Adds a new color gradient.
@@ -373,7 +387,7 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  [[nodiscard]] json serialize() const override;
+  [[nodiscard]] json serialize(bool serializeTexture) const override;
 
   /**
    * @brief Parses a JSON object to create a GPU particle system.

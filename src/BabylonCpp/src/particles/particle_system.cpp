@@ -74,6 +74,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
 
   _scene = scene ? scene : Engine::LastCreatedScene();
 
+  uniqueId = _scene->getUniqueId();
+
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
 
@@ -218,12 +220,10 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
           });
       }
 
-      if (isLocal) {
-        if (particle->_localPosition) {
-          particle->_localPosition->addInPlace(_scaledDirection);
-          Vector3::TransformCoordinatesToRef(*particle->_localPosition, _emitterWorldMatrix,
-                                             particle->position);
-        }
+      if (isLocal && particle->_localPosition) {
+        particle->_localPosition->addInPlace(_scaledDirection);
+        Vector3::TransformCoordinatesToRef(*particle->_localPosition, _emitterWorldMatrix,
+                                           particle->position);
       }
       else {
         particle->position.addInPlace(_scaledDirection);
@@ -336,9 +336,19 @@ Type ParticleSystem::type() const
   return Type::PARTICLESYSTEM;
 }
 
-const char* ParticleSystem::getClassName() const
+size_t ParticleSystem::getActiveCount() const
+{
+  return _particles.size();
+}
+
+std::string ParticleSystem::getClassName() const
 {
   return "ParticleSystem";
+}
+
+bool ParticleSystem::isStopping() const
+{
+  return _stopped && isAlive();
 }
 
 void ParticleSystem::set_onDispose(
@@ -540,7 +550,7 @@ IParticleSystem& ParticleSystem::addStartSizeGradient(float gradient, float fact
 
 IParticleSystem& ParticleSystem::removeStartSizeGradient(float gradient)
 {
-  _removeFactorGradient(_emitRateGradients, gradient);
+  _removeFactorGradient(_startSizeGradients, gradient);
 
   return *this;
 }
@@ -577,10 +587,16 @@ std::vector<Color3Gradient>& ParticleSystem::getRampGradients()
   return _rampGradients;
 }
 
-IParticleSystem& ParticleSystem::addRampGradient(float gradient, const Color3& color)
+void ParticleSystem::forceRefreshGradients()
 {
-  Color3Gradient rampGradient(gradient, color);
-  _rampGradients.emplace_back(rampGradient);
+  _syncRampGradientTexture();
+}
+
+void ParticleSystem::_syncRampGradientTexture()
+{
+  if (_rampGradients.empty()) {
+    return;
+  }
 
   BABYLON::stl_util::sort_js_style(_rampGradients,
                                    [](const Color3Gradient& a, const Color3Gradient& b) {
@@ -600,6 +616,14 @@ IParticleSystem& ParticleSystem::addRampGradient(float gradient, const Color3& c
   }
 
   _createRampGradientTexture();
+}
+
+IParticleSystem& ParticleSystem::addRampGradient(float gradient, const Color3& color)
+{
+  Color3Gradient rampGradient(gradient, color);
+  _rampGradients.emplace_back(rampGradient);
+
+  _syncRampGradientTexture();
 
   return *this;
 }
@@ -924,7 +948,7 @@ void ParticleSystem::_appendParticleVertex(unsigned int index, Particle* particl
     _vertexData[offset++] = particle->direction.z;
   }
 
-  if (_useRampGradients) {
+  if (_useRampGradients && particle->remapData) {
     _vertexData[offset++] = particle->remapData->x;
     _vertexData[offset++] = particle->remapData->y;
     _vertexData[offset++] = particle->remapData->z;
@@ -1589,6 +1613,10 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   if (_rampGradientsTexture) {
+    if (_rampGradients.empty()) {
+      _rampGradientsTexture->dispose();
+      _rampGradientsTexture = nullptr;
+    }
     effect->setTexture("rampSampler", _rampGradientsTexture);
   }
 
@@ -1757,7 +1785,7 @@ IParticleSystem* ParticleSystem::clone(const std::string& /*iName*/, Mesh* /*new
   return nullptr;
 }
 
-json ParticleSystem::serialize() const
+json ParticleSystem::serialize(bool /*serializeTexture*/) const
 {
   return nullptr;
 }

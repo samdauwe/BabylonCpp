@@ -19,11 +19,10 @@ using RawTexturePtr                          = std::shared_ptr<RawTexture>;
 
 /**
  * @brief This represents the base class for particle system in Babylon.
- * Particles are often small sprites used to simulate hard-to-reproduce
- * phenomena like fire, smoke, water, or abstract visual effects like magic
- * glitter and faery dust. Particles can take different shapes while emitted
- * like box, sphere, cone or you can write your custom function.
- * Example https://doc.babylonjs.com/babylon101/particles
+ * Particles are often small sprites used to simulate hard-to-reproduce phenomena like fire, smoke,
+ * water, or abstract visual effects like magic glitter and faery dust. Particles can take different
+ * shapes while emitted like box, sphere, cone or you can write your custom function.
+ * @example https://doc.babylonjs.com/babylon101/particles
  */
 class BABYLON_SHARED_EXPORT BaseParticleSystem : public IParticleSystem {
 
@@ -394,15 +393,18 @@ protected:
 
 public:
   /**
-   * If you want to launch only a few particles at once, that can be done, as
-   * well.
+   * Gets or sets the unique id of the particle system
+   */
+  size_t uniqueId;
+
+  /**
+   * If you want to launch only a few particles at once, that can be done, as well.
    */
   int manualEmitCount;
 
   /**
-   * By default particle system starts as soon as they are created. This
-   * prevents the automatic start to happen and let you decide when to start
-   * emitting particles.
+   * By default particle system starts as soon as they are created. This prevents the automatic
+   * start to happen and let you decide when to start emitting particles.
    */
   bool preventAutoStart;
 
@@ -423,38 +425,34 @@ public:
   Vector3 worldOffset;
 
   /**
-   * An optional mask to filter some colors out of the texture, or filter a part
-   * of the alpha channel
+   * An optional mask to filter some colors out of the texture, or filter a part of the alpha
+   * channel
    */
   Color4 textureMask;
 
   /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter.
+   * Random direction of each particle after it has been emitted, between direction1 and direction2
+   * vectors. This only works when particleEmitterTyps is a BoxParticleEmitter.
    */
   Property<BaseParticleSystem, Vector3> direction1;
 
   /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter.
+   * Random direction of each particle after it has been emitted, between direction1 and direction2
+   * vectors. This only works when particleEmitterTyps is a BoxParticleEmitter.
    */
   Property<BaseParticleSystem, Vector3> direction2;
 
   /**
-   * Minimum box point around our emitter. Our emitter is the center of
-   * particles source, but if you want your particles to emit from more than
-   * one point, then you can tell it to do so. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter.
+   * Minimum box point around our emitter. Our emitter is the center of particles source, but if you
+   * want your particles to emit from more than one point, then you can tell it to do so. This only
+   * works when particleEmitterTyps is a BoxParticleEmitter.
    */
   Property<BaseParticleSystem, Vector3> minEmitBox;
 
   /**
-   * Maximum box point around our emitter. Our emitter is the center of
-   * particles source, but if you want your particles to emit from more than
-   * one point, then you can tell it to do so. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter.
+   * Maximum box point around our emitter. Our emitter is the center of particles source, but if you
+   * want your particles to emit from more than one point, then you can tell it to do so. This only
+   * works when particleEmitterTyps is a BoxParticleEmitter.
    */
   Property<BaseParticleSystem, Vector3> maxEmitBox;
 
@@ -486,8 +484,7 @@ protected:
   ImageProcessingConfigurationDefinesPtr _imageProcessingConfigurationDefines;
 
   /**
-   * Default configuration related to image processing available in the standard
-   * Material.
+   * Default configuration related to image processing available in the standard Material.
    */
   ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 
