@@ -355,6 +355,11 @@ public:
   Property<IParticleSystem, bool> isLocal;
 
   /**
+   * Snippet ID if the particle system was created from the snippet server
+   */
+  std::string snippetId;
+
+  /**
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
@@ -365,6 +370,12 @@ public:
    * @returns The max number of active particles.
    */
   virtual size_t getCapacity() const = 0;
+
+  /**
+   * @brief Gets the number of particles active at the same time.
+   * @returns The number of active particles.
+   */
+  virtual size_t getActiveCount() const = 0;
 
   /**
    * @brief Gets if the system has been started. (Note: this will still be true
@@ -405,14 +416,20 @@ public:
 
   /**
    * @brief Serializes the particle system to a JSON object.
+   * @param serializeTexture defines if the texture must be serialized as well
    * @returns the JSON object
    */
-  virtual json serialize() const = 0;
+  virtual json serialize(bool serializeTexture) const = 0;
 
   /**
    * @brief Rebuild the particle system.
    */
   virtual void rebuild() = 0;
+
+  /**
+   * @brief Force the system to rebuild all gradients that need to be resync
+   */
+  virtual void forceRefreshGradients() = 0;
 
   /**
    * @brief Starts the particle system and begins to emit.
@@ -432,10 +449,22 @@ public:
   virtual void reset() = 0;
 
   /**
+   * @brief Gets a boolean indicating that the system is stopping.
+   * @returns true if the system is currently stopping
+   */
+  virtual bool isStopping() const = 0;
+
+  /**
    * @brief Is this system ready to be used/rendered.
    * @return true if the system is ready
    */
   virtual bool isReady() = 0;
+
+  /**
+   * @brief Returns the string "ParticleSystem".
+   * @returns a string containing the class name
+   */
+  virtual std::string getClassName() const = 0;
 
   /**
    * @brief Adds a new color gradient.
