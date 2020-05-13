@@ -211,16 +211,23 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
   // Create scale cubes
   _scaleBoxesParent = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _scaleBoxesParent->rotationQuaternion = Quaternion();
-  for (unsigned int i = 0; i < 2; i++) {
-    for (unsigned int j = 0; j < 2; j++) {
-      for (unsigned int k = 0; k < 2; k++) {
+  for (unsigned int i = 0; i < 3; ++i) {
+    for (unsigned int j = 0; j < 3; ++j) {
+      for (unsigned int k = 0; k < 3; ++k) {
+        // create box for relevant axis
+        const auto zeroAxisCount = ((i == 1) ? 1 : 0) + ((j == 1) ? 1 : 0) + ((k == 1) ? 1 : 0);
+        if (zeroAxisCount == 1 || zeroAxisCount == 3) {
+          continue;
+        }
+
         BoxOptions boxOptions;
         boxOptions.size = 0.1f;
         auto box      = BoxBuilder::CreateBox("", boxOptions, gizmoLayer->utilityLayerScene.get());
         box->material = coloredMaterial;
+        box->metadata = zeroAxisCount == 2; // None homogenous scale handle
 
         // Dragging logic
-        auto dragAxis = Vector3(i == 0 ? -1.f : 1.f, j == 0 ? -1.f : 1.f, k == 0 ? -1.f : 1.f);
+        auto dragAxis = Vector3(i - 1, j - 1, k - 1);
         PointerDragBehaviorOptions options;
         options.dragAxis = dragAxis;
         PointerDragBehavior _dragBehavior(options);
@@ -243,9 +250,14 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
             auto relativeDragDistance = (event->dragDistance / _boundingDimensions.length())
                                         * _anchorMesh->scaling().length();
             Vector3 deltaScale(relativeDragDistance, relativeDragDistance, relativeDragDistance);
+            if (zeroAxisCount == 2) {
+              // scale on 1 axis when using the anchor box in the face middle
+              deltaScale.x *= std::abs(dragAxis.x);
+              deltaScale.y *= std::abs(dragAxis.y);
+              deltaScale.z *= std::abs(dragAxis.z);
+            }
             deltaScale.scaleInPlace(_scaleDragSpeed);
             updateBoundingBox();
-
             if (scalePivot) {
               attachedMesh()->getWorldMatrix().getRotationMatrixToRef(_tmpRotationMatrix);
               // Move anchor to desired pivot point (Bottom left corner + dimension/2)
@@ -525,13 +537,18 @@ void BoundingBoxGizmo::_updateScaleBoxes()
 {
   // Update scale box locations
   auto scaleBoxes = _scaleBoxesParent->getChildMeshes();
-  for (unsigned int i = 0; i < 2; ++i) {
-    for (unsigned int j = 0; j < 2; ++j) {
-      for (unsigned int k = 0; k < 2; ++k) {
-        auto index = ((i * 4) + (j * 2)) + k;
+  auto index      = 0ull;
+  for (unsigned int i = 0; i < 3; ++i) {
+    for (unsigned int j = 0; j < 3; ++j) {
+      for (unsigned int k = 0; k < 3; ++k) {
+        const auto zeroAxisCount = ((i == 1) ? 1 : 0) + ((j == 1) ? 1 : 0) + ((k == 1) ? 1 : 0);
+        if (zeroAxisCount == 1 || zeroAxisCount == 3) {
+          continue;
+        }
         if (index < scaleBoxes.size() && scaleBoxes[index]) {
-          scaleBoxes[index]->position().set(_boundingDimensions.x * i, _boundingDimensions.y * j,
-                                            _boundingDimensions.z * k);
+          scaleBoxes[index]->position().set(_boundingDimensions.x * (i / 2.f),
+                                            _boundingDimensions.y * (j / 2.f),
+                                            _boundingDimensions.z * (k / 2.f));
           scaleBoxes[index]->position().addInPlace(Vector3(-_boundingDimensions.x / 2.f,
                                                            -_boundingDimensions.y / 2.f,
                                                            -_boundingDimensions.z / 2.f));
@@ -547,6 +564,7 @@ void BoundingBoxGizmo::_updateScaleBoxes()
             scaleBoxes[index]->scaling().set(scaleBoxSize, scaleBoxSize, scaleBoxSize);
           }
         }
+        ++index;
       }
     }
   }
@@ -569,10 +587,15 @@ void BoundingBoxGizmo::setEnabledRotationAxis(const std::string& axis)
   }
 }
 
-void BoundingBoxGizmo::setEnabledScaling(bool enable)
+void BoundingBoxGizmo::setEnabledScaling(bool enable, bool homogeneousScaling)
 {
   for (const auto& m : _scaleBoxesParent->getChildMeshes()) {
-    m->setEnabled(enable);
+    auto enableMesh = enable;
+    // Disable heterogenous scale handles if requested.
+    if (homogeneousScaling && m->metadata == true) {
+      enableMesh = false;
+    }
+    m->setEnabled(enableMesh);
   }
 }
 

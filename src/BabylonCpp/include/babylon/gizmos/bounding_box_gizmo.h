@@ -56,8 +56,9 @@ public:
   /**
    * @brief Enables/disables scaling.
    * @param enable if scaling should be enabled
+   * @param homogeneousScaling defines if scaling should only be homogeneous
    */
-  void setEnabledScaling(bool enable);
+  void setEnabledScaling(bool enable, bool homogeneousScaling = false);
 
   /**
    * @brief Enables a pointer drag behavior on the bounding box of the gizmo.
