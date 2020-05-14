@@ -7,9 +7,9 @@
 namespace BABYLON {
 namespace Extensions {
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Tools
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <typename T, typename F>
 inline bool findIndex(const T& container, const F& value, size_t& idx)
@@ -59,9 +59,9 @@ inline bool removeIfFindIndex(T& container, const F& value)
   return true;
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // IcoNode
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 IcoNode::IcoNode(const Vector3& _p) : p{_p}
 {
@@ -76,9 +76,9 @@ IcoNode::IcoNode(IcoNode&& other)      = default;
 IcoNode& IcoNode::operator=(const IcoNode& other) = default;
 IcoNode& IcoNode::operator=(IcoNode&& other) = default;
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // IcoEdge
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 IcoEdge::IcoEdge(const std::vector<size_t>& _n) : n{_n}
 {
@@ -89,9 +89,9 @@ IcoEdge::IcoEdge(IcoEdge&& other)      = default;
 IcoEdge& IcoEdge::operator=(const IcoEdge& other) = default;
 IcoEdge& IcoEdge::operator=(IcoEdge&& other) = default;
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // IcoFace
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 IcoFace::IcoFace(const std::vector<size_t>& _n, const std::vector<size_t>& _e)
     : n{_n}, e{_e}, boundingSphere{Vector3::Zero(), Vector3::Zero()}
@@ -103,9 +103,9 @@ IcoFace::IcoFace(IcoFace&& other)      = default;
 IcoFace& IcoFace::operator=(const IcoFace& other) = default;
 IcoFace& IcoFace::operator=(IcoFace&& other) = default;
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // IcosahedronMesh
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 IcosahedronMesh::IcosahedronMesh()                             = default;
 IcosahedronMesh::IcosahedronMesh(const IcosahedronMesh& other) = default;
@@ -113,9 +113,9 @@ IcosahedronMesh::IcosahedronMesh(IcosahedronMesh&& other)      = default;
 IcosahedronMesh& IcosahedronMesh::operator=(const IcosahedronMesh& other) = default;
 IcosahedronMesh& IcosahedronMesh::operator=(IcosahedronMesh&& other) = default;
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Icosphere
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 IcosahedronMesh Icosphere::generateIcosahedronMesh(size_t icosahedronSubdivision,
                                                    float topologyDistortionRate,

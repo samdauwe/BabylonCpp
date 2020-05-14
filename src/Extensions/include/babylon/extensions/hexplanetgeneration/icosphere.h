@@ -11,8 +11,8 @@ namespace BABYLON {
 namespace Extensions {
 
 struct IcoNode;
-using RotationPredicateType = std::function<bool(
-  const IcoNode&, const IcoNode&, const IcoNode&, const IcoNode&)>;
+using RotationPredicateType
+  = std::function<bool(const IcoNode&, const IcoNode&, const IcoNode&, const IcoNode&)>;
 struct Tile;
 
 struct BABYLON_SHARED_EXPORT IcoNode {
@@ -67,28 +67,23 @@ struct IRandomFunction;
 
 struct BABYLON_SHARED_EXPORT Icosphere {
 
-  using RotationPredicateType = std::function<bool(
-    const IcoNode&, const IcoNode&, const IcoNode&, const IcoNode&)>;
+  using RotationPredicateType
+    = std::function<bool(const IcoNode&, const IcoNode&, const IcoNode&, const IcoNode&)>;
 
   static IcosahedronMesh generateIcosahedronMesh(size_t icosahedronSubdivision,
                                                  float topologyDistortionRate,
                                                  IRandomFunction& random);
   static void generateIcosahedron(IcosahedronMesh& mesh);
-  static void generateSubdividedIcosahedron(size_t degree,
-                                            IcosahedronMesh& mesh);
+  static void generateSubdividedIcosahedron(size_t degree, IcosahedronMesh& mesh);
   static void correctFaceIndices();
-  static Vector3 calculateFaceCentroid(const Vector3& pa, const Vector3& pb,
-                                       const Vector3& pc);
+  static Vector3 calculateFaceCentroid(const Vector3& pa, const Vector3& pb, const Vector3& pc);
   static size_t getEdgeOppositeFaceIndex(const IcoEdge& edge, size_t faceIndex);
-  static size_t getFaceOppositeNodeIndex(const IcoFace& face,
-                                         const IcoEdge& edge);
-  static bool conditionalRotateEdge(IcosahedronMesh& icosahedronMesh,
-                                    size_t edgeIndex,
+  static size_t getFaceOppositeNodeIndex(const IcoFace& face, const IcoEdge& edge);
+  static bool conditionalRotateEdge(IcosahedronMesh& icosahedronMesh, size_t edgeIndex,
                                     RotationPredicateType& predicate);
-  static size_t findNextFaceIndex(const IcosahedronMesh& icosahedronMesh,
-                                  size_t nodeIndex, size_t faceIndex);
-  static bool distortMesh(IcosahedronMesh& mesh, size_t degree,
-                          IRandomFunction& random);
+  static size_t findNextFaceIndex(const IcosahedronMesh& icosahedronMesh, size_t nodeIndex,
+                                  size_t faceIndex);
+  static bool distortMesh(IcosahedronMesh& mesh, size_t degree, IRandomFunction& random);
   static float relaxMesh(IcosahedronMesh& mesh, float multiplier);
 
 }; // end of struct Icosphere
