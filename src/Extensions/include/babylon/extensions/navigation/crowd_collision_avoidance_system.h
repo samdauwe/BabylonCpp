@@ -23,8 +23,8 @@ public:
 
 private:
   /**
-   * Updates the collision avoidance system by setting the preferred velocity to
-   * be a vector of unit magnitude (speed) in the direction of the goal.
+   * Updates the collision avoidance system by setting the preferred velocity to be a vector of unit
+   * magnitude (speed) in the direction of the goal.
    */
   void setPreferredVelocities();
 

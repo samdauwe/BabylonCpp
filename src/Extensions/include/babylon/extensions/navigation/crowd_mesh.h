@@ -17,7 +17,7 @@ namespace Extensions {
  * @brief A component holding the mesh reference of an entity.
  */
 struct BABYLON_SHARED_EXPORT CrowdMesh : public ECS::Component {
-  AbstractMeshPtr mesh;
+  AbstractMeshPtr mesh = nullptr;
 }; // end of struct CrowdMesh
 
 } // end of namespace Extensions

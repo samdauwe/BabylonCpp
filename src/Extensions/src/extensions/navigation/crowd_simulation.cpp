@@ -11,8 +11,7 @@ namespace Extensions {
 
 CrowdSimulation::CrowdSimulation()
     : _simulator{std::make_unique<RVO2::RVOSimulator>()}
-    , _crowdCollisionAvoidanceSystem{
-        CrowdCollisionAvoidanceSystem(_simulator.get())}
+    , _crowdCollisionAvoidanceSystem{CrowdCollisionAvoidanceSystem(_simulator.get())}
 {
   initializeWorld();
   _simulator->setAgentDefaults(15.0f, 10, 5.0f, 5.0f, 2.0f, 2.0f);
@@ -37,8 +36,7 @@ size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh)
   return addAgent(mesh, position);
 }
 
-size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh,
-                                 const Vector2& position)
+size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh, const Vector2& position)
 {
   // Create the crowd agent entity
   auto agent = _world.createEntity();
@@ -65,8 +63,7 @@ size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh,
   return agentComp.id();
 }
 
-size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh,
-                                 const Vector3& position)
+size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh, const Vector3& position)
 {
   return addAgent(mesh, Vector2(position.x, position.z));
 }
@@ -81,8 +78,7 @@ void CrowdSimulation::setAgentMaxSpeed(size_t agentId, float speed)
   _simulator->setAgentMaxSpeed(agentId, speed);
 }
 
-void CrowdSimulation::addObstacleByBoundingBox(const AbstractMeshPtr& mesh,
-                                               const Vector3& position,
+void CrowdSimulation::addObstacleByBoundingBox(const AbstractMeshPtr& mesh, const Vector3& position,
                                                bool isVisible)
 {
   mesh->position  = position;
@@ -132,8 +128,7 @@ void CrowdSimulation::computeRoadMap()
     // Connect the roadmap vertices by edges if mutually visible.
     for (size_t i = 0; i < roadmap.size(); ++i) {
       for (size_t j = 0; j < roadmap.size(); ++j) {
-        if (_simulator->queryVisibility(roadmap[i].position,
-                                        roadmap[j].position, agentRadius)) {
+        if (_simulator->queryVisibility(roadmap[i].position, roadmap[j].position, agentRadius)) {
           roadmap[i].neighbors.push_back(static_cast<uint32_t>(j));
         }
       }
@@ -148,8 +143,7 @@ void CrowdSimulation::computeRoadMap()
     const unsigned int i = 0;
     {
       std::multimap<float, unsigned int> Q;
-      std::vector<std::multimap<float, unsigned int>::iterator> posInQ(
-        roadmap.size(), Q.end());
+      std::vector<std::multimap<float, unsigned int>::iterator> posInQ(roadmap.size(), Q.end());
 
       roadmap[i].distToGoal[i] = 0.0f;
       posInQ[i]                = Q.insert(std::make_pair(0.0f, i));
@@ -160,9 +154,8 @@ void CrowdSimulation::computeRoadMap()
         posInQ[u] = Q.end();
 
         for (size_t j = 0; j < roadmap[u].neighbors.size(); ++j) {
-          const auto v = roadmap[u].neighbors[j];
-          const float dist_uv
-            = RVO2::abs(roadmap[v].position - roadmap[u].position);
+          const auto v        = roadmap[u].neighbors[j];
+          const float dist_uv = RVO2::abs(roadmap[v].position - roadmap[u].position);
 
           if (roadmap[v].distToGoal[i] > roadmap[u].distToGoal[i] + dist_uv) {
             roadmap[v].distToGoal[i] = roadmap[u].distToGoal[i] + dist_uv;
@@ -225,10 +218,10 @@ void CrowdSimulation::setPrecision(unsigned int precision)
 bool CrowdSimulation::isRunning() const
 {
   // Check if all agents reached their goal
-  auto numEntitiesReachedGoal = std::count_if(
-    _agents.begin(), _agents.end(), [](const ECS::Entity& entity) {
-      return entity.getComponent<CrowdAgent>().reachedGoal();
-    });
+  auto numEntitiesReachedGoal
+    = std::count_if(_agents.begin(), _agents.end(), [](const ECS::Entity& entity) {
+        return entity.getComponent<CrowdAgent>().reachedGoal();
+      });
 
   return numEntitiesReachedGoal == static_cast<long>(_agents.size());
 }

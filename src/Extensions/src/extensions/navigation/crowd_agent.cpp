@@ -5,8 +5,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-CrowdAgent::CrowdAgent(RVO2::RVOSimulator* sim,
-                       const BABYLON::Vector2& position)
+CrowdAgent::CrowdAgent(RVO2::RVOSimulator* sim, const BABYLON::Vector2& position)
     : _goal{RVO2::Vector2(0.f, 0.f)}, _sim{sim}
 {
   _id = _sim->addAgent(RVO2::Vector2(position.x, position.y));
@@ -112,8 +111,7 @@ void CrowdAgent::setAgentTimeHorizonObst(float timeHorizonObst)
 bool CrowdAgent::reachedGoal() const
 {
   const float agentRadius = _sim->getAgentRadius(_id);
-  return RVO2::absSq(_sim->getAgentPosition(_id) - _goal)
-         > (agentRadius * agentRadius);
+  return RVO2::absSq(_sim->getAgentPosition(_id) - _goal) > (agentRadius * agentRadius);
 }
 
 } // end of namespace Extensions
