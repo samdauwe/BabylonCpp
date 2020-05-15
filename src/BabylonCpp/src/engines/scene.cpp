@@ -4528,7 +4528,8 @@ std::optional<PickingInfo>
 Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
                      const std::optional<bool>& iFastCheck,
-                     const std::optional<bool>& /*onlyBoundingInfo*/)
+                     const std::optional<bool>& onlyBoundingInfo,
+                     const TrianglePickingPredicate& trianglePredicate)
 {
   const auto fastCheck                   = iFastCheck.value_or(true);
   std::optional<PickingInfo> pickingInfo = std::nullopt;
@@ -4543,10 +4544,13 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
       continue;
     }
 
-    auto world = mesh->getWorldMatrix();
-    auto ray   = rayFunction(world);
+    auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
+                   mesh->skeleton()->overrideMesh->getWorldMatrix() :
+                   mesh->getWorldMatrix();
+    auto ray = rayFunction(world);
 
-    auto result = mesh->intersects(ray, fastCheck);
+    auto result
+      = mesh->intersects(ray, fastCheck, trianglePredicate, onlyBoundingInfo.value_or(false));
     if (/*!result || */ !result.hit) {
       continue;
     }
@@ -4636,15 +4640,38 @@ Scene::_internalPickSprites(const Ray& ray, const std::function<bool(Sprite* spr
 }
 
 std::optional<PickingInfo>
+Scene::pickWithBoundingInfo(int x, int y,
+                            const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
+                            bool fastCheck, const CameraPtr& camera)
+{
+  auto result = _internalPick(
+    [this, x, y, &camera](Matrix& world) -> Ray {
+      if (!_tempPickingRay) {
+        _tempPickingRay = std::make_unique<Ray>(Ray::Zero());
+      }
+
+      createPickingRayToRef(x, y, world, *_tempPickingRay, camera ? camera : nullptr);
+      return *_tempPickingRay;
+    },
+    predicate, fastCheck, true);
+  if (result) {
+    auto world  = Matrix::Identity();
+    result->ray = createPickingRay(x, y, world, camera ? camera : nullptr);
+  }
+  return result;
+}
+
+std::optional<PickingInfo>
 Scene::pick(int x, int y, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-            bool fastCheck, const CameraPtr& camera)
+            bool fastCheck, const CameraPtr& camera,
+            const TrianglePickingPredicate& trianglePredicate)
 {
   auto result = _internalPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
       createPickingRayToRef(x, y, world, *_tempPickingRay, camera);
       return *_tempPickingRay;
     },
-    predicate, fastCheck);
+    predicate, fastCheck, false, trianglePredicate);
   if (result) {
     auto _result     = *result;
     auto identityMat = Matrix::Identity();
@@ -4743,8 +4770,10 @@ Scene::multiPickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* s
   return _internalMultiPickSprites(*_tempSpritePickingRay, predicate, camera);
 }
 
-std::optional<PickingInfo> Scene::pickWithRay(
-  const Ray& ray, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate, bool fastCheck)
+std::optional<PickingInfo>
+Scene::pickWithRay(const Ray& ray,
+                   const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
+                   bool fastCheck, const TrianglePickingPredicate& trianglePredicate)
 {
   auto result = _internalPick(
     [this, &ray](Matrix& world) -> Ray {
@@ -4760,7 +4789,7 @@ std::optional<PickingInfo> Scene::pickWithRay(
       Ray::TransformToRef(ray, *_pickWithRayInverseMatrix, *_cachedRayForTransform);
       return *_cachedRayForTransform;
     },
-    predicate, fastCheck);
+    predicate, fastCheck, false, trianglePredicate);
   if (result) {
     auto _result = *result;
     _result.ray  = ray;

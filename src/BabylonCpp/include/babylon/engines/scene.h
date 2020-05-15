@@ -98,6 +98,10 @@ using SubMeshPtr                      = std::shared_ptr<SubMesh>;
 class BABYLON_SHARED_EXPORT Scene : public AbstractScene, public IAnimatable {
 
 public:
+  using TrianglePickingPredicate
+    = std::function<bool(const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
+
+public:
   static size_t _uniqueIdCounter;
 
   /** The fog is deactivated */
@@ -1388,6 +1392,11 @@ public:
    */
   Scene& createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, CameraPtr camera = nullptr);
 
+  std::optional<PickingInfo>
+  pickWithBoundingInfo(int x, int y,
+                       const std::function<bool(const AbstractMeshPtr& mesh)>& predicate = nullptr,
+                       bool fastCheck = false, const CameraPtr& camera = nullptr);
+
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
    * @param x position on screen
@@ -1401,7 +1410,8 @@ public:
    */
   std::optional<PickingInfo>
   pick(int x, int y, const std::function<bool(const AbstractMeshPtr& mesh)>& predicate = nullptr,
-       bool fastCheck = false, const CameraPtr& camera = nullptr);
+       bool fastCheck = false, const CameraPtr& camera = nullptr,
+       const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a sprite in the scene.
@@ -1478,7 +1488,7 @@ public:
   std::optional<PickingInfo>
   pickWithRay(const Ray& ray,
               const std::function<bool(const AbstractMeshPtr& mesh)>& predicate = nullptr,
-              bool fastCheck                                                    = false);
+              bool fastCheck = false, const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1816,8 +1826,9 @@ private:
   std::optional<PickingInfo>
   _internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
                 const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
-                const std::optional<bool>& fastCheck        = std::nullopt,
-                const std::optional<bool>& onlyBoundingInfo = std::nullopt);
+                const std::optional<bool>& fastCheck              = std::nullopt,
+                const std::optional<bool>& onlyBoundingInfo       = std::nullopt,
+                const TrianglePickingPredicate& trianglePredicate = nullptr);
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(AbstractMesh* mesh)>& predicate);
