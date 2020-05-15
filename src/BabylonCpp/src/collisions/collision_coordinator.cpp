@@ -18,8 +18,8 @@ DefaultCollisionCoordinator::DefaultCollisionCoordinator()
 DefaultCollisionCoordinator::~DefaultCollisionCoordinator() = default;
 
 void DefaultCollisionCoordinator::getNewPosition(
-  Vector3& position, Vector3& displacement, const ColliderPtr& collider,
-  unsigned int maximumRetry, const AbstractMeshPtr& excludedMesh,
+  Vector3& position, Vector3& displacement, const ColliderPtr& collider, unsigned int maximumRetry,
+  const AbstractMeshPtr& excludedMesh,
   const std::function<void(size_t collisionIndex, Vector3& newPosition,
                            const AbstractMeshPtr& AbstractMesh)>& onNewPosition,
   size_t collisionIndex)
@@ -30,8 +30,8 @@ void DefaultCollisionCoordinator::getNewPosition(
   collider->_retry           = 0;
   collider->_initialVelocity = _scaledVelocity;
   collider->_initialPosition = _scaledPosition;
-  _collideWithWorld(_scaledPosition, _scaledVelocity, collider, maximumRetry,
-                    _finalPosition, excludedMesh);
+  _collideWithWorld(_scaledPosition, _scaledVelocity, collider, maximumRetry, _finalPosition,
+                    excludedMesh);
 
   _finalPosition.multiplyInPlace(collider->_radius);
   // run the callback
@@ -48,10 +48,11 @@ void DefaultCollisionCoordinator::init(Scene* scene)
   _scene = scene;
 }
 
-void DefaultCollisionCoordinator::_collideWithWorld(
-  Vector3& position, Vector3& velocity, const ColliderPtr& collider,
-  unsigned int maximumRetry, Vector3& finalPosition,
-  const AbstractMeshPtr& excludedMesh)
+void DefaultCollisionCoordinator::_collideWithWorld(Vector3& position, Vector3& velocity,
+                                                    const ColliderPtr& collider,
+                                                    unsigned int maximumRetry,
+                                                    Vector3& finalPosition,
+                                                    const AbstractMeshPtr& excludedMesh)
 {
   auto closeDistance = Engine::CollisionsEpsilon * 10.f;
 
@@ -61,16 +62,18 @@ void DefaultCollisionCoordinator::_collideWithWorld(
   }
 
   // Check if this is a mesh else camera or -1
-  auto collisionMask = (excludedMesh ? excludedMesh->collisionMask() :
-                                       collider->collisionMask());
+  auto collisionMask = (excludedMesh ? excludedMesh->collisionMask() : collider->collisionMask());
 
   collider->_initialize(position, velocity, closeDistance);
 
+  // Check if collision detection should happen against specified list of meshes or,
+  // if not specified, against all meshes in the scene
+  const auto meshes = excludedMesh ? excludedMesh->surroundingMeshes() : _scene->meshes;
+
   // Check all meshes
-  for (const auto& mesh : _scene->meshes) {
+  for (const auto& mesh : meshes) {
     if (mesh->isEnabled() && mesh->checkCollisions && !mesh->subMeshes.empty()
-        && mesh != excludedMesh
-        && ((collisionMask & mesh->collisionGroup) != 0)) {
+        && mesh != excludedMesh && ((collisionMask & mesh->collisionGroup) != 0)) {
       mesh->_checkCollision(*collider);
     }
   }
@@ -90,8 +93,7 @@ void DefaultCollisionCoordinator::_collideWithWorld(
   }
 
   ++collider->_retry;
-  _collideWithWorld(position, velocity, collider, maximumRetry, finalPosition,
-                    excludedMesh);
+  _collideWithWorld(position, velocity, collider, maximumRetry, finalPosition, excludedMesh);
 }
 
 } // end of namespace BABYLON
