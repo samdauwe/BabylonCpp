@@ -11,7 +11,9 @@ class AbstractMesh;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
- * @brief Hidden
+ * @brief Implementation of the "Improved Collision detection and Response" algorithm proposed by
+ * Kasper Fauerby.
+ * @see https://www.peroxide.dk/papers/collision/collision.pdf
  */
 class BABYLON_SHARED_EXPORT Collider {
 

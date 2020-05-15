@@ -55,7 +55,7 @@ public:
 
   /**
    * @brief Checks if the ray intersects a box.
-   * This does not account for the ray lenght by design to improve perfs.
+   * This does not account for the ray length by design to improve perfs.
    * @param box the bounding box to check
    * @param intersectionTreshold extra extend to be added to the BoundingBox in all direction
    * @returns if the box was hit
