@@ -50,27 +50,28 @@ bool OBJFileLoader::canDirectLoad(const std::string& /*data*/)
   return false;
 }
 
-int OBJFileLoader::_isInArray(std::vector<TuplePosNormEntry>& arr, const std::vector<size_t>& obj)
+int OBJFileLoader::_isInArray(std::vector<TuplePosNormEntry>& arr, const std::vector<size_t>& iObj)
 {
-  if (arr.size() < obj[0]) {
-    arr.resize(obj[0] + 1);
-    arr[obj[0]] = {};
+  if (arr.size() < iObj[0]) {
+    arr.resize(iObj[0] + 1);
+    arr[iObj[0]] = {};
   }
-  auto idx = stl_util::index_of(arr[obj[0]].normals, obj[1]);
+  auto idx = stl_util::index_of(arr[iObj[0]].normals, iObj[1]);
 
-  return idx == -1 ? -1 : static_cast<int>(arr[obj[0]].idx[static_cast<size_t>(idx)]);
+  return idx == -1 ? -1 : static_cast<int>(arr[iObj[0]].idx[static_cast<size_t>(idx)]);
 }
 
-int OBJFileLoader::_isInArrayUV(std::vector<TuplePosNormEntry>& arr, const std::vector<size_t>& obj)
+int OBJFileLoader::_isInArrayUV(std::vector<TuplePosNormEntry>& arr,
+                                const std::vector<size_t>& iObj)
 {
-  if (arr.size() < obj[0]) {
-    arr.resize(obj[0] + 1);
-    arr[obj[0]] = {};
+  if (arr.size() < iObj[0]) {
+    arr.resize(iObj[0] + 1);
+    arr[iObj[0]] = {};
   }
-  auto idx = stl_util::index_of(arr[obj[0]].normals, obj[1]);
+  auto idx = stl_util::index_of(arr[iObj[0]].normals, iObj[1]);
 
-  if (idx != 1 && (obj[2] == arr[obj[0]].uv[static_cast<size_t>(idx)])) {
-    return static_cast<int>(arr[obj[0]].idx[static_cast<size_t>(idx)]);
+  if (idx != 1 && (iObj[2] == arr[iObj[0]].uv[static_cast<size_t>(idx)])) {
+    return static_cast<int>(arr[iObj[0]].idx[static_cast<size_t>(idx)]);
   }
   return -1;
 }
@@ -96,7 +97,8 @@ void OBJFileLoader::_setData(size_t indicePositionFromObj, size_t indiceUvsFromO
     // Add an new indice.
     // The array of indices is only an array with his length equal to the number of triangles - 1.
     // We add vertices data in this order
-    state.indicesForBabylon.emplace_back(state.wrappedPositionForBabylon.size());
+    state.indicesForBabylon.emplace_back(
+      static_cast<uint32_t>(state.wrappedPositionForBabylon.size()));
     // Push the position of vertice for Babylon
     // Each element is a Vector3(x,y,z)
     state.wrappedPositionForBabylon.emplace_back(positionVectorFromOBJ);
