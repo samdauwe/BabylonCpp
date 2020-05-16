@@ -577,7 +577,7 @@ std::string InputBlock::_dumpPropertiesCode()
 
     std::string valueString = "";
 
-    switch (type) {
+    switch (type()) {
       case NodeMaterialBlockConnectionPointTypes::Float: {
         const auto floatValue = value()->get<float>();
         valueString           = StringTools::printf("%f", floatValue);
@@ -619,7 +619,7 @@ std::string InputBlock::_dumpPropertiesCode()
       StringTools::printf("%s.value = %s", variableName.c_str(), valueString.c_str()));
 
     // Float-Value-Specific Properties
-    if (type == NodeMaterialBlockConnectionPointTypes::Float) {
+    if (type() == NodeMaterialBlockConnectionPointTypes::Float) {
       stl_util::concat(
         codes,
         {StringTools::printf("%s.min = %f;\r\n", variableName.c_str(), min),
