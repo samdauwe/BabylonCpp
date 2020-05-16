@@ -99,7 +99,7 @@ public:
   size_t addSurfacePoints(const MeshPtr& mesh, size_t nb,
                           const std::optional<PointColor> colorWith                = std::nullopt,
                           const std::optional<std::variant<Color4, size_t>>& color = std::nullopt,
-                          const std::optional<int> range                           = std::nullopt);
+                          const std::optional<float> range                         = std::nullopt);
 
   /**
    * @brief Adds points to the PCS inside the model shape.
@@ -116,7 +116,7 @@ public:
   size_t addVolumePoints(const MeshPtr& mesh, size_t nb,
                          const std::optional<PointColor> colorWith                = std::nullopt,
                          const std::optional<std::variant<Color4, size_t>>& color = std::nullopt,
-                         const std::optional<int> range                           = std::nullopt);
+                         const std::optional<float> range                         = std::nullopt);
 
   /**
    * @brief Sets all the particles : this method actually really updates the mesh according to the
@@ -295,7 +295,7 @@ private:
                            const std::optional<bool>& colorFromTexture = std::nullopt,
                            const std::optional<bool>& hasTexture       = std::nullopt,
                            const std::optional<Color4>& color          = std::nullopt,
-                           std::optional<int> range                    = std::nullopt);
+                           std::optional<float> range                  = std::nullopt);
 
   /**
    * @brief Stores mesh texture in dynamic texture for color pixel retrievalwhen pointColor type is

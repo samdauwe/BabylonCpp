@@ -227,7 +227,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
         box->metadata = zeroAxisCount == 2; // None homogenous scale handle
 
         // Dragging logic
-        auto dragAxis = Vector3(i - 1, j - 1, k - 1);
+        auto dragAxis = Vector3(i - 1.f, j - 1.f, k - 1.f);
         PointerDragBehaviorOptions options;
         options.dragAxis = dragAxis;
         PointerDragBehavior _dragBehavior(options);

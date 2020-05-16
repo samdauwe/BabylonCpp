@@ -21,7 +21,7 @@ class ShaderCodeCursor;
 struct ShaderCodeNode;
 struct ShaderCodeTestNode;
 class ShaderDefineArithmeticOperator;
-struct ShaderDefineExpression;
+class ShaderDefineExpression;
 using ShaderCodeConditionNodePtr        = std::shared_ptr<ShaderCodeConditionNode>;
 using ShaderCodeNodePtr                 = std::shared_ptr<ShaderCodeNode>;
 using ShaderCodeTestNodePtr             = std::shared_ptr<ShaderCodeTestNode>;

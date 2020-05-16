@@ -76,9 +76,9 @@ MeshPtr PointsCloudSystem::_buildMesh()
   if (_uvs32.size() > 0) {
     vertexData->set(_uvs32, VertexBuffer::UVKind);
   }
-  auto ec = 0; // emissive color value 0 for UVs, 1 for color
+  auto ec = 0.f; // emissive color value 0 for UVs, 1 for color
   if (_colors32.size() > 0) {
-    ec = 1;
+    ec = 1.f;
     vertexData->set(_colors32, VertexBuffer::ColorKind);
   }
   auto iMesh = Mesh::New(name, _scene);
@@ -98,7 +98,7 @@ MeshPtr PointsCloudSystem::_buildMesh()
   mat->emissiveColor   = Color3(ec, ec, ec);
   mat->disableLighting = true;
   mat->pointsCloud     = true;
-  mat->pointSize       = _size;
+  mat->pointSize       = static_cast<float>(_size);
   iMesh->material      = mat;
 
   return iMesh;
@@ -135,28 +135,28 @@ Color4 PointsCloudSystem::_getColorIndicesForCoord(const PointsGroup& pointsGrou
   return Color4(redForCoord / 255.f, greenForCoord / 255.f, blueForCoord / 255.f, alphaForCoord);
 }
 
-void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup,
+void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& iMesh, const PointsGroupPtr& pointsGroup,
                                             bool isVolume,
                                             const std::optional<bool>& colorFromTexture,
                                             const std::optional<bool>& hasTexture,
                                             const std::optional<Color4>& color,
-                                            std::optional<int> iRange)
+                                            std::optional<float> iRange)
 {
   if (isVolume) {
-    mesh->updateFacetData();
+    iMesh->updateFacetData();
   }
 
-  const auto& boundInfo = mesh->getBoundingInfo();
+  const auto& boundInfo = iMesh->getBoundingInfo();
   const auto diameter   = 2.f * boundInfo->boundingSphere.radius;
 
-  auto meshPos       = mesh->getVerticesData(VertexBuffer::PositionKind);
-  const auto meshInd = mesh->getIndices();
-  const auto meshUV  = mesh->getVerticesData(VertexBuffer::UVKind);
-  const auto meshCol = mesh->getVerticesData(VertexBuffer::ColorKind);
+  auto meshPos       = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd = iMesh->getIndices();
+  const auto meshUV  = iMesh->getVerticesData(VertexBuffer::UVKind);
+  const auto meshCol = iMesh->getVerticesData(VertexBuffer::ColorKind);
 
   auto place = Vector3::Zero();
-  mesh->computeWorldMatrix();
-  auto meshMatrix = mesh->getWorldMatrix();
+  iMesh->computeWorldMatrix();
+  auto meshMatrix = iMesh->getWorldMatrix();
   if (!meshMatrix.isIdentity()) {
     for (size_t p = 0; p < meshPos.size() / 3; ++p) {
       Vector3::TransformCoordinatesFromFloatsToRef(meshPos[3 * p], meshPos[3 * p + 1],
@@ -219,7 +219,7 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
 
   auto lamda = 0.f;
   auto mu    = 0.f;
-  auto range = iRange.value_or(0);
+  auto range = iRange.value_or(0.f);
 
   Vector3 facetPoint;
   Vector2 uvPoint;
@@ -312,7 +312,7 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
       mu         = Scalar::RandomRange(0.f, 1.f);
       facetPoint = vertex0.add(vec0.scale(lamda)).add(vec1.scale(lamda * mu));
       if (isVolume) {
-        norm          = mesh->getFacetNormal(index).normalize().scale(-1.f);
+        norm          = iMesh->getFacetNormal(index).normalize().scale(-1.f);
         tang          = vec0.clone()->normalize();
         biNorm        = Vector3::Cross(norm, tang);
         angle         = Scalar::RandomRange(0.f, Math::PI_2);
@@ -323,7 +323,7 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
         ray.origin    = facetPoint.add(direction.scale(0.00001f));
         ray.direction = direction;
         ray.length    = diameter;
-        pickInfo      = ray.intersectsMesh(mesh.get());
+        pickInfo      = ray.intersectsMesh(iMesh.get());
         if (pickInfo.hit) {
           distance = pickInfo.pickedPoint->subtract(facetPoint).length();
           gap      = Scalar::RandomRange(0.f, 1.f) * distance;
@@ -338,8 +338,8 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
           uvPoint = uv0.add(uvec0.scale(lamda)).add(uvec1.scale(lamda * mu));
           if (colorFromTexture) { // Set particle color to texture color
             if (hasTexture && pointsGroup->_groupImageData) {
-              width       = pointsGroup->_groupImgWidth;
-              height      = pointsGroup->_groupImgHeight;
+              width       = static_cast<float>(pointsGroup->_groupImgWidth);
+              height      = static_cast<float>(pointsGroup->_groupImgHeight);
               pointColors = _getColorIndicesForCoord(
                 *pointsGroup, static_cast<uint32_t>(std::round(uvPoint.x * width)),
                 static_cast<uint32_t>(std::round(uvPoint.y * height)),
@@ -403,26 +403,26 @@ void PointsCloudSystem::_setPointsColorOrUV(const MeshPtr& mesh, const PointsGro
   }
 }
 
-void PointsCloudSystem::_colorFromTexture(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup,
+void PointsCloudSystem::_colorFromTexture(const MeshPtr& iMesh, const PointsGroupPtr& pointsGroup,
                                           bool isVolume)
 {
-  if (mesh->material() == nullptr) {
-    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no material.", mesh->name.c_str())
+  if (iMesh->material() == nullptr) {
+    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no material.", iMesh->name.c_str())
     pointsGroup->_groupImageData.clear();
-    _setPointsColorOrUV(mesh, pointsGroup, isVolume, true, false);
+    _setPointsColorOrUV(iMesh, pointsGroup, isVolume, true, false);
     return;
   }
 
-  auto mat         = mesh->material();
+  auto mat         = iMesh->material();
   auto textureList = mat->getActiveTextures();
   if (textureList.size() == 0) {
-    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no useable texture.", mesh->name.c_str())
+    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no useable texture.", iMesh->name.c_str())
     pointsGroup->_groupImageData.clear();
-    _setPointsColorOrUV(mesh, pointsGroup, isVolume, true, false);
+    _setPointsColorOrUV(iMesh, pointsGroup, isVolume, true, false);
     return;
   }
 
-  auto clone = mesh->clone();
+  auto clone = iMesh->clone();
   clone->setEnabled(false);
   {
     auto n = pointsGroup->_textureNb;
@@ -510,7 +510,7 @@ Float32Array PointsCloudSystem::_calculateDensity(size_t nbPoints, const Float32
   auto extraPoints    = diff % nbFacets;
 
   if (pointsPerFacet > 0.f) {
-    for (size_t i; i < density.size(); ++i) {
+    for (size_t i = 0; i < density.size(); ++i) {
       density[i] += pointsPerFacet;
     }
   }
@@ -555,18 +555,18 @@ size_t PointsCloudSystem::addPoints(
 }
 
 size_t PointsCloudSystem::addSurfacePoints(
-  const MeshPtr& mesh, size_t nb, const std::optional<PointColor> colorWith,
-  const std::optional<std::variant<Color4, size_t>>& iColor, const std::optional<int> range)
+  const MeshPtr& iMesh, size_t nb, const std::optional<PointColor> colorWith,
+  const std::optional<std::variant<Color4, size_t>>& iColor, const std::optional<float> range)
 {
   auto colored = colorWith.value_or(PointColor::Random);
   if (static_cast<int>(colored) < 0 || static_cast<int>(colored) > 3) {
     colored = PointColor::Random;
   }
 
-  const auto meshPos = mesh->getVerticesData(VertexBuffer::PositionKind);
-  const auto meshInd = mesh->getIndices();
+  const auto meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd = iMesh->getIndices();
 
-  _groups.emplace_back(_groupCounter);
+  _groups.emplace_back(static_cast<uint32_t>(_groupCounter));
   auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, nullptr);
 
   pointsGroup->_groupDensity = _calculateDensity(nb, meshPos, meshInd);
@@ -582,16 +582,16 @@ size_t PointsCloudSystem::addSurfacePoints(
   }
   switch (colored) {
     case PointColor::Color:
-      _colorFromTexture(mesh, pointsGroup, false);
+      _colorFromTexture(iMesh, pointsGroup, false);
       break;
     case PointColor::UV:
-      _setPointsColorOrUV(mesh, pointsGroup, false, false, false);
+      _setPointsColorOrUV(iMesh, pointsGroup, false, false, false);
       break;
     case PointColor::Random:
-      _setPointsColorOrUV(mesh, pointsGroup, false);
+      _setPointsColorOrUV(iMesh, pointsGroup, false);
       break;
     case PointColor::Stated:
-      _setPointsColorOrUV(mesh, pointsGroup, false, std::nullopt, std::nullopt, color, range);
+      _setPointsColorOrUV(iMesh, pointsGroup, false, std::nullopt, std::nullopt, color, range);
       break;
   }
   nbParticles += nb;
@@ -599,20 +599,20 @@ size_t PointsCloudSystem::addSurfacePoints(
   return _groupCounter - 1;
 }
 
-size_t PointsCloudSystem::addVolumePoints(const MeshPtr& mesh, size_t nb,
+size_t PointsCloudSystem::addVolumePoints(const MeshPtr& iMesh, size_t nb,
                                           const std::optional<PointColor> colorWith,
                                           const std::optional<std::variant<Color4, size_t>>& iColor,
-                                          const std::optional<int> range)
+                                          const std::optional<float> range)
 {
   auto colored = colorWith.value_or(PointColor::Random);
   if (static_cast<int>(colored) < 0 || static_cast<int>(colored) > 3) {
     colored = PointColor::Random;
   }
 
-  const auto meshPos = mesh->getVerticesData(VertexBuffer::PositionKind);
-  const auto meshInd = mesh->getIndices();
+  const auto meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd = iMesh->getIndices();
 
-  _groups.emplace_back(_groupCounter);
+  _groups.emplace_back(static_cast<uint32_t>(_groupCounter));
   auto pointsGroup = std::make_shared<PointsGroup>(_groupCounter, nullptr);
 
   pointsGroup->_groupDensity = _calculateDensity(nb, meshPos, meshInd);
@@ -628,16 +628,16 @@ size_t PointsCloudSystem::addVolumePoints(const MeshPtr& mesh, size_t nb,
   }
   switch (colored) {
     case PointColor::Color:
-      _colorFromTexture(mesh, pointsGroup, true);
+      _colorFromTexture(iMesh, pointsGroup, true);
       break;
     case PointColor::UV:
-      _setPointsColorOrUV(mesh, pointsGroup, true, false, false);
+      _setPointsColorOrUV(iMesh, pointsGroup, true, false, false);
       break;
     case PointColor::Random:
-      _setPointsColorOrUV(mesh, pointsGroup, true);
+      _setPointsColorOrUV(iMesh, pointsGroup, true);
       break;
     case PointColor::Stated:
-      _setPointsColorOrUV(mesh, pointsGroup, true, std::nullopt, std::nullopt, color, range);
+      _setPointsColorOrUV(iMesh, pointsGroup, true, std::nullopt, std::nullopt, color, range);
       break;
   }
   nbParticles += nb;
@@ -655,7 +655,7 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
   beforeUpdateParticles(start, end, update);
 
   auto& rotMatrix  = TmpVectors::MatrixArray[0];
-  MeshPtr mesh     = nullptr;
+  MeshPtr iMesh    = nullptr;
   auto colors32    = _colors32;
   auto positions32 = _positions32;
   auto uvs32       = _uvs32;
@@ -670,7 +670,7 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
   Matrix::IdentityToRef(rotMatrix);
   size_t idx = 0; // current index of the particle
 
-  if (mesh->isFacetDataEnabled()) {
+  if (iMesh->isFacetDataEnabled()) {
     _computeBoundingBox = true;
   }
 
@@ -680,7 +680,7 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
     if (start != 0
         || end != nbParticles - 1) { // only some particles are updated, then use the current
                                      // existing BBox basis. Note : it can only increase.
-      const auto& boundingInfo = mesh->_boundingInfo;
+      const auto& boundingInfo = iMesh->_boundingInfo;
       if (boundingInfo) {
         minimum.copyFrom(boundingInfo->minimum);
         maximum.copyFrom(boundingInfo->maximum);
@@ -821,38 +821,38 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
     }
 
     if (_computeParticleColor && particle->color) {
-      const auto& color    = *particle->color;
-      auto& colors32       = _colors32;
-      colors32[cindex]     = color.r;
-      colors32[cindex + 1] = color.g;
-      colors32[cindex + 2] = color.b;
-      colors32[cindex + 3] = color.a;
+      const auto& color     = *particle->color;
+      auto& iColors32       = _colors32;
+      iColors32[cindex]     = color.r;
+      iColors32[cindex + 1] = color.g;
+      iColors32[cindex + 2] = color.b;
+      iColors32[cindex + 3] = color.a;
     }
     if (_computeParticleTexture && particle->uv) {
-      const auto& uv    = *particle->uv;
-      auto& uvs32       = _uvs32;
-      uvs32[uindex]     = uv.x;
-      uvs32[uindex + 1] = uv.y;
+      const auto& uv     = *particle->uv;
+      auto& iUvs32       = _uvs32;
+      iUvs32[uindex]     = uv.x;
+      iUvs32[uindex + 1] = uv.y;
     }
   }
 
   // if the VBO must be updated
   if (update) {
     if (_computeParticleColor) {
-      mesh->updateVerticesData(VertexBuffer::ColorKind, colors32, false, false);
+      iMesh->updateVerticesData(VertexBuffer::ColorKind, colors32, false, false);
     }
     if (_computeParticleTexture) {
-      mesh->updateVerticesData(VertexBuffer::UVKind, uvs32, false, false);
+      iMesh->updateVerticesData(VertexBuffer::UVKind, uvs32, false, false);
     }
-    mesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false, false);
+    iMesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false, false);
   }
 
   if (_computeBoundingBox) {
-    if (mesh->_boundingInfo) {
-      mesh->_boundingInfo->reConstruct(minimum, maximum, mesh->_worldMatrix);
+    if (iMesh->_boundingInfo) {
+      iMesh->_boundingInfo->reConstruct(minimum, maximum, iMesh->_worldMatrix);
     }
     else {
-      mesh->_boundingInfo = std::make_shared<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
+      iMesh->_boundingInfo = std::make_shared<BoundingInfo>(minimum, maximum, iMesh->_worldMatrix);
     }
   }
   afterUpdateParticles(start, end, update);

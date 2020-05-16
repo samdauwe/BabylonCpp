@@ -230,8 +230,8 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offset
     sprite._xSize = _cellData[spriteCellRef].frame.w;
     sprite._ySize = _cellData[spriteCellRef].frame.h;
     */
-    _vertexData[arrayOffset + 10] = sprite._xOffset;
-    _vertexData[arrayOffset + 11] = sprite._yOffset;
+    _vertexData[arrayOffset + 10] = static_cast<float>(sprite._xOffset);
+    _vertexData[arrayOffset + 11] = static_cast<float>(sprite._yOffset);
     _vertexData[arrayOffset + 12] = static_cast<float>(sprite._xSize) / baseSize.width;
     _vertexData[arrayOffset + 13] = static_cast<float>(sprite._ySize) / baseSize.height;
   }
