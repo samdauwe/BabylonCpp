@@ -2,6 +2,8 @@
 #include <babylon/GL/gl_rendering_context.h>
 #include <glad/glad.h>
 
+#include <stdexcept>
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image/stb_image_write.h>
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
