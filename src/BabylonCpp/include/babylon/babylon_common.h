@@ -27,6 +27,9 @@ using any = void*;
 // Byte type
 using byte = unsigned char;
 
+// Size type
+using size_t = std::size_t;
+
 // -- Array types -- //
 // 8-bit twos complement signed integer
 using Int8Array = std::vector<int8_t>;
