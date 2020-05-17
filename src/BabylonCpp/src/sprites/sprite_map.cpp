@@ -336,7 +336,7 @@ void SpriteMap::changeTiles(size_t _layer, const std::vector<Vector2>& pos, size
     (*buffer).uint8Array()[id] = static_cast<uint8_t>(tile);
   }
 
-  auto t = _createTileBuffer(*buffer);
+  auto t = _createTileBuffer(buffer->float32Array());
   _tileMaps[_layer]->dispose();
   _tileMaps[_layer] = t;
   _material->setTextureArray("tileMap", _getTileMaps());
