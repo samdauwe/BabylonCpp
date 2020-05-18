@@ -331,15 +331,14 @@ void NullEngine::_releaseTexture(const InternalTexturePtr& /*texture*/)
 }
 
 InternalTexturePtr NullEngine::createTexture(
-  const std::string& urlArg, bool noMipmap, bool invertY, Scene* /*scene*/,
-  unsigned int samplingMode, const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  std::string url, bool noMipmap, bool invertY, Scene* /*scene*/, unsigned int samplingMode,
+  const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
   const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format,
   const std::string& /*forcedExtension*/, const std::string& /*mimeType*/)
 {
-  auto texture    = InternalTexture::New(this, InternalTextureSource::Url);
-  const auto& url = urlArg;
+  auto texture = InternalTexture::New(this, InternalTextureSource::Url);
 
   texture->url             = url;
   texture->generateMipMaps = !noMipmap;

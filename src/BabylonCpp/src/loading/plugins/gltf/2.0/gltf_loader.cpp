@@ -1982,11 +1982,6 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
     if (Tools::IsBase64(image.uri)) {
       url = image.uri;
     }
-    else if (!_babylonScene->getEngine()->textureFormatInUse().empty()) {
-      // If an image uri and a texture format is set like (eg. KTX) load from
-      // url instead of blob to support texture format and fallback
-      url = _rootUrl + image.uri;
-    }
   }
 
   auto babylonTexture = Texture::New(

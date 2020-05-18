@@ -88,8 +88,6 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
                              &ThinEngine::set_doNotHandleContextLost}
     , _alphaState{std::make_unique<AlphaState>()}
     , framebufferDimensionsObject{this, &ThinEngine::set_framebufferDimensionsObject}
-    , texturesSupported{this, &ThinEngine::get_texturesSupported}
-    , textureFormatInUse{this, &ThinEngine::get_textureFormatInUse}
     , currentViewport{this, &ThinEngine::get_currentViewport}
     , emptyTexture{this, &ThinEngine::get_emptyTexture}
     , emptyTexture3D{this, &ThinEngine::get_emptyTexture3D}
@@ -205,16 +203,6 @@ void ThinEngine::set_framebufferDimensionsObject(
   const std::optional<FramebufferDimensionsObject>& dimensions)
 {
   _framebufferDimensionsObject = dimensions;
-}
-
-std::vector<std::string>& ThinEngine::get_texturesSupported()
-{
-  return _texturesSupported;
-}
-
-std::string ThinEngine::get_textureFormatInUse() const
-{
-  return _textureFormatInUse;
 }
 
 std::optional<Viewport>& ThinEngine::get_currentViewport()
@@ -1523,13 +1511,18 @@ EffectPtr ThinEngine::createEffect(
   }
   else if (std::holds_alternative<std::unordered_map<std::string, std::string>>(baseName)) {
     auto _baseName = std::get<std::unordered_map<std::string, std::string>>(baseName);
-    auto vertex    = stl_util::contains(_baseName, "vertexElement") ?
-                    _baseName["vertexElement"] :
-                    stl_util::contains(_baseName, "vertex") ? _baseName["vertex"] : "vertex";
+    auto vertex
+      = stl_util::contains(_baseName, "vertexElement") ?
+          _baseName["vertexElement"] :
+          stl_util::contains(_baseName, "vertex") ?
+          _baseName["vertex"] :
+          stl_util::contains(_baseName, "vertexToken") ? _baseName["vertexToken"] : "vertex";
     auto fragment
       = stl_util::contains(_baseName, "fragmentElement") ?
           _baseName["fragmentElement"] :
-          stl_util::contains(_baseName, "fragment") ? _baseName["fragment"] : "fragment";
+          stl_util::contains(_baseName, "fragment") ?
+          _baseName["fragment"] :
+          stl_util::contains(_baseName, "fragmentToken") ? _baseName["fragmentToken"] : "fragment";
     name = vertex + "+" + fragment + "@" + options.defines;
   }
 
@@ -2173,7 +2166,7 @@ WebGLTexturePtr ThinEngine::_createTexture()
 }
 
 InternalTexturePtr ThinEngine::createTexture(
-  const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
+  std::string url, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
@@ -2181,16 +2174,20 @@ InternalTexturePtr ThinEngine::createTexture(
   const std::string& forcedExtension, const std::string& mimeType)
 {
   // assign a new string, so that the original is still available in case of fallback
-  auto url      = urlArg;
-  auto fromData = url.substr(0, 5) == "data:";
-  auto fromBlob = url.substr(0, 5) == "blob:";
-  auto isBase64 = fromData && StringTools::contains(url, ";base64,");
+  const auto fromData = url.substr(0, 5) == "data:";
+  const auto fromBlob = url.substr(0, 5) == "blob:";
+  const auto isBase64 = fromData && StringTools::contains(url, ";base64,");
 
   auto texture = fallback ? fallback : InternalTexture::New(this, InternalTextureSource::Url);
 
+  const auto originalUrl = url;
+  if (_transformTextureUrl && !isBase64 && !fallback && !buffer) {
+    url = _transformTextureUrl(url);
+  }
+
   // establish the file extension, if possible
-  auto lastDot = StringTools::lastIndexOf(url, ".");
-  auto extension
+  const auto lastDot = StringTools::lastIndexOf(url, ".");
+  const auto extension
     = !forcedExtension.empty() ?
         forcedExtension :
         (lastDot > -1 ? StringTools::toLowerCase(url.substr(static_cast<size_t>(lastDot))) : "");
@@ -2230,31 +2227,24 @@ InternalTexturePtr ThinEngine::createTexture(
       scene->_removePendingData(texture);
     }
 
-    auto customFallback = false;
-    if (loader) {
-      std::string fallbackUrl = "";
-      if (!fallbackUrl.empty()) {
-        // Add Back
-        customFallback = true;
-        createTexture(urlArg, noMipmap, texture->invertY, scene, samplingMode, nullptr, onError,
-                      buffer, texture);
-        return;
-      }
-    }
-
-    if (!customFallback) {
+    if (url == originalUrl) {
       if (onLoadObserver) {
         texture->onLoadedObservable.remove(onLoadObserver);
       }
       if (EngineStore::UseFallbackTexture) {
         createTexture(EngineStore::FallbackTexture, noMipmap, texture->invertY, scene, samplingMode,
                       nullptr, onError, buffer, texture);
-        return;
+      }
+      if (onError) {
+        onError(message.empty() ? "Unknown error" : message, exception);
       }
     }
-
-    if (onError) {
-      onError(message.empty() ? "Unknown error" : message, exception);
+    else {
+      // fall back to the original url if the transformed url fails to load
+      BABYLON_LOGF_WARN("ThinEngine", "Failed to load %s , falling back to %s", url.c_str(),
+                        originalUrl.c_str())
+      createTexture(originalUrl, noMipmap, texture->invertY, scene, samplingMode, onLoad, onError,
+                    buffer, texture, format, forcedExtension, mimeType);
     }
   };
 

@@ -796,7 +796,7 @@ public:
   /**
    * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
-   * @param urlArg defines a value which contains one of the following:
+   * @param url defines a value which contains one of the following:
    * * A conventional http URL, e.g. 'http://...' or 'file://...'
    * * A base64 string of in-line texture data, e.g. 'data:image/jpg;base64,/...'
    * * An indicator that data being passed using the buffer parameter, e.g. 'data:mytexture.jpg'
@@ -820,7 +820,7 @@ public:
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   virtual InternalTexturePtr createTexture(
-    const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
+    std::string url, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
@@ -1637,16 +1637,6 @@ protected:
   set_framebufferDimensionsObject(const std::optional<FramebufferDimensionsObject>& dimensions);
 
   /**
-   * @brief Gets the list of texture formats supported.
-   */
-  std::vector<std::string>& get_texturesSupported();
-
-  /**
-   * @brief Gets the list of texture formats in use.
-   */
-  std::string get_textureFormatInUse() const;
-
-  /**
    * @brief Gets the current viewport.
    */
   std::optional<Viewport>& get_currentViewport();
@@ -1698,6 +1688,7 @@ protected:
   std::unique_ptr<StencilState>& get_stencilState();
 
   virtual void _rebuildBuffers();
+  void _initGLContext();
   /** VBOs **/
   /** @hidden */
   void _resetVertexBufferBinding();
@@ -1727,7 +1718,6 @@ protected:
 private:
   void _rebuildInternalTextures();
   void _rebuildEffects();
-  void _initGLContext();
   WebGLFramebufferPtr _getRealFrameBuffer(const WebGLFramebufferPtr& framebuffer);
   WebGLDataBufferPtr _createVertexBuffer(const Float32Array& data, unsigned int usage);
   void bindBuffer(const WebGLDataBufferPtr& buffer, int target);
@@ -1901,9 +1891,6 @@ public:
   /** @hidden */
   std::function<std::string(const std::string& url)> _transformTextureUrl = nullptr;
 
-  /** @hidden */
-  std::string _textureFormatInUse;
-
   /**
    * sets the object from which width and height will be taken from when getting render width and
    * height Will fallback to the gl object
@@ -1911,16 +1898,6 @@ public:
    */
   WriteOnlyProperty<ThinEngine, std::optional<FramebufferDimensionsObject>>
     framebufferDimensionsObject;
-
-  /**
-   * Gets the list of texture formats supported
-   */
-  ReadOnlyProperty<ThinEngine, std::vector<std::string>> texturesSupported;
-
-  /**
-   * Gets the list of texture formats in use
-   */
-  ReadOnlyProperty<ThinEngine, std::string> textureFormatInUse;
 
   /**
    * Gets the current viewport
@@ -2042,8 +2019,6 @@ protected:
   std::unordered_map<int, WebGLDataBufferPtr> _currentBoundBuffer;
   /** @hidden */
   WebGLFramebufferPtr _currentFramebuffer = nullptr;
-  // Hardware supported Compressed Textures
-  std::vector<std::string> _texturesSupported;
   /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
 

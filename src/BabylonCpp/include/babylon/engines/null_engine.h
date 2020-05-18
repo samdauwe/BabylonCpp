@@ -390,7 +390,7 @@ public:
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   InternalTexturePtr createTexture(
-    const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
+    std::string url, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
