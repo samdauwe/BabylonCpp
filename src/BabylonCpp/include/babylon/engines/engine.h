@@ -327,7 +327,7 @@ public:
   ICanvas* getInputElement() const;
 
   /**
-   * @brief Gets current aspect ratio
+   * @brief Gets current aspect ratio.
    * @param viewportOwner defines the camera to use to get the aspect ratio
    * @param useScreen defines if screen size must be used (or the current render target if any)
    * @returns a number defining the aspect ratio
@@ -609,7 +609,7 @@ public:
   void disableScissor();
 
   /**
-   * @brief Initializes a webVR display and starts listening to display change events
+   * @brief Initializes a webVR display and starts listening to display change events.
    * The onVRDisplayChangedObservable will be notified upon these changes
    * @returns The onVRDisplayChangedObservable
    */
