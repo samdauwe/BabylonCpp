@@ -1403,9 +1403,11 @@ public:
    * @param y position on screen
    * @param predicate Predicate function used to determine eligible meshes. Can be set to null. In
    * this case, a mesh must be enabled, visible and with isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null.
+   * @param fastCheck defines if the first intersection will be used (and not the closest)
    * @param camera to use for computing the picking ray. Can be set to null. In this case, the
    * scene.activeCamera will be used
+   * @param trianglePredicate defines an optional predicate used to select faces when a mesh
+   * intersection is detected
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
@@ -1479,10 +1481,11 @@ public:
   /**
    * @brief Use the given ray to pick a mesh in the scene.
    * @param ray The ray to use to pick meshes
-   * @param predicate Predicate function used to determine eligible meshes. Can
-   * be set to null. In this case, a mesh must have isPickable set to true
-   * @param fastCheck Launch a fast check only using the bounding boxes. Can be
-   * set to null
+   * @param predicate Predicate function used to determine eligible meshes. Can be set to null. In
+   * this case, a mesh must have isPickable set to true
+   * @param fastCheck Launch a fast check only using the bounding boxes. Can be set to null
+   * @param trianglePredicate defines an optional predicate used to select faces when a mesh
+   * intersection is detected
    * @returns a PickingInfo
    */
   std::optional<PickingInfo>
