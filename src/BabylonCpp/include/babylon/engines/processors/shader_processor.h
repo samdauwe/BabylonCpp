@@ -34,6 +34,10 @@ using ShaderDefineExpressionPtr         = std::shared_ptr<ShaderDefineExpression
 class BABYLON_SHARED_EXPORT ShaderProcessor {
 
 public:
+  static constexpr const char* regexSE       = R"(defined\s*?\((.+?)\))";
+  static constexpr const char* regexSERevert = R"(defined\s*?\[(.+?)\])";
+
+public:
   static void Process(const std::string& sourceCode, ProcessingOptions& options,
                       const std::function<void(const std::string& migratedCode)>& callback);
 
@@ -60,7 +64,7 @@ public:
 private:
   static std::string _ProcessPrecision(std::string source, const ProcessingOptions& options);
   static ShaderDefineExpressionPtr _ExtractOperation(const std::string& expression);
-  static ShaderDefineExpressionPtr _BuildSubExpression(const std::string& expression);
+  static ShaderDefineExpressionPtr _BuildSubExpression(std::string expression);
   static ShaderCodeTestNodePtr _BuildExpression(const std::string& line, size_t start);
   static void _MoveCursorWithinIf(ShaderCodeCursor& cursor,
                                   const ShaderCodeConditionNodePtr& rootNode,

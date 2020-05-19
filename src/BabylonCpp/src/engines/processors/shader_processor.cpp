@@ -83,8 +83,78 @@ ShaderDefineExpressionPtr ShaderProcessor::_ExtractOperation(const std::string& 
   return std::make_shared<ShaderDefineArithmeticOperator>(define, matchedOperator, value);
 }
 
-ShaderDefineExpressionPtr ShaderProcessor::_BuildSubExpression(const std::string& expression)
+ShaderDefineExpressionPtr ShaderProcessor::_BuildSubExpression(std::string expression)
 {
+#if 0 // BabylonJS 4.2.0-alpha.11
+  expression = StringTools::regexReplace(expression, regexSE, "defined[$1]");
+
+  const auto postfix = ShaderDefineExpression::infixToPostfix(expression);
+
+  std::vector<std::variant<std::string, ShaderDefineExpressionPtr>> stack;
+
+  for (const auto& c : postfix) {
+    if (c != "||" && c != "&&") {
+      stack.emplace_back(c);
+    }
+    else if (stack.size() >= 2) {
+      auto v1 = stack[stack.size() - 1];
+      auto v2 = stack[stack.size() - 2];
+
+      stack.pop_back();
+      stack.pop_back();
+
+      std::shared_ptr<ShaderDefineAndOperator> andOperator = nullptr;
+      std::shared_ptr<ShaderDefineOrOperator> orOperator   = nullptr;
+      if (c == "&&") {
+        andOperator = std::make_shared<ShaderDefineAndOperator>();
+      }
+      else {
+        orOperator = std::make_shared<ShaderDefineOrOperator>();
+      }
+
+      if (std::holds_alternative<std::string>(v1)) {
+        v1 = StringTools::regexReplace(std::get<std::string>(v1), regexSERevert, "defined($1)");
+      }
+
+      if (std::holds_alternative<std::string>(v2)) {
+        v2 = StringTools::regexReplace(std::get<std::string>(v2), regexSERevert, "defined($1)");
+      }
+
+      if (andOperator) {
+        andOperator->leftOperand = std::holds_alternative<std::string>(v2) ?
+                                     _ExtractOperation(std::get<std::string>(v2)) :
+                                     std::get<ShaderDefineExpressionPtr>(v2);
+        andOperator->rightOperand = std::holds_alternative<std::string>(v1) ?
+                                      _ExtractOperation(std::get<std::string>(v1)) :
+                                      std::get<ShaderDefineExpressionPtr>(v1);
+      }
+      else {
+        orOperator->leftOperand = std::holds_alternative<std::string>(v2) ?
+                                    _ExtractOperation(std::get<std::string>(v2)) :
+                                    std::get<ShaderDefineExpressionPtr>(v2);
+        orOperator->rightOperand = std::holds_alternative<std::string>(v1) ?
+                                     _ExtractOperation(std::get<std::string>(v1)) :
+                                     std::get<ShaderDefineExpressionPtr>(v1);
+      }
+
+      auto _operator = andOperator ? std::static_pointer_cast<ShaderDefineExpression>(andOperator) :
+                                     std::static_pointer_cast<ShaderDefineExpression>(orOperator);
+      stack.emplace_back(_operator);
+    }
+  }
+
+  auto& result = stack.back();
+
+  if (std::holds_alternative<std::string>(result)) {
+    result = StringTools::regexReplace(std::get<std::string>(result), regexSERevert, "defined($1)");
+  }
+
+  // note: stack.length !== 1 if there was an error in the parsing
+
+  return std::holds_alternative<std::string>(result) ?
+           _ExtractOperation(std::get<std::string>(result)) :
+           std::get<ShaderDefineExpressionPtr>(result);
+#else // BabylonJS 4.1.0
   auto indexOr = StringTools::indexOf(expression, "||");
   if (indexOr == -1) {
     auto indexAnd = StringTools::indexOf(expression, "&&");
@@ -114,6 +184,7 @@ ShaderDefineExpressionPtr ShaderProcessor::_BuildSubExpression(const std::string
 
     return orOperator;
   }
+#endif
 }
 
 ShaderCodeTestNodePtr ShaderProcessor::_BuildExpression(const std::string& line, size_t start)
@@ -318,7 +389,8 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
   auto regexBegin = std::sregex_iterator(sourceCode.begin(), sourceCode.end(), regex);
   auto regexEnd   = std::sregex_iterator();
 
-  auto returnValue = sourceCode;
+  auto returnValue    = sourceCode;
+  auto keepProcessing = false;
 
   for (std::sregex_iterator regexIt = regexBegin; regexIt != regexEnd; ++regexIt) {
     auto match       = *regexIt;
@@ -390,6 +462,8 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
 
       // Replace
       returnValue = StringTools::replace(returnValue, match[0].str(), includeContent);
+
+      keepProcessing = keepProcessing || StringTools::indexOf(includeContent, "#include<") >= 0;
     }
     else {
       auto includeShaderUrl = options.shadersRepository + "ShadersInclude/" + includeFile + ".fx";
@@ -408,7 +482,12 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
     }
   }
 
-  callback(returnValue);
+  if (keepProcessing) {
+    _ProcessIncludes(returnValue, options, callback);
+  }
+  else {
+    callback(returnValue);
+  }
 }
 
 void ShaderProcessor::_FileToolsLoadFile(
