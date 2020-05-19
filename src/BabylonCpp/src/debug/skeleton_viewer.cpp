@@ -13,26 +13,23 @@
 namespace BABYLON {
 namespace Debug {
 
-SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton,
-                               const AbstractMeshPtr& iMesh, Scene* iScene,
-                               bool iAutoUpdateBonesMatrices,
-                               int iRenderingGroupId)
+SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshPtr& iMesh,
+                               Scene* iScene, bool iAutoUpdateBonesMatrices, int iRenderingGroupId)
     : color{Color3::White()}
     , debugMesh{this, &SkeletonViewer::get_debugMesh}
     , skeleton{iSkeleton}
     , mesh{iMesh}
     , autoUpdateBonesMatrices{iAutoUpdateBonesMatrices}
     , renderingGroupId{iRenderingGroupId}
-    , isEnabled{this, &SkeletonViewer::get_isEnabled,
-                &SkeletonViewer::set_isEnabled}
+    , isEnabled{this, &SkeletonViewer::get_isEnabled, &SkeletonViewer::set_isEnabled}
     , _debugMesh{nullptr}
     , _isEnabled{false}
     , _utilityLayer{nullptr}
 {
   _scene = iScene;
 
-  _utilityLayer = UtilityLayerRenderer::New(_scene, false);
-  _utilityLayer->pickUtilitySceneFirst                       = false;
+  _utilityLayer                        = UtilityLayerRenderer::New(_scene, false);
+  _utilityLayer->pickUtilitySceneFirst = false;
   _utilityLayer->utilityLayerScene->autoClearDepthAndStencil = true;
 
   update();
@@ -68,9 +65,8 @@ bool SkeletonViewer::get_isEnabled() const
   return _isEnabled;
 }
 
-void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
-                                      const Matrix& meshMat, float x, float y,
-                                      float z) const
+void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone, const Matrix& meshMat,
+                                      float x, float y, float z) const
 {
   auto& tmat             = TmpVectors::MatrixArray[0];
   const auto& parentBone = bone.getParent();
@@ -96,8 +92,8 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
   position.z        = tmatM[14];
 }
 
-void SkeletonViewer::_getLinesForBonesWithLength(
-  const std::vector<BonePtr>& bones, const Matrix& meshMat)
+void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
+                                                 const Matrix& meshMat)
 {
   _resizeDebugLines(bones.size());
 
@@ -110,16 +106,15 @@ void SkeletonViewer::_getLinesForBonesWithLength(
       points = {Vector3::Zero(), Vector3::Zero()};
     }
     _getBonePosition(points[0], *bone, meshMat);
-    _getBonePosition(points[1], *bone, meshMat, 0.f,
-                     static_cast<float>(bones.size()), 0.f);
+    _getBonePosition(points[1], *bone, meshMat, 0.f, static_cast<float>(bones.size()), 0.f);
     points[0].subtractInPlace(meshPos);
     points[1].subtractInPlace(meshPos);
     ++i;
   }
 }
 
-void SkeletonViewer::_getLinesForBonesNoLength(
-  const std::vector<BonePtr>& bones, const Matrix& /*meshMat*/)
+void SkeletonViewer::_getLinesForBonesNoLength(const std::vector<BonePtr>& bones,
+                                               const Matrix& /*meshMat*/)
 {
   _resizeDebugLines(bones.size());
 
@@ -168,8 +163,7 @@ void SkeletonViewer::update()
 
   auto _mesh = mesh->_effectiveMesh();
 
-  if (!skeleton->bones.empty()
-      && stl_util::almost_equal(skeleton->bones[0]->length, -1.f)) {
+  if (!skeleton->bones.empty() && stl_util::almost_equal(skeleton->bones[0]->length, -1.f)) {
     _getLinesForBonesNoLength(skeleton->bones, _mesh->getWorldMatrix());
   }
   else {
@@ -183,7 +177,7 @@ void SkeletonViewer::update()
   options.instance  = nullptr;
 
   if (!_debugMesh) {
-    _debugMesh = LinesBuilder::CreateLineSystem("", options, targetScene);
+    _debugMesh                   = LinesBuilder::CreateLineSystem("", options, targetScene);
     _debugMesh->renderingGroupId = renderingGroupId;
   }
   else {

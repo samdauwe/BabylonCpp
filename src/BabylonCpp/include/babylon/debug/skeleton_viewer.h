@@ -37,10 +37,9 @@ public:
    * @param skeleton defines the skeleton to render
    * @param mesh defines the mesh attached to the skeleton
    * @param scene defines the hosting scene
-   * @param autoUpdateBonesMatrices defines a boolean indicating if bones
-   * matrices must be forced to update before rendering (true by default)
-   * @param renderingGroupId defines the rendering group id to use with the
-   * viewer
+   * @param autoUpdateBonesMatrices defines a boolean indicating if bones matrices must be forced to
+   * update before rendering (true by default)
+   * @param renderingGroupId defines the rendering group id to use with the viewer
    */
   SkeletonViewer(const SkeletonPtr& skeleton, const AbstractMeshPtr& mesh, Scene* scene,
                  bool autoUpdateBonesMatrices = true, int renderingGroupId = 1);
@@ -101,8 +100,8 @@ public:
   AbstractMeshPtr mesh;
 
   /**
-   * Defines a boolean indicating if bones matrices must be forced to update
-   * before rendering (true by default)
+   * Defines a boolean indicating if bones matrices must be forced to update before rendering (true
+   * by default)
    */
   bool autoUpdateBonesMatrices;
 
