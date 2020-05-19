@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-std::unique_ptr<RayHelper>
-RayHelper::CreateAndShow(const Ray& ray, Scene* scene, const Color3& color)
+std::unique_ptr<RayHelper> RayHelper::CreateAndShow(const Ray& ray, Scene* scene,
+                                                    const Color3& color)
 {
   auto helper = std::make_unique<RayHelper>(ray);
 
@@ -34,9 +34,8 @@ void RayHelper::show(Scene* scene)
   if (!_renderFunction && ray) {
     _renderFunction = [this](Scene*, EventState&) { _render(); };
     _scene          = scene;
-    _renderPoints
-      = {ray->origin, ray->origin.add(ray->direction.scale(ray->length))};
-    _renderLine = Mesh::CreateLines("ray", _renderPoints, scene, true);
+    _renderPoints   = {ray->origin, ray->origin.add(ray->direction.scale(ray->length))};
+    _renderLine     = Mesh::CreateLines("ray", _renderPoints, scene, true);
 
     if (_renderFunction) {
       _scene->registerBeforeRender(_renderFunction);
@@ -83,8 +82,7 @@ void RayHelper::_render()
   Mesh::CreateLines("ray", _renderPoints, _scene, true, _renderLine);
 }
 
-void RayHelper::attachToMesh(const AbstractMeshPtr& mesh,
-                             const Vector3& meshSpaceDirection,
+void RayHelper::attachToMesh(const AbstractMeshPtr& mesh, const Vector3& meshSpaceDirection,
                              const Vector3& meshSpaceOrigin, float length)
 {
   _attachedToMesh = mesh;
@@ -112,8 +110,7 @@ void RayHelper::detachFromMesh()
 {
   if (_attachedToMesh) {
     if (_updateToMeshFunction) {
-      _attachedToMesh->getScene()->unregisterBeforeRender(
-        _updateToMeshFunction);
+      _attachedToMesh->getScene()->unregisterBeforeRender(_updateToMeshFunction);
     }
     _attachedToMesh       = nullptr;
     _updateToMeshFunction = nullptr;
@@ -132,8 +129,8 @@ void RayHelper::_updateToMesh()
   }
 
   _attachedToMesh->getDirectionToRef(_meshSpaceDirection, ray->direction);
-  Vector3::TransformCoordinatesToRef(
-    _meshSpaceOrigin, _attachedToMesh->getWorldMatrix(), ray->origin);
+  Vector3::TransformCoordinatesToRef(_meshSpaceOrigin, _attachedToMesh->getWorldMatrix(),
+                                     ray->origin);
 }
 
 void RayHelper::dispose()

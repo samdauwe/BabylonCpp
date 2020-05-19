@@ -18,8 +18,8 @@ using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
 
 /**
- * @brief As raycast might be hard to debug, the RayHelper can help rendering
- * the different rays in order to better appreciate the issue one might have.
+ * @brief As raycast might be hard to debug, the RayHelper can help rendering the different rays in
+ * order to better appreciate the issue one might have.
  * @see http://doc.babylonjs.com/babylon101/raycasts#debugging
  */
 class BABYLON_SHARED_EXPORT RayHelper {
@@ -38,8 +38,8 @@ public:
 public:
   /**
    * @brief Instantiate a new ray helper.
-   * As raycast might be hard to debug, the RayHelper can help rendering the
-   * different rays in order to better appreciate the issue one might have.
+   * As raycast might be hard to debug, the RayHelper can help rendering the different rays in order
+   * to better appreciate the issue one might have.
    * @see http://doc.babylonjs.com/babylon101/raycasts#debugging
    * @param ray Defines the ray we are currently tryin to visualize
    */
@@ -65,19 +65,18 @@ public:
   void hide();
 
   /**
-   * @brief Attach a ray helper to a mesh so that we can easily see its
-   * orientation for instance or information like its normals.
+   * @brief Attach a ray helper to a mesh so that we can easily see its orientation for instance or
+   * information like its normals.
    * @param mesh Defines the mesh we want the helper attached to
-   * @param meshSpaceDirection Defines the direction of the Ray in mesh space
-   * (local space of the mesh node)
-   * @param meshSpaceOrigin Defines the origin of the Ray in mesh space (local
-   * space of the mesh node)
+   * @param meshSpaceDirection Defines the direction of the Ray in mesh space (local space of the
+   * mesh node)
+   * @param meshSpaceOrigin Defines the origin of the Ray in mesh space (local space of the mesh
+   * node)
    * @param length Defines the length of the ray
    */
   void attachToMesh(const AbstractMeshPtr& mesh,
                     const Vector3& meshSpaceDirection = Vector3::Zero(),
-                    const Vector3& meshSpaceOrigin    = Vector3(0.f, 0.f, -1.f),
-                    float length                      = 0.f);
+                    const Vector3& meshSpaceOrigin = Vector3(0.f, 0.f, -1.f), float length = 0.f);
 
   /**
    * @brief Detach the ray helper from the mesh it has previously been attached
