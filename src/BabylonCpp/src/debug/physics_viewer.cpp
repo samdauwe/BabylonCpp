@@ -34,8 +34,8 @@ PhysicsViewer::PhysicsViewer(Scene* scene)
     _physicsEnginePlugin = physicEngine->getPhysicsPlugin();
   }
 
-  _utilityLayer = UtilityLayerRenderer::New(_scene, false);
-  _utilityLayer->pickUtilitySceneFirst                       = false;
+  _utilityLayer                        = UtilityLayerRenderer::New(_scene, false);
+  _utilityLayer->pickUtilitySceneFirst = false;
   _utilityLayer->utilityLayerScene->autoClearDepthAndStencil = true;
 }
 
@@ -68,8 +68,7 @@ void PhysicsViewer::_updateDebugMeshes()
   }
 }
 
-AbstractMeshPtr PhysicsViewer::showImpostor(PhysicsImpostor* impostor,
-                                            const MeshPtr& targetMesh)
+AbstractMeshPtr PhysicsViewer::showImpostor(PhysicsImpostor* impostor, const MeshPtr& targetMesh)
 {
   if (!_scene) {
     return nullptr;
@@ -88,9 +87,7 @@ AbstractMeshPtr PhysicsViewer::showImpostor(PhysicsImpostor* impostor,
     _meshes[_numMeshes]    = debugMesh;
 
     if (_numMeshes == 0) {
-      _renderFunction = [this](Scene* /*scene*/, EventState& /*es*/) {
-        _updateDebugMeshes();
-      };
+      _renderFunction = [this](Scene* /*scene*/, EventState& /*es*/) { _updateDebugMeshes(); };
       _scene->registerBeforeRender(_renderFunction);
     }
 
@@ -120,9 +117,8 @@ void PhysicsViewer::hideImpostor(PhysicsImpostor* impostor)
       utilityLayerScene->removeMesh(mesh);
       mesh->dispose();
 
-      _debugMeshMeshes.erase(
-        std::remove(_debugMeshMeshes.begin(), _debugMeshMeshes.end(), mesh),
-        _debugMeshMeshes.end());
+      _debugMeshMeshes.erase(std::remove(_debugMeshMeshes.begin(), _debugMeshMeshes.end(), mesh),
+                             _debugMeshMeshes.end());
 
       --_numMeshes;
       if (_numMeshes > 0) {
@@ -161,9 +157,8 @@ AbstractMeshPtr PhysicsViewer::_getDebugBoxMesh(Scene* scene)
 {
   if (!_debugBoxMesh) {
     BoxOptions options;
-    options.size = 1.f;
-    _debugBoxMesh
-      = BoxBuilder::CreateBox("physicsBodyBoxViewMesh", options, scene);
+    options.size  = 1.f;
+    _debugBoxMesh = BoxBuilder::CreateBox("physicsBodyBoxViewMesh", options, scene);
     _debugBoxMesh->rotationQuaternion = Quaternion::Identity();
     _debugBoxMesh->material           = _getDebugMaterial(scene);
     _debugBoxMesh->setEnabled(false);
@@ -177,8 +172,7 @@ AbstractMeshPtr PhysicsViewer::_getDebugSphereMesh(Scene* scene)
   if (!_debugSphereMesh) {
     SphereOptions options;
     options.diameter = 1.f;
-    _debugSphereMesh = SphereBuilder::CreateSphere("physicsBodySphereViewMesh",
-                                                   options, scene);
+    _debugSphereMesh = SphereBuilder::CreateSphere("physicsBodySphereViewMesh", options, scene);
     _debugSphereMesh->rotationQuaternion = Quaternion::Identity();
     _debugSphereMesh->material           = _getDebugMaterial(scene);
     _debugSphereMesh->setEnabled(false);
@@ -194,8 +188,8 @@ AbstractMeshPtr PhysicsViewer::_getDebugCylinderMesh(Scene* scene)
     options.diameterTop    = 1.f;
     options.diameterBottom = 1.f;
     options.height         = 1.f;
-    _debugCylinderMesh     = CylinderBuilder::CreateCylinder(
-      "physicsBodyCylinderViewMesh", options, scene);
+    _debugCylinderMesh
+      = CylinderBuilder::CreateCylinder("physicsBodyCylinderViewMesh", options, scene);
     _debugCylinderMesh->rotationQuaternion = Quaternion::Identity();
     _debugCylinderMesh->material           = _getDebugMaterial(scene);
     _debugCylinderMesh->setEnabled(false);
@@ -204,8 +198,7 @@ AbstractMeshPtr PhysicsViewer::_getDebugCylinderMesh(Scene* scene)
   return _debugCylinderMesh->createInstance("physicsBodyBoxViewInstance");
 }
 
-AbstractMeshPtr PhysicsViewer::_getDebugMeshMesh(const MeshPtr& mesh,
-                                                 Scene* scene)
+AbstractMeshPtr PhysicsViewer::_getDebugMeshMesh(const MeshPtr& mesh, Scene* scene)
 {
   auto wireframeOver      = Mesh::New(mesh->name, scene, nullptr, mesh.get());
   wireframeOver->position = Vector3::Zero();
@@ -217,8 +210,7 @@ AbstractMeshPtr PhysicsViewer::_getDebugMeshMesh(const MeshPtr& mesh,
   return wireframeOver;
 }
 
-AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor,
-                                             const MeshPtr& targetMesh)
+AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor, const MeshPtr& targetMesh)
 {
   if (!_utilityLayer) {
     return nullptr;

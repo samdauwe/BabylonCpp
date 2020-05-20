@@ -45,8 +45,7 @@ public:
    * @param targetMesh defines the mesh represented by the impostor
    * @returns the new debug mesh used to render the impostor
    */
-  AbstractMeshPtr showImpostor(PhysicsImpostor* impostor,
-                               const MeshPtr& targetMesh = nullptr);
+  AbstractMeshPtr showImpostor(PhysicsImpostor* impostor, const MeshPtr& targetMesh = nullptr);
 
   /**
    * @brief Hides a specified physic impostor.
@@ -71,8 +70,7 @@ private:
   AbstractMeshPtr _getDebugSphereMesh(Scene* scene);
   AbstractMeshPtr _getDebugCylinderMesh(Scene* scene);
   AbstractMeshPtr _getDebugMeshMesh(const MeshPtr& mesh, Scene* scene);
-  AbstractMeshPtr _getDebugMesh(PhysicsImpostor* impostor,
-                                const MeshPtr& targetMesh);
+  AbstractMeshPtr _getDebugMesh(PhysicsImpostor* impostor, const MeshPtr& targetMesh);
 
 protected:
   /**
