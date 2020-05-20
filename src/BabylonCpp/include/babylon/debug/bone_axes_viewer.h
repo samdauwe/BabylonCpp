@@ -13,8 +13,7 @@ class Mesh;
 namespace Debug {
 
 /**
- * @brief The BoneAxesViewer will attach 3 axes to a specific bone of a specific
- * mesh.
+ * @brief The BoneAxesViewer will attach 3 axes to a specific bone of a specific mesh.
  * @see demo here: https://www.babylonjs-playground.com/#0DE8F4#8
  */
 class BABYLON_SHARED_EXPORT BoneAxesViewer : public AxesViewer {

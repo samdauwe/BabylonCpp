@@ -7,8 +7,7 @@
 namespace BABYLON {
 namespace Debug {
 
-BoneAxesViewer::BoneAxesViewer(Scene* iScene, Bone* iBone, Mesh* iMesh,
-                               float iScaleLines)
+BoneAxesViewer::BoneAxesViewer(Scene* iScene, Bone* iBone, Mesh* iMesh, float iScaleLines)
     : AxesViewer{iScene, iScaleLines}
     , mesh{iMesh}
     , bone{iBone}
