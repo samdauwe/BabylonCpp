@@ -100,6 +100,8 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
     _updatable = true;
   }
   if (_pickable) {
+    pickedBySubMesh = {};
+    // pickedParticles = pickedBySubMesh[0];
     pickedParticles = {};
   }
 
@@ -373,6 +375,7 @@ void SolidParticleSystem::_resetCopy()
   copy->uvs.copyFromFloats(0.f, 0.f, 1.f, 1.f);
   copy->color              = std::nullopt;
   copy->translateFromPivot = false;
+  copy->shapeId            = 0;
   copy->materialIndex      = std::nullopt;
 }
 
@@ -393,6 +396,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   auto storeApart = (options && options->storage) ? true : false;
   copy.idx        = idx;
   copy.idxInShape = idxInShape;
+  copy.shapeId    = model->shapeID;
   if (_useModelMaterial) {
     const auto materialId     = model->_material->uniqueId;
     auto& materialIndexesById = _materialIndexesById;
@@ -917,6 +921,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
     // camera-particle distance for depth sorting
     if (_depthSort && _depthSortParticles) {
       auto& dsp         = depthSortedParticles[p];
+      dsp.idx           = particle->idx;
       dsp.ind           = particle->_ind;
       dsp.indicesLength = particle->_model->_indicesLength;
       dsp.sqDistance    = Vector3::DistanceSquared(particle->position, camInvertedPosition);
@@ -1256,18 +1261,36 @@ void SolidParticleSystem::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialA
 {
   mesh->dispose();
   // drop references to internal big arrays for the GC
-  _positions.clear();
-  _indices.clear();
-  _normals.clear();
-  _uvs.clear();
-  _colors.clear();
-  _indices32.clear();
-  _positions32.clear();
-  _normals32.clear();
-  _fixedNormal32.clear();
-  _uvs32.clear();
-  _colors32.clear();
-  pickedParticles.clear();
+  _positions         = {};
+  _indices           = {};
+  _normals           = {};
+  _uvs               = {};
+  _colors            = {};
+  _indices32         = {};
+  _positions32       = {};
+  _normals32         = {};
+  _fixedNormal32     = {};
+  _uvs32             = {};
+  _colors32          = {};
+  pickedParticles    = {};
+  pickedBySubMesh    = {};
+  _materials         = {};
+  _materialIndexes   = {};
+  _indicesByMaterial = {};
+  _idxOfId           = {};
+}
+
+std::optional<PickedParticle> SolidParticleSystem::pickedParticle(const PickingInfo& pickingInfo)
+{
+  if (pickingInfo.hit) {
+    const auto subMesh = pickingInfo.subMeshId;
+    const auto faceId  = pickingInfo.faceId;
+    const auto& picked = pickedBySubMesh;
+    if (subMesh < picked.size() && faceId < picked[subMesh].size()) {
+      return picked[subMesh][faceId];
+    }
+  }
+  return std::nullopt;
 }
 
 SolidParticlePtr SolidParticleSystem::getParticleById(size_t id)
@@ -1327,6 +1350,7 @@ SolidParticleSystem& SolidParticleSystem::computeSubMeshes()
       sortedPart.materialIndex = part->materialIndex.value_or(0);
       sortedPart.ind           = part->_ind;
       sortedPart.indicesLength = part->_model->_indicesLength;
+      sortedPart.idx           = part->idx;
     }
   }
   _sortParticlesByMaterial();
@@ -1350,12 +1374,20 @@ SolidParticleSystem& SolidParticleSystem::_sortParticlesByMaterial()
   std::vector<size_t> materialIndexes;
   _materialIndexes = materialIndexes;
   std::sort(depthSortedParticles.begin(), depthSortedParticles.end(), _materialSortFunction);
-  auto length       = depthSortedParticles.size();
-  auto& indices32   = _indices32;
-  auto& indices     = _indices;
-  auto sid          = 0ull;
-  auto lastMatIndex = depthSortedParticles[0].materialIndex;
+  auto length     = depthSortedParticles.size();
+  auto& indices32 = _indices32;
+  auto& indices   = _indices;
+
+  auto subMeshIndex  = 0;
+  auto subMeshFaceId = 0;
+  auto sid           = 0ull;
+  auto lastMatIndex  = depthSortedParticles[0].materialIndex;
   materialIndexes.emplace_back(lastMatIndex);
+  if (_pickable) {
+    pickedBySubMesh = {};
+    // pickedParticles = this.pickedBySubMesh[0];
+    pickedParticles = {};
+  }
   for (size_t sorted = 0; sorted < length; ++sorted) {
     auto& sortedPart = depthSortedParticles[sorted];
     auto lind        = sortedPart.indicesLength;
@@ -1364,10 +1396,29 @@ SolidParticleSystem& SolidParticleSystem::_sortParticlesByMaterial()
       lastMatIndex = sortedPart.materialIndex;
       indicesByMaterial.emplace_back(sid);
       materialIndexes.emplace_back(lastMatIndex);
+      if (_pickable) {
+        ++subMeshIndex;
+        pickedBySubMesh.resize(subMeshIndex + 1);
+        pickedBySubMesh[subMeshIndex] = {};
+        subMeshFaceId                 = 0;
+      }
     }
+    auto faceId = 0ull;
     for (size_t i = 0; i < lind; i++) {
       indices32[sid] = indices[sind + i];
-      sid++;
+      if (_pickable) {
+        auto f = i % 3;
+        if (f == 0) {
+          pickedBySubMesh[subMeshIndex].resize(subMeshFaceId + 1);
+          pickedBySubMesh[subMeshIndex][subMeshFaceId] = PickedParticle{
+            sortedPart.idx, // idx
+            faceId          // faceId
+          };
+          ++subMeshFaceId;
+          ++faceId;
+        }
+      }
+      ++sid;
     }
   }
   indicesByMaterial.emplace_back(

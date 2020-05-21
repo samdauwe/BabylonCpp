@@ -15,6 +15,7 @@ struct DepthSortedParticle;
 class Material;
 class Mesh;
 class MultiMaterial;
+class PickingInfo;
 class SolidParticleSystem;
 class Scene;
 class TargetCamera;
@@ -176,6 +177,15 @@ public:
    * @brief Disposes the SPS.
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Returns an object {idx: numbern faceId: number} for the picked particle from the passed
+   * pickingInfo object. idx is the particle index in the SPS faceId is the picked face index
+   * counted within this particle. Returns null if the pickInfo can't identify a picked particle.
+   * @param pickingInfo (PickingInfo object)
+   * @returns {idx: number, faceId: number} or null
+   */
+  std::optional<PickedParticle> pickedParticle(const PickingInfo& pickingInfo);
 
   /**
    * @brief Returns a SolidParticle object from its identifier : particle.id
@@ -682,9 +692,25 @@ public:
    * Each element of this array is an object `{idx: int, faceId: int}`.
    * `idx` is the picked particle index in the `SPS.particles` array
    * `faceId` is the picked face index counted within this particle.
+   * This array is the first element of the pickedBySubMesh array : sps.pickBySubMesh[0].
+   * It's not pertinent to use it when using a SPS with the support for MultiMaterial enabled.
+   * Use the method SPS.pickedParticle(pickingInfo) instead.
    * Please read : http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
    */
   std::vector<PickedParticle> pickedParticles;
+
+  /**
+   * This array is populated when the SPS is set as 'pickable'
+   * Each key of this array is a submesh index.
+   * Each element of this array is a second array defined like this :
+   * Each key of this second array is a `faceId` value that you can get from a pickResult object.
+   * Each element of this second array is an object `{idx: int, faceId: int}`.
+   * `idx` is the picked particle index in the `SPS.particles` array
+   * `faceId` is the picked face index counted within this particle.
+   * It's better to use the method SPS.pickedParticle(pickingInfo) rather than using directly this
+   * array. Please read : http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
+   */
+  std::vector<std::vector<PickedParticle>> pickedBySubMesh;
 
   /**
    * This array is populated when `enableDepthSort` is set to true.
