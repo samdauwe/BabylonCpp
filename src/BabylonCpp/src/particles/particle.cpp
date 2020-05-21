@@ -22,15 +22,15 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , scale{Vector2(1.f, 1.f)}
     , angle{0.f}
     , angularSpeed{0.f}
-    , cellIndex{0}
+    , cellIndex{0u}
     , remapData{std::nullopt}
     , _randomCellOffset{std::nullopt}
     , _initialDirection{std::nullopt}
     , _initialStartSpriteCellID{0}
     , _initialEndSpriteCellID{0}
     , _currentColorGradient{std::nullopt}
-    , _currentColor1{Color4(0, 0, 0, 0)}
-    , _currentColor2{Color4(0, 0, 0, 0)}
+    , _currentColor1{Color4(0.f, 0.f, 0.f, 0.f)}
+    , _currentColor2{Color4(0.f, 0.f, 0.f, 0.f)}
     , _currentSizeGradient{std::nullopt}
     , _currentSize1{0.f}
     , _currentSize2{0.f}
@@ -49,7 +49,7 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , _randomNoiseCoordinates1{std::nullopt}
     , _localPosition{std::nullopt}
     , particleSystem{iParticleSystem}
-    , _currentFrameCounter{0}
+    , _currentFrameCounter{0u}
 {
   if (!particleSystem->isAnimationSheetEnabled()) {
     return;
