@@ -5,6 +5,7 @@
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/thin_engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
@@ -13,38 +14,54 @@
 
 namespace BABYLON {
 
-ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene) : BaseTexture{scene}
+ColorGradingTexture::ColorGradingTexture(const std::string& iUrl,
+                                         const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
+                                         const std::function<void()>& onLoad)
+    : BaseTexture{ColorGradingTexture::_isScene(sceneOrEngine) ? std::get<Scene*>(sceneOrEngine) :
+                                                                 nullptr}
+    , _onLoad{nullptr}
 {
   if (iUrl.empty()) {
     return;
   }
 
-  _engine        = scene->getEngine();
   _textureMatrix = std::make_unique<Matrix>(Matrix::Identity());
   name           = iUrl;
   url            = iUrl;
-  hasAlpha       = false;
-  isCube         = false;
-  is3D           = _engine->webGLVersion() > 1.f;
-  wrapU          = Constants::TEXTURE_CLAMP_ADDRESSMODE;
-  wrapV          = Constants::TEXTURE_CLAMP_ADDRESSMODE;
-  wrapR          = Constants::TEXTURE_CLAMP_ADDRESSMODE;
-
-  anisotropicFilteringLevel = 1;
+  _onLoad        = onLoad;
 
   _texture = _getFromCache(url, true);
 
   if (!_texture) {
-    if (!scene->useDelayedTextureLoading) {
-      loadTexture();
+    if (ColorGradingTexture::_isScene(sceneOrEngine)) {
+      _engine = std::get<Scene*>(sceneOrEngine)->getEngine();
+
+      if (!std::get<Scene*>(sceneOrEngine)->useDelayedTextureLoading) {
+        loadTexture();
+      }
+      else {
+        delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
+      }
     }
     else {
-      delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
+      _engine = std::get<ThinEngine*>(sceneOrEngine);
+      loadTexture();
     }
+  }
+  else {
+    _engine = _texture->getEngine();
+    _triggerOnLoad();
   }
 }
 
 ColorGradingTexture::~ColorGradingTexture() = default;
+
+void ColorGradingTexture::_triggerOnLoad()
+{
+  if (_onLoad) {
+    _onLoad();
+  }
+}
 
 Matrix* ColorGradingTexture::getTextureMatrix(int /*uBase*/)
 {
@@ -67,7 +84,17 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
 
   _texture = texture;
 
-  const auto callback = [&](const std::variant<std::string, ArrayBufferView>& iText,
+  _texture          = texture;
+  _texture->isReady = false;
+
+  isCube                    = false;
+  is3D                      = _engine->webGLVersion() > 1.f;
+  wrapU                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
+  wrapV                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
+  wrapR                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
+  anisotropicFilteringLevel = 1u;
+
+  const auto callback = [=](const std::variant<std::string, ArrayBufferView>& iText,
                             const std::string & /*onSuccess*/) -> void {
     if (!std::holds_alternative<std::string>(iText)) {
       return;
@@ -78,9 +105,9 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     Uint8Array data;
     Float32Array tempData;
 
-    auto lines  = StringTools::split(text, '\n');
-    size_t size = 0, pixelIndexW = 0, pixelIndexH = 0, pixelIndexSlice = 0;
-    int maxColor = 0;
+    auto lines = StringTools::split(text, '\n');
+    auto size = 0ull, pixelIndexW = 0ull, pixelIndexH = 0ull, pixelIndexSlice = 0ull;
+    auto maxColor = 0;
 
     for (auto& line : lines) {
 
@@ -155,6 +182,9 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
       _texture->updateSize(_size * _size, _size);
       _engine->updateRawTexture(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
     }
+
+    texture->isReady = true;
+    _triggerOnLoad();
   };
 
   auto scene = getScene();
@@ -209,6 +239,11 @@ std::unique_ptr<ColorGradingTexture> ColorGradingTexture::Parse(const json& /*pa
 json ColorGradingTexture::serialize() const
 {
   return nullptr;
+}
+
+bool ColorGradingTexture::_isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine)
+{
+  return std::holds_alternative<Scene*>(sceneOrEngine);
 }
 
 } // end of namespace BABYLON

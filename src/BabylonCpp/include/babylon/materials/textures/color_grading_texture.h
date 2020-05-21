@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-class Engine;
+class ThinEngine;
 
 /**
  * @brief This represents a color grading texture. This acts as a lookup table LUT, useful during
@@ -23,9 +23,12 @@ public:
    * @brief Instantiates a ColorGradingTexture from the following parameters.
    *
    * @param url The location of the color gradind data (currently only supporting 3dl)
-   * @param scene The scene the texture will be used in
+   * @param sceneOrEngine The scene or engine the texture will be used in
+   * @param onLoad defines a callback triggered when the texture has been loaded
    */
-  ColorGradingTexture(const std::string& url, Scene* scene);
+  ColorGradingTexture(const std::string& url,
+                      const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
+                      const std::function<void()>& onLoad = nullptr);
   ~ColorGradingTexture() override; // = default
 
   /**
@@ -62,6 +65,11 @@ public:
 
 private:
   /**
+   * @brief Fires the onload event from the constructor if requested.
+   */
+  void _triggerOnLoad();
+
+  /**
    * @brief Occurs when the file being loaded is a .3dl LUT file.
    */
   InternalTexturePtr load3dlTexture();
@@ -71,6 +79,12 @@ private:
    */
   void loadTexture();
 
+  /**
+   * @brief Returns true if the passed parameter is a scene object (can be use for typings)
+   * @param sceneOrEngine The object to test.
+   */
+  static bool _isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine);
+
 public:
   /**
    * The texture URL.
@@ -79,11 +93,17 @@ public:
 
 private:
   /**
+   * Empty line regex stored for GC.
+   */
+  static constexpr const char* _noneEmptyLineRegex = R"(\S+)";
+
+  /**
    * The current texture matrix. (will always be identity in color grading texture)
    */
   std::unique_ptr<Matrix> _textureMatrix;
 
-  Engine* _engine;
+  ThinEngine* _engine;
+  std::function<void()> _onLoad;
 
 }; // end of class ColorGradingTexture
 
