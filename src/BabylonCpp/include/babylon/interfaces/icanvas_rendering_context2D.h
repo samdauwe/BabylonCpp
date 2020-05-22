@@ -29,9 +29,8 @@ public:
     std::cout << text << ", " << '\n';
     return ISize(0, 0);
   }
-  void drawImage(const Image& /*img*/, int /*sx*/, int /*sy*/, int /*sWidth*/,
-                 int /*sHeight*/, int /*dx*/, int /*dy*/, int /*dWidth*/,
-                 int /*dHeight*/)
+  void drawImage(const Image& /*img*/, int /*sx*/, int /*sy*/, int /*sWidth*/, int /*sHeight*/,
+                 int /*dx*/, int /*dy*/, int /*dWidth*/, int /*dHeight*/)
   {
   }
 
