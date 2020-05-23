@@ -11,16 +11,16 @@ namespace BABYLON {
 
 const char* ParticleHelper::BaseAssetsUrl = ParticleSystemSet::BaseAssetsUrl;
 
-IParticleSystem*
+IParticleSystemPtr
 ParticleHelper::CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
                               size_t capacity, Scene* scene, bool useGPU)
 {
-  IParticleSystem* system = nullptr;
+  IParticleSystemPtr system = nullptr;
   if (useGPU) {
-    system = new GPUParticleSystem("default system", capacity, std::nullopt, scene);
+    system = std::make_shared<GPUParticleSystem>("default system", capacity, std::nullopt, scene);
   }
   else {
-    system = new ParticleSystem("default system", capacity, scene);
+    system = std::make_shared<ParticleSystem>("default system", capacity, scene);
   }
 
   system->emitter = emitter;

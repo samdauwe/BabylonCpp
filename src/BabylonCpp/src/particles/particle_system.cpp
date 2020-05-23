@@ -58,7 +58,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
     , _started{false}
     , _stopped{false}
     , _actualFrame{0}
-    , _vertexBufferSize{11}
+    , _vertexBufferSize{11u}
     , _rawTextureWidth{256}
     , _rampGradientsTexture{nullptr}
     , _useRampGradients{false}

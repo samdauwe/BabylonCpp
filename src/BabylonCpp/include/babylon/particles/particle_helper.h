@@ -18,7 +18,8 @@ class ParticleSystem;
 class ParticleSystemSet;
 class Scene;
 class Vector3;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
 
 /**
  * @brief This class is made for on one-liner static method to help creating particle systems.
@@ -38,9 +39,9 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * @param useGPU defines if a GPUParticleSystem must be created (default is false)
    * @returns the new Particle system
    */
-  static IParticleSystem* CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
-                                        size_t capacity = 500, Scene* scene = nullptr,
-                                        bool useGPU = false);
+  static IParticleSystemPtr CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
+                                          size_t capacity = 500, Scene* scene = nullptr,
+                                          bool useGPU = false);
 
   /**
    * @brief This is the main static method (one-liner) of this helper to create different particle
