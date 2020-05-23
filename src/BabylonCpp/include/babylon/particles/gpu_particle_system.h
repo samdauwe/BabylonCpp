@@ -53,20 +53,6 @@ public:
                     bool isAnimationSheetEnabled = false);
   ~GPUParticleSystem() override; // = default
 
-  /**/
-  size_t getActiveCount() const override
-  {
-    return 0;
-  }
-  void forceRefreshGradients() override
-  {
-  }
-  bool isStopping() const override
-  {
-    return false;
-  }
-  /**/
-
   /**
    * @brief Returns the object type.
    * @return the object type
@@ -91,6 +77,25 @@ public:
    * @returns True if it has been started, otherwise false.
    */
   [[nodiscard]] bool isStarted() const override;
+
+  /**
+   * @brief Gets if the system has been stopped. (Note: rendering is still happening but the system
+   * is frozen)
+   * @returns True if it has been stopped, otherwise false.
+   */
+  bool isStopped();
+
+  /**
+   * @brief Gets a boolean indicating that the system is stopping
+   * @returns true if the system is currently stopping
+   */
+  bool isStopping() const override;
+
+  /**
+   * @brief Gets the number of particles active at the same time.
+   * @returns The number of active particles.
+   */
+  size_t getActiveCount() const override;
 
   /**
    * @brief Starts the particle system and begins to emit
@@ -124,6 +129,11 @@ public:
    */
   GPUParticleSystem& addColorGradient(float gradient, const Color4& color1,
                                       const std::optional<Color4>& color2 = std::nullopt) override;
+
+  /**
+   * @brief Force the system to rebuild all gradients that need to be resync.
+   */
+  void forceRefreshGradients() override;
 
   /**
    * @brief Remove a specific color gradient.
@@ -385,9 +395,10 @@ public:
 
   /**
    * @brief Serializes the particle system to a JSON object.
+   * @param serializeTexture defines if the texture must be serialized as well
    * @returns the JSON object
    */
-  [[nodiscard]] json serialize(bool serializeTexture) const override;
+  [[nodiscard]] json serialize(bool serializeTexture = false) const override;
 
   /**
    * @brief Parses a JSON object to create a GPU particle system.
@@ -450,8 +461,11 @@ protected:
                                                 const RawTexturePtr& texture) override;
 
 private:
+  void _refreshColorGradient(bool reorder = false);
   void _addFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient,
                           float factor);
+  void _refreshFactorGradient(std::vector<FactorGradient>& factorGradients,
+                              const std::string& textureName, bool reorder = false);
   WebGLVertexArrayObjectPtr _createUpdateVAO(Buffer* source);
   WebGLVertexArrayObjectPtr _createRenderVAO(Buffer* source, Buffer* spriteSource);
   void _initialize(bool force = false);

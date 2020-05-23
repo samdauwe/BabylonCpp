@@ -72,6 +72,9 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     , _dragGradientsTexture{nullptr}
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
+
+  uniqueId = _scene->getUniqueId();
+
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
   _engine = _scene->getEngine();
@@ -212,12 +215,27 @@ bool GPUParticleSystem::isStarted() const
   return _started;
 }
 
+bool GPUParticleSystem::isStopped()
+{
+  return _stopped;
+}
+
+bool GPUParticleSystem::isStopping() const
+{
+  return false; // Stop is immediate on GPU
+}
+
+size_t GPUParticleSystem::getActiveCount() const
+{
+  return _currentActiveCount;
+}
+
 void GPUParticleSystem::start(size_t delay)
 {
   if (!targetStopDuration && _hasTargetStopDurationDependantGradient()) {
     throw std::runtime_error(
-      "Particle system started with a targetStopDuration dependant gradient "
-      "(eg. startSizeGradients) but no targetStopDuration set");
+      "Particle system started with a targetStopDuration dependant gradient (eg. "
+      "startSizeGradients) but no targetStopDuration set");
   }
   if (delay > 0) {
     // Timeout
@@ -290,26 +308,46 @@ GPUParticleSystem& GPUParticleSystem::addColorGradient(float gradient, const Col
   ColorGradient colorGradient(gradient, iColor1);
   _colorGradients.emplace_back(colorGradient);
 
-  BABYLON::stl_util::sort_js_style(_colorGradients,
-                                   [](const ColorGradient& a, const ColorGradient& b) {
-                                     if (a.gradient < b.gradient) {
-                                       return -1;
-                                     }
-                                     else if (a.gradient > b.gradient) {
-                                       return 1;
-                                     }
-
-                                     return 0;
-                                   });
-
-  if (_colorGradientsTexture) {
-    _colorGradientsTexture->dispose();
-    _colorGradientsTexture = nullptr;
-  }
+  _refreshColorGradient(true);
 
   _releaseBuffers();
 
   return *this;
+}
+
+void GPUParticleSystem::_refreshColorGradient(bool reorder)
+{
+  if (!_colorGradients.empty()) {
+    if (reorder) {
+      stl_util::sort_js_style(_colorGradients, [](const ColorGradient& a, const ColorGradient& b) {
+        if (a.gradient < b.gradient) {
+          return -1;
+        }
+        else if (a.gradient > b.gradient) {
+          return 1;
+        }
+
+        return 0;
+      });
+    }
+
+    if (_colorGradientsTexture) {
+      _colorGradientsTexture->dispose();
+      _colorGradientsTexture = nullptr;
+    }
+  }
+}
+
+void GPUParticleSystem::forceRefreshGradients()
+{
+  _refreshColorGradient();
+  _refreshFactorGradient(_sizeGradients, "_sizeGradientsTexture");
+  _refreshFactorGradient(_angularSpeedGradients, "_angularSpeedGradientsTexture");
+  _refreshFactorGradient(_velocityGradients, "_velocityGradientsTexture");
+  _refreshFactorGradient(_limitVelocityGradients, "_limitVelocityGradientsTexture");
+  _refreshFactorGradient(_dragGradients, "_dragGradientsTexture");
+
+  reset();
 }
 
 GPUParticleSystem& GPUParticleSystem::removeColorGradient(float gradient)
@@ -326,18 +364,6 @@ void GPUParticleSystem::_addFactorGradient(std::vector<FactorGradient>& factorGr
   FactorGradient valueGradient(gradient, factor);
   factorGradients.emplace_back(valueGradient);
 
-  BABYLON::stl_util::sort_js_style(factorGradients,
-                                   [](const FactorGradient& a, const FactorGradient& b) {
-                                     if (a.gradient < b.gradient) {
-                                       return -1;
-                                     }
-                                     else if (a.gradient > b.gradient) {
-                                       return 1;
-                                     }
-
-                                     return 0;
-                                   });
-
   _releaseBuffers();
 }
 
@@ -346,10 +372,7 @@ GPUParticleSystem& GPUParticleSystem::addSizeGradient(float gradient, float fact
 {
   _addFactorGradient(_sizeGradients, gradient, factor);
 
-  if (_sizeGradientsTexture) {
-    _sizeGradientsTexture->dispose();
-    _sizeGradientsTexture = nullptr;
-  }
+  _refreshFactorGradient(_sizeGradients, "_sizeGradientsTexture", true);
 
   _releaseBuffers();
 
@@ -364,16 +387,54 @@ GPUParticleSystem& GPUParticleSystem::removeSizeGradient(float gradient)
   return *this;
 }
 
+void GPUParticleSystem::_refreshFactorGradient(std::vector<FactorGradient>& factorGradients,
+                                               const std::string& textureName, bool reorder)
+{
+  if (factorGradients.empty()) {
+    return;
+  }
+
+  if (reorder) {
+    stl_util::sort_js_style(factorGradients, [](const FactorGradient& a, const FactorGradient& b) {
+      if (a.gradient < b.gradient) {
+        return -1;
+      }
+      else if (a.gradient > b.gradient) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }
+
+  const auto disposeTexture = [](RawTexturePtr& texture) -> void {
+    texture->dispose();
+    texture = nullptr;
+  };
+
+  if (textureName == "_sizeGradientsTexture") {
+    disposeTexture(_sizeGradientsTexture);
+  }
+  else if (textureName == "_angularSpeedGradientsTexture") {
+    disposeTexture(_angularSpeedGradientsTexture);
+  }
+  else if (textureName == "_velocityGradientsTexture") {
+    disposeTexture(_velocityGradientsTexture);
+  }
+  else if (textureName == "_limitVelocityGradientsTexture") {
+    disposeTexture(_limitVelocityGradientsTexture);
+  }
+  else if (textureName == "_dragGradientsTexture") {
+    disposeTexture(_dragGradientsTexture);
+  }
+}
+
 GPUParticleSystem&
 GPUParticleSystem::addAngularSpeedGradient(float gradient, float factor,
                                            const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_angularSpeedGradients, gradient, factor);
-
-  if (_angularSpeedGradientsTexture) {
-    _angularSpeedGradientsTexture->dispose();
-    _angularSpeedGradientsTexture = nullptr;
-  }
+  _refreshFactorGradient(_angularSpeedGradients, "_angularSpeedGradientsTexture", true);
 
   _releaseBuffers();
 
@@ -392,11 +453,7 @@ GPUParticleSystem& GPUParticleSystem::addVelocityGradient(float gradient, float 
                                                           const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_velocityGradients, gradient, factor);
-
-  if (_velocityGradientsTexture) {
-    _velocityGradientsTexture->dispose();
-    _velocityGradientsTexture = nullptr;
-  }
+  _refreshFactorGradient(_velocityGradients, "_velocityGradientsTexture", true);
 
   _releaseBuffers();
 
@@ -416,11 +473,7 @@ GPUParticleSystem::addLimitVelocityGradient(float gradient, float factor,
                                             const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_limitVelocityGradients, gradient, factor);
-
-  if (_limitVelocityGradientsTexture) {
-    _limitVelocityGradientsTexture->dispose();
-    _limitVelocityGradientsTexture = nullptr;
-  }
+  _refreshFactorGradient(_limitVelocityGradients, "_limitVelocityGradientsTexture", true);
 
   _releaseBuffers();
 
@@ -440,11 +493,7 @@ IParticleSystem& GPUParticleSystem::addDragGradient(float gradient, float factor
 )
 {
   _addFactorGradient(_dragGradients, gradient, factor);
-
-  if (_dragGradientsTexture) {
-    _dragGradientsTexture->dispose();
-    _dragGradientsTexture = nullptr;
-  }
+  _refreshFactorGradient(_dragGradients, "_dragGradientsTexture", true);
 
   _releaseBuffers();
 
