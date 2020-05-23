@@ -306,8 +306,9 @@ public:
    * @brief Binds the material to the mesh.
    * @param world defines the world transformation matrix
    * @param mesh defines the mesh to bind the material to
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  virtual void bind(Matrix& world, Mesh* mesh);
+  virtual void bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOverride = nullptr);
 
   /**
    * @brief Binds the submesh to the material.
@@ -320,8 +321,9 @@ public:
   /**
    * @brief Binds the world matrix to the material.
    * @param world defines the world transformation matrix
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  virtual void bindOnlyWorldMatrix(Matrix& world);
+  virtual void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr);
 
   /**
    * @brief Binds the scene's uniform buffer to the effect.
@@ -600,7 +602,7 @@ protected:
    * @brief Processes to execute after binding the material to a mesh.
    * @param mesh defines the rendered mesh
    */
-  void _afterBind(Mesh* mesh);
+  virtual void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr);
 
   /**
    * @brief Marks all submeshes of a material to indicate that their material
@@ -675,7 +677,8 @@ public:
    */
   std::function<std::string(const std::string& shaderName, std::vector<std::string>& uniforms,
                             std::vector<std::string>& uniformBuffers,
-                            std::vector<std::string>& samplers, MaterialDefines& defines,
+                            std::vector<std::string>& samplers, MaterialDefines* materialDefines,
+                            std::vector<std::string>* defines,
                             std::vector<std::string>& attributes)>
     customShaderNameResolve;
 

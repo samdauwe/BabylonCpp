@@ -656,8 +656,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
   if (customShaderNameResolve) {
-    shaderName
-      = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines, attribs);
+    shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, &defines,
+                                         nullptr, attribs);
   }
 
   auto join = defines.toString();

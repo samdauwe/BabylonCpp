@@ -41,8 +41,9 @@ public:
   /**
    * @brief Binds the given world matrix to the active effect.
    * @param world the matrix to bind
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  void bindOnlyWorldMatrix(Matrix& world) override;
+  void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr) override;
 
   /**
    * @brief Binds the given normal matrix to the active effect.
@@ -50,13 +51,19 @@ public:
    */
   void bindOnlyNormalMatrix(Matrix& normalMatrix);
 
-  void bind(Matrix& world, Mesh* mesh) override;
+  /**
+   * @brief Binds the material to the mesh.
+   * @param world defines the world transformation matrix
+   * @param mesh defines the mesh to bind the material to
+   * @param effectOverride - If provided, use this effect instead of internal effect
+   */
+  void bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOverride = nullptr) override;
 
 protected:
   PushMaterial(const std::string& name, Scene* scene);
 
   bool _isReadyForSubMesh(BaseSubMesh* subMesh);
-  void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr);
+  void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr) override;
   bool _mustRebind(Scene* scene, const EffectPtr& effect, float visibility = 1.f);
 
 public:

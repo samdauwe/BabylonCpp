@@ -56,7 +56,7 @@ bool PushMaterial::_isReadyForSubMesh(BaseSubMesh* subMesh)
   return false;
 }
 
-void PushMaterial::bindOnlyWorldMatrix(Matrix& world)
+void PushMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& /*effectOverride*/)
 {
   _activeEffect->setMatrix("world", world);
 }
@@ -66,7 +66,7 @@ void PushMaterial::bindOnlyNormalMatrix(Matrix& normalMatrix)
   _activeEffect->setMatrix("normalMatrix", normalMatrix);
 }
 
-void PushMaterial::bind(Matrix& world, Mesh* mesh)
+void PushMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& /*effectOverride*/)
 {
   if (!mesh) {
     return;

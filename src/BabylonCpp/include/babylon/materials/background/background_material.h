@@ -81,10 +81,11 @@ public:
   void unbind() override;
 
   /**
-   * @brief Bind only the world matrix to the material.
-   * @param world The world matrix to bind.
+   * @brief Binds the world matrix to the material.
+   * @param world defines the world transformation matrix
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  void bindOnlyWorldMatrix(Matrix& world) override;
+  void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr) override;
 
   /**
    * @brief Bind the material for a dedicated submeh (every used meshes will be

@@ -666,7 +666,7 @@ std::string NodeMaterial::compiledShaders() const
                              _fragmentCompilationState->compilationString.c_str());
 }
 
-void NodeMaterial::bindOnlyWorldMatrix(Matrix& world)
+void NodeMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& /*effectOverride*/)
 {
   auto scene = getScene();
 

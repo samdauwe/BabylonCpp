@@ -69,17 +69,15 @@ public:
 
   /**
    * @brief Set a texture in the shader.
-   * @param name Define the name of the uniform samplers as defined in the
-   * shader
+   * @param name Define the name of the uniform samplers as defined in the shader
    * @param texture Define the texture to bind to this sampler
    * @return the material itself allowing "fluent" like uniform updates
    */
-  ShaderMaterial& setTexture(const std::string& name, const TexturePtr& texture);
+  ShaderMaterial& setTexture(const std::string& name, const BaseTexturePtr& texture);
 
   /**
    * @brief Set a texture array in the shader.
-   * @param name Define the name of the uniform sampler array as defined in the
-   * shader
+   * @param name Define the name of the uniform sampler array as defined in the shader
    * @param textures Define the list of textures to bind to this sampler
    * @return the material itself allowing "fluent" like uniform updates
    */
@@ -235,8 +233,7 @@ public:
   /**
    * @brief Checks if the material is ready to render the requested mesh.
    * @param mesh Define the mesh to render
-   * @param useInstances Define whether or not the material is used with
-   * instances
+   * @param useInstances Define whether or not the material is used with instances
    * @returns true if ready, otherwise false
    */
   bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false) override;
@@ -244,15 +241,26 @@ public:
   /**
    * @brief Binds the world matrix to the material.
    * @param world defines the world transformation matrix
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  void bindOnlyWorldMatrix(Matrix& world) override;
+  void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr) override;
+
+  /**
+   * @brief Binds the submesh to this material by preparing the effect and shader to draw
+   * @param world defines the world transformation matrix
+   * @param mesh defines the mesh containing the submesh
+   * @param subMesh defines the submesh to bind the material to
+   */
+  void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
 
   /**
    * @brief Binds the material to the mesh.
    * @param world defines the world transformation matrix
    * @param mesh defines the mesh to bind the material to
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  void bind(Matrix& world, Mesh* mesh = nullptr) override;
+  void bind(Matrix& world, Mesh* mesh = nullptr,
+            const EffectPtr& effectOverride = nullptr) override;
 
   /**
    * @brief Gets the active textures from the material.
@@ -310,18 +318,15 @@ protected:
    * @see http://doc.babylonjs.com/how_to/shader_material
    * @param name Define the name of the material in the scene
    * @param scene Define the scene the material belongs to
-   * @param shaderPath Defines  the route to the shader code in one of three
-   * ways:
+   * @param shaderPath Defines  the route to the shader code in one of three ways:
    *  * object: { vertex: "custom", fragment: "custom" }, used with
-   * Effect.ShadersStore["customVertexShader"] and
-   * Effect.ShadersStore["customFragmentShader"]
-   *  * object: { vertexElement: "vertexShaderCode", fragmentElement:
-   * "fragmentShaderCode" }, used with shader code in script tags
-   *  * object: { vertexSource: "vertex shader code string", fragmentSource:
-   * "fragment shader code string" } using with strings containing the shaders
-   * code
-   *  * string: "./COMMON_NAME", used with external files COMMON_NAME.vertex.fx
-   * and COMMON_NAME.fragment.fx in index.html folder.
+   * Effect.ShadersStore["customVertexShader"] and Effect.ShadersStore["customFragmentShader"]
+   *  * object: { vertexElement: "vertexShaderCode", fragmentElement: "fragmentShaderCode" }, used
+   * with shader code in script tags
+   *  * object: { vertexSource: "vertex shader code string", fragmentSource: "fragment shader code
+   * string" } using with strings containing the shaders code
+   *  * string: "./COMMON_NAME", used with external files COMMON_NAME.vertex.fx and
+   * COMMON_NAME.fragment.fx in index.html folder.
    * @param options Define the options used to create the shader
    */
   ShaderMaterial(const std::string& name, Scene* scene, const std::string& shaderPath,
@@ -339,6 +344,12 @@ protected:
    */
   void set_shaderPath(const std::string shaderPath);
 
+  /**
+   * @brief Processes to execute after binding the material to a mesh.
+   * @param mesh defines the rendered mesh
+   */
+  void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr) override;
+
 private:
   bool _checkCache(AbstractMesh* mesh, bool useInstances = false);
   void _checkUniform(const std::string& uniformName);
@@ -351,9 +362,10 @@ public:
   Property<ShaderMaterial, std::string> shaderPath;
 
 private:
+  OnCreatedEffectParameters onCreatedEffectParameters;
   std::string _shaderPath;
   IShaderMaterialOptions _options;
-  std::unordered_map<std::string, TexturePtr> _textures;
+  std::unordered_map<std::string, BaseTexturePtr> _textures;
   std::unordered_map<std::string, std::vector<BaseTexturePtr>> _textureArrays;
   std::unordered_map<std::string, float> _floats;
   std::unordered_map<std::string, int> _ints;
@@ -376,6 +388,7 @@ private:
   Matrix _cachedWorldViewProjectionMatrix;
   int _renderId;
   bool _multiview;
+  std::string _cachedDefines;
 
 }; // end of class ShaderMaterial
 

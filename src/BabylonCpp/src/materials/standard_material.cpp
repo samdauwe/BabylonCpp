@@ -861,10 +861,10 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
       {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
     IEffectCreationOptions options;
-    options.attributes            = std::move(attribs);
-    options.uniformsNames         = std::move(uniforms);
-    options.uniformBuffersNames   = std::move(uniformBuffers);
-    options.samplers              = std::move(samplers);
+    options.attributes            = attribs;
+    options.uniformsNames         = uniforms;
+    options.uniformBuffersNames   = uniformBuffers;
+    options.samplers              = samplers;
     options.materialDefines       = &defines;
     options.defines               = std::move(join);
     options.fallbacks             = std::move(fallbacks);
@@ -876,8 +876,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
     if (customShaderNameResolve) {
-      shaderName
-        = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, defines, attribs);
+      shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, &defines,
+                                           nullptr, attribs);
     }
 
     auto& previousEffect = subMesh->effect();

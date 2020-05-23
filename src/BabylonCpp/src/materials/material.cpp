@@ -484,7 +484,7 @@ bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> ove
   return reverse;
 }
 
-void Material::bind(Matrix& /*world*/, Mesh* /*mesh*/)
+void Material::bind(Matrix& /*world*/, Mesh* /*mesh*/, const EffectPtr& /*effectOverride*/)
 {
 }
 
@@ -492,7 +492,7 @@ void Material::bindForSubMesh(Matrix& /*world*/, Mesh* /*mesh*/, SubMesh* /*subM
 {
 }
 
-void Material::bindOnlyWorldMatrix(Matrix& /*world*/)
+void Material::bindOnlyWorldMatrix(Matrix& /*world*/, const EffectPtr& /*effectOverride*/)
 {
 }
 
@@ -521,7 +521,7 @@ void Material::bindViewProjection(const EffectPtr& effect)
   }
 }
 
-void Material::_afterBind(Mesh* mesh)
+void Material::_afterBind(Mesh* mesh, const EffectPtr& /*effect*/)
 {
   _scene->_cachedMaterial = this;
   if (mesh) {

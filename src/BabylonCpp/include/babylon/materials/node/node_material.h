@@ -173,8 +173,9 @@ public:
   /**
    * @brief Binds the world matrix to the material
    * @param world defines the world transformation matrix
+   * @param effectOverride - If provided, use this effect instead of internal effect
    */
-  void bindOnlyWorldMatrix(Matrix& world) override;
+  void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr) override;
 
   /**
    * @brief Binds the submesh to this material by preparing the effect and shader to draw

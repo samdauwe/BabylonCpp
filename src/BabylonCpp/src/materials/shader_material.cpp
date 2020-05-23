@@ -18,6 +18,7 @@
 #include <babylon/maths/vector4.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
@@ -85,7 +86,7 @@ void ShaderMaterial::_checkUniform(const std::string& uniformName)
   }
 }
 
-ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName, const TexturePtr& texture)
+ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName, const BaseTexturePtr& texture)
 {
   if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
@@ -342,6 +343,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Bones
+  auto numInfluencers = 0u;
+
   if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
@@ -352,8 +355,9 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
     const auto& skeleton = mesh->skeleton();
 
-    defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
+    numInfluencers = mesh->numBoneInfluencers();
+
+    defines.emplace_back("#define NUM_BONE_INFLUENCERS " + std::to_string(numInfluencers));
     fallbacks->addCPUSkinningFallback(0, mesh);
 
     if (skeleton->isUsingTextureForMatrices()) {
@@ -391,20 +395,40 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     defines.emplace_back("#define ALPHATEST");
   }
 
+  auto shaderName     = _shaderPath;
+  auto uniforms       = _options.uniforms;
+  auto uniformBuffers = _options.uniformBuffers;
+  auto samplers       = _options.samplers;
+
+  if (customShaderNameResolve) {
+    shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, nullptr,
+                                         &defines, attribs);
+  }
+
   auto previousEffect = _effect;
   auto join           = StringTools::join(defines, '\n');
 
-  IEffectCreationOptions options;
-  options.attributes          = std::move(attribs);
-  options.uniformsNames       = _options.uniforms;
-  options.uniformBuffersNames = _options.uniformBuffers;
-  options.samplers            = _options.samplers;
-  options.defines             = std::move(join);
-  options.fallbacks           = std::move(fallbacks);
-  options.onCompiled          = onCompiled;
-  options.onError             = onError;
+  if (_cachedDefines != join) {
+    _cachedDefines = join;
 
-  _effect = engine->createEffect(_shaderPath, options, engine);
+    IEffectCreationOptions options;
+    options.attributes          = std::move(attribs);
+    options.uniformsNames       = _options.uniforms;
+    options.uniformBuffersNames = _options.uniformBuffers;
+    options.samplers            = samplers;
+    options.defines             = join;
+    options.fallbacks           = std::move(fallbacks);
+    options.onCompiled          = onCompiled;
+    options.onError             = onError;
+    options.indexParameters     = {{"maxSimultaneousMorphTargets", numInfluencers}};
+
+    _effect = engine->createEffect(shaderName, options, engine);
+
+    /* if (_onEffectCreatedObservable()) */ {
+      onCreatedEffectParameters.effect = _effect.get();
+      _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
+    }
+  }
 
   if (!_effect->isReady()) {
     return false;
@@ -420,154 +444,174 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   return true;
 }
 
-void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
+void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride)
 {
   auto scene = getScene();
 
-  if (!_effect) {
+  auto effect = effectOverride ? effectOverride : _effect;
+
+  if (!effect) {
     return;
   }
 
   if (stl_util::contains(_options.uniforms, "world")) {
-    _effect->setMatrix("world", world);
+    effect->setMatrix("world", world);
   }
 
   if (stl_util::contains(_options.uniforms, "worldView")) {
     world.multiplyToRef(scene->getViewMatrix(), _cachedWorldViewMatrix);
-    _effect->setMatrix("worldView", _cachedWorldViewMatrix);
+    effect->setMatrix("worldView", _cachedWorldViewMatrix);
   }
 
   if (stl_util::contains(_options.uniforms, "worldViewProjection")) {
     world.multiplyToRef(scene->getTransformMatrix(), _cachedWorldViewProjectionMatrix);
-    _effect->setMatrix("worldViewProjection", world.multiply(_cachedWorldViewProjectionMatrix));
+    effect->setMatrix("worldViewProjection", world.multiply(_cachedWorldViewProjectionMatrix));
   }
 }
 
-void ShaderMaterial::bind(Matrix& world, Mesh* mesh)
+void ShaderMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
+{
+  bind(world, mesh, subMesh->_effectOverride);
+}
+
+void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOverride)
 {
   // Std values
-  bindOnlyWorldMatrix(world);
+  bindOnlyWorldMatrix(world, effectOverride);
 
-  if (_effect && getScene()->getCachedMaterial() != this) {
+  auto effect = effectOverride ? effectOverride : _effect;
+
+  if (effect && getScene()->getCachedMaterial() != this) {
     if (stl_util::contains(_options.uniforms, "view")) {
-      _effect->setMatrix("view", getScene()->getViewMatrix());
+      effect->setMatrix("view", getScene()->getViewMatrix());
     }
 
     if (stl_util::contains(_options.uniforms, "projection")) {
-      _effect->setMatrix("projection", getScene()->getProjectionMatrix());
+      effect->setMatrix("projection", getScene()->getProjectionMatrix());
     }
 
     if (stl_util::contains(_options.uniforms, "viewProjection")) {
-      _effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
+      effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
       if (_multiview) {
-        _effect->setMatrix("viewProjectionR", getScene()->_transformMatrixR);
+        effect->setMatrix("viewProjectionR", getScene()->_transformMatrixR);
       }
     }
 
     if (getScene()->activeCamera() && stl_util::contains(_options.uniforms, "cameraPosition")) {
-      _effect->setVector3("cameraPosition", getScene()->activeCamera()->globalPosition());
+      effect->setVector3("cameraPosition", getScene()->activeCamera()->globalPosition());
     }
 
     // Bones
-    MaterialHelper::BindBonesParameters(mesh, _effect);
+    MaterialHelper::BindBonesParameters(mesh, effect);
 
     // Texture
     for (const auto& [channel, texture] : _textures) {
-      _effect->setTexture(channel, texture);
+      effect->setTexture(channel, texture);
     }
 
     // Texture arrays
     for (const auto& [channel, textureArray] : _textureArrays) {
-      _effect->setTextureArray(channel, textureArray);
+      effect->setTextureArray(channel, textureArray);
     }
 
     // Int
     for (const auto& [channel, intValue] : _ints) {
-      _effect->setInt(channel, intValue);
+      effect->setInt(channel, intValue);
     }
 
     // Float
     for (const auto& [channel, floatValue] : _floats) {
-      _effect->setFloat(channel, floatValue);
+      effect->setFloat(channel, floatValue);
     }
 
     // Floats
     for (const auto& [channel, floatsArray] : _floatsArrays) {
-      _effect->setArray(channel, floatsArray);
+      effect->setArray(channel, floatsArray);
     }
 
     // Color3
     for (const auto& [channel, colors3] : _colors3) {
-      _effect->setColor3(channel, colors3);
+      effect->setColor3(channel, colors3);
     }
 
     // Color3Array
     for (const auto& [channel, array3] : _colors3Arrays) {
-      _effect->setArray3(channel, array3);
+      effect->setArray3(channel, array3);
     }
 
     // Color4
     for (const auto& [channel, color] : _colors4) {
-      _effect->setFloat4(channel, color.r, color.g, color.b, color.a);
+      effect->setFloat4(channel, color.r, color.g, color.b, color.a);
     }
 
     // Color4Array
     for (const auto& [channel, array4] : _colors4Arrays) {
-      _effect->setArray4(channel, array4);
+      effect->setArray4(channel, array4);
     }
 
     // Vector2
     for (const auto& [channel, vectors2] : _vectors2) {
-      _effect->setVector2(channel, vectors2);
+      effect->setVector2(channel, vectors2);
     }
 
     // Vector3
     for (const auto& [channel, vector3] : _vectors3) {
-      _effect->setVector3(channel, vector3);
+      effect->setVector3(channel, vector3);
     }
 
     // Vector4
     for (const auto& [channel, vector4] : _vectors4) {
-      _effect->setVector4(channel, vector4);
+      effect->setVector4(channel, vector4);
     }
 
     // Matrix
     for (const auto& [channel, matrix] : _matrices) {
-      _effect->setMatrix(channel, matrix);
+      effect->setMatrix(channel, matrix);
     }
 
     // MatrixArray
     for (const auto& [channel, matrixArray] : _matrixArrays) {
-      _effect->setMatrices(channel, matrixArray);
+      effect->setMatrices(channel, matrixArray);
     }
 
     // Matrix 3x3
     for (const auto& [channel, matrices3x3] : _matrices3x3) {
-      _effect->setMatrix3x3(channel, matrices3x3);
+      effect->setMatrix3x3(channel, matrices3x3);
     }
 
     // Matrix 2x2
     for (const auto& [channel, matrix2x2] : _matrices2x2) {
-      _effect->setMatrix2x2(channel, matrix2x2);
+      effect->setMatrix2x2(channel, matrix2x2);
     }
 
     // Vector2Array
     for (const auto& [channel, array2] : _vectors2Arrays) {
-      _effect->setArray2(channel, array2);
+      effect->setArray2(channel, array2);
     }
 
     // Vector3Array
     for (const auto& [channel, array3] : _vectors3Arrays) {
-      _effect->setArray3(channel, array3);
+      effect->setArray3(channel, array3);
     }
 
     // Vector4Array
     for (const auto& [channel, array4] : _vectors4Arrays) {
-      _effect->setArray4(channel, array4);
+      effect->setArray4(channel, array4);
     }
   }
 
+  const auto seffect = _effect;
+
+  _effect = effect; // make sure the active effect is the right one if there are some observers for
+                    // onBind that would need to get the current effect
   _afterBind(mesh);
+  _effect = seffect;
+}
+
+void ShaderMaterial::_afterBind(Mesh* mesh, const EffectPtr& /*effect*/)
+{
+  Material::_afterBind(mesh);
+  getScene()->_cachedEffect = _effect;
 }
 
 std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
@@ -594,9 +638,10 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
     return true;
   }
 
-  auto it1 = std::find_if(
-    _textures.begin(), _textures.end(),
-    [&texture](const std::pair<std::string, TexturePtr>& tex) { return tex.second == texture; });
+  auto it1 = std::find_if(_textures.begin(), _textures.end(),
+                          [&texture](const std::pair<std::string, BaseTexturePtr>& tex) {
+                            return tex.second == texture;
+                          });
   if (it1 != _textures.end()) {
     return true;
   }

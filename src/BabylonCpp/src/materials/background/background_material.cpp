@@ -956,7 +956,7 @@ void BackgroundMaterial::unbind()
   PushMaterial::unbind();
 }
 
-void BackgroundMaterial::bindOnlyWorldMatrix(Matrix& world)
+void BackgroundMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& /*effectOverride*/)
 {
   _activeEffect->setMatrix("world", world);
 }
