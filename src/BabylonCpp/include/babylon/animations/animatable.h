@@ -130,24 +130,24 @@ public:
 
 protected:
   /**
-   * @brief Creates a new Animatable.     * @param scene defines the hosting
-   * scene
+   * @brief Creates a new Animatable
+   * @param scene defines the hosting scene
    * @param target defines the target object
    * @param fromFrame defines the starting frame number (default is 0)
    * @param toFrame defines the ending frame number (default is 100)
    * @param loopAnimation defines if the animation must loop (default is false)
-   * @param speedRatio defines the factor to apply to animation speed (default
-   * is 1)
-   * @param onAnimationEnd defines a callback to call when animation ends if it
-   * is not looping
+   * @param speedRatio defines the factor to apply to animation speed (default is 1)
+   * @param onAnimationEnd defines a callback to call when animation ends if it is not looping
    * @param animations defines a group of animation to add to the new Animatable
    * @param onAnimationLoop defines a callback to call when animation loops
+   * @param isAdditive defines whether the animation should be evaluated additively
    */
   Animatable(Scene* scene, const IAnimatablePtr& target, float fromFrame = 0.f,
              float toFrame = 100.f, bool loopAnimation = false, float speedRatio = 1.f,
              const std::function<void()>& onAnimationEnd  = nullptr,
              const std::vector<AnimationPtr>& animations  = {},
-             const std::function<void()>& onAnimationLoop = nullptr);
+             const std::function<void()>& onAnimationLoop = nullptr,
+             const std::optional<bool>& isAdditive        = std::nullopt);
 
 private:
   /**
@@ -229,6 +229,11 @@ public:
    * Defines a callback to call when animation loops
    */
   std::function<void()> onAnimationLoop;
+
+  /**
+   * Defines whether the animation should be evaluated additively
+   */
+  bool isAdditive;
 
   /**
    * Observer raised when the animation ends

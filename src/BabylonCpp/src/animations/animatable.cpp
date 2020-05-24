@@ -12,7 +12,8 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget, float iFromF
                        float iToFrame, bool iLoopAnimation, float iSpeedRatio,
                        const std::function<void()>& iOnAnimationEnd,
                        const std::vector<AnimationPtr>& animations,
-                       const std::function<void()>& iOnAnimationLoop)
+                       const std::function<void()>& iOnAnimationLoop,
+                       const std::optional<bool>& iIsAdditive)
     : target{iTarget}
     , disposeOnEnd{true}
     , animationStarted{false}
@@ -21,6 +22,7 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget, float iFromF
     , loopAnimation{iLoopAnimation}
     , onAnimationEnd{iOnAnimationEnd}
     , onAnimationLoop{iOnAnimationLoop}
+    , isAdditive{iIsAdditive.value_or(false)}
     , syncRoot{this, &Animatable::get_syncRoot}
     , masterFrame{this, &Animatable::get_masterFrame}
     , weight{this, &Animatable::get_weight, &Animatable::set_weight}
