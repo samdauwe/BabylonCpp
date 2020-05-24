@@ -18,6 +18,7 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     , isPlaying{this, &AnimationGroup::get_isPlaying}
     , speedRatio{this, &AnimationGroup::get_speedRatio, &AnimationGroup::set_speedRatio}
     , loopAnimation{this, &AnimationGroup::get_loopAnimation, &AnimationGroup::set_loopAnimation}
+    , isAdditive{this, &AnimationGroup::get_isAdditive, &AnimationGroup::set_isAdditive}
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , animatables{this, &AnimationGroup::get_animatables}
     , _from{std::numeric_limits<float>::max()}
@@ -26,6 +27,7 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     , _isPaused{false}
     , _speedRatio{1.f}
     , _loopAnimation{false}
+    , _isAdditive{false}
     , _animationLoopCount{0}
 {
   _scene   = scene ? scene : Engine::LastCreatedScene();
@@ -36,7 +38,7 @@ AnimationGroup::~AnimationGroup() = default;
 
 void AnimationGroup::addToScene(const AnimationGroupPtr& newAnimationGroup)
 {
-  _scene->animationGroups.emplace_back(newAnimationGroup);
+  _scene->addAnimationGroup(newAnimationGroup);
 }
 
 float AnimationGroup::get_from() const
@@ -92,6 +94,24 @@ void AnimationGroup::set_loopAnimation(bool value)
 
   for (const auto& animatable : _animatables) {
     animatable->loopAnimation = _loopAnimation;
+  }
+}
+
+bool AnimationGroup::get_isAdditive() const
+{
+  return _isAdditive;
+}
+
+void AnimationGroup::set_isAdditive(bool value)
+{
+  if (_isAdditive == value) {
+    return;
+  }
+
+  _isAdditive = value;
+
+  for (const auto& animatable : _animatables) {
+    animatable->isAdditive = _isAdditive;
   }
 }
 
@@ -187,7 +207,7 @@ void AnimationGroup::_processLoop(const AnimatablePtr& animatable,
 }
 
 AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio, std::optional<float> iFrom,
-                                      std::optional<float> iTo)
+                                      std::optional<float> iTo, std::optional<bool> iIsAdditive)
 {
   if (_isStarted || _targetedAnimations.empty()) {
     return *this;
@@ -199,10 +219,17 @@ AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio, std::optiona
   _animationLoopFlags = {};
 
   size_t index = 0;
-  for (auto& targetedAnimation : _targetedAnimations) {
-    auto animatable = _scene->beginDirectAnimation(
-      targetedAnimation->target, {targetedAnimation->animation}, iFrom.has_value() ? *iFrom : _from,
-      iTo.has_value() ? *iTo : _to, loop, iSpeedRatio);
+  for (const auto& targetedAnimation : _targetedAnimations) {
+    auto animatable            = _scene->beginDirectAnimation(targetedAnimation->target,        //
+                                                   {targetedAnimation->animation},   //
+                                                   iFrom.value_or(_from),            //
+                                                   iTo.value_or(_to),                //
+                                                   loop,                             //
+                                                   iSpeedRatio,                      //
+                                                   nullptr,                          //
+                                                   nullptr,                          //
+                                                   iIsAdditive.value_or(_isAdditive) //
+    );
     animatable->onAnimationEnd = [&]() -> void {
       onAnimationEndObservable.notifyObservers(targetedAnimation.get());
       _checkAnimationGroupEnded(animatable);
@@ -393,6 +420,27 @@ json AnimationGroup::serialize() const
 AnimationGroupPtr AnimationGroup::Parse(const json& /*parsedAnimationGroup*/, Scene* /*scene*/)
 {
   return nullptr;
+}
+
+AnimationGroupPtr
+AnimationGroup::MakeAnimationAdditive(const AnimationGroupPtr& sourceAnimationGroup,
+                                      int referenceFrame, const std::string& range,
+                                      bool cloneOriginal, const std::string& clonedName)
+{
+  auto animationGroup = sourceAnimationGroup;
+  if (cloneOriginal) {
+    animationGroup
+      = sourceAnimationGroup->clone(!clonedName.empty() ? clonedName : animationGroup->name);
+  }
+
+  const auto& targetedAnimations = animationGroup->targetedAnimations();
+  for (const auto& targetedAnimation : targetedAnimations) {
+    Animation::MakeAnimationAdditive(targetedAnimation->animation, referenceFrame, range);
+  }
+
+  animationGroup->isAdditive = true;
+
+  return animationGroup;
 }
 
 std::string AnimationGroup::getClassName() const

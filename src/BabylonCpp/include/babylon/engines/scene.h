@@ -551,13 +551,16 @@ public:
    * @param onAnimationEnd defines the callback to call when an animation ends (will be called once
    * per node)
    * @param onAnimationLoop defines the callback to call when an animation loops
+   * @param isAdditive defines whether the animation should be evaluated additively (false by
+   * default)
    * @returns the list of created animatables
    */
   AnimatablePtr beginDirectAnimation(const IAnimatablePtr& target,
                                      const std::vector<AnimationPtr>& animations, float from,
                                      float to, bool loop = false, float speedRatio = 1.f,
                                      const std::function<void()>& onAnimationEnd  = nullptr,
-                                     const std::function<void()>& onAnimationLoop = nullptr);
+                                     const std::function<void()>& onAnimationLoop = nullptr,
+                                     const std::optional<bool>& isAdditive        = std::nullopt);
 
   /**
    * @brief Begin a new animation on a given node and its hierarchy.

@@ -69,11 +69,13 @@ public:
    * @param speedRatio defines the ratio to apply to animation speed (1 by default)
    * @param from defines the from key (optional)
    * @param to defines the to key (optional)
+   * @param isAdditive defines the additive state for the resulting animatables (optional)
    * @returns the current animation group
    */
   AnimationGroup& start(bool loop = false, float speedRatio = 1.f,
-                        std::optional<float> from = std::nullopt,
-                        std::optional<float> to   = std::nullopt);
+                        std::optional<float> from      = std::nullopt,
+                        std::optional<float> to        = std::nullopt,
+                        std::optional<bool> isAdditive = std::nullopt);
 
   /**
    * @brief Pause all animations.
@@ -165,6 +167,26 @@ public:
   static AnimationGroupPtr Parse(const json& parsedAnimationGroup, Scene* scene);
 
   /**
+   * @brief Convert the keyframes for all animations belonging to the group to be relative to a
+   * given reference frame.
+   * @param sourceAnimationGroup defines the AnimationGroup containing animations to convert
+   * @param referenceFrame defines the frame that keyframes in the range will be relative to
+   * @param range defines the name of the AnimationRange belonging to the animations in the group to
+   * convert
+   * @param cloneOriginal defines whether or not to clone the group and convert the clone or convert
+   * the original group (default is false)
+   * @param clonedName defines the name of the resulting cloned AnimationGroup if cloneOriginal is
+   * true
+   * @returns a new AnimationGroup if cloneOriginal is true or the original AnimationGroup if
+   * cloneOriginal is false
+   */
+  static AnimationGroupPtr MakeAnimationAdditive(const AnimationGroupPtr& sourceAnimationGroup,
+                                                 int referenceFrame            = 0,
+                                                 const std::string& range      = "",
+                                                 bool cloneOriginal            = false,
+                                                 const std::string& clonedName = "");
+
+  /**
    * @brief Returns the string "AnimationGroup".
    * @returns "AnimationGroup"
    */
@@ -227,6 +249,16 @@ protected:
    * @brief Sets if all animations should loop or not.
    */
   void set_loopAnimation(bool value);
+
+  /**
+   * @brief Gets if all animations should be evaluated additively.
+   */
+  [[nodiscard]] bool get_isAdditive() const;
+
+  /**
+   * @brief Sets if all animations should be evaluated additively.
+   */
+  void set_isAdditive(bool value);
 
   /**
    * @brief Gets the targeted animations for this animation group.
@@ -315,6 +347,11 @@ public:
   Property<AnimationGroup, bool> loopAnimation;
 
   /**
+   * Gets or sets if all animations should be evaluated additively
+   */
+  Property<AnimationGroup, bool> isAdditive;
+
+  /**
    * Targeted animations for this animation group.
    */
   ReadOnlyProperty<AnimationGroup, std::vector<std::unique_ptr<TargetedAnimation>>>
@@ -335,6 +372,7 @@ private:
   bool _isPaused;
   float _speedRatio;
   bool _loopAnimation;
+  bool _isAdditive;
   size_t _animationLoopCount;
   std::vector<bool> _animationLoopFlags;
 

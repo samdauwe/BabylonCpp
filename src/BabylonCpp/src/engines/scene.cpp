@@ -2037,14 +2037,17 @@ AnimatablePtr Scene::beginDirectAnimation(const IAnimatablePtr& target,
                                           const std::vector<AnimationPtr>& _animations, float from,
                                           float to, bool loop, float speedRatio,
                                           const std::function<void()>& onAnimationEnd,
-                                          const std::function<void()>& onAnimationLoop)
+                                          const std::function<void()>& onAnimationLoop,
+                                          const std::optional<bool>& isAdditive)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1.f;
   }
 
-  return Animatable::New(this, target, from, to, loop, speedRatio, onAnimationEnd, _animations,
-                         onAnimationLoop);
+  auto animatable = Animatable::New(this, target, from, to, loop, speedRatio, onAnimationEnd,
+                                    _animations, onAnimationLoop, isAdditive);
+
+  return animatable;
 }
 
 std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
