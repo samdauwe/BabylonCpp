@@ -224,6 +224,23 @@ public:
     const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
+   * @brief Convert the keyframes for all animations belonging to the group to be relative to a
+   * given reference frame.
+   * @param sourceAnimation defines the Animation containing keyframes to convert
+   * @param referenceFrame defines the frame that keyframes in the range will be relative to
+   * @param range defines the name of the AnimationRange belonging to the Animation to convert
+   * @param cloneOriginal defines whether or not to clone the animation and convert the clone or
+   * convert the original animation (default is false)
+   * @param clonedName defines the name of the resulting cloned Animation if cloneOriginal is true
+   * @returns a new Animation if cloneOriginal is true or the original Animation if cloneOriginal is
+   * false
+   */
+  static AnimatablePtr MakeAnimationAdditive(const AnimationPtr& sourceAnimation,
+                                             int referenceFrame = 0, const std::string& range = "",
+                                             bool cloneOriginal            = false,
+                                             const std::string& clonedName = "");
+
+  /**
    * @brief Transition property of an host to the target Value.
    * @param property The property to transition
    * @param targetValue The target Value of the property

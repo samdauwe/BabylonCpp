@@ -131,6 +131,14 @@ AnimatablePtr Animation::CreateMergeAndStartAnimation(
                                           onAnimationEnd);
 }
 
+AnimatablePtr Animation::MakeAnimationAdditive(const AnimationPtr& /*sourceAnimation*/,
+                                               int /*referenceFrame*/, const std::string& /*range*/,
+                                               bool /*cloneOriginal*/,
+                                               const std::string& /*clonedName*/)
+{
+  return nullptr;
+}
+
 Animatable* Animation::TransitionTo(const std::string& /*property*/,
                                     const AnimationValue& /*targetValue*/, const Node* /*host*/,
                                     Scene* /*scene*/, float /*frameRate*/,
