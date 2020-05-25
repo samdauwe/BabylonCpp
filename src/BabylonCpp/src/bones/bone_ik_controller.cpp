@@ -6,16 +6,14 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 6> BoneIKController::_tmpVecs{
-  {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
-   Vector3::Zero(), Vector3::Zero()}};
+std::array<Vector3, 6> BoneIKController::_tmpVecs{{Vector3::Zero(), Vector3::Zero(),
+                                                   Vector3::Zero(), Vector3::Zero(),
+                                                   Vector3::Zero(), Vector3::Zero()}};
 Quaternion BoneIKController::_tmpQuat{Quaternion::Identity()};
-std::array<Matrix, 2> BoneIKController::_tmpMats{
-  {Matrix::Identity(), Matrix::Identity()}};
+std::array<Matrix, 2> BoneIKController::_tmpMats{{Matrix::Identity(), Matrix::Identity()}};
 
-BoneIKController::BoneIKController(
-  AbstractMesh* iMesh, Bone* bone,
-  const std::optional<BoneIKControllerOptions>& iOptions)
+BoneIKController::BoneIKController(AbstractMesh* iMesh, Bone* bone,
+                                   const std::optional<BoneIKControllerOptions>& iOptions)
     : targetMesh{nullptr}
     , poleTargetMesh{nullptr}
     , targetPosition{Vector3::Zero()}
@@ -23,8 +21,7 @@ BoneIKController::BoneIKController(
     , poleTargetLocalOffset{Vector3::Zero()}
     , poleAngle{0.f}
     , slerpAmount{1.f}
-    , maxAngle{this, &BoneIKController::get_maxAngle,
-               &BoneIKController::set_maxAngle}
+    , maxAngle{this, &BoneIKController::get_maxAngle, &BoneIKController::set_maxAngle}
     , _bone1Quat{Quaternion::Identity()}
     , _bone1Mat{Matrix::Identity()}
     , _bone2Ang{Math::PI}
@@ -43,7 +40,7 @@ BoneIKController::BoneIKController(
 
   mesh = iMesh;
 
-  auto bonePos = bone->getPosition();
+  const auto bonePos = bone->getPosition();
 
   if (bone->getAbsoluteTransform().determinant() > 0.f) {
     _rightHandedSystem = true;
@@ -58,20 +55,18 @@ BoneIKController::BoneIKController(
   }
 
   if (_bone1->length > 0.f) {
-
-    auto boneScale1 = *_bone1->getScale();
-    auto boneScale2 = *_bone2->getScale();
+    const auto& boneScale1 = *_bone1->getScale();
+    const auto& boneScale2 = *_bone2->getScale();
 
     _bone1Length = _bone1->length * boneScale1.y * mesh->scaling().y;
     _bone2Length = _bone2->length * boneScale2.y * mesh->scaling().y;
   }
   else if (!_bone1->children.empty() && _bone1->children[0]) {
-
     mesh->computeWorldMatrix(true);
 
-    auto pos1 = _bone2->children[0]->getAbsolutePosition(mesh);
-    auto pos2 = _bone2->getAbsolutePosition(mesh);
-    auto pos3 = _bone1->getAbsolutePosition(mesh);
+    const auto pos1 = _bone2->children[0]->getAbsolutePosition(mesh);
+    const auto pos2 = _bone2->getAbsolutePosition(mesh);
+    const auto pos3 = _bone1->getAbsolutePosition(mesh);
 
     _bone1Length = Vector3::Distance(pos1, pos2);
     _bone2Length = Vector3::Distance(pos2, pos3);
@@ -171,12 +166,11 @@ void BoneIKController::update()
   }
 
   if (poleTargetBone) {
-    poleTargetBone->getAbsolutePositionFromLocalToRef(poleTargetLocalOffset,
-                                                      mesh, poleTarget);
+    poleTargetBone->getAbsolutePositionFromLocalToRef(poleTargetLocalOffset, mesh, poleTarget);
   }
   else if (poleTargetMesh) {
-    Vector3::TransformCoordinatesToRef(
-      poleTargetLocalOffset, poleTargetMesh->getWorldMatrix(), poleTarget);
+    Vector3::TransformCoordinatesToRef(poleTargetLocalOffset, poleTargetMesh->getWorldMatrix(),
+                                       poleTarget);
   }
 
   auto& bonePos = BoneIKController::_tmpVecs[0];
@@ -191,8 +185,7 @@ void BoneIKController::update()
 
   poleTarget.subtractToRef(bonePos, upAxis);
 
-  if (stl_util::almost_equal(upAxis.x, 0.f)
-      && stl_util::almost_equal(upAxis.y, 0.f)
+  if (stl_util::almost_equal(upAxis.x, 0.f) && stl_util::almost_equal(upAxis.y, 0.f)
       && stl_util::almost_equal(upAxis.z, 0.f)) {
     upAxis.y = 1.f;
   }
