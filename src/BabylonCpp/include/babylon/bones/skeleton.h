@@ -159,6 +159,17 @@ public:
   Animatable* beginAnimation(const std::string& name, bool loop = false, float speedRatio = 1.f,
                              const std::function<void()>& onAnimationEnd = nullptr);
 
+  /**
+   * @brief Convert the keyframes for a range of animation on a skeleton to be relative to a given
+   * reference frame.
+   * @param skeleton defines the Skeleton containing the animation range to convert
+   * @param referenceFrame defines the frame that keyframes in the range will be relative to
+   * @param range defines the name of the AnimationRange belonging to the Skeleton to convert
+   * @returns the original skeleton
+   */
+  static SkeletonPtr MakeAnimationAdditive(const SkeletonPtr& skeleton, int referenceFrame = 0,
+                                           const std::string& range = "");
+
   void _markAsDirty();
   void _registerMeshWithPoseMatrix(AbstractMesh* mesh);
   void _unregisterMeshWithPoseMatrix(AbstractMesh* mesh);

@@ -300,6 +300,12 @@ Animatable* Skeleton::beginAnimation(const std::string& _name, bool /*loop*/, fl
   return nullptr;
 }
 
+SkeletonPtr Skeleton::MakeAnimationAdditive(const SkeletonPtr& /*skeleton*/, int /*referenceFrame*/,
+                                            const std::string& /*range*/)
+{
+  return nullptr;
+}
+
 // Methods
 void Skeleton::_markAsDirty()
 {
