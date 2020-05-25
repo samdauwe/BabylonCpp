@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -12,16 +13,20 @@ namespace BABYLON {
 class Effect;
 struct EffectWrapper;
 struct IEffectRendererOptions;
+class InternalTexture;
+class RenderTargetTexture;
 class Texture;
 class ThinEngine;
 class VertexBuffer;
 class Viewport;
 class WebGLDataBuffer;
-using EffectPtr          = std::shared_ptr<Effect>;
-using EffectWrapperPtr   = std::shared_ptr<EffectWrapper>;
-using TexturePtr         = std::shared_ptr<Texture>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+using EffectPtr              = std::shared_ptr<Effect>;
+using EffectWrapperPtr       = std::shared_ptr<EffectWrapper>;
+using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using TexturePtr             = std::shared_ptr<Texture>;
+using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Helper class to render one or more effects.
@@ -78,13 +83,19 @@ public:
    * @param effectWrapper the effect to renderer
    * @param outputTexture texture to draw to, if null it will render to the screen.
    */
-  void render(const std::vector<EffectWrapperPtr>& effectWrappers,
-              const TexturePtr& outputTexture = nullptr);
+  void render(
+    const EffectWrapperPtr& effectWrappers,
+    const std::optional<std::variant<InternalTexturePtr, RenderTargetTexturePtr>>& outputTexture
+    = std::nullopt);
 
   /**
    * @brief Disposes of the effect renderer.
    */
   void dispose();
+
+private:
+  bool
+  isRenderTargetTexture(const std::variant<InternalTexturePtr, RenderTargetTexturePtr>& texture);
 
 public:
   ThinEngine* engine;
