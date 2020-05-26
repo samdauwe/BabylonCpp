@@ -20,6 +20,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget, const Animatio
     , currentValue{this, &RuntimeAnimation::get_currentValue}
     , targetPath{this, &RuntimeAnimation::get_targetPath}
     , target{this, &RuntimeAnimation::get_target}
+    , isAdditive{this, &RuntimeAnimation::get_isAdditive}
     , _onLoop{nullptr}
     , _currentFrame{0}
     , _originalBlendValue{std::nullopt}
@@ -117,6 +118,11 @@ std::string RuntimeAnimation::get_targetPath() const
 IAnimatablePtr& RuntimeAnimation::get_target()
 {
   return _currentActiveTarget;
+}
+
+bool RuntimeAnimation::get_isAdditive() const
+{
+  return _host && _host->isAdditive;
 }
 
 void RuntimeAnimation::_preparePath(const IAnimatablePtr& iTarget, unsigned int targetIndex)

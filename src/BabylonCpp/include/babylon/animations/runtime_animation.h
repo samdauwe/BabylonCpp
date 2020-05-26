@@ -47,8 +47,7 @@ public:
 
   /**
    * @brief Resets the runtime animation to the beginning.
-   * @param restoreOriginal defines whether to restore the target property to
-   * the original value
+   * @param restoreOriginal defines whether to restore the target property to the original value
    */
   void reset(bool restoreOriginal = false);
 
@@ -94,8 +93,7 @@ public:
    * @param to defines the upper bound of the animation range
    * @param loop defines if the current animation must loop
    * @param speedRatio defines the current speed ratio
-   * @param weight defines the weight of the animation (default is -1 so no
-   * weight)
+   * @param weight defines the weight of the animation (default is -1 so no weight)
    * @param onLoop optional callback called when animation loops
    * @returns a boolean indicating if the animation is running
    */
@@ -138,6 +136,11 @@ protected:
    */
   IAnimatablePtr& get_target();
 
+  /**
+   * @brief Gets the additive state of the runtime animation.
+   */
+  bool get_isAdditive() const;
+
 private:
   void _preparePath(const IAnimatablePtr& target, unsigned int targetIndex = 0);
   void _getOriginalValues(unsigned int targetIndex = 0);
@@ -174,6 +177,11 @@ public:
    * Actual target of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, IAnimatablePtr> target;
+
+  /**
+   * Gets the additive state of the runtime animation
+   */
+  ReadOnlyProperty<RuntimeAnimation, bool> isAdditive;
 
   /**
    * Hidden
