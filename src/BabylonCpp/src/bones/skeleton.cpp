@@ -1,5 +1,6 @@
 #include <babylon/bones/skeleton.h>
 
+#include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
@@ -163,43 +164,43 @@ std::string Skeleton::toString(bool fullDetails)
   return oss.str();
 }
 
-int Skeleton::getBoneIndexByName(const std::string& _name)
+int Skeleton::getBoneIndexByName(const std::string& iName)
 {
   for (size_t boneIndex = 0, cache = bones.size(); boneIndex < cache; ++boneIndex) {
-    if (bones[boneIndex]->name == _name) {
+    if (bones[boneIndex]->name == iName) {
       return static_cast<int>(boneIndex);
     }
   }
   return -1;
 }
 
-void Skeleton::createAnimationRange(const std::string& _name, float from, float to)
+void Skeleton::createAnimationRange(const std::string& iName, float from, float to)
 {
   // check name not already in use
-  if (!stl_util::contains(_ranges, _name)) {
-    _ranges[_name] = std::make_shared<AnimationRange>(_name, from, to);
+  if (!stl_util::contains(_ranges, iName)) {
+    _ranges[iName] = std::make_shared<AnimationRange>(iName, from, to);
     for (const auto& bone : bones) {
       if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
-        bone->animations[0]->createRange(_name, from, to);
+        bone->animations[0]->createRange(iName, from, to);
       }
     }
   }
 }
 
-void Skeleton::deleteAnimationRange(const std::string& _name, bool deleteFrames)
+void Skeleton::deleteAnimationRange(const std::string& iName, bool deleteFrames)
 {
   for (const auto& bone : bones) {
     if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
-      bone->animations[0]->deleteRange(_name, deleteFrames);
+      bone->animations[0]->deleteRange(iName, deleteFrames);
     }
   }
-  _ranges.erase(_name);
+  _ranges.erase(iName);
 }
 
-AnimationRangePtr Skeleton::getAnimationRange(const std::string& _name)
+AnimationRangePtr Skeleton::getAnimationRange(const std::string& iName)
 {
-  if (!stl_util::contains(_ranges, _name)) {
-    return _ranges[_name];
+  if (!stl_util::contains(_ranges, iName)) {
+    return _ranges[iName];
   }
 
   return nullptr;
@@ -214,10 +215,10 @@ std::vector<AnimationRangePtr> Skeleton::getAnimationRanges()
   return animationRanges;
 }
 
-bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
+bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& iName,
                                   bool rescaleAsRequired)
 {
-  if (stl_util::contains(_ranges, _name) || !source->getAnimationRange(_name)) {
+  if (stl_util::contains(_ranges, iName) || !source->getAnimationRange(iName)) {
     return false;
   }
   auto ret         = true;
@@ -245,7 +246,7 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   for (const auto& bone : bones) {
     if (stl_util::contains(boneDict, bone->name)) {
       ret = ret
-            && bone->copyAnimationRange(boneDict[bone->name], _name, static_cast<int>(frameOffset),
+            && bone->copyAnimationRange(boneDict[bone->name], iName, static_cast<int>(frameOffset),
                                         rescaleAsRequired, skelDimensionsRatio);
     }
     else {
@@ -254,12 +255,11 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
       ret = false;
     }
   }
-  // do not call createAnimationRange(), since it also is done to bones, which
-  // was already done
-  auto range = source->getAnimationRange(_name);
+  // do not call createAnimationRange(), since it also is done to bones, which was already done
+  auto range = source->getAnimationRange(iName);
   if (range) {
-    _ranges[_name]
-      = std::make_shared<AnimationRange>(_name, range->from + frameOffset, range->to + frameOffset);
+    _ranges[iName]
+      = std::make_shared<AnimationRange>(iName, range->from + frameOffset, range->to + frameOffset);
   }
   return ret;
 }
@@ -273,7 +273,7 @@ void Skeleton::returnToRest()
 
 float Skeleton::_getHighestAnimationFrame()
 {
-  float ret = 0.f;
+  auto ret = 0.f;
   for (const auto& bone : bones) {
     if (!bone->animations.empty() && bone->animations[0]) {
       auto highest = bone->animations[0]->getHighestFrame();
@@ -285,10 +285,10 @@ float Skeleton::_getHighestAnimationFrame()
   return ret;
 }
 
-Animatable* Skeleton::beginAnimation(const std::string& _name, bool /*loop*/, float /*speedRatio*/,
+Animatable* Skeleton::beginAnimation(const std::string& iName, bool /*loop*/, float /*speedRatio*/,
                                      const std::function<void()>& /*onAnimationEnd*/)
 {
-  auto range = getAnimationRange(_name);
+  auto range = getAnimationRange(iName);
 
   if (!range) {
     return nullptr;
@@ -300,10 +300,49 @@ Animatable* Skeleton::beginAnimation(const std::string& _name, bool /*loop*/, fl
   return nullptr;
 }
 
-SkeletonPtr Skeleton::MakeAnimationAdditive(const SkeletonPtr& /*skeleton*/, int /*referenceFrame*/,
-                                            const std::string& /*range*/)
+SkeletonPtr Skeleton::MakeAnimationAdditive(const SkeletonPtr& skeleton, int referenceFrame,
+                                            const std::string& range)
 {
-  return nullptr;
+  auto rangeValue = skeleton->getAnimationRange(/*name*/ range);
+
+  // We can't make a range additive if it doesn't exist
+  if (!rangeValue) {
+    return nullptr;
+  }
+
+  // Find any current scene-level animatable belonging to the target that matches the range
+  auto sceneAnimatables         = skeleton->_scene->getAllAnimatablesByTarget(skeleton);
+  AnimatablePtr rangeAnimatable = nullptr;
+
+  for (const auto& sceneAnimatable : sceneAnimatables) {
+    if (sceneAnimatable->fromFrame == rangeValue->from
+        && sceneAnimatable->toFrame == rangeValue->to) {
+      rangeAnimatable = sceneAnimatable;
+      break;
+    }
+  }
+
+  // Convert the animations belonging to the skeleton to additive keyframes
+  auto animatables = skeleton->getAnimatables();
+
+  for (const auto& animatable : animatables) {
+    auto animations = animatable->getAnimations();
+
+    if (animations.empty()) {
+      continue;
+    }
+
+    for (const auto& animation : animations) {
+      Animation::MakeAnimationAdditive(animation, referenceFrame, range);
+    }
+  }
+
+  // Mark the scene-level animatable as additive
+  if (rangeAnimatable) {
+    rangeAnimatable->isAdditive = true;
+  }
+
+  return skeleton;
 }
 
 // Methods
