@@ -100,8 +100,8 @@ public:
   AbstractMeshPtr mesh;
 
   /**
-   * Defines a boolean indicating if bones matrices must be forced to update before rendering (true
-   * by default)
+   * Defines a boolean indicating if bones matrices must be forced to update before rendering
+   * (true by default)
    */
   bool autoUpdateBonesMatrices;
 
