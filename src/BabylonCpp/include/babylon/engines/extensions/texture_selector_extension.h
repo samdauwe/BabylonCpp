@@ -58,6 +58,9 @@ protected:
    */
   std::string get_textureFormatInUse() const;
 
+private:
+  std::string transformTextureUrl(Engine* engine, const std::string& url) const;
+
 public:
   /**
    * Gets the list of texture formats supported

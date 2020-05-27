@@ -1,6 +1,7 @@
 #include <babylon/engines/extensions/texture_selector_extension.h>
 
 #include <babylon/engines/engine.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -13,6 +14,13 @@ TextureSelectorExtension::TextureSelectorExtension(Engine* engine)
 }
 
 TextureSelectorExtension::~TextureSelectorExtension() = default;
+
+std::string TextureSelectorExtension::transformTextureUrl(Engine* /*engine*/,
+                                                          const std::string& url) const
+{
+  const auto lastDot = StringTools::lastIndexOf(url, ".");
+  return (lastDot > -1 ? url.substr(0, lastDot) : url) + _textureFormatInUse;
+}
 
 std::vector<std::string>& TextureSelectorExtension::get_texturesSupported()
 {
@@ -47,12 +55,30 @@ std::string TextureSelectorExtension::get_textureFormatInUse() const
   return _textureFormatInUse;
 }
 
-void setCompressedTextureExclusions(const std::vector<std::string>& /*skippedFiles*/)
+void TextureSelectorExtension::setCompressedTextureExclusions(
+  const std::vector<std::string>& skippedFiles)
 {
+  _excludedCompressedTextures = skippedFiles;
 }
 
-std::string setTextureFormatToUse(const std::vector<std::string>& /*formatsAvailable*/)
+std::string
+TextureSelectorExtension::setTextureFormatToUse(const std::vector<std::string>& formatsAvailable)
 {
+  const auto& _texturesSupported = texturesSupported();
+  for (size_t i = 0, len1 = _texturesSupported.size(); i < len1; ++i) {
+    for (size_t j = 0, len2 = formatsAvailable.size(); j < len2; ++j) {
+      if (_texturesSupported[i] == StringTools::toLowerCase(formatsAvailable[j])) {
+        _this->_transformTextureUrl = [this](const std::string& url) -> std::string {
+          return transformTextureUrl(_this, url);
+        };
+        return _textureFormatInUse = _texturesSupported[i];
+      }
+    }
+  }
+  // actively set format to nothing, to allow this to be called more than once and possibly fail the
+  // 2nd time
+  _textureFormatInUse.clear();
+  _this->_transformTextureUrl = nullptr;
   return "";
 }
 
