@@ -9,9 +9,8 @@
 namespace BABYLON {
 
 /**
- * @brief Represents a node of the Tree<T> class. The TreeNode<T> is also a
- * container, and can be thought of as instrumentation to determine the location
- * of the type T in the Tree<T>.
+ * @brief Represents a node of the Tree<T> class. The TreeNode<T> is also a container, and can be
+ * thought of as instrumentation to determine the location of the type T in the Tree<T>.
  */
 template <typename T>
 class TreeNode {
@@ -177,11 +176,10 @@ public:
   }
 
   /**
-   * @brief Creates a child node using the given data object and adds the item
-   * defined by the comparator argument.
+   * @brief Creates a child node using the given data object and adds the item defined by the
+   * comparator argument.
    * @param data The data object to be encapsulated in the new child node.
-   * @param comparator The comparator function to insert a new element in a
-   * sorted vector.
+   * @param comparator The comparator function to insert a new element in a sorted vector.
    * @return Reference to the created node.
    */
   TreeNode<T>& addChildSorted(T data, const std::function<bool(const T& a, const T& b)>& comparator)
@@ -197,8 +195,8 @@ public:
   }
 
   /**
-   * @brief Returns the node depth. A node depth of zero means that the node is
-   * the root node of the tree.
+   * @brief Returns the node depth. A node depth of zero means that the node is the root node of the
+   * tree.
    * @return The node level.
    */
   [[nodiscard]] unsigned int depth() const
@@ -230,13 +228,11 @@ private:
 }; // end of class TreeNode
 
 /**
- * @brief Represents a Tree of Objects of generic type T. The Tree is
- * represented as a single root node which points to a
- * std::vector<TreeNode<T>>
- * of children. There is no restriction on the number of children that a
- * particular node may have. This Tree provides a method to serialize the Tree
- * into a List by doing a pre-order traversal. It has several methods to allow
- * easy updation of nodes in the tree.
+ * @brief Represents a Tree of Objects of generic type T. The Tree is represented as a single root
+ * node which points to a std::vector<TreeNode<T>> of children. There is no restriction on the
+ * number of children that a particular node may have. This Tree provides a method to serialize the
+ * Tree into a List by doing a pre-order traversal. It has several methods to allow easy updation of
+ * nodes in the tree.
  */
 template <typename T>
 class Tree {
@@ -404,14 +400,13 @@ public:
 /**
  * @brief Iterator implementing a depth first pre-order tree traversal.
  *
- * There's two ways we can implement iterators: either we use a stack containing
- * the expanded nodes, or we "manually" backtrack the tree. The first method
- * leads to somewhat faster traversal in theory, since getting to the next node
- * is O(1). On the other hand, we need to add all expanded nodes to the stack,
- * and whenever we copy an iterator, we need to copy the entire stack.
+ * There's two ways we can implement iterators: either we use a stack containing the expanded nodes,
+ * or we "manually" backtrack the tree. The first method leads to somewhat faster traversal in
+ * theory, since getting to the next node is O(1). On the other hand, we need to add all expanded
+ * nodes to the stack, and whenever we copy an iterator, we need to copy the entire stack.
  *
- * STL algorithms are designed around an assumption of fast copying of
- * iterators, so we pick the lighter iterator approach (manually backtracking).
+ * STL algorithms are designed around an assumption of fast copying of iterators, so we pick the
+ * lighter iterator approach (manually backtracking).
  */
 template <typename T>
 class Tree<T>::iterator : public std::iterator<std::bidirectional_iterator_tag, T> {
@@ -473,15 +468,13 @@ public:
   iterator& operator--()
   {
     if (_nodePtr) {
-      // note: -- on first element is undefined => we may safely move up if not
-      // left
+      // note: -- on first element is undefined => we may safely move up if not left
       if (_nodePtr == _nodePtr->parent()->firstChild()) {
         // nptr is first child => move up
         _nodePtr = _nodePtr->parent();
       }
       else {
-        // nptr is not first child => move up one step, then traverse down
-        // find pointer from parent
+        // nptr is not first child => move up one step, then traverse down find pointer from parent
         auto prev = --_nodePtr->parent()->child_end();
         for (; (*prev).get() != _nodePtr; --prev) {
         }

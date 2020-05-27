@@ -39,8 +39,7 @@ void initializeChildNodesSorted(BABYLON::Tree<int>& tree)
 {
   using namespace BABYLON;
 
-  const auto comparator
-    = [](const int& a, const int& b) -> bool { return a < b; };
+  const auto comparator = [](const int& a, const int& b) -> bool { return a < b; };
 
   tree.root()
     .addChildSorted(2, comparator)
