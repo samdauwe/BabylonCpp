@@ -6,14 +6,12 @@
 
 namespace BABYLON {
 
-MeshPtr TiledPlaneBuilder::CreateTiledPlane(const std::string& name,
-                                            TiledPlaneOptions& options,
+MeshPtr TiledPlaneBuilder::CreateTiledPlane(const std::string& name, TiledPlaneOptions& options,
                                             Scene* scene)
 {
   auto plane = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   plane->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreateTiledPlane(options);
