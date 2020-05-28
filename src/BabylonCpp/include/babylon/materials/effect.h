@@ -59,6 +59,11 @@ public:
   static std::string ShadersRepository;
 
   /**
+   * Enable logging of the shader code when a compilation error occurs
+   */
+  static bool LogShaderCodeOnCompilationError;
+
+  /**
    * Store of each shader (The can be looked up using effect.key)
    */
   static std::unordered_map<std::string, std::string>& ShadersStore();
@@ -142,10 +147,28 @@ public:
   WebGLUniformLocationPtr getUniform(const std::string& uniformName);
 
   /**
-   * @brief Returns an array of sampler variable names
-   * @returns The array of sampler variable neames.
+   * @brief Returns an array of sampler variable names.
+   * @returns The array of sampler variable names.
    */
   std::vector<std::string>& getSamplers();
+
+  /**
+   * @brief Returns an array of uniform variable names.
+   * @returns The array of uniform variable names.
+   */
+  std::vector<std::string>& getUniformNames();
+
+  /**
+   * @brief Returns an array of uniform buffer variable names.
+   * @returns The array of uniform buffer variable names.
+   */
+  std::vector<std::string>& getUniformBuffersNames();
+
+  /**
+   * @brief Returns the index parameters used to create the effect.
+   * @returns The index parameters object
+   */
+  std::unordered_map<std::string, unsigned int>& getIndexParameters();
 
   /**
    * @brief The error from the last compilation.
@@ -557,12 +580,25 @@ protected:
    */
   Observable<Effect>& get_onBindObservable();
 
+  /**
+   * @brief Gets the vertex shader source code of this effect.
+   */
+  std::string get_vertexSourceCode() const;
+
+  /**
+   * @brief Gets the fragment shader source code of this effect.
+   */
+  std::string get_fragmentSourceCode() const;
+
 private:
   void _useFinalCode(
     const std::string& migratedVertexCode, const std::string& migratedFragmentCode,
     const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName);
   bool _isReadyInternal() const;
   void _checkIsReady(const IPipelineContextPtr& previousPipelineContext);
+  std::tuple<std::string, std::string> _getShaderCodeAndErrorLine(const std::string& code,
+                                                                  const std::string& error,
+                                                                  bool isFragment) const;
   void _processCompilationErrors(const std::exception& e,
                                  const IPipelineContextPtr& previousPipelineContext);
   int _getChannel(const std::string& channel);
@@ -632,11 +668,22 @@ public:
    */
   IPipelineContextPtr _pipelineContext;
 
+  /**
+   * Gets the vertex shader source code of this effect
+   */
+  ReadOnlyProperty<Effect, std::string> vertexSourceCode;
+
+  /**
+   * Gets the fragment shader source code of this effect
+   */
+  ReadOnlyProperty<Effect, std::string> fragmentSourceCode;
+
 private:
   Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
   ThinEngine* _engine;
   std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
+  std::vector<std::string> _uniformBuffersNamesList;
   std::vector<std::string> _uniformsNames;
   std::vector<std::string> _samplerList;
   std::unordered_map<std::string, int> _samplers;

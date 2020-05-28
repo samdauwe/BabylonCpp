@@ -23,7 +23,8 @@
 
 namespace BABYLON {
 
-std::string Effect::ShadersRepository = "src/Shaders/";
+std::string Effect::ShadersRepository        = "src/Shaders/";
+bool Effect::LogShaderCodeOnCompilationError = true;
 
 std::unordered_map<std::string, std::string>& Effect::ShadersStore()
 {
@@ -47,6 +48,8 @@ Effect::Effect(
     , _bonesComputationForcedToCPU{false}
     , onBindObservable{this, &Effect::get_onBindObservable}
     , _pipelineContext{nullptr}
+    , vertexSourceCode{this, &Effect::get_vertexSourceCode}
+    , fragmentSourceCode{this, &Effect::get_fragmentSourceCode}
     , _onCompileObserver{nullptr}
     , _isReady{false}
     , _compilationError{""}
@@ -69,6 +72,7 @@ Effect::Effect(
     stl_util::concat(_uniformsNames, options.samplers);
 
     if (!options.uniformBuffersNames.empty()) {
+      _uniformBuffersNamesList = options.uniformBuffersNames;
       for (unsigned int i = 0; i < options.uniformBuffersNames.size(); ++i) {
         _uniformBuffersNames[options.uniformBuffersNames[i]] = i;
       }
@@ -264,6 +268,21 @@ std::vector<std::string>& Effect::getSamplers()
   return _samplerList;
 }
 
+std::vector<std::string>& Effect::getUniformNames()
+{
+  return _uniformsNames;
+}
+
+std::vector<std::string>& Effect::getUniformBuffersNames()
+{
+  return _uniformBuffersNamesList;
+}
+
+std::unordered_map<std::string, unsigned int>& Effect::getIndexParameters()
+{
+  return _indexParameters;
+}
+
 std::string Effect::getCompilationError()
 {
   return _compilationError;
@@ -352,6 +371,20 @@ void Effect::_loadShader(const std::string& shader, const std::string& key,
         callback(std::get<std::string>(data));
       }
     });
+}
+
+std::string Effect::get_vertexSourceCode() const
+{
+  return !_vertexSourceCodeOverride.empty() && !_fragmentSourceCodeOverride.empty() ?
+           _vertexSourceCodeOverride :
+           _vertexSourceCode;
+}
+
+std::string Effect::get_fragmentSourceCode() const
+{
+  return !_vertexSourceCodeOverride.empty() && !_fragmentSourceCodeOverride.empty() ?
+           _fragmentSourceCodeOverride :
+           _fragmentSourceCode;
 }
 
 void Effect::_rebuildProgram(
@@ -470,6 +503,33 @@ void Effect::_prepareEffect()
   }
 }
 
+std::tuple<std::string, std::string> Effect::_getShaderCodeAndErrorLine(const std::string& code,
+                                                                        const std::string& error,
+                                                                        bool isFragment) const
+{
+  const std::regex regexp(isFragment ? R"(FRAGMENT SHADER ERROR: 0:(\d+?):)" :
+                                       R"(VERTEX SHADER ERROR: 0:(\d+?):)",
+                          std::regex::optimize);
+
+  std::string errorLine;
+
+  if (!error.empty() && !code.empty()) {
+    std::smatch match;
+    std::regex_search(error, match, regexp);
+    if (match.size() == 2) {
+      const auto lineNumber = std::stoul(match.str(1));
+      const auto lines      = StringTools::split(code, "\n");
+      if (lines.size() >= lineNumber) {
+        errorLine
+          = StringTools::printf("Offending line [%lu] in %s code: %s", lineNumber,
+                                isFragment ? "fragment" : "vertex", lines[lineNumber - 1].c_str());
+      }
+    }
+  }
+
+  return std::make_pair(code, errorLine);
+}
+
 void Effect::_processCompilationErrors(const std::exception& e,
                                        const IPipelineContextPtr& previousPipelineContext)
 {
@@ -482,6 +542,31 @@ void Effect::_processCompilationErrors(const std::exception& e,
   BABYLON_LOGF_ERROR("Effect", "Uniforms: %s", StringTools::join(_uniformsNames, ' ').c_str())
   BABYLON_LOGF_ERROR("Effect", "Attributes: %s", StringTools::join(attributesNames, ' ').c_str())
   BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str())
+  if (Effect::LogShaderCodeOnCompilationError) {
+    std::string lineErrorVertex, lineErrorFragment, code;
+    const auto vertexShaderCode = _pipelineContext->_getVertexShaderCode();
+    if (!vertexShaderCode.empty()) {
+      std::tie(code, lineErrorVertex)
+        = _getShaderCodeAndErrorLine(vertexShaderCode, _compilationError, false);
+      if (!code.empty()) {
+        BABYLON_LOGF_ERROR("Effect", "Vertex code:\n%s", code.c_str());
+      }
+    }
+    const auto fragmentShaderCode = _pipelineContext->_getFragmentShaderCode();
+    if (!fragmentShaderCode.empty()) {
+      std::tie(code, lineErrorFragment)
+        = _getShaderCodeAndErrorLine(fragmentShaderCode, _compilationError, true);
+      if (!code.empty()) {
+        BABYLON_LOGF_ERROR("Effect", "Fragment code:\n%s", code.c_str());
+      }
+    }
+    if (!lineErrorVertex.empty()) {
+      BABYLON_LOGF_ERROR("Effect", "%s", lineErrorVertex.c_str());
+    }
+    if (!lineErrorFragment.empty()) {
+      BABYLON_LOGF_ERROR("Effect", "%s", lineErrorFragment.c_str());
+    }
+  }
   BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str())
 
   if (previousPipelineContext) {
