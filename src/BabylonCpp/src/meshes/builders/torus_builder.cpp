@@ -6,13 +6,11 @@
 
 namespace BABYLON {
 
-MeshPtr TorusBuilder::CreateTorus(const std::string& name,
-                                  TorusOptions& options, Scene* scene)
+MeshPtr TorusBuilder::CreateTorus(const std::string& name, TorusOptions& options, Scene* scene)
 {
   auto torus = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   torus->_originalBuilderSideOrientation = *options.sideOrientation;
 
   auto vertexData = VertexData::CreateTorus(options);
