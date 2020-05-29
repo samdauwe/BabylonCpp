@@ -15,12 +15,11 @@ TEST(TestGeometry, TestGetVerticesData_Vec3FloatColor)
   // vec3 float color tightly packed
   auto subject = createSubject();
   auto scene   = Scene::New(subject.get());
-  Float32Array data{0.4f, 0.4f, 0.4f, 0.6f, 0.6f, 0.6f,
-                    0.8f, 0.8f, 0.8f, 1.f,  1.f,  1.f};
-  auto buffer       = std::make_unique<Buffer>(subject.get(), data, false);
-  auto vertexBuffer = std::make_shared<VertexBuffer>(
-    subject.get(), buffer.get(), VertexBuffer::ColorKind, false, std::nullopt,
-    std::nullopt, std::nullopt, std::nullopt, 3);
+  Float32Array data{0.4f, 0.4f, 0.4f, 0.6f, 0.6f, 0.6f, 0.8f, 0.8f, 0.8f, 1.f, 1.f, 1.f};
+  auto buffer = std::make_unique<Buffer>(subject.get(), data, false);
+  auto vertexBuffer
+    = std::make_shared<VertexBuffer>(subject.get(), buffer.get(), VertexBuffer::ColorKind, false,
+                                     std::nullopt, std::nullopt, std::nullopt, std::nullopt, 3);
 
   auto geometry = Geometry::New("geometry1", scene.get());
   geometry->setVerticesBuffer(vertexBuffer);
