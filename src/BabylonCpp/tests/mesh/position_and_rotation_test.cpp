@@ -45,19 +45,13 @@ TEST(TestPositionAndRotation, TestParenting)
   parent->rotationQuaternion = Quaternion();
   Vector3 eulerRotation{0.f, Math::PI_2, 0.f};
   Quaternion rotation;
-  Quaternion::RotationYawPitchRollToRef(eulerRotation.y, eulerRotation.x,
-                                        eulerRotation.z, rotation);
+  Quaternion::RotationYawPitchRollToRef(eulerRotation.y, eulerRotation.x, eulerRotation.z,
+                                        rotation);
   parent->rotationQuaternion()->multiplyInPlace(rotation);
-  parent->position().rotateByQuaternionAroundPointToRef(
-    rotation, child->absolutePosition(), parent->position());
-  EXPECT_TRUE(parent->position().subtract(Vector3(1.f, 0.f, 0.f)).length()
+  parent->position().rotateByQuaternionAroundPointToRef(rotation, child->absolutePosition(),
+                                                        parent->position());
+  EXPECT_TRUE(parent->position().subtract(Vector3(1.f, 0.f, 0.f)).length() < 0.00001f);
+  EXPECT_TRUE(parent->rotationQuaternion()->toEulerAngles().subtract(eulerRotation).length()
               < 0.00001f);
-  EXPECT_TRUE(parent->rotationQuaternion()
-                ->toEulerAngles()
-                .subtract(eulerRotation)
-                .length()
-              < 0.00001f);
-  EXPECT_TRUE(
-    child->absolutePosition().subtract(Vector3(0.f, 0.f, 0.f)).length()
-    < 0.00001f);
+  EXPECT_TRUE(child->absolutePosition().subtract(Vector3(0.f, 0.f, 0.f)).length() < 0.00001f);
 }
