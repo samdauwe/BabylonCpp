@@ -64,7 +64,7 @@ protected:
   /**
    * @brief Gets the matrices names.
    */
-  std::vector<std::string>& get__matriceNames();
+  std::unordered_map<std::string, std::string>& get__matriceNames();
 
   /**
    * @brief Gets the standalone status of the wrapper.
@@ -80,7 +80,7 @@ public:
   /**
    * Gets the matrices names
    */
-  ReadOnlyProperty<ShadowDepthWrapper, std::vector<std::string>> _matriceNames;
+  ReadOnlyProperty<ShadowDepthWrapper, std::unordered_map<std::string, std::string>> _matriceNames;
 
   /**
    * Gets the standalone status of the wrapper

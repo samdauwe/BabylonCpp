@@ -2,7 +2,10 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/base_sub_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
@@ -30,7 +33,7 @@ public:
     mm[a][b] = v;
   }
 
-private:
+public:
   std::unordered_map<Ka, std::unordered_map<Kb, V>> mm;
 };
 
@@ -88,7 +91,7 @@ public:
   /**
    * Hidden
    */
-  std::vector<std::string> _matriceNames;
+  std::unordered_map<std::string, std::string> _matriceNames;
 
 private:
   Scene* _scene;
@@ -97,14 +100,51 @@ private:
   Observer<OnCreatedEffectParameters>::Ptr _onEffectCreatedObserver;
   std::unordered_map<SubMesh*, Effect> _subMeshToEffect;
   MapMap<SubMesh*, ShadowGenerator*, DepthEffect> _subMeshToDepthEffect;
-  std::unordered_map<AbstractMesh*, Observer<Node>::Ptr> _meshes;
+  std::unordered_map<AbstractMeshPtr, Observer<Node>::Ptr> _meshes;
 
 }; // end of class ShadowDepthWrapper::ShadowDepthWrapperImpl
 
 ShadowDepthWrapper::ShadowDepthWrapperImpl::ShadowDepthWrapperImpl(
-  const MaterialPtr& /*baseMaterial*/, Scene* /*scene*/,
-  const std::optional<IIOptionShadowDepthMaterial>& /*options*/)
+  const MaterialPtr& baseMaterial, Scene* scene,
+  const std::optional<IIOptionShadowDepthMaterial>& options)
 {
+  _baseMaterial = baseMaterial;
+  _scene        = scene;
+  _options      = options;
+
+  const std::string prefix = baseMaterial->getClassName() == "NodeMaterial" ? "u_" : "";
+
+  _matriceNames = {
+    {"view", prefix + "view"},                              //
+    {"projection", prefix + "projection"},                  //
+    {"viewProjection", prefix + "viewProjection"},          //
+    {"worldView", prefix + "worldView"},                    //
+    {"worldViewProjection", prefix + "worldViewProjection"} //
+  };
+
+  // Register for onEffectCreated to store the effect of the base material when it is (re)generated.
+  // This effect will be used to create the depth effect later on
+  _onEffectCreatedObserver = _baseMaterial->onEffectCreatedObservable().add(
+    [this](OnCreatedEffectParameters* params, EventState & /*es*/) -> void {
+      const auto mesh = static_cast<SubMesh*>(params->subMesh)->getMesh();
+
+      if (mesh && !stl_util::contains(_meshes, mesh)) {
+        // Register for mesh onDispose to clean up our internal maps when a mesh is disposed
+        _meshes[mesh]
+          = mesh->onDisposeObservable.add([this](Node* mesh, EventState & /*es*/) -> void {
+              for (const auto& item : _subMeshToEffect) {
+                const auto subMesh = item.first;
+                if (subMesh->getMesh().get() == mesh) {
+                  _subMeshToEffect.erase(subMesh);
+                  _subMeshToDepthEffect.mm.erase(subMesh);
+                }
+              }
+            });
+      }
+
+      // _subMeshToEffect.set(params->subMesh, params->effect);
+      // _subMeshToDepthEffect.mm.erase(params->subMesh); // trigger a depth effect recreation
+    });
 }
 
 ShadowDepthWrapper::ShadowDepthWrapperImpl::~ShadowDepthWrapperImpl() = default;
@@ -156,7 +196,7 @@ ShadowDepthWrapper::ShadowDepthWrapper(const MaterialPtr& baseMaterial, Scene* s
 
 ShadowDepthWrapper::~ShadowDepthWrapper() = default;
 
-std::vector<std::string>& ShadowDepthWrapper::get__matriceNames()
+std::unordered_map<std::string, std::string>& ShadowDepthWrapper::get__matriceNames()
 {
   return _impl->_matriceNames;
 }
