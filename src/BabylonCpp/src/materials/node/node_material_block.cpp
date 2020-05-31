@@ -172,7 +172,8 @@ NodeMaterialBlock::registerInput(const std::string& iName,
 NodeMaterialBlock&
 NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const NodeMaterialBlockConnectionPointTypes& type,
-                                  const std::optional<NodeMaterialBlockTargets>& iTarget)
+                                  const std::optional<NodeMaterialBlockTargets>& iTarget,
+                                  const NodeMaterialConnectionPointPtr& /*point*/)
 {
   auto point  = NodeMaterialConnectionPoint::New(iName, shared_from_this(),
                                                 NodeMaterialConnectionPointDirection::Output);

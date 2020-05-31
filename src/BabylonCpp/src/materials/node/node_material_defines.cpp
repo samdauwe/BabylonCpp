@@ -1,5 +1,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 
+#include <babylon/babylon_stl_util.h>
+
 namespace BABYLON {
 
 NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
@@ -50,8 +52,13 @@ NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
 
 NodeMaterialDefines::~NodeMaterialDefines() = default;
 
-void NodeMaterialDefines::setValue(const std::string& name, bool value)
+void NodeMaterialDefines::setValue(const std::string& name, bool value,
+                                   bool markAsUnprocessedIfDirty)
 {
+  if (markAsUnprocessedIfDirty && (!stl_util::contains(boolDef, name) || boolDef[name] != value)) {
+    markAsUnprocessed();
+  }
+
   boolDef[name] = value;
 }
 

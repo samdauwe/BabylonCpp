@@ -16,6 +16,7 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , _linkedConnectionSource{nullptr}
     , _enforceAssociatedVariableName{false}
     , direction{this, &NodeMaterialConnectionPoint::get_direction}
+    , needDualDirectionValidation{false}
     , associatedVariableName{this, &NodeMaterialConnectionPoint::get_associatedVariableName,
                              &NodeMaterialConnectionPoint::set_associatedVariableName}
     , innerType{this, &NodeMaterialConnectionPoint::get_innerType}

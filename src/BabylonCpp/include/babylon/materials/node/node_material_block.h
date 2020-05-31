@@ -104,11 +104,13 @@ public:
    * @param type defines the connection point type
    * @param target defines the target to use to limit the connection point (will be
    * VertexAndFragment by default)
+   * @param point an already created connection point. If not provided, create a new one
    * @returns the current block
    */
   NodeMaterialBlock&
   registerOutput(const std::string& name, const NodeMaterialBlockConnectionPointTypes& type,
-                 const std::optional<NodeMaterialBlockTargets>& target = std::nullopt);
+                 const std::optional<NodeMaterialBlockTargets>& target = std::nullopt,
+                 const NodeMaterialConnectionPointPtr& point           = nullptr);
 
   /**
    * @brief Will return the first available input e.g. the first one which is

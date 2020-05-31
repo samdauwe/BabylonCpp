@@ -10,9 +10,8 @@ namespace BABYLON {
 /**
  * @brief Manages the defines for the Node Material.
  */
-struct BABYLON_SHARED_EXPORT NodeMaterialDefines
-    : public MaterialDefines,
-      public IImageProcessingConfigurationDefines {
+struct BABYLON_SHARED_EXPORT NodeMaterialDefines : public MaterialDefines,
+                                                   public IImageProcessingConfigurationDefines {
 
   /**
    * @brief Initializes the Node Material defines.
@@ -20,7 +19,7 @@ struct BABYLON_SHARED_EXPORT NodeMaterialDefines
   NodeMaterialDefines();
   ~NodeMaterialDefines() override;
 
-  void setValue(const std::string& name, bool value);
+  void setValue(const std::string& name, bool value, bool markAsUnprocessedIfDirty = false);
 
 }; // end of struct NodeMaterialDefines
 

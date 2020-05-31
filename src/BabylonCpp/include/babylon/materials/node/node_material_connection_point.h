@@ -236,6 +236,12 @@ public:
   ReadOnlyProperty<NodeMaterialConnectionPoint, NodeMaterialConnectionPointDirection> direction;
 
   /**
+   * Indicates that this connection point needs dual validation before being connected to another
+   * point
+   */
+  bool needDualDirectionValidation;
+
+  /**
    * Gets or sets the additional types supported by this connection point.
    */
   std::vector<NodeMaterialBlockConnectionPointTypes> acceptedConnectionPointTypes;
