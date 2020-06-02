@@ -2401,11 +2401,12 @@ std::unique_ptr<VertexData>
 VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
                           const std::array<std::optional<Vector4>, 3>& fUV,
                           const std::optional<std::array<std::optional<Color4>, 3>>& fColors,
-                          Vector4& frontUVs, Vector4& backUVs)
+                          Vector4& frontUVs, Vector4& backUVs, const std::optional<bool>& wrp)
 {
   auto faceUV     = fUV;
   auto faceColors = fColors;
   Float32Array colors;
+  auto wrap = wrp.value_or(false);
 
   // default face colors and UV if undefined
   for (uint32_t f = 0; f < 3; ++f) {
@@ -2417,11 +2418,26 @@ VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
     }
   }
 
-  auto positions = polygon->getVerticesData(VertexBuffer::PositionKind);
-  auto normals   = polygon->getVerticesData(VertexBuffer::NormalKind);
-  auto uvs       = polygon->getVerticesData(VertexBuffer::UVKind);
-  auto indices   = polygon->getIndices();
-
+  auto positions  = polygon->getVerticesData(VertexBuffer::PositionKind);
+  auto normals    = polygon->getVerticesData(VertexBuffer::NormalKind);
+  auto uvs        = polygon->getVerticesData(VertexBuffer::UVKind);
+  auto indices    = polygon->getIndices();
+  auto startIndex = positions.size() / 9;
+  auto disp       = 0ull;
+  auto distX      = 0.f;
+  auto distZ      = 0.f;
+  auto dist       = 0.f;
+  auto totalLen   = 0.f;
+  auto cumulate   = Float32Array{0.f};
+  if (wrap) {
+    for (size_t idx = startIndex; idx < positions.size() / 3; idx += 4) {
+      distX = positions[3 * (idx + 2)] - positions[3 * idx];
+      distZ = positions[3 * (idx + 2) + 2] - positions[3 * idx + 2];
+      dist  = std::sqrt(distX * distX + distZ * distZ);
+      totalLen += dist;
+      cumulate.emplace_back(totalLen);
+    }
+  }
   // set face colours and textures
   uint32_t idx  = 0;
   uint32_t face = 0;
@@ -2438,10 +2454,41 @@ VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
     if (std::abs(normals[index + 1] + 1) < 0.001f) {
       face = 2;
     }
-    idx          = index / 3;
-    uvs[2 * idx] = (1 - uvs[2 * idx]) * faceUV[face]->x + uvs[2 * idx] * faceUV[face]->z;
-    uvs[2 * idx + 1]
-      = (1.f - uvs[2 * idx + 1]) * faceUV[face]->y + uvs[2 * idx + 1] * faceUV[face]->w;
+    idx = index / 3;
+    if (face == 1) {
+      disp = idx - startIndex;
+      if (disp % 4 < 1.5f) {
+        if (wrap) {
+          uvs[2 * idx]
+            = faceUV[face]->x
+              + (faceUV[face]->z - faceUV[face]->x) * cumulate[std::floor(disp / 4)] / totalLen;
+        }
+        else {
+          uvs[2 * idx] = faceUV[face]->x;
+        }
+      }
+      else {
+        if (wrap) {
+          uvs[2 * idx]
+            = faceUV[face]->x
+              + (faceUV[face]->z - faceUV[face]->x) * cumulate[std::floor(disp / 4) + 1] / totalLen;
+        }
+        else {
+          uvs[2 * idx] = faceUV[face]->z;
+        }
+      }
+      if (disp % 2 == 0) {
+        uvs[2 * idx + 1] = faceUV[face]->w;
+      }
+      else {
+        uvs[2 * idx + 1] = faceUV[face]->y;
+      }
+    }
+    else {
+      uvs[2 * idx] = (1 - uvs[2 * idx]) * faceUV[face]->x + uvs[2 * idx] * faceUV[face]->z;
+      uvs[2 * idx + 1]
+        = (1.f - uvs[2 * idx + 1]) * faceUV[face]->y + uvs[2 * idx + 1] * faceUV[face]->w;
+    }
     if (faceColors) {
       stl_util::concat(colors, {(*faceColors)[face]->r, (*faceColors)[face]->g,
                                 (*faceColors)[face]->b, (*faceColors)[face]->a});

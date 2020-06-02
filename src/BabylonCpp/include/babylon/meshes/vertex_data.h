@@ -471,7 +471,7 @@ public:
   CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
                 const std::array<std::optional<Vector4>, 3>& fUV,
                 const std::optional<std::array<std::optional<Color4>, 3>>& fColors,
-                Vector4& frontUVs, Vector4& backUVs);
+                Vector4& frontUVs, Vector4& backUVs, const std::optional<bool>& wrp = std::nullopt);
 
   /**
    * @brief Creates the VertexData of the IcoSphere.

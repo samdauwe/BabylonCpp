@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_BUILDERS_POLYGON_BUILDER_H
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include <babylon/babylon_api.h>
@@ -54,7 +55,8 @@ struct BABYLON_SHARED_EXPORT PolygonBuilder {
    * @returns the polygon mesh
    */
   static MeshPtr ExtrudePolygon(const std::string& name, PolygonOptions& options,
-                                Scene* scene = nullptr);
+                                Scene* scene                    = nullptr,
+                                const std::optional<bool>& wrap = std::nullopt);
 
 }; // end of struct PolygonBuilder
 

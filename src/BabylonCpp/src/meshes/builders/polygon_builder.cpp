@@ -39,14 +39,14 @@ MeshPtr PolygonBuilder::CreatePolygon(const std::string& name, PolygonOptions& o
   polygon->_originalBuilderSideOrientation = sideOrientation;
   auto vertexData
     = VertexData::CreatePolygon(polygon.get(), sideOrientation, options.faceUV, options.faceColors,
-                                options.frontUVs, options.backUVs);
+                                options.frontUVs, options.backUVs, options.wrap);
   vertexData->applyToMesh(*polygon, options.updatable);
 
   return polygon;
 }
 
 MeshPtr PolygonBuilder::ExtrudePolygon(const std::string& name, PolygonOptions& options,
-                                       Scene* scene)
+                                       Scene* scene, const std::optional<bool>& /*wrap*/)
 {
   return PolygonBuilder::CreatePolygon(name, options, scene);
 }
