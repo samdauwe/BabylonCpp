@@ -323,6 +323,7 @@ PolygonOptions::PolygonOptions()
     , sideOrientation{std::nullopt}
     , frontUVs{Vector4(0.f, 0.f, 1.f, 1.f)}
     , backUVs{Vector4(0.f, 0.f, 1.f, 1.f)}
+    , wrap{std::nullopt}
 {
 }
 

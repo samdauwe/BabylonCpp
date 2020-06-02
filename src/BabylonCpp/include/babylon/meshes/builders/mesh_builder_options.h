@@ -466,6 +466,7 @@ public:
   std::optional<unsigned int> sideOrientation;
   Vector4 frontUVs;
   Vector4 backUVs;
+  std::optional<bool> wrap;
 
 }; // end of class PolygonOptions
 
