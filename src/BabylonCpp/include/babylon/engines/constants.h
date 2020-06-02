@@ -258,6 +258,18 @@ struct BABYLON_SHARED_EXPORT Constants {
   /** Equirectangular Fixed Mirrored coordinates mode */
   static constexpr unsigned int TEXTURE_FIXED_EQUIRECTANGULAR_MIRRORED_MODE = 9;
 
+  /** Offline (baking) quality for texture filtering */
+  static constexpr unsigned int TEXTURE_FILTERING_QUALITY_OFFLINE = 4096;
+
+  /** High quality for texture filtering */
+  static constexpr unsigned int TEXTURE_FILTERING_QUALITY_HIGH = 64;
+
+  /** Medium quality for texture filtering */
+  static constexpr unsigned int TEXTURE_FILTERING_QUALITY_MEDIUM = 16;
+
+  /** Low quality for texture filtering */
+  static constexpr unsigned int TEXTURE_FILTERING_QUALITY_LOW = 8;
+
   // Texture rescaling mode
   /** Defines that texture rescaling will use a floor to find the closer power of 2 size */
   static constexpr unsigned int SCALEMODE_FLOOR = 1;
