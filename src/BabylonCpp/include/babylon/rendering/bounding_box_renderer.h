@@ -7,6 +7,7 @@
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/maths/color3.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
@@ -112,6 +113,16 @@ public:
    * Defines if the renderer should show the back lines or not
    */
   bool showBackLines;
+
+  /**
+   * Observable raised before rendering a bounding box
+   */
+  Observable<BoundingBox> onBeforeBoxRenderingObservable;
+
+  /**
+   * Observable raised after rendering a bounding box
+   */
+  Observable<BoundingBox> onAfterBoxRenderingObservable;
 
   /**
    * Hidden

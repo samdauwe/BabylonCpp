@@ -134,6 +134,9 @@ void BoundingBoxRenderer::render(int renderingGroupId)
     if (boundingBox._tag != renderingGroupId) {
       continue;
     }
+
+    onBeforeBoxRenderingObservable.notifyObservers(&boundingBox);
+
     const auto& min = boundingBox.minimum;
     const auto& max = boundingBox.maximum;
     auto diff       = max.subtract(min);
@@ -165,6 +168,8 @@ void BoundingBoxRenderer::render(int renderingGroupId)
 
     // Draw order
     engine->drawElementsType(Material::LineListDrawMode, 0, 24);
+
+    onAfterBoxRenderingObservable.notifyObservers(&boundingBox);
   }
   _colorShader->unbind();
   engine->setDepthFunctionToLessOrEqual();
@@ -217,6 +222,9 @@ void BoundingBoxRenderer::dispose()
   if (!_colorShader) {
     return;
   }
+
+  onBeforeBoxRenderingObservable.clear();
+  onAfterBoxRenderingObservable.clear();
 
   renderList.clear();
 

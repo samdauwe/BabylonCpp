@@ -20,18 +20,14 @@ Vector3 RenderingGroup::_zeroVector = Vector3::Zero();
 
 RenderingGroup::RenderingGroup(
   unsigned int iIndex, Scene* scene,
-  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
-    iOpaqueSortCompareFn,
-  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
-    iAlphaTestSortCompareFn,
-  const std::function<bool(const SubMesh* a, const SubMesh* b)>&
-    iTransparentSortCompareFn)
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& iOpaqueSortCompareFn,
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& iAlphaTestSortCompareFn,
+  const std::function<bool(const SubMesh* a, const SubMesh* b)>& iTransparentSortCompareFn)
     : index{iIndex}
     , onBeforeTransparentRendering{nullptr}
     , opaqueSortCompareFn{this, &RenderingGroup::set_opaqueSortCompareFn}
     , alphaTestSortCompareFn{this, &RenderingGroup::set_alphaTestSortCompareFn}
-    , transparentSortCompareFn{this,
-                               &RenderingGroup::set_transparentSortCompareFn}
+    , transparentSortCompareFn{this, &RenderingGroup::set_transparentSortCompareFn}
     , _scene{scene}
     , _opaqueSortCompareFn{nullptr}
     , _alphaTestSortCompareFn{nullptr}
@@ -61,14 +57,12 @@ void RenderingGroup::set_opaqueSortCompareFn(
 {
   _opaqueSortCompareFn = value;
   if (value) {
-    _renderOpaque = [this](const std::vector<SubMesh*>& subMeshes) {
-      renderOpaqueSorted(subMeshes);
-    };
+    _renderOpaque
+      = [this](const std::vector<SubMesh*>& subMeshes) { renderOpaqueSorted(subMeshes); };
   }
   else {
-    _renderOpaque = [](const std::vector<SubMesh*>& subMeshes) {
-      RenderingGroup::renderUnsorted(subMeshes);
-    };
+    _renderOpaque
+      = [](const std::vector<SubMesh*>& subMeshes) { RenderingGroup::renderUnsorted(subMeshes); };
   }
 }
 
@@ -77,14 +71,12 @@ void RenderingGroup::set_alphaTestSortCompareFn(
 {
   _alphaTestSortCompareFn = value;
   if (value) {
-    _renderAlphaTest = [this](const std::vector<SubMesh*>& subMeshes) {
-      renderAlphaTestSorted(subMeshes);
-    };
+    _renderAlphaTest
+      = [this](const std::vector<SubMesh*>& subMeshes) { renderAlphaTestSorted(subMeshes); };
   }
   else {
-    _renderAlphaTest = [](const std::vector<SubMesh*>& subMeshes) {
-      RenderingGroup::renderUnsorted(subMeshes);
-    };
+    _renderAlphaTest
+      = [](const std::vector<SubMesh*>& subMeshes) { RenderingGroup::renderUnsorted(subMeshes); };
   }
 }
 
@@ -99,9 +91,8 @@ void RenderingGroup::set_transparentSortCompareFn(
       return RenderingGroup::defaultTransparentSortCompare(a, b);
     };
   }
-  _renderTransparent = [this](const std::vector<SubMesh*>& subMeshes) {
-    renderTransparentSorted(subMeshes);
-  };
+  _renderTransparent
+    = [this](const std::vector<SubMesh*>& subMeshes) { renderTransparentSorted(subMeshes); };
 }
 
 void RenderingGroup::render(
@@ -109,14 +100,12 @@ void RenderingGroup::render(
                      const std::vector<SubMesh*>& alphaTestSubMeshes,
                      const std::vector<SubMesh*>& transparentSubMeshes,
                      const std::vector<SubMesh*>& depthOnlySubMeshes,
-                     const std::function<void()>& beforeTransparents)>&
-    customRenderFunction,
-  bool renderSprites, bool renderParticles,
-  const std::vector<AbstractMesh*>& activeMeshes)
+                     const std::function<void()>& beforeTransparents)>& customRenderFunction,
+  bool renderSprites, bool renderParticles, const std::vector<AbstractMesh*>& activeMeshes)
 {
   if (customRenderFunction) {
-    customRenderFunction(_opaqueSubMeshes, _alphaTestSubMeshes,
-                         _transparentSubMeshes, _depthOnlySubMeshes, nullptr);
+    customRenderFunction(_opaqueSubMeshes, _alphaTestSubMeshes, _transparentSubMeshes,
+                         _depthOnlySubMeshes, nullptr);
     return;
   }
 
@@ -180,22 +169,20 @@ void RenderingGroup::render(
 
 void RenderingGroup::renderOpaqueSorted(const std::vector<SubMesh*>& subMeshes)
 {
-  return RenderingGroup::renderSorted(subMeshes, _opaqueSortCompareFn,
-                                      _scene->activeCamera(), false);
+  return RenderingGroup::renderSorted(subMeshes, _opaqueSortCompareFn, _scene->activeCamera(),
+                                      false);
 }
 
-void RenderingGroup::renderAlphaTestSorted(
-  const std::vector<SubMesh*>& subMeshes)
+void RenderingGroup::renderAlphaTestSorted(const std::vector<SubMesh*>& subMeshes)
 {
-  return RenderingGroup::renderSorted(subMeshes, _alphaTestSortCompareFn,
-                                      _scene->activeCamera(), false);
+  return RenderingGroup::renderSorted(subMeshes, _alphaTestSortCompareFn, _scene->activeCamera(),
+                                      false);
 }
 
-void RenderingGroup::renderTransparentSorted(
-  const std::vector<SubMesh*>& subMeshes)
+void RenderingGroup::renderTransparentSorted(const std::vector<SubMesh*>& subMeshes)
 {
-  return RenderingGroup::renderSorted(subMeshes, _transparentSortCompareFn,
-                                      _scene->activeCamera(), true);
+  return RenderingGroup::renderSorted(subMeshes, _transparentSortCompareFn, _scene->activeCamera(),
+                                      true);
 }
 
 void RenderingGroup::renderSorted(
@@ -203,12 +190,11 @@ void RenderingGroup::renderSorted(
   const std::function<bool(const SubMesh* a, const SubMesh* b)>& sortCompareFn,
   const CameraPtr& camera, bool transparent)
 {
-  auto cameraPosition
-    = camera ? camera->globalPosition() : RenderingGroup::_zeroVector;
+  auto cameraPosition = camera ? camera->globalPosition() : RenderingGroup::_zeroVector;
   for (auto& subMesh : subMeshes) {
-    subMesh->_alphaIndex       = subMesh->getMesh()->alphaIndex;
-    subMesh->_distanceToCamera = Vector3::Distance(
-      subMesh->getBoundingInfo()->boundingSphere.centerWorld, cameraPosition);
+    subMesh->_alphaIndex = subMesh->getMesh()->alphaIndex;
+    subMesh->_distanceToCamera
+      = Vector3::Distance(subMesh->getBoundingInfo()->boundingSphere.centerWorld, cameraPosition);
   }
 
   auto sortedArray = subMeshes;
@@ -242,8 +228,7 @@ void RenderingGroup::renderUnsorted(const std::vector<SubMesh*>& subMeshes)
   }
 }
 
-bool RenderingGroup::defaultTransparentSortCompare(const SubMesh* a,
-                                                   const SubMesh* b)
+bool RenderingGroup::defaultTransparentSortCompare(const SubMesh* a, const SubMesh* b)
 {
   // Alpha index first
   if (a->_alphaIndex > b->_alphaIndex) {
@@ -301,8 +286,7 @@ void RenderingGroup::dispose()
   _edgesRenderers.clear();
 }
 
-void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
-                              MaterialPtr material)
+void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh, MaterialPtr material)
 {
   // Get mesh and materials if not provided
   if (!mesh) {
@@ -336,7 +320,9 @@ void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
   mesh->_renderingGroup = this;
 
   if (mesh->_edgesRenderer != nullptr && mesh->_edgesRenderer->isEnabled) {
-    _edgesRenderers.push_back(mesh->_edgesRenderer);
+    if (!stl_util::contains(_edgesRenderers, mesh->_edgesRenderer)) {
+      _edgesRenderers.emplace_back(mesh->_edgesRenderer);
+    }
   }
 }
 
@@ -350,8 +336,7 @@ void RenderingGroup::dispatchParticles(IParticleSystem* particleSystem)
   _particleSystems.emplace_back(particleSystem);
 }
 
-void RenderingGroup::_renderParticles(
-  const std::vector<AbstractMesh*>& activeMeshes)
+void RenderingGroup::_renderParticles(const std::vector<AbstractMesh*>& activeMeshes)
 {
   if (_particleSystems.empty()) {
     return;
@@ -361,15 +346,13 @@ void RenderingGroup::_renderParticles(
   const auto& activeCamera = _scene->activeCamera();
   _scene->onBeforeParticlesRenderingObservable.notifyObservers(_scene);
   for (auto& particleSystem : _particleSystems) {
-    if ((activeCamera && activeCamera->layerMask & particleSystem->layerMask)
-        == 0) {
+    if ((activeCamera && activeCamera->layerMask & particleSystem->layerMask) == 0) {
       continue;
     }
     if (!activeMeshes.empty()
         || (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
-            && stl_util::index_of(
-                 activeMeshes,
-                 std::get<AbstractMeshPtr>(particleSystem->emitter).get())
+            && stl_util::index_of(activeMeshes,
+                                  std::get<AbstractMeshPtr>(particleSystem->emitter).get())
                  != -1)) {
       _scene->_activeParticles.addCount(particleSystem->render(), false);
     }
@@ -387,8 +370,7 @@ void RenderingGroup::_renderSprites()
   auto& activeCamera = _scene->activeCamera();
   _scene->onBeforeSpritesRenderingObservable.notifyObservers(_scene);
   for (auto& spriteManager : _spriteManagers) {
-    if (((activeCamera && activeCamera->layerMask & spriteManager->layerMask)
-         != 0)) {
+    if (((activeCamera && activeCamera->layerMask & spriteManager->layerMask) != 0)) {
       spriteManager->render();
     }
   }
