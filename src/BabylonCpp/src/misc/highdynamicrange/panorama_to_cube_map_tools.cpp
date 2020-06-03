@@ -7,82 +7,77 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_LEFT{{
   Vector3(-1.f, -1.f, -1.f), //
   Vector3(1.f, -1.f, -1.f),  //
   Vector3(-1.f, 1.f, -1.f),  //
   Vector3(1.f, 1.f, -1.f)    //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_BACK{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_RIGHT{{
   Vector3(1.f, -1.f, 1.f),  //
   Vector3(-1.f, -1.f, 1.f), //
   Vector3(1.f, 1.f, 1.f),   //
   Vector3(-1.f, 1.f, 1.f)   //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_RIGHT{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
   Vector3(1.f, -1.f, -1.f), //
   Vector3(1.f, -1.f, 1.f),  //
   Vector3(1.f, 1.f, -1.f),  //
   Vector3(1.f, 1.f, 1.f)    //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_LEFT{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_BACK{{
   Vector3(-1.f, -1.f, 1.f),  //
   Vector3(-1.f, -1.f, -1.f), //
   Vector3(-1.f, 1.f, 1.f),   //
   Vector3(-1.f, 1.f, -1.f)   //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_DOWN{
-  {Vector3(-1.f, 1.f, -1.f), //
-   Vector3(1.f, 1.f, -1.f),  //
-   Vector3(-1.f, 1.f, 1.f),  //
-   Vector3(1.f, 1.f, 1.f)}};
-
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_UP{{
-  Vector3(-1.f, -1.f, 1.f),  //
-  Vector3(1.f, -1.f, 1.f),   //
-  Vector3(-1.f, -1.f, -1.f), //
-  Vector3(1.f, -1.f, -1.f)   //
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_DOWN{{
+  Vector3(1.f, 1.f, -1.f),  //
+  Vector3(1.f, 1.f, 1.f),   //
+  Vector3(-1.f, 1.f, -1.f), //
+  Vector3(-1.f, 1.f, 1.f)   //
 }};
 
-CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
-  const Float32Array& float32Array, size_t inputWidth, size_t inputHeight,
-  size_t size)
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_UP{{
+  Vector3(-1.f, -1.f, -1.f), //
+  Vector3(-1.f, -1.f, 1.f),  //
+  Vector3(1.f, -1.f, -1.f),  //
+  Vector3(1.f, -1.f, 1.f)    //
+}};
+
+CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(const Float32Array& float32Array,
+                                                             size_t inputWidth, size_t inputHeight,
+                                                             size_t size)
 {
   CubeMapInfo cubeMapInfo;
 
   if (float32Array.size() != inputWidth * inputHeight * 3) {
-    BABYLON_LOG_ERROR("PanoramaToCubeMapTools",
-                      "ConvertPanoramaToCubemap: input size is wrong")
+    BABYLON_LOG_ERROR("PanoramaToCubeMapTools", "ConvertPanoramaToCubemap: input size is wrong")
     return cubeMapInfo;
   }
 
-  cubeMapInfo.front = CreateCubemapTexture(size, FACE_FRONT, float32Array,
-                                           inputWidth, inputHeight);
-  cubeMapInfo.back  = CreateCubemapTexture(size, FACE_BACK, float32Array,
-                                          inputWidth, inputHeight);
-  cubeMapInfo.left  = CreateCubemapTexture(size, FACE_LEFT, float32Array,
-                                          inputWidth, inputHeight);
-  cubeMapInfo.right = CreateCubemapTexture(size, FACE_RIGHT, float32Array,
-                                           inputWidth, inputHeight);
-  cubeMapInfo.up = CreateCubemapTexture(size, FACE_UP, float32Array, inputWidth,
-                                        inputHeight);
-  cubeMapInfo.down       = CreateCubemapTexture(size, FACE_DOWN, float32Array,
-                                          inputWidth, inputHeight);
-  cubeMapInfo.size       = size;
-  cubeMapInfo.type       = Constants::TEXTURETYPE_FLOAT;
+  cubeMapInfo.front = CreateCubemapTexture(size, FACE_FRONT, float32Array, inputWidth, inputHeight);
+  cubeMapInfo.back  = CreateCubemapTexture(size, FACE_BACK, float32Array, inputWidth, inputHeight);
+  cubeMapInfo.left  = CreateCubemapTexture(size, FACE_LEFT, float32Array, inputWidth, inputHeight);
+  cubeMapInfo.right = CreateCubemapTexture(size, FACE_RIGHT, float32Array, inputWidth, inputHeight);
+  cubeMapInfo.up    = CreateCubemapTexture(size, FACE_UP, float32Array, inputWidth, inputHeight);
+  cubeMapInfo.down  = CreateCubemapTexture(size, FACE_DOWN, float32Array, inputWidth, inputHeight);
+  cubeMapInfo.size  = size;
+  cubeMapInfo.type  = Constants::TEXTURETYPE_FLOAT;
   cubeMapInfo.format     = Constants::TEXTUREFORMAT_RGB;
   cubeMapInfo.gammaSpace = false;
 
   return cubeMapInfo;
 }
 
-Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
-  size_t texSize, const std::array<Vector3, 4>& faceData,
-  const Float32Array& float32Array, size_t inputWidth, size_t inputHeight)
+Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(size_t texSize,
+                                                          const std::array<Vector3, 4>& faceData,
+                                                          const Float32Array& float32Array,
+                                                          size_t inputWidth, size_t inputHeight)
 {
   Float32Array textureArray(texSize * texSize * 4 * 3);
 
@@ -101,8 +96,7 @@ Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
       auto v = xv2.subtract(xv1).scale(fy).add(xv1);
       v.normalize();
 
-      auto color
-        = CalcProjectionSpherical(v, float32Array, inputWidth, inputHeight);
+      auto color = CalcProjectionSpherical(v, float32Array, inputWidth, inputHeight);
 
       // 3 channels per pixels
       textureArray[y * texSize * 3 + (x * 3) + 0] = color.r;
@@ -119,9 +113,9 @@ Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
   return textureArray;
 }
 
-Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
-  const Vector3& vDir, const Float32Array& float32Array, size_t inputWidth,
-  size_t inputHeight)
+Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(const Vector3& vDir,
+                                                       const Float32Array& float32Array,
+                                                       size_t inputWidth, size_t inputHeight)
 {
   auto theta = std::atan2(vDir.z, vDir.x);
   auto phi   = std::acos(vDir.y);
