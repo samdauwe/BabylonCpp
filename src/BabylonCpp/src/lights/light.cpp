@@ -404,7 +404,7 @@ float Light::getScaledIntensity() const
   return _photometricScale * intensity;
 }
 
-std::unique_ptr<Light> Light::clone(const std::string& /*name*/)
+std::unique_ptr<Light> Light::clone(const std::string& /*name*/, const NodePtr& /*newParent*/)
 {
   return nullptr;
 }
