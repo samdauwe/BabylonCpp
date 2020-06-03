@@ -78,7 +78,10 @@ void DepthReducer::dispose(bool disposeAll)
   MinMaxReducer::dispose(disposeAll);
 
   if (_depthRenderer && disposeAll) {
-    _depthRenderer->getDepthMap()->getScene()->_depthRenderer.erase(_depthRendererId);
+    const auto& scene = _depthRenderer->getDepthMap()->getScene();
+    if (scene) {
+      scene->_depthRenderer.erase(_depthRendererId);
+    }
 
     _depthRenderer->dispose();
     _depthRenderer = nullptr;
