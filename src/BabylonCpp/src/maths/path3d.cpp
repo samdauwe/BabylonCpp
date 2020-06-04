@@ -283,7 +283,8 @@ void Path3D::_compute(const std::optional<Vector3>& firstNormal, bool alignTange
       _tangents[i] = alignTangentsWithPath ? cur : prev.add(cur);
       _tangents[i].normalize();
     }
-    _distances[i] = _distances[i - 1] + prev.length();
+
+    _distances[i] = _distances[i - 1] + _curve[i].subtract(_curve[i - 1]).length();
 
     // normals and binormals
     // http://www.cs.cmu.edu/afs/andrew/scs/cs/15-462/web/old/asst2camera.html

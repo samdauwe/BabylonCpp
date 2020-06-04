@@ -370,10 +370,6 @@ bool Vector3::isNonUniform() const
     return true;
   }
 
-  if (!stl_util::almost_equal(absY, absZ)) {
-    return true;
-  }
-
   return false;
 }
 
