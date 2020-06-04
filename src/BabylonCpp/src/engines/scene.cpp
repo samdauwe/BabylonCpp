@@ -5008,9 +5008,10 @@ void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace, bool a
 
   // Camera
   if (!_activeCamera) {
-    auto worldExtends = getWorldExtends();
-    auto worldSize    = worldExtends.max.subtract(worldExtends.min);
-    auto worldCenter  = worldExtends.min.add(worldSize.scale(0.5f));
+    auto worldExtends = getWorldExtends(
+      [](const AbstractMeshPtr& mesh) -> bool { return mesh->isVisible && mesh->isEnabled(); });
+    auto worldSize   = worldExtends.max.subtract(worldExtends.min);
+    auto worldCenter = worldExtends.min.add(worldSize.scale(0.5f));
 
     TargetCameraPtr camera = nullptr;
     auto radius            = worldSize.length() * 1.5f;

@@ -1326,10 +1326,9 @@ public:
    */
   void cleanCachedTextureBuffer();
 
-  /** Octrees **/
-
   /**
-   * @brief Get the world extend vectors with an optional filter.
+   * @brief Get the world extend vectors with an optional filter
+   *
    * @param filterPredicate the predicate - which meshes should be included when calculating the
    * world size
    * @returns {{ min: Vector3; max: Vector3 }} min and max vectors
