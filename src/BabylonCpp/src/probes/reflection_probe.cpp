@@ -25,9 +25,18 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
     , _attachedMesh{nullptr}
     , _invertYAxis{false}
 {
-  _renderTargetTexture = RenderTargetTexture::New(
-    iName, RenderTargetSize{size.width, size.height}, scene, generateMipMaps, true,
-    useFloat ? Constants::TEXTURETYPE_FLOAT : Constants::TEXTURETYPE_UNSIGNED_INT, true);
+  auto textureType = Constants::TEXTURETYPE_UNSIGNED_BYTE;
+  if (useFloat) {
+    const auto caps = _scene->getEngine()->getCaps();
+    if (caps.textureHalfFloatRender) {
+      textureType = Constants::TEXTURETYPE_HALF_FLOAT;
+    }
+    else if (caps.textureFloatRender) {
+      textureType = Constants::TEXTURETYPE_FLOAT;
+    }
+  }
+  _renderTargetTexture = RenderTargetTexture::New(iName, RenderTargetSize{size.width, size.height},
+                                                  scene, generateMipMaps, true, textureType, true);
 
   _renderTargetTexture->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
     switch (*faceIndex) {
