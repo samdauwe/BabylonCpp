@@ -25,10 +25,10 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     , _light{nullptr}
 {
   attachedMesh        = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  _attachedMeshParent = TransformNode::New("parent", gizmoLayer->originalScene);
+  _attachedMeshParent = TransformNode::New("parent", gizmoLayer->utilityLayerScene.get());
 
   attachedMesh()->parent   = _attachedMeshParent.get();
-  _material                = StandardMaterial::New("light", gizmoLayer->originalScene);
+  _material                = StandardMaterial::New("light", gizmoLayer->utilityLayerScene.get());
   _material->diffuseColor  = Color3(0.5f, 0.5f, 0.5f);
   _material->specularColor = Color3(0.1f, 0.1f, 0.1f);
 }
