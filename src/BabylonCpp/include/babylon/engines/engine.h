@@ -11,7 +11,9 @@ namespace BABYLON {
 
 class AudioEngine;
 class Camera;
+class EffectFallbacks;
 class ILoadingScreen;
+class IParticleSystem;
 class Material;
 class MultiviewExtension;
 class OcclusionQueryExtension;
@@ -21,6 +23,7 @@ class TransformFeedbackExtension;
 using WebGLQuery                = GL::IGLQuery;
 using AudioEnginePtr            = std::shared_ptr<AudioEngine>;
 using ILoadingScreenPtr         = std::shared_ptr<ILoadingScreen>;
+using IParticleSystemPtr        = std::shared_ptr<IParticleSystem>;
 using PostProcessPtr            = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr    = std::shared_ptr<RenderTargetTexture>;
 using WebGLTransformFeedback    = GL::IGLTransformFeedback;
@@ -839,13 +842,35 @@ public:
                                                     unsigned int samples);
 
   /**
-   *@brief Updates a depth texture Comparison Mode and Function.
+   * @brief Updates a depth texture Comparison Mode and Function.
    * If the comparison Function is equal to 0, the mode will be set to none.
    * Otherwise, this only works in webgl 2 and requires a shadow sampler in the shader.
    * @param texture The texture to set the comparison function for
    * @param comparisonFunction The comparison function to set, 0 if no comparison required
    */
   void updateTextureComparisonFunction(const InternalTexturePtr& texture, int comparisonFunction);
+
+  /**
+   * @brief Create an effect to use with particle systems.
+   * Please note that some parameters like animation sheets or not being billboard are not supported
+   * in this configuration, except if you pass the particle system for which you want to create a
+   * custom effect in the last parameter
+   * @param fragmentName defines the base name of the effect (The name of file without .fragment.fx)
+   * @param uniformsNames defines a list of attribute names
+   * @param samplers defines an array of string used to represent textures
+   * @param defines defines the string containing the defines to use to compile the shaders
+   * @param fallbacks defines the list of potential fallbacks to use if shader conmpilation fails
+   * @param onCompiled defines a function to call when the effect creation is successful
+   * @param onError defines a function to call when the effect creation has failed
+   * @param particleSystem the particle system you want to create the effect for
+   * @returns the new Effect
+   */
+  EffectPtr createEffectForParticles(
+    const std::string& fragmentName, const std::vector<std::string>& uniformsNames,
+    std::vector<std::string> samplers, std::string defines, EffectFallbacks* fallbacks = nullptr,
+    const std::function<void(Effect* effect)>& onCompiled                         = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>& onError = nullptr,
+    const IParticleSystemPtr& particleSystem                                      = nullptr);
 
   /**
    * @brief Creates a webGL buffer to use with instanciation.
@@ -859,13 +884,6 @@ public:
    * @param buffer defines the webGL buffer to delete
    */
   void deleteInstancesBuffer(const WebGLDataBufferPtr& buffer);
-
-  /**
-   * @brief Hidden
-   */
-  ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture, int width, int height,
-                                     int faceIndex = -1, int level = 0,
-                                     std::optional<ArrayBufferView> buffer = std::nullopt);
 
   /**
    * @brief Dispose and release all associated resources.
@@ -1247,9 +1265,8 @@ public:
   WriteOnlyProperty<Engine, std::string> loadingUIBackgroundColor;
 
 private:
-  ILoadingScreenPtr _loadingScreen      = nullptr;
-  bool _pointerLockRequested            = false;
-  WebGLFramebufferPtr _dummyFramebuffer = nullptr;
+  ILoadingScreenPtr _loadingScreen = nullptr;
+  bool _pointerLockRequested       = false;
   PostProcessPtr _rescalePostProcess;
 
   // Deterministic lockstepMaxSteps

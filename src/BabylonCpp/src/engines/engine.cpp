@@ -12,11 +12,14 @@
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/iloading_screen.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/misc/string_tools.h>
+#include <babylon/particles/iparticle_system.h>
+#include <babylon/particles/particle_system.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/states/depth_culling_state.h>
@@ -971,6 +974,51 @@ void Engine::updateTextureComparisonFunction(const InternalTexturePtr& texture,
   texture->_comparisonFunction = comparisonFunction;
 }
 
+EffectPtr Engine::createEffectForParticles(
+  const std::string& fragmentName, const std::vector<std::string>& uniformsNames,
+  std::vector<std::string> samplers, std::string defines, EffectFallbacks* /*fallbacks*/,
+  const std::function<void(Effect* effect)>& onCompiled,
+  const std::function<void(Effect* effect, const std::string& errors)>& onError,
+  const IParticleSystemPtr& particleSystem)
+{
+  std::vector<std::string> attributesNamesOrOptions;
+  std::vector<std::string> effectCreationOption;
+  std::vector<std::string> allSamplers;
+
+  if (particleSystem) {
+    particleSystem->fillUniformsAttributesAndSamplerNames(effectCreationOption,
+                                                          attributesNamesOrOptions, allSamplers);
+  }
+  else {
+    attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions();
+    effectCreationOption     = ParticleSystem::_GetEffectCreationOptions();
+  }
+
+  if (!StringTools::contains(defines, " BILLBOARD")) {
+    defines += "\n#define BILLBOARD\n";
+  }
+
+  if (!stl_util::contains(samplers, "diffuseSampler")) {
+    samplers.emplace_back("diffuseSampler");
+  }
+
+  std::unordered_map<std::string, std::string> baseName{
+    {"vertex",
+     !particleSystem->vertexShaderName.empty() ? particleSystem->vertexShaderName : "particles"}, //
+    {"fragmentElement", fragmentName}                                                             //
+  };
+
+  IEffectCreationOptions options;
+  options.attributes          = attributesNamesOrOptions;
+  options.uniformBuffersNames = stl_util::concat(effectCreationOption, uniformsNames);
+  options.samplers            = stl_util::concat(allSamplers, samplers);
+  options.defines             = defines;
+  options.onCompiled          = onCompiled;
+  options.onError             = onError;
+
+  return createEffect(baseName, options, this);
+}
+
 WebGLDataBufferPtr Engine::createInstancesBuffer(unsigned int capacity)
 {
   auto buffer = _gl->createBuffer();
@@ -991,59 +1039,6 @@ WebGLDataBufferPtr Engine::createInstancesBuffer(unsigned int capacity)
 void Engine::deleteInstancesBuffer(const WebGLDataBufferPtr& buffer)
 {
   _gl->deleteBuffer(buffer->underlyingResource().get());
-}
-
-ArrayBufferView Engine::_readTexturePixels(const InternalTexturePtr& texture, int width, int height,
-                                           int faceIndex, int level,
-                                           std::optional<ArrayBufferView> buffer)
-{
-  auto& gl = *_gl;
-  if (!_dummyFramebuffer) {
-    auto dummy = gl.createFramebuffer();
-
-    if (!dummy) {
-      throw std::runtime_error("Unable to create dummy framebuffer");
-    }
-
-    _dummyFramebuffer = dummy;
-  }
-  gl.bindFramebuffer(GL::FRAMEBUFFER, _dummyFramebuffer.get());
-
-  if (faceIndex > -1) {
-    auto _faceIndex = static_cast<unsigned>(faceIndex);
-    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                            GL::TEXTURE_CUBE_MAP_POSITIVE_X + _faceIndex,
-                            texture->_webGLTexture.get(), level);
-  }
-  else {
-    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::TEXTURE_2D,
-                            texture->_webGLTexture.get(), level);
-  }
-
-  auto readType = _getWebGLTextureType(texture->type);
-
-  switch (readType) {
-    case GL::UNSIGNED_BYTE: {
-      if (!buffer.has_value()) {
-        buffer = ArrayBufferView(Uint8Array(static_cast<std::size_t>(4 * width * height)));
-      }
-      readType = GL::UNSIGNED_BYTE;
-      gl.readPixels(0, 0, width, height, GL::RGBA, readType, buffer->uint8Array());
-      gl.bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer.get());
-    } break;
-    default: {
-      if (!buffer.has_value()) {
-        buffer = ArrayBufferView(Float32Array(static_cast<std::size_t>(4 * width * height)));
-      }
-      readType                = GL::FLOAT;
-      auto bufferFloat32Array = buffer->float32Array();
-      gl.readPixels(0, 0, width, height, GL::RGBA, readType, bufferFloat32Array);
-      gl.bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer.get());
-      buffer = ArrayBufferView(bufferFloat32Array);
-    } break;
-  }
-
-  return *buffer;
 }
 
 void Engine::dispose()
