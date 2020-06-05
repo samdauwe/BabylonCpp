@@ -9,6 +9,7 @@
 #include <babylon/engines/extensions/dynamic_texture_extension.h>
 #include <babylon/engines/extensions/multi_render_extension.h>
 #include <babylon/engines/extensions/raw_texture_extension.h>
+#include <babylon/engines/extensions/read_texture_extension.h>
 #include <babylon/engines/extensions/render_target_cube_extension.h>
 #include <babylon/engines/extensions/render_target_extension.h>
 #include <babylon/engines/extensions/uniform_buffer_extension.h>
@@ -106,6 +107,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , _dynamicTextureExtension{std::make_unique<DynamicTextureExtension>(this)}
     , _multiRenderExtension{std::make_unique<MultiRenderExtension>(this)}
     , _rawTextureExtension{std::make_unique<RawTextureExtension>(this)}
+    , _readTextureExtension{std::make_unique<ReadTextureExtension>(this)}
     , _renderTargetExtension{std::make_unique<RenderTargetExtension>(this)}
     , _renderTargetCubeExtension{std::make_unique<RenderTargetCubeExtension>(this)}
     , _uniformBufferExtension{std::make_unique<UniformBufferExtension>(this)}
@@ -3916,6 +3918,18 @@ void ThinEngine::updateRawTexture2DArray(const InternalTexturePtr& texture,
 {
   _rawTextureExtension->updateRawTexture2DArray(texture, data, format, invertY, compression,
                                                 textureType);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Read Texture Extension
+//--------------------------------------------------------------------------------------------------
+
+ArrayBufferView ThinEngine::_readTexturePixels(const InternalTexturePtr& texture, int width,
+                                               int height, int faceIndex, int level,
+                                               std::optional<ArrayBufferView> buffer)
+{
+  return _readTextureExtension->_readTexturePixels(texture, width, height, faceIndex, level,
+                                                   buffer);
 }
 
 //--------------------------------------------------------------------------------------------------

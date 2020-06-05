@@ -44,6 +44,7 @@ struct ISize;
 class MultiRenderExtension;
 class ProgressEvent;
 class RawTextureExtension;
+class ReadTextureExtension;
 class RenderTargetCubeExtension;
 class RenderTargetExtension;
 class Scene;
@@ -1482,6 +1483,17 @@ public:
                                unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   //------------------------------------------------------------------------------------------------
+  //                              Read Texture Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Hidden
+   */
+  ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture, int width, int height,
+                                     int faceIndex = -1, int level = 0,
+                                     std::optional<ArrayBufferView> buffer = std::nullopt);
+
+  //------------------------------------------------------------------------------------------------
   //                              Render Target Extension
   //------------------------------------------------------------------------------------------------
 
@@ -2018,6 +2030,8 @@ protected:
   /** @hidden */
   std::unordered_map<int, WebGLDataBufferPtr> _currentBoundBuffer;
   /** @hidden */
+  WebGLFramebufferPtr _dummyFramebuffer = nullptr;
+  /** @hidden */
   WebGLFramebufferPtr _currentFramebuffer = nullptr;
   /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
@@ -2071,11 +2085,13 @@ private:
   std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension;
   std::unique_ptr<MultiRenderExtension> _multiRenderExtension;
   std::unique_ptr<RawTextureExtension> _rawTextureExtension;
+  std::unique_ptr<ReadTextureExtension> _readTextureExtension;
   std::unique_ptr<RenderTargetExtension> _renderTargetExtension;
   std::unique_ptr<RenderTargetCubeExtension> _renderTargetCubeExtension;
   std::unique_ptr<UniformBufferExtension> _uniformBufferExtension;
 
   // Friend classes
+  friend class ReadTextureExtension;
   friend class RenderTargetExtension;
 
 }; // end of class ThinEngine
