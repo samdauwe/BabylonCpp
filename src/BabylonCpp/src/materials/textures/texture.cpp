@@ -19,12 +19,12 @@ bool Texture::SerializeBuffers      = true;
 bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
-  const std::string& iUrl, Scene* scene, bool iNoMipmap, bool invertY, unsigned int samplingMode,
-  const std::function<void()>& onLoad,
+  const std::string& iUrl, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
+  bool iNoMipmap, bool invertY, unsigned int samplingMode, const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType)
-    : BaseTexture{scene}
+    : BaseTexture{sceneOrEngine}
     , uOffset{0.f}
     , vOffset{0.f}
     , uScale{1.0}
@@ -71,8 +71,8 @@ Texture::Texture(
     _format = format;
   }
 
-  scene       = getScene();
-  auto engine = scene->getEngine();
+  auto scene  = getScene();
+  auto engine = _getEngine();
 
   if (!engine) {
     return;

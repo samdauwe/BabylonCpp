@@ -189,7 +189,7 @@ protected:
    * input.
    * @see http://doc.babylonjs.com/babylon101/materials#texture
    * @param url defines the url of the picture to load as a texture
-   * @param scene defines the scene or engine the texture will belong to
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
    * @param noMipmap defines if the texture will require mip maps or not
    * @param invertY defines if the texture needs to be inverted on the y axis during loading
    * @param samplingMode defines the sampling mode we want for the texture while fectching from it
@@ -205,7 +205,8 @@ protected:
    * @param mimeType defines an optional mime type information
    */
   Texture(
-    const std::string& url, Scene* scene, bool noMipmap = false, bool invertY = true,
+    const std::string& url, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
+    bool noMipmap = false, bool invertY = true,
     unsigned int samplingMode           = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError

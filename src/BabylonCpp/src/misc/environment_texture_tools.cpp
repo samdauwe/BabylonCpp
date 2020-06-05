@@ -144,8 +144,7 @@ void EnvironmentTextureTools::UploadEnvLevelsSync(const InternalTexturePtr& text
 
   texture->_lodGenerationScale = *specularInfo->lodGenerationScale;
 
-  const auto imageData
-    = EnvironmentTextureTools::CreateImageDataArrayBufferViews(data, info);
+  const auto imageData = EnvironmentTextureTools::CreateImageDataArrayBufferViews(data, info);
 
   return EnvironmentTextureTools::UploadLevelsSync(texture, imageData);
 }
@@ -289,7 +288,7 @@ void EnvironmentTextureTools::UploadLevelsSync(
         engine->updateTextureSamplingMode(Constants::TEXTURE_LINEAR_LINEAR, glTextureFromLod);
 
         // Wrap in a base texture for easy binding.
-        auto lodTexture          = BaseTexture::New(nullptr);
+        auto lodTexture          = BaseTexture::New(std::nullopt);
         lodTexture->isCube       = true;
         lodTexture->_texture     = glTextureFromLod;
         lodTextures[mipmapIndex] = lodTexture;

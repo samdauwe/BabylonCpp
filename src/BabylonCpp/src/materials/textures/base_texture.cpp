@@ -5,6 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
@@ -15,7 +16,7 @@
 
 namespace BABYLON {
 
-BaseTexture::BaseTexture(Scene* scene)
+BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine)
     : hasAlpha{this, &BaseTexture::get_hasAlpha, &BaseTexture::set_hasAlpha}
     , getAlphaFromRGB{false}
     , level{1.f}
@@ -42,6 +43,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , irradianceTexture{this, &BaseTexture::get_irradianceTexture,
                         &BaseTexture::set_irradianceTexture}
     , isRenderTarget{false}
+    , _prefiltered{false}
     , uid{this, &BaseTexture::get_uid}
     , onDispose{this, &BaseTexture::set_onDispose}
     , delayLoadState{Constants::DELAYLOADSTATE_NONE}
@@ -58,7 +60,6 @@ BaseTexture::BaseTexture(Scene* scene)
     , _hasAlpha{false}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _gammaSpace{true}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
@@ -68,6 +69,17 @@ BaseTexture::BaseTexture(Scene* scene)
     , _nullSphericalPolynomial{nullptr}
     , _nullBaseTexture{nullptr}
 {
+  if (sceneOrEngine) {
+    if (BaseTexture::_isScene(*sceneOrEngine)) {
+      _scene = std::get<Scene*>(*sceneOrEngine);
+    }
+    else {
+      _engine = std::get<ThinEngine*>(*sceneOrEngine);
+    }
+  }
+  else {
+    _scene = EngineStore::LastCreatedScene();
+  }
 }
 
 BaseTexture::~BaseTexture() = default;
@@ -82,6 +94,7 @@ void BaseTexture::addToScene(const BaseTexturePtr& newTexture)
   if (_scene) {
     uniqueId = _scene->getUniqueId();
     _scene->textures.emplace_back(newTexture);
+    _engine = _scene->getEngine();
   }
 }
 
@@ -305,6 +318,11 @@ Scene* BaseTexture::getScene() const
   return _scene;
 }
 
+ThinEngine* BaseTexture::_getEngine() const
+{
+  return _engine;
+}
+
 Matrix* BaseTexture::getTextureMatrix(int /*uBase*/)
 {
   return &_textureMatrix;
@@ -377,13 +395,13 @@ void BaseTexture::updateSamplingMode(unsigned int samplingMode)
     return;
   }
 
-  auto scene = getScene();
+  auto engine = _getEngine();
 
-  if (!scene) {
+  if (!engine) {
     return;
   }
 
-  scene->getEngine()->updateTextureSamplingMode(samplingMode, _texture);
+  engine->updateTextureSamplingMode(samplingMode, _texture);
 }
 
 void BaseTexture::scale(float /*ratio*/)
@@ -399,11 +417,12 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
                                               unsigned int sampling,
                                               const std::optional<bool>& invertY)
 {
-  if (!_scene) {
+  auto engine = _getEngine();
+  if (!engine) {
     return nullptr;
   }
 
-  auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
+  auto& texturesCache = engine->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
     if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
       if ((texturesCacheEntry->url == url) && texturesCacheEntry->generateMipMaps != iNoMipmap) {
@@ -484,13 +503,11 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
   auto size   = getSize();
   auto width  = size.width;
   auto height = size.height;
-  auto scene  = getScene();
 
-  if (!scene) {
+  const auto engine = _getEngine();
+  if (!engine) {
     return ArrayBufferView();
   }
-
-  auto engine = scene->getEngine();
 
   if (iLevel != 0) {
     width  = width / static_cast<int>(std::pow(2, iLevel));
@@ -573,6 +590,7 @@ void BaseTexture::dispose()
     stl_util::remove_vector_elements_equal_sharedptr(_scene->textures, this);
 
     _scene->onTextureRemovedObservable.notifyObservers(this);
+    _scene = nullptr;
   }
 
   if (_texture == nullptr) {
@@ -585,6 +603,8 @@ void BaseTexture::dispose()
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
+
+  _engine = nullptr;
 }
 
 json BaseTexture::serialize() const
@@ -620,6 +640,11 @@ void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
       onLoadObservable.add(onLoadCallback);
     }
   }
+}
+
+bool _isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine)
+{
+  return std::holds_alternative<Scene*>(sceneOrEngine);
 }
 
 } // end of namespace BABYLON

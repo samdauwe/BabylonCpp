@@ -15,6 +15,7 @@ namespace BABYLON {
 class BaseTexture;
 class InternalTexture;
 class SphericalPolynomial;
+class ThinEngine;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
 using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
@@ -215,7 +216,14 @@ public:
                            const std::function<void()>& callback);
 
 protected:
-  BaseTexture(Scene* scene);
+  /**
+   * @brief Instantiates a new BaseTexture.
+   * Base class of all the textures in babylon.
+   * It groups all the common properties the materials, post process, lights... might need
+   * in order to make a correct use of the texture.
+   * @param sceneOrEngine Define the scene or engine the texture blongs to
+   */
+  BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine);
 
   void set_hasAlpha(bool value);
   bool get_hasAlpha() const;
@@ -264,9 +272,17 @@ protected:
   BaseTexturePtr& get__lodTextureLow();
 
   /**
+   * @brief Hidden
+   */
+  ThinEngine* _getEngine() const;
+
+  /**
    * @brief Indicates that textures need to be re-calculated for all materials.
    */
   void _markAllSubMeshesAsTexturesDirty();
+
+private:
+  static bool _isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine);
 
 public:
   /**
@@ -428,6 +444,11 @@ public:
   bool isRenderTarget;
 
   /**
+   * @hidden
+   */
+  bool _prefiltered;
+
+  /**
    * Define the unique id of the texture in the scene.
    */
   ReadOnlyProperty<BaseTexture, std::string> uid;
@@ -498,6 +519,7 @@ private:
   unsigned int _coordinatesMode;
   bool _gammaSpace;
   Scene* _scene;
+  ThinEngine* _engine;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;
