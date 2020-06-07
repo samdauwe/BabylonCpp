@@ -12,6 +12,7 @@
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/color_gradient.h>
 #include <babylon/misc/factor_gradient.h>
+#include <babylon/misc/observable.h>
 
 using json = nlohmann::json;
 
@@ -25,6 +26,7 @@ struct Color3Gradient;
 class ConeParticleEmitter;
 class CylinderDirectedParticleEmitter;
 class CylinderParticleEmitter;
+class Effect;
 class HemisphericParticleEmitter;
 struct IParticleEmitterType;
 class Mesh;
@@ -41,6 +43,7 @@ using BoxParticleEmitterPtr              = std::shared_ptr<BoxParticleEmitter>;
 using ConeParticleEmitterPtr             = std::shared_ptr<ConeParticleEmitter>;
 using CylinderDirectedParticleEmitterPtr = std::shared_ptr<CylinderDirectedParticleEmitter>;
 using CylinderParticleEmitterPtr         = std::shared_ptr<CylinderParticleEmitter>;
+using EffectPtr                          = std::shared_ptr<Effect>;
 using HemisphericParticleEmitterPtr      = std::shared_ptr<HemisphericParticleEmitter>;
 using IParticleEmitterTypePtr            = std::shared_ptr<IParticleEmitterType>;
 using PointParticleEmitterPtr            = std::shared_ptr<PointParticleEmitter>;
@@ -407,6 +410,11 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override = 0;
 
   /**
+   * An event triggered when the system is disposed
+   */
+  Observable<IParticleSystem> onDisposeObservable;
+
+  /**
    * @brief Clones the particle system.
    * @param name The name of the cloned object
    * @param newEmitter The new emitter to use
@@ -465,6 +473,49 @@ public:
    * @returns a string containing the class name
    */
   virtual std::string getClassName() const = 0;
+
+  /**
+   * @brief Gets the custom effect used to render the particles.
+   * @param blendMode Blend mode for which the effect should be retrieved
+   * @returns The effect
+   */
+  virtual EffectPtr getCustomEffect(unsigned int blendMode = 0) = 0;
+
+  /**
+   * @brief Sets the custom effect used to render the particles.
+   * @param effect The effect to set
+   * @param blendMode Blend mode for which the effect should be set
+   */
+  virtual void setCustomEffect(const EffectPtr& effect, unsigned int blendMode = 0) = 0;
+
+  /**
+   * @brief Fill the defines array according to the current settings of the particle system.
+   * @param defines Array to be updated
+   * @param blendMode blend mode to take into account when updating the array
+   */
+  virtual void fillDefines(std::vector<std::string>& defines, unsigned int blendMode = 0) = 0;
+
+  /**
+   * @brief Fill the uniforms, attributes and samplers arrays according to the current settings of
+   * the particle system.
+   * @param uniforms Uniforms array to fill
+   * @param attributes Attributes array to fill
+   * @param samplers Samplers array to fill
+   */
+  virtual void fillUniformsAttributesAndSamplerNames(std::vector<std::string>& uniforms,
+                                                     std::vector<std::string>& attributes,
+                                                     std::vector<std::string>& samplers)
+    = 0;
+
+  /**
+   * Observable that will be called just before the particles are drawn
+   */
+  ReadOnlyProperty<IParticleSystem, Observable<Effect>> onBeforeDrawParticlesObservable;
+
+  /**
+   * Gets the name of the particle vertex shader
+   */
+  ReadOnlyProperty<IParticleSystem, std::string> vertexShaderName;
 
   /**
    * @brief Adds a new color gradient.
@@ -943,6 +994,16 @@ protected:
    * @brief Sets a texture used to add random noise to particle positions.
    */
   virtual void set_noiseTexture(const ProceduralTexturePtr& value) = 0;
+
+  /**
+   * @brief Gets the Observable that will be called just before the particles are drawn.
+   */
+  virtual Observable<Effect>& get_onBeforeDrawParticlesObservable() = 0;
+
+  /**
+   * @brief Gets the name of the particle vertex shader.
+   */
+  virtual std::string get_vertexShaderName() const = 0;
 
   /**
    * @brief Not supported by GPUParticleSystem.

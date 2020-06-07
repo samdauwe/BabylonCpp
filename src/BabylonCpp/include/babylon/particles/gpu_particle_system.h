@@ -45,12 +45,13 @@ public:
    * @param name The name of the particle system
    * @param options The options used to create the system
    * @param scene The scene the particle system belongs to
-   * @param isAnimationSheetEnabled Must be true if using a spritesheet to
-   * animate the particles texture
+   * @param isAnimationSheetEnabled Must be true if using a spritesheet to animate the particles
+   * texture
+   * @param customEffect a custom effect used to change the way particles are rendered by default
    */
   GPUParticleSystem(const std::string& name, size_t capacity = 5000,
                     std::optional<size_t> randomTextureSize = std::nullopt, Scene* scene = nullptr,
-                    bool isAnimationSheetEnabled = false);
+                    bool isAnimationSheetEnabled = false, const EffectPtr& customEffect = nullptr);
   ~GPUParticleSystem() override; // = default
 
   /**
@@ -118,6 +119,20 @@ public:
    * @returns a string containing the class name
    */
   [[nodiscard]] std::string getClassName() const override;
+
+  /**
+   * @brief Gets the custom effect used to render the particles.
+   * @param blendMode Blend mode for which the effect should be retrieved
+   * @returns The effect
+   */
+  EffectPtr getCustomEffect(unsigned int blendMode = 0) override;
+
+  /**
+   * @brief Sets the custom effect used to render the particles.
+   * @param effect The effect to set
+   * @param blendMode Blend mode for which the effect should be set
+   */
+  void setCustomEffect(const EffectPtr& effect, unsigned int blendMode = 0) override;
 
   /**
    * @brief Adds a new color gradient.
@@ -355,9 +370,27 @@ public:
   void _recreateUpdateEffect();
 
   /**
+   * @brief Fill the defines array according to the current settings of the particle system.
+   * @param defines Array to be updated
+   * @param blendMode blend mode to take into account when updating the array
+   */
+  void fillDefines(std::vector<std::string>& defines, unsigned int blendMode = 0) override;
+
+  /**
+   * @brief Fill the uniforms, attributes and samplers arrays according to the current settings of
+   * the particle system.
+   * @param uniforms Uniforms array to fill
+   * @param attributes Attributes array to fill
+   * @param samplers Samplers array to fill
+   */
+  void fillUniformsAttributesAndSamplerNames(std::vector<std::string>& uniforms,
+                                             std::vector<std::string>& attributes,
+                                             std::vector<std::string>& samplers) override;
+
+  /**
    * @brief Hidden
    */
-  void _recreateRenderEffect();
+  EffectPtr _recreateRenderEffect();
 
   /**
    * @brief Animates the particle system for the current frame by emitting new particles and or
@@ -433,6 +466,16 @@ protected:
    * This is always false for GPU particles
    */
   void set_isLocal(bool value) override;
+
+  /**
+   * @brief Gets the Observable that will be called just before the particles are drawn.
+   */
+  Observable<Effect>& get_onBeforeDrawParticlesObservable();
+
+  /**
+   * @brief Gets the name of the particle vertex shader.
+   */
+  std::string get_vertexShaderName() const;
 
   /**
    * @brief Hidden
@@ -529,10 +572,14 @@ private:
 
   size_t _randomTextureSize;
   int _actualFrame;
+  std::unordered_map<unsigned int, EffectPtr> _customEffect;
 
   Vector3 _zeroVector3;
   unsigned int _rawTextureWidth;
   bool _preWarmDone;
+
+  /** @hidden */
+  Observable<Effect> _onBeforeDrawParticlesObservable;
 
   RawTexturePtr _colorGradientsTexture;
   RawTexturePtr _angularSpeedGradientsTexture;

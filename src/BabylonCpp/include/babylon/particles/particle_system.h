@@ -327,6 +327,20 @@ public:
   bool isStopping() const override;
 
   /**
+   * @brief Gets the custom effect used to render the particles.
+   * @param blendMode Blend mode for which the effect should be retrieved
+   * @returns The effect
+   */
+  EffectPtr getCustomEffect(unsigned int blendMode = 0) override;
+
+  /**
+   * @brief Sets the custom effect used to render the particles.
+   * @param effect The effect to set
+   * @param blendMode Blend mode for which the effect should be set
+   */
+  void setCustomEffect(const EffectPtr& effect, unsigned int blendMode = 0) override;
+
+  /**
    * @brief Gets the maximum number of particles active at the same time.
    * @returns The max number of active particles.
    */
@@ -394,6 +408,24 @@ public:
    * @brief Hidden
    */
   static std::vector<std::string> _GetEffectCreationOptions(bool isAnimationSheetEnabled = false);
+
+  /**
+   * @brief Fill the defines array according to the current settings of the particle system
+   * @param defines Array to be updated
+   * @param blendMode blend mode to take into account when updating the array
+   */
+  void fillDefines(std::vector<std::string>& defines, unsigned int blendMode = 0) override;
+
+  /**
+   * @brief Fill the uniforms, attributes and samplers arrays according to the current settings of
+   * the particle system.
+   * @param uniforms Uniforms array to fill
+   * @param attributes Attributes array to fill
+   * @param samplers Samplers array to fill
+   */
+  void fillUniformsAttributesAndSamplerNames(std::vector<std::string>& uniforms,
+                                             std::vector<std::string>& attributes,
+                                             std::vector<std::string>& samplers) override;
 
   /**
    * @brief For internal use only.
@@ -478,7 +510,7 @@ protected:
   /**
    * @brief Sets a callback that will be triggered when the system is disposed.
    */
-  void set_onDispose(const std::function<void(ParticleSystem*, EventState&)>& callback);
+  void set_onDispose(const std::function<void(IParticleSystem*, EventState&)>& callback);
 
   /** @brief Gets a boolean indicating that ramp gradients must be used.
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
@@ -490,6 +522,19 @@ protected:
    */
   void set_useRampGradients(bool value) override;
 
+  /**
+   * @brief Gets the Observable that will be called just before the particles are drawn.
+   */
+  Observable<Effect>& get_onBeforeDrawParticlesObservable() override;
+
+  /**
+   * @brief Gets the name of the particle vertex shader.
+   */
+  std::string get_vertexShaderName() const override;
+
+  /**
+   * @brief Hidden
+   */
   void _reset() override;
 
 private:
@@ -510,6 +555,7 @@ private:
   void _emitFromParticle(Particle* particle);
   // End of sub system methods
   void _update(int newParticles);
+  /** @hidden */
   EffectPtr _getEffect(unsigned int blendMode);
   void _appendParticleVertices(unsigned int offset, Particle* particle);
   size_t _render(unsigned int blendMode);
@@ -553,12 +599,12 @@ public:
   /**
    * An event triggered when the system is disposed
    */
-  Observable<ParticleSystem> onDisposeObservable;
+  Observable<IParticleSystem> onDisposeObservable;
 
   /**
    * Sets a callback that will be triggered when the system is disposed
    */
-  WriteOnlyProperty<ParticleSystem, std::function<void(ParticleSystem*, EventState&)>> onDispose;
+  WriteOnlyProperty<ParticleSystem, std::function<void(IParticleSystem*, EventState&)>> onDispose;
 
   /** Hidden */
   std::optional<FactorGradient> _currentEmitRateGradient;
@@ -598,7 +644,7 @@ public:
   std::vector<ParticleSystem*> activeSubSystems;
 
 private:
-  Observer<ParticleSystem>::Ptr _onDisposeObserver;
+  Observer<IParticleSystem>::Ptr _onDisposeObserver;
   std::vector<Particle*> _particles;
   float _epsilon;
   size_t _capacity;
@@ -610,7 +656,7 @@ private:
   std::unique_ptr<Buffer> _spriteBuffer;
   WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effect;
-  EffectPtr _customEffect;
+  std::unordered_map<unsigned int, EffectPtr> _customEffect;
   std::string _cachedDefines;
 
   Color4 _scaledColorStep;
@@ -637,6 +683,9 @@ private:
   Vector3 _zeroVector3;
 
   Matrix _emitterWorldMatrix;
+
+  /** @hidden */
+  Observable<Effect> _onBeforeDrawParticlesObservable;
 
 }; // end of class ParticleSystem
 

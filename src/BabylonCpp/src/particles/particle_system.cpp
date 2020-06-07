@@ -79,7 +79,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
 
-  _customEffect = customEffect;
+  _customEffect[0] = customEffect;
 
   _scene->particleSystems.emplace_back(this);
 
@@ -351,8 +351,28 @@ bool ParticleSystem::isStopping() const
   return _stopped && isAlive();
 }
 
+EffectPtr ParticleSystem::getCustomEffect(unsigned int blendMode)
+{
+  return stl_util::contains(_customEffect, blendMode) ? _customEffect[blendMode] : nullptr;
+}
+
+void ParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int blendMode)
+{
+  _customEffect[blendMode] = effect;
+}
+
+Observable<Effect>& ParticleSystem::get_onBeforeDrawParticlesObservable()
+{
+  return _onBeforeDrawParticlesObservable;
+}
+
+std::string ParticleSystem::get_vertexShaderName() const
+{
+  return "particles";
+}
+
 void ParticleSystem::set_onDispose(
-  const std::function<void(ParticleSystem*, EventState&)>& callback)
+  const std::function<void(IParticleSystem*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -1335,14 +1355,8 @@ std::vector<std::string> ParticleSystem::_GetEffectCreationOptions(bool iIsAnima
   return effectCreationOption;
 }
 
-EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
+void ParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int iBlendMode)
 {
-  if (_customEffect) {
-    return _customEffect;
-  }
-
-  std::vector<std::string> defines;
-
   if (_scene->clipPlane.has_value()) {
     defines.emplace_back("#define CLIPPLANE");
   }
@@ -1399,27 +1413,50 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
     _imageProcessingConfiguration->prepareDefines(*_imageProcessingConfigurationDefines);
     defines.emplace_back(_imageProcessingConfigurationDefines->toString());
   }
+}
+
+void ParticleSystem::fillUniformsAttributesAndSamplerNames(std::vector<std::string>& uniforms,
+                                                           std::vector<std::string>& attributes,
+                                                           std::vector<std::string>& samplers)
+{
+  stl_util::concat(attributes,
+                   ParticleSystem::_GetAttributeNamesOrOptions(
+                     _isAnimationSheetEnabled,
+                     _isBillboardBased && billboardMode != ParticleSystem::BILLBOARDMODE_STRETCHED,
+                     _useRampGradients));
+
+  stl_util::concat(uniforms, ParticleSystem::_GetEffectCreationOptions(_isAnimationSheetEnabled));
+
+  stl_util::concat(samplers, {"diffuseSampler", "rampSampler"});
+
+  if (_imageProcessingConfiguration) {
+    ImageProcessingConfiguration::PrepareUniforms(uniforms, *_imageProcessingConfigurationDefines);
+    ImageProcessingConfiguration::PrepareSamplers(samplers, *_imageProcessingConfigurationDefines);
+  }
+}
+
+EffectPtr ParticleSystem::_getEffect(unsigned int blendMode)
+{
+  const auto customEffect = getCustomEffect(blendMode);
+
+  if (customEffect) {
+    return customEffect;
+  }
+
+  std::vector<std::string> defines;
+
+  fillDefines(defines, blendMode);
 
   // Effect
   std::string join = StringTools::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
-    auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions(
-      _isAnimationSheetEnabled,
-      _isBillboardBased && billboardMode != ParticleSystem::BILLBOARDMODE_STRETCHED,
-      _useRampGradients);
-    auto effectCreationOption = ParticleSystem::_GetEffectCreationOptions(_isAnimationSheetEnabled);
+    std::vector<std::string> attributesNamesOrOptions;
+    std::vector<std::string> effectCreationOption;
+    std::vector<std::string> samplers;
 
-    std::vector<std::string> samplers{"diffuseSampler", "rampSampler"};
-
-    // if (ImageProcessingConfiguration)
-    {
-      ImageProcessingConfiguration::PrepareUniforms(effectCreationOption,
-                                                    *_imageProcessingConfigurationDefines);
-      ImageProcessingConfiguration::PrepareSamplers(samplers,
-                                                    *_imageProcessingConfigurationDefines);
-    }
+    fillUniformsAttributesAndSamplerNames(effectCreationOption, attributesNamesOrOptions, samplers);
 
     IEffectCreationOptions options;
     options.attributes    = std::move(attributesNamesOrOptions);
@@ -1654,6 +1691,10 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
       break;
   }
 
+  if (_onBeforeDrawParticlesObservable) {
+    _onBeforeDrawParticlesObservable.notifyObservers(effect.get());
+  }
+
   if (_useInstancing) {
     engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
                            static_cast<int>(_particles.size()));
@@ -1741,6 +1782,10 @@ void ParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextu
 
   if (_disposeEmitterOnDispose && std::holds_alternative<AbstractMeshPtr>(emitter)) {
     std::get<AbstractMeshPtr>(emitter)->dispose(true);
+  }
+
+  if (_onBeforeDrawParticlesObservable) {
+    _onBeforeDrawParticlesObservable.clear();
   }
 
   // Remove from scene

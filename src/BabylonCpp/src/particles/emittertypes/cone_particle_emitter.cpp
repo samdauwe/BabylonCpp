@@ -4,6 +4,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/particles/particle.h>
 
@@ -90,35 +91,24 @@ void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
 }
 
 void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
-                                                Vector3& positionToUpdate, Particle* /*particle*/,
+                                                Vector3& directionToUpdate, Particle* particle,
                                                 bool isLocal)
 {
-  const auto s = Scalar::RandomRange(0.f, Math::PI2);
-  auto h       = 0.f;
-
-  if (!emitFromSpawnPointOnly) {
-    h = Scalar::RandomRange(0.f, heightRange);
-    // Better distribution in a cone at normal angles.
-    h = 1.f - h * h;
+  if (isLocal) {
+    TmpVectors::Vector3Array[0].copyFrom(particle->_localPosition.value_or(Vector3())).normalize();
   }
   else {
-    h = 0.0001f;
-  }
-  auto iRadius = _radius - Scalar::RandomRange(0.f, _radius * radiusRange);
-  iRadius      = iRadius * h;
-
-  const auto randX = iRadius * std::sin(s);
-  const auto randZ = iRadius * std::cos(s);
-  const auto randY = h * _height;
-
-  if (isLocal) {
-    positionToUpdate.x = randX;
-    positionToUpdate.y = randY;
-    positionToUpdate.z = randZ;
-    return;
+    particle->position.subtractToRef(worldMatrix.getTranslation(), TmpVectors::Vector3Array[0])
+      .normalize();
   }
 
-  Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix, positionToUpdate);
+  const auto randX    = Scalar::RandomRange(0.f, directionRandomizer);
+  const auto randY    = Scalar::RandomRange(0.f, directionRandomizer);
+  const auto randZ    = Scalar::RandomRange(0.f, directionRandomizer);
+  directionToUpdate.x = TmpVectors::Vector3Array[0].x + randX;
+  directionToUpdate.y = TmpVectors::Vector3Array[0].y + randY;
+  directionToUpdate.z = TmpVectors::Vector3Array[0].z + randZ;
+  directionToUpdate.normalize();
 }
 
 std::unique_ptr<IParticleEmitterType> ConeParticleEmitter::clone() const
@@ -176,7 +166,8 @@ void ConeParticleEmitter::parse(const json& serializationObject, Scene* /*scene*
     heightRange = json_util::get_number<float>(serializationObject, "heightRange", 1.f);
   }
   if (json_util::has_valid_key_value(serializationObject, "emitFromSpawnPointOnly")) {
-    emitFromSpawnPointOnly = json_util::get_bool(serializationObject, "emitFromSpawnPointOnly");
+    emitFromSpawnPointOnly
+      = json_util::get_bool(serializationObject, "emitFromSpawnPointOnly", false);
   }
 }
 

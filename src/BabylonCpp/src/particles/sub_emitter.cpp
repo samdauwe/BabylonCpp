@@ -15,17 +15,16 @@ SubEmitter::SubEmitter(const ParticleSystemPtr& iParticleSystem)
 {
   // Create mesh as emitter to support rotation
   if (!std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
-    particleSystem->emitter = AbstractMesh::New("SubemitterSystemEmitter",
-                                                particleSystem->getScene());
+    particleSystem->emitter
+      = AbstractMesh::New("SubemitterSystemEmitter", particleSystem->getScene());
   }
 
   // Automatically dispose of subemitter when system is disposed
-  particleSystem->onDisposeObservable.add(
-    [this](ParticleSystem* /*ps*/, EventState& /*es*/) {
-      if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
-        std::get<AbstractMeshPtr>(particleSystem->emitter)->dispose();
-      }
-    });
+  particleSystem->onDisposeObservable.add([this](IParticleSystem* /*ps*/, EventState& /*es*/) {
+    if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
+      std::get<AbstractMeshPtr>(particleSystem->emitter)->dispose();
+    }
+  });
 }
 
 SubEmitter::~SubEmitter() = default;

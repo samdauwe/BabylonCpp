@@ -40,7 +40,7 @@ bool GPUParticleSystem::IsSupported()
 
 GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
                                      std::optional<size_t> randomTextureSize, Scene* scene,
-                                     bool iIsAnimationSheetEnabled)
+                                     bool iIsAnimationSheetEnabled, const EffectPtr& customEffect)
     : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
@@ -74,6 +74,8 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _scene = scene ? scene : Engine::LastCreatedScene();
 
   uniqueId = _scene->getUniqueId();
+
+  _customEffect[0] = customEffect;
 
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -264,9 +266,29 @@ void GPUParticleSystem::reset()
   _targetIndex        = 0;
 }
 
+Observable<Effect>& GPUParticleSystem::get_onBeforeDrawParticlesObservable()
+{
+  return _onBeforeDrawParticlesObservable;
+}
+
+std::string GPUParticleSystem::get_vertexShaderName() const
+{
+  return "gpuRenderParticles";
+}
+
 std::string GPUParticleSystem::getClassName() const
 {
   return "GPUParticleSystem";
+}
+
+EffectPtr GPUParticleSystem::getCustomEffect(unsigned int blendMode)
+{
+  return stl_util::contains(_customEffect, blendMode) ? _customEffect[blendMode] : _customEffect[0];
+}
+
+void GPUParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int blendMode)
+{
+  _customEffect[blendMode] = effect;
 }
 
 BaseParticleSystem&
@@ -274,7 +296,6 @@ GPUParticleSystem::_removeGradientAndTexture(float gradient, std::vector<ColorGr
                                              const RawTexturePtr& texture)
 {
   BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
-
   _releaseBuffers();
 
   return *this;
@@ -994,41 +1015,44 @@ void GPUParticleSystem::_recreateUpdateEffect()
   _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
 }
 
-void GPUParticleSystem::_recreateRenderEffect()
+void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int blendMode)
 {
-  std::ostringstream definesStream;
   if (_scene->clipPlane.has_value()) {
-    definesStream << "\n#define CLIPPLANE";
+    defines.emplace_back("#define CLIPPLANE");
   }
   if (_scene->clipPlane2.has_value()) {
-    definesStream << "\n#define CLIPPLANE2";
+    defines.emplace_back("#define CLIPPLANE2");
   }
   if (_scene->clipPlane3.has_value()) {
-    definesStream << "\n#define CLIPPLANE3";
+    defines.emplace_back("#define CLIPPLANE3");
   }
   if (_scene->clipPlane4.has_value()) {
-    definesStream << "\n#define CLIPPLANE4";
+    defines.emplace_back("#define CLIPPLANE4");
   }
   if (_scene->clipPlane5.has_value()) {
-    definesStream << "\n#define CLIPPLANE5";
+    defines.emplace_back("#define CLIPPLANE5");
   }
   if (_scene->clipPlane6.has_value()) {
-    definesStream << "\n#define CLIPPLANE6";
+    defines.emplace_back("#define CLIPPLANE6");
   }
 
   if (blendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
-    definesStream << "\n#define BLENDMULTIPLYMODE";
+    defines.emplace_back("#define BLENDMULTIPLYMODE");
+  }
+
+  if (isLocal()) {
+    defines.emplace_back("#define LOCAL");
   }
 
   if (_isBillboardBased) {
-    definesStream << "\n#define BILLBOARD";
+    defines.emplace_back("#define BILLBOARD");
 
     switch (billboardMode) {
       case ParticleSystem::BILLBOARDMODE_Y:
-        definesStream << "\n#define BILLBOARDY";
+        defines.emplace_back("#define BILLBOARDY");
         break;
       case ParticleSystem::BILLBOARDMODE_STRETCHED:
-        definesStream << "\n#define BILLBOARDSTRETCHED";
+        defines.emplace_back("#define BILLBOARDSTRETCHED");
         break;
       case ParticleSystem::BILLBOARDMODE_ALL:
       default:
@@ -1037,45 +1061,72 @@ void GPUParticleSystem::_recreateRenderEffect()
   }
 
   if (_colorGradientsTexture) {
-    definesStream << "\n#define COLORGRADIENTS";
+    defines.emplace_back("#define COLORGRADIENTS");
   }
 
   if (isAnimationSheetEnabled) {
-    definesStream << "\n#define ANIMATESHEET";
+    defines.emplace_back("#define ANIMATESHEET");
   }
 
   if (_imageProcessingConfiguration) {
     _imageProcessingConfiguration->prepareDefines(*_imageProcessingConfigurationDefines);
-    definesStream << "\n" << _imageProcessingConfigurationDefines->toString();
+    defines.emplace_back("" + _imageProcessingConfigurationDefines->toString());
   }
+}
 
-  auto defines = definesStream.str();
+void GPUParticleSystem::fillUniformsAttributesAndSamplerNames(std::vector<std::string>& uniforms,
+                                                              std::vector<std::string>& attributes,
+                                                              std::vector<std::string>& samplers)
+{
+  stl_util::concat(attributes, {"position", "age", "life", "size", "color", "offset", "uv",
+                                "direction", "initialDirection", "angle", "cellIndex"});
 
-  if (_renderEffect && _renderEffect->defines == defines) {
-    return;
-  }
+  stl_util::concat(uniforms,
+                   {"emitterWM", "worldOffset", "view", "projection", "colorDead", "invView",
+                    "vClipPlane", "vClipPlane2", "vClipPlane3", "vClipPlane4", "vClipPlane5",
+                    "vClipPlane6", "sheetInfos", "translationPivot", "eyePosition"});
 
-  std::vector<std::string> uniforms{"worldOffset",      "view",        "projection",  "colorDead",
-                                    "invView",          "vClipPlane",  "vClipPlane2", "vClipPlane3",
-                                    "vClipPlane4",      "vClipPlane5", "vClipPlane6", "sheetInfos",
-                                    "translationPivot", "eyePosition"};
-  std::vector<std::string> samplers{"textureSampler", "colorGradientSampler"};
+  stl_util::concat(samplers, {"diffuseSampler", "colorGradientSampler"});
 
-  // if (ImageProcessingConfiguration)
-  {
+  if (_imageProcessingConfiguration) {
     ImageProcessingConfiguration::PrepareUniforms(uniforms, *_imageProcessingConfigurationDefines);
     ImageProcessingConfiguration::PrepareSamplers(samplers, *_imageProcessingConfigurationDefines);
   }
+}
+
+EffectPtr GPUParticleSystem::_recreateRenderEffect()
+{
+  const auto customEffect = getCustomEffect();
+
+  if (customEffect) {
+    return customEffect;
+  }
+
+  std::vector<std::string> defines;
+
+  fillDefines(defines);
+
+  const auto join = StringTools::join(defines, "\n");
+
+  if (_renderEffect && _renderEffect->defines == join) {
+    return _renderEffect;
+  }
+
+  std::vector<std::string> attributes;
+  std::vector<std::string> uniforms;
+  std::vector<std::string> samplers;
+
+  fillUniformsAttributesAndSamplerNames(uniforms, attributes, samplers);
 
   IEffectCreationOptions renderEffectOptions;
-  renderEffectOptions.attributes
-    = {"position",         "age",   "life",     "size", "color", "offset", "uv", "direction",
-       "initialDirection", "angle", "cellIndex"};
-  renderEffectOptions.uniformsNames = uniforms;
-  renderEffectOptions.samplers      = samplers;
-  renderEffectOptions.defines       = std::move(defines);
+  renderEffectOptions.attributes    = std::move(attributes);
+  renderEffectOptions.uniformsNames = std::move(uniforms);
+  renderEffectOptions.samplers      = std::move(samplers);
+  renderEffectOptions.defines       = std::move(join);
 
   _renderEffect = Effect::New("gpuRenderParticles", renderEffectOptions, _scene->getEngine());
+
+  return _renderEffect;
 }
 
 void GPUParticleSystem::animate(bool preWarm)

@@ -37,13 +37,13 @@ public:
                               Particle* particle, bool isLocal) override;
 
   /**
-   * @brief Called by the particle System when the position is computed for the created particle.
+   * @brief Called by the particle System when the direction is computed for the created particle.
    * @param worldMatrix is the world matrix of the particle system
-   * @param positionToUpdate is the position vector to update with the result
-   * @param particle is the particle we are computed the position for
-   * @param isLocal defines if the position should be set in local space
+   * @param directionToUpdate is the direction vector to update with the result
+   * @param particle is the particle we are computed the direction for
+   * @param isLocal defines if the direction should be set in local space
    */
-  void startPositionFunction(const Matrix& worldMatrix, Vector3& positionToUpdate,
+  void startPositionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
                              Particle* particle, bool isLocal) override;
 
   /**
