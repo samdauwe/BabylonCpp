@@ -5,6 +5,10 @@
 
 namespace BABYLON {
 
+ReadTextureExtension::ReadTextureExtension(ThinEngine* engine) : _this{engine}
+{
+}
+
 ArrayBufferView ReadTextureExtension::_readTexturePixels(const InternalTexturePtr& texture,
                                                          int width, int height, int faceIndex,
                                                          int level,

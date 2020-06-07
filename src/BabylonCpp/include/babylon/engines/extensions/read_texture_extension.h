@@ -19,7 +19,7 @@ class BABYLON_SHARED_EXPORT ReadTextureExtension {
 
 public:
   ReadTextureExtension(ThinEngine* engine);
-  ~ReadTextureExtension();
+  ~ReadTextureExtension() = default;
 
   /**
    * @brief Hidden
