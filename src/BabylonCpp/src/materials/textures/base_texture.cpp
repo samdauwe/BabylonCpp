@@ -60,6 +60,8 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _hasAlpha{false}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _gammaSpace{true}
+    , _scene{nullptr}
+    , _engine{nullptr}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
@@ -642,7 +644,7 @@ void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
   }
 }
 
-bool _isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine)
+bool BaseTexture::_isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine)
 {
   return std::holds_alternative<Scene*>(sceneOrEngine);
 }
