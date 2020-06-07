@@ -1003,9 +1003,9 @@ EffectPtr Engine::createEffectForParticles(
   }
 
   std::unordered_map<std::string, std::string> baseName{
-    {"vertex",
-     !particleSystem->vertexShaderName.empty() ? particleSystem->vertexShaderName : "particles"}, //
-    {"fragmentElement", fragmentName}                                                             //
+    {"vertex", !particleSystem->vertexShaderName().empty() ? particleSystem->vertexShaderName() :
+                                                             "particles"}, //
+    {"fragmentElement", fragmentName}                                      //
   };
 
   IEffectCreationOptions options;
