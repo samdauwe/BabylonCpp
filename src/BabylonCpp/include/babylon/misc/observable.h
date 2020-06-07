@@ -59,6 +59,14 @@ public:
   }
 
   /**
+   * @brief Returns whether or not this observable has observers.
+   */
+  operator bool() const
+  {
+    return !_observers.empty();
+  }
+
+  /**
    * @brief Create a new Observer with the specified callback.
    * @param callback the callback that will be executed for that Observer
    * @param mask the mask used to filter observers
