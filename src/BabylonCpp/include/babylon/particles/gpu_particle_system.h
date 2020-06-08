@@ -470,12 +470,12 @@ protected:
   /**
    * @brief Gets the Observable that will be called just before the particles are drawn.
    */
-  Observable<Effect>& get_onBeforeDrawParticlesObservable();
+  Observable<Effect>& get_onBeforeDrawParticlesObservable() override;
 
   /**
    * @brief Gets the name of the particle vertex shader.
    */
-  std::string get_vertexShaderName() const;
+  std::string get_vertexShaderName() const override;
 
   /**
    * @brief Hidden
