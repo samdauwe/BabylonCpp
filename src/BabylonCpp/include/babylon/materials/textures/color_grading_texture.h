@@ -79,12 +79,6 @@ private:
    */
   void loadTexture();
 
-  /**
-   * @brief Returns true if the passed parameter is a scene object (can be use for typings)
-   * @param sceneOrEngine The object to test.
-   */
-  static bool _isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine);
-
 public:
   /**
    * The texture URL.
@@ -102,7 +96,6 @@ private:
    */
   std::unique_ptr<Matrix> _textureMatrix;
 
-  ThinEngine* _engine;
   std::function<void()> _onLoad;
 
 }; // end of class ColorGradingTexture

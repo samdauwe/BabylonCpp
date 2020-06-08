@@ -17,9 +17,7 @@ namespace BABYLON {
 ColorGradingTexture::ColorGradingTexture(const std::string& iUrl,
                                          const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
                                          const std::function<void()>& onLoad)
-    : BaseTexture{ColorGradingTexture::_isScene(sceneOrEngine) ? std::get<Scene*>(sceneOrEngine) :
-                                                                 nullptr}
-    , _onLoad{nullptr}
+    : BaseTexture{sceneOrEngine}, _onLoad{nullptr}
 {
   if (iUrl.empty()) {
     return;
@@ -33,10 +31,9 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl,
   _texture = _getFromCache(url, true);
 
   if (!_texture) {
-    if (ColorGradingTexture::_isScene(sceneOrEngine)) {
-      _engine = std::get<Scene*>(sceneOrEngine)->getEngine();
-
-      if (!std::get<Scene*>(sceneOrEngine)->useDelayedTextureLoading) {
+    const auto scene = getScene();
+    if (scene) {
+      if (!scene->useDelayedTextureLoading) {
         loadTexture();
       }
       else {
@@ -44,12 +41,10 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl,
       }
     }
     else {
-      _engine = std::get<ThinEngine*>(sceneOrEngine);
       loadTexture();
     }
   }
   else {
-    _engine = _texture->getEngine();
     _triggerOnLoad();
   }
 }
@@ -70,16 +65,17 @@ Matrix* ColorGradingTexture::getTextureMatrix(int /*uBase*/)
 
 InternalTexturePtr ColorGradingTexture::load3dlTexture()
 {
+  auto engine                = _getEngine();
   InternalTexturePtr texture = nullptr;
-  if (_engine->webGLVersion() == 1.f) {
-    texture = _engine->createRawTexture(Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
-                                        false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
-                                        Constants::TEXTURETYPE_UNSIGNED_INT);
+  if (engine->webGLVersion() == 1.f) {
+    texture = engine->createRawTexture(Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
+                                       false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
+                                       Constants::TEXTURETYPE_UNSIGNED_INT);
   }
   else {
-    texture = _engine->createRawTexture3D(Uint8Array(), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA,
-                                          false, false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
-                                          Constants::TEXTURETYPE_UNSIGNED_INT);
+    texture = engine->createRawTexture3D(Uint8Array(), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA,
+                                         false, false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
+                                         Constants::TEXTURETYPE_UNSIGNED_INT);
   }
 
   _texture = texture;
@@ -88,7 +84,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
   _texture->isReady = false;
 
   isCube                    = false;
-  is3D                      = _engine->webGLVersion() > 1.f;
+  is3D                      = engine->webGLVersion() > 1.f;
   wrapU                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
   wrapV                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
   wrapR                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
@@ -176,11 +172,11 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     const auto _size = static_cast<int>(size);
     if (_texture->is3D) {
       _texture->updateSize(_size, _size, _size);
-      _engine->updateRawTexture3D(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
+      engine->updateRawTexture3D(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
     }
     else {
       _texture->updateSize(_size * _size, _size);
-      _engine->updateRawTexture(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
+      engine->updateRawTexture(_texture, data, Constants::TEXTUREFORMAT_RGBA, false);
     }
 
     texture->isReady = true;
@@ -192,7 +188,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     scene->_loadFile(url, callback);
   }
   else {
-    _engine->_loadFile(url, callback);
+    engine->_loadFile(url, callback);
   }
 
   return _texture;
@@ -207,7 +203,13 @@ void ColorGradingTexture::loadTexture()
 
 std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
 {
-  auto newTexture = std::make_unique<ColorGradingTexture>(url, getScene());
+  std::unique_ptr<ColorGradingTexture> newTexture = nullptr;
+  if (getScene()) {
+    newTexture = std::make_unique<ColorGradingTexture>(url, getScene());
+  }
+  else {
+    newTexture = std::make_unique<ColorGradingTexture>(url, _getEngine());
+  }
 
   // Base texture
   newTexture->level = level;
@@ -239,11 +241,6 @@ std::unique_ptr<ColorGradingTexture> ColorGradingTexture::Parse(const json& /*pa
 json ColorGradingTexture::serialize() const
 {
   return nullptr;
-}
-
-bool ColorGradingTexture::_isScene(const std::variant<Scene*, ThinEngine*>& sceneOrEngine)
-{
-  return std::holds_alternative<Scene*>(sceneOrEngine);
 }
 
 } // end of namespace BABYLON
