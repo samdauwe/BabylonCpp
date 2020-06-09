@@ -113,8 +113,7 @@ public:
 
   /**
    * @brief Gets the texture coordinates data stored in this target.
-   * @returns a FloatArray containing the texture coordinates data (or null if
-   * not present)
+   * @returns a FloatArray containing the texture coordinates data (or null if not present)
    */
   [[nodiscard]] const Float32Array& getUVs() const;
 
@@ -157,14 +156,12 @@ public:
 
 protected:
   /**
-   * @brief Gets the influence of this target (ie. its weight in the overall
-   * morphing).
+   * @brief Gets the influence of this target (ie. its weight in the overall morphing).
    */
   [[nodiscard]] float get_influence() const;
 
   /**
-   * @brief Sets the influence of this target (ie. its weight in the overall
-   * morphing).
+   * @brief Sets the influence of this target (ie. its weight in the overall morphing).
    */
   void set_influence(float influence);
 
