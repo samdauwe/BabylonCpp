@@ -1,6 +1,8 @@
 #ifndef BABYLON_PARTICLES_GPU_PARTICLE_SYSTEM_H
 #define BABYLON_PARTICLES_GPU_PARTICLE_SYSTEM_H
 
+#include <unordered_map>
+
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/misc/observable.h>
