@@ -130,6 +130,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , useBones{this, &AbstractMesh::get_useBones}
     , isAnInstance{this, &AbstractMesh::get_isAnInstance}
     , hasInstances{this, &AbstractMesh::get_hasInstances}
+    , hasThinInstances{this, &AbstractMesh::get_hasThinInstances}
     , checkCollisions{this, &AbstractMesh::get_checkCollisions, &AbstractMesh::set_checkCollisions}
     , collider{this, &AbstractMesh::get_collider}
     , _renderingGroupId{0}
@@ -680,28 +681,21 @@ void AbstractMesh::_markSubMeshesAsDirty(const std::function<void(MaterialDefine
 
 void AbstractMesh::_markSubMeshesAsLightDirty(bool dispose)
 {
-  const auto func = [dispose](MaterialDefines& defines) { defines.markAsLightDirty(dispose); };
+  const auto func
+    = [dispose](MaterialDefines& defines) -> void { defines.markAsLightDirty(dispose); };
   _markSubMeshesAsDirty(func);
 }
 
 void AbstractMesh::_markSubMeshesAsAttributesDirty()
 {
-  const auto func = [](MaterialDefines& defines) { defines.markAsAttributesDirty(); };
+  const auto func = [](MaterialDefines& defines) -> void { defines.markAsAttributesDirty(); };
   _markSubMeshesAsDirty(func);
 }
 
 void AbstractMesh::_markSubMeshesAsMiscDirty()
 {
-  if (subMeshes.empty()) {
-    return;
-  }
-
-  for (const auto& subMesh : subMeshes) {
-    auto iMaterial = subMesh->getMaterial();
-    if (iMaterial) {
-      iMaterial->markAsDirty(Constants::MATERIAL_MiscDirtyFlag);
-    }
-  }
+  const auto func = [](MaterialDefines& defines) -> void { defines.markAsMiscDirty(); };
+  _markSubMeshesAsDirty(func);
 }
 
 Scene* AbstractMesh::getScene() const
@@ -927,6 +921,11 @@ bool AbstractMesh::get_isAnInstance() const
 }
 
 bool AbstractMesh::get_hasInstances() const
+{
+  return false;
+}
+
+bool AbstractMesh::get_hasThinInstances() const
 {
   return false;
 }

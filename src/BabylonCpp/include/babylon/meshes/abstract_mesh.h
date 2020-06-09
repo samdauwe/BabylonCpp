@@ -1341,6 +1341,11 @@ protected:
    */
   virtual bool get_hasInstances() const;
 
+  /**
+   * @brief Gets a boolean indicating if this mesh has thin instances.
+   */
+  virtual bool get_hasThinInstances() const;
+
   /** Collisions **/
 
   /**
@@ -1901,6 +1906,11 @@ public:
    * Gets a boolean indicating if this mesh has instances
    */
   ReadOnlyProperty<AbstractMesh, bool> hasInstances;
+
+  /**
+   * Gets a boolean indicating if this mesh has thin instances
+   */
+  ReadOnlyProperty<AbstractMesh, bool> hasThinInstances;
 
   /** Collisions **/
 
