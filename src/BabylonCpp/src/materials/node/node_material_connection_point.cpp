@@ -138,7 +138,7 @@ void NodeMaterialConnectionPoint::set_target(const NodeMaterialBlockTargets& val
 
 bool NodeMaterialConnectionPoint::get_isConnected() const
 {
-  return connectedPoint() != nullptr;
+  return connectedPoint() != nullptr || hasEndpoints();
 }
 
 bool NodeMaterialConnectionPoint::get_isConnectedToInputBlock() const
@@ -262,6 +262,12 @@ bool NodeMaterialConnectionPoint::get_isConnectedInFragmentShader() const
   return false;
 }
 
+std::optional<std::pair<NodeMaterialBlockPtr, std::string>>
+NodeMaterialConnectionPoint::createCustomInputBlock()
+{
+  return std::nullopt;
+}
+
 std::string NodeMaterialConnectionPoint::getClassName() const
 {
   return "NodeMaterialConnectionPoint";
@@ -379,7 +385,7 @@ NodeMaterialConnectionPoint::disconnectFrom(const NodeMaterialConnectionPointPtr
   return *this;
 }
 
-json NodeMaterialConnectionPoint::serialize() const
+json NodeMaterialConnectionPoint::serialize(bool /*isInput*/) const
 {
   return nullptr;
 }

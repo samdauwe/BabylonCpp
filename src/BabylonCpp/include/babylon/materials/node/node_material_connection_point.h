@@ -60,6 +60,14 @@ public:
   ~NodeMaterialConnectionPoint() = default;
 
   /**
+   * @brief Creates a block suitable to be used as an input for this input point.
+   * If null is returned, a block based on the point type will be created.
+   * @returns The returned string parameter is the name of the output point of NodeMaterialBlock
+   * (first parameter of the returned array) that can be connected to the input
+   */
+  std::optional<std::pair<NodeMaterialBlockPtr, std::string>> createCustomInputBlock();
+
+  /**
    * @brief Gets the current class name e.g. "NodeMaterialConnectionPoint".
    * @returns the class name
    */
@@ -99,9 +107,10 @@ public:
 
   /**
    * @brief Serializes this point in a JSON representation.
+   * @param isInput defines if the connection point is an input (default is true)
    * @returns the serialized point object
    */
-  json serialize() const;
+  json serialize(bool isInput = true) const;
 
   /**
    * @brief Release resources.
@@ -159,7 +168,8 @@ protected:
   void set_target(const NodeMaterialBlockTargets& value);
 
   /**
-   * @brief Gets a boolean indicating that the current point is connected.
+   * @brief Gets a boolean indicating that the current point is connected to another
+   * NodeMaterialBlock.
    */
   bool get_isConnected() const;
 
@@ -277,6 +287,11 @@ public:
   std::string name;
 
   /**
+   * Gets or sets the connection point name
+   */
+  std::string displayName;
+
+  /**
    * Gets or sets a boolean indicating that this connection point can be omitted
    */
   bool isOptional;
@@ -297,7 +312,7 @@ public:
   Property<NodeMaterialConnectionPoint, NodeMaterialBlockTargets> target;
 
   /**
-   * Gets a boolean indicating that the current point is connected.
+   * Gets a boolean indicating that the current point is connected to another NodeMaterialBlock
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isConnected;
 
