@@ -86,7 +86,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _emitExtension(const std::string& name, const std::string& extension);
+  void _emitExtension(const std::string& name, std::string extension,
+                      const std::string& define = "");
 
   /**
    * @brief Hidden
@@ -193,6 +194,8 @@ public:
   std::string _samplerDeclaration;
   /** @hidden */
   std::string _varyingTransfer;
+  /** @hidden */
+  std::string _injectAtEnd;
 
   /** @hidden */
   std::string _builtCompilationString;

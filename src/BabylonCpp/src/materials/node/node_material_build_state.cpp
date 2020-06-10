@@ -46,6 +46,11 @@ void NodeMaterialBuildState::finalize(const NodeMaterialBuildState& state)
       = StringTools::printf("%s\r\n%s", compilationString.c_str(), _varyingTransfer.c_str());
   }
 
+  if (!_injectAtEnd.empty()) {
+    compilationString
+      = StringTools::printf("%s\r\n%s", compilationString.c_str(), _injectAtEnd.c_str());
+  }
+
   compilationString = StringTools::printf("%s\r\n}", compilationString.c_str());
 
   if (!sharedData->varyingDeclaration.empty()) {
@@ -152,13 +157,18 @@ std::string NodeMaterialBuildState::_getGLType(NodeMaterialBlockConnectionPointT
   return "";
 }
 
-void NodeMaterialBuildState::_emitExtension(const std::string& name, const std::string& extension)
+void NodeMaterialBuildState::_emitExtension(const std::string& name, std::string extension,
+                                            const std::string& define)
 {
   if (stl_util::contains(extensions, name) && !extensions[name].empty()) {
     return;
   }
 
-  extensions[name] = extension;
+  if (!define.empty()) {
+    extension = StringTools::printf("#if %s\r\n%s\r\n#endif", define.c_str(), extension.c_str());
+  }
+
+  extensions[name] = std::move(extension);
 }
 
 void NodeMaterialBuildState::_emitFunction(const std::string& name, std::string code,
@@ -318,8 +328,13 @@ void NodeMaterialBuildState::_emitUniformFromString(const std::string& name,
   uniforms.emplace_back(name);
 
   if (!define.empty()) {
-    _uniformDeclaration
-      += StringTools::printf("%s %s\r\n", notDefine ? "#ifndef" : "#ifdef", define.c_str());
+    if (StringTools::startsWith(define, "defined(")) {
+      _uniformDeclaration += StringTools::printf("#if %s\r\n", define.c_str());
+    }
+    else {
+      _uniformDeclaration
+        += StringTools::printf("%s %s\r\n", notDefine ? "#ifndef" : "#ifdef", define.c_str());
+    }
   }
   _uniformDeclaration += StringTools::printf("uniform %s %s;\r\n", type.c_str(), name.c_str());
   if (!define.empty()) {
