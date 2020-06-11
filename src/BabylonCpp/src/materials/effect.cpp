@@ -56,6 +56,9 @@ Effect::Effect(
     , _allFallbacksProcessed{false}
 
 {
+  std::function<std::string(const std::string& shaderType, const std::string& code)>
+    processFinalCode = nullptr;
+
   {
     _engine = engine;
 
@@ -77,6 +80,8 @@ Effect::Effect(
         _uniformBuffersNames[options.uniformBuffersNames[i]] = i;
       }
     }
+
+    processFinalCode = options.processFinalCode ? options.processFinalCode : nullptr;
   }
 
   uniqueId = Effect::_uniqueIdSeed++;
@@ -123,24 +128,34 @@ Effect::Effect(
   processorOptions.version      = std::to_string(static_cast<int>(_engine->webGLVersion() * 100));
   processorOptions.platformName = _engine->webGLVersion() >= 2 ? "WEBGL2" : "WEBGL1";
 
-  _loadShader(
-    vertexSource, "Vertex", "",
-    [this, &fragmentSource, &processorOptions, &baseName](const std::string& vertexCode) -> void {
-      _loadShader(
-        fragmentSource, "Fragment", "Pixel",
-        [this, &vertexCode, &processorOptions, &baseName](const std::string& fragmentCode) -> void {
-          ShaderProcessor::Process(
-            vertexCode, processorOptions,
-            [this, &fragmentCode, &processorOptions,
-             &baseName](const std::string& migratedVertexCode) -> void {
-              processorOptions.isFragment = true;
-              ShaderProcessor::Process(
-                fragmentCode, processorOptions,
-                [this, &migratedVertexCode, &baseName](const std::string& migratedFragmentCode)
-                  -> void { _useFinalCode(migratedVertexCode, migratedFragmentCode, baseName); });
-            });
-        });
-    });
+  _loadShader(vertexSource, "Vertex", "",
+              [this, &fragmentSource, &processorOptions, &baseName,
+               &processFinalCode](const std::string& vertexCode) -> void {
+                _loadShader(
+                  fragmentSource, "Fragment", "Pixel",
+                  [this, &vertexCode, &processorOptions, &baseName,
+                   &processFinalCode](const std::string& fragmentCode) -> void {
+                    ShaderProcessor::Process(
+                      vertexCode, processorOptions,
+                      [this, &fragmentCode, &processorOptions, &baseName,
+                       &processFinalCode](std::string migratedVertexCode) -> void {
+                        if (processFinalCode) {
+                          migratedVertexCode = processFinalCode("vertex", migratedVertexCode);
+                        }
+                        processorOptions.isFragment = true;
+                        ShaderProcessor::Process(
+                          fragmentCode, processorOptions,
+                          [this, &migratedVertexCode, &baseName,
+                           &processFinalCode](std::string migratedFragmentCode) -> void {
+                            if (processFinalCode) {
+                              migratedFragmentCode
+                                = processFinalCode("fragment", migratedFragmentCode);
+                            }
+                            _useFinalCode(migratedVertexCode, migratedFragmentCode, baseName);
+                          });
+                      });
+                  });
+              });
 } // namespace BABYLON
 
 Effect::~Effect() = default;

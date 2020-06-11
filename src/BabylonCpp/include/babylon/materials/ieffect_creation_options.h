@@ -71,6 +71,12 @@ struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
    * https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings
    */
   std::vector<std::string> transformFeedbackVaryings{};
+  /**
+   * If provided, will be called two times with the vertex and fragment code so that this code can
+   * be updated before it is compiled by the GPU
+   */
+  std::function<std::string(const std::string& shaderType, const std::string& code)>
+    processFinalCode = nullptr;
 }; // end of class IEffectCreationOptions
 
 } // end of namespace BABYLON
