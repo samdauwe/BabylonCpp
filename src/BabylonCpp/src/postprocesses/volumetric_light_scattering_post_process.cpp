@@ -135,6 +135,9 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
+    if (subMesh->getRenderingMesh()->hasInstances()) {
+      defines.emplace_back("#define THIN_INSTANCES");
+    }
   }
 
   // Get correct effect
@@ -214,11 +217,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
 
   // Custom render function for submeshes
   auto renderSubMesh = [this](SubMesh* subMesh) {
-    auto ownerMesh = subMesh->getMesh();
-    auto replacementMesh
-      = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
     auto renderingMesh = subMesh->getRenderingMesh();
-    auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+    auto effectiveMesh = subMesh->getEffectiveMesh();
     if (_meshExcluded(renderingMesh)) {
       return;
     }
@@ -238,7 +238,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
     engine_->setState(material->backFaceCulling());
 
     // Managing instances
-    auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
+    auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
+                                                        subMesh->getReplacementMesh() != nullptr);
 
     if (batch->mustReturn) {
       return;
@@ -246,7 +247,9 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
 
     bool hardwareInstancedRendering
       = (engine_->getCaps().instancedArrays)
-        && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end());
+        && ((batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end()
+             && !batch->visibleInstances[subMesh->_id].empty())
+            || renderingMesh->hasThinInstances());
 
     if (_isReady(subMesh, hardwareInstancedRendering)) {
       auto effect = _volumetricLightScatteringPass;

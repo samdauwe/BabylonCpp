@@ -25,6 +25,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     : name{iName}
     , width{-1}
     , height{-1}
+    , nodeMaterialSource{nullptr}
     , _outputTexture{nullptr}
     , autoClear{true}
     , alphaMode{Constants::ALPHA_DISABLE}
@@ -238,10 +239,12 @@ void PostProcess::updateEffect(
   const std::vector<std::string>& samplers,
   const std::unordered_map<std::string, unsigned int>& indexParameters,
   const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)>& onError)
+  const std::function<void(Effect* effect, const std::string& errors)>& onError,
+  const std::string& vertexUrl, const std::string& fragmentUrl)
 {
-  std::unordered_map<std::string, std::string> baseName{{"vertex", _vertexUrl},
-                                                        {"fragment", _fragmentUrl}};
+  std::unordered_map<std::string, std::string> baseName{
+    {"vertex", !vertexUrl.empty() ? vertexUrl : _vertexUrl},
+    {"fragment", !fragmentUrl.empty() ? fragmentUrl : _fragmentUrl}};
 
   IEffectCreationOptions options;
   options.attributes      = {"position"};

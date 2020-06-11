@@ -18,6 +18,7 @@ class Animation;
 class Camera;
 class Effect;
 class Engine;
+class NodeMaterial;
 class PostProcess;
 class Scene;
 class InternalTexture;
@@ -25,6 +26,7 @@ using CameraPtr          = std::shared_ptr<Camera>;
 using EffectPtr          = std::shared_ptr<Effect>;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
+using NodeMaterialPtr    = std::shared_ptr<NodeMaterial>;
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has been rendered
@@ -112,14 +114,17 @@ public:
    * shader.
    * @param defines Define statements that should be added at the beginning of the shader. (default:
    * null)
-   * @param uniforms Set of uniform variables that will be passed to the shader.
-   * (default: null)
+   * @param uniforms Set of uniform variables that will be passed to the shader. (default: null)
    * @param samplers Set of Texture2D variables that will be passed to the shader. (default: null)
    * @param indexParameters The index parameters to be used for babylons include syntax
    * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage in
    * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
+   * @param vertexUrl The url of the vertex shader to be used (default: the one given at
+   * construction time)
+   * @param fragmentUrl The url of the fragment shader to be used (default: the one given at
+   * construction time)
    */
   virtual void
   updateEffect(const std::string& defines = "", const std::vector<std::string>& uniforms = {},
@@ -127,7 +132,8 @@ public:
                const std::unordered_map<std::string, unsigned int>& indexParameters = {},
                const std::function<void(Effect* effect)>& onCompiled                = nullptr,
                const std::function<void(Effect* effect, const std::string& errors)>& onError
-               = nullptr);
+               = nullptr,
+               const std::string& vertexUrl = "", const std::string& fragmentUrl = "");
 
   /**
    * @brief The post process is reusable if it can be used multiple times within one frame.
@@ -290,6 +296,12 @@ public:
    * Height of the texture to apply the post process on
    */
   int height;
+
+  /**
+   * Gets the node material used to create this postprocess (null if the postprocess was manually
+   * created)
+   */
+  NodeMaterialPtr nodeMaterialSource;
 
   /**
    * Internal, reference to the location where this postprocess was output to.

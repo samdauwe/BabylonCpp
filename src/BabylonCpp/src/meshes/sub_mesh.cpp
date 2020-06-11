@@ -97,6 +97,19 @@ MeshPtr& SubMesh::getRenderingMesh()
   return _renderingMesh;
 }
 
+AbstractMeshPtr SubMesh::getReplacementMesh() const
+{
+  return _mesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? _mesh : nullptr;
+}
+
+AbstractMeshPtr SubMesh::getEffectiveMesh() const
+{
+  const auto replacementMesh
+    = _mesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? _mesh : nullptr;
+
+  return replacementMesh ? replacementMesh : _renderingMesh;
+}
+
 MaterialPtr SubMesh::getMaterial()
 {
   auto rootMaterial = _renderingMesh->getMaterial();

@@ -52,6 +52,8 @@ public:
 
   /**
    * @brief Manually render a set of post processes to a texture.
+   * Please note, the frame buffer won't be unbound after the call in case you have more render to
+   * do.
    * @param postProcesses An array of post processes to be run.
    * @param targetTexture The target texture to render to.
    * @param forceFullscreenViewport force gl.viewport to be full screen eg.

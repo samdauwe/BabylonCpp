@@ -61,6 +61,18 @@ public:
   MeshPtr& getRenderingMesh();
 
   /**
+   * @brief Returns the replacement mesh of the submesh.
+   * @returns the replacement mesh (could be different from parent mesh)
+   */
+  AbstractMeshPtr getReplacementMesh() const;
+
+  /**
+   * @brief Returns the effective mesh of the submesh.
+   * @returns the effective mesh (could be different from parent mesh)
+   */
+  AbstractMeshPtr getEffectiveMesh() const;
+
+  /**
    * @brief Returns the submesh material.
    */
   MaterialPtr getMaterial();

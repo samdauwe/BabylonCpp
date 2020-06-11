@@ -91,7 +91,8 @@ void BlurPostProcess::updateEffect(
   const std::vector<std::string>& /*samplers*/,
   const std::unordered_map<std::string, unsigned int>& /*indexParameters*/,
   const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)>& onError)
+  const std::function<void(Effect* effect, const std::string& errors)>& onError,
+  const std::string& /*vertexUrl*/, const std::string& /*fragmentUrl*/)
 {
   _updateParameters(onCompiled, onError);
 }

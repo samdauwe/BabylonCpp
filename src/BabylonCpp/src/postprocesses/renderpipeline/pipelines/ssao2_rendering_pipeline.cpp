@@ -180,7 +180,7 @@ bool SSAO2RenderingPipeline::IsSupported()
   if (!engine) {
     return false;
   }
-  return engine->getCaps().drawBuffersExtension;
+  return engine->webGLVersion() >= 2.f;
 }
 
 void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
