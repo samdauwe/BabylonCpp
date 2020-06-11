@@ -502,11 +502,7 @@ void Node::deleteAnimationRange(const std::string& iName, bool deleteFrames)
 
 AnimationRangePtr Node::getAnimationRange(const std::string& iName)
 {
-  if (stl_util::contains(_ranges, iName)) {
-    return _ranges[iName];
-  }
-
-  return nullptr;
+  return stl_util::contains(_ranges, iName) ? _ranges[iName] : nullptr;
 }
 
 std::vector<AnimationRangePtr> Node::getAnimationRanges()
