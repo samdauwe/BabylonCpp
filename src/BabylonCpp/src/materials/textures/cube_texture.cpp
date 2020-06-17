@@ -45,18 +45,16 @@ CubeTexturePtr CubeTexture::CreateFromPrefilteredData(const std::string& url, Sc
 }
 
 CubeTexture::CubeTexture(
-  const std::string& rootUrl, Scene* scene, const std::vector<std::string>& extensions,
-  bool iNoMipmap, std::vector<std::string> iFiles,
+  const std::string& rootUrl, const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
+  const std::vector<std::string>& extensions, bool iNoMipmap, std::vector<std::string> iFiles,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, bool prefiltered, const std::string& forcedExtension, bool createPolynomials,
   float lodScale, float lodOffset)
-    : BaseTexture{scene}
+    : BaseTexture{sceneOrEngine}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
     , noMipmap{this, &CubeTexture::get_noMipmap}
-    , _prefiltered{false}
-    , isPrefiltered{this, &CubeTexture::get_isPrefiltered}
     , _delayedOnLoad{nullptr}
     , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
@@ -131,16 +129,17 @@ CubeTexture::CubeTexture(
   };
 
   if (!_texture) {
+    auto scene = getScene();
     if (!scene->useDelayedTextureLoading) {
       if (prefiltered) {
-        _texture = scene->getEngine()->createPrefilteredCubeTexture(
-          rootUrl, scene, lodScale, lodOffset, onLoad, onError, format, forcedExtension,
-          _createPolynomials);
+        _texture = _getEngine()->createPrefilteredCubeTexture(rootUrl, scene, lodScale, lodOffset,
+                                                              onLoad, onError, format,
+                                                              forcedExtension, _createPolynomials);
       }
       else {
-        _texture = scene->getEngine()->createCubeTexture(rootUrl, scene, _files, noMipmap, onLoad,
-                                                         onError, _format, forcedExtension, false,
-                                                         lodScale, lodOffset);
+        _texture
+          = _getEngine()->createCubeTexture(rootUrl, scene, _files, noMipmap, onLoad, onError,
+                                            _format, forcedExtension, false, lodScale, lodOffset);
       }
       _texture->onLoadedObservable.add(
         [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
@@ -199,11 +198,6 @@ bool CubeTexture::get_noMipmap() const
   return _noMipmap;
 }
 
-bool CubeTexture::get_isPrefiltered() const
-{
-  return _prefiltered;
-}
-
 std::string CubeTexture::getClassName() const
 {
   return "CubeTexture";
@@ -243,23 +237,18 @@ void CubeTexture::delayLoad(const std::string& forcedExtension)
     return;
   }
 
-  auto scene = getScene();
-
-  if (!scene) {
-    return;
-  }
-
   delayLoadState = Constants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap);
 
   if (!_texture) {
+    auto scene = getScene();
     if (_prefiltered) {
-      _texture = scene->getEngine()->createPrefilteredCubeTexture(
+      _texture = _getEngine()->createPrefilteredCubeTexture(
         url, scene, 0.8f, 0.f, _delayedOnLoad, nullptr, _format, "", _createPolynomials);
     }
     else {
-      _texture = scene->getEngine()->createCubeTexture(
-        url, scene, _files, _noMipmap, _delayedOnLoad, nullptr, _format, forcedExtension);
+      _texture = _getEngine()->createCubeTexture(url, scene, _files, _noMipmap, _delayedOnLoad,
+                                                 nullptr, _format, forcedExtension);
     }
     _texture->onLoadedObservable.add(
       [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
@@ -333,15 +322,21 @@ CubeTexturePtr CubeTexture::Parse(const json& parsedTexture, Scene* scene,
 
 CubeTexturePtr CubeTexture::clone() const
 {
-  auto scene = getScene();
+  const auto uniqueId = 0u;
 
-  if (!scene) {
-    return nullptr;
+  std::optional<std::variant<Scene*, ThinEngine*>> sceneOrEngine = std::nullopt;
+  if (getScene()) {
+    sceneOrEngine = getScene();
+  }
+  else {
+    sceneOrEngine = _getEngine();
   }
 
-  auto newCubeTexture
-    = CubeTexture::New(url, scene, _extensions, _noMipmap, _files, nullptr, nullptr, _format,
-                       _prefiltered, _forcedExtension, _createPolynomials, _lodScale, _lodOffset);
+  auto newCubeTexture = CubeTexture::New(url, *sceneOrEngine, _extensions, _noMipmap, _files,
+                                         nullptr, nullptr, _format, _prefiltered, _forcedExtension,
+                                         _createPolynomials, _lodScale, _lodOffset);
+
+  newCubeTexture->uniqueId = uniqueId;
 
   return newCubeTexture;
 }

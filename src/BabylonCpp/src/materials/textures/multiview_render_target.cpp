@@ -28,7 +28,7 @@ MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
   internalTexture->isMultiview = true;
   internalTexture->format      = Constants::TEXTUREFORMAT_RGBA;
   _texture                     = internalTexture;
-  samples = std::min(static_cast<unsigned int>(_engine->getCaps().maxSamples), samples());
+  samples = std::min(static_cast<unsigned int>(_getEngine()->getCaps().maxSamples), samples());
 }
 
 MultiviewRenderTarget::~MultiviewRenderTarget() = default;

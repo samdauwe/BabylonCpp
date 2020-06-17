@@ -108,7 +108,7 @@ protected:
    * @brief Creates a cube texture to use with reflection for instance. It can be based upon dds or
    * six images as well as prefiltered data.
    * @param rootUrl defines the url of the texture or the root name of the six images
-   * @param scene defines the scene the texture is attached to
+   * @param null defines the scene or engine the texture is attached to
    * @param extensions defines the suffixes add to the picture name in case six images are in use
    * like _px.jpg...
    * @param noMipmap defines if mipmaps should be created or not
@@ -129,8 +129,9 @@ protected:
    * @return the cube texture
    */
   CubeTexture(
-    const std::string& rootUrl, Scene* scene, const std::vector<std::string>& extensions = {},
-    bool noMipmap = false, std::vector<std::string> files = {},
+    const std::string& rootUrl, const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
+    const std::vector<std::string>& extensions = {}, bool noMipmap = false,
+    std::vector<std::string> files                                                = {},
     const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
@@ -170,12 +171,6 @@ protected:
    */
   bool get_noMipmap() const override;
 
-  /**
-   * @brief Gets a boolean indicating if the cube texture contains prefiltered
-   * mips (used to simulate roughness with PBR).
-   */
-  bool get_isPrefiltered() const;
-
 public:
   /**
    * Observable triggered once the texture has been loaded.
@@ -203,15 +198,6 @@ public:
    * Are mip maps generated for this texture or not
    */
   ReadOnlyProperty<CubeTexture, bool> noMipmap;
-
-  /** Hidden */
-  bool _prefiltered;
-
-  /**
-   * Gets a boolean indicating if the cube texture contains prefiltered mips
-   * (used to simulate roughness with PBR)
-   */
-  ReadOnlyProperty<CubeTexture, bool> isPrefiltered;
 
 protected:
   std::string _forcedExtension;

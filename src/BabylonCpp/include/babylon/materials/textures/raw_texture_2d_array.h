@@ -50,9 +50,6 @@ public:
    */
   unsigned int format;
 
-private:
-  Engine* _engine;
-
 }; // end of struct of class RawTexture2DArray
 
 } // end of namespace BABYLON

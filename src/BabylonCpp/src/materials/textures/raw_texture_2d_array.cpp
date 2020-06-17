@@ -12,8 +12,6 @@ RawTexture2DArray::RawTexture2DArray(const ArrayBufferView& data, int width, int
                                      unsigned int iTextureType)
     : Texture{nullptr, scene, !generateMipMaps, iInvertY}, format{iFormat}
 {
-  _engine = scene->getEngine();
-
   _texture = scene->getEngine()->createRawTexture2DArray(data,            //
                                                          width,           //
                                                          height,          //
@@ -36,8 +34,8 @@ void RawTexture2DArray::update(const ArrayBufferView& data)
   if (!_texture) {
     return;
   }
-  _engine->updateRawTexture2DArray(_texture, data, _texture->format, _texture->invertY, "",
-                                   _texture->type);
+  _getEngine()->updateRawTexture2DArray(_texture, data, _texture->format, _texture->invertY, "",
+                                        _texture->type);
 }
 
 } // end of namespace BABYLON

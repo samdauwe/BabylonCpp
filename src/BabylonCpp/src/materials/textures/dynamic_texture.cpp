@@ -18,21 +18,25 @@ DynamicTexture::DynamicTexture(const std::string& iName, const DynamicTextureOpt
     , canRescale{this, &DynamicTexture::get_canRescale}
     , _generateMipMaps{generateMipMaps}
 {
-  name    = iName;
-  _engine = getScene()->getEngine();
-  wrapU   = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapV   = TextureConstants::CLAMP_ADDRESSMODE;
+  name  = iName;
+  wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
   _generateMipMaps = generateMipMaps;
+
+  auto engine = _getEngine();
+  if (!engine) {
+    return;
+  }
 
   if (options.canvas) {
     _canvas = options.canvas;
     _texture
-      = _engine->createDynamicTexture(options.width, options.height, generateMipMaps, samplingMode);
+      = engine->createDynamicTexture(options.width, options.height, generateMipMaps, samplingMode);
   }
   else {
     _texture
-      = _engine->createDynamicTexture(options.width, options.height, generateMipMaps, samplingMode);
+      = engine->createDynamicTexture(options.width, options.height, generateMipMaps, samplingMode);
   }
 
   if (_canvas) {
@@ -62,8 +66,8 @@ void DynamicTexture::_recreate(const ISize& textureSize)
 
   releaseInternalTexture();
 
-  _texture = _engine->createDynamicTexture(textureSize.width, textureSize.height, _generateMipMaps,
-                                           samplingMode());
+  _texture = _getEngine()->createDynamicTexture(textureSize.width, textureSize.height,
+                                                _generateMipMaps, samplingMode());
 }
 
 void DynamicTexture::scale(float ratio)
@@ -98,7 +102,7 @@ void DynamicTexture::clear()
 
 void DynamicTexture::update(bool iInvertY, bool premulAlpha)
 {
-  _engine->updateDynamicTexture(_texture, _canvas, iInvertY, premulAlpha, *_format);
+  _getEngine()->updateDynamicTexture(_texture, _canvas, iInvertY, premulAlpha, *_format);
 }
 
 void DynamicTexture::drawText(const std::string& text, int x, int y, const std::string& font,

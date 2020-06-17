@@ -11,8 +11,6 @@ RawTexture3D::RawTexture3D(const ArrayBufferView& data, int width, int height, i
                            unsigned int iSamplingMode, unsigned int iTextureType)
     : Texture{nullptr, scene, !generateMipMaps, iInvertY}, format{iFormat}
 {
-  _engine = scene->getEngine();
-
   _texture = scene->getEngine()->createRawTexture3D(data,            //
                                                     width,           //
                                                     height,          //
@@ -35,8 +33,8 @@ void RawTexture3D::update(const ArrayBufferView& data)
   if (!_texture) {
     return;
   }
-  _engine->updateRawTexture3D(_texture, data, _texture->format, _texture->invertY, "",
-                              _texture->type);
+  _getEngine()->updateRawTexture3D(_texture, data, _texture->format, _texture->invertY, "",
+                                   _texture->type);
 }
 
 } // end of namespace BABYLON

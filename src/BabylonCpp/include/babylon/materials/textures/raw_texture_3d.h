@@ -49,9 +49,6 @@ public:
    */
   unsigned int format;
 
-private:
-  Engine* _engine;
-
 }; // end of struct of class RawTexture3D
 
 } // end of namespace BABYLON
