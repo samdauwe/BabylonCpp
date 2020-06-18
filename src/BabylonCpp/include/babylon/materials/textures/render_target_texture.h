@@ -490,7 +490,6 @@ protected:
   int _refreshRate;
   std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _samples;
-  Engine* _engine;
 
 private:
   std::vector<AbstractMesh*> _renderList;

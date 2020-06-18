@@ -7,12 +7,10 @@
 
 namespace BABYLON {
 
-class Engine;
-
 /**
- * @brief Raw texture can help creating a texture directly from an array of
- * data. This can be super useful if you either get the data from an
- * uncompressed source or if you wish to create your texture pixel by pixel.
+ * @brief Raw texture can help creating a texture directly from an array of data. This can be super
+ * useful if you either get the data from an uncompressed source or if you wish to create your
+ * texture pixel by pixel.
  */
 class BABYLON_SHARED_EXPORT RawTexture : public Texture {
 
@@ -180,9 +178,6 @@ public:
    * Define the format of the data (int, float... Engine.TEXTURETYPE_xxx)
    */
   unsigned int type;
-
-private:
-  Engine* _engine;
 
 }; // struct of class RawTexture
 

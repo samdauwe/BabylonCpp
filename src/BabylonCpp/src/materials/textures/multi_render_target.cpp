@@ -30,8 +30,6 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
   auto doNotChangeAspectRatio
     = options && (*options).doNotChangeAspectRatio ? *(*options).doNotChangeAspectRatio : true;
 
-  _engine = scene->getEngine();
-
   if (!isSupported()) {
     dispose();
     return;
@@ -84,7 +82,7 @@ MultiRenderTarget::~MultiRenderTarget() = default;
 
 bool MultiRenderTarget::get_isSupported() const
 {
-  return (_engine->webGLVersion() > 1.f) || (_engine->getCaps().drawBuffersExtension);
+  return (_getEngine()->webGLVersion() > 1.f) || (_getEngine()->getCaps().drawBuffersExtension);
 }
 
 std::vector<TexturePtr>& MultiRenderTarget::get_textures()
@@ -132,8 +130,8 @@ void MultiRenderTarget::_rebuild()
 void MultiRenderTarget::_createInternalTextures()
 {
 
-  _internalTextures = _engine->createMultipleRenderTarget(ISize{_size.width, _size.height},
-                                                          _multiRenderTargetOptions);
+  _internalTextures = _getEngine()->createMultipleRenderTarget(ISize{_size.width, _size.height},
+                                                               _multiRenderTargetOptions);
 }
 
 void MultiRenderTarget::_createTextures()
@@ -160,7 +158,7 @@ void MultiRenderTarget::set_samples(unsigned int value)
     return;
   }
 
-  _samples = _engine->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
+  _samples = _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
 }
 
 void MultiRenderTarget::resize(Size size)

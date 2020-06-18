@@ -68,7 +68,7 @@ RenderTargetTexture::RenderTargetTexture(const std::string& iName,
   if (!scene) {
     return;
   }
-  _engine         = scene->getEngine();
+
   name            = iName;
   isRenderTarget  = true;
   isCube          = iIsCube;
@@ -220,11 +220,12 @@ void RenderTargetTexture::_processSizeParameter(
   const std::variant<int, RenderTargetSize, float>& size)
 {
   if (std::holds_alternative<float>(size)) {
-    _sizeRatio = std::get<float>(size);
-    _size      = RenderTargetSize{
-      _bestReflectionRenderTargetDimension(_engine->getRenderWidth(),
+    _sizeRatio  = std::get<float>(size);
+    auto engine = _getEngine();
+    _size       = RenderTargetSize{
+      _bestReflectionRenderTargetDimension(engine->getRenderWidth(),
                                            _sizeRatio), // width
-      _bestReflectionRenderTargetDimension(_engine->getRenderHeight(),
+      _bestReflectionRenderTargetDimension(engine->getRenderHeight(),
                                            _sizeRatio), // height
       std::nullopt,                                     // layers
     };
