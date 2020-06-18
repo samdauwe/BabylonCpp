@@ -82,6 +82,11 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
   else {
     _scene = EngineStore::LastCreatedScene();
   }
+
+  if (_scene) {
+    uniqueId = _scene->getUniqueId();
+    _engine  = _scene->getEngine();
+  }
 }
 
 BaseTexture::~BaseTexture() = default;
@@ -94,9 +99,7 @@ Type BaseTexture::type() const
 void BaseTexture::addToScene(const BaseTexturePtr& newTexture)
 {
   if (_scene) {
-    uniqueId = _scene->getUniqueId();
     _scene->textures.emplace_back(newTexture);
-    _engine = _scene->getEngine();
   }
 }
 
