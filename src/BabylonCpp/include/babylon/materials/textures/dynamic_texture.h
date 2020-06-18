@@ -8,7 +8,6 @@
 namespace BABYLON {
 
 class DynamicTexture;
-class Engine;
 class ICanvasRenderingContext2D;
 using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
 

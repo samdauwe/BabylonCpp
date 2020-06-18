@@ -73,10 +73,10 @@ Texture::Texture(
 
   auto scene  = getScene();
   auto engine = _getEngine();
-
   if (!engine) {
     return;
   }
+
   engine->onBeforeTextureInitObservable.notifyObservers(this);
 
   _load = [this](InternalTexture*, EventState&) {

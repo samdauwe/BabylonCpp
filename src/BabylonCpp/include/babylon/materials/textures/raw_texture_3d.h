@@ -7,8 +7,6 @@
 
 namespace BABYLON {
 
-class Engine;
-
 /**
  * @brief Class used to store 3D textures containing user data.
  */

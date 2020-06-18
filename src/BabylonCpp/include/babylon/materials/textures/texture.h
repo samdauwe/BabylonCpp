@@ -12,7 +12,6 @@
 
 namespace BABYLON {
 
-class Engine;
 class MirrorTexture;
 class Texture;
 using MirrorTexturePtr = std::shared_ptr<MirrorTexture>;
