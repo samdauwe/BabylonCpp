@@ -49,12 +49,16 @@ protected:
   IShadowLightPtr& get_activeLight();
   void set_activeLight(const IShadowLightPtr& light);
 
+private:
+  IShadowLightPtr _getFirstShadowLightForMesh(AbstractMesh* mesh);
+
 public:
   Color3 shadowColor;
   Property<ShadowOnlyMaterial, IShadowLightPtr> activeLight;
 
 private:
   IShadowLightPtr _activeLight;
+  bool _needAlphaBlending;
 
 }; // end of class ShadowOnlyMaterial
 

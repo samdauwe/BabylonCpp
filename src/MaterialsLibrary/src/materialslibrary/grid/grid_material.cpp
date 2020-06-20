@@ -189,7 +189,7 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect = effect;
 
   // Matrices
-  if (!(*defines)["INSTANCES"]) {
+  if (!(*defines)["INSTANCES"] || (*defines)["THIN_INSTANCE"]) {
     bindOnlyWorldMatrix(world);
   }
   _activeEffect->setMatrix("worldView", world.multiply(scene->getViewMatrix()));

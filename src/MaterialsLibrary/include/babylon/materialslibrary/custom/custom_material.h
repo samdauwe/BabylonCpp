@@ -55,7 +55,7 @@ public:
   CustomMaterial& Vertex_MainEnd(const std::string& shaderPart);
 
 private:
-  void _afterBind(Mesh* mesh, Effect* effect);
+  void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr) override;
 
 public:
   static unsigned int ShaderIndexer;

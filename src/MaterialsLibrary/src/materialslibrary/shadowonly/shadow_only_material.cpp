@@ -8,6 +8,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
+#include <babylon/lights/shadows/cascaded_shadow_generator.h>
+#include <babylon/lights/shadows/ishadow_generator.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -25,6 +27,7 @@ ShadowOnlyMaterial::ShadowOnlyMaterial(const std::string& iName, Scene* scene)
     , shadowColor{Color3::Black()}
     , activeLight{this, &ShadowOnlyMaterial::get_activeLight, &ShadowOnlyMaterial::set_activeLight}
     , _activeLight{nullptr}
+    , _needAlphaBlending{true}
 {
   // Vertex shader
   Effect::ShadersStore()["shadowOnlyVertexShader"] = shadowOnlyVertexShader;
@@ -34,6 +37,21 @@ ShadowOnlyMaterial::ShadowOnlyMaterial(const std::string& iName, Scene* scene)
 }
 
 ShadowOnlyMaterial::~ShadowOnlyMaterial() = default;
+
+bool ShadowOnlyMaterial::needAlphaBlending() const
+{
+  return _needAlphaBlending;
+}
+
+bool ShadowOnlyMaterial::needAlphaTesting() const
+{
+  return false;
+}
+
+BaseTexturePtr ShadowOnlyMaterial::getAlphaTestTexture()
+{
+  return nullptr;
+}
 
 IShadowLightPtr& ShadowOnlyMaterial::get_activeLight()
 {
@@ -45,18 +63,13 @@ void ShadowOnlyMaterial::set_activeLight(const IShadowLightPtr& light)
   _activeLight = light;
 }
 
-bool ShadowOnlyMaterial::needAlphaBlending() const
+IShadowLightPtr ShadowOnlyMaterial::_getFirstShadowLightForMesh(AbstractMesh* mesh)
 {
-  return true;
-}
-
-bool ShadowOnlyMaterial::needAlphaTesting() const
-{
-  return false;
-}
-
-BaseTexturePtr ShadowOnlyMaterial::getAlphaTestTexture()
-{
+  for (const auto& light : mesh->lightSources()) {
+    if (light->shadowEnabled()) {
+      return std::static_pointer_cast<IShadowLight>(light);
+    }
+  }
   return nullptr;
 }
 
@@ -109,6 +122,17 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subM
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false, 1);
+
+  const auto shadowGenerator = _getFirstShadowLightForMesh(mesh)->getShadowGenerator();
+
+  _needAlphaBlending = true;
+
+  if (shadowGenerator) {
+    const auto csg = std::static_pointer_cast<CascadedShadowGenerator>(shadowGenerator);
+    if (csg) {
+      _needAlphaBlending = !csg->autoCalcDepthBounds();
+    }
+  }
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
@@ -211,10 +235,24 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
   // Lights
   if (scene->lightsEnabled()) {
     MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, 1);
+
+    const auto light = _getFirstShadowLightForMesh(mesh);
+
+    if (light) {
+      // Make sure the uniforms for this light will be rebound for other materials using this light
+      // when rendering the current frame. Indeed, there is an optimization in Light that binds the
+      // light uniforms only once per frame for a given light (if using ubo). Doing this way assumes
+      // that all uses of this light are the same, meaning all parameters passed to
+      // Light._bindLlight are the same, notably useSpecular. However, isReadyForSubMesh (see above)
+      // is passing false for this parameter, which may not be the value the other materials may
+      // pass.
+      light->_renderId = -1;
+    }
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE) {
+  if ((scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE)
+      || defines->boolDef["SHADOWCSM0"]) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 

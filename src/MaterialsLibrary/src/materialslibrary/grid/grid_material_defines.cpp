@@ -12,7 +12,8 @@ GridMaterialDefines::GridMaterialDefines()
     {"PREMULTIPLYALPHA", false}, //
     {"UV1", false},              //
     {"UV2", false},              //
-    {"INSTANCES", false}         //
+    {"INSTANCES", false},        //
+    {"THIN_INSTANCES", false}    //
   };
 }
 

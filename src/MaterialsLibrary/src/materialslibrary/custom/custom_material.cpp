@@ -146,11 +146,14 @@ std::string CustomMaterial::Builder(const std::string& /*shaderName*/,
     _FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_LIGHTS",
     (!CustomParts.Fragment_Before_Lights.empty() ? CustomParts.Fragment_Before_Lights : ""));
   StringTools::replaceInPlace(
-    _FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_FOG",
-    (!CustomParts.Fragment_Before_Fog.empty() ? CustomParts.Fragment_Before_Fog : ""));
-  StringTools::replaceInPlace(
     _FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_FRAGCOLOR",
     (!CustomParts.Fragment_Before_FragColor.empty() ? CustomParts.Fragment_Before_FragColor : ""));
+
+  if (!CustomParts.Fragment_Before_Fog.empty()) {
+    StringTools::replaceInPlace(_FragmentShader, "#define CUSTOM_FRAGMENT_BEFORE_FOG",
+                                CustomParts.Fragment_Before_Fog);
+  }
+
   Effect::ShadersStore()[customName + "PixelShader"] = _FragmentShader;
 
   _isCreatedShader   = true;
@@ -276,12 +279,12 @@ CustomMaterial& CustomMaterial::Vertex_MainEnd(const std::string& shaderPart)
   return *this;
 }
 
-void CustomMaterial::_afterBind(Mesh* mesh, Effect* effect)
+void CustomMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
 {
   if (!effect) {
     return;
   }
-  AttachAfterBind(mesh, effect);
+  AttachAfterBind(mesh, effect.get());
   _afterBind(mesh, effect);
 }
 
