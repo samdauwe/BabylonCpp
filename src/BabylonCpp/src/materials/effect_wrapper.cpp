@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-EffectWrapper::EffectWrapper(IEffectWrapperCreationOptions& /*creationOptions*/)
+EffectWrapper::EffectWrapper(EffectWrapperCreationOptions& /*creationOptions*/)
 {
   // TODO Implement
 }

@@ -74,6 +74,11 @@ public:
   void applyEffectWrapper(const EffectWrapperPtr& effectWrapper);
 
   /**
+   * @brief Restores engine states.
+   */
+  void restoreStates();
+
+  /**
    * @brief Draws a full screen quad.
    */
   void draw();

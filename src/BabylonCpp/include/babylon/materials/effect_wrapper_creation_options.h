@@ -1,6 +1,8 @@
 #ifndef BABYLON_MATERIALS_EFFECT_WRAPPER_CREATION_OPTIONS_H
 #define BABYLON_MATERIALS_EFFECT_WRAPPER_CREATION_OPTIONS_H
 
+#include <functional>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -8,6 +10,7 @@
 
 namespace BABYLON {
 
+class Effect;
 class ThinEngine;
 
 /**
@@ -22,6 +25,10 @@ struct BABYLON_SHARED_EXPORT EffectWrapperCreationOptions {
    * Fragment shader for the effect
    */
   std::string fragmentShader;
+  /**
+   * Use the shader store instead of direct source code
+   */
+  std::optional<bool> useShaderStore = std::nullopt;
   /**
    * Vertex shader for the effect
    */
@@ -38,6 +45,14 @@ struct BABYLON_SHARED_EXPORT EffectWrapperCreationOptions {
    * Texture sampler names to use in the shader
    */
   std::vector<std::string> samplerNames;
+  /**
+   * Defines to use in the shader
+   */
+  std::vector<std::string> defines;
+  /**
+   * Callback when effect is compiled
+   */
+  std::function<void(Effect* effect)> onCompiled = nullptr;
   /**
    * The friendly name of the effect displayed in Spector.
    */

@@ -56,6 +56,12 @@ void EffectRenderer::applyEffectWrapper(const EffectWrapperPtr& effectWrapper)
   effectWrapper->onApplyObservable.notifyObservers(nullptr);
 }
 
+void EffectRenderer::restoreStates()
+{
+  engine->depthCullingState()->depthTest = true;
+  engine->stencilState()->stencilTest    = true;
+}
+
 void EffectRenderer::draw()
 {
   engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, 6);
