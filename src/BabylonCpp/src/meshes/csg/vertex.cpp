@@ -4,17 +4,17 @@
 
 namespace BABYLON {
 
-CSG::Vertex::Vertex(const Vector3& iPos, const Vector3& iNormal,
-                    const Vector2& iUv)
-    : pos{iPos}, normal{iNormal}, uv{iUv}
+CSG::Vertex::Vertex(const Vector3& iPos, const Vector3& iNormal, const Vector2& iUv,
+                    const std::optional<Color4>& iVertColor)
+    : pos{iPos}, normal{iNormal}, uv{iUv}, vertColor{iVertColor}
 {
 }
 
 CSG::Vertex::Vertex(const BABYLON::CSG::Vertex& otherVertex) = default;
-CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex) = default;
+CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex)      = default;
 CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex) = default;
 CSG::Vertex& CSG::Vertex::operator=(BABYLON::CSG::Vertex&& otherVertex) = default;
-CSG::Vertex::~Vertex() = default;
+CSG::Vertex::~Vertex()                                                  = default;
 
 CSG::Vertex CSG::Vertex::clone() const
 {
@@ -29,8 +29,15 @@ std::unique_ptr<CSG::Vertex> CSG::Vertex::cloneToNewObject() const
 namespace CSG {
 std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Vertex& vertex)
 {
-  os << "{\"Position\":" << vertex.pos << ",\"Normal\":" << vertex.normal
-     << ",\"UV\":" << vertex.uv << "}";
+  os << "{\"Position\":" << vertex.pos << ",\"Normal\":" << vertex.normal << ",\"UV\":" << vertex.uv
+     << ",\"Color\":";
+  if (vertex.vertColor) {
+    os << *vertex.vertColor;
+  }
+  else {
+    os << "undefined";
+  }
+  os << "}";
   return os;
 }
 } // namespace CSG
@@ -49,9 +56,11 @@ void CSG::Vertex::flip()
 
 CSG::Vertex CSG::Vertex::interpolate(const BABYLON::CSG::Vertex& other, float t)
 {
-  return Vertex(Vector3::Lerp(pos, other.pos, t),
-                Vector3::Lerp(normal, other.normal, t),
-                Vector2::Lerp(uv, other.uv, t));
+  return Vertex(Vector3::Lerp(pos, other.pos, t), Vector3::Lerp(normal, other.normal, t),
+                Vector2::Lerp(uv, other.uv, t),
+                vertColor && other.vertColor ?
+                  std::optional<Color4>(Color4::Lerp(*vertColor, *other.vertColor, t)) :
+                  std::nullopt);
 }
 
 } // end of namespace BABYLON

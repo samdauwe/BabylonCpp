@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_CSG_VERTEX_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/maths/vector3.h>
 
@@ -26,8 +27,10 @@ public:
    * @param pos The position of the vertex
    * @param normal The normal of the vertex
    * @param uv The texture coordinate of the vertex
+   * @param vertColor The RGBA color of the vertex
    */
-  Vertex(const Vector3& pos, const Vector3& normal, const Vector2& uv);
+  Vertex(const Vector3& pos, const Vector3& normal, const Vector2& uv,
+         const std::optional<Color4>& vertColor = std::nullopt);
   Vertex(const Vertex& otherVertex);
   Vertex(Vertex&& otherVertex);
   Vertex& operator=(const Vertex& otherVertex);
@@ -73,6 +76,11 @@ public:
    * The texture coordinate of the vertex
    */
   Vector2 uv;
+
+  /**
+   * The texture coordinate of the vertex
+   */
+  std::optional<Color4> vertColor;
 
 }; // end of class Vertex
 
