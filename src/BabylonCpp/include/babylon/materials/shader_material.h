@@ -227,8 +227,7 @@ public:
    * @param useInstances specifies that instances should be used
    * @returns a boolean indicating that the submesh is ready or not
    */
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
 
   /**
    * @brief Checks if the material is ready to render the requested mesh.

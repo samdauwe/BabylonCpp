@@ -32,8 +32,7 @@ public:
   [[nodiscard]] bool needAlphaBlending() const override;
   [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
   [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;

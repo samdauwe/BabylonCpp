@@ -282,8 +282,7 @@ bool ShaderMaterial::_checkCache(AbstractMesh* mesh, bool useInstances)
   return true;
 }
 
-bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* /*subMesh*/,
-                                       bool useInstances)
+bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* /*subMesh*/, bool useInstances)
 {
   return isReady(mesh, useInstances);
 }
@@ -402,7 +401,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   if (customShaderNameResolve) {
     shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, nullptr,
-                                         &defines, attribs);
+                                         &defines, attribs, nullptr);
   }
 
   auto previousEffect = _effect;

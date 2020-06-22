@@ -67,8 +67,7 @@ public:
    * instances
    * @returns true if ready, otherwise false
    */
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
 
   /**
    * @brief Clones the current material and its related sub materials.

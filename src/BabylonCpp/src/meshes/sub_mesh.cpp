@@ -25,7 +25,12 @@ namespace BABYLON {
 SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_t iVerticesCount,
                  unsigned int iIndexStart, size_t iIndexCount, const AbstractMeshPtr& mesh,
                  const MeshPtr& renderingMesh, bool iCreateBoundingBox)
-    : materialIndex{iMaterialIndex}
+    : _materialDefines{nullptr}
+    , _materialEffect{nullptr}
+    , _effectOverride{nullptr}
+    , materialDefines{this, &SubMesh::get_materialDefines, &SubMesh::set_materialDefines}
+    , effect{this, &SubMesh::get_effect}
+    , materialIndex{iMaterialIndex}
     , verticesStart{iVerticesStart}
     , verticesCount{iVerticesCount}
     , indexStart{iIndexStart}
@@ -52,6 +57,33 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
 }
 
 SubMesh::~SubMesh() = default;
+
+MaterialDefinesPtr& SubMesh::get_materialDefines()
+{
+  return _materialDefines;
+}
+
+void SubMesh::set_materialDefines(const MaterialDefinesPtr& defines)
+{
+  _materialDefines = defines;
+}
+
+EffectPtr& SubMesh::get_effect()
+{
+  return _effectOverride ? _effectOverride : _materialEffect;
+}
+
+void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines)
+{
+  if (_materialEffect == iEffect) {
+    if (!iEffect) {
+      _materialDefines = nullptr;
+    }
+    return;
+  }
+  _materialDefines = defines;
+  _materialEffect  = iEffect;
+}
 
 void SubMesh::addToMesh(const std::shared_ptr<SubMesh>& newSubMesh)
 {

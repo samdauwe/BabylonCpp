@@ -365,7 +365,7 @@ bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
   return true;
 }
 
-bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, BaseSubMesh* /*subMesh*/,
+bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, SubMesh* /*subMesh*/,
                                  bool /*useInstances*/)
 {
   return false;
@@ -626,16 +626,11 @@ void Material::forceCompilation(AbstractMesh* mesh,
     localOptions.useInstances = options->useInstances;
   }
 
-  auto subMesh = std::make_unique<BaseSubMesh>();
-  auto scene   = getScene();
+  auto scene = getScene();
 
-  const auto checkReady = [&]() {
+  const auto checkReady = [=]() {
     if (!_scene || !_scene->getEngine()) {
       return;
-    }
-
-    if (subMesh->_materialDefines) {
-      subMesh->_materialDefines->_renderId = -1;
     }
 
     auto clipPlaneState = scene->clipPlane;
@@ -645,20 +640,51 @@ void Material::forceCompilation(AbstractMesh* mesh,
     }
 
     if (_storeEffectOnSubMeshes) {
-      if (isReadyForSubMesh(mesh, subMesh.get(), localOptions.useInstances)) {
-        if (iOnCompiled) {
-          iOnCompiled(this);
-        }
-      }
-      else {
-        if (subMesh->effect() && !subMesh->effect()->getCompilationError().empty()
-            && subMesh->effect()->allFallbacksProcessed()) {
-          if (iOnError) {
-            iOnError(subMesh->effect()->getCompilationError());
+      bool allDone = true;
+      std::string lastError;
+      if (!mesh->subMeshes.empty()) {
+        for (const auto& subMesh : mesh->subMeshes) {
+          auto effectiveMaterial = subMesh->getMaterial();
+          if (effectiveMaterial) {
+            if (effectiveMaterial->_storeEffectOnSubMeshes) {
+              if (!effectiveMaterial->isReadyForSubMesh(mesh, subMesh.get(),
+                                                        localOptions.useInstances)) {
+                if (subMesh->effect() && !subMesh->effect()->getCompilationError().empty()
+                    && subMesh->effect()->allFallbacksProcessed()) {
+                  lastError = subMesh->effect()->getCompilationError();
+                }
+                else {
+                  allDone = false;
+                  // setTimeout(checkReady, 16);
+                  break;
+                }
+              }
+            }
+            else {
+              if (!effectiveMaterial->isReady(mesh, localOptions.useInstances)) {
+                if (effectiveMaterial->getEffect()
+                    && !effectiveMaterial->getEffect()->getCompilationError().empty()
+                    && effectiveMaterial->getEffect()->allFallbacksProcessed()) {
+                  lastError = effectiveMaterial->getEffect()->getCompilationError();
+                }
+                else {
+                  allDone = false;
+                  // setTimeout(checkReady, 16);
+                  break;
+                }
+              }
+            }
           }
         }
-        else {
-          // setTimeout(checkReady, 16);
+      }
+      if (allDone) {
+        if (!lastError.empty()) {
+          if (onError) {
+            iOnError(lastError);
+          }
+        }
+        if (onCompiled) {
+          iOnCompiled(this);
         }
       }
     }

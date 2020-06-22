@@ -66,7 +66,7 @@ bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& /*mesh*/) const
   return needAlphaBlending();
 }
 
-bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

@@ -106,7 +106,7 @@ BaseTexturePtr NormalMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

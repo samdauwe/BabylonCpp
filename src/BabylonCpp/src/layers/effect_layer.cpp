@@ -349,6 +349,9 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
+    if (subMesh->getRenderingMesh()->hasThinInstances()) {
+      defines.emplace_back("#define THIN_INSTANCES");
+    }
   }
 
   _addCustomEffectDefines(defines);
@@ -467,14 +470,13 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     return;
   }
 
-  auto material  = subMesh->getMaterial();
-  auto ownerMesh = subMesh->getMesh();
-  auto replacementMesh
-    = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
-  auto renderingMesh = subMesh->getRenderingMesh();
-  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
-  auto scene         = _scene;
-  auto engine        = scene->getEngine();
+  auto material        = subMesh->getMaterial();
+  auto ownerMesh       = subMesh->getMesh();
+  auto replacementMesh = subMesh->getReplacementMesh();
+  auto renderingMesh   = subMesh->getRenderingMesh();
+  auto effectiveMesh   = subMesh->getEffectiveMesh();
+  auto scene           = _scene;
+  auto engine          = scene->getEngine();
 
   effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
@@ -501,9 +503,10 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     return;
   }
 
-  auto hardwareInstancedRendering = (engine->getCaps().instancedArrays)
-                                    && (stl_util::contains(batch->visibleInstances, subMesh->_id))
-                                    && (!batch->visibleInstances[subMesh->_id].empty());
+  auto hardwareInstancedRendering = ((engine->getCaps().instancedArrays)
+                                     && (stl_util::contains(batch->visibleInstances, subMesh->_id))
+                                     && (!batch->visibleInstances[subMesh->_id].empty()))
+                                    || renderingMesh->hasThinInstances();
 
   _setEmissiveTextureAndColor(renderingMesh, subMesh, material);
 

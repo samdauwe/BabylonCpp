@@ -581,8 +581,7 @@ bool BackgroundMaterial::needAlphaBlending() const
   return ((alpha() < 0.f) || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()));
 }
 
-bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                           bool useInstances)
+bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
     if (subMesh->effect()->_wasPreviouslyReady) {

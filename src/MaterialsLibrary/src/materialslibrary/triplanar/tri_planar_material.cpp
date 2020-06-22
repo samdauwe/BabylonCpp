@@ -196,8 +196,7 @@ BaseTexturePtr TriPlanarMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                          bool useInstances)
+bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

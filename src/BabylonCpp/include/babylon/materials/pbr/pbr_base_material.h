@@ -130,8 +130,7 @@ public:
    * @param useInstances - Specifies that instances should be used.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
 
   /**
    * @brief Specifies if the material uses metallic roughness workflow.

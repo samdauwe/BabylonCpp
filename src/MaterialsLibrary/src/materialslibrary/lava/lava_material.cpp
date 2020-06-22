@@ -118,7 +118,7 @@ BaseTexturePtr LavaMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

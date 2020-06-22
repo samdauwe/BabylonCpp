@@ -9,8 +9,7 @@ namespace BABYLON {
 
 MultiMaterial::MultiMaterial(const std::string& name, Scene* scene)
     : Material{name, scene, true}
-    , subMaterials{this, &MultiMaterial::get_subMaterials,
-                   &MultiMaterial::set_subMaterials}
+    , subMaterials{this, &MultiMaterial::get_subMaterials, &MultiMaterial::set_subMaterials}
 {
   // multimaterial is considered like a push material
   _storeEffectOnSubMeshes = true;
@@ -69,8 +68,7 @@ std::string MultiMaterial::getClassName() const
   return "MultiMaterial";
 }
 
-bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                      bool useInstances)
+bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   for (const auto& subMaterial : _subMaterials) {
     if (subMaterial) {
@@ -90,8 +88,7 @@ bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-MaterialPtr MultiMaterial::clone(const std::string& iName,
-                                 bool cloneChildren) const
+MaterialPtr MultiMaterial::clone(const std::string& iName, bool cloneChildren) const
 {
   auto newMultiMaterial = MultiMaterial::New(iName, getScene());
 
@@ -136,16 +133,14 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-MultiMaterialPtr
-MultiMaterial::ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene)
+MultiMaterialPtr MultiMaterial::ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene)
 {
-  auto multiMaterial = MultiMaterial::New(
-    json_util::get_string(parsedMultiMaterial, "name"), scene);
+  auto multiMaterial
+    = MultiMaterial::New(json_util::get_string(parsedMultiMaterial, "name"), scene);
 
   multiMaterial->id = json_util::get_string(parsedMultiMaterial, "id");
 
-  for (const auto& subMatId :
-       json_util::get_array<json>(parsedMultiMaterial, "materials")) {
+  for (const auto& subMatId : json_util::get_array<json>(parsedMultiMaterial, "materials")) {
 
     if (subMatId.is_string()) {
       // If the same multimaterial is loaded twice, the 2nd multimaterial needs

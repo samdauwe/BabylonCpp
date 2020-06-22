@@ -73,8 +73,7 @@ IShadowLightPtr ShadowOnlyMaterial::_getFirstShadowLightForMesh(AbstractMesh* me
   return nullptr;
 }
 
-bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                           bool useInstances)
+bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

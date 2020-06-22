@@ -225,7 +225,7 @@ BaseTexturePtr MixMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

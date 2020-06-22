@@ -44,7 +44,7 @@ bool PushMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   return isReadyForSubMesh(mesh, mesh->subMeshes[0].get(), useInstances);
 }
 
-bool PushMaterial::_isReadyForSubMesh(BaseSubMesh* subMesh)
+bool PushMaterial::_isReadyForSubMesh(SubMesh* subMesh)
 {
   const auto& defines = subMesh->_materialDefines;
   if (!checkReadyOnEveryCall && subMesh->effect() && defines) {

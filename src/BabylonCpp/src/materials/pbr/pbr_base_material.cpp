@@ -30,7 +30,6 @@
 #include <babylon/maths/spherical_polynomial.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/base_sub_mesh.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
@@ -256,7 +255,7 @@ BaseTexturePtr PBRBaseMaterial::getAlphaTestTexture()
   return _albedoTexture;
 }
 
-bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
     if (subMesh->effect()->_wasPreviouslyReady) {
@@ -657,7 +656,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
 
   if (customShaderNameResolve) {
     shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, &defines,
-                                         nullptr, attribs);
+                                         nullptr, attribs, nullptr);
   }
 
   auto join = defines.toString();

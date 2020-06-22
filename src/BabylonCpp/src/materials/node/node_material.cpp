@@ -502,7 +502,7 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
   }
 }
 
-bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (!_buildWasSuccessful) {
     return false;

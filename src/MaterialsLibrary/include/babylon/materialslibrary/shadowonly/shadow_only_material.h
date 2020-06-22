@@ -33,7 +33,7 @@ public:
   [[nodiscard]] bool needAlphaBlending() const override;
   [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   [[nodiscard]] std::string getClassName() const override;
   [[nodiscard]] MaterialPtr clone(const std::string& name,

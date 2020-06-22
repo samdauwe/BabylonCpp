@@ -46,6 +46,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"VERTEXALPHA", false},                                 //
     {"BONETEXTURE", false},                                 //
     {"INSTANCES", false},                                   //
+    {"THIN_INSTANCES", false},                              //
     {"GLOSSINESS", false},                                  //
     {"ROUGHNESS", false},                                   //
     {"EMISSIVEASILLUMINATION", false},                      //
@@ -80,6 +81,10 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"PREMULTIPLYALPHA", false},                    // https://playground.babylonjs.com#LNVJJ7
     {"ALPHATEST_AFTERALLALPHACOMPUTATIONS", false}, //
     {"ALPHABLEND", true},                           //
+
+    {"RGBDLIGHTMAP", false},   //
+    {"RGBDREFLECTION", false}, //
+    {"RGBDREFRACTION", false}, //
 
     {"IMAGEPROCESSING", false},            //
     {"VIGNETTE", false},                   //

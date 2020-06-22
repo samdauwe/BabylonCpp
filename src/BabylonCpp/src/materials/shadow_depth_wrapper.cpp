@@ -4,7 +4,6 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/base_sub_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/observer.h>
 

@@ -5,21 +5,22 @@
 #include <babylon/culling/icullable.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/plane.h>
-#include <babylon/meshes/base_sub_mesh.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
 class IntersectionInfo;
+struct MaterialDefines;
 class SubMesh;
 class WebGLDataBuffer;
+using MaterialDefinesPtr = std::shared_ptr<MaterialDefines>;
 using SubMeshPtr         = std::shared_ptr<SubMesh>;
 using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
- * @brief
+ * @brief Defines a subdivision inside a mesh.
  */
-class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh, public ICullable {
+class BABYLON_SHARED_EXPORT SubMesh : public ICullable {
 
 public:
   using TrianglePickingPredicate
@@ -35,6 +36,13 @@ public:
     return subMesh;
   }
   ~SubMesh() override; // = default
+
+  /**
+   * @brief Sets associated effect (effect used to render this submesh).
+   * @param effect defines the effect to associate with
+   * @param defines defines the set of defines used to compile this effect
+   */
+  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr);
 
   void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
   [[nodiscard]] bool isGlobal() const;
@@ -190,30 +198,62 @@ protected:
           unsigned int indexStart, size_t indexCount, const AbstractMeshPtr& mesh,
           const MeshPtr& renderingMesh = nullptr, bool createBoundingBox = true);
 
+  /**
+   * @brief Gets material defines used by the effect associated to the sub mesh.
+   */
+  MaterialDefinesPtr& get_materialDefines();
+
+  /**
+   * @brief Sets material defines used by the effect associated to the sub mesh.
+   */
+  void set_materialDefines(const MaterialDefinesPtr& defines);
+
+  /**
+   * @brief Gets the associated effect.
+   */
+  EffectPtr& get_effect();
+
 private:
-  /** Hidden */
+  /** @hidden */
   std::optional<IntersectionInfo> _intersectLines(Ray& ray, const std::vector<Vector3>& positions,
                                                   const IndicesArray& indices,
                                                   float intersectionThreshold,
                                                   bool fastCheck = false);
-  /** Hidden */
+  /** @hidden */
   std::optional<IntersectionInfo> _intersectUnIndexedLines(Ray& ray,
                                                            const std::vector<Vector3>& positions,
                                                            const IndicesArray& indices,
                                                            float intersectionThreshold,
                                                            bool fastCheck = false);
-  /** Hidden */
+  /** @hidden */
   std::optional<IntersectionInfo>
   _intersectTriangles(Ray& ray, const std::vector<Vector3>& positions, const IndicesArray& indices,
                       unsigned int step, bool checkStopper, bool fastCheck = false,
                       const TrianglePickingPredicate& trianglePredicate = nullptr);
-  /** Hidden */
+  /** @hidden */
   std::optional<IntersectionInfo>
   _intersectUnIndexedTriangles(Ray& ray, const std::vector<Vector3>& positions,
                                const IndicesArray& indices, bool fastCheck = false,
                                const TrianglePickingPredicate& trianglePredicate = nullptr);
 
 public:
+  /** @hidden */
+  MaterialDefinesPtr _materialDefines;
+  /** @hidden */
+  EffectPtr _materialEffect;
+  /** @hidden */
+  EffectPtr _effectOverride;
+
+  /**
+   * Gets or sets material defines used by the effect associated to the sub mesh
+   */
+  Property<SubMesh, MaterialDefinesPtr> materialDefines;
+
+  /**
+   * Gets associated effect
+   */
+  ReadOnlyProperty<SubMesh, EffectPtr> effect;
+
   /** the material index to use */
   unsigned int materialIndex;
   /** vertex index start */
@@ -226,19 +266,19 @@ public:
   size_t indexCount;
   bool createBoundingBox;
   size_t _linesIndexCount;
-  /** Hidden */
+  /** @hidden */
   std::vector<Vector3> _lastColliderWorldVertices;
-  /** Hidden */
+  /** @hidden */
   std::vector<Plane> _trianglePlanes;
-  /** Hidden */
+  /** @hidden */
   std::unique_ptr<Matrix> _lastColliderTransformMatrix;
-  /** Hidden */
+  /** @hidden */
   int _renderId;
-  /** Hidden */
+  /** @hidden */
   int _alphaIndex;
-  /** Hidden */
+  /** @hidden */
   float _distanceToCamera;
-  /** Hidden */
+  /** @hidden */
   size_t _id;
 
 private:

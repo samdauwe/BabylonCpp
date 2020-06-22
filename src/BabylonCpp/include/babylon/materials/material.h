@@ -19,7 +19,6 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class AbstractMesh;
-class BaseSubMesh;
 class BaseTexture;
 class Effect;
 class Material;
@@ -53,6 +52,18 @@ struct BABYLON_SHARED_EXPORT IMaterialCompilationOptions {
    */
   bool useInstances = false;
 }; // end of struct IMaterialCompilationOptions
+
+/**
+ * @brief Options passed when calling customShaderNameResolve.
+ */
+struct BABYLON_SHARED_EXPORT ICustomShaderNameResolveOptions {
+  /**
+   * If provided, will be called two times with the vertex and fragment code so that this code can
+   * be updated before it is compiled by the GPU
+   */
+  std::function<std::string(const std::string& shaderType, const std::string& code)>
+    processFinalCode = nullptr;
+}; // end of struct ICustomShaderNameResolveOptions
 
 /**
  * @brief Base class for the main features of a material in Babylon.js.
@@ -233,8 +244,7 @@ public:
    * @param useInstances specifies that instances should be used
    * @returns a boolean indicating that the submesh is ready or not
    */
-  virtual bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                 bool useInstances = false);
+  virtual bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false);
 
   /**
    * @brief Returns the material effect.
@@ -678,8 +688,8 @@ public:
   std::function<std::string(const std::string& shaderName, std::vector<std::string>& uniforms,
                             std::vector<std::string>& uniformBuffers,
                             std::vector<std::string>& samplers, MaterialDefines* materialDefines,
-                            std::vector<std::string>* defines,
-                            std::vector<std::string>& attributes)>
+                            std::vector<std::string>* defines, std::vector<std::string>& attributes,
+                            ICustomShaderNameResolveOptions* options)>
     customShaderNameResolve;
 
   /**

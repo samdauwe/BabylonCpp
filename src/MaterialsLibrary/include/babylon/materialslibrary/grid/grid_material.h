@@ -35,8 +35,7 @@ public:
    */
   [[nodiscard]] bool needAlphaBlending() const override;
   [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   [[nodiscard]] std::string getClassName() const override;
 

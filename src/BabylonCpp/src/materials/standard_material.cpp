@@ -409,8 +409,7 @@ BaseTexturePtr StandardMaterial::getAlphaTestTexture()
   return _diffuseTexture;
 }
 
-bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                                         bool useInstances)
+bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
     if (subMesh->effect()->_wasPreviouslyReady) {
@@ -493,7 +492,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
           defines.boolDef["REFLECTIONOVERALPHA"] = _useReflectionOverAlpha;
           defines.boolDef["INVERTCUBICMAP"]
             = (_reflectionTexture->coordinatesMode() == TextureConstants::INVCUBIC_MODE);
-          defines.boolDef["REFLECTIONMAP_3D"] = _reflectionTexture->isCube;
+          defines.boolDef["REFLECTIONMAP_3D"] = _reflectionTexture->isCube();
+          defines.boolDef["RGBDREFLECTION"]   = _reflectionTexture->isRGBD();
 
           switch (_reflectionTexture->coordinatesMode()) {
             case TextureConstants::EXPLICIT_MODE:
@@ -553,6 +553,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines, "LIGHTMAP");
           defines.boolDef["USELIGHTMAPASSHADOWMAP"] = _useLightmapAsShadowmap;
+          defines.boolDef["RGBDLIGHTMAP"]           = _lightmapTexture->isRGBD();
         }
       }
       else {
@@ -599,7 +600,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
           defines._needUVs              = true;
           defines.boolDef["REFRACTION"] = true;
 
-          defines.boolDef["REFRACTIONMAP_3D"] = _refractionTexture->isCube;
+          defines.boolDef["REFRACTIONMAP_3D"] = _refractionTexture->isCube();
+          defines.boolDef["RGBDREFRACTION"]   = _refractionTexture->isRGBD();
         }
       }
       else {
@@ -692,7 +694,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true, true, true);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(
+    scene, engine, defines, useInstances, std::nullopt,
+    subMesh->getRenderingMesh()->hasThinInstances());
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -875,13 +879,16 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMes
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
+    ICustomShaderNameResolveOptions csnrOptions = {};
+
     if (customShaderNameResolve) {
       shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, &defines,
-                                           nullptr, attribs);
+                                           nullptr, attribs, &csnrOptions);
     }
 
-    auto& previousEffect = subMesh->effect();
-    auto effect          = scene->getEngine()->createEffect(shaderName, options, engine);
+    auto& previousEffect     = subMesh->effect();
+    options.processFinalCode = csnrOptions.processFinalCode;
+    auto effect              = scene->getEngine()->createEffect(shaderName, options, engine);
 
     if (effect) {
       /*if (_onEffectCreatedObservable) */ {
@@ -1005,7 +1012,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   _activeEffect = effect;
 
   // Matrices
-  if (!defines["INSTANCES"]) {
+  if (!defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
     bindOnlyWorldMatrix(world);
   }
 
@@ -1161,12 +1168,12 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
         "vEmissiveColor",
         StandardMaterial::EmissiveTextureEnabled() ? emissiveColor : Color3::BlackReadOnly(), "");
 
-      // Visibility
-      ubo.updateFloat("visibility", mesh->visibility());
-
       // Diffuse
       ubo.updateColor4("vDiffuseColor", diffuseColor, alpha(), "");
     }
+
+    // Visibility
+    ubo.updateFloat("visibility", mesh->visibility());
 
     // Textures
     if (scene->texturesEnabled()) {

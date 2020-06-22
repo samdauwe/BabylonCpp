@@ -262,7 +262,7 @@ BaseTexturePtr WaterMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh, bool useInstances)
+bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (subMesh->effect() && subMesh->effect()->_wasPreviouslyReady) {

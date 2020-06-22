@@ -67,8 +67,7 @@ public:
    * instances
    * @returns true if all the dependencies are ready (Textures, Effects...)
    */
-  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
-                         bool useInstances = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
 
   /**
    * @brief Build the uniform buffer used in the material.
