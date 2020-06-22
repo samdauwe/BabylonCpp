@@ -30,17 +30,18 @@ std::unique_ptr<MaterialDefines> MaterialHelper::_TmpMorphInfluencers
   = std::make_unique<MaterialDefines>();
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
 
-void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
+void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene,
+                                     const std::string& variableName)
 {
   if (scene->_forcedViewPosition) {
-    effect->setVector3("vEyePosition", *scene->_forcedViewPosition);
+    effect->setVector3(variableName, *scene->_forcedViewPosition);
     return;
   }
   const auto& globalPosition = scene->activeCamera()->globalPosition();
 
-  effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                       *scene->_mirroredCameraPosition :
-                                       globalPosition);
+  effect->setVector3(variableName, scene->_mirroredCameraPosition ?
+                                     *scene->_mirroredCameraPosition :
+                                     globalPosition);
 }
 
 void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
@@ -91,7 +92,8 @@ void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(Scene* scene, Engine* engine,
                                                        MaterialDefines& defines, bool useInstances,
-                                                       std::optional<bool> useClipPlane)
+                                                       std::optional<bool> useClipPlane,
+                                                       bool useThinInstances)
 {
   auto changed       = false;
   auto useClipPlane1 = false;
@@ -151,6 +153,11 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(Scene* scene, Engine* eng
   if (defines["INSTANCES"] != useInstances) {
     defines.boolDef["INSTANCES"] = useInstances;
     changed                      = true;
+  }
+
+  if (defines["THIN_INSTANCES"] != useThinInstances) {
+    defines.boolDef["THIN_INSTANCES"] = useThinInstances;
+    changed                           = true;
   }
 
   if (changed) {
@@ -634,7 +641,7 @@ void MaterialHelper::PrepareAttributesForBones(std::vector<std::string>& attribs
 void MaterialHelper::PrepareAttributesForInstances(std::vector<std::string>& attribs,
                                                    MaterialDefines& defines)
 {
-  if (defines["INSTANCES"]) {
+  if (defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
     PushAttributesForInstances(attribs);
   }
 }

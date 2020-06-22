@@ -50,8 +50,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @brief Bind the current view position to an effect.
    * @param effect The effect to be bound
    * @param scene The scene the eyes position is used from
+   * @param variableName name of the shader variable that will hold the eye position
    */
-  static void BindEyePosition(const EffectPtr& effect, Scene* scene);
+  static void BindEyePosition(const EffectPtr& effect, Scene* scene,
+                              const std::string& variableName = "vEyePosition");
 
   /**
    * @brief Helps preparing the defines values about the UVs in used in the effect. UVs are shared
@@ -103,10 +105,13 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param defines specifies the list of active defines
    * @param useInstances defines if instances have to be turned on
    * @param useClipPlane defines if clip plane have to be turned on
+   * @param useInstances defines if instances have to be turned on
+   * @param useThinInstances defines if thin instances have to be turned on
    */
   static void PrepareDefinesForFrameBoundValues(Scene* scene, Engine* engine,
                                                 MaterialDefines& defines, bool useInstances,
-                                                std::optional<bool> useClipPlane = std::nullopt);
+                                                std::optional<bool> useClipPlane = std::nullopt,
+                                                bool useThinInstances            = false);
 
   /**
    * @brief Prepares the defines for bones.
