@@ -11,10 +11,10 @@
 
 namespace BABYLON {
 
-class BaseSubMesh;
 class Effect;
 class ICanvas;
 class Node;
+class SubMesh;
 
 struct Bounds {
   Vector2 min;
@@ -221,8 +221,8 @@ struct NodeCache {
 }; // end of struct NodeCache
 
 struct OnCreatedEffectParameters {
-  Effect* effect       = nullptr;
-  BaseSubMesh* subMesh = nullptr;
+  Effect* effect   = nullptr;
+  SubMesh* subMesh = nullptr;
 }; // end of struct OnCreatedEffectParameters
 
 struct PickedParticle {
