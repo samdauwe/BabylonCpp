@@ -449,29 +449,27 @@ public:
   static std::unique_ptr<VertexData> CreateDisc(DiscOptions& options);
 
   /**
-   * @brief Creates the VertexData for an irregular Polygon in the XoZ plane
-   * using a mesh built by polygonTriangulation.build() All parameters are
-   * provided by MeshBuilder.CreatePolygon as needed.
+   * @brief Creates the VertexData for an irregular Polygon in the XoZ plane using a mesh built by
+   * polygonTriangulation.build() All parameters are provided by MeshBuilder.CreatePolygon as needed
    * @param polygon a mesh built from polygonTriangulation.build()
-   * @param sideOrientation takes the values Mesh.FRONTSIDE (default),
-   * Mesh.BACKSIDE or Mesh.DOUBLESIDE
-   * @param fUV an array of Vector4 elements used to set different images to the
-   * top, rings and bottom respectively
-   * @param fColors an array of Color3 elements used to set different colors to
-   * the top, rings and bottom respectively
-   * @param frontUVs only usable when you create a double-sided mesh, used to
-   * choose what parts of the texture image to crop and apply on the front side,
-   * optional, default vector4 (0, 0, 1, 1)
-   * @param backUVs only usable when you create a double-sided mesh, used to
-   * choose what parts of the texture image to crop and apply on the back side,
-   * optional, default vector4 (0, 0, 1, 1)
+   * @param sideOrientation takes the values Mesh.FRONTSIDE (default), Mesh.BACKSIDE or
+   * Mesh.DOUBLESIDE
+   * @param fUV an array of Vector4 elements used to set different images to the top, rings and
+   * bottom respectively
+   * @param fColors an array of Color3 elements used to set different colors to the top, rings and
+   * bottom respectively
+   * @param frontUVs only usable when you create a double-sided mesh, used to choose what parts of
+   * the texture image to crop and apply on the front side, optional, default vector4 (0, 0, 1, 1)
+   * @param backUVs only usable when you create a double-sided mesh, used to choose what parts of
+   * the texture image to crop and apply on the back side, optional, default vector4 (0, 0, 1, 1)
+   * @param wrap a boolean, default false, when true and fUVs used texture is wrapped around all
+   * sides, when false texture is applied side
    * @returns the VertexData of the Polygon
    */
-  static std::unique_ptr<VertexData>
-  CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
-                const std::array<std::optional<Vector4>, 3>& fUV,
-                const std::optional<std::array<std::optional<Color4>, 3>>& fColors,
-                Vector4& frontUVs, Vector4& backUVs, const std::optional<bool>& wrp = std::nullopt);
+  static std::unique_ptr<VertexData> CreatePolygon(
+    Mesh* polygon, unsigned int sideOrientation, const std::array<std::optional<Vector4>, 3>& fUV,
+    const std::optional<std::array<std::optional<Color4>, 3>>& fColors, Vector4& frontUVs,
+    Vector4& backUVs, const std::optional<bool>& wrap = std::nullopt);
 
   /**
    * @brief Creates the VertexData of the IcoSphere.
