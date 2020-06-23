@@ -169,9 +169,9 @@ unsigned int SpriteManager::get_blendMode() const
   return _blendMode;
 }
 
-void SpriteManager::set_blendMode(unsigned int blendMode)
+void SpriteManager::set_blendMode(unsigned int iBlendMode)
 {
-  _blendMode = blendMode;
+  _blendMode = iBlendMode;
 }
 
 void SpriteManager::_makePacked(const std::string& /*imgUrl*/, const std::string& /*spriteJSON*/)

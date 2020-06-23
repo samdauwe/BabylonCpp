@@ -39,8 +39,8 @@ void AmbientOcclusionBlock::RegisterConnections(
     NodeMaterialBlockTargets::Fragment,
     NodeMaterialConnectionPointCustomObject::New(
       "ambientOcclusion", ambientOcclusionBlock, NodeMaterialConnectionPointDirection::Output,
-      [](const std::string& name) -> AmbientOcclusionBlockPtr {
-        return AmbientOcclusionBlock::New(name);
+      [](const std::string& iName) -> AmbientOcclusionBlockPtr {
+        return AmbientOcclusionBlock::New(iName);
       },
       "AOBlock"));
 }

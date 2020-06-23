@@ -281,14 +281,15 @@ std::string GPUParticleSystem::getClassName() const
   return "GPUParticleSystem";
 }
 
-EffectPtr GPUParticleSystem::getCustomEffect(unsigned int blendMode)
+EffectPtr GPUParticleSystem::getCustomEffect(unsigned int iBlendMode)
 {
-  return stl_util::contains(_customEffect, blendMode) ? _customEffect[blendMode] : _customEffect[0];
+  return stl_util::contains(_customEffect, iBlendMode) ? _customEffect[iBlendMode] :
+                                                         _customEffect[0];
 }
 
-void GPUParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int blendMode)
+void GPUParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int iBlendMode)
 {
-  _customEffect[blendMode] = effect;
+  _customEffect[iBlendMode] = effect;
 }
 
 BaseParticleSystem&
@@ -1015,7 +1016,7 @@ void GPUParticleSystem::_recreateUpdateEffect()
   _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
 }
 
-void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int blendMode)
+void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int iBlendMode)
 {
   if (_scene->clipPlane.has_value()) {
     defines.emplace_back("#define CLIPPLANE");
@@ -1036,7 +1037,7 @@ void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned 
     defines.emplace_back("#define CLIPPLANE6");
   }
 
-  if (blendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
+  if (iBlendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
     defines.emplace_back("#define BLENDMULTIPLYMODE");
   }
 

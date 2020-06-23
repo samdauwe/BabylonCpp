@@ -403,14 +403,14 @@ std::string Effect::get_fragmentSourceCode() const
 }
 
 void Effect::_rebuildProgram(
-  const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
+  const std::string& iVertexSourceCode, const std::string& iFragmentSourceCode,
   const std::function<void(const IPipelineContextPtr& pipelineContext)>& iOnCompiled,
   const std::function<void(const std::string& message)>& iOnError)
 {
   _isReady = false;
 
-  _vertexSourceCodeOverride   = vertexSourceCode;
-  _fragmentSourceCodeOverride = fragmentSourceCode;
+  _vertexSourceCodeOverride   = iVertexSourceCode;
+  _fragmentSourceCodeOverride = iFragmentSourceCode;
   onError                     = [=](const Effect* /*effect*/, const std::string& error) {
     if (iOnError) {
       iOnError(error);

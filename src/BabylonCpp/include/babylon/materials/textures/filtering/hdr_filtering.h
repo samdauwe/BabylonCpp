@@ -12,7 +12,7 @@ namespace BABYLON {
 class BaseTexture;
 class Effect;
 class EffectRenderer;
-class EffectWrapper;
+struct EffectWrapper;
 class InternalTexture;
 class ThinEngine;
 using BaseTexturePtr     = std::shared_ptr<BaseTexture>;
@@ -32,7 +32,7 @@ struct BABYLON_SHARED_EXPORT IHDRFilteringOptions {
   /**
    * Quality of the filter. Should be `Constants.TEXTURE_FILTERING_QUALITY_OFFLINE` for prefiltering
    */
-  std::optional<float> quality = std::nullopt;
+  std::optional<unsigned int> quality = std::nullopt;
 }; // end of struct IHDRFilteringOptions
 
 /**

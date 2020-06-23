@@ -64,14 +64,14 @@ void TextureSelectorExtension::setCompressedTextureExclusions(
 std::string
 TextureSelectorExtension::setTextureFormatToUse(const std::vector<std::string>& formatsAvailable)
 {
-  const auto& _texturesSupported = texturesSupported();
-  for (size_t i = 0, len1 = _texturesSupported.size(); i < len1; ++i) {
+  const auto& iTexturesSupported = texturesSupported();
+  for (size_t i = 0, len1 = iTexturesSupported.size(); i < len1; ++i) {
     for (size_t j = 0, len2 = formatsAvailable.size(); j < len2; ++j) {
-      if (_texturesSupported[i] == StringTools::toLowerCase(formatsAvailable[j])) {
+      if (iTexturesSupported[i] == StringTools::toLowerCase(formatsAvailable[j])) {
         _this->_transformTextureUrl = [this](const std::string& url) -> std::string {
           return transformTextureUrl(_this, url);
         };
-        return _textureFormatInUse = _texturesSupported[i];
+        return _textureFormatInUse = iTexturesSupported[i];
       }
     }
   }

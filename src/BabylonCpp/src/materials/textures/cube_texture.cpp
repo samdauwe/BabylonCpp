@@ -322,7 +322,7 @@ CubeTexturePtr CubeTexture::Parse(const json& parsedTexture, Scene* scene,
 
 CubeTexturePtr CubeTexture::clone() const
 {
-  const auto uniqueId = 0u;
+  const auto iUniqueId = 0u;
 
   std::optional<std::variant<Scene*, ThinEngine*>> sceneOrEngine = std::nullopt;
   if (getScene()) {
@@ -336,7 +336,7 @@ CubeTexturePtr CubeTexture::clone() const
                                          nullptr, nullptr, _format, _prefiltered, _forcedExtension,
                                          _createPolynomials, _lodScale, _lodOffset);
 
-  newCubeTexture->uniqueId = uniqueId;
+  newCubeTexture->uniqueId = iUniqueId;
 
   return newCubeTexture;
 }

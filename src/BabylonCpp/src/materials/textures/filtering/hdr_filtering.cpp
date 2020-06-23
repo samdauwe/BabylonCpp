@@ -21,7 +21,7 @@ HDRFiltering::HDRFiltering(ThinEngine* engine, const IHDRFilteringOptions& optio
   // pass
   _engine  = engine;
   hdrScale = options.hdrScale.value_or(Constants::TEXTURE_FILTERING_QUALITY_OFFLINE);
-  quality  = options.hdrScale.value_or(1.f);
+  quality  = options.quality.value_or(1u);
 }
 
 InternalTexturePtr HDRFiltering::_createRenderTarget(int size)
@@ -80,7 +80,8 @@ BaseTexturePtr HDRFiltering::_prefilterInternal(const BaseTexturePtr& texture)
   }};
 
   effect->setFloat("hdrScale", hdrScale);
-  effect->setFloat2("vFilteringInfo", texture->getSize().width, mipmapsCount);
+  effect->setFloat2("vFilteringInfo", static_cast<float>(texture->getSize().width),
+                    static_cast<float>(mipmapsCount));
   effect->setTexture("inputTexture", texture);
 
   for (unsigned int face = 0; face < 6; ++face) {
@@ -93,9 +94,10 @@ BaseTexturePtr HDRFiltering::_prefilterInternal(const BaseTexturePtr& texture)
       _engine->bindFramebuffer(outputTexture, face, std::nullopt, std::nullopt, true, lod);
       _effectRenderer->applyEffectWrapper(_effectWrapper);
 
-      auto alpha = std::pow(2, (lod - _lodGenerationOffset) / _lodGenerationScale) / width;
+      auto alpha = static_cast<float>(
+        std::pow(2, (lod - _lodGenerationOffset) / _lodGenerationScale) / width);
       if (lod == 0) {
-        alpha = 0;
+        alpha = 0.f;
       }
 
       effect->setFloat("alphaG", alpha);

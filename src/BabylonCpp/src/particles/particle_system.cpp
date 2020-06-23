@@ -351,14 +351,14 @@ bool ParticleSystem::isStopping() const
   return _stopped && isAlive();
 }
 
-EffectPtr ParticleSystem::getCustomEffect(unsigned int blendMode)
+EffectPtr ParticleSystem::getCustomEffect(unsigned int iBlendMode)
 {
-  return stl_util::contains(_customEffect, blendMode) ? _customEffect[blendMode] : nullptr;
+  return stl_util::contains(_customEffect, iBlendMode) ? _customEffect[iBlendMode] : nullptr;
 }
 
-void ParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int blendMode)
+void ParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int iBlendMode)
 {
-  _customEffect[blendMode] = effect;
+  _customEffect[iBlendMode] = effect;
 }
 
 Observable<Effect>& ParticleSystem::get_onBeforeDrawParticlesObservable()
@@ -1435,9 +1435,9 @@ void ParticleSystem::fillUniformsAttributesAndSamplerNames(std::vector<std::stri
   }
 }
 
-EffectPtr ParticleSystem::_getEffect(unsigned int blendMode)
+EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
 {
-  const auto customEffect = getCustomEffect(blendMode);
+  const auto customEffect = getCustomEffect(iBlendMode);
 
   if (customEffect) {
     return customEffect;
@@ -1445,7 +1445,7 @@ EffectPtr ParticleSystem::_getEffect(unsigned int blendMode)
 
   std::vector<std::string> defines;
 
-  fillDefines(defines, blendMode);
+  fillDefines(defines, iBlendMode);
 
   // Effect
   std::string join = StringTools::join(defines, '\n');
