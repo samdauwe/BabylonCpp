@@ -5,6 +5,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
+#include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -712,6 +713,8 @@ TransformNode& TransformNode::attachToBone(Bone* bone, TransformNode* affectedTr
   _transformToBoneReferal = affectedTransformNode;
   Node::set_parent(bone);
 
+  bone->getSkeleton()->prepare();
+
   if (bone->getWorldMatrix().determinant() < 0.f) {
     scalingDeterminant *= -1.f;
   }
@@ -1031,7 +1034,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
 
   // Normal matrix
   if (!ignoreNonUniformScaling) {
-    if (_scaling.isNonUniform()) {
+    if (_scaling.isNonUniformWithinEpsilon(0.000001f)) {
       _updateNonUniformScalingState(true);
     }
     else if (iParent) {

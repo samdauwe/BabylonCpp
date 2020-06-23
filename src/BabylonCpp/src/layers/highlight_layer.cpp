@@ -220,6 +220,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
       auto internalTexture = _blurTexture->getInternalTexture();
       if (internalTexture) {
         _scene->postProcessManager->directRender(_postProcesses, internalTexture, true);
+        _engine->unBindFramebuffer(internalTexture, true);
       }
 
       onAfterBlurObservable.notifyObservers(this);

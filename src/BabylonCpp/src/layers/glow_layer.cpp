@@ -196,10 +196,11 @@ void GlowLayer::_createTextureAndPostProcesses()
       if (internalTexture) {
         _scene->postProcessManager->directRender(_postProcesses1, internalTexture, true);
 
-        internalTexture = _blurTexture2->getInternalTexture();
-        if (internalTexture) {
-          _scene->postProcessManager->directRender(_postProcesses2, internalTexture, true);
+        auto internalTexture2 = _blurTexture2->getInternalTexture();
+        if (internalTexture2) {
+          _scene->postProcessManager->directRender(_postProcesses2, internalTexture2, true);
         }
+        _engine->unBindFramebuffer(internalTexture2 ? internalTexture2 : internalTexture, true);
       }
     });
 
