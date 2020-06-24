@@ -159,7 +159,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   // Alpha test
   if (material) {
     auto needUv = false;
-    if (material->needAlphaBlending()) {
+    if (material->needAlphaTesting()) {
       defines.emplace_back("#define ALPHATEST");
       needUv = true;
     }
@@ -254,6 +254,9 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
+    if (subMesh->getRenderingMesh()->hasInstances()) {
+      defines.emplace_back("#define THIN_INSTANCES");
+    }
   }
 
   // Setup textures count
@@ -395,11 +398,8 @@ void GeometryBufferRenderer::_createRenderTargets()
 
 void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 {
-  auto ownerMesh = subMesh->getMesh();
-  auto replacementMesh
-    = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
   auto renderingMesh = subMesh->getRenderingMesh();
-  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+  auto effectiveMesh = subMesh->getEffectiveMesh();
   auto engine        = _scene->getEngine();
   auto material      = subMesh->getMaterial();
 
@@ -430,15 +430,17 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
   engine->setState(material->backFaceCulling(), 0, false, _scene->useRightHandedSystem());
 
   // Managing instances
-  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
+  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
+                                                      subMesh->getReplacementMesh() != nullptr);
 
   if (batch->mustReturn) {
     return;
   }
 
-  auto hardwareInstancedRendering = (engine->getCaps().instancedArrays != 0)
-                                    && (stl_util::contains(batch->visibleInstances, subMesh->_id))
-                                    && (!batch->visibleInstances[subMesh->_id].empty());
+  auto hardwareInstancedRendering = ((engine->getCaps().instancedArrays != 0)
+                                     && (stl_util::contains(batch->visibleInstances, subMesh->_id))
+                                     && (!batch->visibleInstances[subMesh->_id].empty()))
+                                    || renderingMesh->hasThinInstances();
   auto world = effectiveMesh->getWorldMatrix();
 
   if (isReady(subMesh, hardwareInstancedRendering)) {
