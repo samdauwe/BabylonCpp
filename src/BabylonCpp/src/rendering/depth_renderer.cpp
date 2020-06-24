@@ -72,81 +72,12 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
   _depthMap->onClearObservable.add(
     [this](Engine* _engine, EventState&) { _engine->clear(_clearColor, true, true); });
 
-  // Custom render function
-  auto renderSubMesh = [this](SubMesh* subMesh) {
-    auto ownerMesh = subMesh->getMesh();
-    auto replacementMesh
-      = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
-    auto renderingMesh = subMesh->getRenderingMesh();
-    auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
-    auto scene         = _scene;
-    auto engine        = scene->getEngine();
-    auto material      = subMesh->getMaterial();
-
-    effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
-
-    if (!material) {
-      return;
-    }
-
-    // Culling and reverse (right handed system)
-    engine->setState(material->backFaceCulling(), 0, false, scene->useRightHandedSystem());
-
-    // Managing instances
-    auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
-
-    if (batch->mustReturn) {
-      return;
-    }
-
-    bool hardwareInstancedRendering
-      = engine->getCaps().instancedArrays
-        && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end());
-
-    auto camera = (!_camera) ? _camera : scene->activeCamera;
-    if (isReady(subMesh, hardwareInstancedRendering) && camera) {
-      engine->enableEffect(_effect);
-      renderingMesh->_bind(subMesh, _effect, material->fillMode());
-
-      _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
-
-      _effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
-
-      // Alpha test
-      if (material && material->needAlphaTesting()) {
-        auto alphaTexture = material->getAlphaTestTexture();
-        if (alphaTexture) {
-          _effect->setTexture("diffuseSampler", alphaTexture);
-          _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
-        }
-      }
-
-      // Bones
-      if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
-          && renderingMesh->skeleton()) {
-        _effect->setMatrices("mBones",
-                             renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
-      }
-
-      // Morph targets
-      MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
-
-      // Draw
-      renderingMesh->_processRendering(
-        effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
-        hardwareInstancedRendering,
-        [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
-          _effect->setMatrix("world", world);
-        });
-    }
-  };
-
   _depthMap->customRenderFunction
-    = [engine, renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
-                              const std::vector<SubMesh*>& alphaTestSubMeshes,
-                              const std::vector<SubMesh*>& /*transparentSubMeshes*/,
-                              const std::vector<SubMesh*>& depthOnlySubMeshes,
-                              const std::function<void()>& /*beforeTransparents*/) {
+    = [this, engine](const std::vector<SubMesh*>& opaqueSubMeshes,
+                     const std::vector<SubMesh*>& alphaTestSubMeshes,
+                     const std::vector<SubMesh*>& /*transparentSubMeshes*/,
+                     const std::vector<SubMesh*>& depthOnlySubMeshes,
+                     const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
@@ -230,6 +161,9 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
+    if (subMesh->getRenderingMesh()->hasInstances()) {
+      defines.emplace_back("#define THIN_INSTANCES");
+    }
   }
 
   // None linear depth
@@ -260,6 +194,74 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   return _effect->isReady();
+}
+
+void DepthRenderer::renderSubMesh(SubMesh* subMesh)
+{
+  auto renderingMesh = subMesh->getRenderingMesh();
+  auto effectiveMesh = subMesh->getEffectiveMesh();
+  auto scene         = _scene;
+  auto engine        = scene->getEngine();
+  auto material      = subMesh->getMaterial();
+
+  effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
+
+  if (!material) {
+    return;
+  }
+
+  // Culling and reverse (right handed system)
+  engine->setState(material->backFaceCulling(), 0, false, scene->useRightHandedSystem());
+
+  // Managing instances
+  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
+                                                      subMesh->getReplacementMesh() != nullptr);
+
+  if (batch->mustReturn) {
+    return;
+  }
+
+  bool hardwareInstancedRendering
+    = (engine->getCaps().instancedArrays
+       && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end()))
+      || renderingMesh->hasThinInstances();
+
+  auto camera = (!_camera) ? _camera : scene->activeCamera;
+  if (isReady(subMesh, hardwareInstancedRendering) && camera) {
+    engine->enableEffect(_effect);
+    renderingMesh->_bind(subMesh, _effect, material->fillMode());
+
+    _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
+
+    _effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
+
+    // Alpha test
+    if (material && material->needAlphaTesting()) {
+      auto alphaTexture = material->getAlphaTestTexture();
+      if (alphaTexture) {
+        _effect->setTexture("diffuseSampler", alphaTexture);
+        _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+      }
+    }
+
+    // Bones
+    if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+        && renderingMesh->skeleton()) {
+      _effect->setMatrices("mBones",
+                           renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
+    }
+
+    // Morph targets
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
+
+    // Draw
+    renderingMesh->_processRendering(
+      effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+      hardwareInstancedRendering,
+      [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
+        _effect->setMatrix("world", world);
+      });
+  }
 }
 
 RenderTargetTexturePtr& DepthRenderer::getDepthMap()

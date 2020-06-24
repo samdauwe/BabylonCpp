@@ -56,6 +56,13 @@ public:
    */
   void dispose();
 
+private:
+  /**
+   * @brief Custom render function.
+   * @param subMesh
+   */
+  void renderSubMesh(SubMesh* subMesh);
+
 public:
   /**
    * Get if the depth renderer is using packed depth or not
