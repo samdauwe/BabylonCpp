@@ -63,9 +63,10 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   auto engine = scene->getEngine();
 
   bool hardwareInstancedRendering
-    = engine->getCaps().instancedArrays
-      && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end())
-      && (!batch->visibleInstances[subMesh->_id].empty());
+    = (engine->getCaps().instancedArrays
+       && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end())
+       && (!batch->visibleInstances[subMesh->_id].empty()))
+      || subMesh->getRenderingMesh()->hasThinInstances();
 
   if (!isReady(subMesh, hardwareInstancedRendering)) {
     return;
@@ -192,6 +193,9 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
+    if (subMesh->getRenderingMesh()->hasInstances()) {
+      defines.emplace_back("#define THIN_INSTANCES");
+    }
   }
 
   // Get correct effect
