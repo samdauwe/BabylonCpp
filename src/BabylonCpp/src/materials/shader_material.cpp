@@ -339,6 +339,9 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
+    if (mesh->hasThinInstances()) {
+      defines.emplace_back("#define THIN_INSTANCES");
+    }
   }
 
   // Bones
