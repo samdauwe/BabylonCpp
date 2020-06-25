@@ -114,6 +114,7 @@ ShadowDepthWrapper::ShadowDepthWrapperImpl::ShadowDepthWrapperImpl(
   const std::string prefix = baseMaterial->getClassName() == "NodeMaterial" ? "u_" : "";
 
   _matriceNames = {
+    {"world", prefix + "world"},                            //
     {"view", prefix + "view"},                              //
     {"projection", prefix + "projection"},                  //
     {"viewProjection", prefix + "viewProjection"},          //
