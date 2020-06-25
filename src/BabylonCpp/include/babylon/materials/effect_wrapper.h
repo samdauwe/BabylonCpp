@@ -29,7 +29,7 @@ struct BABYLON_SHARED_EXPORT EffectWrapper {
    * @brief Creates an effect to be renderer.
    * @param creationOptions options to create the effect
    */
-  EffectWrapper(EffectWrapperCreationOptions& creationOptions);
+  EffectWrapper(const EffectWrapperCreationOptions& creationOptions);
   ~EffectWrapper();
 
   /**

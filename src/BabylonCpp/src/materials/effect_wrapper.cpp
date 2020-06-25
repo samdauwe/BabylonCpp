@@ -6,9 +6,39 @@
 
 namespace BABYLON {
 
-EffectWrapper::EffectWrapper(EffectWrapperCreationOptions& /*creationOptions*/)
+EffectWrapper::EffectWrapper(const EffectWrapperCreationOptions& creationOptions)
 {
-  // TODO Implement
+  std::unordered_map<std::string, std::string> effectCreationOptions{};
+  auto uniformNames = creationOptions.uniformNames;
+  if (!creationOptions.vertexShader.empty()) {
+    effectCreationOptions["fragmentSource"] = creationOptions.fragmentShader;
+    effectCreationOptions["vertexSource"]   = creationOptions.vertexShader;
+    effectCreationOptions["spectorName"]
+      = !creationOptions.name.empty() ? creationOptions.name : "effectWrapper";
+  }
+  else {
+    // Default scale to use in post process vertex shader.
+    uniformNames.emplace_back("scale");
+
+    effectCreationOptions["fragmentSource"] = creationOptions.fragmentShader;
+    effectCreationOptions["vertexSource"]   = "postprocess";
+    effectCreationOptions["spectorName"]
+      = !creationOptions.name.empty() ? creationOptions.name : "effectWrapper";
+
+    // Sets the default scale to identity for the post process vertex shader.
+    onApplyObservable.add(
+      [this](void*, EventState & /*es*/) -> void { effect->setFloat2("scale", 1.f, 1.f); });
+  }
+
+  const std::vector<std::string> fallbackAttributeNames = {"position"};
+
+  IEffectCreationOptions options;
+  options.attributes = !creationOptions.attributeNames.empty() ? creationOptions.attributeNames :
+                                                                 fallbackAttributeNames;
+  options.uniformsNames = uniformNames;
+  options.samplers      = creationOptions.samplerNames;
+
+  effect = Effect ::New(effectCreationOptions, options, creationOptions.engine);
 }
 
 EffectWrapper::~EffectWrapper() = default;

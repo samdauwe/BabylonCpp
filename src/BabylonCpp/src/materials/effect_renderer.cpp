@@ -102,6 +102,8 @@ void EffectRenderer::render(
   if (out) {
     engine->unBindFramebuffer(out);
   }
+
+  restoreStates();
 }
 
 void EffectRenderer::dispose()
