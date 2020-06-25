@@ -286,6 +286,12 @@ class WindowsBuild(Build):
                 'versionNumber': '15.0',
                 'cmakeGeneratorPlatform': 'Visual Studio 15 2017 Win64',
                 'path': 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\Auxiliary\\Build\\vcvars64.bat'
+            },
+            'vs2019Community': {
+                'productName': 'Visual Studio 2019',
+                'versionNumber': '16.0',
+                'cmakeGeneratorPlatform': 'Visual Studio 16 2019',
+                'path': 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\Auxiliary\\Build\\vcvars64.bat'
             }
         }
         self._msvcDef = self._msvcDefs[msvcVer]
