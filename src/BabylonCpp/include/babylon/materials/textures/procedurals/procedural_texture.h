@@ -325,7 +325,7 @@ private:
   std::unordered_map<std::string, Vector3> _vectors3;
   std::unordered_map<std::string, Matrix> _matrices;
   bool _fallbackTextureUsed;
-  Engine* _engine;
+  Engine* _fullEngine;
   std::string _cachedDefines;
   int _contentUpdateId;
   ArrayBufferView _contentData;

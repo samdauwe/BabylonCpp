@@ -44,7 +44,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     scene->_addComponent(component);
   }
 
-  _engine = scene->getEngine();
+  _fullEngine = scene->getEngine();
 
   name           = iName;
   isRenderTarget = true;
@@ -56,14 +56,14 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
   if (iIsCube) {
     IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
-    _texture                = _engine->createRenderTargetCubeTexture(size, options);
+    _texture                = _fullEngine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
     IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture
-      = _engine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
+      = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
   }
 
   // VBO
@@ -73,12 +73,12 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
-    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+    _fullEngine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices{0, 1, 2, 0, 2, 3};
 
-  _indexBuffer = _engine->createIndexBuffer(indices);
+  _indexBuffer = _fullEngine->createIndexBuffer(indices);
 }
 
 ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
@@ -103,7 +103,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     scene->_addComponent(component);
   }
 
-  _engine = scene->getEngine();
+  _fullEngine = scene->getEngine();
 
   name           = iName;
   isRenderTarget = true;
@@ -118,7 +118,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     options.generateMipMaps       = generateMipMaps;
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
-    _texture                      = _engine->createRenderTargetCubeTexture(size, options);
+    _texture                      = _fullEngine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
@@ -127,7 +127,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
     _texture
-      = _engine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
+      = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
   }
 
   // VBO
@@ -137,7 +137,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
-    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+    _fullEngine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 }
@@ -179,7 +179,7 @@ void ProceduralTexture::_createIndexBuffer()
     3  //
   };
 
-  _indexBuffer = _engine->createIndexBuffer(indices);
+  _indexBuffer = _fullEngine->createIndexBuffer(indices);
 }
 
 void ProceduralTexture::_rebuild()
@@ -214,7 +214,7 @@ std::string ProceduralTexture::_getDefines() const
 
 bool ProceduralTexture::isReady()
 {
-  auto engine = _engine;
+  auto engine = _fullEngine;
   std::unordered_map<std::string, std::string> shaders;
 
   if (_fragment.empty()) {
@@ -338,7 +338,8 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
   releaseInternalTexture();
   IRenderTargetOptions options;
   options.generateMipMaps = generateMipMaps;
-  _texture = _engine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
+  _texture
+    = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
 
   // Update properties
   _size            = size;
@@ -437,7 +438,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     return;
   }
 
-  auto engine = _engine;
+  auto engine = _fullEngine;
 
   // Render
   engine->enableEffect(_effect);
@@ -574,7 +575,7 @@ void ProceduralTexture::dispose()
     _vertexBuffers.erase(VertexBuffer::PositionKind);
   }
 
-  if (_indexBuffer && _engine->_releaseBuffer(_indexBuffer)) {
+  if (_indexBuffer && _fullEngine->_releaseBuffer(_indexBuffer)) {
     _indexBuffer = nullptr;
   }
 
