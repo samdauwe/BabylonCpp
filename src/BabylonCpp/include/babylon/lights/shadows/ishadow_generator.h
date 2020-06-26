@@ -43,9 +43,10 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * post processes needs to be ready).
    * @param subMesh The submesh we want to render in the shadow map
    * @param useInstances Defines wether will draw in the map using instances
+   * @param isTransparent Indicates that isReady is called for a transparent subMesh
    * @returns true if ready otherwise, false
    */
-  virtual bool isReady(SubMesh* subMesh, bool useInstances = false) = 0;
+  virtual bool isReady(SubMesh* subMesh, bool useInstances = false, bool isTransparent = false) = 0;
 
   /**
    * @brief Prepare all the defines in a material relying on a shadow map at the specified light
