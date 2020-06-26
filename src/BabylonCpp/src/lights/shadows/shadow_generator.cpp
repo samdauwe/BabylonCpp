@@ -75,6 +75,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , darkness{this, &ShadowGenerator::get_darkness, &ShadowGenerator::set_darkness}
     , transparencyShadow{this, &ShadowGenerator::get_transparencyShadow,
                          &ShadowGenerator::set_transparencyShadow}
+    , enableSoftTransparentShadow{false}
     , frustumEdgeFalloff{0.f}
     , forceBackFacesOnly{false}
     , _bias{0.00005f}
@@ -602,18 +603,26 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Blur if required afer render.
   _shadowMap->onAfterUnbindObservable.add([this](RenderTargetTexture*, EventState&) {
+    auto engine = _scene->getEngine();
+    if (_scene->getSceneUniformBuffer()->useUbo()) {
+      const auto sceneUBO = _scene->getSceneUniformBuffer();
+      sceneUBO->updateMatrix("viewProjection", _scene->getTransformMatrix());
+      sceneUBO->updateMatrix("view", _scene->getViewMatrix());
+      sceneUBO->update();
+    }
+
     if (_filter == ShadowGenerator::FILTER_PCF) {
-      _scene->getEngine()->setColorWrite(true);
+      engine->setColorWrite(true);
     }
     if (!useBlurExponentialShadowMap() && !useBlurCloseExponentialShadowMap()) {
       return;
     }
-
     auto shadowMap = getShadowMapForRendering();
 
     if (shadowMap) {
-      _scene->postProcessManager->directRender(_blurPostProcesses, shadowMap->getInternalTexture(),
-                                               true);
+      const auto texture = shadowMap->getInternalTexture();
+      _scene->postProcessManager->directRender(_blurPostProcesses, texture, true);
+      engine->unBindFramebuffer(texture, true);
     }
   });
 
@@ -728,7 +737,13 @@ void ShadowGenerator::_renderForShadowMap(const std::vector<SubMesh*>& opaqueSub
 
   if (_transparencyShadow) {
     for (const auto& transparentSubMesh : transparentSubMeshes) {
-      _renderSubMeshForShadowMap(transparentSubMesh);
+      _renderSubMeshForShadowMap(transparentSubMesh, true);
+    }
+  }
+  else {
+    for (const auto& transparentSubMesh : transparentSubMeshes) {
+      transparentSubMesh->getEffectiveMesh()->_internalAbstractMeshDataInfo._isActiveIntermediate
+        = false;
     }
   }
 }
@@ -738,13 +753,10 @@ void ShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* /*s
 {
 }
 
-void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
+void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransparent)
 {
-  auto ownerMesh = subMesh->getMesh();
-  auto replacementMesh
-    = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
   auto renderingMesh = subMesh->getRenderingMesh();
-  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+  auto effectiveMesh = subMesh->getEffectiveMesh();
   auto scene         = _scene;
   auto engine        = scene->getEngine();
   auto material      = subMesh->getMaterial();
@@ -759,14 +771,16 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
   engine->setState(material->backFaceCulling());
 
   // Managing instances
-  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id);
+  auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
+                                                      subMesh->getReplacementMesh() != nullptr);
   if (batch->mustReturn) {
     return;
   }
 
-  auto hardwareInstancedRendering = (engine->getCaps().instancedArrays)
-                                    && (stl_util::contains(batch->visibleInstances, subMesh->_id))
-                                    && (!batch->visibleInstances[subMesh->_id].empty());
+  auto hardwareInstancedRendering
+    = (engine->getCaps().instancedArrays)
+      && (stl_util::contains(batch->visibleInstances, subMesh->_id))
+      && (!batch->visibleInstances[subMesh->_id].empty() || renderingMesh->hasThinInstances());
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
 
@@ -786,6 +800,10 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
       _effect->setFloat2("depthValues", getLight()->getDepthMinZ(*scene->activeCamera()),
                          getLight()->getDepthMinZ(*scene->activeCamera())
                            + getLight()->getDepthMaxZ(*scene->activeCamera()));
+    }
+
+    if (isTransparent && enableSoftTransparentShadow) {
+      _effect->setFloat("softTransparentShadowSM", effectiveMesh->visibility);
     }
 
     // Alpha test
@@ -930,7 +948,7 @@ void ShadowGenerator::_isReadyCustomDefines(std::vector<std::string>& /*defines*
 {
 }
 
-bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
+bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool /*isTransparent*/)
 {
   std::vector<std::string> defines;
 
