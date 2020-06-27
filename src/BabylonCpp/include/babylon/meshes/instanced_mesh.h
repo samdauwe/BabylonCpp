@@ -56,6 +56,14 @@ public:
   size_t getTotalIndices() const;
 
   /**
+   * @brief Creates a new InstancedMesh object from the mesh model.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_instances
+   * @param name defines the name of the new instance
+   * @returns a new InstancedMesh
+   */
+  InstancedMeshPtr createInstance(const std::string& name);
+
+  /**
    * @brief Is this node ready to be used/rendered.
    * @param completeCheck defines if a complete check (including materials and
    * lights) has to be done (false by default)

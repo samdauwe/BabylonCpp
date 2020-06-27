@@ -130,6 +130,11 @@ MeshPtr& InstancedMesh::get_sourceMesh()
   return _sourceMesh;
 }
 
+InstancedMeshPtr InstancedMesh::createInstance(const std::string& name)
+{
+  return _sourceMesh->createInstance(name);
+}
+
 bool InstancedMesh::isReady(bool completeCheck, bool /*forceInstanceSupport*/)
 {
   return _sourceMesh->isReady(completeCheck, true);
