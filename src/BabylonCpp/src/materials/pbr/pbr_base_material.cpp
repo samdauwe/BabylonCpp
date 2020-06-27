@@ -69,8 +69,9 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _metallicTexture{nullptr}
     , _metallic{std::nullopt}
     , _roughness{std::nullopt}
-    , _metallicF0Factor{0.f}
-    , _useMetallicF0FactorFromMetallicTexture{false}
+    , _metallicF0Factor{1.f}
+    , _metallicReflectanceColor{Color3::White()}
+    , _metallicReflectanceTexture{nullptr}
     , _microSurfaceTexture{nullptr}
     , _bumpTexture{nullptr}
     , _lightmapTexture{nullptr}
@@ -116,6 +117,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _rebuildInParallel{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity, _environmentIntensity,
                              _specularIntensity)}
+    , _realTimeFiltering{false}
     , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
@@ -855,8 +857,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
             = !_useRoughnessFromMetallicTextureAlpha && _useRoughnessFromMetallicTextureGreen;
           defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"] = _useMetallnessFromMetallicTextureBlue;
           defines.boolDef["AOSTOREINMETALMAPRED"] = _useAmbientOcclusionFromMetallicTextureRed;
-          defines.boolDef["METALLICF0FACTORFROMMETALLICMAP"]
-            = _useMetallicF0FactorFromMetallicTexture;
         }
         else if (_reflectivityTexture) {
           MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture, defines, "REFLECTIVITY");
@@ -1368,7 +1368,8 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       }
     }
 
-    subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(), defines["LODBASEDMICROSFURACE"]);
+    subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(), defines["LODBASEDMICROSFURACE"],
+                               _realTimeFiltering);
     clearCoat->bindForSubMesh(ubo, scene, engine, _disableBumpMap, isFrozen(), _invertNormalMapX,
                               _invertNormalMapY);
     anisotropy->bindForSubMesh(ubo, scene, isFrozen());

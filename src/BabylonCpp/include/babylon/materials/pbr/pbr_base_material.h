@@ -386,11 +386,22 @@ protected:
   float _metallicF0Factor;
 
   /**
-   * Specifies whether the F0 factor can be fetched from the mettalic texture.
-   * If set to true, please adapt the metallicF0Factor to ensure it fits with
-   * your expectation as it multiplies with the texture data.
+   * In metallic workflow, specifies an F90 color to help configuring the material F90.
+   * By default the F90 is always 1;
+   *
+   * Please note that this factor is also used as a factor against the default reflectance at normal
+   * incidence.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor
+   * F90 = metallicReflectanceColor;
    */
-  bool _useMetallicF0FactorFromMetallicTexture;
+  Color3 _metallicReflectanceColor;
+
+  /**
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * This is multiply against the scalar values defined in the material.
+   */
+  BaseTexturePtr _metallicReflectanceTexture;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending
@@ -653,6 +664,9 @@ private:
    * intensities into a Vector4.
    */
   Vector4 _lightingInfos;
+
+  bool _realTimeFiltering;
+
   /**
    * Keep track of the image processing observer to allow dispose and replace.
    */

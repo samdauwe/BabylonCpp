@@ -205,21 +205,36 @@ protected:
   void set_roughness(const std::optional<float>& value);
 
   /**
-   * Specifies the an F0 factor to help configuring the material F0.
-   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting
-   * to 0.5 the previously hard coded value stays the same.
-   * Can also be used to scale the F0 values of the metallic texture.
+   * In metallic workflow, specifies an F0 factor to help configuring the material F0.
+   * By default the indexOfrefraction is used to compute F0;
+   *
+   * This is used as a factor against the default reflectance at normal incidence to tweak it.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor;
+   * F90 = metallicReflectanceColor;
    */
   float get_metallicF0Factor() const;
   void set_metallicF0Factor(float value);
 
   /**
-   * Specifies whether the F0 factor can be fetched from the mettalic texture.
-   * If set to true, please adapt the metallicF0Factor to ensure it fits with
-   * your expectation as it multiplies with the texture data.
+   * In metallic workflow, specifies an F90 color to help configuring the material F90.
+   * By default the F90 is always 1;
+   *
+   * Please note that this factor is also used as a factor against the default reflectance at normal
+   * incidence.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor
+   * F90 = metallicReflectanceColor;
    */
-  bool get_useMetallicF0FactorFromMetallicTexture() const;
-  void set_useMetallicF0FactorFromMetallicTexture(bool value);
+  Color3& get_metallicReflectanceColor();
+  void set_metallicReflectanceColor(const Color3& value);
+
+  /**
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * This is multiply against the scalar values defined in the material.
+   */
+  BaseTexturePtr& get_metallicReflectanceTexture();
+  void set_metallicReflectanceTexture(const BaseTexturePtr& value);
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending on the current
@@ -762,11 +777,22 @@ public:
   Property<PBRMaterial, float> metallicF0Factor;
 
   /**
-   * Specifies whether the F0 factor can be fetched from the mettalic texture.
-   * If set to true, please adapt the metallicF0Factor to ensure it fits with
-   * your expectation as it multiplies with the texture data.
+   * In metallic workflow, specifies an F90 color to help configuring the material F90.
+   * By default the F90 is always 1;
+   *
+   * Please note that this factor is also used as a factor against the default reflectance at normal
+   * incidence.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor
+   * F90 = metallicReflectanceColor;
    */
-  Property<PBRMaterial, bool> useMetallicF0FactorFromMetallicTexture;
+  Property<PBRMaterial, Color3> metallicReflectanceColor;
+
+  /**
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * This is multiply against the scalar values defined in the material.
+   */
+  Property<PBRMaterial, BaseTexturePtr> metallicReflectanceTexture;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending
@@ -821,7 +847,12 @@ public:
   Property<PBRMaterial, float> microSurface;
 
   /**
-   * source material index of refraction (IOR)' / 'destination material IOR.
+   * Index of refraction of the material base layer.
+   * https://en.wikipedia.org/wiki/List_of_refractive_indices
+   *
+   * This does not only impact refraction but also the Base F0 of Dielectric Materials.
+   *
+   * From dielectric fresnel rules: F0 = square((iorT - iorI) / (iorT + iorI))
    */
   Property<PBRMaterial, float> indexOfRefraction;
 

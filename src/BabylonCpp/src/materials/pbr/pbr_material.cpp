@@ -39,11 +39,10 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     , metallic{this, &PBRMaterial::get_metallic, &PBRMaterial::set_metallic}
     , roughness{this, &PBRMaterial::get_roughness, &PBRMaterial::set_roughness}
     , metallicF0Factor{this, &PBRMaterial::get_metallicF0Factor, &PBRMaterial::set_metallicF0Factor}
-    , useMetallicF0FactorFromMetallicTexture{this,
-                                             &PBRMaterial::
-                                               get_useMetallicF0FactorFromMetallicTexture,
-                                             &PBRMaterial::
-                                               set_useMetallicF0FactorFromMetallicTexture}
+    , metallicReflectanceColor{this, &PBRMaterial::get_metallicReflectanceColor,
+                               &PBRMaterial::set_metallicReflectanceColor}
+    , metallicReflectanceTexture{this, &PBRMaterial::get_metallicReflectanceTexture,
+                                 &PBRMaterial::set_metallicReflectanceTexture}
     , microSurfaceTexture{this, &PBRMaterial::get_microSurfaceTexture,
                           &PBRMaterial::set_microSurfaceTexture}
     , bumpTexture{this, &PBRMaterial::get_bumpTexture, &PBRMaterial::set_bumpTexture}
@@ -165,8 +164,9 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     metallicTexture                           = nullptr;
     metallic                                  = 0.f;
     roughness                                 = 0.f;
-    metallicF0Factor                          = 0.5f;
-    useMetallicF0FactorFromMetallicTexture    = false;
+    metallicF0Factor                          = 1.0f;
+    metallicReflectanceColor                  = Color3::White();
+    metallicReflectanceTexture                = nullptr;
     microSurfaceTexture                       = nullptr;
     bumpTexture                               = nullptr;
     lightmapTexture                           = nullptr;
@@ -471,18 +471,33 @@ void PBRMaterial::set_metallicF0Factor(float value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
-bool PBRMaterial::get_useMetallicF0FactorFromMetallicTexture() const
+Color3& PBRMaterial::get_metallicReflectanceColor()
 {
-  return _useMetallicF0FactorFromMetallicTexture;
+  return _metallicReflectanceColor;
 }
 
-void PBRMaterial::set_useMetallicF0FactorFromMetallicTexture(bool value)
+void PBRMaterial::set_metallicReflectanceColor(const Color3& value)
 {
-  if (_useMetallicF0FactorFromMetallicTexture == value) {
+  if (_metallicReflectanceColor == value) {
     return;
   }
 
-  _useMetallicF0FactorFromMetallicTexture = value;
+  _metallicReflectanceColor = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+BaseTexturePtr& PBRMaterial::get_metallicReflectanceTexture()
+{
+  return _metallicReflectanceTexture;
+}
+
+void PBRMaterial::set_metallicReflectanceTexture(const BaseTexturePtr& value)
+{
+  if (_metallicReflectanceTexture == value) {
+    return;
+  }
+
+  _metallicReflectanceTexture = value;
   _markAllSubMeshesAsTexturesDirty();
 }
 
@@ -639,12 +654,12 @@ void PBRMaterial::set_microSurface(float value)
 
 float PBRMaterial::get_indexOfRefraction() const
 {
-  return 1.f / subSurface->indexOfRefraction();
+  return subSurface->indexOfRefraction();
 }
 
 void PBRMaterial::set_indexOfRefraction(float value)
 {
-  subSurface->indexOfRefraction = 1.f / value;
+  subSurface->indexOfRefraction = value;
 }
 
 bool PBRMaterial::get_invertRefractionY() const
