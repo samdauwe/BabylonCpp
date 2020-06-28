@@ -71,11 +71,13 @@ public:
   /**
    * Gets or sets the minimum range
    */
+  // @editableInPropertyPage("Minimum", PropertyTypeForEdition.Float)
   float minimum;
 
   /**
    * Gets or sets the maximum range
    */
+  // @editableInPropertyPage("Maximum", PropertyTypeForEdition.Float)
   float maximum;
 
   /**
