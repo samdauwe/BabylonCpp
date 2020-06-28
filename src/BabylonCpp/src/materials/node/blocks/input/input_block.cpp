@@ -6,6 +6,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_value.h>
 #include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -13,6 +14,23 @@
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
+
+static const std::unordered_map<std::string, std::string> remapAttributeName{
+  {"position2d", "position"},             //
+  {"particle_uv", "vUV"},                 //
+  {"particle_color", "vColor"},           //
+  {"particle_texturemask", "textureMask"} //
+};
+
+static const std::unordered_map<std::string, bool> attributeInFragmentOnly{
+  {"particle_uv", true},         //
+  {"particle_color", true},      //
+  {"particle_texturemask", true} //
+};
+
+static const std::unordered_map<std::string, bool> attributeAsUniform{
+  {"particle_texturemask", true}, //
+};
 
 InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarget,
                        NodeMaterialBlockConnectionPointTypes type)
@@ -37,6 +55,7 @@ InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarge
     , isVarying{this, &InputBlock::get_isVarying, &InputBlock::set_isVarying}
     , isSystemValue{this, &InputBlock::get_isSystemValue}
     , systemValue{this, &InputBlock::get_systemValue, &InputBlock::set_systemValue}
+    , _noContextSwitch{this, &InputBlock::get__noContextSwitch}
     , _mode{NodeMaterialBlockConnectionPointMode::Undefined}
     , _storedValue{nullptr}
     , _valueCallback{nullptr}
@@ -93,7 +112,7 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         _type = NodeMaterialBlockConnectionPointTypes::Vector3;
         return _type;
       }
-      else if (name == "uv" || name == "uv2") {
+      else if (name == "uv" || name == "uv2" || name == "position2d" || name == "particle_uv") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector2;
         return _type;
       }
@@ -102,7 +121,7 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         _type = NodeMaterialBlockConnectionPointTypes::Vector4;
         return _type;
       }
-      else if (name == "color") {
+      else if (name == "color" || name == "particle_color" || name == "particle_texturemask") {
         _type = NodeMaterialBlockConnectionPointTypes::Color4;
         return _type;
       }
@@ -371,6 +390,11 @@ std::string InputBlock::_emitConstant(NodeMaterialBuildState& state)
   return "";
 }
 
+bool InputBlock::get__noContextSwitch() const
+{
+  return attributeInFragmentOnly.at(name);
+}
+
 void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
 {
   // Uniforms
@@ -429,12 +453,22 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
 
   // Attribute
   if (isAttribute) {
-    associatedVariableName = name;
+    associatedVariableName
+      = stl_util::contains(remapAttributeName, name) ? remapAttributeName.at(name) : name;
 
     if (target() == NodeMaterialBlockTargets::Vertex
-        && state._vertexState) { // Attribute for fragment need to be carried
-                                 // over by varyings
-      _emit(*state._vertexState, define);
+        && state._vertexState) { // Attribute for fragment need to be carried over by varyings
+      if (stl_util::contains(attributeInFragmentOnly, name) && attributeInFragmentOnly.at(name)) {
+        if (stl_util::contains(attributeAsUniform, name) && attributeAsUniform.at(name)) {
+          state._emitUniformFromString(associatedVariableName, state._getGLType(type), define);
+        }
+        else {
+          state._emitVaryingFromString(associatedVariableName, state._getGLType(type), define);
+        }
+      }
+      else {
+        _emit(*state._vertexState, define);
+      }
       return;
     }
 
@@ -443,13 +477,24 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
     }
 
     state.attributes.emplace_back(associatedVariableName);
-    if (!define.empty()) {
-      state._attributeDeclaration += _emitDefine(define);
+
+    if (stl_util::contains(attributeInFragmentOnly, name) && attributeInFragmentOnly.at(name)) {
+      if (stl_util::contains(attributeAsUniform, name) && attributeAsUniform.at(name)) {
+        state._emitUniformFromString(associatedVariableName, state._getGLType(type), define);
+      }
+      else {
+        state._emitVaryingFromString(associatedVariableName, state._getGLType(type), define);
+      }
     }
-    state._attributeDeclaration += StringTools::printf(
-      "attribute %s %s;\r\n", state._getGLType(type()).c_str(), associatedVariableName().c_str());
-    if (!define.empty()) {
-      state._attributeDeclaration += "#endif\r\n";
+    else {
+      if (!define.empty()) {
+        state._attributeDeclaration += _emitDefine(define);
+      }
+      state._attributeDeclaration += StringTools::printf(
+        "attribute %s %s;\r\n", state._getGLType(type()).c_str(), associatedVariableName().c_str());
+      if (!define.empty()) {
+        state._attributeDeclaration += "#endif\r\n";
+      }
     }
   }
 }
@@ -500,7 +545,7 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
         effect->setMatrix(variableName, scene->getTransformMatrix());
         break;
       case NodeMaterialSystemValues::CameraPosition:
-        effect->setVector3(variableName, scene->activeCamera()->globalPosition());
+        MaterialHelper::BindEyePosition(effect, scene, variableName);
         break;
       case NodeMaterialSystemValues::FogColor:
         effect->setColor3(variableName, scene->fogColor);

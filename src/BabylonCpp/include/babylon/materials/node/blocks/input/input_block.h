@@ -233,6 +233,11 @@ protected:
   /**
    * @brief Hidden
    */
+  bool get__noContextSwitch() const;
+
+  /**
+   * @brief Hidden
+   */
   std::string _dumpPropertiesCode() override;
 
   /**
@@ -360,6 +365,11 @@ public:
    * Gets or sets the current well known value or null if not defined as a system value
    */
   Property<InputBlock, std::optional<NodeMaterialSystemValues>> systemValue;
+
+  /**
+   * @hidden
+   */
+  ReadOnlyProperty<InputBlock, bool> _noContextSwitch;
 
 private:
   NodeMaterialBlockConnectionPointMode _mode;
