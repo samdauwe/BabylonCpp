@@ -36,7 +36,8 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      NodeMaterialDefines& defines, bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false,
+                      const SubMeshPtr& subMesh = nullptr) override;
 
   /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
@@ -121,11 +122,15 @@ public:
   /**
    * Gets or sets a boolean indicating that normal should be inverted on X axis
    */
+  // @editableInPropertyPage("Invert X axis", PropertyTypeForEdition.Boolean, "PROPERTIES", {
+  // "notifiers": { "update": false }})
   bool invertX;
 
   /**
    * Gets or sets a boolean indicating that normal should be inverted on Y axis
    */
+  // @editableInPropertyPage("Invert Y axis", PropertyTypeForEdition.Boolean, "PROPERTIES", {
+  // "notifiers": { "update": false }})
   bool invertY;
 
   /**

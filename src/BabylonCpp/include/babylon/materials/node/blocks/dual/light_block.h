@@ -44,7 +44,8 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      NodeMaterialDefines& defines, bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false,
+                      const SubMeshPtr& subMesh = nullptr) override;
 
   /**
    * @brief Add uniforms, samplers and uniform buffers at compilation time.

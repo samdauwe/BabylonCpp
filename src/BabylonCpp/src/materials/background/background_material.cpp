@@ -1073,7 +1073,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
 
-    MaterialHelper::BindEyePosition(effect, scene);
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   if (mustRebind || !isFrozen()) {

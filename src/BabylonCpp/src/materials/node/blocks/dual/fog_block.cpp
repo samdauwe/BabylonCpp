@@ -104,7 +104,8 @@ void FogBlock::autoConfigure(const NodeMaterialPtr& material)
 }
 
 void FogBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                              NodeMaterialDefines& defines, bool /*useInstances*/)
+                              NodeMaterialDefines& defines, bool /*useInstances*/,
+                              const SubMeshPtr& /*subMesh*/)
 {
   auto scene = mesh->getScene();
   defines.setValue("FOG", nodeMaterial->fogEnabled() && MaterialHelper::GetFogState(mesh, scene));

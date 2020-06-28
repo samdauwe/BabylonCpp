@@ -24,10 +24,12 @@ class NodeMaterialConnectionPoint;
 struct NodeMaterialDefines;
 class NodeMaterialBuildState;
 class Scene;
+class SubMesh;
 using EffectPtr                      = std::shared_ptr<Effect>;
 using NodeMaterialPtr                = std::shared_ptr<NodeMaterial>;
 using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
 using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
+using SubMeshPtr                     = std::shared_ptr<SubMesh>;
 
 struct NodeMaterialBlockConnectionOptions {
   std::string input{};
@@ -184,7 +186,8 @@ public:
    * @param useInstances specifies that instances should be used
    */
   virtual void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                              NodeMaterialDefines& defines, bool useInstances = false);
+                              NodeMaterialDefines& defines, bool useInstances = false,
+                              const SubMeshPtr& subMesh = nullptr);
 
   /**
    * @brief Lets the block try to connect some inputs automatically.

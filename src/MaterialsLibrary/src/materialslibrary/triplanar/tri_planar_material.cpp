@@ -393,7 +393,7 @@ void TriPlanarMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMe
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    MaterialHelper::BindEyePosition(effect, scene);
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);

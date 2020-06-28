@@ -288,7 +288,8 @@ void NodeMaterialBlock::initializeDefines(AbstractMesh* /*mesh*/,
 
 void NodeMaterialBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                        const NodeMaterialPtr& /*nodeMaterial*/,
-                                       NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
+                                       NodeMaterialDefines& /*defines*/, bool /*useInstances*/,
+                                       const SubMeshPtr& /*subMesh*/)
 {
   // Do nothing
 }

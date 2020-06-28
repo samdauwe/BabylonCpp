@@ -166,7 +166,8 @@ void TextureBlock::initializeDefines(AbstractMesh* /*mesh*/,
 }
 
 void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
-                                  NodeMaterialDefines& defines, bool /*useInstances*/)
+                                  NodeMaterialDefines& defines, bool /*useInstances*/,
+                                  const SubMeshPtr& /*subMesh*/)
 {
   if (!defines._areTexturesDirty) {
     return;

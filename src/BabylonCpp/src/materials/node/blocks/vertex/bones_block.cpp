@@ -130,7 +130,8 @@ void BonesBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMate
 }
 
 void BonesBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
-                                NodeMaterialDefines& defines, bool /*useInstances*/)
+                                NodeMaterialDefines& defines, bool /*useInstances*/,
+                                const SubMeshPtr& /*subMesh*/)
 {
   if (!defines._areAttributesDirty) {
     return;

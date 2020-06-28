@@ -228,7 +228,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
     _activeEffect->setFloat("alpha", alpha);
     _activeEffect->setColor3("shadowColor", shadowColor);
 
-    MaterialHelper::BindEyePosition(effect, scene);
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   // Lights

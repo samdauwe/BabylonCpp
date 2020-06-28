@@ -98,7 +98,8 @@ std::string AmbientOcclusionBlock::GetCode(const AmbientOcclusionBlockPtr& block
 }
 
 void AmbientOcclusionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                                           NodeMaterialDefines& defines, bool /*useInstances*/)
+                                           NodeMaterialDefines& defines, bool /*useInstances*/,
+                                           const SubMeshPtr& /*subMesh*/)
 {
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 

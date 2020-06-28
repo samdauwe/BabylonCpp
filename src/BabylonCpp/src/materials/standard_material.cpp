@@ -1231,7 +1231,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    MaterialHelper::BindEyePosition(effect, scene);
+    MaterialHelper::BindEyePosition(effect.get(), scene);
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 

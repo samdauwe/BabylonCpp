@@ -48,7 +48,8 @@ public:
    * @param useInstances specifies that instances should be used
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                      NodeMaterialDefines& defines, bool useInstances = false) override;
+                      NodeMaterialDefines& defines, bool useInstances = false,
+                      const SubMeshPtr& subMesh = nullptr) override;
   /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to

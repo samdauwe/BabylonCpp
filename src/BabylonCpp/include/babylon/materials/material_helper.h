@@ -52,7 +52,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param scene The scene the eyes position is used from
    * @param variableName name of the shader variable that will hold the eye position
    */
-  static void BindEyePosition(const EffectPtr& effect, Scene* scene,
+  static void BindEyePosition(Effect* effect, Scene* scene,
                               const std::string& variableName = "vEyePosition");
 
   /**

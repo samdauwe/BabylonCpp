@@ -81,7 +81,8 @@ NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_output()
 
 void PerturbNormalBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                         const NodeMaterialPtr& /*nodeMaterial*/,
-                                        NodeMaterialDefines& defines, bool /*useInstances*/)
+                                        NodeMaterialDefines& defines, bool /*useInstances*/,
+                                        const SubMeshPtr& /*subMesh*/)
 {
   defines.setValue("BUMP", true);
 }
@@ -155,14 +156,22 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
     state.compilationString += "mat3 vTBN = mat3(tbnTangent, tbnBitangent, tbnNormal);\r\n";
   }
 
-  EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
-  emitFunctionFromIncludeOptions.replaceStrings
-    = {{"vBumpInfos.y", replaceForBumpInfos},
-       {"vTangentSpaceParams", _tangentSpaceParameterName},
-       {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
-       tangentReplaceString};
-  state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
-                                 emitFunctionFromIncludeOptions);
+  {
+    EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
+    emitFunctionFromIncludeOptions.replaceStrings = {tangentReplaceString};
+    state._emitFunctionFromInclude("bumpFragmentMainFunctions", iComments,
+                                   emitFunctionFromIncludeOptions);
+  }
+
+  {
+    EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
+    emitFunctionFromIncludeOptions.replaceStrings
+      = {{"vBumpInfos.y", replaceForBumpInfos},
+         {"vTangentSpaceParams", _tangentSpaceParameterName},
+         {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"}};
+    state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
+                                   emitFunctionFromIncludeOptions);
+  }
 
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
@@ -174,6 +183,8 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
        {"vBumpUV", _uv->associatedVariableName()},
        {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
        {"normalW=", output()->associatedVariableName() + ".xyz = "},
+       {R"(mat3\(normalMatrix\)\*normalW)",
+        "mat3(normalMatrix) * " + output()->associatedVariableName() + ".xyz"},
        {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
        tangentReplaceString};
   state.compilationString

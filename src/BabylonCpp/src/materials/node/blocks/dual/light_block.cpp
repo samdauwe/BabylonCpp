@@ -128,7 +128,8 @@ void LightBlock::autoConfigure(const NodeMaterialPtr& material)
 }
 
 void LightBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-                                NodeMaterialDefines& defines, bool /*useInstances*/)
+                                NodeMaterialDefines& defines, bool /*useInstances*/,
+                                const SubMeshPtr& /*subMesh*/)
 {
   if (!defines._areLightsDirty) {
     return;

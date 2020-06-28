@@ -6,6 +6,7 @@
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
@@ -125,15 +126,21 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
     worldInput->output()->connectTo(world);
   }
 
-  world()->define = "!INSTANCES";
+  world()->define = "!INSTANCES || THIN_INSTANCES";
 }
 
 void InstancesBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
-                                    NodeMaterialDefines& defines, bool useInstances)
+                                    NodeMaterialDefines& defines, bool useInstances,
+                                    const SubMeshPtr& subMesh)
 {
   auto changed = false;
   if (defines["INSTANCES"] != useInstances) {
     defines.setValue("INSTANCES", useInstances);
+    changed = true;
+  }
+
+  if (subMesh && defines["THIN_INSTANCES"] != subMesh->getRenderingMesh()->hasInstances()) {
+    defines.setValue("THIN_INSTANCES", subMesh->getRenderingMesh()->hasInstances());
     changed = true;
   }
 
@@ -164,6 +171,11 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
                                                    iWorld1->associatedVariableName().c_str(),
                                                    iWorld2->associatedVariableName().c_str(),
                                                    iWorld3->associatedVariableName().c_str());
+  state.compilationString += "#ifdef THIN_INSTANCES\r\n";
+  state.compilationString += StringTools::printf(
+    "%s = %s * %s;\r\n", output()->associatedVariableName().c_str(),
+    world()->associatedVariableName().c_str(), output()->associatedVariableName().c_str());
+  state.compilationString += "#endif\r\n";
   state.compilationString += _declareOutput(iInstanceID, state) + " = float(gl_InstanceID);\r\n";
   state.compilationString += "#else\r\n";
   state.compilationString
