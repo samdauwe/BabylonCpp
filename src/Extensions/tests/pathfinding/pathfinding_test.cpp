@@ -17,9 +17,8 @@ TEST(TestPathFinding, WithoutCosts)
     path = maze.findPath(L{8, 0}, L{5, 9});
   }
   // Compare with expected path
-  const std::vector<L> expectedPath{L{8, 0}, L{7, 0}, L{6, 0}, L{5, 0}, L{5, 1},
-                                    L{5, 2}, L{5, 3}, L{5, 4}, L{5, 5}, L{5, 6},
-                                    L{5, 7}, L{5, 8}, L{5, 9}};
+  const std::vector<L> expectedPath{L{8, 0}, L{7, 0}, L{6, 0}, L{5, 0}, L{5, 1}, L{5, 2}, L{5, 3},
+                                    L{5, 4}, L{5, 5}, L{5, 6}, L{5, 7}, L{5, 8}, L{5, 9}};
   EXPECT_EQ(path.size(), expectedPath.size());
   for (std::size_t i = 0; i < path.size(); ++i) {
     std::size_t x1, y1, x2, y2;
@@ -47,9 +46,9 @@ TEST(TestPathFinding, WithCosts)
     path = maze.findPath(L{8, 0}, L{5, 9});
   }
   // Compare with expected path
-  const std::vector<L> expectedPath{
-    L{8, 0}, L{9, 0}, L{9, 1}, L{9, 2}, L{9, 3}, L{9, 4}, L{9, 5}, L{8, 5},
-    L{8, 6}, L{7, 6}, L{7, 7}, L{6, 7}, L{6, 8}, L{5, 8}, L{5, 9}};
+  const std::vector<L> expectedPath{L{8, 0}, L{9, 0}, L{9, 1}, L{9, 2}, L{9, 3},
+                                    L{9, 4}, L{9, 5}, L{8, 5}, L{8, 6}, L{7, 6},
+                                    L{7, 7}, L{6, 7}, L{6, 8}, L{5, 8}, L{5, 9}};
   EXPECT_EQ(path.size(), expectedPath.size());
   for (std::size_t i = 0; i < path.size(); ++i) {
     std::size_t x1, y1, x2, y2;
