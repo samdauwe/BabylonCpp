@@ -51,9 +51,8 @@ using namespace BABYLON::Extensions::ECS;
 template <class Container>
 long countNonNull(const Container& c)
 {
-  return std::count_if(
-    std::begin(c), std::end(c),
-    [](typename Container::const_reference x) { return x != nullptr; });
+  return std::count_if(std::begin(c), std::end(c),
+                       [](typename Container::const_reference x) { return x != nullptr; });
 }
 
 // Gross, I know, but oh well.
@@ -359,8 +358,7 @@ TEST(TestEntities, Retrieving_an_Entity_via_ID_index_VALID_index)
   EXPECT_EQ(e1, e2);
 }
 
-TEST(TestEntities,
-     Retrieving_an_Entity_via_ID_index_VALID_index_multiple_entities_created)
+TEST(TestEntities, Retrieving_an_Entity_via_ID_index_VALID_index_multiple_entities_created)
 {
   World world;
 

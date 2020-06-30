@@ -96,8 +96,7 @@ TEST(TestSystems, Removing_all_systems_from_the_world)
   EXPECT_FALSE(world.doesSystemExist(playerSystem));
 }
 
-TEST(TestSystems,
-     Attempt_to_add_an_Entity_that_does_confine_to_a_systems_filter)
+TEST(TestSystems, Attempt_to_add_an_Entity_that_does_confine_to_a_systems_filter)
 {
   World world;
   MovementSystem system;
@@ -113,8 +112,7 @@ TEST(TestSystems,
   world.refresh();
 }
 
-TEST(TestSystems,
-     Attempt_to_add_an_Entity_that_does_NOT_confine_to_a_system_filter)
+TEST(TestSystems, Attempt_to_add_an_Entity_that_does_NOT_confine_to_a_system_filter)
 {
   World world;
   PlayerSystem system;

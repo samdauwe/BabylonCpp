@@ -45,7 +45,7 @@ ComponentTypeList createTypeList()
 {
   ComponentTypeList temp(MAXIMUM_AMOUNT_OF_COMPONENT_TYPES_TO_TEST);
   for (size_t i = 0; i < MAXIMUM_AMOUNT_OF_COMPONENT_TYPES_TO_TEST; ++i)
-    temp[i]     = false;
+    temp[i] = false;
   Assigner<Types...>()(temp);
   return temp;
 }
@@ -71,8 +71,7 @@ ComponentTypeList createTypeList()
 
 TEST(TestComponentFilter, Requires_pass)
 {
-  auto filter
-    = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<>>();
+  auto filter   = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<>>();
   auto typeList = createTypeList<PositionComponent, VelocityComponent>();
 
   EXPECT_TRUE(filter.doesPassFilter(typeList));
@@ -80,8 +79,7 @@ TEST(TestComponentFilter, Requires_pass)
 
 TEST(TestComponentFilter, Requires_fail)
 {
-  auto filter
-    = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<>>();
+  auto filter   = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<>>();
   auto typeList = createTypeList<PlayerComponent>();
 
   EXPECT_FALSE(filter.doesPassFilter(typeList));
@@ -89,8 +87,7 @@ TEST(TestComponentFilter, Requires_fail)
 
 TEST(TestComponentFilter, Excludes_pass)
 {
-  auto filter
-    = MakeFilter<Requires<>, Excludes<PositionComponent, VelocityComponent>>();
+  auto filter   = MakeFilter<Requires<>, Excludes<PositionComponent, VelocityComponent>>();
   auto typeList = createTypeList();
 
   EXPECT_TRUE(filter.doesPassFilter(typeList));
@@ -98,8 +95,7 @@ TEST(TestComponentFilter, Excludes_pass)
 
 TEST(TestComponentFilter, Excludes_fail_via_one)
 {
-  auto filter
-    = MakeFilter<Requires<>, Excludes<PositionComponent, VelocityComponent>>();
+  auto filter   = MakeFilter<Requires<>, Excludes<PositionComponent, VelocityComponent>>();
   auto typeList = createTypeList<PositionComponent>();
 
   EXPECT_FALSE(filter.doesPassFilter(typeList));
@@ -107,8 +103,7 @@ TEST(TestComponentFilter, Excludes_fail_via_one)
 
 TEST(TestComponentFilter, Excludes_fail_via_all)
 {
-  auto filter
-    = MakeFilter<Requires<>, Excludes<PositionComponent, VelocityComponent>>();
+  auto filter   = MakeFilter<Requires<>, Excludes<PositionComponent, VelocityComponent>>();
   auto typeList = createTypeList<PlayerComponent, VelocityComponent>();
 
   EXPECT_FALSE(filter.doesPassFilter(typeList));
@@ -116,8 +111,8 @@ TEST(TestComponentFilter, Excludes_fail_via_all)
 
 TEST(TestComponentFilter, Requires_and_excludes_pass)
 {
-  auto filter = MakeFilter<Requires<PositionComponent, VelocityComponent>,
-                           Excludes<PlayerComponent>>();
+  auto filter
+    = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<PlayerComponent>>();
   auto typeList = createTypeList<PositionComponent, VelocityComponent>();
 
   EXPECT_TRUE(filter.doesPassFilter(typeList));
@@ -125,8 +120,8 @@ TEST(TestComponentFilter, Requires_and_excludes_pass)
 
 TEST(TestComponentFilter, Requires_and_excludes_fail_via_requires)
 {
-  auto filter = MakeFilter<Requires<PositionComponent, VelocityComponent>,
-                           Excludes<PlayerComponent>>();
+  auto filter
+    = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<PlayerComponent>>();
   auto typeList = createTypeList<VelocityComponent>();
 
   EXPECT_FALSE(filter.doesPassFilter(typeList));
@@ -134,18 +129,17 @@ TEST(TestComponentFilter, Requires_and_excludes_fail_via_requires)
 
 TEST(TestComponentFilter, Requires_and_excludes_fail_via_excludes)
 {
-  auto filter = MakeFilter<Requires<PositionComponent, VelocityComponent>,
-                           Excludes<PlayerComponent>>();
-  auto typeList
-    = createTypeList<VelocityComponent, PositionComponent, PlayerComponent>();
+  auto filter
+    = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<PlayerComponent>>();
+  auto typeList = createTypeList<VelocityComponent, PositionComponent, PlayerComponent>();
 
   EXPECT_FALSE(filter.doesPassFilter(typeList));
 }
 
 TEST(TestComponentFilter, Requires_and_excludes_fail_via_both)
 {
-  auto filter = MakeFilter<Requires<PositionComponent, VelocityComponent>,
-                           Excludes<PlayerComponent>>();
+  auto filter
+    = MakeFilter<Requires<PositionComponent, VelocityComponent>, Excludes<PlayerComponent>>();
   auto typeList = createTypeList<PlayerComponent>();
 
   EXPECT_FALSE(filter.doesPassFilter(typeList));
