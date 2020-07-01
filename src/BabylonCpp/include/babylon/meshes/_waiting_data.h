@@ -13,18 +13,18 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 struct LODItem {
-  std::vector<std::string> ids;
-  Float32Array distances;
-  Float32Array coverages;
+  std::vector<std::string> ids{};
+  Float32Array distances{};
+  Float32Array coverages{};
 }; // end of struct Lod
 
 /**
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT _WaitingData {
-  std::optional<LODItem> lods           = std::nullopt;
-  std::vector<json> actions             = {};
-  std::optional<bool> freezeWorldMatrix = std::nullopt;
+  std::optional<LODItem> lods{std::nullopt};
+  std::vector<json> actions{};
+  std::optional<bool> freezeWorldMatrix{std::nullopt};
 }; // end of struct _WaitingData
 
 } // end of namespace BABYLON
