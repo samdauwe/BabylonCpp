@@ -85,8 +85,7 @@ Vector3 GroundMesh::getNormalAtCoordinates(float x, float z)
   return normal;
 }
 
-GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
-                                                    Vector3& ref)
+GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z, Vector3& ref)
 {
   auto world   = getWorldMatrix();
   auto& tmpMat = TmpVectors::MatrixArray[5];
@@ -104,8 +103,7 @@ GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
     _computeHeightQuads();
   }
   auto facet = _getFacetAt(x, z);
-  Vector3::TransformNormalFromFloatsToRef(facet.x, facet.y, facet.z, world,
-                                          ref);
+  Vector3::TransformNormalFromFloatsToRef(facet.x, facet.y, facet.z, world, ref);
   return *this;
 }
 
@@ -123,10 +121,9 @@ Vector4 GroundMesh::_getFacetAt(float x, float z)
   // retrieve col and row from x, z coordinates in the ground local system
   auto subdivisionsXf = static_cast<float>(_subdivisionsX);
   auto subdivisionsYf = static_cast<float>(_subdivisionsY);
-  auto col
-    = static_cast<size_t>(std::floor((x + _maxX) * subdivisionsXf / _width));
-  auto row = static_cast<size_t>(
-    std::floor(-(z + _maxZ) * subdivisionsYf / _height + subdivisionsYf));
+  auto col            = static_cast<size_t>(std::floor((x + _maxX) * subdivisionsXf / _width));
+  auto row
+    = static_cast<size_t>(std::floor(-(z + _maxZ) * subdivisionsYf / _height + subdivisionsYf));
   auto& quad = _heightQuads[row * _subdivisionsX + col];
   Vector4 facet;
   if (z < quad.slope.x * x + quad.slope.y) {
@@ -232,13 +229,10 @@ void GroundMesh::serialize(json& /*serializationObject*/) const
 
 GroundMeshPtr GroundMesh::Parse(const json& parsedMesh, Scene* scene)
 {
-  auto result
-    = GroundMesh::New(json_util::get_string(parsedMesh, "name"), scene);
+  auto result = GroundMesh::New(json_util::get_string(parsedMesh, "name"), scene);
 
-  result->_subdivisionsX
-    = json_util::get_number<size_t>(parsedMesh, "subdivisionsX", 1);
-  result->_subdivisionsY
-    = json_util::get_number<size_t>(parsedMesh, "subdivisionsY", 1);
+  result->_subdivisionsX = json_util::get_number<size_t>(parsedMesh, "subdivisionsX", 1);
+  result->_subdivisionsY = json_util::get_number<size_t>(parsedMesh, "subdivisionsY", 1);
 
   result->_minX = json_util::get_number(parsedMesh, "minX", 1.f);
   result->_maxX = json_util::get_number(parsedMesh, "maxX", 1.f);

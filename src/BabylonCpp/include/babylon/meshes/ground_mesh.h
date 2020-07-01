@@ -40,10 +40,9 @@ public:
   Type type() const override;
 
   /**
-   * @brief This function will update an octree to help to select the right
-   * submeshes for rendering, picking and collision computations. Please note
-   * that you must have a decent number of submeshes to get performance
-   * improvements when using an octree
+   * @brief This function will update an octree to help to select the right submeshes for rendering,
+   * picking and collision computations. Please note that you must have a decent number of submeshes
+   * to get performance improvements when using an octree
    * @param chunksCount the number of subdivisions for x and y
    * @param octreeBlocksSize (Default: 32)
    */
@@ -51,8 +50,7 @@ public:
 
   /**
    * @brief Returns a height (y) value in the Worl system :
-   * the ground altitude at the coordinates (x, z) expressed in the World
-   * system.
+   * the ground altitude at the coordinates (x, z) expressed in the World system.
    * @param x x coordinate
    * @param z z coordinate
    * @returns the ground y position if (x, z) are outside the ground surface.
@@ -60,8 +58,8 @@ public:
   float getHeightAtCoordinates(float x, float z);
 
   /**
-   * @brief Returns a normalized vector (Vector3) orthogonal to the ground
-   * at the ground coordinates (x, z) expressed in the World system.
+   * @brief Returns a normalized vector (Vector3) orthogonal to the ground at the ground coordinates
+   * (x, z) expressed in the World system.
    * @param x x coordinate
    * @param z z coordinate
    * @returns Vector3(0.0, 1.0, 0.0) if (x, z) are outside the ground surface.
@@ -69,10 +67,9 @@ public:
   Vector3 getNormalAtCoordinates(float x, float z);
 
   /**
-   * @brief Updates the Vector3 passed a reference with a normalized vector
-   * orthogonal to the ground at the ground coordinates (x, z) expressed in the
-   * World system. Doesn't uptade the reference Vector3 if (x, z) are outside
-   * the ground surface.
+   * @brief Updates the Vector3 passed a reference with a normalized vector orthogonal to the ground
+   * at the ground coordinates (x, z) expressed in the World system. Doesn't uptade the reference
+   * Vector3 if (x, z) are outside the ground surface.
    * @param x x coordinate
    * @param z z coordinate
    * @param ref vector to store the result
@@ -82,8 +79,7 @@ public:
 
   /**
    * @brief Force the heights to be recomputed for getHeightAtCoordinates() or
-   * getNormalAtCoordinates() if the ground has been updated. This can be used
-   * in the render loop.
+   * getNormalAtCoordinates() if the ground has been updated. This can be used in the render loop.
    * @returns the GroundMesh.
    */
   GroundMesh& updateCoordinateHeights();
@@ -108,38 +104,28 @@ private:
   size_t get_subdivisionsY() const;
 
   /**
-   * @brief Returns the element "facet" from the heightQuads array relative to
-   * (x, z) local coordinates
+   * @brief Returns the element "facet" from the heightQuads array relative to (x, z) local
+   * coordinates
    */
   Vector4 _getFacetAt(float x, float z);
 
   /**
-   * @brief Creates and populates the heightMap array with "facet" elements:
-   * a quad is two triangular facets separated by a slope, so a "facet" element
-   * is 1 slope + 2 facets
-   * slope : Vector2(c, h) = 2D diagonal line equation setting appart two
-   * triangular facets in a quad : z = cx + h
-   * facet1 : Vector4(a, b, c, d) = first facet 3D plane equation : ax + by + cz
-   * + d = 0
-   * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
-   * cz + d = 0
-   * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
-   * cz + d = 0
-   * @returns The GroundMesh.
+   * @brief Creates and populates the heightMap array with "facet" elements :
+   * a quad is two triangular facets separated by a slope, so a "facet" element is 1 slope + 2
+   * facets slope : Vector2(c, h) = 2D diagonal line equation setting appart two triangular facets
+   * in a quad : z = cx + h facet1 : Vector4(a, b, c, d) = first facet 3D plane equation : ax + by +
+   * cz + d = 0 facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by + cz + d =
+   * 0
+   * @returns the GroundMesh.
    */
   GroundMesh& _initHeightQuads();
 
   /**
-   * @brief Compute each quad element values and update the the heightMap array:
-   * slope : Vector2(c, h) = 2D diagonal line equation setting appart two
-   * triangular facets in a quad : z = cx + h
-   * facet1 : Vector4(a, b, c, d) = first facet 3D plane equation : ax + by + cz
-   * + d = 0
-   * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
-   * cz + d = 0
-   * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
-   * cz + d = 0
-   * @returns The GroundMesh.
+   * @brief Compute each quad element values and update the the heightMap array :
+   * slope : Vector2(c, h) = 2D diagonal line equation setting appart two triangular facets in a
+   * quad : z = cx + h facet1 : Vector4(a, b, c, d) = first facet 3D plane equation : ax + by + cz +
+   * d = 0 facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by + cz + d = 0
+   * @returns the GroundMesh.
    */
   GroundMesh& _computeHeightQuads();
 
