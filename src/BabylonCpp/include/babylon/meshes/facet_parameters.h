@@ -24,14 +24,12 @@ struct BABYLON_SHARED_EXPORT FacetParameters {
   std::vector<Vector3> facetPositions;
   // Array of facet normals (vector3)
   std::vector<Vector3> facetNormals;
-  // Partitioning array, facetPositions is required for facetPartitioning
-  // computation
+  // Partitioning array, facetPositions is required for facetPartitioning computation
   std::vector<Uint32Array> facetPartitioning;
-  // Partitioning data about subdivsions on each axis (int), required for
-  // facetPartitioning computation
-  SubdivisionsPerAxis subDiv;
-  // Partitioning ratio / bounding box, required for facetPartitioning
+  // Partitioning data about subdivsions on each axis (int), required for facetPartitioning
   // computation
+  SubdivisionsPerAxis subDiv;
+  // Partitioning ratio / bounding box, required for facetPartitioning computation
   std::optional<float> ratio;
   // Bounding box size data, required for facetPartitioning computation
   std::optional<Vector3> bbSize;
@@ -43,8 +41,7 @@ struct BABYLON_SHARED_EXPORT FacetParameters {
   bool depthSort;
   // Vector3 to compute the facet depth from this location
   std::optional<Vector3> distanceTo;
-  // Array of depthSortedFacets to store the facet distances from the reference
-  // location
+  // Array of depthSortedFacets to store the facet distances from the reference location
   std::vector<DepthSortedFacet> depthSortedFacets;
 
 }; // end of struct FacetParameters
