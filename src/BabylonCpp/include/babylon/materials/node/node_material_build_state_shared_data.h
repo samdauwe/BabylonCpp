@@ -11,16 +11,22 @@
 
 namespace BABYLON {
 
+class CurrentScreenBlock;
 class InputBlock;
 class NodeMaterialBlock;
 class NodeMaterialConnectionPoint;
+class ParticleTextureBlock;
 class ReflectionTextureBlock;
+class RefractionBlock;
 class Scene;
 class TextureBlock;
+using CurrentScreenBlockPtr          = std::shared_ptr<CurrentScreenBlock>;
 using InputBlockPtr                  = std::shared_ptr<InputBlock>;
 using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
 using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
+using ParticleTextureBlockPtr        = std::shared_ptr<ParticleTextureBlock>;
 using ReflectionTextureBlockPtr      = std::shared_ptr<ReflectionTextureBlock>;
+using RefractionBlockPtr             = std::shared_ptr<RefractionBlock>;
 using TextureBlockPtr                = std::shared_ptr<TextureBlock>;
 
 struct BABYLON_SHARED_EXPORT NodeMaterialCompilationHints {
@@ -40,6 +46,10 @@ struct BABYLON_SHARED_EXPORT NodeMaterialCompilationChecks {
  * @brief Class used to store shared data between 2 NodeMaterialBuildState.
  */
 struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
+
+  using TextureInputBlockType
+    = std::variant<TextureBlockPtr, ReflectionTextureBlockPtr, RefractionBlockPtr,
+                   CurrentScreenBlockPtr, ParticleTextureBlockPtr>;
 
   /**
    * @brief Creates a new shared data.
@@ -75,7 +85,7 @@ struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
   /**
    * Input blocks
    */
-  std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>> textureBlocks;
+  std::vector<TextureInputBlockType> textureBlocks;
 
   /**
    * Bindable blocks (Blocks that need to set data to the effect)

@@ -6,6 +6,7 @@
 
 namespace BABYLON {
 
+class CurrentScreenBlock;
 class ImageProcessingConfiguration;
 struct INodeMaterialOptions;
 struct INodeMaterialEditorOptions;
@@ -16,8 +17,11 @@ class NodeMaterialBuildState;
 struct NodeMaterialDefines;
 struct NodeMaterialOptimizer;
 struct NodeMaterialBuildStateSharedData;
+class ParticleTextureBlock;
 class ReflectionTextureBlock;
+class RefractionBlock;
 class TextureBlock;
+using CurrentScreenBlockPtr               = std::shared_ptr<CurrentScreenBlock>;
 using ImageProcessingConfigurationPtr     = std::shared_ptr<ImageProcessingConfiguration>;
 using INodeMaterialEditorOptionsPtr       = std::shared_ptr<INodeMaterialEditorOptions>;
 using INodeMaterialOptionsPtr             = std::shared_ptr<INodeMaterialOptions>;
@@ -27,7 +31,9 @@ using NodeMaterialBlockPtr                = std::shared_ptr<NodeMaterialBlock>;
 using NodeMaterialBuildStatePtr           = std::shared_ptr<NodeMaterialBuildState>;
 using NodeMaterialOptimizerPtr            = std::shared_ptr<NodeMaterialOptimizer>;
 using NodeMaterialBuildStateSharedDataPtr = std::shared_ptr<NodeMaterialBuildStateSharedData>;
+using ParticleTextureBlockPtr             = std::shared_ptr<ParticleTextureBlock>;
 using ReflectionTextureBlockPtr           = std::shared_ptr<ReflectionTextureBlock>;
+using RefractionBlockPtr                  = std::shared_ptr<RefractionBlock>;
 using TextureBlockPtr                     = std::shared_ptr<TextureBlock>;
 
 /**
@@ -38,6 +44,10 @@ class BABYLON_SHARED_EXPORT NodeMaterial : public PushMaterial,
                                            public std::enable_shared_from_this<NodeMaterial> {
 
 public:
+  using TextureInputBlockType
+    = std::variant<TextureBlockPtr, ReflectionTextureBlockPtr, RefractionBlockPtr,
+                   CurrentScreenBlockPtr, ParticleTextureBlockPtr>;
+
   /** Define the Url to load node editor script */
   static constexpr const char* EditorURL
     = "https://unpkg.com/babylonjs-node-editor@${Engine.Version}/babylon.nodeEditor.js";
@@ -194,7 +204,7 @@ public:
    * @brief Gets the list of texture blocks.
    * @returns an array of texture blocks
    */
-  std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>> getTextureBlocks();
+  std::vector<TextureInputBlockType> getTextureBlocks();
 
   /**
    * @brief Specifies if the material uses a texture.

@@ -742,8 +742,7 @@ std::vector<BaseTexturePtr> NodeMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-std::vector<std::variant<TextureBlockPtr, ReflectionTextureBlockPtr>>
-NodeMaterial::getTextureBlocks()
+std::vector<NodeMaterial::TextureInputBlockType> NodeMaterial::getTextureBlocks()
 {
   if (!_sharedData) {
     return {};
