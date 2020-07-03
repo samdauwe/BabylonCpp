@@ -87,38 +87,38 @@ std::string ReflectivityBlock::getCode(const std::string& aoIntensityVarName) co
   // note: metallic F0 factor = 0.04
   const auto code = StringTools::printf(
     R"(vec3 baseColor = surfaceAlbedo;
-        vec4 metallicReflectanceFactors = vec4(1.);
-        reflectivityOutParams reflectivityOut;
+       vec4 metallicReflectanceFactors = vec4(1.);
+       reflectivityOutParams reflectivityOut;
 
-        reflectivityBlock(
-            vec4(%s, %s, 0., 0.),
-        #ifdef METALLICWORKFLOW
-            surfaceAlbedo,
-            metallicReflectanceFactors,
-        #endif
-        #ifdef REFLECTIVITY
-            vec3(0., 0., %s),
-            %s,
-        #endif
-        #if defined(METALLICWORKFLOW) && defined(REFLECTIVITY)  && defined(AOSTOREINMETALMAPRED)
-            aoOut.ambientOcclusionColor,
-        #endif
-        #ifdef MICROSURFACEMAP
-            microSurfaceTexel, <== not handled!
-        #endif
-            reflectivityOut
-        );
+       reflectivityBlock(
+           vec4(%s, %s, 0., 0.),
+       #ifdef METALLICWORKFLOW
+           surfaceAlbedo,
+           metallicReflectanceFactors,
+       #endif
+       #ifdef REFLECTIVITY
+           vec3(0., 0., %s),
+           %s,
+       #endif
+       #if defined(METALLICWORKFLOW) && defined(REFLECTIVITY)  && defined(AOSTOREINMETALMAPRED)
+           aoOut.ambientOcclusionColor,
+       #endif
+       #ifdef MICROSURFACEMAP
+           microSurfaceTexel, <== not handled!
+       #endif
+           reflectivityOut
+       );
 
-        float microSurface = reflectivityOut.microSurface;
-        float roughness = reflectivityOut.roughness;
+       float microSurface = reflectivityOut.microSurface;
+       float roughness = reflectivityOut.roughness;
 
-        #ifdef METALLICWORKFLOW
-            surfaceAlbedo = reflectivityOut.surfaceAlbedo;
-        #endif
-        #if defined(METALLICWORKFLOW) && defined(REFLECTIVITY) && defined(AOSTOREINMETALMAPRED)
-            aoOut.ambientOcclusionColor = reflectivityOut.ambientOcclusionColor;
-        #endif\r\n
-       )",
+       #ifdef METALLICWORKFLOW
+           surfaceAlbedo = reflectivityOut.surfaceAlbedo;
+       #endif
+       #if defined(METALLICWORKFLOW) && defined(REFLECTIVITY) && defined(AOSTOREINMETALMAPRED)
+           aoOut.ambientOcclusionColor = reflectivityOut.ambientOcclusionColor;
+       #endif\r\n
+      )",
     metallic()->associatedVariableName().c_str(), roughness()->associatedVariableName().c_str(), //
     aoIntensityVarName.c_str(),                                                                  //
     metalRoughTexture.c_str());
