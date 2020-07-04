@@ -20,8 +20,7 @@ using ISceneLoaderPluginFactoryPtr = std::shared_ptr<ISceneLoaderPluginFactory>;
  */
 struct BABYLON_SHARED_EXPORT IRegisteredPlugin {
   IRegisteredPlugin();
-  IRegisteredPlugin(const std::variant<ISceneLoaderPluginPtr,
-                                       ISceneLoaderPluginAsyncPtr>& iPlugin,
+  IRegisteredPlugin(const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& iPlugin,
                     bool iIsBinary);
   IRegisteredPlugin(const IRegisteredPlugin& other);
   IRegisteredPlugin(IRegisteredPlugin&& other);
@@ -32,8 +31,7 @@ struct BABYLON_SHARED_EXPORT IRegisteredPlugin {
   /**
    * Defines the plugin to use
    */
-  std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr,
-               ISceneLoaderPluginFactoryPtr>
+  std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr, ISceneLoaderPluginFactoryPtr>
     plugin;
   /**
    * Defines if the plugin supports binary data

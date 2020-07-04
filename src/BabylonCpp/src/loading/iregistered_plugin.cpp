@@ -10,9 +10,7 @@ IRegisteredPlugin::IRegisteredPlugin() : isBinary{false}
 }
 
 IRegisteredPlugin::IRegisteredPlugin(
-  const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>&
-    iPlugin,
-  bool iIsBinary)
+  const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& iPlugin, bool iIsBinary)
     : isBinary{iIsBinary}
 {
   if (std::holds_alternative<ISceneLoaderPluginPtr>(iPlugin)) {
@@ -29,7 +27,7 @@ IRegisteredPlugin::IRegisteredPlugin(IRegisteredPlugin&& other) = default;
 
 IRegisteredPlugin& IRegisteredPlugin::operator=(const IRegisteredPlugin& other) = default;
 
-IRegisteredPlugin& IRegisteredPlugin::operator=(IRegisteredPlugin&& other) =  default;
+IRegisteredPlugin& IRegisteredPlugin::operator=(IRegisteredPlugin&& other) = default;
 
 IRegisteredPlugin::~IRegisteredPlugin() = default;
 
