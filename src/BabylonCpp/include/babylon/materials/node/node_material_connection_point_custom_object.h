@@ -39,6 +39,22 @@ protected:
       nodeMaterialBlockConstructor,
     const std::string& blockName, const std::string& nameForCheking = "");
 
+  /**
+   * @brief Gets a number indicating if the current point can be connected to another point.
+   * @param connectionPoint defines the other connection point
+   * @returns a number defining the compatibility state
+   */
+  NodeMaterialConnectionPointCompatibilityStates
+  checkCompatibilityState(const NodeMaterialConnectionPointPtr& connectionPoint) const;
+
+  /**
+   * @brief Creates a block suitable to be used as an input for this input point.
+   * If null is returned, a block based on the point type will be created.
+   * @returns The returned string parameter is the name of the output point of NodeMaterialBlock
+   * (first parameter of the returned array) that can be connected to the input
+   */
+  std::pair<NodeMaterialBlockPtr, std::string> createCustomInputBlock() const;
+
 private:
   std::function<NodeMaterialBlockPtr(const std::string& name)> _nodeMaterialBlockConstructor;
   std::string _blockName;
