@@ -95,6 +95,7 @@ void SheenBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeM
   defines.setValue("SHEEN_TEXTURE", texture()->isConnected(), true);
 }
 
+// TODO FIXME
 std::string SheenBlock::getCode(const ReflectionBlockPtr& /*reflectionBlock*/) const
 {
   const auto iColor     = color()->isConnected() ? color()->associatedVariableName() : "vec3(1.)";
