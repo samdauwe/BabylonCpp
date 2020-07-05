@@ -448,28 +448,6 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
   return *this;
 }
 
-std::string ReflectionTextureBlock::_dumpPropertiesCode()
-{
-  if (!texture) {
-    return "";
-  }
-
-  std::string codeString;
-
-  if (texture->isCube()) {
-    codeString = StringTools::printf("%s.texture = CubeTexture::New(\"%s\");\r\n",
-                                     _codeVariableName.c_str(), texture->name.c_str());
-  }
-  else {
-    codeString = StringTools::printf("%s.texture = Texture::New(\"%s\");\r\n",
-                                     _codeVariableName.c_str(), texture->name.c_str());
-  }
-  codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
-                                    _codeVariableName.c_str(), texture->coordinatesMode());
-
-  return codeString;
-}
-
 json ReflectionTextureBlock::serialize() const
 {
   return nullptr;
