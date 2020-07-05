@@ -163,9 +163,9 @@ std::string SheenBlock::getCode(const ReflectionBlockPtr& /*reflectionBlock*/) c
         #endif
     #endif\r\n
     )",
-    iColor, iIntensity, //
-    iRoughness,         //
-    iTexture);
+    iColor.c_str(), iIntensity.c_str(), //
+    iRoughness.c_str(),                 //
+    iTexture.c_str());
 
   return code;
 }
