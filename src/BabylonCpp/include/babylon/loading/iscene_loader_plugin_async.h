@@ -48,8 +48,8 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
 
   /**
    * @brief Import meshes into a scene.
-   * @param meshesNames An array of mesh names, a single mesh name, or empty
-   * string for all meshes that filter what meshes are imported
+   * @param meshesNames An array of mesh names, a single mesh name, or empty string for all meshes
+   * that filter what meshes are imported
    * @param scene The scene to import into
    * @param data The data to import
    * @param rootUrl The root url for scene and resources
@@ -58,12 +58,12 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * @returns The loaded meshes, particle systems, skeletons, and animation
    * groups
    */
-  virtual ImportedMeshes importMeshAsync(
-    const std::vector<std::string>& meshesNames, Scene* scene,
-    const std::string& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "")
+  virtual ImportedMeshes
+  importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
+                  const std::string& data, const std::string& rootUrl,
+                  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+                  = nullptr,
+                  const std::string& fileName = "")
     = 0;
 
   /**
@@ -75,11 +75,10 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * @param fileName Defines the name of the file to load
    * @returns Nothing
    */
-  virtual void loadAsync(
-    Scene* scene, const std::string& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "")
+  virtual void
+  loadAsync(Scene* scene, const std::string& data, const std::string& rootUrl,
+            const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
+            const std::string& fileName                                                  = "")
     = 0;
 
   /**
@@ -88,12 +87,10 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
   std::function<bool(const std::string& data)> canDirectLoad = nullptr;
 
   /**
-   * The callback that allows custom handling of the root url based on the
-   * response url.
+   * The callback that allows custom handling of the root url based on the response url.
    */
-  std::function<bool(const std::string& rootUrl,
-                     const std::string& responseURL)>
-    rewriteRootURL = nullptr;
+  std::function<bool(const std::string& rootUrl, const std::string& responseURL)> rewriteRootURL
+    = nullptr;
 
   /**
    * @brief Load into an asset container.
@@ -106,9 +103,8 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    */
   virtual AssetContainerPtr loadAssetContainerAsync(
     Scene* scene, const std::string& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::string& fileName = "")
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
+    const std::string& fileName                                                  = "")
     = 0;
 
 }; // end of struct ISceneLoaderPluginAsync
