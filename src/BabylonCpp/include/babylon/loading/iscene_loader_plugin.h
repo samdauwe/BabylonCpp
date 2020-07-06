@@ -26,7 +26,7 @@ using SkeletonPtr        = std::shared_ptr<Skeleton>;
  * @brief Interface used to define a SceneLoader plugin.
  */
 struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
-  virtual ~ISceneLoaderPlugin () = default;
+  virtual ~ISceneLoaderPlugin() = default;
   /**
    * The friendly name of this plugin.
    */
@@ -39,8 +39,8 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
 
   /**
    * @brief Import meshes into a scene.
-   * @param meshesNames An array of mesh names, a single mesh name, or empty
-   * string for all meshes that filter what meshes are imported
+   * @param meshesNames An array of mesh names, a single mesh name, or empty string for all meshes
+   * that filter what meshes are imported
    * @param scene The scene to import into
    * @param data The data to import
    * @param rootUrl The root url for scene and resources
@@ -50,15 +50,12 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
    * @param onError The callback when import fails
    * @returns True if successful or false otherwise
    */
-  virtual bool
-  importMesh(const std::vector<std::string>& meshesNames, Scene* scene,
-             const std::string& data, const std::string& rootUrl,
-             std::vector<AbstractMeshPtr>& meshes,
-             std::vector<IParticleSystemPtr>& particleSystems,
-             std::vector<SkeletonPtr>& skeletons,
-             const std::function<void(const std::string& message,
-                                      const std::string& exception)>& onError
-             = nullptr) const = 0;
+  virtual bool importMesh(
+    const std::vector<std::string>& meshesNames, Scene* scene, const std::string& data,
+    const std::string& rootUrl, std::vector<AbstractMeshPtr>& meshes,
+    std::vector<IParticleSystemPtr>& particleSystems, std::vector<SkeletonPtr>& skeletons,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
+    = nullptr) const = 0;
 
   /**
    * @brief Load into a scene.
@@ -70,8 +67,7 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
    */
   virtual bool
   load(Scene* scene, const std::string& data, const std::string& rootUrl,
-       const std::function<void(const std::string& message,
-                                const std::string& exception)>& onError
+       const std::function<void(const std::string& message, const std::string& exception)>& onError
        = nullptr) const = 0;
 
   /**
@@ -80,11 +76,9 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
   std::function<bool(const std::string& data)> canDirectLoad = nullptr;
 
   /**
-   * The callback that allows custom handling of the root url based on the
-   * response url.
+   * The callback that allows custom handling of the root url based on the response url.
    */
-  std::function<std::string(const std::string& rootUrl,
-                            const std::string& responseURL)>
+  std::function<std::string(const std::string& rootUrl, const std::string& responseURL)>
     rewriteRootURL = nullptr;
 
   /**
@@ -97,8 +91,7 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
    */
   virtual AssetContainerPtr loadAssetContainer(
     Scene* scene, const std::string& data, const std::string& rootUrl,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
     bool addToScene = false) const = 0;
 
