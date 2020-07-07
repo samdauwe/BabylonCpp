@@ -59,15 +59,15 @@ public:
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-            Mesh* mesh = nullptr) override;
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr,
+            SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Gets the code to inject in the vertex shader.
    * @param state current state of the node material building
    * @returns the shader code
    */
-  std::string handleVertexSide(NodeMaterialBuildState& state);
+  virtual std::string handleVertexSide(NodeMaterialBuildState& state);
 
   /**
    * @brief Handles the inits for the fragment code path.
@@ -158,7 +158,7 @@ protected:
   /**
    * @brief Gets the texture.
    */
-  BaseTexturePtr _getTexture() const;
+  virtual BaseTexturePtr _getTexture() const;
 
   /**
    * @brief Hidden
