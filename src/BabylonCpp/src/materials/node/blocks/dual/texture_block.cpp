@@ -202,7 +202,7 @@ bool TextureBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*node
 }
 
 void TextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
-                        Mesh* mesh)
+                        Mesh* mesh, SubMesh* /*subMesh*/)
 {
   if (!mesh || !texture) {
     return;

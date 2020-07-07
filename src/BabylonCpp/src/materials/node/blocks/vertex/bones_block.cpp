@@ -124,7 +124,8 @@ void BonesBlock::provideFallbacks(AbstractMesh* mesh, EffectFallbacks* fallbacks
   }
 }
 
-void BonesBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh)
+void BonesBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh,
+                      SubMesh* /*subMesh*/)
 {
   MaterialHelper::BindBonesParameters(mesh, effect);
 }

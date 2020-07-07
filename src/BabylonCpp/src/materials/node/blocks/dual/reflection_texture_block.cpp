@@ -212,7 +212,7 @@ bool ReflectionTextureBlock::isReady(AbstractMesh* /*mesh*/,
 }
 
 void ReflectionTextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
-                                  Mesh* mesh)
+                                  Mesh* mesh, SubMesh* /*subMesh*/)
 {
   if (!mesh || !texture) {
     return;

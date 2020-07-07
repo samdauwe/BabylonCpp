@@ -130,7 +130,8 @@ bool ReflectionTextureBaseBlock::isReady(AbstractMesh* /*mesh*/,
 }
 
 void ReflectionTextureBaseBlock::bind(const EffectPtr& effect,
-                                      const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh)
+                                      const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh,
+                                      SubMesh* /*subMesh*/)
 {
   const auto texture = _getTexture();
 

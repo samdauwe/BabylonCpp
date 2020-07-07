@@ -111,7 +111,8 @@ void FogBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMat
   defines.setValue("FOG", nodeMaterial->fogEnabled() && MaterialHelper::GetFogState(mesh, scene));
 }
 
-void FogBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh)
+void FogBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh,
+                    SubMesh* /*subMesh*/)
 {
   if (!mesh) {
     return;

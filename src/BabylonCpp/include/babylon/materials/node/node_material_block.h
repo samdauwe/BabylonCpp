@@ -78,7 +78,7 @@ public:
    * @param mesh defines the mesh that will be rendered
    */
   virtual void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                    Mesh* mesh = nullptr);
+                    Mesh* mesh = nullptr, SubMesh* subMesh = nullptr);
 
   /**
    * @brief Gets the current class name e.g. "NodeMaterialBlock".

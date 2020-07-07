@@ -88,7 +88,7 @@ void PerturbNormalBlock::prepareDefines(AbstractMesh* /*mesh*/,
 }
 
 void PerturbNormalBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                              Mesh* /*mesh*/)
+                              Mesh* /*mesh*/, SubMesh* /*subMesh*/)
 {
   if (nodeMaterial->getScene()->_mirroredCameraPosition) {
     effect->setFloat2(_tangentSpaceParameterName, invertX ? 1.f : -1.f, invertY ? 1.f : -1.f);

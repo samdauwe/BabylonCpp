@@ -55,7 +55,7 @@ NodeMaterialConnectionPointPtr& LightInformationBlock::get_intensity()
 }
 
 void LightInformationBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                                 Mesh* mesh)
+                                 Mesh* mesh, SubMesh* /*subMes*/)
 {
   if (!mesh) {
     return;

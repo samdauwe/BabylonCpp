@@ -143,7 +143,7 @@ void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr
 }
 
 void MorphTargetsBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
-                             Mesh* mesh)
+                             Mesh* mesh, SubMesh* /*subMesh*/)
 {
   if (mesh && mesh->morphTargetManager() && mesh->morphTargetManager()->numInfluencers() > 0) {
     MaterialHelper::BindMorphTargetParameters(mesh, effect);

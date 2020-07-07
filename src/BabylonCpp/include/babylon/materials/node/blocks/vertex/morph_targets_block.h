@@ -50,14 +50,15 @@ public:
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                       NodeMaterialDefines& defines, bool useInstances = false,
                       const SubMeshPtr& subMesh = nullptr) override;
+
   /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-            Mesh* mesh = nullptr) override;
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr,
+            SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Function called when a block is declared as repeatable content generator.

@@ -112,7 +112,7 @@ void NodeMaterialBlock::initialize(NodeMaterialBuildState& /*state*/)
 }
 
 void NodeMaterialBlock::bind(const EffectPtr& /*effect*/, const NodeMaterialPtr& /*nodeMaterial*/,
-                             Mesh* /*mesh*/)
+                             Mesh* /*mesh*/, SubMesh* /*subMesh*/)
 {
   // Do nothing
 }

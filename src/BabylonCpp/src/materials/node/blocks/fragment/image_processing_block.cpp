@@ -75,7 +75,7 @@ void ImageProcessingBlock::prepareDefines(AbstractMesh* /*mesh*/,
 }
 
 void ImageProcessingBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                                Mesh* mesh)
+                                Mesh* mesh, SubMesh* /*subMesh*/)
 {
   if (!mesh) {
     return;

@@ -45,8 +45,8 @@ public:
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
    */
-  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-            Mesh* mesh = nullptr) override;
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr,
+            SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Lets the block try to connect some inputs automatically.
