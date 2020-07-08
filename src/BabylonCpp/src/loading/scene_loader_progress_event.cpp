@@ -4,8 +4,8 @@
 
 namespace BABYLON {
 
-SceneLoaderProgressEvent::SceneLoaderProgressEvent(bool lengthComputable,
-                                                   size_t loaded, size_t total)
+SceneLoaderProgressEvent::SceneLoaderProgressEvent(bool lengthComputable, size_t loaded,
+                                                   size_t total)
     : lengthComputable{this, &SceneLoaderProgressEvent::get_lengthComputable}
     , loaded{this, &SceneLoaderProgressEvent::get_loaded}
     , total{this, &SceneLoaderProgressEvent::get_total}
@@ -15,8 +15,7 @@ SceneLoaderProgressEvent::SceneLoaderProgressEvent(bool lengthComputable,
 {
 }
 
-SceneLoaderProgressEvent::SceneLoaderProgressEvent(
-  const SceneLoaderProgressEvent& other)
+SceneLoaderProgressEvent::SceneLoaderProgressEvent(const SceneLoaderProgressEvent& other)
     : lengthComputable{this, &SceneLoaderProgressEvent::get_lengthComputable}
     , loaded{this, &SceneLoaderProgressEvent::get_loaded}
     , total{this, &SceneLoaderProgressEvent::get_total}
@@ -26,8 +25,7 @@ SceneLoaderProgressEvent::SceneLoaderProgressEvent(
 {
 }
 
-SceneLoaderProgressEvent::SceneLoaderProgressEvent(
-  SceneLoaderProgressEvent&& other)
+SceneLoaderProgressEvent::SceneLoaderProgressEvent(SceneLoaderProgressEvent&& other)
     : lengthComputable{this, &SceneLoaderProgressEvent::get_lengthComputable}
     , loaded{this, &SceneLoaderProgressEvent::get_loaded}
     , total{this, &SceneLoaderProgressEvent::get_total}
@@ -37,8 +35,7 @@ SceneLoaderProgressEvent::SceneLoaderProgressEvent(
 {
 }
 
-SceneLoaderProgressEvent& SceneLoaderProgressEvent::
-operator=(const SceneLoaderProgressEvent& other)
+SceneLoaderProgressEvent& SceneLoaderProgressEvent::operator=(const SceneLoaderProgressEvent& other)
 {
   if (&other != this) {
     _lengthComputable = other.lengthComputable;
@@ -49,8 +46,7 @@ operator=(const SceneLoaderProgressEvent& other)
   return *this;
 }
 
-SceneLoaderProgressEvent& SceneLoaderProgressEvent::
-operator=(SceneLoaderProgressEvent&& other)
+SceneLoaderProgressEvent& SceneLoaderProgressEvent::operator=(SceneLoaderProgressEvent&& other)
 {
   if (&other != this) {
     _lengthComputable = std::move(other.lengthComputable);
@@ -78,11 +74,9 @@ size_t SceneLoaderProgressEvent::get_total() const
   return _total;
 }
 
-SceneLoaderProgressEvent
-SceneLoaderProgressEvent::FromProgressEvent(const ProgressEvent& event)
+SceneLoaderProgressEvent SceneLoaderProgressEvent::FromProgressEvent(const ProgressEvent& event)
 {
-  return SceneLoaderProgressEvent(event.lengthComputable, event.loaded,
-                                  event.total);
+  return SceneLoaderProgressEvent(event.lengthComputable, event.loaded, event.total);
 }
 
 } // end of namespace BABYLON
