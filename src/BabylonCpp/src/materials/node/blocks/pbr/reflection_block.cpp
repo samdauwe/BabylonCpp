@@ -381,21 +381,21 @@ std::string ReflectionBlock::getCode(NodeMaterialBuildState& state,
         );
       #endif\r\n
      )",
-    _vReflectionInfosName.c_str(),                                                      //
-    StringTools::printf("v_%s.xyz", worldPosition()->associatedVariableName().c_str()), //
-    normalVarName.c_str(),                                                              //
-    _vReflectionMicrosurfaceInfosName.c_str(),                                          //
-    _vReflectionInfosName.c_str(),                                                      //
-    reflectionColor().c_str(),                                                          //
-    _defineLODReflectionAlpha.c_str(), _defineSkyboxName.c_str(),                       //
-    _defineLinearSpecularReflection.c_str(),                                            //
-    _define3DName.c_str(),                                                              //
-    _cubeSamplerName.c_str(),                                                           //
-    _2DSamplerName.c_str(),                                                             //
-    _vEnvironmentIrradianceName.c_str(),                                                //
-    _reflectionMatrixName.c_str(),                                                      //
-    _define3DName.c_str(),                                                              //
-    _cubeSamplerName.c_str(),                                                           //
+    _vReflectionInfosName.c_str(),                                                              //
+    StringTools::printf("v_%s.xyz", worldPosition()->associatedVariableName().c_str()).c_str(), //
+    normalVarName.c_str(),                                                                      //
+    _vReflectionMicrosurfaceInfosName.c_str(),                                                  //
+    _vReflectionInfosName.c_str(),                                                              //
+    reflectionColor().c_str(),                                                                  //
+    _defineLODReflectionAlpha.c_str(), _defineSkyboxName.c_str(),                               //
+    _defineLinearSpecularReflection.c_str(),                                                    //
+    _define3DName.c_str(),                                                                      //
+    _cubeSamplerName.c_str(),                                                                   //
+    _2DSamplerName.c_str(),                                                                     //
+    _vEnvironmentIrradianceName.c_str(),                                                        //
+    _reflectionMatrixName.c_str(),                                                              //
+    _define3DName.c_str(),                                                                      //
+    _cubeSamplerName.c_str(),                                                                   //
     _cubeSamplerName.c_str(),
     _2DSamplerName.c_str(), //
     _2DSamplerName.c_str()  //
