@@ -8,8 +8,7 @@ namespace BABYLON {
 bool SceneLoaderFlags::_ForceFullSceneLoadingForIncremental = false;
 bool SceneLoaderFlags::_ShowLoadingScreen                   = true;
 bool SceneLoaderFlags::_CleanBoneMatrixWeights              = false;
-unsigned int SceneLoaderFlags::_loggingLevel
-  = Constants::SCENELOADER_NO_LOGGING;
+unsigned int SceneLoaderFlags::_loggingLevel                = Constants::SCENELOADER_NO_LOGGING;
 
 bool SceneLoaderFlags::ForceFullSceneLoadingForIncremental()
 {
