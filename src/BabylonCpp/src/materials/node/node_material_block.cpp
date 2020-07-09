@@ -154,17 +154,19 @@ std::string NodeMaterialBlock::getClassName() const
 NodeMaterialBlock&
 NodeMaterialBlock::registerInput(const std::string& iName,
                                  const NodeMaterialBlockConnectionPointTypes& type, bool isOptional,
-                                 const std::optional<NodeMaterialBlockTargets>& iTarget)
+                                 const std::optional<NodeMaterialBlockTargets>& iTarget,
+                                 const NodeMaterialConnectionPointPtr& point)
 {
-  auto point        = NodeMaterialConnectionPoint::New(iName, shared_from_this(),
-                                                NodeMaterialConnectionPointDirection::Input);
-  point->type       = type;
-  point->isOptional = isOptional;
+  auto iPoint = point ? point :
+                        NodeMaterialConnectionPoint::New(
+                          iName, shared_from_this(), NodeMaterialConnectionPointDirection::Input);
+  iPoint->type       = type;
+  iPoint->isOptional = isOptional;
   if (iTarget.has_value()) {
-    point->target = *iTarget;
+    iPoint->target = *iTarget;
   }
 
-  _inputs.emplace_back(point);
+  _inputs.emplace_back(iPoint);
 
   return *this;
 }

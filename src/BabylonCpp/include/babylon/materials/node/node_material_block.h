@@ -87,18 +87,21 @@ public:
   virtual std::string getClassName() const;
 
   /**
-   * @brief Register a new input. Must be called inside a block constructor.
+   * @brief
+   * Register a new input. Must be called inside a block constructor
    * @param name defines the connection point name
    * @param type defines the connection point type
    * @param isOptional defines a boolean indicating that this input can be omitted
    * @param target defines the target to use to limit the connection point (will be
    * VertexAndFragment by default)
+   * @param point an already created connection point. If not provided, create a new one
    * @returns the current block
    */
   NodeMaterialBlock&
   registerInput(const std::string& name, const NodeMaterialBlockConnectionPointTypes& type,
                 bool isOptional                                       = false,
-                const std::optional<NodeMaterialBlockTargets>& target = std::nullopt);
+                const std::optional<NodeMaterialBlockTargets>& target = std::nullopt,
+                const NodeMaterialConnectionPointPtr& point           = nullptr);
 
   /**
    * @brief Register a new output. Must be called inside a block constructor.
