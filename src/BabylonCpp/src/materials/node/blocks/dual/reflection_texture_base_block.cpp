@@ -85,34 +85,34 @@ void ReflectionTextureBaseBlock::prepareDefines(AbstractMesh* /*mesh*/,
     return;
   }
 
-  const auto texture = _getTexture();
+  const auto iTexture = _getTexture();
 
-  if (!texture || !texture->getTextureMatrix()) {
+  if (!iTexture || !iTexture->getTextureMatrix()) {
     return;
   }
 
-  defines.setValue(_define3DName, texture->isCube(), true);
-  defines.setValue(_defineLocalCubicName, texture->boundingBoxSize() ? true : false, true);
+  defines.setValue(_define3DName, iTexture->isCube(), true);
+  defines.setValue(_defineLocalCubicName, iTexture->boundingBoxSize() ? true : false, true);
   defines.setValue(_defineExplicitName,
-                   texture->coordinatesMode() == Constants::TEXTURE_EXPLICIT_MODE, true);
-  defines.setValue(_defineSkyboxName, texture->coordinatesMode() == Constants::TEXTURE_SKYBOX_MODE,
+                   iTexture->coordinatesMode() == Constants::TEXTURE_EXPLICIT_MODE, true);
+  defines.setValue(_defineSkyboxName, iTexture->coordinatesMode() == Constants::TEXTURE_SKYBOX_MODE,
                    true);
-  defines.setValue(_defineCubicName, texture->coordinatesMode() == Constants::TEXTURE_CUBIC_MODE,
+  defines.setValue(_defineCubicName, iTexture->coordinatesMode() == Constants::TEXTURE_CUBIC_MODE,
                    true);
   defines.setValue(_defineSphericalName,
-                   texture->coordinatesMode() == Constants::TEXTURE_SPHERICAL_MODE, true);
-  defines.setValue(_definePlanarName, texture->coordinatesMode() == Constants::TEXTURE_PLANAR_MODE,
+                   iTexture->coordinatesMode() == Constants::TEXTURE_SPHERICAL_MODE, true);
+  defines.setValue(_definePlanarName, iTexture->coordinatesMode() == Constants::TEXTURE_PLANAR_MODE,
                    true);
   defines.setValue(_defineProjectionName,
-                   texture->coordinatesMode() == Constants::TEXTURE_PROJECTION_MODE, true);
+                   iTexture->coordinatesMode() == Constants::TEXTURE_PROJECTION_MODE, true);
   defines.setValue(_defineEquirectangularName,
-                   texture->coordinatesMode() == Constants::TEXTURE_EQUIRECTANGULAR_MODE, true);
+                   iTexture->coordinatesMode() == Constants::TEXTURE_EQUIRECTANGULAR_MODE, true);
   defines.setValue(_defineEquirectangularFixedName,
-                   texture->coordinatesMode() == Constants::TEXTURE_FIXED_EQUIRECTANGULAR_MODE,
+                   iTexture->coordinatesMode() == Constants::TEXTURE_FIXED_EQUIRECTANGULAR_MODE,
                    true);
   defines.setValue(
     _defineMirroredEquirectangularFixedName,
-    texture->coordinatesMode() == Constants::TEXTURE_FIXED_EQUIRECTANGULAR_MIRRORED_MODE, true);
+    iTexture->coordinatesMode() == Constants::TEXTURE_FIXED_EQUIRECTANGULAR_MIRRORED_MODE, true);
 }
 
 bool ReflectionTextureBaseBlock::isReady(AbstractMesh* /*mesh*/,
@@ -120,9 +120,9 @@ bool ReflectionTextureBaseBlock::isReady(AbstractMesh* /*mesh*/,
                                          const NodeMaterialDefines& /*defines*/,
                                          bool /*useInstances*/)
 {
-  const auto texture = _getTexture();
+  const auto iTexture = _getTexture();
 
-  if (texture && !texture->isReadyOrNotBlocking()) {
+  if (iTexture && !iTexture->isReadyOrNotBlocking()) {
     return false;
   }
 
@@ -133,19 +133,19 @@ void ReflectionTextureBaseBlock::bind(const EffectPtr& effect,
                                       const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh,
                                       SubMesh* /*subMesh*/)
 {
-  const auto texture = _getTexture();
+  const auto iTexture = _getTexture();
 
-  if (!mesh || !texture) {
+  if (!mesh || !iTexture) {
     return;
   }
 
-  effect->setMatrix(_reflectionMatrixName, *texture->getReflectionTextureMatrix());
+  effect->setMatrix(_reflectionMatrixName, *iTexture->getReflectionTextureMatrix());
 
-  if (texture->isCube()) {
-    effect->setTexture(_cubeSamplerName, texture);
+  if (iTexture->isCube()) {
+    effect->setTexture(_cubeSamplerName, iTexture);
   }
   else {
-    effect->setTexture(_2DSamplerName, texture);
+    effect->setTexture(_2DSamplerName, iTexture);
   }
 }
 

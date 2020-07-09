@@ -2459,9 +2459,9 @@ VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
       disp = idx - startIndex;
       if (disp % 4 < 1.5f) {
         if (wrap) {
-          uvs[2 * idx]
-            = faceUV[face]->x
-              + (faceUV[face]->z - faceUV[face]->x) * cumulate[std::floor(disp / 4)] / totalLen;
+          uvs[2 * idx] = faceUV[face]->x
+                         + (faceUV[face]->z - faceUV[face]->x)
+                             * cumulate[static_cast<size_t>(std::floor(disp / 4))] / totalLen;
         }
         else {
           uvs[2 * idx] = faceUV[face]->x;
@@ -2469,9 +2469,9 @@ VertexData::CreatePolygon(Mesh* polygon, uint32_t sideOrientation,
       }
       else {
         if (wrap) {
-          uvs[2 * idx]
-            = faceUV[face]->x
-              + (faceUV[face]->z - faceUV[face]->x) * cumulate[std::floor(disp / 4) + 1] / totalLen;
+          uvs[2 * idx] = faceUV[face]->x
+                         + (faceUV[face]->z - faceUV[face]->x)
+                             * cumulate[static_cast<size_t>(std::floor(disp / 4) + 1)] / totalLen;
         }
         else {
           uvs[2 * idx] = faceUV[face]->z;

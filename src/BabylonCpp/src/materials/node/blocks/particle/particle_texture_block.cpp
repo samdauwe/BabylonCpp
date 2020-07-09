@@ -173,8 +173,8 @@ ParticleTextureBlock& ParticleTextureBlock::_buildBlock(NodeMaterialBuildState& 
   _linearDefineName = state._getFreeDefineName("ISLINEAR");
   _gammaDefineName  = state._getFreeDefineName("ISGAMMA");
 
-  const auto comments = StringTools::printf("//%s", name.c_str());
-  state._emitFunctionFromInclude("helperFunctions", comments);
+  const auto iComments = StringTools::printf("//%s", name.c_str());
+  state._emitFunctionFromInclude("helperFunctions", iComments);
 
   state.compilationString
     += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),

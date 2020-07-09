@@ -126,11 +126,11 @@ void RefractionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 
   const auto refractionTexture = _getTexture();
-  const auto refraction        = refractionTexture && refractionTexture->getTextureMatrix();
+  const auto iRefraction       = refractionTexture && refractionTexture->getTextureMatrix();
 
-  defines.setValue("SS_REFRACTION", refraction, true);
+  defines.setValue("SS_REFRACTION", iRefraction, true);
 
-  if (!refraction) {
+  if (!iRefraction) {
     return;
   }
 
@@ -150,9 +150,9 @@ void RefractionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
 bool RefractionBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
                               const NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
 {
-  const auto texture = _getTexture();
+  const auto iTexture = _getTexture();
 
-  if (texture && !texture->isReadyOrNotBlocking()) {
+  if (iTexture && !iTexture->isReadyOrNotBlocking()) {
     return false;
   }
 
@@ -194,9 +194,9 @@ void RefractionBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeM
   effect->setFloat4(_vRefractionInfosName, refractionTexture->level, 1.f / iIndexOfRefraction,
                     depth, invertRefractionY ? -1.f : 1.f);
 
-  effect->setFloat3(_vRefractionMicrosurfaceInfosName, refractionTexture->getSize().width,
-                    refractionTexture->lodGenerationScale(),
-                    refractionTexture->lodGenerationOffset());
+  effect->setFloat3(
+    _vRefractionMicrosurfaceInfosName, static_cast<float>(refractionTexture->getSize().width),
+    refractionTexture->lodGenerationScale(), refractionTexture->lodGenerationOffset());
 }
 
 std::string RefractionBlock::getCode(NodeMaterialBuildState& state)

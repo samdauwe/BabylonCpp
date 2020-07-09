@@ -125,11 +125,11 @@ void ReflectionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   ReflectionTextureBaseBlock::prepareDefines(mesh, nodeMaterial, defines);
 
   const auto reflectionTexture = _getTexture();
-  const auto reflection        = reflectionTexture && reflectionTexture->getTextureMatrix();
+  const auto iReflection       = reflectionTexture && reflectionTexture->getTextureMatrix();
 
-  defines.setValue("REFLECTION", reflection, true);
+  defines.setValue("REFLECTION", iReflection, true);
 
-  if (!reflection) {
+  if (!iReflection) {
     return;
   }
 
@@ -176,8 +176,9 @@ void ReflectionBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeM
     effect->setTexture(_2DSamplerName, reflectionTexture);
   }
 
-  effect->setFloat3(_vReflectionMicrosurfaceInfosName, reflectionTexture->getSize().width,
-                    reflectionTexture->lodGenerationScale, reflectionTexture->lodGenerationOffset);
+  effect->setFloat3(
+    _vReflectionMicrosurfaceInfosName, static_cast<float>(reflectionTexture->getSize().width),
+    reflectionTexture->lodGenerationScale(), reflectionTexture->lodGenerationOffset());
 
   auto defines = std::static_pointer_cast<NodeMaterialDefines>(subMesh->_materialDefines);
 
