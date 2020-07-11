@@ -1,6 +1,7 @@
 #include <babylon/materials/node/blocks/pbr/sheen_block.h>
 
 #include <babylon/core/json_util.h>
+#include <babylon/materials/node/blocks/pbr/reflection_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
@@ -95,8 +96,7 @@ void SheenBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeM
   defines.setValue("SHEEN_TEXTURE", texture()->isConnected(), true);
 }
 
-// TODO FIXME
-std::string SheenBlock::getCode(const ReflectionBlockPtr& /*reflectionBlock*/) const
+std::string SheenBlock::getCode(const ReflectionBlockPtr& reflectionBlock) const
 {
   const auto iColor     = color()->isConnected() ? color()->associatedVariableName() : "vec3(1.)";
   const auto iIntensity = intensity()->isConnected() ? intensity()->associatedVariableName() : "1.";
@@ -129,30 +129,30 @@ std::string SheenBlock::getCode(const ReflectionBlockPtr& /*reflectionBlock*/) c
         #endif
         #if defined(REFLECTION) && defined(ENVIRONMENTBRDF)
             AARoughnessFactors,
-            ${reflectionBlock?._vReflectionMicrosurfaceInfosName},
-            ${reflectionBlock?._vReflectionInfosName},
-            ${reflectionBlock?.reflectionColor},
+            %s,
+            %s,
+            %s,
             vLightingIntensity,
-            #ifdef ${reflectionBlock?._define3DName}
-                ${reflectionBlock?._cubeSamplerName},
+            #ifdef %s
+                %s,
             #else
-                ${reflectionBlock?._2DSamplerName},
+                %s,
             #endif
             reflectionOut.reflectionCoords,
             NdotVUnclamped,
             #ifndef LODBASEDMICROSFURACE
-                #ifdef ${reflectionBlock?._define3DName}
-                    ${reflectionBlock?._cubeSamplerName},
-                    ${reflectionBlock?._cubeSamplerName},
+                #ifdef %s
+                    %s,
+                    %s,
                 #else
-                    ${reflectionBlock?._2DSamplerName},
-                    ${reflectionBlock?._2DSamplerName},
+                    %s,
+                    %s,
                 #endif
             #endif
-            #if !defined(${reflectionBlock?._defineSkyboxName}) && defined(RADIANCEOCCLUSION)
+            #if !defined(%s) && defined(RADIANCEOCCLUSION)
                 seo,
             #endif
-            #if !defined(${reflectionBlock?._defineSkyboxName}) && defined(HORIZONOCCLUSION) && defined(BUMP) && defined(${reflectionBlock?._define3DName})
+            #if !defined(%s) && defined(HORIZONOCCLUSION) && defined(BUMP) && defined(%s)
                 eho,
             #endif
         #endif
@@ -164,9 +164,23 @@ std::string SheenBlock::getCode(const ReflectionBlockPtr& /*reflectionBlock*/) c
         #endif
     #endif\r\n
     )",
-    iColor.c_str(), iIntensity.c_str(), //
-    iRoughness.c_str(),                 //
-    iTexture.c_str());
+    iColor.c_str(), iIntensity.c_str(),                                                //
+    iRoughness.c_str(),                                                                //
+    iTexture.c_str(),                                                                  //
+    reflectionBlock->_vReflectionMicrosurfaceInfosName.c_str(),                        //
+    reflectionBlock->_vReflectionInfosName.c_str(),                                    //
+    reflectionBlock->reflectionColor().c_str(),                                        //
+    reflectionBlock->_define3DName.c_str(),                                            //
+    reflectionBlock->_cubeSamplerName.c_str(),                                         //
+    reflectionBlock->_2DSamplerName.c_str(),                                           //
+    reflectionBlock->_define3DName.c_str(),                                            //
+    reflectionBlock->_cubeSamplerName.c_str(),                                         //
+    reflectionBlock->_cubeSamplerName.c_str(),                                         //
+    reflectionBlock->_2DSamplerName.c_str(),                                           //
+    reflectionBlock->_2DSamplerName.c_str(),                                           //
+    reflectionBlock->_defineSkyboxName.c_str(),                                        //
+    reflectionBlock->_defineSkyboxName.c_str(), reflectionBlock->_define3DName.c_str() //
+  );
 
   return code;
 }
