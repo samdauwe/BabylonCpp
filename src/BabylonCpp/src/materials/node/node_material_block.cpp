@@ -175,16 +175,17 @@ NodeMaterialBlock&
 NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const NodeMaterialBlockConnectionPointTypes& type,
                                   const std::optional<NodeMaterialBlockTargets>& iTarget,
-                                  const NodeMaterialConnectionPointPtr& /*point*/)
+                                  const NodeMaterialConnectionPointPtr& point)
 {
-  auto point  = NodeMaterialConnectionPoint::New(iName, shared_from_this(),
-                                                NodeMaterialConnectionPointDirection::Output);
-  point->type = type;
+  auto iPoint = point ? point :
+                        NodeMaterialConnectionPoint::New(
+                          iName, shared_from_this(), NodeMaterialConnectionPointDirection::Output);
+  iPoint->type = type;
   if (iTarget.has_value()) {
-    point->target = *iTarget;
+    iPoint->target = *iTarget;
   }
 
-  _outputs.emplace_back(point);
+  _outputs.emplace_back(iPoint);
 
   return *this;
 }
@@ -339,8 +340,9 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
               && otherBlockWasGeneratedInVertexShader))) { // context switch! We need a varying
     if ((!block->isInput()
          && state.target != block->_buildTarget) // block was already emitted by vertex shader
-        || (block->isInput()
-            && std::static_pointer_cast<InputBlock>(block)->isAttribute()) // block is an attribute
+        || (block->isInput() && std::static_pointer_cast<InputBlock>(block)->isAttribute()
+            && !std::static_pointer_cast<InputBlock>(block)
+                  ->_noContextSwitch()) // block is an attribute
     ) {
       auto connectedPoint = input->connectedPoint();
       if (state._vertexState->_emitVaryingFromString("v_"

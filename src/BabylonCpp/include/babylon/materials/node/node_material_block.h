@@ -72,10 +72,11 @@ public:
   virtual void initialize(NodeMaterialBuildState& state);
 
   /**
-   * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
    * @param mesh defines the mesh that will be rendered
+   * @param subMesh defines the submesh that will be rendered
    */
   virtual void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
                     Mesh* mesh = nullptr, SubMesh* subMesh = nullptr);
@@ -87,8 +88,7 @@ public:
   virtual std::string getClassName() const;
 
   /**
-   * @brief
-   * Register a new input. Must be called inside a block constructor
+   * @brief Register a new input. Must be called inside a block constructor.
    * @param name defines the connection point name
    * @param type defines the connection point type
    * @param isOptional defines a boolean indicating that this input can be omitted
@@ -187,6 +187,7 @@ public:
    * @param nodeMaterial defines the node material requesting the update
    * @param defines defines the material defines to update
    * @param useInstances specifies that instances should be used
+   * @param subMesh defines which submesh to render
    */
   virtual void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                               NodeMaterialDefines& defines, bool useInstances = false,
