@@ -24,7 +24,7 @@ enum class PropertyTypeForEdition {
 }; // end of enum class PropertyTypeForEdition
 
 /**
- * @brief Interface that defines an option in a variable of type list
+ * @brief Interface that defines an option in a variable of type list.
  */
 struct BABYLON_SHARED_EXPORT IEditablePropertyListOption {
   /** label of the option */
