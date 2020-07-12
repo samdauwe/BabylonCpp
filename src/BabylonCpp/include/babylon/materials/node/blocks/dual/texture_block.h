@@ -96,7 +96,7 @@ protected:
    * @brief Create a new TextureBlock.
    * @param name defines the block name
    */
-  TextureBlock(const std::string& name);
+  TextureBlock(const std::string& name, bool fragmentOnly = false);
 
   /**
    * @brief Gets the uv input component.
@@ -171,6 +171,11 @@ public:
   bool convertToGammaSpace;
 
   /**
+   * Gets or sets a boolean indicating if content needs to be converted to linear space
+   */
+  bool convertToLinearSpace;
+
+  /**
    * Gets the uv input component.
    */
   ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> uv;
@@ -213,6 +218,7 @@ public:
 private:
   std::string _defineName;
   std::string _linearDefineName;
+  std::string _gammaDefineName;
   std::string _tempTextureRead;
   std::string _samplerName;
   std::string _transformedUVName;
@@ -220,6 +226,7 @@ private:
   std::string _textureInfoName;
   std::string _mainUVName;
   std::string _mainUVDefineName;
+  bool _fragmentOnly;
 
   NodeMaterialBlockTargets _currentTarget;
 

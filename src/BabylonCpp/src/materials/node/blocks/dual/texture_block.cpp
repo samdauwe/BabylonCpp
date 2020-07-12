@@ -14,10 +14,11 @@
 
 namespace BABYLON {
 
-TextureBlock::TextureBlock(const std::string& iName)
+TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment}
     , texture{nullptr}
     , convertToGammaSpace{false}
+    , convertToLinearSpace{false}
     , uv{this, &TextureBlock::get_uv}
     , rgba{this, &TextureBlock::get_rgba}
     , rgb{this, &TextureBlock::get_rgb}
@@ -28,6 +29,8 @@ TextureBlock::TextureBlock(const std::string& iName)
     , _isMixed{this, &TextureBlock::get__isMixed}
     , _currentTarget{NodeMaterialBlockTargets::VertexAndFragment}
 {
+  _fragmentOnly = fragmentOnly;
+
   registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2, false,
                 NodeMaterialBlockTargets::VertexAndFragment);
 
@@ -49,7 +52,7 @@ TextureBlock::TextureBlock(const std::string& iName)
   _inputs[0]->acceptedConnectionPointTypes.emplace_back(
     NodeMaterialBlockConnectionPointTypes::Vector4);
 
-  _inputs[0]->_prioritizeVertex = true;
+  _inputs[0]->_prioritizeVertex = !fragmentOnly;
 }
 
 TextureBlock::~TextureBlock() = default;
@@ -142,15 +145,31 @@ NodeMaterialBlockTargets& TextureBlock::get_target()
 void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
-    auto uvInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
-      return inputBlock->isAttribute() && inputBlock->name == "uv";
-    });
+    if (material->mode() == NodeMaterialModes::PostProcess) {
+      auto uvInput
+        = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+            return inputBlock->isAttribute() && inputBlock->name == "uv";
+          });
 
-    if (!uvInput) {
-      uvInput = InputBlock::New("uv");
-      uvInput->setAsAttribute();
+      if (uvInput) {
+        uvInput->connectTo(shared_from_this());
+      }
     }
-    uvInput->output()->connectTo(uv);
+    else {
+      const auto attributeName
+        = material->mode() == NodeMaterialModes::Particle ? "particle_uv" : "uv";
+
+      auto uvInput = material->getInputBlockByPredicate(
+        [&attributeName](const InputBlockPtr& inputBlock) -> bool {
+          return inputBlock->isAttribute() && inputBlock->name == attributeName;
+        });
+
+      if (!uvInput) {
+        uvInput = InputBlock::New("uv");
+        uvInput->setAsAttribute(attributeName);
+      }
+      uvInput->output()->connectTo(uv);
+    }
   }
 }
 
@@ -180,6 +199,7 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
   }
 
   defines.setValue(_linearDefineName, convertToGammaSpace);
+  defines.setValue(_gammaDefineName, convertToLinearSpace);
   if (_isMixed) {
     if (!texture->getTextureMatrix()->isIdentityAs3x2()) {
       defines.setValue(_defineName, true);
@@ -202,9 +222,9 @@ bool TextureBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*node
 }
 
 void TextureBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
-                        Mesh* mesh, SubMesh* /*subMesh*/)
+                        Mesh* /*mesh*/, SubMesh* /*subMesh*/)
 {
-  if (!mesh || !texture) {
+  if (texture) {
     return;
   }
 
@@ -287,7 +307,7 @@ void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexM
     return;
   }
 
-  if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
+  if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment || _fragmentOnly) {
     state.compilationString
       += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
                              _samplerName.c_str(), uvInput->associatedVariableName().c_str());
@@ -340,13 +360,19 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
     += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
                            output->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
+
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
+  state.compilationString
+    += StringTools::printf("%s = toLinearSpace(%s);\r\n", output->associatedVariableName().c_str(),
+                           output->associatedVariableName().c_str());
+  state.compilationString += "#endif\r\n";
 }
 
 TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  if (state.target == NodeMaterialBlockTargets::Vertex) {
+  if (state.target == NodeMaterialBlockTargets::Vertex || _fragmentOnly) {
     _tempTextureRead = state._getFreeVariableName("tempTextureRead");
   }
 
@@ -383,6 +409,7 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
   }
 
   _linearDefineName = state._getFreeDefineName("ISLINEAR");
+  _gammaDefineName  = state._getFreeDefineName("ISGAMMA");
 
   auto iComments = StringTools::printf("//%s", name.c_str());
   state._emitFunctionFromInclude("helperFunctions", iComments);
@@ -428,8 +455,10 @@ std::string TextureBlock::_dumpPropertiesCode()
                                     texture->uScale);
   codeString += StringTools::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(),
                                     texture->vScale);
-  codeString += StringTools::printf("%s.convertToGammaSpace = %d;\r\n", _codeVariableName.c_str(),
-                                    convertToGammaSpace);
+  codeString += StringTools::printf("%s.convertToGammaSpace = %s;\r\n", _codeVariableName.c_str(),
+                                    convertToGammaSpace ? "true" : "false");
+  codeString += StringTools::printf("%s.convertToLinearSpace = %s;\r\n", _codeVariableName.c_str(),
+                                    convertToLinearSpace ? "true" : "false");
 
   return codeString;
 }
