@@ -162,6 +162,11 @@ struct BABYLON_SHARED_EXPORT NodeMaterialBuildStateSharedData {
    */
   NodeMaterialCompilationChecks checks;
 
+  /**
+   * Is vertex program allowed to be empty?
+   */
+  bool allowEmptyVertexProgram;
+
 }; // end of struct NodeMaterialBuildStateSharedData
 
 } // end of namespace BABYLON

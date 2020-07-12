@@ -7,6 +7,7 @@
 namespace BABYLON {
 
 NodeMaterialBuildStateSharedData::NodeMaterialBuildStateSharedData()
+    : allowEmptyVertexProgram{false}
 {
   // Exclude usual attributes from free variable names
   variableNames["position"]             = 0;
@@ -49,7 +50,7 @@ void NodeMaterialBuildStateSharedData::emitErrors()
 {
   std::ostringstream errorMessage;
 
-  if (!checks.emitVertex) {
+  if (!checks.emitVertex && !allowEmptyVertexProgram) {
     errorMessage << "NodeMaterial does not have a vertex output. You need to at least add "
                     "a block that generates a glPosition value.\r\n";
   }
