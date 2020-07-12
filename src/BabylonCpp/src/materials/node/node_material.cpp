@@ -41,6 +41,8 @@ NodeMaterial::NodeMaterial(const std::string& iName, Scene* iScene,
     , options{this, &NodeMaterial::get_options, &NodeMaterial::set_options}
     , imageProcessingConfiguration{this, &NodeMaterial::get_imageProcessingConfiguration,
                                    &NodeMaterial::set_imageProcessingConfiguration}
+    , _mode{NodeMaterialModes::Material}
+    , mode(this, &NodeMaterial::get_mode)
     , _imageProcessingConfiguration{nullptr}
     , _options{nullptr}
     , _vertexCompilationState{nullptr}
@@ -80,6 +82,11 @@ void NodeMaterial::set_imageProcessingConfiguration(const ImageProcessingConfigu
 
   // Ensure the effect will be rebuilt.
   _markAllSubMeshesAsTexturesDirty();
+}
+
+NodeMaterialModes& NodeMaterial::get_mode()
+{
+  return _mode;
 }
 
 std::string NodeMaterial::getClassName() const

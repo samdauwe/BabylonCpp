@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_NODE_NODE_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/materials/node/enums/node_material_modes.h>
 #include <babylon/materials/push_material.h>
 
 namespace BABYLON {
@@ -324,6 +325,11 @@ protected:
   void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
+   * @brief Gets the mode property.
+   */
+  NodeMaterialModes& get_mode();
+
+  /**
    * @brief Attaches a new image processing configuration to the Standard Material.
    * @param configuration
    */
@@ -392,6 +398,17 @@ public:
    * Gets an array of blocks that needs to be serialized even if they are not yet connected
    */
   std::vector<NodeMaterialBlockPtr> attachedBlocks;
+
+  /**
+   * Specifies the mode of the node material
+   * @hidden
+   */
+  NodeMaterialModes _mode;
+
+  /**
+   * Gets the mode property
+   */
+  ReadOnlyProperty<NodeMaterial, NodeMaterialModes> mode;
 
 protected:
   /**
