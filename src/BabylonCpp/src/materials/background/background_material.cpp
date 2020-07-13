@@ -752,7 +752,9 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
                                         _shouldTurnAlphaTestOn(mesh), defines);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(
+    scene, engine, defines, useInstances, std::nullopt,
+    subMesh->getRenderingMesh()->hasThinInstances());
 
   // Attribs
   if (MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true, false)) {
