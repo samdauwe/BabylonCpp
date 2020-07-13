@@ -36,6 +36,8 @@
 #include <babylon/shaders/gpu_update_particles_fragment_fx.h>
 #include <babylon/shaders/gpu_update_particles_vertex_fx.h>
 #include <babylon/shaders/grain_fragment_fx.h>
+#include <babylon/shaders/hdr_filtering_fragment_fx.h>
+#include <babylon/shaders/hdr_filtering_vertex_fx.h>
 #include <babylon/shaders/highlights_fragment_fx.h>
 #include <babylon/shaders/image_processing_fragment_fx.h>
 #include <babylon/shaders/kernel_blur_fragment_fx.h>
@@ -137,6 +139,8 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
   {"gpuUpdateParticlesPixelShader", gpuUpdateParticlesPixelShader},
   {"gpuUpdateParticlesVertexShader", gpuUpdateParticlesVertexShader},
   {"grainPixelShader", grainPixelShader},
+  {"hdrFilteringPixelShader", hdrFilteringPixelShader},
+  {"hdrFilteringVertexShader", hdrFilteringVertexShader},
   {"highlightsPixelShader", highlightsPixelShader},
   {"imageProcessingPixelShader", imageProcessingPixelShader},
   {"kernelBlurPixelShader", kernelBlurPixelShader},
