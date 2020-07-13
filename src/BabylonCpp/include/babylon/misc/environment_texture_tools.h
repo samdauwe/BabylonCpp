@@ -12,7 +12,6 @@ namespace BABYLON {
 
 class ArrayBufferView;
 class BaseTexture;
-class CubeTexture;
 class Engine;
 class EnvironmentTextureInfo;
 class EnvironmentTextureIrradianceInfoV1;
@@ -21,7 +20,6 @@ class InternalTexture;
 class PostProcess;
 class SphericalPolynomial;
 using BaseTexturePtr                        = std::shared_ptr<BaseTexture>;
-using CubeTexturePtr                        = std::shared_ptr<CubeTexture>;
 using EnvironmentTextureInfoPtr             = std::shared_ptr<EnvironmentTextureInfo>;
 using EnvironmentTextureIrradianceInfoV1Ptr = std::shared_ptr<EnvironmentTextureIrradianceInfoV1>;
 using InternalTexturePtr                    = std::shared_ptr<InternalTexture>;
@@ -102,7 +100,7 @@ private:
    * @return the JSON representation of the spherical info
    */
   static EnvironmentTextureIrradianceInfoV1Ptr
-  _CreateEnvTextureIrradiance(const CubeTexturePtr& texture);
+  _CreateEnvTextureIrradiance(const BaseTexturePtr& texture);
 
   /**
    * @brief Hidden

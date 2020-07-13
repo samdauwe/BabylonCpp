@@ -70,7 +70,7 @@ EnvironmentTextureInfoPtr EnvironmentTextureTools::GetEnvInfo(const ArrayBufferV
 }
 
 EnvironmentTextureIrradianceInfoV1Ptr
-EnvironmentTextureTools::_CreateEnvTextureIrradiance(const CubeTexturePtr& texture)
+EnvironmentTextureTools::_CreateEnvTextureIrradiance(const BaseTexturePtr& texture)
 {
   auto polynmials = texture->sphericalPolynomial();
   if (polynmials == nullptr) {
