@@ -18,6 +18,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/shadow_depth_wrapper.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -593,11 +594,22 @@ void ShadowGenerator::_initializeShadowMap()
                         depthOnlySubMeshes);
   };
 
+  // Force the mesh is ready funcion to true as we are double checking it
+  // in the custom render function. Also it prevents side effects and useless
+  // shader variations in DEPTHPREPASS mode.
+  _shadowMap->customIsReadyFunction = [](AbstractMesh* /*m*/, int /*r*/) -> bool { return true; };
+
   // Record Face Index before render.
   _shadowMap->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
     _currentFaceIndex = static_cast<unsigned int>(*faceIndex);
     if (_filter == ShadowGenerator::FILTER_PCF) {
       _scene->getEngine()->setColorWrite(false);
+    }
+    if (_scene->getSceneUniformBuffer()->useUbo()) {
+      const auto sceneUBO = _scene->getSceneUniformBuffer();
+      sceneUBO->updateMatrix("viewProjection", getTransformMatrix());
+      sceneUBO->updateMatrix("view", _viewMatrix);
+      sceneUBO->update();
     }
   });
 
@@ -651,8 +663,8 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Ensures rendering groupids do not erase the depth buffer or we would lose the shadows
   // information.
-  for (unsigned int i = RenderingManager::MIN_RENDERINGGROUPS;
-       i < RenderingManager::MAX_RENDERINGGROUPS; ++i) {
+  for (auto i = RenderingManager::MIN_RENDERINGGROUPS; i < RenderingManager::MAX_RENDERINGGROUPS;
+       ++i) {
     _shadowMap->setRenderingAutoClearDepthStencil(i, false);
   }
 }
@@ -748,9 +760,39 @@ void ShadowGenerator::_renderForShadowMap(const std::vector<SubMesh*>& opaqueSub
   }
 }
 
-void ShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* /*subMesh*/,
-                                                                    Effect* /*effect*/)
+void ShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(
+  SubMesh* /*subMesh*/, Effect* effect,
+  const std::unordered_map<std::string, std::string>& matriceNames, AbstractMesh* mesh)
 {
+  effect->setMatrix(stl_util::contains(matriceNames, "viewProjection") ?
+                      matriceNames.at("viewProjection") :
+                      "viewProjection",
+                    getTransformMatrix());
+
+  effect->setMatrix(stl_util::contains(matriceNames, "view") ? matriceNames.at("view") : "view",
+                    _viewMatrix);
+
+  effect->setMatrix(stl_util::contains(matriceNames, "projection") ? matriceNames.at("projection") :
+                                                                     "projection",
+                    _projectionMatrix);
+
+  auto world = mesh->getWorldMatrix();
+
+  effect->setMatrix(stl_util::contains(matriceNames, "world") ? matriceNames.at("world") : "world",
+                    world);
+
+  world.multiplyToRef(getTransformMatrix(), tmpMatrix);
+
+  effect->setMatrix(stl_util::contains(matriceNames, "worldViewProjection") ?
+                      matriceNames.at("worldViewProjection") :
+                      "worldViewProjection",
+                    tmpMatrix);
+
+  world.multiplyToRef(_viewMatrix, tmpMatrix2);
+
+  effect->setMatrix(stl_util::contains(matriceNames, "worldView") ? matriceNames.at("worldView") :
+                                                                    "worldView",
+                    tmpMatrix2);
 }
 
 void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransparent)
@@ -781,69 +823,95 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     = (engine->getCaps().instancedArrays)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty() || renderingMesh->hasThinInstances());
-  if (isReady(subMesh, hardwareInstancedRendering)) {
-    engine->enableEffect(_effect);
+  if (isReady(subMesh, hardwareInstancedRendering, isTransparent)) {
+    const auto shadowDepthWrapper
+      = renderingMesh->material() ? renderingMesh->material()->shadowDepthWrapper : nullptr;
 
-    renderingMesh->_bind(subMesh, _effect, material->fillMode());
+    auto iEffect = (shadowDepthWrapper && shadowDepthWrapper->getEffect(subMesh, this)) ?
+                     shadowDepthWrapper->getEffect(subMesh, this) :
+                     _effect;
 
-    _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
+    engine->enableEffect(iEffect);
 
-    _effect->setMatrix("viewProjection", getTransformMatrix());
+    renderingMesh->_bind(subMesh, iEffect, material->fillMode());
+
+    getTransformMatrix(); // make sure _cachedDirection et _cachedPosition are up to date
+
+    iEffect->setFloat3("biasAndScaleSM", bias(), normalBias(), depthScale());
+
     if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
-      _effect->setVector3("lightData", _cachedDirection);
+      iEffect->setVector3("lightDataSM", _cachedDirection);
     }
     else {
-      _effect->setVector3("lightData", _cachedPosition);
+      iEffect->setVector3("lightDataSM", _cachedPosition);
     }
 
     if (scene->activeCamera()) {
-      _effect->setFloat2("depthValues", getLight()->getDepthMinZ(*scene->activeCamera()),
+      iEffect->setFloat2("depthValuesSM", getLight()->getDepthMinZ(*scene->activeCamera()),
                          getLight()->getDepthMinZ(*scene->activeCamera())
                            + getLight()->getDepthMaxZ(*scene->activeCamera()));
     }
 
     if (isTransparent && enableSoftTransparentShadow) {
-      _effect->setFloat("softTransparentShadowSM", effectiveMesh->visibility);
+      iEffect->setFloat("softTransparentShadowSM", effectiveMesh->visibility());
     }
 
-    // Alpha test
-    if (material && material->needAlphaTesting()) {
-      auto alphaTexture = material->getAlphaTestTexture();
-      if (alphaTexture) {
-        _effect->setTexture("diffuseSampler", alphaTexture);
-        _effect->setMatrix("diffuseMatrix", alphaTexture->getTextureMatrix() ?
-                                              *alphaTexture->getTextureMatrix() :
-                                              _defaultTextureMatrix);
-      }
-    }
-
-    // Bones
-    if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
-        && renderingMesh->skeleton()) {
-      const auto& skeleton = renderingMesh->skeleton();
-
-      if (skeleton->isUsingTextureForMatrices) {
-        const auto& boneTexture = skeleton->getTransformMatrixTexture(renderingMesh.get());
-
-        if (!boneTexture) {
-          return;
-        }
-
-        _effect->setTexture("boneSampler", boneTexture);
-        _effect->setFloat("boneTextureWidth", 4.f * (skeleton->bones.size() + 1));
+    if (shadowDepthWrapper) {
+      subMesh->_effectOverride = iEffect;
+      if (shadowDepthWrapper->standalone()) {
+        shadowDepthWrapper->baseMaterial()->bindForSubMesh(effectiveMesh->getWorldMatrix(),
+                                                           renderingMesh.get(), subMesh);
       }
       else {
-        _effect->setMatrices("mBones", skeleton->getTransformMatrices((renderingMesh.get())));
+        material->bindForSubMesh(effectiveMesh->getWorldMatrix(), renderingMesh.get(), subMesh);
       }
+      subMesh->_effectOverride = nullptr;
+    }
+    else {
+      iEffect->setMatrix("viewProjection", getTransformMatrix());
+      // Alpha test
+      if (material && material->needAlphaTesting()) {
+        auto alphaTexture = material->getAlphaTestTexture();
+        if (alphaTexture) {
+          iEffect->setTexture("diffuseSampler", alphaTexture);
+          iEffect->setMatrix("diffuseMatrix", alphaTexture->getTextureMatrix() ?
+                                                *alphaTexture->getTextureMatrix() :
+                                                _defaultTextureMatrix);
+        }
+      }
+
+      // Bones
+      if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
+          && renderingMesh->skeleton()) {
+        const auto& skeleton = renderingMesh->skeleton();
+
+        if (skeleton->isUsingTextureForMatrices) {
+          const auto& boneTexture = skeleton->getTransformMatrixTexture(renderingMesh.get());
+
+          if (!boneTexture) {
+            return;
+          }
+
+          iEffect->setTexture("boneSampler", boneTexture);
+          iEffect->setFloat("boneTextureWidth", 4.f * (skeleton->bones.size() + 1));
+        }
+        else {
+          iEffect->setMatrices("mBones", skeleton->getTransformMatrices((renderingMesh.get())));
+        }
+      }
+
+      // Morph targets
+      MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), iEffect);
+
+      // Clip planes
+      MaterialHelper::BindClipPlane(iEffect, scene);
     }
 
-    // Morph targets
-    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
-
-    // Clip planes
-    MaterialHelper::BindClipPlane(_effect, scene);
-
-    _bindCustomEffectForRenderSubMeshForShadowMap(subMesh, _effect.get());
+    _bindCustomEffectForRenderSubMeshForShadowMap(subMesh, iEffect.get(),
+                                                  shadowDepthWrapper ?
+                                                    shadowDepthWrapper->_matriceNames :
+                                                    std::unordered_map<std::string, std::string>{},
+                                                  effectiveMesh.get());
 
     if (forceBackFacesOnly) {
       engine->setState(true, 0, false, true);
@@ -851,14 +919,14 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
 
     // Observables
     onBeforeShadowMapRenderMeshObservable.notifyObservers(renderingMesh.get());
-    onBeforeShadowMapRenderObservable.notifyObservers(_effect.get());
+    onBeforeShadowMapRenderObservable.notifyObservers(iEffect.get());
 
     // Draw
     renderingMesh->_processRendering(
-      effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+      effectiveMesh.get(), subMesh, iEffect, static_cast<int>(material->fillMode()), batch,
       hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
-        _effect->setMatrix("world", world);
+        iEffect->setMatrix("world", world);
       });
 
     if (forceBackFacesOnly) {
@@ -866,7 +934,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     }
 
     // Observables
-    onAfterShadowMapRenderObservable.notifyObservers(_effect.get());
+    onAfterShadowMapRenderObservable.notifyObservers(iEffect.get());
     onAfterShadowMapRenderMeshObservable.notifyObservers(renderingMesh.get());
   }
   else {
@@ -929,7 +997,12 @@ void ShadowGenerator::forceCompilationSync(
       return;
     }
 
-    while (isReady(subMeshes[currentIndex], options.useInstances)) {
+    while (isReady(subMeshes[currentIndex], options.useInstances,
+                   subMeshes[currentIndex]->getMaterial()->needAlphaBlendingForMesh(
+                     *subMeshes[currentIndex]->getMesh()) ?
+                     subMeshes[currentIndex]->getMaterial()->needAlphaBlendingForMesh(
+                       *subMeshes[currentIndex]->getMesh()) :
+                     false)) {
       ++currentIndex;
       if (currentIndex >= subMeshes.size()) {
         if (onCompiled) {
@@ -948,197 +1021,241 @@ void ShadowGenerator::_isReadyCustomDefines(std::vector<std::string>& /*defines*
 {
 }
 
-bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool /*isTransparent*/)
+std::vector<std::string>& ShadowGenerator::_prepareShadowDefines(SubMesh* subMesh,
+                                                                 bool useInstances,
+                                                                 std::vector<std::string>& defines,
+                                                                 bool isTransparent)
 {
-  std::vector<std::string> defines;
+  defines.emplace_back(StringTools::printf(
+    "#define SM_FLOAT %s", (_textureType != Constants::TEXTURETYPE_UNSIGNED_INT ? "1" : "0")));
 
-  if (_textureType != Constants::TEXTURETYPE_UNSIGNED_INT) {
-    defines.emplace_back("#define FLOAT");
-  }
+  defines.emplace_back(StringTools::printf(
+    "#define SM_ESM %s", (useExponentialShadowMap || useBlurExponentialShadowMap ? "1" : "0")));
 
-  if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
-    defines.emplace_back("#define ESM");
-  }
-  else if (usePercentageCloserFiltering() || useContactHardeningShadow()) {
-    defines.emplace_back("#define DEPTHTEXTURE");
-  }
+  defines.emplace_back(
+    StringTools::printf("#define SM_DEPTHTEXTURE %s",
+                        (usePercentageCloserFiltering || useContactHardeningShadow ? "1" : "0")));
 
-  std::vector<std::string> attribs{VertexBuffer::PositionKind};
-
-  auto mesh     = subMesh->getMesh();
-  auto material = subMesh->getMaterial();
+  const auto mesh = subMesh->getMesh();
 
   // Normal bias.
-  if (normalBias() > 0.f && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    attribs.emplace_back(VertexBuffer::NormalKind);
-    defines.emplace_back("#define NORMAL");
-    if (mesh->nonUniformScaling()) {
-      defines.emplace_back("#define NONUNIFORMSCALING");
-    }
-    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
-      defines.emplace_back("#define DIRECTIONINLIGHTDATA");
-    }
-  }
-
-  // Alpha test
-  if (material && material->needAlphaTesting()) {
-    auto alphaTexture = material->getAlphaTestTexture();
-    if (alphaTexture) {
-      defines.emplace_back("#define ALPHATEST");
-      if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-        attribs.emplace_back(VertexBuffer::UVKind);
-        defines.emplace_back("#define UV1");
-      }
-      if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-        if (alphaTexture->coordinatesIndex == 1) {
-          attribs.emplace_back(VertexBuffer::UV2Kind);
-          defines.emplace_back("#define UV2");
-        }
-      }
-    }
-  }
-
-  // Bones
-  auto fallbacks = std::make_unique<EffectFallbacks>();
-  if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
-    if (mesh->numBoneInfluencers() > 4) {
-      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
-      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
-    }
-    const auto skeleton = mesh->skeleton();
-    defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
-    if (mesh->numBoneInfluencers > 0) {
-      fallbacks->addCPUSkinningFallback(0, mesh.get());
-    }
-
-    if (skeleton->isUsingTextureForMatrices()) {
-      defines.emplace_back("#define BONETEXTURE");
-    }
-    else {
-      defines.emplace_back(StringTools::concat(
-        "#define BonesPerMesh " + std::to_string(mesh->skeleton()->bones.size() + 1)));
-    }
-  }
-  else {
-    defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
-  }
-
-  // Morph targets
-  auto manager                  = (std::static_pointer_cast<Mesh>(mesh))->morphTargetManager();
-  unsigned int morphInfluencers = 0;
-  if (manager) {
-    if (manager->numInfluencers() > 0) {
-      defines.emplace_back("#define MORPHTARGETS");
-      morphInfluencers = static_cast<unsigned int>(manager->numInfluencers());
-      defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(morphInfluencers));
-      MaterialDefines iDefines;
-      iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
-      MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(attribs, mesh.get(),
-                                                                  morphInfluencers);
-    }
-  }
-
-  // ClipPlanes
-  const auto scene = _scene;
-  if (scene->clipPlane) {
-    defines.emplace_back("#define CLIPPLANE");
-  }
-  if (scene->clipPlane2) {
-    defines.emplace_back("#define CLIPPLANE2");
-  }
-  if (scene->clipPlane3) {
-    defines.emplace_back("#define CLIPPLANE3");
-  }
-  if (scene->clipPlane4) {
-    defines.emplace_back("#define CLIPPLANE4");
-  }
-  if (scene->clipPlane5) {
-    defines.emplace_back("#define CLIPPLANE5");
-  }
-  if (scene->clipPlane6) {
-    defines.emplace_back("#define CLIPPLANE6");
-  }
-
-  // Instances
-  if (useInstances) {
-    defines.emplace_back("#define INSTANCES");
-    MaterialHelper::PushAttributesForInstances(attribs);
-  }
-
-  if (customShaderOptions) {
-    if (!customShaderOptions->defines.empty()) {
-      for (const auto& define : customShaderOptions->defines) {
-        if (!stl_util::contains(defines, define)) {
-          defines.emplace_back(define);
-        }
-      }
-    }
-  }
+  defines.emplace_back(StringTools::printf(
+    "#define SM_NORMALBIAS %s",
+    (normalBias && mesh->isVerticesDataPresent(VertexBuffer::NormalKind) ? "1" : "0")));
+  defines.emplace_back(StringTools::printf(
+    "#define SM_DIRECTIONINLIGHTDATA %s",
+    (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT ? "1" : "0")));
 
   // Point light
-  if (_light->needCube()) {
-    defines.emplace_back("#define USEDISTANCE");
-  }
+  defines.emplace_back(
+    StringTools::printf("#define SM_USEDISTANCE %s", (_light->needCube() ? "1" : "0")));
+
+  // Soft transparent shadows
+  defines.emplace_back(
+    StringTools::printf("#define SM_SOFTTRANSPARENTSHADOW %s",
+                        (enableSoftTransparentShadow && isTransparent ? "1" : "0")));
 
   _isReadyCustomDefines(defines, subMesh, useInstances);
 
-  // Get correct effect
-  auto join = StringTools::join(defines, '\n');
-  if (_cachedDefines != join) {
-    _cachedDefines = join;
+  return defines;
+}
 
-    std::string shaderName = "shadowMap";
-    std::vector<std::string> uniforms{
-      "world",       "mBones",       "viewProjection",        "diffuseMatrix",    "lightData",
-      "depthValues", "biasAndScale", "morphTargetInfluences", "boneTextureWidth", "vClipPlane",
-      "vClipPlane2", "vClipPlane3",  "vClipPlane4",           "vClipPlane5",      "vClipPlane6"};
-    std::vector<std::string> samplers{"diffuseSampler", "boneSampler"};
+bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransparent)
+{
+  const auto material           = subMesh->getMaterial();
+  const auto shadowDepthWrapper = material->shadowDepthWrapper;
 
-    // Custom shader?
-    if (customShaderOptions) {
-      shaderName = customShaderOptions->shaderName;
+  std::vector<std::string> defines;
 
-      if (!customShaderOptions->attributes.empty()) {
-        for (const auto& attrib : customShaderOptions->attributes) {
-          if (!stl_util::contains(attribs, attrib)) {
-            attribs.emplace_back(attrib);
-          }
-        }
+  _prepareShadowDefines(subMesh, useInstances, defines, isTransparent);
+
+  if (shadowDepthWrapper) {
+    if (!shadowDepthWrapper->isReadyForSubMesh(subMesh, defines, this, useInstances)) {
+      return false;
+    }
+  }
+  else {
+    std::vector<std::string> attribs{VertexBuffer::PositionKind};
+
+    auto mesh = subMesh->getMesh();
+
+    // Normal bias.
+    if (normalBias() > 0.f && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
+      attribs.emplace_back(VertexBuffer::NormalKind);
+      defines.emplace_back("#define NORMAL");
+      if (mesh->nonUniformScaling()) {
+        defines.emplace_back("#define NONUNIFORMSCALING");
       }
+    }
 
-      if (!customShaderOptions->uniforms.empty()) {
-        for (const auto& uniform : customShaderOptions->uniforms) {
-          if (!stl_util::contains(uniforms, uniform)) {
-            uniforms.emplace_back(uniform);
-          }
+    // Alpha test
+    if (material && material->needAlphaTesting()) {
+      auto alphaTexture = material->getAlphaTestTexture();
+      if (alphaTexture) {
+        defines.emplace_back("#define ALPHATEST");
+        if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
+          attribs.emplace_back(VertexBuffer::UVKind);
+          defines.emplace_back("#define UV1");
         }
-      }
-
-      if (!customShaderOptions->samplers.empty()) {
-        for (const auto& sampler : customShaderOptions->samplers) {
-          if (!stl_util::contains(samplers, sampler)) {
-            samplers.emplace_back(sampler);
+        if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
+          if (alphaTexture->coordinatesIndex == 1) {
+            attribs.emplace_back(VertexBuffer::UV2Kind);
+            defines.emplace_back("#define UV2");
           }
         }
       }
     }
 
-    IEffectCreationOptions options;
-    options.attributes      = std::move(attribs);
-    options.uniformsNames   = std::move(uniforms);
-    options.samplers        = std::move(samplers);
-    options.defines         = std::move(join);
-    options.fallbacks       = std::move(fallbacks);
-    options.indexParameters = {{"maxSimultaneousMorphTargets", morphInfluencers}};
+    // Bones
+    auto fallbacks = std::make_unique<EffectFallbacks>();
+    if (mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
+      attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
+      if (mesh->numBoneInfluencers() > 4) {
+        attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
+        attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
+      }
+      const auto skeleton = mesh->skeleton();
+      defines.emplace_back("#define NUM_BONE_INFLUENCERS "
+                           + std::to_string(mesh->numBoneInfluencers()));
+      if (mesh->numBoneInfluencers > 0) {
+        fallbacks->addCPUSkinningFallback(0, mesh.get());
+      }
 
-    _effect = _scene->getEngine()->createEffect(shaderName, options, _scene->getEngine());
-  }
+      if (skeleton->isUsingTextureForMatrices()) {
+        defines.emplace_back("#define BONETEXTURE");
+      }
+      else {
+        defines.emplace_back(StringTools::concat(
+          "#define BonesPerMesh " + std::to_string(mesh->skeleton()->bones.size() + 1)));
+      }
+    }
+    else {
+      defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
+    }
 
-  if (!_effect->isReady()) {
-    return false;
+    // Morph targets
+    auto manager          = (std::static_pointer_cast<Mesh>(mesh))->morphTargetManager();
+    auto morphInfluencers = 0u;
+    if (manager) {
+      if (manager->numInfluencers() > 0) {
+        defines.emplace_back("#define MORPHTARGETS");
+        morphInfluencers = static_cast<unsigned int>(manager->numInfluencers());
+        defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(morphInfluencers));
+        MaterialDefines iDefines;
+        iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
+        MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(attribs, mesh.get(),
+                                                                    morphInfluencers);
+      }
+    }
+
+    // ClipPlanes
+    const auto scene = _scene;
+    if (scene->clipPlane) {
+      defines.emplace_back("#define CLIPPLANE");
+    }
+    if (scene->clipPlane2) {
+      defines.emplace_back("#define CLIPPLANE2");
+    }
+    if (scene->clipPlane3) {
+      defines.emplace_back("#define CLIPPLANE3");
+    }
+    if (scene->clipPlane4) {
+      defines.emplace_back("#define CLIPPLANE4");
+    }
+    if (scene->clipPlane5) {
+      defines.emplace_back("#define CLIPPLANE5");
+    }
+    if (scene->clipPlane6) {
+      defines.emplace_back("#define CLIPPLANE6");
+    }
+
+    // Instances
+    if (useInstances) {
+      defines.emplace_back("#define INSTANCES");
+      MaterialHelper::PushAttributesForInstances(attribs);
+      if (subMesh->getRenderingMesh()->hasThinInstances()) {
+        defines.emplace_back("#define THIN_INSTANCES");
+      }
+    }
+
+    if (customShaderOptions) {
+      if (!customShaderOptions->defines.empty()) {
+        for (const auto& define : customShaderOptions->defines) {
+          if (!stl_util::contains(defines, define)) {
+            defines.emplace_back(define);
+          }
+        }
+      }
+    }
+
+    // Get correct effect
+    auto join = StringTools::join(defines, '\n');
+    if (_cachedDefines != join) {
+      _cachedDefines = join;
+
+      std::string shaderName = "shadowMap";
+      std::vector<std::string> uniforms{"world",
+                                        "mBones",
+                                        "viewProjection",
+                                        "diffuseMatrix",
+                                        "lightDataSM",
+                                        "depthValuesSM",
+                                        "biasAndScaleSM",
+                                        "morphTargetInfluences",
+                                        "boneTextureWidth",
+                                        "vClipPlane",
+                                        "vClipPlane2",
+                                        "vClipPlane3",
+                                        "vClipPlane4",
+                                        "vClipPlane5",
+                                        "vClipPlane6",
+                                        "softTransparentShadowSM"};
+      std::vector<std::string> samplers{"diffuseSampler", "boneSampler"};
+
+      // Custom shader?
+      if (customShaderOptions) {
+        shaderName = customShaderOptions->shaderName;
+
+        if (!customShaderOptions->attributes.empty()) {
+          for (const auto& attrib : customShaderOptions->attributes) {
+            if (!stl_util::contains(attribs, attrib)) {
+              attribs.emplace_back(attrib);
+            }
+          }
+        }
+
+        if (!customShaderOptions->uniforms.empty()) {
+          for (const auto& uniform : customShaderOptions->uniforms) {
+            if (!stl_util::contains(uniforms, uniform)) {
+              uniforms.emplace_back(uniform);
+            }
+          }
+        }
+
+        if (!customShaderOptions->samplers.empty()) {
+          for (const auto& sampler : customShaderOptions->samplers) {
+            if (!stl_util::contains(samplers, sampler)) {
+              samplers.emplace_back(sampler);
+            }
+          }
+        }
+      }
+
+      IEffectCreationOptions options;
+      options.attributes      = std::move(attribs);
+      options.uniformsNames   = std::move(uniforms);
+      options.samplers        = std::move(samplers);
+      options.defines         = std::move(join);
+      options.fallbacks       = std::move(fallbacks);
+      options.indexParameters = {{"maxSimultaneousMorphTargets", morphInfluencers}};
+
+      _effect = _scene->getEngine()->createEffect(shaderName, options, _scene->getEngine());
+    }
+
+    if (!_effect->isReady()) {
+      return false;
+    }
   }
 
   if (useBlurExponentialShadowMap() || useBlurCloseExponentialShadowMap()) {

@@ -363,7 +363,9 @@ protected:
   /**
    * @brief Hidden
    */
-  void _bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* subMesh, Effect* effect) override;
+  void _bindCustomEffectForRenderSubMeshForShadowMap(
+    SubMesh* subMesh, Effect* effect,
+    const std::unordered_map<std::string, std::string>& matriceNames, AbstractMesh* mesh) override;
 
   /**
    * @brief Hidden
@@ -392,8 +394,8 @@ public:
 
   /**
    * Sets this to true if you want that the edges of the shadows don't "swimm" / "shimmer" when
-   * rotating the camera. The trade off is that you loose some precision in the shadow rendering
-   * when enabling this setting.
+   * rotating the camera. The trade off is that you lose some precision in the shadow rendering when
+   * enabling this setting.
    */
   bool stabilizeCascades;
 

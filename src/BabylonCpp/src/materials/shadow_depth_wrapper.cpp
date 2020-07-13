@@ -54,7 +54,7 @@ public:
    * @returns the effect to use to generate the depth map for the subMesh + shadow generator
    * specified
    */
-  Effect* getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
+  EffectPtr getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
 
   /**
    * @brief Specifies that the submesh is ready to be used for depth rendering
@@ -159,8 +159,9 @@ MaterialPtr& ShadowDepthWrapper::ShadowDepthWrapperImpl::get_baseMaterial()
   return _baseMaterial;
 }
 
-Effect* ShadowDepthWrapper::ShadowDepthWrapperImpl::getEffect(SubMesh* /*subMesh*/,
-                                                              ShadowGenerator* /*shadowGenerator*/)
+EffectPtr
+ShadowDepthWrapper::ShadowDepthWrapperImpl::getEffect(SubMesh* /*subMesh*/,
+                                                      ShadowGenerator* /*shadowGenerator*/)
 {
   return nullptr;
 }
@@ -211,7 +212,7 @@ MaterialPtr& ShadowDepthWrapper::get_baseMaterial()
   return _impl->get_baseMaterial();
 }
 
-Effect* ShadowDepthWrapper::getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator)
+EffectPtr ShadowDepthWrapper::getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator)
 {
   return _impl->getEffect(subMesh, shadowGenerator);
 }

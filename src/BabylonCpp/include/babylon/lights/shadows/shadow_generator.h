@@ -523,13 +523,20 @@ protected:
                            const std::vector<SubMesh*>& alphaTestSubMeshes,
                            const std::vector<SubMesh*>& transparentSubMeshes,
                            const std::vector<SubMesh*>& depthOnlySubMeshes);
-  virtual void _bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* subMesh, Effect* effect);
+  virtual void _bindCustomEffectForRenderSubMeshForShadowMap(
+    SubMesh* subMesh, Effect* effect,
+    const std::unordered_map<std::string, std::string>& matriceNames, AbstractMesh* mesh);
   void _renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransparent = false);
   void _applyFilterValues();
   virtual void _isReadyCustomDefines(std::vector<std::string>& defines, SubMesh* subMesh,
                                      bool useInstances);
   void _disposeBlurPostProcesses();
   void _disposeRTTandPostProcesses();
+
+private:
+  std::vector<std::string>& _prepareShadowDefines(SubMesh* subMesh, bool useInstances,
+                                                  std::vector<std::string>& defines,
+                                                  bool isTransparent);
 
 public:
   /**
@@ -727,6 +734,7 @@ protected:
   unsigned int _textureType;
   Matrix _defaultTextureMatrix;
   std::optional<size_t> _storedUniqueId;
+  Matrix tmpMatrix, tmpMatrix2;
 
 }; // end of class ShadowGenerator
 

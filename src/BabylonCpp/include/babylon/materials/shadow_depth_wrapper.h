@@ -9,10 +9,12 @@
 
 namespace BABYLON {
 
+class Effect;
 class Material;
 class Scene;
 class ShadowGenerator;
 class SubMesh;
+using EffectPtr   = std::shared_ptr<Effect>;
 using MaterialPtr = std::shared_ptr<Material>;
 
 /**
@@ -42,7 +44,7 @@ public:
    * @returns the effect to use to generate the depth map for the subMesh + shadow generator
    * specified
    */
-  Effect* getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
+  EffectPtr getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
 
   /**
    * @brief Specifies that the submesh is ready to be used for depth rendering

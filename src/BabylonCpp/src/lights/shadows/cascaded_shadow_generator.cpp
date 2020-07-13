@@ -722,12 +722,36 @@ void CascadedShadowGenerator::_createTargetRenderTexture()
   _splitFrustum();
 }
 
-void CascadedShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(SubMesh* /*subMesh*/,
-                                                                            Effect* effect)
+void CascadedShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(
+  SubMesh* /*subMesh*/, Effect* effect,
+  const std::unordered_map<std::string, std::string>& matriceNames, AbstractMesh* mesh)
 {
-  // TODO FIXME
-  effect->setMatrix("viewProjection",
-                    *getCascadeTransformMatrix(static_cast<unsigned>(_currentLayer)));
+  effect->setMatrix(stl_util::contains(matriceNames, "viewProjection") ?
+                      matriceNames.at("viewProjection") :
+                      "viewProjection",
+                    *getCascadeTransformMatrix(_currentLayer));
+
+  effect->setMatrix(stl_util::contains(matriceNames, "view") ? matriceNames.at("view") : "view",
+                    *getCascadeViewMatrix(_currentLayer));
+
+  effect->setMatrix(stl_util::contains(matriceNames, "projection") ? matriceNames.at("projection") :
+                                                                     "projection",
+                    *getCascadeProjectionMatrix(_currentLayer));
+
+  auto world = mesh->getWorldMatrix();
+
+  world.multiplyToRef(*getCascadeTransformMatrix(_currentLayer), tmpMatrix);
+
+  effect->setMatrix(stl_util::contains(matriceNames, "worldViewProjection") ?
+                      matriceNames.at("worldViewProjection") :
+                      "worldViewProjection",
+                    tmpMatrix);
+
+  world.multiplyToRef(*getCascadeViewMatrix(_currentLayer), tmpMatrix2);
+
+  effect->setMatrix(stl_util::contains(matriceNames, "worldView") ? matriceNames.at("worldView") :
+                                                                    "worldView",
+                    tmpMatrix2);
 }
 
 void CascadedShadowGenerator::_isReadyCustomDefines(std::vector<std::string>& defines,
