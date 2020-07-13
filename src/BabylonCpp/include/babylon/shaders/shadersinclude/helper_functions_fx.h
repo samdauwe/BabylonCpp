@@ -58,9 +58,19 @@ vec3 toLinearSpace(vec3 color)
     return pow(color, vec3(LinearEncodePowerApprox));
 }
 
+vec4 toLinearSpace(vec4 color)
+{
+    return vec4(pow(color.rgb, vec3(LinearEncodePowerApprox)), color.a);
+}
+
 vec3 toGammaSpace(vec3 color)
 {
     return pow(color, vec3(GammaEncodePowerApprox));
+}
+
+vec4 toGammaSpace(vec4 color)
+{
+    return vec4(pow(color.rgb, vec3(GammaEncodePowerApprox)), color.a);
 }
 
 float toGammaSpace(float color)
@@ -71,6 +81,54 @@ float toGammaSpace(float color)
 float square(float value)
 {
     return value * value;
+}
+
+#ifdef WEBGL2
+    // https://learnopengl.com/PBR/IBL/Specular-IBL
+    // Hammersley
+    float radicalInverse_VdC(uint bits)
+    {
+        bits = (bits << 16u) | (bits >> 16u);
+        bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+        bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+        bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+        bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+        return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+    }
+
+    vec2 hammersley(uint i, uint N)
+    {
+        return vec2(float(i)/float(N), radicalInverse_VdC(i));
+    }
+#else
+    float vanDerCorpus(int n, int base)
+    {
+        float invBase = 1.0 / float(base);
+        float denom   = 1.0;
+        float result  = 0.0;
+
+        for(int i = 0; i < 32; ++i)
+        {
+            if(n > 0)
+            {
+                denom   = mod(float(n), 2.0);
+                result += denom * invBase;
+                invBase = invBase / 2.0;
+                n       = int(float(n) / 2.0);
+            }
+        }
+
+        return result;
+    }
+
+    vec2 hammersley(int i, int N)
+    {
+        return vec2(float(i)/float(N), vanDerCorpus(i, 2));
+    }
+#endif
+
+float log4(float x) {
+    return log2(x) / 2.;
 }
 
 float pow5(float value) {

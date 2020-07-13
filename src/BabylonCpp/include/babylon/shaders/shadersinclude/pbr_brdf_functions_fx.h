@@ -39,6 +39,16 @@ const char* pbrBRDFFunctions
         return brdfLookup.rgb;
     }
 
+    vec3 getReflectanceFromBRDFLookup(const vec3 specularEnvironmentR0, const vec3 specularEnvironmentR90, const vec3 environmentBrdf) {
+        #ifdef BRDF_V_HEIGHT_CORRELATED
+            vec3 reflectance = (specularEnvironmentR90 - specularEnvironmentR0) * environmentBrdf.x + specularEnvironmentR0 * environmentBrdf.y;
+            // Simplification if F90 = 1 vec3 reflectance = (specularEnvironmentR90 - specularEnvironmentR0) * environmentBrdf.xxx + specularEnvironmentR0 * environmentBrdf.yyy;
+        #else
+            vec3 reflectance = specularEnvironmentR0 * environmentBrdf.x + specularEnvironmentR90 * environmentBrdf.y;
+        #endif
+        return reflectance;
+    }
+
     vec3 getReflectanceFromBRDFLookup(const vec3 specularEnvironmentR0, const vec3 environmentBrdf) {
         #ifdef BRDF_V_HEIGHT_CORRELATED
             vec3 reflectance = mix(environmentBrdf.xxx, environmentBrdf.yyy, specularEnvironmentR0);
@@ -49,6 +59,18 @@ const char* pbrBRDFFunctions
     }
 #endif
 
+/* NOT USED
+#if defined(SHEEN) && defined(SHEEN_SOFTER)
+// Approximation of (integral on hemisphere)[f_sheen*cos(theta)*dtheta*dphi]
+float getBRDFLookupCharlieSheen(float NdotV, float perceptualRoughness)
+{
+    float c = 1.0 - NdotV;
+    float c3 = c*c*c;
+    return 0.65584461 * c3 + 1.0 / (4.16526551 + exp(-7.97291361*perceptualRoughness+6.33516894));
+}
+#endif
+*/
+
 #if !defined(ENVIRONMENTBRDF) || defined(REFLECTIONMAP_SKYBOX) || defined(ALPHAFRESNEL)
     vec3 getReflectanceFromAnalyticalBRDFLookup_Jones(float VdotN, vec3 reflectance0, vec3 reflectance90, float smoothness)
     {
@@ -58,7 +80,7 @@ const char* pbrBRDFFunctions
     }
 #endif
 
-#if defined(SHEEN) && defined(REFLECTION)
+#if defined(SHEEN) && defined(ENVIRONMENTBRDF)
     /**
      * The sheen BRDF not containing F can be easily stored in the blue channel of the BRDF texture.
      * The blue channel contains DCharlie * VAshikhmin * NdotL as a lokkup table
@@ -74,18 +96,21 @@ const char* pbrBRDFFunctions
 //                              Schlick/Fresnel
 // ______________________________________________________________________
 
+// iorI incident iorT transmitted
+
 // Schlick's approximation for R0 (Fresnel Reflectance Values)
 // Keep for references
-// vec3 getR0fromAirToSurfaceIOR(vec3 ior1) {
-//     return getR0fromIOR(ior1, vec3(1.0));
-// }
 
-// vec3 getR0fromIOR(vec3 ior1, vec3 ior2) {
-//     vec3 t = (ior1 - ior2) / (ior1 + ior2);
+// vec3 getR0fromIORs(vec3 iorT, vec3 iorI) {
+//     vec3 t = (iorT - iorI) / (iorT + iorI);
 //     return t * t;
 // }
 
-// vec3 getIORfromAirToSurfaceR0(vec3 f0) {
+// vec3 getR0fromAirToSurfaceIORT(vec3 iorT) {
+//     return getR0fromIOR(iorT, vec3(1.0));
+// }
+
+// vec3 getIORTfromAirToSurfaceR0(vec3 f0) {
 //     vec3 s = sqrt(f0);
 //     return (1.0 + s) / (1.0 - s);
 // }
@@ -146,6 +171,7 @@ float normalDistributionFunction_TrowbridgeReitzGGX(float NdotH, float alphaG)
 }
 
 #ifdef SHEEN
+    // http://www.aconty.com/pdf/s2017_pbs_imageworks_sheen.pdf
     // https://knarkowicz.wordpress.com/2018/01/04/cloth-shading/
     float normalDistributionFunction_CharlieSheen(float NdotH, float alphaG)
     {
@@ -183,6 +209,10 @@ float normalDistributionFunction_TrowbridgeReitzGGX(float NdotH, float alphaG)
             float GGXV = NdotL * (NdotV * (1.0 - alphaG) + alphaG);
             float GGXL = NdotV * (NdotL * (1.0 - alphaG) + alphaG);
             return 0.5 / (GGXV + GGXL);
+
+)ShaderCode"
+R"ShaderCode(
+
         #else
             float a2 = alphaG * alphaG;
             float GGXV = NdotL * sqrt(NdotV * (NdotV - a2 * NdotV) + a2);
@@ -208,10 +238,6 @@ float normalDistributionFunction_TrowbridgeReitzGGX(float NdotH, float alphaG)
 
     // From smithVisibilityG1_TrowbridgeReitzGGX * dot / dot to cancel the cook
     // torrance denominator :-)
-
-)ShaderCode"
-R"ShaderCode(
-
     float smithVisibilityG1_TrowbridgeReitzGGXFast(float dot, float alphaG)
     {
         #ifdef MOBILE
@@ -259,6 +285,33 @@ R"ShaderCode(
     {
         return 1. / (4. * (NdotL + NdotV - NdotL * NdotV));
     }
+
+    /* NOT USED
+    #ifdef SHEEN_SOFTER
+        // http://www.aconty.com/pdf/s2017_pbs_imageworks_sheen.pdf
+        float l(float x, float alphaG)
+        {
+            float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
+            float a = mix(21.5473, 25.3245, oneMinusAlphaSq);
+            float b = mix(3.82987, 3.32435, oneMinusAlphaSq);
+            float c = mix(0.19823, 0.16801, oneMinusAlphaSq);
+            float d = mix(-1.97760, -1.27393, oneMinusAlphaSq);
+            float e = mix(-4.32054, -4.85967, oneMinusAlphaSq);
+            return a / (1.0 + b * pow(x, c)) + d * x + e;
+        }
+
+        float lambdaSheen(float cosTheta, float alphaG)
+        {
+            return abs(cosTheta) < 0.5 ? exp(l(cosTheta, alphaG)) : exp(2.0 * l(0.5, alphaG) - l(1.0 - cosTheta, alphaG));
+        }
+
+        float visibility_CharlieSheen(float NdotL, float NdotV, float alphaG)
+        {
+            float G = 1.0 / (1.0 + lambdaSheen(NdotV, alphaG) + lambdaSheen(NdotL, alphaG));
+            return G / (4.0 * NdotV * NdotL);
+        }
+    #endif
+    */
 #endif
 
 // ______________________________________________________________________

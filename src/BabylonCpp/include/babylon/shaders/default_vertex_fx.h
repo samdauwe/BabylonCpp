@@ -134,6 +134,23 @@ void main(void) {
 
     vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
 
+#ifdef NORMAL
+    mat3 normalWorld = mat3(finalWorld);
+
+    #if defined(INSTANCES) && defined(THIN_INSTANCES)
+        vNormalW = normalUpdated / vec3(dot(normalWorld[0], normalWorld[0]), dot(normalWorld[1], normalWorld[1]), dot(normalWorld[2], normalWorld[2]));
+        vNormalW = normalize(normalWorld * vNormalW);
+    #else
+        #ifdef NONUNIFORMSCALING
+            normalWorld = transposeMat3(inverseMat3(normalWorld));
+        #endif
+
+        vNormalW = normalize(normalWorld * normalUpdated);
+    #endif
+#endif
+
+#define CUSTOM_VERTEX_UPDATE_WORLDPOS
+
 #ifdef MULTIVIEW
     if (gl_ViewID_OVR == 0u) {
         gl_Position = viewProjection * worldPos;
@@ -145,16 +162,6 @@ void main(void) {
 #endif
 
     vPositionW = vec3(worldPos);
-
-#ifdef NORMAL
-    mat3 normalWorld = mat3(finalWorld);
-
-    #ifdef NONUNIFORMSCALING
-        normalWorld = transposeMat3(inverseMat3(normalWorld));
-    #endif
-
-    vNormalW = normalize(normalWorld * normalUpdated);
-#endif
 
 #if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
     vDirectionW = normalize(vec3(finalWorld * vec4(positionUpdated, 0.0)));

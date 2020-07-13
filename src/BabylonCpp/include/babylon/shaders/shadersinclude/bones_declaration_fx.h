@@ -24,6 +24,7 @@ const char* bonesDeclaration
     #endif
 
     #ifdef BONETEXTURE
+        #define inline
         mat4 readMatrixFromRawSampler(sampler2D smp, float index)
         {
             float offset = index  * 4.0;

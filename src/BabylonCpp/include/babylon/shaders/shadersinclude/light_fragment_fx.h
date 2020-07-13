@@ -67,7 +67,7 @@ const char* lightFragment
             #ifdef HEMILIGHT{X}
                 info.diffuse = computeHemisphericDiffuseLighting(preInfo, light{X}.vLightDiffuse.rgb, light{X}.vLightGround);
             #elif defined(SS_TRANSLUCENCY)
-                info.diffuse = computeDiffuseAndTransmittedLighting(preInfo, light{X}.vLightDiffuse.rgb, transmittance);
+                info.diffuse = computeDiffuseAndTransmittedLighting(preInfo, light{X}.vLightDiffuse.rgb, subSurfaceOut.transmittance);
             #else
                 info.diffuse = computeDiffuseLighting(preInfo, light{X}.vLightDiffuse.rgb);
             #endif
@@ -75,9 +75,9 @@ const char* lightFragment
             // Specular contribution
             #ifdef SPECULARTERM
                 #ifdef ANISOTROPIC
-                    info.specular = computeAnisotropicSpecularLighting(preInfo, viewDirectionW, normalW, anisotropicTangent, anisotropicBitangent, anisotropy, specularEnvironmentR0, specularEnvironmentR90, AARoughnessFactors.x, light{X}.vLightDiffuse.rgb);
+                    info.specular = computeAnisotropicSpecularLighting(preInfo, viewDirectionW, normalW, anisotropicOut.anisotropicTangent, anisotropicOut.anisotropicBitangent, anisotropicOut.anisotropy, clearcoatOut.specularEnvironmentR0, specularEnvironmentR90, AARoughnessFactors.x, light{X}.vLightDiffuse.rgb);
                 #else
-                    info.specular = computeSpecularLighting(preInfo, normalW, specularEnvironmentR0, specularEnvironmentR90, AARoughnessFactors.x, light{X}.vLightDiffuse.rgb);
+                    info.specular = computeSpecularLighting(preInfo, normalW, clearcoatOut.specularEnvironmentR0, specularEnvironmentR90, AARoughnessFactors.x, light{X}.vLightDiffuse.rgb);
                 #endif
             #endif
 
@@ -85,25 +85,31 @@ const char* lightFragment
             #ifdef SHEEN
                 #ifdef SHEEN_LINKWITHALBEDO
                     // BE Carefull: Sheen intensity is replacing the roughness value.
-                    preInfo.roughness = sheenIntensity;
+                    preInfo.roughness = sheenOut.sheenIntensity;
+                #else
+                    #ifdef HEMILIGHT{X}
+                        preInfo.roughness = sheenOut.sheenRoughness;
+                    #else
+                        preInfo.roughness = adjustRoughnessFromLightProperties(sheenOut.sheenRoughness, light{X}.vLightSpecular.a, preInfo.lightDistance);
+                    #endif
                 #endif
-                info.sheen = computeSheenLighting(preInfo, normalW, sheenColor, specularEnvironmentR90, AARoughnessFactors.x, light{X}.vLightDiffuse.rgb);
+                info.sheen = computeSheenLighting(preInfo, normalW, sheenOut.sheenColor, specularEnvironmentR90, AARoughnessFactors.x, light{X}.vLightDiffuse.rgb);
             #endif
 
             // Clear Coat contribution
             #ifdef CLEARCOAT
                 // Simulates Light radius
                 #ifdef HEMILIGHT{X}
-                    preInfo.roughness = clearCoatRoughness;
+                    preInfo.roughness = clearcoatOut.clearCoatRoughness;
                 #else
-                    preInfo.roughness = adjustRoughnessFromLightProperties(clearCoatRoughness, light{X}.vLightSpecular.a, preInfo.lightDistance);
+                    preInfo.roughness = adjustRoughnessFromLightProperties(clearcoatOut.clearCoatRoughness, light{X}.vLightSpecular.a, preInfo.lightDistance);
                 #endif
 
-                info.clearCoat = computeClearCoatLighting(preInfo, clearCoatNormalW, clearCoatAARoughnessFactors.x, clearCoatIntensity, light{X}.vLightDiffuse.rgb);
+                info.clearCoat = computeClearCoatLighting(preInfo, clearcoatOut.clearCoatNormalW, clearcoatOut.clearCoatAARoughnessFactors.x, clearcoatOut.clearCoatIntensity, light{X}.vLightDiffuse.rgb);
 
                 #ifdef CLEARCOAT_TINT
                     // Absorption
-                    absorption = computeClearCoatLightingAbsorption(clearCoatNdotVRefract, preInfo.L, clearCoatNormalW, clearCoatColor, clearCoatThickness, clearCoatIntensity);
+                    absorption = computeClearCoatLightingAbsorption(clearcoatOut.clearCoatNdotVRefract, preInfo.L, clearcoatOut.clearCoatNormalW, clearcoatOut.clearCoatColor, clearcoatOut.clearCoatThickness, clearcoatOut.clearCoatIntensity);
                     info.diffuse *= absorption;
                     #ifdef SPECULARTERM
                         info.specular *= absorption;
@@ -137,6 +143,10 @@ const char* lightFragment
     #ifdef SHADOW{X}
         #ifdef SHADOWCSM{X}
             for (int i = 0; i < SHADOWCSMNUM_CASCADES{X}; i++)
+
+)ShaderCode"
+R"ShaderCode(
+
             {
                 #ifdef SHADOWCSM_RIGHTHANDED{X}
                     diff{X} = viewFrustumZ{X}[i] + vPositionFromCamera{X}.z;
@@ -155,10 +165,6 @@ const char* lightFragment
             {
                 #if defined(SHADOWPCF{X})
                     #if defined(SHADOWLOWQUALITY{X})
-
-)ShaderCode"
-R"ShaderCode(
-
                         shadow = computeShadowWithCSMPCF1(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
                     #elif defined(SHADOWMEDIUMQUALITY{X})
                         shadow = computeShadowWithCSMPCF3(float(index{X}), vPositionFromLight{X}[index{X}], vDepthMetric{X}[index{X}], shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
@@ -238,6 +244,10 @@ R"ShaderCode(
                 shadow = computeShadowWithPCF1(vPositionFromLight{X}, vDepthMetric{X}, shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
             #elif defined(SHADOWMEDIUMQUALITY{X})
                 shadow = computeShadowWithPCF3(vPositionFromLight{X}, vDepthMetric{X}, shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
+
+)ShaderCode"
+R"ShaderCode(
+
             #else
                 shadow = computeShadowWithPCF5(vPositionFromLight{X}, vDepthMetric{X}, shadowSampler{X}, light{X}.shadowsInfo.yz, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
             #endif
@@ -246,10 +256,6 @@ R"ShaderCode(
                 shadow = computeShadowWithPCSS16(vPositionFromLight{X}, vDepthMetric{X}, depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
             #elif defined(SHADOWMEDIUMQUALITY{X})
                 shadow = computeShadowWithPCSS32(vPositionFromLight{X}, vDepthMetric{X}, depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
-
-)ShaderCode"
-R"ShaderCode(
-
             #else
                 shadow = computeShadowWithPCSS64(vPositionFromLight{X}, vDepthMetric{X}, depthSampler{X}, shadowSampler{X}, light{X}.shadowsInfo.y, light{X}.shadowsInfo.z, light{X}.shadowsInfo.x, light{X}.shadowsInfo.w);
             #endif
