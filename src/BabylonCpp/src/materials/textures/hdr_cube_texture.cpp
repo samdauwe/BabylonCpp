@@ -8,6 +8,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/filtering/hdr_filtering.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
@@ -26,10 +27,11 @@ std::vector<std::string> HDRCubeTexture::_facesMapping{
 };
 
 HDRCubeTexture::HDRCubeTexture(
-  const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap, bool generateHarmonics,
-  bool iGammaSpace, bool /*reserved*/, const std::function<void()>& onLoad,
+  const std::string& iUrl, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
+  size_t size, bool iNoMipmap, bool generateHarmonics, bool iGammaSpace, bool prefilterOnLoad,
+  const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
-    : BaseTexture(scene)
+    : BaseTexture(sceneOrEngine)
     , url{iUrl}
     , rotationY{this, &HDRCubeTexture::get_rotationY, &HDRCubeTexture::set_rotationY}
     , boundingBoxPosition{Vector3::Zero()}
@@ -45,15 +47,16 @@ HDRCubeTexture::HDRCubeTexture(
     return;
   }
 
-  name            = iUrl;
-  url             = iUrl;
-  hasAlpha        = false;
-  isCube          = true;
-  _textureMatrix  = Matrix::Identity();
-  _onLoad         = onLoad;
-  _onError        = onError;
-  gammaSpace      = iGammaSpace;
-  coordinatesMode = TextureConstants::CUBIC_MODE;
+  name             = iUrl;
+  url              = iUrl;
+  hasAlpha         = false;
+  isCube           = true;
+  _textureMatrix   = Matrix::Identity();
+  _prefilterOnLoad = prefilterOnLoad;
+  _onLoad          = onLoad;
+  _onError         = onError;
+  gammaSpace       = iGammaSpace;
+  coordinatesMode  = TextureConstants::CUBIC_MODE;
 
   _noMipmap          = noMipmap;
   _size              = size;
@@ -62,7 +65,7 @@ HDRCubeTexture::HDRCubeTexture(
   _texture = _getFromCache(url, _noMipmap);
 
   if (!_texture) {
-    if (!scene->useDelayedTextureLoading) {
+    if (!getScene()->useDelayedTextureLoading) {
       loadTexture();
     }
     else {
@@ -132,14 +135,11 @@ std::optional<Vector3>& HDRCubeTexture::get_boundingBoxSize()
 void HDRCubeTexture::loadTexture()
 {
   const auto callback = [this](const ArrayBuffer& buffer) -> std::vector<ArrayBufferView> {
+    const auto engine = _getEngine();
+
     lodGenerationOffset = 0.f;
     lodGenerationScale  = 0.8f;
 
-    auto scene = getScene();
-
-    if (!scene) {
-      return {};
-    }
     // Extract the raw linear data.
     auto data = HDRTools::GetCubeMapTextureData(buffer, _size);
 
@@ -157,7 +157,7 @@ void HDRCubeTexture::loadTexture()
     for (unsigned int j = 0; j < 6; ++j) {
 
       // Create uintarray fallback.
-      if (!scene->getEngine()->getCaps().textureFloat) {
+      if (!engine->getCaps().textureFloat) {
         // 3 channels of 1 bytes per pixel in bytes.
         byteArray.resize(_size * _size * 3);
       }
@@ -204,28 +204,36 @@ void HDRCubeTexture::loadTexture()
         results.emplace_back(dataFace);
       }
     }
+
     return results;
   };
 
-  auto scene = getScene();
-  if (scene) {
-    _texture = scene->getEngine()->createRawCubeTextureFromUrl(
-      url, scene, static_cast<int>(_size), Constants::TEXTUREFORMAT_RGB,
-      scene->getEngine()->getCaps().textureFloat ? Constants::TEXTURETYPE_FLOAT :
-                                                   Constants::TEXTURETYPE_UNSIGNED_INT,
-      _noMipmap, callback, nullptr, _onLoad, _onError);
+  if (_getEngine()->webGLVersion() >= 2.f && _prefilterOnLoad) {
+    _onLoad = [this]() -> void {
+      const auto previousOnLoad = _onLoad;
+      HDRFiltering hdrFiltering(_getEngine());
+      hdrFiltering.prefilter(shared_from_base<HDRCubeTexture>(), previousOnLoad);
+    };
   }
+
+  _texture = _getEngine()->createRawCubeTextureFromUrl(
+    url, getScene(), static_cast<int>(_size), Constants::TEXTUREFORMAT_RGB,
+    _getEngine()->getCaps().textureFloat ? Constants::TEXTURETYPE_FLOAT :
+                                           Constants::TEXTURETYPE_UNSIGNED_INT,
+    _noMipmap, callback, nullptr, _onLoad, _onError);
 }
 
 HDRCubeTexturePtr HDRCubeTexture::clone() const
 {
-  auto scene = getScene();
-  if (!scene) {
-    return nullptr;
+  HDRCubeTexturePtr newTexture = nullptr;
+  if (getScene()) {
+    newTexture
+      = HDRCubeTexture::New(url, getScene(), _size, _noMipmap, _generateHarmonics, gammaSpace);
   }
-
-  auto newTexture
-    = HDRCubeTexture::New(url, scene, _size, _noMipmap, _generateHarmonics, gammaSpace);
+  else {
+    newTexture
+      = HDRCubeTexture::New(url, _getEngine(), _size, _noMipmap, _generateHarmonics, gammaSpace);
+  }
 
   // Base texture
   newTexture->level            = level;
