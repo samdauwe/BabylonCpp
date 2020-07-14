@@ -1,7 +1,7 @@
 #include <babylon/engines/processors/shader_code_node.h>
 
 #include <babylon/engines/processors/ishader_processor.h>
-#include <babylon/engines/processors/processing_options.h>
+#include <babylon/engines/processors/shader_processing_options.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {

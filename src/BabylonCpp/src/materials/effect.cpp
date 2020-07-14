@@ -6,7 +6,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/ipipeline_context.h>
-#include <babylon/engines/processors/processing_options.h>
+#include <babylon/engines/processors/shader_processing_options.h>
 #include <babylon/engines/processors/shader_processor.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect_fallbacks.h>

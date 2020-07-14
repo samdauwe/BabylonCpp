@@ -7,11 +7,11 @@
 #include <babylon/engines/processors/expressions/operators/shader_define_or_operator.h>
 #include <babylon/engines/processors/expressions/shader_define_expression.h>
 #include <babylon/engines/processors/ishader_processor.h>
-#include <babylon/engines/processors/processing_options.h>
 #include <babylon/engines/processors/shader_code_condition_node.h>
 #include <babylon/engines/processors/shader_code_cursor.h>
 #include <babylon/engines/processors/shader_code_node.h>
 #include <babylon/engines/processors/shader_code_test_node.h>
+#include <babylon/engines/processors/shader_processing_options.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
 
