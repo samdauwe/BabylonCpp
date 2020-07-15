@@ -1893,6 +1893,10 @@ public:
   /** @hidden */
   InternalTexturePtr _currentRenderTarget = nullptr;
   /** @hidden */
+  WebGLFramebufferPtr _currentFramebuffer = nullptr;
+  /** @hidden */
+  WebGLFramebufferPtr _dummyFramebuffer = nullptr;
+  /** @hidden */
   ICanvas* _workingCanvas = nullptr;
   /** @hidden */
   ICanvasRenderingContext2D* _workingContext = nullptr;
@@ -2029,10 +2033,6 @@ protected:
   EffectPtr _cachedEffectForVertexBuffers = nullptr;
   /** @hidden */
   std::unordered_map<int, WebGLDataBufferPtr> _currentBoundBuffer;
-  /** @hidden */
-  WebGLFramebufferPtr _dummyFramebuffer = nullptr;
-  /** @hidden */
-  WebGLFramebufferPtr _currentFramebuffer = nullptr;
   /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
 

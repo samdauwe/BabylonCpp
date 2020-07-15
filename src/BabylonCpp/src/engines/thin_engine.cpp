@@ -2970,8 +2970,9 @@ void ThinEngine::_bindTexture(int channel, const InternalTexturePtr& texture)
     texture->_associatedChannel = channel;
   }
 
-  _activeChannel = channel;
-  _bindTextureDirectly(GL::TEXTURE_2D, texture);
+  _activeChannel    = channel;
+  const auto target = texture ? _getTextureTarget(texture) : GL::TEXTURE_2D;
+  _bindTextureDirectly(target, texture);
 }
 
 void ThinEngine::unbindAllTextures()
@@ -3256,6 +3257,10 @@ void ThinEngine::dispose()
   if (_emptyCubeTexture) {
     _releaseTexture(_emptyCubeTexture);
     _emptyCubeTexture = nullptr;
+  }
+
+  if (_dummyFramebuffer) {
+    _gl->deleteFramebuffer(_dummyFramebuffer.get());
   }
 
   // Release effects
