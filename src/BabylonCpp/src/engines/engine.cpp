@@ -1052,6 +1052,7 @@ void Engine::dispose()
     postProcess->dispose();
   }
   postProcesses.clear();
+
   // Rescale PP
   if (_rescalePostProcess) {
     _rescalePostProcess->dispose();
@@ -1062,10 +1063,6 @@ void Engine::dispose()
     scene->dispose();
   }
   scenes.clear();
-
-  if (_dummyFramebuffer) {
-    _gl->deleteFramebuffer(_dummyFramebuffer.get());
-  }
 
   // WebVR
   disableVR();
