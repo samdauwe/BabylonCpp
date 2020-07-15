@@ -191,7 +191,15 @@ ShaderCodeTestNodePtr ShaderProcessor::_BuildExpression(const std::string& line,
 {
   auto node       = std::make_shared<ShaderCodeTestNode>();
   auto command    = line.substr(0, start);
-  auto expression = StringTools::trimCopy(line.substr(start));
+  auto expression = line.substr(start);
+
+  const auto indexOfComment = StringTools::indexOf(expression, "//");
+  if ((indexOfComment + 1) != 0) {
+    expression = StringTools::trimCopy(expression.substr(0, (indexOfComment + 1) - 1));
+  }
+  else {
+    expression = StringTools::trimCopy(expression.substr(0, (expression.size() + 1) - 1));
+  }
 
   if (command == "#ifdef") {
     node->testExpression = std::make_shared<ShaderDefineIsDefinedOperator>(expression);
