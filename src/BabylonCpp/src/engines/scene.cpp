@@ -149,6 +149,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , activeCamera{this, &Scene::get_activeCamera, &Scene::set_activeCamera}
     , defaultMaterial{this, &Scene::get_defaultMaterial, &Scene::set_defaultMaterial}
     , texturesEnabled{this, &Scene::get_texturesEnabled, &Scene::set_texturesEnabled}
+    , physicsEnabled{true}
     , particlesEnabled{true}
     , spritesEnabled{true}
     , _pointerOverSprite{nullptr}
@@ -1812,8 +1813,9 @@ bool Scene::isReady()
     // Effect layers
     auto _mesh = static_cast<Mesh*>(mesh.get());
     auto hardwareInstancedRendering
-      = mesh->getClassName() == std::string("InstancedMesh")
-        || (engine->getCaps().instancedArrays && !_mesh->instances.empty());
+      = mesh->hasThinInstances() || mesh->getClassName() == "InstancedMesh"
+        || mesh->getClassName() == "InstancedLinesMesh"
+        || (engine->getCaps().instancedArrays && _mesh->instances.size() > 0);
 
     // Is Ready For Mesh
     for (const auto& step : _isReadyForMeshStage) {
@@ -3804,7 +3806,9 @@ void Scene::animate()
       onAfterAnimationsObservable.notifyObservers(this);
 
       // Physics
-      _advancePhysicsEngineStep(defaultFrameTime);
+      if (physicsEnabled) {
+        _advancePhysicsEngineStep(defaultFrameTime);
+      }
 
       onAfterStepObservable.notifyObservers(this);
       ++_currentStepId;
@@ -3828,7 +3832,9 @@ void Scene::animate()
     onAfterAnimationsObservable.notifyObservers(this);
 
     // Physics
-    _advancePhysicsEngineStep(iDeltaTime);
+    if (physicsEnabled) {
+      _advancePhysicsEngineStep(iDeltaTime);
+    }
   }
 }
 
@@ -3836,6 +3842,10 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
 {
   if (isDisposed()) {
     return;
+  }
+
+  if (onReadyObservable.hasObservers() && _executeWhenReadyTimeoutId == -1) {
+    _checkIsReady();
   }
 
   ++_frameId;

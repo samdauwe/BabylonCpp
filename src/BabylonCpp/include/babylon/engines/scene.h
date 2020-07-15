@@ -2893,6 +2893,13 @@ public:
    */
   Property<Scene, bool> texturesEnabled;
 
+  // Physics
+
+  /**
+   * Gets or sets a boolean indicating if physic engines are enabled on this scene
+   */
+  bool physicsEnabled;
+
   // Particles
 
   /**
