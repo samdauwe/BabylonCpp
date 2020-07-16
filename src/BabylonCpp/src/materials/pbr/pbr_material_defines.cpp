@@ -9,6 +9,8 @@ PBRMaterialDefines::PBRMaterialDefines()
   boolDef = {
     {"PBR", true}, //
 
+    {"REALTIME_FILTERING", false}, //
+
     {"MAINUV1", false}, //
     {"MAINUV2", false}, //
     {"UV1", false},     //
@@ -44,12 +46,13 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"LODBASEDMICROSFURACE", false},            //
     {"MICROSURFACEMAP", false},                 //
 
-    {"METALLICWORKFLOW", false},                //
-    {"ROUGHNESSSTOREINMETALMAPALPHA", false},   //
-    {"ROUGHNESSSTOREINMETALMAPGREEN", false},   //
-    {"METALLNESSSTOREINMETALMAPBLUE", false},   //
-    {"AOSTOREINMETALMAPRED", false},            //
-    {"METALLICF0FACTORFROMMETALLICMAP", false}, //
+    {"METALLICWORKFLOW", false},              //
+    {"ROUGHNESSSTOREINMETALMAPALPHA", false}, //
+    {"ROUGHNESSSTOREINMETALMAPGREEN", false}, //
+    {"METALLNESSSTOREINMETALMAPBLUE", false}, //
+    {"AOSTOREINMETALMAPRED", false},          //
+
+    {"METALLIC_REFLECTANCE", false}, //
 
     {"ENVIRONMENTBRDF", false},      //
     {"ENVIRONMENTBRDF_RGBD", false}, //
@@ -92,7 +95,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"RADIANCEOCCLUSION", false},                           //
     {"HORIZONOCCLUSION", false},                            //
 
-    {"INSTANCES", false}, //
+    {"INSTANCES", false},      //
+    {"THIN_INSTANCES", false}, //
 
     {"BONETEXTURE", false}, //
 
@@ -179,12 +183,14 @@ PBRMaterialDefines::PBRMaterialDefines()
   };
 
   intDef = {
+    {"NUM_SAMPLES", 0},                         //
     {"AMBIENTDIRECTUV", 0},                     //
     {"ALBEDODIRECTUV", 0},                      //
     {"OPACITYDIRECTUV", 0},                     //
     {"EMISSIVEDIRECTUV", 0},                    //
     {"REFLECTIVITYDIRECTUV", 0},                //
     {"MICROSURFACEMAPDIRECTUV", 0},             //
+    {"METALLIC_REFLECTANCEDIRECTUV", 0},        //
     {"BUMPDIRECTUV", 0},                        //
     {"LIGHTMAPDIRECTUV", 0},                    //
     {"NUM_BONE_INFLUENCERS", 0},                //
