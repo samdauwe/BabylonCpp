@@ -45,6 +45,16 @@ using MorphTargetManagerPtr   = std::shared_ptr<MorphTargetManager>;
 using SubMeshPtr              = std::shared_ptr<SubMesh>;
 using VertexBufferPtr         = std::shared_ptr<VertexBuffer>;
 
+/**
+ * @brief Represents a custom thin buffer that will be instanced.
+ */
+struct _UserThinInstanceBuffersStorage {
+  std::unordered_map<std::string, Float32Array> data;
+  std::unordered_map<std::string, size_t> sizes;
+  std::unordered_map<std::string, VertexBufferPtr> vertexBuffers;
+  std::unordered_map<std::string, size_t> strides;
+}; // end of struct UserThinInstanceBuffersStorage
+
 struct SkinningValidationResult {
   bool skinned;
   bool valid;
@@ -551,7 +561,7 @@ public:
    * @param buffer defines the buffer to use
    * @returns the current mesh
    */
-  Mesh& setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
+  Mesh& setVerticesBuffer(const VertexBufferPtr& buffer);
 
   /**
    * @brief Update a specific associated vertex buffer.
@@ -691,11 +701,95 @@ public:
   /** Thin instances **/
 
   /**
+   * @brief Creates a new thin instance.
+   * @param matrix the matrix of the thin instance(s) to create
+   * @param refresh true to refresh the underlying gpu buffer (default: true). If you do multiple
+   * calls to this method in a row, set refresh to true only for the last call to save performance
+   * @returns the thin instance index number. If you pass an array of matrices, other instance
+   * indexes are index+1, index+2, etc
+   */
+  size_t thinInstanceAdd(const Matrix& matrix, bool refresh = true);
+
+  /**
+   * @brief Creates a new thin instance.
+   * @param matrix array of matrices (position, rotation, scale) of the thin instance(s) to create
+   * @param refresh true to refresh the underlying gpu buffer (default: true). If you do multiple
+   * calls to this method in a row, set refresh to true only for the last call to save performance
+   * @returns the thin instance index number. If you pass an array of matrices, other instance
+   * indexes are index+1, index+2, etc
+   */
+  size_t thinInstanceAdd(const std::vector<Matrix>& matrix, bool refresh = true);
+
+  /**
+   * @brief Adds the transformation (matrix) of the current mesh as a thin instance.
+   * @param refresh true to refresh the underlying gpu buffer (default: true). If you do multiple
+   * calls to this method in a row, set refresh to true only for the last call to save performance
+   * @returns the thin instance index number
+   */
+  size_t thinInstanceAddSelf(bool refresh);
+
+  /**
+   * @brief Registers a custom attribute to be used with thin instances.
+   * @param kind name of the attribute
+   * @param stride size in floats of the attribute
+   */
+  void thinInstanceRegisterAttribute(const std::string& kind, unsigned int stride);
+
+  /**
+   * @brief Sets the matrix of a thin instance.
+   * @param index index of the thin instance
+   * @param matrix matrix to set
+   * @param refresh true to refresh the underlying gpu buffer (default: true). If you do multiple
+   * calls to this method in a row, set refresh to true only for the last call to save performance
+   */
+  bool thinInstanceSetMatrixAt(size_t index, const Matrix& matrix, bool refresh = true);
+
+  /**
+   * @brief Sets the value of a custom attribute for a thin instance.
+   * @param kind name of the attribute
+   * @param index index of the thin instance
+   * @param value value to set
+   * @param refresh true to refresh the underlying gpu buffer (default: true). If you do multiple
+   * calls to this method in a row, set refresh to true only for the last call to save performance
+   */
+  bool thinInstanceSetAttributeAt(const std::string& kind, size_t index, const Float32Array& value,
+                                  bool refresh = true);
+
+  /**
+   * @brief Sets a buffer to be used with thin instances. This method is a faster way to setup
+   * multiple instances than calling thinInstanceAdd repeatedly.
+   * @param kind name of the attribute. Use "matrix" to setup the buffer of matrices
+   * @param buffer buffer to set
+   * @param stride size in floats of each value of the buffer
+   * @param staticBuffer indicates that the buffer is static, so that you won't change it after it
+   * is set (better performances - false by default)
+   */
+  void thinInstanceSetBuffer(const std::string& kind, const Float32Array& buffer,
+                             unsigned int stride = 0, bool staticBuffer = false);
+
+  /**
+   * @brief Synchronize the gpu buffers with a thin instance buffer. Call this method if you update
+   * later on the buffers passed to thinInstanceSetBuffer.
+   * @param kind name of the attribute to update. Use "matrix" to update the buffer of matrices
+   */
+  void thinInstanceBufferUpdated(const std::string& kind);
+
+  /**
    * @brief Refreshes the bounding info, taking into account all the thin instances defined
    * @param forceRefreshParentInfo true to force recomputing the mesh bounding info and use it to
    * compute the aggregated bounding info.
    */
   void thinInstanceRefreshBoundingInfo(bool forceRefreshParentInfo);
+
+  /**
+   * @brief Hidden
+   */
+  void _thinInstanceInitializeUserStorage();
+
+  /**
+   * @brief Hidden
+   */
+  void _thinInstanceUpdateBufferSize(const std::string& kind, size_t numInstances);
 
   /**
    * @brief Hidden
@@ -1856,6 +1950,18 @@ protected:
   void set_overridenInstanceCount(size_t count);
 
   /**
+   * @brief Gets the number of thin instances to display. Note that you can't set a number higher
+   * than what the underlying buffer can handle.
+   */
+  size_t get_thinInstanceCount() const;
+
+  /**
+   * @brief Sets the number of thin instances to display. Note that you can't set a number higher
+   * than what the underlying buffer can handle.
+   */
+  void set_thinInstanceCount(size_t value);
+
+  /**
    * @brief Hidden
    */
   std::vector<Vector3>& get__positions() override;
@@ -2026,6 +2132,12 @@ public:
    */
   WriteOnlyProperty<Mesh, size_t> overridenInstanceCount;
 
+  /**
+   * Gets / sets the number of thin instances to display. Note that you can't set a number higher
+   * than what the underlying buffer can handle.
+   */
+  Property<Mesh, size_t> thinInstanceCount;
+
 private:
   // Internal data
   std::unique_ptr<_InternalMeshDataInfo> _internalMeshDataInfo;
@@ -2035,6 +2147,7 @@ private:
   std::vector<VertexBuffer*> _delayInfo;
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
   std::unique_ptr<_ThinInstanceDataStorage> _thinInstanceDataStorage;
+  std::unique_ptr<_UserThinInstanceBuffersStorage> _userThinInstanceBuffersStorage;
   MaterialPtr _effectiveMaterial;
   // Instances
   /** @hidden */

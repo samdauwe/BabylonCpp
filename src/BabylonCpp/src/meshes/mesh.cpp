@@ -95,10 +95,12 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , geometry{this, &Mesh::get_geometry}
     , areNormalsFrozen{this, &Mesh::get_areNormalsFrozen}
     , overridenInstanceCount{this, &Mesh::set_overridenInstanceCount}
+    , thinInstanceCount{this, &Mesh::get_thinInstanceCount, &Mesh::set_thinInstanceCount}
     , _internalMeshDataInfo{std::make_unique<_InternalMeshDataInfo>()}
     , _onBeforeDrawObserver{nullptr}
     , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
     , _thinInstanceDataStorage{std::make_unique<_ThinInstanceDataStorage>()}
+    , _userThinInstanceBuffersStorage{nullptr}
     , _effectiveMaterial{nullptr}
     , _tessellation{0}
     , _arc{1.f}
@@ -705,6 +707,20 @@ void Mesh::set_overridenInstanceCount(size_t count)
   _instanceDataStorage->overridenInstanceCount = count;
 }
 
+size_t Mesh::get_thinInstanceCount() const
+{
+  return _thinInstanceDataStorage->instancesCount;
+}
+
+void Mesh::set_thinInstanceCount(size_t value)
+{
+  const auto numMaxInstances = (_thinInstanceDataStorage->matrixData.size()) / 16;
+
+  if (value <= numMaxInstances) {
+    _thinInstanceDataStorage->instancesCount = value;
+  }
+}
+
 void Mesh::_preActivate()
 {
   auto& internalDataInfo = *_internalMeshDataInfo;
@@ -880,7 +896,7 @@ void Mesh::markVerticesDataAsUpdatable(const std::string& kind, bool updatable)
   setVerticesData(kind, getVerticesData(kind), updatable);
 }
 
-Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
+Mesh& Mesh::setVerticesBuffer(const VertexBufferPtr& buffer)
 {
   if (!_geometry) {
     _geometry = Geometry::CreateGeometryForMesh(this).get();
@@ -1213,8 +1229,289 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   return *this;
 }
 
-void Mesh::thinInstanceRefreshBoundingInfo(bool /*forceRefreshParentInfo*/)
+size_t Mesh::thinInstanceAdd(const Matrix& matrix, bool refresh)
 {
+  _thinInstanceUpdateBufferSize("matrix", 1);
+
+  const auto index = _thinInstanceDataStorage->instancesCount;
+
+  thinInstanceSetMatrixAt(_thinInstanceDataStorage->instancesCount++, matrix, refresh);
+
+  return index;
+}
+
+size_t Mesh::thinInstanceAdd(const std::vector<Matrix>& matrix, bool refresh)
+{
+  _thinInstanceUpdateBufferSize("matrix", matrix.size());
+
+  const auto index = _thinInstanceDataStorage->instancesCount;
+
+  for (size_t i = 0; i < matrix.size(); ++i) {
+    thinInstanceSetMatrixAt(_thinInstanceDataStorage->instancesCount++, matrix[i],
+                            (i == matrix.size() - 1) && refresh);
+  }
+
+  return index;
+}
+
+size_t Mesh::thinInstanceAddSelf(bool refresh)
+{
+  return thinInstanceAdd(Matrix::IdentityReadOnly(), refresh);
+}
+
+void Mesh::thinInstanceRegisterAttribute(const std::string& kind, unsigned int stride)
+{
+  removeVerticesData(kind);
+
+  _thinInstanceInitializeUserStorage();
+
+  _userThinInstanceBuffersStorage->strides[kind] = stride;
+  _userThinInstanceBuffersStorage->sizes[kind]
+    = stride
+      * std::max(32, static_cast<int>(_thinInstanceDataStorage->instancesCount)); // Initial size
+  _userThinInstanceBuffersStorage->data[kind]
+    = {static_cast<float>(_userThinInstanceBuffersStorage->sizes[kind])};
+  _userThinInstanceBuffersStorage->vertexBuffers[kind] = std::make_shared<VertexBuffer>(
+    getEngine(), _userThinInstanceBuffersStorage->data[kind], kind, true, false, stride, true);
+
+  setVerticesBuffer(_userThinInstanceBuffersStorage->vertexBuffers[kind]);
+}
+
+bool Mesh::thinInstanceSetMatrixAt(size_t index, const Matrix& iMatrix, bool refresh)
+{
+  if (_thinInstanceDataStorage->matrixData.empty()
+      || index >= _thinInstanceDataStorage->instancesCount) {
+    return false;
+  }
+
+  auto& matrixData = _thinInstanceDataStorage->matrixData;
+
+  auto matrix = iMatrix;
+  matrix.copyToArray(matrixData, index * 16);
+
+  if (refresh) {
+    thinInstanceBufferUpdated("matrix");
+
+    if (!doNotSyncBoundingInfo) {
+      thinInstanceRefreshBoundingInfo(false);
+    }
+  }
+
+  return true;
+}
+
+bool Mesh::thinInstanceSetAttributeAt(const std::string& kind, size_t index,
+                                      const Float32Array& value, bool refresh)
+{
+  if (!_userThinInstanceBuffersStorage || _userThinInstanceBuffersStorage->data[kind].empty()
+      || index >= _thinInstanceDataStorage->instancesCount) {
+    return false;
+  }
+
+  // make sure the buffer for the kind attribute is big enough
+  _thinInstanceUpdateBufferSize(kind, 0);
+
+  auto offset = index * _userThinInstanceBuffersStorage->strides[kind];
+  for (const auto v : value) {
+    _userThinInstanceBuffersStorage->data[kind][offset++] = v;
+  }
+
+  if (refresh) {
+    thinInstanceBufferUpdated(kind);
+  }
+
+  return true;
+}
+
+void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& buffer,
+                                 unsigned int stride, bool staticBuffer)
+{
+  stride = (stride == 0) ? 16u : stride;
+
+  if (kind == "matrix") {
+    if (_thinInstanceDataStorage->matrixBuffer) {
+      _thinInstanceDataStorage->matrixBuffer->dispose();
+      _thinInstanceDataStorage->matrixBuffer = nullptr;
+    }
+    _thinInstanceDataStorage->matrixBufferSize = !buffer.empty() ? buffer.size() : 32 * stride;
+    _thinInstanceDataStorage->matrixData       = buffer;
+
+    if (!buffer.empty()) {
+      _thinInstanceDataStorage->instancesCount = buffer.size() / stride;
+
+      const auto matrixBuffer
+        = std::make_shared<Buffer>(getEngine(), buffer, !staticBuffer, stride, false, true);
+
+      _thinInstanceDataStorage->matrixBuffer = matrixBuffer;
+
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world0", 0, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world1", 4, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world2", 8, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world3", 12, 4));
+
+      if (!doNotSyncBoundingInfo) {
+        thinInstanceRefreshBoundingInfo(false);
+      }
+    }
+    else {
+      _thinInstanceDataStorage->instancesCount = 0;
+      if (!doNotSyncBoundingInfo) {
+        // mesh has no more thin instances, so need to recompute the bounding box because it's the
+        // regular mesh that will now be displayed
+        refreshBoundingInfo(true);
+      }
+    }
+  }
+  else {
+    if (buffer.empty()) {
+      if (_userThinInstanceBuffersStorage && !_userThinInstanceBuffersStorage->data[kind].empty()) {
+        removeVerticesData(kind);
+        _userThinInstanceBuffersStorage->data.erase(kind);
+        _userThinInstanceBuffersStorage->strides.erase(kind);
+        _userThinInstanceBuffersStorage->sizes.erase(kind);
+        _userThinInstanceBuffersStorage->vertexBuffers.erase(kind);
+      }
+    }
+    else {
+      _thinInstanceInitializeUserStorage();
+
+      _userThinInstanceBuffersStorage->data[kind]          = buffer;
+      _userThinInstanceBuffersStorage->strides[kind]       = stride;
+      _userThinInstanceBuffersStorage->sizes[kind]         = buffer.size();
+      _userThinInstanceBuffersStorage->vertexBuffers[kind] = std::make_shared<VertexBuffer>(
+        getEngine(), buffer, kind, !staticBuffer, false, stride, true);
+
+      setVerticesBuffer(_userThinInstanceBuffersStorage->vertexBuffers[kind]);
+    }
+  }
+}
+
+void Mesh::thinInstanceBufferUpdated(const std::string& kind)
+{
+  if (kind == "matrix") {
+    if (_thinInstanceDataStorage->matrixBuffer) {
+      _thinInstanceDataStorage->matrixBuffer->updateDirectly(
+        _thinInstanceDataStorage->matrixData, 0, _thinInstanceDataStorage->instancesCount);
+    }
+  }
+  else if (_userThinInstanceBuffersStorage
+           && _userThinInstanceBuffersStorage->vertexBuffers[kind]) {
+    _userThinInstanceBuffersStorage->vertexBuffers[kind]->updateDirectly(
+      _userThinInstanceBuffersStorage->data[kind], 0);
+  }
+}
+
+void Mesh::thinInstanceRefreshBoundingInfo(bool forceRefreshParentInfo)
+{
+  if (_thinInstanceDataStorage->matrixData.empty() || !_thinInstanceDataStorage->matrixBuffer) {
+    return;
+  }
+
+  auto& vectors = _thinInstanceDataStorage->boundingVectors;
+
+  if (forceRefreshParentInfo) {
+    vectors.clear();
+    refreshBoundingInfo(true);
+  }
+
+  const auto boundingInfo = getBoundingInfo();
+  const auto matrixData   = _thinInstanceDataStorage->matrixData;
+
+  if (vectors.empty()) {
+    const auto worldMatrix = getWorldMatrix();
+    for (size_t v = 0; v < boundingInfo->boundingBox.vectors.size(); ++v) {
+      vectors.emplace_back(boundingInfo->boundingBox.vectors[v]);
+      Vector3::TransformCoordinatesToRef(vectors[v], worldMatrix, vectors[v]);
+    }
+  }
+
+  TmpVectors::Vector3Array[0].setAll(std::numeric_limits<float>::max());    // min
+  TmpVectors::Vector3Array[1].setAll(std::numeric_limits<float>::lowest()); // max
+
+  for (size_t i = 0; i < _thinInstanceDataStorage->instancesCount; ++i) {
+    Matrix::FromArrayToRef(matrixData, i * 16, TmpVectors::MatrixArray[0]);
+
+    for (size_t v = 0; v < vectors.size(); ++v) {
+      Vector3::TransformCoordinatesToRef(vectors[v], TmpVectors::MatrixArray[0],
+                                         TmpVectors::Vector3Array[2]);
+      TmpVectors::Vector3Array[0].minimizeInPlace(TmpVectors::Vector3Array[2]);
+      TmpVectors::Vector3Array[1].maximizeInPlace(TmpVectors::Vector3Array[2]);
+    }
+  }
+
+  boundingInfo->reConstruct(TmpVectors::Vector3Array[0], TmpVectors::Vector3Array[1]);
+}
+
+void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInstances)
+{
+  const auto kindIsMatrix = kind == "matrix";
+
+  if (!kindIsMatrix
+      && (!_userThinInstanceBuffersStorage
+          || !stl_util::contains(_userThinInstanceBuffersStorage->strides, kind)
+          || !_userThinInstanceBuffersStorage->strides[kind])) {
+    return;
+  }
+
+  const auto stride      = kindIsMatrix ? 16 : _userThinInstanceBuffersStorage->strides[kind];
+  const auto currentSize = kindIsMatrix ? _thinInstanceDataStorage->matrixBufferSize :
+                                          _userThinInstanceBuffersStorage->sizes[kind];
+  auto data = kindIsMatrix ? _thinInstanceDataStorage->matrixData :
+                             _userThinInstanceBuffersStorage->data[kind];
+
+  const auto bufferSize = (_thinInstanceDataStorage->instancesCount + numInstances) * stride;
+
+  auto newSize = currentSize;
+
+  while (newSize < bufferSize) {
+    newSize *= 2;
+  }
+
+  if (data.empty() || currentSize != newSize) {
+    if (data.empty()) {
+      data = Float32Array(newSize);
+    }
+    else {
+      auto newData = Float32Array(newSize);
+      for (size_t i = 0; i < data.size(); ++i) {
+        newData[i] = data[i];
+      }
+      data = newData;
+    }
+
+    if (kindIsMatrix) {
+      _thinInstanceDataStorage->matrixBuffer->dispose();
+
+      const auto matrixBuffer
+        = std::make_shared<Buffer>(getEngine(), data, true, stride, false, true);
+
+      _thinInstanceDataStorage->matrixBuffer     = matrixBuffer;
+      _thinInstanceDataStorage->matrixData       = data;
+      _thinInstanceDataStorage->matrixBufferSize = newSize;
+
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world0", 0, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world1", 4, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world2", 8, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world3", 12, 4));
+    }
+    else {
+      _userThinInstanceBuffersStorage->vertexBuffers[kind]->dispose();
+
+      _userThinInstanceBuffersStorage->data[kind]  = data;
+      _userThinInstanceBuffersStorage->sizes[kind] = newSize;
+      _userThinInstanceBuffersStorage->vertexBuffers[kind]
+        = std::make_shared<VertexBuffer>(getEngine(), data, kind, true, false, stride, true);
+
+      setVerticesBuffer(_userThinInstanceBuffersStorage->vertexBuffers[kind]);
+    }
+  }
+}
+
+void Mesh::_thinInstanceInitializeUserStorage()
+{
+  if (!_userThinInstanceBuffersStorage) {
+    _userThinInstanceBuffersStorage = std::make_unique<_UserThinInstanceBuffersStorage>();
+  }
 }
 
 void Mesh::_renderWithThinInstances(SubMesh* subMesh, unsigned int fillMode,
@@ -1301,8 +1598,7 @@ Mesh& Mesh::_processRendering(
 void Mesh::_rebuild()
 {
   if (_instanceDataStorage->instancesBuffer) {
-    // Dispose instance buffer to be recreated in _renderWithInstances when
-    // rendered
+    // Dispose instance buffer to be recreated in _renderWithInstances when rendered
     _instanceDataStorage->instancesBuffer->dispose();
     _instanceDataStorage->instancesBuffer = nullptr;
   }
@@ -1640,7 +1936,7 @@ SkinningValidationResult Mesh::validateSkinning()
   for (size_t a = 0; a <= numInfluences; a++) {
     usedWeightCounts[a] = 0;
   }
-  const float toleranceEpsilon = 0.001f;
+  const auto toleranceEpsilon = 0.001f;
 
   for (size_t a = 0; a < numWeights; a += 4) {
     auto lastWeight  = matricesWeights[a];
@@ -1712,7 +2008,7 @@ SkinningValidationResult Mesh::validateSkinning()
          << "\nWeightCounts = [" << usedWeightCounts.size() << "]"
          << "\nNumber of bones = " << numBones << "\nBad Bone Indices = " << numBadBoneIndices;
 
-  bool isValid = (missingWeights == 0 && numberNotNormalized == 0 && numBadBoneIndices == 0);
+  auto isValid = (missingWeights == 0 && numberNotNormalized == 0 && numBadBoneIndices == 0);
 
   return {
     true,        // skinned
@@ -1984,7 +2280,10 @@ void Mesh::_disposeInstanceSpecificData()
 
 void Mesh::_disposeThinInstanceSpecificData()
 {
-  // Do nothing
+  if (_thinInstanceDataStorage && _thinInstanceDataStorage->matrixBuffer) {
+    _thinInstanceDataStorage->matrixBuffer->dispose();
+    _thinInstanceDataStorage->matrixBuffer = nullptr;
+  }
 }
 
 Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
@@ -2031,8 +2330,8 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer, unsigned int
   auto normal    = Vector3::Zero();
   auto uv        = Vector2::Zero();
 
-  Vector2 uvOffset = iUvOffset.has_value() ? *iUvOffset : Vector2::Zero();
-  Vector2 uvScale  = iUvScale.has_value() ? *iUvScale : Vector2(1.f, 1.f);
+  auto uvOffset = iUvOffset.has_value() ? *iUvOffset : Vector2::Zero();
+  auto uvScale  = iUvScale.has_value() ? *iUvScale : Vector2(1.f, 1.f);
 
   for (unsigned int index = 0; index < positions.size(); index += 3) {
     Vector3::FromArrayToRef(positions, index, iPosition);
