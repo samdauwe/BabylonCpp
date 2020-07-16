@@ -200,6 +200,18 @@ protected:
   [[nodiscard]] bool _shouldUseAlphaFromAlbedoTexture() const;
 
   /**
+   * @brief Enables realtime filtering on the texture.
+   */
+  bool get_realTimeFiltering() const;
+  void set_realTimeFiltering(bool b);
+
+  /**
+   * @brief Quality switch for realtime filtering
+   */
+  unsigned int get_realTimeFilteringQuality() const;
+  void set_realTimeFilteringQuality(unsigned int n);
+
+  /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
@@ -232,10 +244,12 @@ private:
                            std::function<void(Effect* effect, const std::string& errors)> onError
                            = nullptr,
                            const std::optional<bool>& useInstances = std::nullopt,
-                           const std::optional<bool>& useClipPlane = std::nullopt);
+                           const std::optional<bool>& useClipPlane = std::nullopt,
+                           bool useThinInstances                   = false);
   void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
                        const std::optional<bool>& useInstances = std::nullopt,
-                       const std::optional<bool>& useClipPlane = std::nullopt);
+                       const std::optional<bool>& useClipPlane = std::nullopt,
+                       bool useThinInstances                   = false);
 
   /**
    * @brief Returns the texture used for reflections.
@@ -245,6 +259,16 @@ private:
   [[nodiscard]] BaseTexturePtr _getReflectionTexture() const;
 
 public:
+  /**
+   * Enables realtime filtering on the texture.
+   */
+  Property<PBRBaseMaterial, bool> realTimeFiltering;
+
+  /**
+   * Quality switch for realtime filtering
+   */
+  Property<PBRBaseMaterial, unsigned int> realTimeFilteringQuality;
+
   /**
    * The transparency mode of the material.
    */
@@ -378,10 +402,13 @@ protected:
   std::optional<float> _roughness;
 
   /**
-   * Specifies the an F0 factor to help configuring the material F0.
-   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting
-   * to 0.5 the previously hard coded value stays the same.
-   * Can also be used to scale the F0 values of the metallic texture.
+   * In metallic workflow, specifies an F0 factor to help configuring the material F0.
+   * By default the indexOfrefraction is used to compute F0;
+   *
+   * This is used as a factor against the default reflectance at normal incidence to tweak it.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor;
+   * F90 = metallicReflectanceColor;
    */
   float _metallicF0Factor;
 
@@ -398,7 +425,7 @@ protected:
   Color3 _metallicReflectanceColor;
 
   /**
-   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A.
    * This is multiply against the scalar values defined in the material.
    */
   BaseTexturePtr _metallicReflectanceTexture;
@@ -665,7 +692,15 @@ private:
    */
   Vector4 _lightingInfos;
 
+  /**
+   * Enables realtime filtering on the texture.
+   */
   bool _realTimeFiltering;
+
+  /**
+   * Quality switch for realtime filtering
+   */
+  unsigned int _realTimeFilteringQuality;
 
   /**
    * Keep track of the image processing observer to allow dispose and replace.

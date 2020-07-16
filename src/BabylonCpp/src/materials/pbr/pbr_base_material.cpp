@@ -27,6 +27,7 @@
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/refraction_texture.h>
 #include <babylon/materials/uniform_buffer.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/maths/spherical_polynomial.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
@@ -40,6 +41,10 @@ namespace BABYLON {
 
 PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , realTimeFiltering{this, &PBRBaseMaterial::get_realTimeFiltering,
+                        &PBRBaseMaterial::set_realTimeFiltering}
+    , realTimeFilteringQuality{this, &PBRBaseMaterial::get_realTimeFilteringQuality,
+                               &PBRBaseMaterial::set_realTimeFilteringQuality}
     , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
                        &PBRBaseMaterial::set_transparencyMode}
     , debugMode{this, &PBRBaseMaterial::get_debugMode, &PBRBaseMaterial::set_debugMode}
@@ -118,6 +123,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity, _environmentIntensity,
                              _specularIntensity)}
     , _realTimeFiltering{false}
+    , _realTimeFilteringQuality{Constants::TEXTURE_FILTERING_QUALITY_LOW}
     , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
@@ -189,6 +195,28 @@ void PBRBaseMaterial::set_debugMode(unsigned int value)
 
   _markAllSubMeshesAsMiscDirty();
   _debugMode = value;
+}
+
+bool PBRBaseMaterial::get_realTimeFiltering() const
+{
+  return _realTimeFiltering;
+}
+
+void PBRBaseMaterial::set_realTimeFiltering(bool b)
+{
+  _realTimeFiltering = b;
+  markAsDirty(Constants::MATERIAL_TextureDirtyFlag);
+}
+
+unsigned int PBRBaseMaterial::get_realTimeFilteringQuality() const
+{
+  return _realTimeFilteringQuality;
+}
+
+void PBRBaseMaterial::set_realTimeFilteringQuality(unsigned int n)
+{
+  _realTimeFilteringQuality = n;
+  markAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
 bool PBRBaseMaterial::get_hasRenderTargetTextures() const
@@ -333,6 +361,12 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
           }
         }
 
+        if (_metallicReflectanceTexture) {
+          if (!_metallicReflectanceTexture->isReadyOrNotBlocking()) {
+            return false;
+          }
+        }
+
         if (_microSurfaceTexture) {
           if (!_microSurfaceTexture->isReadyOrNotBlocking()) {
             return false;
@@ -379,7 +413,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 
   auto& previousEffect     = subMesh->effect();
   const auto lightDisposed = defines._areLightsDisposed;
-  auto effect              = _prepareEffect(mesh, defines, onCompiled, onError, useInstances);
+  auto effect = _prepareEffect(mesh, defines, onCompiled, onError, useInstances, std::nullopt,
+                               subMesh->getRenderingMesh()->hasThinInstances());
 
   if (effect) {
     /* if (_onEffectCreatedObservable) */ {
@@ -431,9 +466,10 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
   const std::function<void(Effect* effect)>& iOnCompiled,
   std::function<void(Effect* effect, const std::string& errors)> iOnError,
-  const std::optional<bool>& useInstances, const std::optional<bool>& useClipPlane)
+  const std::optional<bool>& useInstances, const std::optional<bool>& useClipPlane,
+  bool useThinInstances)
 {
-  _prepareDefines(mesh, defines, useInstances, useClipPlane);
+  _prepareDefines(mesh, defines, useInstances, useClipPlane, useThinInstances);
   if (!defines.isDirty()) {
     return nullptr;
   }
@@ -566,6 +602,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "vAmbientColor",
                                     "vAlbedoColor",
                                     "vReflectivityColor",
+                                    "vMetallicReflectanceFactors",
                                     "vEmissiveColor",
                                     "visibility",
                                     "vReflectionColor",
@@ -580,6 +617,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "vReflectionSize",
                                     "vEmissiveInfos",
                                     "vReflectivityInfos",
+                                    "vReflectionFilteringInfo",
+                                    "vMetallicReflectanceInfos",
                                     "vMicroSurfaceSamplerInfos",
                                     "vBumpInfos",
                                     "vLightmapInfos",
@@ -600,6 +639,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "microSurfaceSamplerMatrix",
                                     "bumpMatrix",
                                     "lightmapMatrix",
+                                    "metallicReflectanceMatrix",
                                     "vLightingIntensity",
                                     "logarithmicDepthConstant",
                                     "vSphericalX",
@@ -630,7 +670,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     "emissiveSampler",        "bumpSampler",         "lightmapSampler",
     "opacitySampler",         "reflectionSampler",   "reflectionSamplerLow",
     "reflectionSamplerHigh",  "irradianceSampler",   "microSurfaceSampler",
-    "environmentBrdfSampler", "boneSampler"};
+    "environmentBrdfSampler", "boneSampler",         "metallicReflectanceSampler"};
 
   std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
@@ -656,9 +696,11 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     {"maxSimultaneousLights", _maxSimultaneousLights},
     {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
+  ICustomShaderNameResolveOptions csnrOptions{};
+
   if (customShaderNameResolve) {
     shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, &defines,
-                                         nullptr, attribs, nullptr);
+                                         nullptr, attribs, &csnrOptions);
   }
 
   auto join = defines.toString();
@@ -674,6 +716,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   options.onCompiled            = iOnCompiled;
   options.onError               = iOnError;
   options.indexParameters       = std::move(indexParameters);
+  options.processFinalCode      = csnrOptions.processFinalCode;
   options.maxSimultaneousLights = _maxSimultaneousLights;
 
   MaterialHelper::PrepareUniformsAndSamplersList(options);
@@ -683,7 +726,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
 
 void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
                                       const std::optional<bool>& useInstances,
-                                      const std::optional<bool>& useClipPlane)
+                                      const std::optional<bool>& useClipPlane,
+                                      bool useThinInstances)
 {
   auto scene  = getScene();
   auto engine = scene->getEngine();
@@ -739,6 +783,17 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
                                                        reflectionTexture->invertZ;
         defines.boolDef["LODINREFLECTIONALPHA"]     = reflectionTexture->lodLevelInAlpha;
         defines.boolDef["LINEARSPECULARREFLECTION"] = reflectionTexture->linearSpecularLOD();
+
+        if (realTimeFiltering && realTimeFilteringQuality() > 0) {
+          defines.intDef["NUM_SAMPLES"] = realTimeFilteringQuality;
+          if (engine->webGLVersion > 1.f) {
+            defines.intDef["NUM_SAMPLES"] = defines.intDef["NUM_SAMPLES"];
+          }
+          defines.boolDef["REALTIME_FILTERING"] = true;
+        }
+        else {
+          defines.boolDef["REALTIME_FILTERING"] = false;
+        }
 
         if (reflectionTexture->coordinatesMode() == TextureConstants::INVCUBIC_MODE) {
           defines.boolDef["INVERTCUBICMAP"] = true;
@@ -798,7 +853,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
           else if (reflectionTexture->isCube()) {
             defines.boolDef["USESPHERICALFROMREFLECTIONMAP"] = true;
             defines.boolDef["USEIRRADIANCEMAP"]              = false;
-            if (_forceIrradianceInFragment
+            if (_forceIrradianceInFragment || realTimeFiltering
                 || scene->getEngine()->getCaps().maxVaryingVectors <= 8) {
               defines.boolDef["USESPHERICALINVERTEX"] = false;
             }
@@ -866,6 +921,14 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
         }
         else {
           defines.boolDef["REFLECTIVITY"] = false;
+        }
+
+        if (_metallicReflectanceTexture) {
+          MaterialHelper::PrepareDefinesForMergedUV(_metallicReflectanceTexture, defines,
+                                                    "METALLIC_REFLECTANCE");
+        }
+        else {
+          defines.boolDef["METALLIC_REFLECTANCE"] = false;
         }
 
         if (_microSurfaceTexture) {
@@ -984,8 +1047,9 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
   sheen->prepareDefines(defines, scene);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances.has_value() && (*useInstances), useClipPlane);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines,
+                                                    useInstances.has_value() && (*useInstances),
+                                                    useClipPlane, useThinInstances);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
@@ -999,7 +1063,7 @@ void PBRBaseMaterial::forceCompilation(AbstractMesh* mesh,
   const auto& localOptions = options;
   PBRMaterialDefines defines;
   auto effect = _prepareEffect(mesh, defines, nullptr, nullptr, localOptions.useInstances,
-                               localOptions.clipPlane);
+                               localOptions.clipPlane, mesh->hasThinInstances());
   /* if (_onEffectCreatedObservable) */ {
     onCreatedEffectParameters.effect  = effect.get();
     onCreatedEffectParameters.subMesh = nullptr;
@@ -1031,6 +1095,7 @@ void PBRBaseMaterial::buildUniformLayout()
   ubo.addUniform("vReflectivityInfos", 3);
   ubo.addUniform("vMicroSurfaceSamplerInfos", 2);
   ubo.addUniform("vReflectionInfos", 2);
+  ubo.addUniform("vReflectionFilteringInfo", 2);
   ubo.addUniform("vReflectionPosition", 3);
   ubo.addUniform("vReflectionSize", 3);
   ubo.addUniform("vBumpInfos", 3);
@@ -1054,6 +1119,9 @@ void PBRBaseMaterial::buildUniformLayout()
   ubo.addUniform("vReflectivityColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
   ubo.addUniform("visibility", 1);
+  ubo.addUniform("vMetallicReflectanceFactors", 4);
+  ubo.addUniform("vMetallicReflectanceInfos", 2);
+  ubo.addUniform("metallicReflectanceMatrix", 16);
 
   PBRClearCoatConfiguration::PrepareUniformBuffer(ubo);
   PBRAnisotropicConfiguration::PrepareUniformBuffer(ubo);
@@ -1102,7 +1170,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   _activeEffect = effect;
 
   // Matrices
-  if (!defines["INSTANCES"]) {
+  if (!defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
     bindOnlyWorldMatrix(world);
   }
 
@@ -1159,6 +1227,11 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
               ubo.updateVector3("vReflectionPosition", cubeTexture->boundingBoxPosition);
               ubo.updateVector3("vReflectionSize", *cubeTexture->boundingBoxSize());
             }
+          }
+
+          if (realTimeFiltering) {
+            const auto width = static_cast<float>(reflectionTexture->getSize().width);
+            ubo.updateFloat2("vReflectionFilteringInfo", width, Scalar::Log2(width), "");
           }
 
           if (!defines["USEIRRADIANCEMAP"]) {
@@ -1233,6 +1306,14 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
             MaterialHelper::BindTextureMatrix(*_reflectivityTexture, ubo, "reflectivity");
           }
 
+          if (_metallicReflectanceTexture) {
+            ubo.updateFloat2("vMetallicReflectanceInfos",
+                             static_cast<float>(_metallicReflectanceTexture->coordinatesIndex),
+                             _metallicReflectanceTexture->level, "");
+            MaterialHelper::BindTextureMatrix(*_metallicReflectanceTexture, ubo,
+                                              "metallicReflectance");
+          }
+
           if (_microSurfaceTexture) {
             ubo.updateFloat2("vMicroSurfaceSamplerInfos",
                              static_cast<float>(_microSurfaceTexture->coordinatesIndex),
@@ -1267,13 +1348,22 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       if (defines["METALLICWORKFLOW"]) {
         TmpVectors::Color3Array[0].r = !_metallic.has_value() ? 1.f : *_metallic;
         TmpVectors::Color3Array[0].g = !_roughness.has_value() ? 1.f : *_roughness;
+        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], 1, "");
+
+        const auto ior = subSurface->indexOfRefraction();
+        const auto outside_ior
+          = 1.f; // consider air as clear coat and other layaers would remap in the shader.
 
         // We are here deriving our default reflectance from a common value for none metallic
-        // surface. Default specular reflectance at normal incidence. 4% corresponds to index of
-        // refraction (IOR) of 1.50, approximately equal to glass. We then use 8% combined with a
-        // factor of 0.5 to allow some variations around the 0.04 default value.
-        const auto metallicF0 = 0.08f * _metallicF0Factor;
-        ubo.updateColor4("vReflectivityColor", TmpVectors::Color3Array[0], metallicF0, "");
+        // surface. Based of the schlick fresnel approximation model for dielectrics.
+        const auto f0 = std::pow((ior - outside_ior) / (ior + outside_ior), 2);
+
+        // Tweak the default F0 and F90 based on our given setup
+        _metallicReflectanceColor.scaleToRef(f0 * _metallicF0Factor, TmpVectors::Color3Array[0]);
+        const auto metallicF90 = _metallicF0Factor;
+
+        ubo.updateColor4("vMetallicReflectanceFactors", TmpVectors::Color3Array[0], metallicF90,
+                         "");
       }
       else {
         ubo.updateColor4("vReflectivityColor", _reflectivityColor, _microSurface, "");
@@ -1290,9 +1380,6 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
         ubo.updateColor4("vAlbedoColor", _albedoColor, alpha, "");
       }
 
-      // Visibility
-      ubo.updateFloat("visibility", mesh->visibility());
-
       // Misc
       _lightingInfos.x = _directIntensity;
       _lightingInfos.y = _emissiveIntensity;
@@ -1301,6 +1388,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
 
       ubo.updateVector4("vLightingIntensity", _lightingInfos);
     }
+
+    // Visibility
+    ubo.updateFloat("visibility", mesh->visibility());
 
     // Textures
     if (scene->texturesEnabled()) {
@@ -1355,6 +1445,10 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
         }
         else if (_reflectivityTexture) {
           ubo.setTexture("reflectivitySampler", _reflectivityTexture);
+        }
+
+        if (_metallicReflectanceTexture) {
+          ubo.setTexture("metallicReflectanceSampler", _metallicReflectanceTexture);
         }
 
         if (_microSurfaceTexture) {
@@ -1515,6 +1609,10 @@ std::vector<BaseTexturePtr> PBRBaseMaterial::getActiveTextures() const
     activeTextures.emplace_back(_metallicTexture);
   }
 
+  if (_metallicReflectanceTexture) {
+    activeTextures.emplace_back(_metallicReflectanceTexture);
+  }
+
   if (_microSurfaceTexture) {
     activeTextures.emplace_back(_microSurfaceTexture);
   }
@@ -1565,6 +1663,10 @@ bool PBRBaseMaterial::hasTexture(const BaseTexturePtr& texture) const
     return true;
   }
 
+  if (_metallicReflectanceTexture == texture) {
+    return true;
+  }
+
   if (_microSurfaceTexture == texture) {
     return true;
   }
@@ -1585,44 +1687,17 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures
                               bool /*notBoundToMesh*/)
 {
   if (forceDisposeTextures) {
-    if (_albedoTexture) {
-      _albedoTexture->dispose();
-    }
-
-    if (_ambientTexture) {
-      _ambientTexture->dispose();
-    }
-
-    if (_opacityTexture) {
-      _opacityTexture->dispose();
-    }
-
-    if (_reflectionTexture) {
-      _reflectionTexture->dispose();
-    }
-
     if (_environmentBRDFTexture && getScene()->environmentBRDFTexture != _environmentBRDFTexture) {
       _environmentBRDFTexture->dispose();
     }
 
-    if (_emissiveTexture) {
-      _emissiveTexture->dispose();
-    }
-
-    if (_metallicTexture) {
-      _metallicTexture->dispose();
-    }
-
-    if (_reflectivityTexture) {
-      _reflectivityTexture->dispose();
-    }
-
-    if (_bumpTexture) {
-      _bumpTexture->dispose();
-    }
-
-    if (_lightmapTexture) {
-      _lightmapTexture->dispose();
+    for (const auto& texture :
+         {_albedoTexture, _ambientTexture, _opacityTexture, _reflectionTexture, _emissiveTexture,
+          _metallicTexture, _reflectivityTexture, _bumpTexture, _lightmapTexture,
+          _metallicReflectanceTexture, _microSurfaceTexture}) {
+      if (texture) {
+        texture->dispose();
+      }
     }
   }
 
