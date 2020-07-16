@@ -14,6 +14,7 @@ struct _CreationDataStorage;
 struct _InstancesBatch;
 struct _InstanceDataStorage;
 struct _InternalMeshDataInfo;
+struct _ThinInstanceDataStorage;
 struct _VisibleInstances;
 class Buffer;
 class Effect;
@@ -687,6 +688,21 @@ public:
                              const _InstancesBatchPtr& batch, const EffectPtr& effect,
                              Engine* engine);
 
+  /** Thin instances **/
+
+  /**
+   * @brief Refreshes the bounding info, taking into account all the thin instances defined
+   * @param forceRefreshParentInfo true to force recomputing the mesh bounding info and use it to
+   * compute the aggregated bounding info.
+   */
+  void thinInstanceRefreshBoundingInfo(bool forceRefreshParentInfo);
+
+  /**
+   * @brief Hidden
+   */
+  void _renderWithThinInstances(SubMesh* subMesh, unsigned int fillMode, const EffectPtr& effect,
+                                Engine* engine);
+
   /**
    * @brief Register a custom buffer that will be instanced.
    * @see https://doc.babylonjs.com/how_to/how_to_use_instances#custom-buffers
@@ -873,6 +889,11 @@ public:
    * @brief Hidden
    */
   void _disposeInstanceSpecificData();
+
+  /**
+   * @brief Hidden
+   */
+  void _disposeThinInstanceSpecificData();
 
   /** Geometric tools **/
 
@@ -1754,6 +1775,11 @@ protected:
   bool get_hasInstances() const override;
 
   /**
+   * @brief Gets a boolean indicating if this mesh has thin instances.
+   */
+  bool get_hasThinInstances() const override;
+
+  /**
    * @brief Gets the morph target manager.
    * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
    */
@@ -1833,6 +1859,11 @@ protected:
    * @brief Hidden
    */
   std::vector<Vector3>& get__positions() override;
+
+  /**
+   * @brief Hidden
+   */
+  void _afterComputeWorldMatrix() override;
 
 private:
   void _sortLODLevels();
@@ -2003,6 +2034,7 @@ private:
   // Morph
   std::vector<VertexBuffer*> _delayInfo;
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
+  std::unique_ptr<_ThinInstanceDataStorage> _thinInstanceDataStorage;
   MaterialPtr _effectiveMaterial;
   // Instances
   /** @hidden */

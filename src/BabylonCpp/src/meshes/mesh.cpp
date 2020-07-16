@@ -29,6 +29,7 @@
 #include <babylon/meshes/_instance_data_storage.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/_internal_mesh_data_info.h>
+#include <babylon/meshes/_thin_instance_data_storage.h>
 #include <babylon/meshes/_visible_instances.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/builders/box_builder.h>
@@ -97,6 +98,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _internalMeshDataInfo{std::make_unique<_InternalMeshDataInfo>()}
     , _onBeforeDrawObserver{nullptr}
     , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
+    , _thinInstanceDataStorage{std::make_unique<_ThinInstanceDataStorage>()}
     , _effectiveMaterial{nullptr}
     , _tessellation{0}
     , _arc{1.f}
@@ -144,6 +146,9 @@ void Mesh::_initialize(Scene* scene, Node* iParent, Mesh* source, bool doNotClon
     // shapes.
     _originalBuilderSideOrientation = source->_originalBuilderSideOrientation;
     _creationDataStorage            = source->_creationDataStorage;
+
+    // Enabled
+    setEnabled(source->isEnabled());
 
     // Parent
     Node::set_parent(source->parent());
@@ -330,6 +335,11 @@ void Mesh::set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callb
 bool Mesh::get_hasInstances() const
 {
   return !instances.empty();
+}
+
+bool Mesh::get_hasThinInstances() const
+{
+  return _thinInstanceDataStorage->instancesCount > 0;
 }
 
 std::string Mesh::toString(bool fullDetails)
@@ -613,7 +623,8 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
   auto engine = getEngine();
   auto scene  = getScene();
   auto hardwareInstancedRendering
-    = forceInstanceSupport || (engine->getCaps().instancedArrays && !instances.empty());
+    = forceInstanceSupport
+      || (engine->getCaps().instancedArrays && (!instances.empty() || hasThinInstances()));
 
   computeWorldMatrix();
 
@@ -652,7 +663,10 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
         && (generator->getShadowMap()->renderList().empty()
             || stl_util::contains(generator->getShadowMap()->renderList(), this))) {
       for (const auto& subMesh : subMeshes) {
-        if (!generator->isReady(subMesh.get(), hardwareInstancedRendering)) {
+        const auto subMeshMaterial = subMesh->getMaterial();
+        if (!generator->isReady(subMesh.get(), hardwareInstancedRendering,
+                                subMeshMaterial ? subMeshMaterial->needAlphaBlendingForMesh(*this) :
+                                                  false)) {
           return false;
         }
       }
@@ -727,6 +741,19 @@ Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
   _instanceDataStorage->visibleInstances->meshes[renderId].emplace_back(instance);
 
   return *this;
+}
+
+void Mesh::_afterComputeWorldMatrix()
+{
+  AbstractMesh::_afterComputeWorldMatrix();
+
+  if (!hasThinInstances()) {
+    return;
+  }
+
+  if (!doNotSyncBoundingInfo) {
+    thinInstanceRefreshBoundingInfo(false);
+  }
 }
 
 Mesh& Mesh::refreshBoundingInfo(bool applySkeleton)
@@ -1125,14 +1152,16 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     instanceStorage->instancesData = Float32Array(instanceStorage->instancesBufferSize / 4);
   }
 
-  unsigned int offset         = 0;
-  unsigned int instancesCount = 0;
+  auto offset         = 0u;
+  auto instancesCount = 0u;
 
   const auto& renderSelf = batch->renderSelf[subMesh->_id];
 
-  if (!_instanceDataStorage->manualUpdate) {
-    auto world = _effectiveMesh()->getWorldMatrix();
+  const auto needUpdateBuffer
+    = !instancesBuffer || currentInstancesBufferSize != instanceStorage->instancesBufferSize;
 
+  if (!_instanceDataStorage->manualUpdate && (!instanceStorage->isFrozen || needUpdateBuffer)) {
+    auto world = _effectiveMesh()->getWorldMatrix();
     if (renderSelf) {
       world.copyToArray(instanceStorage->instancesData, offset);
       offset += 16;
@@ -1151,7 +1180,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     instancesCount = (renderSelf ? 1 : 0) + static_cast<unsigned int>(visibleInstances.size());
   }
 
-  if (!instancesBuffer || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
+  if (needUpdateBuffer) {
     if (instancesBuffer) {
       instancesBuffer->dispose();
     }
@@ -1165,7 +1194,9 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     setVerticesBuffer(instancesBuffer->createVertexBuffer(VertexBuffer::World3Kind, 12, 4));
   }
   else {
-    instancesBuffer->updateDirectly(instanceStorage->instancesData, 0, instancesCount);
+    if (!_instanceDataStorage->isFrozen) {
+      instancesBuffer->updateDirectly(instanceStorage->instancesData, 0, instancesCount);
+    }
   }
 
   _processInstancedBuffers(visibleInstances, renderSelf);
@@ -1180,6 +1211,25 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   engine->unbindInstanceAttributes();
 
   return *this;
+}
+
+void Mesh::thinInstanceRefreshBoundingInfo(bool /*forceRefreshParentInfo*/)
+{
+}
+
+void Mesh::_renderWithThinInstances(SubMesh* subMesh, unsigned int fillMode,
+                                    const EffectPtr& effect, Engine* engine)
+{
+  // Stats
+  const auto instancesCount = _thinInstanceDataStorage->instancesCount;
+
+  getScene()->_activeIndices.addCount(subMesh->indexCount * instancesCount, false);
+
+  // Draw
+  _bind(subMesh, effect, fillMode);
+  _draw(subMesh, fillMode, instancesCount);
+
+  engine->unbindInstanceAttributes();
 }
 
 void Mesh::registerInstancedBuffer(const std::string& /*kind*/, size_t /*stride*/)
@@ -1200,6 +1250,11 @@ Mesh& Mesh::_processRendering(
 {
   auto scene  = getScene();
   auto engine = scene->getEngine();
+
+  if (hardwareInstancedRendering && subMesh->getRenderingMesh()->hasThinInstances()) {
+    _renderWithThinInstances(subMesh, fillMode, effect, engine);
+    return *this;
+  }
 
   if (hardwareInstancedRendering) {
     _renderWithInstances(subMesh, static_cast<unsigned>(fillMode), batch, effect, engine);
@@ -1309,8 +1364,9 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
   }
 
   auto engine                     = scene.getEngine();
-  auto hardwareInstancedRendering = batch->hardwareInstancedRendering[subMesh->_id];
-  auto& instanceDataStorage       = *_instanceDataStorage;
+  auto hardwareInstancedRendering = batch->hardwareInstancedRendering[subMesh->_id]
+                                    || subMesh->getRenderingMesh()->hasThinInstances();
+  auto& instanceDataStorage = *_instanceDataStorage;
 
   // Material
   auto iMaterial = subMesh->getMaterial();
@@ -1358,7 +1414,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
 
   std::optional<unsigned int> sideOrientation = std::nullopt;
 
-  if (!instanceDataStorage.isFrozen && _effectiveMaterial->backFaceCulling()) {
+  if (!instanceDataStorage.isFrozen
+      && (_effectiveMaterial->backFaceCulling() || overrideMaterialSideOrientation.has_value())) {
     const auto mainDeterminant = effectiveMesh._getWorldMatrixDeterminant();
     sideOrientation            = overrideMaterialSideOrientation;
     if (!sideOrientation.has_value()) {
@@ -1897,6 +1954,9 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Instances
   _disposeInstanceSpecificData();
 
+  // Thin instances
+  _disposeThinInstanceSpecificData();
+
   AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
@@ -1920,6 +1980,11 @@ void Mesh::_disposeInstanceSpecificData()
   }
 
   instancedBuffers = {};
+}
+
+void Mesh::_disposeThinInstanceSpecificData()
+{
+  // Do nothing
 }
 
 Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
@@ -2993,6 +3058,10 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
         instance->_waitingParentId = json_util::get_string(parsedInstance, "parentId");
       }
 
+      if (json_util::has_valid_key_value(parsedInstance, "isPickable")) {
+        instance->isPickable = json_util::get_bool(parsedInstance, "isPickable");
+      }
+
       if (json_util::has_valid_key_value(parsedInstance, "rotationQuaternion")) {
         instance->rotationQuaternion = Quaternion::FromArray(
           json_util::get_array<float>(parsedInstance, "rotationQuaternion"));
@@ -3023,6 +3092,39 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
         }
       }
     }
+  }
+
+  // Thin instances
+  if (json_util::has_valid_key_value(parsedMesh, "thinInstances")) {
+    const auto thinInstances = parsedMesh["thinInstances"];
+
+    if (json_util::has_valid_key_value(thinInstances, "matrixData")) {
+#if 0
+      mesh->thinInstanceSetBuffer(
+        "matrix", json_util::get_array<float>(thinInstances, "matrixData"), 16, false);
+#endif
+
+      mesh->_thinInstanceDataStorage->matrixBufferSize
+        = json_util::get_number<size_t>(thinInstances, "matrixBufferSize");
+      mesh->_thinInstanceDataStorage->instancesCount
+        = json_util::get_number<size_t>(thinInstances, "instancesCount");
+    }
+    else {
+      mesh->_thinInstanceDataStorage->matrixBufferSize
+        = json_util::get_number<size_t>(thinInstances, "matrixBufferSize");
+    }
+#if 0
+    if (json_util::has_valid_key_value(thinInstances, "userThinInstance")) {
+      const auto userThinInstance = thinInstances["userThinInstance"];
+
+      for (const auto& item : userThinInstance["data"].items()) {
+        const auto kind = item.key();
+        mesh.thinInstanceSetBuffer(kind, new Float32Array(userThinInstance.data[kind]),
+                                   userThinInstance.strides[kind], false);
+        mesh._userThinInstanceBuffersStorage.sizes[kind] = userThinInstance.sizes[kind];
+      }
+    }
+#endif
   }
 
   return mesh;
