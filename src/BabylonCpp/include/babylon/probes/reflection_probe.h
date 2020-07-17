@@ -23,7 +23,7 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Class used to generate realtime reflection / refraction cube textures.
- * @see http://doc.babylonjs.com/how_to/how_to_use_reflection_probes
+ * @see https://doc.babylonjs.com/how_to/how_to_use_reflection_probes
  */
 class BABYLON_SHARED_EXPORT ReflectionProbe {
 
