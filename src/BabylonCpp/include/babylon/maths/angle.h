@@ -47,10 +47,10 @@ public:
   /** Statics **/
 
   /**
-   * @brief Gets a new Angle object valued with the angle value in radians.
-   * between the two given vectors
-   * @param a defines first vector
-   * @param b defines second vector
+   * @brief Gets a new Angle object valued with the gradient angle, in radians, of the line joining
+   * two points
+   * @param a defines first point as the origin
+   * @param b defines point
    * @returns a new Angle
    */
   static Angle BetweenTwoPoints(const Vector2& a, const Vector2& b);

@@ -13,7 +13,7 @@ namespace BABYLON {
 class Matrix;
 
 /**
- * @brief Represens a plane by the equation ax + by + cz + d = 0
+ * @brief Represents a plane by the equation ax + by + cz + d = 0
  */
 class BABYLON_SHARED_EXPORT Plane {
 
