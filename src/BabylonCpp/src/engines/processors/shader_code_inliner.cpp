@@ -5,6 +5,38 @@
 
 namespace BABYLON {
 
+static std::string toString(const IInlineFunctionDescr& descr)
+{
+  std::ostringstream oss;
+  oss << "{\"name\":\"" << descr.name << "\",\"name\":\"" << descr.type << "\",\"parameters\":";
+  if (descr.parameters.empty()) {
+    oss << "["
+        << "]";
+  }
+  else {
+    oss << "[\"" << StringTools::join(descr.parameters, "\",") << "\"]";
+  }
+  oss << ",\"body\":\"" << descr.body << "\",\"callIndex\":" << descr.callIndex << "}";
+  return oss.str();
+}
+
+static std::string toString(const std::vector<IInlineFunctionDescr>& descr)
+{
+  std::vector<std::string> descriptions;
+  for (const auto& descriptor : descr) {
+    descriptions.emplace_back(toString(descriptor));
+  }
+  std::ostringstream oss;
+  if (descriptions.empty()) {
+    oss << "["
+        << "]";
+  }
+  else {
+    oss << "[" << StringTools::join(descriptions, ",") << "]";
+  }
+  return oss.str();
+}
+
 ShaderCodeInliner::ShaderCodeInliner(const std::string& sourceCode, size_t numMaxIterations)
     : debug{false}, code{this, &ShaderCodeInliner::get_code}
 {
@@ -24,19 +56,142 @@ std::string ShaderCodeInliner::get_code() const
 void ShaderCodeInliner::processCode()
 {
   if (debug) {
-    BABYLON_LOGF_INFO("ShaderCodeInliner", "Start inlining process (code size=%lull)...",
-                      _sourceCode.size());
+    BABYLON_LOGF_DEBUG("ShaderCodeInliner", "Start inlining process (code size=%lull)...",
+                       _sourceCode.size());
   }
   _collectFunctions();
   _processInlining(_numMaxIterations);
   if (debug) {
-    BABYLON_LOG_INFO("ShaderCodeInliner", "End of inlining process.");
+    BABYLON_LOG_DEBUG("ShaderCodeInliner", "End of inlining process.");
   }
 }
 
 void ShaderCodeInliner::_collectFunctions()
 {
-  // TODO Implement
+  size_t startIndex = 0;
+
+  while (startIndex < _sourceCode.size()) {
+    // locate the function to inline and extract its name
+    const auto inlineTokenIndex = StringTools::indexOf(_sourceCode, inlineToken, startIndex);
+    if (inlineTokenIndex < 0) {
+      break;
+    }
+
+    const auto funcParamsStartIndex
+      = StringTools::indexOf(_sourceCode, "(", inlineTokenIndex + inlineToken.size());
+    if (funcParamsStartIndex < 0) {
+      if (debug) {
+        BABYLON_LOGF_WARN("ShaderCodeInliner",
+                          "Could not find the opening parenthesis after the token. startIndex=%zu",
+                          startIndex);
+      }
+      startIndex = inlineTokenIndex + inlineToken.size();
+      continue;
+    }
+
+    const auto funcNameMatch = StringTools::regexMatch(
+      _sourceCode.substr(inlineTokenIndex + inlineToken.size(), funcParamsStartIndex),
+      std::regex(ShaderCodeInliner::_RegexpFindFunctionNameAndType, std::regex::optimize));
+    if (funcNameMatch.empty()) {
+      if (debug) {
+        BABYLON_LOGF_WARN(
+          "ShaderCodeInliner", "Could not extract the name/type of the function from: %s",
+          _sourceCode.substr(inlineTokenIndex + inlineToken.size(), funcParamsStartIndex).c_str());
+      }
+      startIndex = inlineTokenIndex + inlineToken.size();
+      continue;
+    }
+    const auto funcType = funcNameMatch.size() > 3 ? funcNameMatch[3] : "";
+    const auto funcName = funcNameMatch.size() > 4 ? funcNameMatch[4] : "";
+
+    // extract the parameters of the function as a whole string (without the leading / trailing
+    // parenthesis)
+    const auto funcParamsEndIndex
+      = _extractBetweenMarkers('(', ')', _sourceCode, funcParamsStartIndex);
+    if (funcParamsEndIndex < 0) {
+      if (debug) {
+        BABYLON_LOGF_WARN(
+          "ShaderCodeInliner",
+          "Could not extract the parameters the function '%s' (type=%s). funcParamsStartIndex=%d",
+          funcName.c_str(), funcType.c_str(), funcParamsStartIndex);
+      }
+      startIndex = inlineTokenIndex + inlineToken.size();
+      continue;
+    }
+    const auto funcParams = _sourceCode.substr(funcParamsStartIndex + 1, funcParamsEndIndex);
+
+    // extract the body of the function (with the curly brackets)
+    const auto funcBodyStartIndex = _skipWhitespaces(_sourceCode, funcParamsEndIndex + 1);
+    if (funcBodyStartIndex == _sourceCode.size()) {
+      if (debug) {
+        BABYLON_LOGF_WARN(
+          "ShaderCodeInliner",
+          "Could not extract the body of the function '%s' (type=%s). funcParamsEndIndex=%d",
+          funcName.c_str(), funcType.c_str(), funcParamsEndIndex);
+      }
+      startIndex = inlineTokenIndex + inlineToken.size();
+      continue;
+    }
+
+    const auto funcBodyEndIndex = _extractBetweenMarkers('{', '}', _sourceCode, funcBodyStartIndex);
+    if (funcBodyEndIndex < 0) {
+      if (debug) {
+        BABYLON_LOGF_WARN(
+          "ShaderCodeInliner",
+          "Could not extract the body of the function '%s' (type=%s). funcBodyStartIndex=%lu",
+          funcName.c_str(), funcType.c_str(), funcBodyStartIndex);
+      }
+      startIndex = inlineTokenIndex + inlineToken.size();
+      continue;
+    }
+    const auto funcBody = _sourceCode.substr(funcBodyStartIndex, funcBodyEndIndex + 1);
+
+    // process the parameters: extract each names
+    auto params = StringTools::split(_removeComments(funcParams), ",");
+    std::vector<std::string> paramNames{};
+
+    for (auto& iParam : params) {
+      const auto& param = StringTools::trim(iParam);
+      const auto idx    = StringTools::lastIndexOf(param, " ");
+
+      if (idx >= 0) {
+        paramNames.emplace_back(param.substr(idx + 1));
+      }
+    }
+
+    if (funcType != "void") {
+      // for functions that return a value, we will replace "return" by "tempvarname = ",
+      // tempvarname being a unique generated name
+      paramNames.emplace_back("return");
+    }
+
+    // collect the function
+    _functionDescr.emplace_back(IInlineFunctionDescr{
+      funcName,   // name
+      funcType,   // type
+      paramNames, // parameters
+      funcBody,   // body
+      0,          // callIndex
+    });
+
+    startIndex = funcBodyEndIndex + 1;
+
+    // remove the function from the source code
+    const auto partBefore = inlineTokenIndex > 0 ? _sourceCode.substr(0, inlineTokenIndex) : "";
+    const auto partAfter  = funcBodyEndIndex + 1 < static_cast<int>(_sourceCode.size()) - 1 ?
+                             _sourceCode.substr(funcBodyEndIndex + 1) :
+                             "";
+
+    _sourceCode = partBefore + partAfter;
+
+    startIndex -= funcBodyEndIndex + 1 - inlineTokenIndex;
+  }
+
+  if (debug) {
+    BABYLON_LOGF_DEBUG("ShaderCodeInliner",
+                       "Collect functions: %zu functions found. functionDescr=, %s",
+                       _functionDescr.size(), toString(_functionDescr).c_str());
+  }
 }
 
 bool ShaderCodeInliner::_processInlining(size_t iNumMaxIterations)
@@ -50,8 +205,8 @@ bool ShaderCodeInliner::_processInlining(size_t iNumMaxIterations)
   }
 
   if (debug) {
-    BABYLON_LOGF_INFO("ShaderCodeInliner", "numMaxIterations is %d after inlining process",
-                      numMaxIterations);
+    BABYLON_LOGF_DEBUG("ShaderCodeInliner", "numMaxIterations is %d after inlining process",
+                       numMaxIterations);
   }
 
   return numMaxIterations >= 0;
@@ -294,7 +449,7 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
                       + retParamName + partAfter;
 
         if (debug) {
-          BABYLON_LOGF_INFO(
+          BABYLON_LOGF_DEBUG(
             "ShaderCodeInliner",
             "Replace function call by code. Function '%s' (type=%s). injectDeclarationIndex=%d",
             name.c_str(), type.c_str(), injectDeclarationIndex);
@@ -307,7 +462,7 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
         startIndex += funcBody.size() - (callParamsEndIndex + 1 - functionCallIndex);
 
         if (debug) {
-          BABYLON_LOGF_INFO(
+          BABYLON_LOGF_DEBUG(
             "ShaderCodeInliner",
             "Replace function call by code. Function '%s' (type=%s). functionCallIndex=%d",
             name.c_str(), type.c_str(), functionCallIndex);
