@@ -13,7 +13,7 @@ using BonePtr = std::shared_ptr<Bone>;
 
 /**
  * @brief Class used to store bone information.
- * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+ * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
  */
 class BABYLON_SHARED_EXPORT Bone : public Node {
 

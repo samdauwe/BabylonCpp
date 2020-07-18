@@ -30,8 +30,7 @@ struct BABYLON_SHARED_EXPORT BoneLookControllerOptions {
 
 /**
  * @brief Class used to make a bone look toward a point in space.
- * @see
- * http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons#bonelookcontroller
+ * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons#bonelookcontroller
  */
 class BABYLON_SHARED_EXPORT BoneLookController {
 
@@ -46,11 +45,10 @@ public:
    * * minYaw: the minimum angle the bone will yaw to
    * * maxPitch: the maximum angle the bone will pitch to
    * * minPitch: the minimum angle the bone will yaw to
-   * * slerpAmount: set the between 0 and 1 to make the bone slerp to the
-   *target.
+   * * slerpAmount: set the between 0 and 1 to make the bone slerp to the target.
    * * upAxis: the up axis of the coordinate system
-   * * upAxisSpace: the space that the up axis is in - Space.BONE, Space.LOCAL
-   *(default), or Space.WORLD.
+   * * upAxisSpace: the space that the up axis is in - Space.BONE, Space.LOCAL (default), or
+   *Space.WORLD.
    * * yawAxis: set yawAxis if the bone does not yaw on the y axis
    * * pitchAxis: set pitchAxis if the bone does not pitch on the x axis
    * * adjustYaw: used to make an adjustment to the yaw of the bone
@@ -135,8 +133,7 @@ public:
   Vector3 upAxis;
 
   /**
-   * The space that the up axis is in - Space.BONE, Space.LOCAL (default), or
-   * Space.WORLD
+   * The space that the up axis is in - Space.BONE, Space.LOCAL (default), or Space.WORLD
    */
   Space upAxisSpace;
 
@@ -156,8 +153,8 @@ public:
   float adjustRoll;
 
   /**
-   * The amount to slerp (spherical linear interpolation) to the target.  Set
-   * this to a value between 0 and 1 (a value of 1 disables slerp)
+   * The amount to slerp (spherical linear interpolation) to the target. Set this to a value
+   * between 0 and 1 (a value of 1 disables slerp)
    */
   float slerpAmount;
 

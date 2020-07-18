@@ -33,7 +33,7 @@ using SkeletonPtr       = std::shared_ptr<Skeleton>;
 
 /**
  * @brief Class used to handle skinning animations.
- * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+ * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
  */
 class BABYLON_SHARED_EXPORT Skeleton : public IAnimatable, public IDisposable {
 
@@ -202,7 +202,7 @@ public:
   /**
    * @brief Enable animation blending for this skeleton.
    * @param blendingSpeed defines the blending speed to apply
-   * @see http://doc.babylonjs.com/babylon101/animations#animation-blending
+   * @see https://doc.babylonjs.com/babylon101/animations#animation-blending
    */
   void enableBlending(float blendingSpeed = 0.01f);
 
