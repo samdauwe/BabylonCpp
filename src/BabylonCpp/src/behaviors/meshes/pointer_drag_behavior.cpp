@@ -1,6 +1,7 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -198,8 +199,18 @@ void PointerDragBehavior::releaseDrag()
   // Reattach camera controls
   if (detachCameraControls && _attachedElement && _scene->activeCamera()
       && !_scene->activeCamera()->leftCamera()) {
-    _scene->activeCamera()->attachControl(_attachedElement,
-                                          _scene->activeCamera()->inputs.noPreventDefault);
+    if (_scene->activeCamera()->getClassName() == "ArcRotateCamera") {
+      const auto arcRotateCamera
+        = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera());
+      arcRotateCamera->attachControl(
+        _attachedElement,
+        arcRotateCamera->inputs ? arcRotateCamera->inputs->noPreventDefault : true,
+        arcRotateCamera->_useCtrlForPanning, arcRotateCamera->_panningMouseButton);
+    }
+    else {
+      _scene->activeCamera()->attachControl(_attachedElement,
+                                            _scene->activeCamera()->inputs.noPreventDefault);
+    }
   }
 }
 
