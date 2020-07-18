@@ -607,7 +607,7 @@ public:
 
   /**
    * @brief Gets the current physics impostor.
-   * @see http://doc.babylonjs.com/features/physics_engine
+   * @see https://doc.babylonjs.com/features/physics_engine
    * @returns a physics impostor or null
    */
   PhysicsImpostorPtr& getPhysicsImpostor();
@@ -617,7 +617,7 @@ public:
    * @param force defines the force to apply
    * @param contactPoint defines where to apply the force
    * @returns the current mesh
-   * @see http://doc.babylonjs.com/how_to/using_the_physics_engine
+   * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
    */
   AbstractMesh& applyImpulse(const Vector3& force, const Vector3& contactPoint);
 
@@ -1750,7 +1750,7 @@ public:
 
   /**
    * Gets or sets impostor used for physic simulation
-   * @see http://doc.babylonjs.com/features/physics_engine
+   * @see https://doc.babylonjs.com/features/physics_engine
    */
   Property<AbstractMesh, PhysicsImpostorPtr> physicsImpostor;
 

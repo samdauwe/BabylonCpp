@@ -16,7 +16,7 @@ using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
 
 /**
  * @brief Interface used to define a physics engine.
- * @see http://doc.babylonjs.com/how_to/using_the_physics_engine
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   virtual ~IPhysicsEngine() = default;

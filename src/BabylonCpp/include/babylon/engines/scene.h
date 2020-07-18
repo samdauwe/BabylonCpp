@@ -1592,50 +1592,46 @@ public:
 
   /**
    * @brief Creates a default light for the scene.
-   * @see http://doc.babylonjs.com/How_To/Fast_Build#create-default-light
-   * @param replace has the default false, when true replaces the existing
-   * lights in the scene with a hemispheric light
+   * @see https://doc.babylonjs.com/How_To/Fast_Build#create-default-light
+   * @param replace has the default false, when true replaces the existing lights in the scene with
+   * a hemispheric light
    */
   void createDefaultLight(bool replace = false);
 
   /**
    * @brief Creates a default camera for the scene.
-   * @see http://doc.babylonjs.com/How_To/Fast_Build#create-default-camera
-   * @param createArcRotateCamera has the default false which creates a free
-   * camera, when true creates an arc rotate camera
-   * @param replace has default false, when true replaces the active camera in
-   * the scene
-   * @param attachCameraControls has default false, when true attaches camera
-   * controls to the canvas.
+   * @see https://doc.babylonjs.com/How_To/Fast_Build#create-default-camera
+   * @param createArcRotateCamera has the default false which creates a free camera, when true
+   * creates an arc rotate camera
+   * @param replace has default false, when true replaces the active camera in the scene
+   * @param attachCameraControls has default false, when true attaches camera controls to the
+   * canvas.
    */
   void createDefaultCamera(bool createArcRotateCamera = false, bool replace = false,
                            bool attachCameraControls = false);
 
   /**
    * @brief Creates a default camera and a default light.
-   * @see
-   * http://doc.babylonjs.com/how_to/Fast_Build#create-default-camera-or-light
-   * @param createArcRotateCamera has the default false which creates a free
-   * camera, when true creates an arc rotate camera
-   * @param replace has the default false, when true replaces the active
-   * camera/light in the scene
-   * @param attachCameraControls has the default false, when true attaches
-   * camera controls to the canvas.
+   * @see https://doc.babylonjs.com/how_to/Fast_Build#create-default-camera-or-light
+   * @param createArcRotateCamera has the default false which creates a free camera, when true
+   * creates an arc rotate camera
+   * @param replace has the default false, when true replaces the active camera/light in the scene
+   * @param attachCameraControls has the default false, when true attaches camera controls to the
+   * canvas.
    */
   void createDefaultCameraOrLight(bool createArcRotateCamera = false, bool replace = false,
                                   bool attachCameraControls = false);
 
   /**
    * @brief Creates a new sky box.
-   * @see http://doc.babylonjs.com/how_to/Fast_Build#create-default-skybox
+   * @see https://doc.babylonjs.com/how_to/Fast_Build#create-default-skybox
    * @param environmentTexture defines the texture to use as environment texture
-   * @param pbr has default false which requires the StandardMaterial to be
-   * used, when true PBRMaterial must be used
+   * @param pbr has default false which requires the StandardMaterial to be used, when true
+   * PBRMaterial must be used
    * @param scale defines the overall scale of the skybox
-   * @param blur is only available when pbr is true, default is 0, no blur,
-   * maximum value is 1
-   * @param setGlobalEnvTexture has default true indicating that
-   * scene.environmentTexture must match the current skybox texture
+   * @param blur is only available when pbr is true, default is 0, no blur, maximum value is 1
+   * @param setGlobalEnvTexture has default true indicating that scene.environmentTexture must match
+   * the current skybox texture
    * @returns a new mesh holding the sky box
    */
   MeshPtr createDefaultSkybox(BaseTexturePtr environmentTexture = nullptr, bool pbr = false,
@@ -1643,8 +1639,8 @@ public:
                               bool setGlobalEnvTexture = true);
 
   /**
-   * Creates a new environment.
-   * @see http://doc.babylonjs.com/How_To/Fast_Build#create-default-environment
+   * @brief Creates a new environment.
+   * @see https://doc.babylonjs.com/How_To/Fast_Build#create-default-environment
    * @param options defines the options you can use to configure the environment
    * @returns the new EnvironmentHelper
    */
@@ -2738,8 +2734,8 @@ public:
   // Gamepads
 
   /**
-   * Gets the gamepad manager associated with the scene
-   * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
+   * Gets the gamepad manager associated with the scene.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_gamepads
    */
   ReadOnlyProperty<Scene, std::unique_ptr<GamepadManager>> gamepadManager;
 
