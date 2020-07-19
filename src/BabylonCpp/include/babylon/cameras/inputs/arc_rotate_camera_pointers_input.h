@@ -9,7 +9,7 @@ namespace BABYLON {
 
 /**
  * @brief Manage the pointers inputs to control an arc rotate camera.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 class BABYLON_SHARED_EXPORT ArcRotateCameraPointersInput
     : public BaseCameraPointersInput<ArcRotateCamera> {

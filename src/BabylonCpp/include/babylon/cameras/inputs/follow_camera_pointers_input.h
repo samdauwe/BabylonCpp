@@ -9,7 +9,7 @@ namespace BABYLON {
 
 /**
  * @brief Manage the pointers inputs to control an follow camera.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 class BABYLON_SHARED_EXPORT FollowCameraPointersInput
     : public BaseCameraPointersInput<FollowCamera> {
@@ -45,15 +45,13 @@ private:
 
 public:
   /**
-   * Defines the pointer angular sensibility along the X axis or how fast is
-   * the camera rotating.
+   * Defines the pointer angular sensibility along the X axis or how fast is the camera rotating.
    * A negative number will reverse the axis direction.
    */
   float angularSensibilityX;
 
   /**
-   * Defines the pointer angular sensibility along the Y axis or how fast is
-   * the camera rotating.
+   * Defines the pointer angular sensibility along the Y axis or how fast is the camera rotating.
    * A negative number will reverse the axis direction.
    */
   float angularSensibilityY;
@@ -65,10 +63,8 @@ public:
   float pinchPrecision;
 
   /**
-   * pinchDeltaPercentage will be used instead of pinchPrecision if different
-   * from 0.
-   * It defines the percentage of current camera.radius to use as delta when
-   * pinch zoom is used.
+   * pinchDeltaPercentage will be used instead of pinchPrecision if different from 0.
+   * It defines the percentage of current camera.radius to use as delta when pinch zoom is used.
    */
   float pinchDeltaPercentage;
 
@@ -78,14 +74,12 @@ public:
   bool axisXControlRadius;
 
   /**
-   * Pointer X axis controls height. (X axis modifies camera.heightOffset
-   * value.)
+   * Pointer X axis controls height. (X axis modifies camera.heightOffset value.)
    */
   bool axisXControlHeight;
 
   /**
-   * Pointer X axis controls angle. (X axis modifies camera.rotationOffset
-   * value.)
+   * Pointer X axis controls angle. (X axis modifies camera.rotationOffset value.)
    */
   bool axisXControlRotation;
 
@@ -95,14 +89,12 @@ public:
   bool axisYControlRadius;
 
   /**
-   * Pointer Y axis controls height. (Y axis modifies camera.heightOffset
-   * value.)
+   * Pointer Y axis controls height. (Y axis modifies camera.heightOffset value.)
    */
   bool axisYControlHeight;
 
   /**
-   * Pointer Y axis controls angle. (Y axis modifies camera.rotationOffset
-   * value.)
+   * Pointer Y axis controls angle. (Y axis modifies camera.rotationOffset value.)
    */
   bool axisYControlRotation;
 

@@ -11,8 +11,8 @@
 namespace BABYLON {
 
 /**
- * @brief Manage the mouse inputs to control the movement of a free camera.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @brief Listen to mouse events to control the camera.
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 class BABYLON_SHARED_EXPORT FlyCameraMouseInput : public ICameraInput<FlyCamera> {
 
@@ -20,7 +20,7 @@ public:
   /**
    * @brief Listen to mouse events to control the camera.
    * @param touchEnabled Define if touch is enabled. (Default is true.)
-   * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+   * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
    */
   FlyCameraMouseInput(bool touchEnabled = true);
   ~FlyCameraMouseInput() override; // = default
@@ -28,8 +28,8 @@ public:
   /**
    * @brief Attach the mouse control to the HTML DOM element.
    * @param element Defines the element that listens to the input events.
-   * @param noPreventDefault Defines whether events caught by the controls
-   * should call preventdefault().
+   * @param noPreventDefault Defines whether events caught by the controls should call
+   * preventdefault().
    */
   void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
 
@@ -40,9 +40,9 @@ public:
   void detachControl(ICanvas* canvas) override;
 
   /**
-   * @brief Update the current camera state depending on the inputs that have
-   * been used this frame. This is a dynamically created lambda to avoid the
-   * performance penalty of looping for inputs in the render loop.
+   * @brief Update the current camera state depending on the inputs that have been used this frame.
+   * This is a dynamically created lambda to avoid the performance penalty of looping for inputs in
+   * the render loop.
    */
   void checkInputs() override;
 

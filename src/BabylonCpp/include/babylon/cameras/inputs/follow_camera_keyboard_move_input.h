@@ -11,7 +11,7 @@ namespace BABYLON {
 
 /**
  * @brief Manage the keyboard inputs to control the movement of a follow camera.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 class BABYLON_SHARED_EXPORT FollowCameraKeyboardMoveInput : public ICameraInput<FollowCamera> {
 
@@ -23,12 +23,10 @@ public:
   ~FollowCameraKeyboardMoveInput() override; // = default
 
   /**
-   * @brief Attach the input controls to a specific dom element to get the input
-   * from.
+   * @brief Attach the input controls to a specific dom element to get the input from.
    * @param element Defines the element the controls should be listened from
-   * @param noPreventDefault Defines whether event caught by the controls should
-   * call preventdefault()
-   * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
+   * @param noPreventDefault Defines whether event caught by the controls should call
+   * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
   void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
 
@@ -39,9 +37,9 @@ public:
   void detachControl(ICanvas* canvas) override;
 
   /**
-   * @brief Update the current camera state depending on the inputs that have
-   * been used this frame. This is a dynamically created lambda to avoid the
-   * performance penalty of looping for inputs in the render loop.
+   * @brief Update the current camera state depending on the inputs that have been used this frame.
+   * This is a dynamically created lambda to avoid the performance penalty of looping for inputs in
+   * the render loop.
    */
   void checkInputs() override;
 
@@ -59,111 +57,96 @@ public:
 
 private:
   /**
-   * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those
-   * configured to allow modification of the heightOffset value.
+   * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those configured to allow
+   * modification of the heightOffset value.
    */
   [[nodiscard]] bool _modifierHeightOffset() const;
 
   /**
-   * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those
-   * configured to allow modification of the rotationOffset value.
+   * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those configured to allow
+   * modification of the rotationOffset value.
    */
   [[nodiscard]] bool _modifierRotationOffset() const;
 
   /**
-   * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those
-   * configured to allow modification of the radius value.
+   * @brief Check if the pressed modifier keys (Alt/Ctrl/Shift) match those configured to allow
+   * modification of the radius value.
    */
   [[nodiscard]] bool _modifierRadius() const;
 
 public:
   /**
-   * Defines the list of key codes associated with the up action (increase
-   * heightOffset)
+   * Defines the list of key codes associated with the up action (increase heightOffset)
    */
   Int32Array keysHeightOffsetIncr;
 
   /**
-   * Defines the list of key codes associated with the down action (decrease
-   * heightOffset)
+   * Defines the list of key codes associated with the down action (decrease heightOffset)
    */
   Int32Array keysHeightOffsetDecr;
 
   /**
-   * Defines whether the Alt modifier key is required to move up/down (alter
-   * heightOffset)
+   * Defines whether the Alt modifier key is required to move up/down (alter heightOffset)
    */
   bool keysHeightOffsetModifierAlt;
 
   /**
-   * Defines whether the Ctrl modifier key is required to move up/down (alter
-   * heightOffset)
+   * Defines whether the Ctrl modifier key is required to move up/down (alter heightOffset)
    */
   bool keysHeightOffsetModifierCtrl;
 
   /**
-   * Defines whether the Shift modifier key is required to move up/down (alter
-   * heightOffset)
+   * Defines whether the Shift modifier key is required to move up/down (alter heightOffset)
    */
   bool keysHeightOffsetModifierShift;
 
   /**
-   * Defines the list of key codes associated with the left action (increase
-   * rotationOffset)
+   * Defines the list of key codes associated with the left action (increase rotationOffset)
    */
   Int32Array keysRotationOffsetIncr;
 
   /**
-   * Defines the list of key codes associated with the right action (decrease
-   * rotationOffset)
+   * Defines the list of key codes associated with the right action (decrease rotationOffset)
    */
   Int32Array keysRotationOffsetDecr;
 
   /**
-   * Defines whether the Alt modifier key is required to move left/right (alter
-   * rotationOffset)
+   * Defines whether the Alt modifier key is required to move left/right (alter rotationOffset)
    */
   bool keysRotationOffsetModifierAlt;
 
   /**
-   * Defines whether the Ctrl modifier key is required to move left/right (alter
-   * rotationOffset)
+   * Defines whether the Ctrl modifier key is required to move left/right (alter rotationOffset)
    */
   bool keysRotationOffsetModifierCtrl;
 
   /**
-   * Defines whether the Shift modifier key is required to move left/right
-   * (alter rotationOffset)
+   * Defines whether the Shift modifier key is required to move left/right (alter rotationOffset)
    */
   bool keysRotationOffsetModifierShift;
 
   /**
-   * Defines the list of key codes associated with the zoom-in action (decrease
-   * radius)
+   * Defines the list of key codes associated with the zoom-in action (decrease radius)
    */
   Int32Array keysRadiusIncr;
 
   /**
-   * Defines the list of key codes associated with the zoom-out action (increase
-   * radius)
+   * Defines the list of key codes associated with the zoom-out action (increase radius)
    */
   Int32Array keysRadiusDecr;
 
   /**
-   * Defines whether the Alt modifier key is required to zoom in/out (alter
-   * radius value)
+   * Defines whether the Alt modifier key is required to zoom in/out (alter radius value)
    */
   bool keysRadiusModifierAlt;
 
   /**
-   * Defines whether the Ctrl modifier key is required to zoom in/out (alter
-   * radius value)
+   * Defines whether the Ctrl modifier key is required to zoom in/out (alter radius value)
    */
   bool keysRadiusModifierCtrl;
 
   /**
-   * Defines whether the Shift modifier key is required to zoom in/out (alter
-   * radius value)
+   * Defines whether the Shift modifier key is required to zoom in/out (alter radius value)
    */
   bool keysRadiusModifierShift;
 

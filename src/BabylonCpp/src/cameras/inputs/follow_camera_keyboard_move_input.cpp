@@ -36,8 +36,7 @@ FollowCameraKeyboardMoveInput::FollowCameraKeyboardMoveInput()
 
 FollowCameraKeyboardMoveInput::~FollowCameraKeyboardMoveInput() = default;
 
-void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
-                                                  bool noPreventDefault)
+void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 {
   if (_onCanvasBlurObserver) {
     return;
@@ -49,12 +48,10 @@ void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
   _scene  = camera->getScene();
   _engine = _scene->getEngine();
 
-  _onCanvasBlurObserver = _engine->onCanvasBlurObservable.add(
-    [this](Engine*, EventState&) { _keys.clear(); });
+  _onCanvasBlurObserver
+    = _engine->onCanvasBlurObservable.add([this](Engine*, EventState&) { _keys.clear(); });
 
-  _onKeyboardObserver = _scene->onKeyboardObservable.add([this](
-                                                           KeyboardInfo* info,
-                                                           EventState&) {
+  _onKeyboardObserver = _scene->onKeyboardObservable.add([this](KeyboardInfo* info, EventState&) {
     const auto& evt = info->event;
 
     if (!evt.metaKey) {
@@ -64,17 +61,13 @@ void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
         _shiftPressed = evt.shiftKey;
 
         const auto keyCode = evt.keyCode;
-        if ((std::find(keysHeightOffsetIncr.begin(), keysHeightOffsetIncr.end(),
-                       keyCode)
+        if ((std::find(keysHeightOffsetIncr.begin(), keysHeightOffsetIncr.end(), keyCode)
              != keysHeightOffsetIncr.end())
-            || (std::find(keysHeightOffsetDecr.begin(),
-                          keysHeightOffsetDecr.end(), keyCode)
+            || (std::find(keysHeightOffsetDecr.begin(), keysHeightOffsetDecr.end(), keyCode)
                 != keysHeightOffsetDecr.end())
-            || (std::find(keysRotationOffsetIncr.begin(),
-                          keysRotationOffsetIncr.end(), keyCode)
+            || (std::find(keysRotationOffsetIncr.begin(), keysRotationOffsetIncr.end(), keyCode)
                 != keysRotationOffsetIncr.end())
-            || (std::find(keysRotationOffsetDecr.begin(),
-                          keysRotationOffsetDecr.end(), keyCode)
+            || (std::find(keysRotationOffsetDecr.begin(), keysRotationOffsetDecr.end(), keyCode)
                 != keysRotationOffsetDecr.end())
             || (std::find(keysRadiusIncr.begin(), keysRadiusIncr.end(), keyCode)
                 != keysRadiusIncr.end())
@@ -92,25 +85,20 @@ void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
       }
       else {
         const auto keyCode = evt.keyCode;
-        if ((std::find(keysHeightOffsetIncr.begin(), keysHeightOffsetIncr.end(),
-                       keyCode)
+        if ((std::find(keysHeightOffsetIncr.begin(), keysHeightOffsetIncr.end(), keyCode)
              != keysHeightOffsetIncr.end())
-            || (std::find(keysHeightOffsetDecr.begin(),
-                          keysHeightOffsetDecr.end(), keyCode)
+            || (std::find(keysHeightOffsetDecr.begin(), keysHeightOffsetDecr.end(), keyCode)
                 != keysHeightOffsetDecr.end())
-            || (std::find(keysRotationOffsetIncr.begin(),
-                          keysRotationOffsetIncr.end(), keyCode)
+            || (std::find(keysRotationOffsetIncr.begin(), keysRotationOffsetIncr.end(), keyCode)
                 != keysRotationOffsetIncr.end())
-            || (std::find(keysRotationOffsetDecr.begin(),
-                          keysRotationOffsetDecr.end(), keyCode)
+            || (std::find(keysRotationOffsetDecr.begin(), keysRotationOffsetDecr.end(), keyCode)
                 != keysRotationOffsetDecr.end())
             || (std::find(keysRadiusIncr.begin(), keysRadiusIncr.end(), keyCode)
                 != keysRadiusIncr.end())
             || (std::find(keysRadiusDecr.begin(), keysRadiusDecr.end(), keyCode)
                 != keysRadiusDecr.end())) {
 
-          _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
-                      _keys.end());
+          _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode), _keys.end());
 
           if (!_noPreventDefault) {
             evt.preventDefault();
@@ -141,27 +129,23 @@ void FollowCameraKeyboardMoveInput::checkInputs()
 {
   if (_onKeyboardObserver) {
     for (auto keyCode : _keys) {
-      if ((std::find(keysHeightOffsetIncr.begin(), keysHeightOffsetIncr.end(),
-                     keyCode)
+      if ((std::find(keysHeightOffsetIncr.begin(), keysHeightOffsetIncr.end(), keyCode)
            != keysHeightOffsetIncr.end())
           && _modifierHeightOffset()) {
         camera->heightOffset += heightSensibility;
       }
-      else if ((std::find(keysHeightOffsetDecr.begin(),
-                          keysHeightOffsetDecr.end(), keyCode)
+      else if ((std::find(keysHeightOffsetDecr.begin(), keysHeightOffsetDecr.end(), keyCode)
                 != keysHeightOffsetDecr.end())
                && _modifierHeightOffset()) {
         camera->heightOffset -= heightSensibility;
       }
-      else if ((std::find(keysRotationOffsetIncr.begin(),
-                          keysRotationOffsetIncr.end(), keyCode)
+      else if ((std::find(keysRotationOffsetIncr.begin(), keysRotationOffsetIncr.end(), keyCode)
                 != keysRotationOffsetIncr.end())
                && _modifierRotationOffset()) {
         camera->rotationOffset += rotationSensibility;
         camera->rotationOffset = std::fmod(camera->rotationOffset, 360.f);
       }
-      else if ((std::find(keysRotationOffsetDecr.begin(),
-                          keysRotationOffsetDecr.end(), keyCode)
+      else if ((std::find(keysRotationOffsetDecr.begin(), keysRotationOffsetDecr.end(), keyCode)
                 != keysRotationOffsetDecr.end())
                && _modifierRotationOffset()) {
         camera->rotationOffset -= rotationSensibility;
@@ -193,8 +177,7 @@ std::string FollowCameraKeyboardMoveInput::getSimpleName() const
 
 bool FollowCameraKeyboardMoveInput::_modifierHeightOffset() const
 {
-  return (keysHeightOffsetModifierAlt == _altPressed
-          && keysHeightOffsetModifierCtrl == _ctrlPressed
+  return (keysHeightOffsetModifierAlt == _altPressed && keysHeightOffsetModifierCtrl == _ctrlPressed
           && keysHeightOffsetModifierShift == _shiftPressed);
 }
 
@@ -207,8 +190,7 @@ bool FollowCameraKeyboardMoveInput::_modifierRotationOffset() const
 
 bool FollowCameraKeyboardMoveInput::_modifierRadius() const
 {
-  return (keysRadiusModifierAlt == _altPressed
-          && keysRadiusModifierCtrl == _ctrlPressed
+  return (keysRadiusModifierAlt == _altPressed && keysRadiusModifierCtrl == _ctrlPressed
           && keysRadiusModifierShift == _shiftPressed);
 }
 

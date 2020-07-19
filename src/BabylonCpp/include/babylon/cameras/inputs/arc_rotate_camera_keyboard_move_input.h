@@ -12,7 +12,7 @@ class KeyboardInfo;
 
 /**
  * @brief Manage the keyboard inputs to control the movement of an arc rotate camera.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 class BABYLON_SHARED_EXPORT ArcRotateCameraKeyboardMoveInput
     : public ICameraInput<ArcRotateCamera> {
@@ -28,8 +28,7 @@ public:
    * @brief Attach the input controls to a specific dom element to get the input from.
    * @param element Defines the element the controls should be listened from
    * @param noPreventDefault Defines whether event caught by the controls should call
-   * preventdefault()
-   * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
+   * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
   void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
 
