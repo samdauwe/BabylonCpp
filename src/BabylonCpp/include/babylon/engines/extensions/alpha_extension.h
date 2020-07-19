@@ -30,13 +30,13 @@ public:
    * @param mode defines the mode to use (one of the Engine.ALPHA_XXX)
    * @param noDepthWriteChange defines if depth writing state should remains unchanged (false by
    * default)
-   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @see https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    */
   void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
 
   /**
    * @brief Gets the current alpha mode.
-   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @see https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    * @returns the current alpha mode
    */
   unsigned int getAlphaMode() const;

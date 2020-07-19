@@ -37,7 +37,7 @@ public:
 
   /**
    * @brief Create a multi render target texture.
-   * @see http://doc.babylonjs.com/features/webgl2#multiple-render-target
+   * @see https://doc.babylonjs.com/features/webgl2#multiple-render-target
    * @param size defines the size of the texture
    * @param options defines the creation options
    * @returns the cube texture as an InternalTexture
@@ -46,8 +46,8 @@ public:
   createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options);
 
   /**
-   * @brief Update the sample count for a given multiple render target texture
-   * @see http://doc.babylonjs.com/features/webgl2#multisample-render-targets
+   * @brief Update the sample count for a given multiple render target texture.
+   * @see https://doc.babylonjs.com/features/webgl2#multisample-render-targets
    * @param textures defines the textures to update
    * @param samples defines the sample count to set
    * @returns the effective sample count (could be 0 if multisample render targets are not
@@ -56,6 +56,12 @@ public:
   unsigned int
   updateMultipleRenderTargetTextureSampleCount(const std::vector<InternalTexturePtr>& textures,
                                                unsigned int samples);
+
+  /**
+   * @brief Select a subsets of attachments to draw to.
+   * @param attachments gl attachments
+   */
+  void bindAttachments(const std::vector<unsigned int>& attachments);
 
 private:
   ThinEngine* _this;

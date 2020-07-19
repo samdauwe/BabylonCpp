@@ -1165,13 +1165,13 @@ public:
    * @param mode defines the mode to use (one of the Engine.ALPHA_XXX)
    * @param noDepthWriteChange defines if depth writing state should remains unchanged (false by
    * default)
-   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @see https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    */
   virtual void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
 
   /**
    * @brief Gets the current alpha mode.
-   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @see https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    * @returns the current alpha mode
    */
   unsigned int getAlphaMode() const;
@@ -1313,6 +1313,12 @@ public:
   unsigned int
   updateMultipleRenderTargetTextureSampleCount(const std::vector<InternalTexturePtr>& textures,
                                                unsigned int samples);
+
+  /**
+   * @brief Select a subsets of attachments to draw to.
+   * @param attachments gl attachments
+   */
+  void bindAttachments(const std::vector<unsigned int>& attachments);
 
   //------------------------------------------------------------------------------------------------
   //                              Raw Texture Extension
@@ -1541,8 +1547,8 @@ public:
   //------------------------------------------------------------------------------------------------
 
   /**
-   * @brief CCreate an uniform buffer.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @brief Create an uniform buffer.
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param elements defines the content of the uniform buffer
    * @returns the webGL uniform buffer
    */
@@ -1550,7 +1556,7 @@ public:
 
   /**
    * @brief Create a dynamic uniform buffer.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param elements defines the content of the uniform buffer
    * @returns the webGL uniform buffer
    */
@@ -1558,7 +1564,7 @@ public:
 
   /**
    * @brief Update an existing uniform buffer.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param uniformBuffer defines the target uniform buffer
    * @param elements defines the content to update
    * @param offset defines the offset in the uniform buffer where update should start

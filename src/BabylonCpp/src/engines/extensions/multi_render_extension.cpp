@@ -23,21 +23,18 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
   // If MSAA, we need to bitblt back to main texture
   auto& gl = *_this->_gl;
 
+  auto& attachments = textures[0]->_attachments;
+  auto count        = attachments.size();
+
   if (textures[0]->_MSAAFramebuffer) {
     gl.bindFramebuffer(GL::READ_FRAMEBUFFER, textures[0]->_MSAAFramebuffer.get());
     gl.bindFramebuffer(GL::DRAW_FRAMEBUFFER, textures[0]->_framebuffer.get());
 
-    auto& attachments = textures[0]->_attachments;
-    if (attachments.empty()) {
-      attachments               = Uint32Array(textures.size());
-      textures[0]->_attachments = attachments;
-    }
-
-    for (size_t i = 0; i < textures.size(); ++i) {
+    for (size_t i = 0; i < count; ++i) {
       const auto iStr = std::to_string(i);
       auto& texture   = textures[i];
 
-      for (size_t j = 0; j < attachments.size(); ++j) {
+      for (size_t j = 0; j < count; ++j) {
         attachments[j] = GL::NONE;
       }
 
@@ -48,7 +45,7 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
       gl.blitFramebuffer(0, 0, texture->width, texture->height, 0, 0, texture->width,
                          texture->height, GL::COLOR_BUFFER_BIT, GL::NEAREST);
     }
-    for (size_t i = 0; i < attachments.size(); i++) {
+    for (size_t i = 0; i < count; i++) {
       const auto iStr = std::to_string(i);
       attachments[i]  = gl[_this->webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
                                                         "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
@@ -56,7 +53,8 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
     gl.drawBuffers(attachments);
   }
 
-  for (const auto& texture : textures) {
+  for (size_t i = 0; i < count; ++i) {
+    const auto& texture = textures[i];
     if (texture->generateMipMaps && !disableGenerateMipMaps && !texture->isCube) {
       _this->_bindTextureDirectly(GL::TEXTURE_2D, texture);
       gl.generateMipmap(GL::TEXTURE_2D);
@@ -171,6 +169,7 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
     texture->_generateDepthBuffer   = generateDepthBuffer;
     texture->_generateStencilBuffer = generateStencilBuffer;
     texture->_attachments           = attachments;
+    texture->_textureArray          = textures;
 
     _this->_internalTexturesCache.emplace_back(texture);
   }
@@ -238,6 +237,12 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
     return samples;
   }
 
+  auto count = textures[0]->_attachments.size();
+
+  if (count == 0) {
+    return 1;
+  }
+
   auto& gl = *_this->_gl;
 
   samples = std::min(samples, _this->getCaps().maxMSAASamples);
@@ -253,7 +258,8 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
     textures[0]->_MSAAFramebuffer = nullptr;
   }
 
-  for (const auto& texture : textures) {
+  for (size_t i = 0; i < count; i++) {
+    const auto& texture = textures[i];
     if (texture->_MSAARenderBuffer) {
       gl.deleteRenderbuffer(texture->_MSAARenderBuffer.get());
       texture->_MSAARenderBuffer = nullptr;
@@ -275,7 +281,7 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
 
     Uint32Array attachments;
 
-    for (size_t i = 0; i < textures.size(); ++i) {
+    for (size_t i = 0; i < count; ++i) {
       auto iStr       = std::to_string(i);
       auto& texture   = textures[i];
       auto attachment = gl[_this->webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
@@ -311,6 +317,13 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
   _this->_bindUnboundFramebuffer(nullptr);
 
   return samples;
+}
+
+void MultiRenderExtension::bindAttachments(const std::vector<unsigned int>& attachments)
+{
+  auto& gl = *_this->_gl;
+
+  gl.drawBuffers(attachments);
 }
 
 } // end of namespace BABYLON

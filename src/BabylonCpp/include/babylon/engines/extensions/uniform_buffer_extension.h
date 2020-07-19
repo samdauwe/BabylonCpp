@@ -24,8 +24,8 @@ public:
   ~UniformBufferExtension();
 
   /**
-   * @brief CCreate an uniform buffer.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @brief Create an uniform buffer.
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param elements defines the content of the uniform buffer
    * @returns the webGL uniform buffer
    */
@@ -33,7 +33,7 @@ public:
 
   /**
    * @brief Create a dynamic uniform buffer.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param elements defines the content of the uniform buffer
    * @returns the webGL uniform buffer
    */
@@ -41,7 +41,7 @@ public:
 
   /**
    * @brief Update an existing uniform buffer.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    * @param uniformBuffer defines the target uniform buffer
    * @param elements defines the content to update
    * @param offset defines the offset in the uniform buffer where update should start

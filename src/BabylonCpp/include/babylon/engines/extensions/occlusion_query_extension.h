@@ -84,13 +84,13 @@ public:
    * @param algorithmType defines the algorithm to use
    * @param query defines the query to use
    * @returns the current engine
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Engine& beginOcclusionQuery(unsigned int algorithmType, const WebGLQueryPtr& query);
 
   /**
    * @brief Ends an occlusion query.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @see https://doc.babylonjs.com/features/occlusionquery
    * @param algorithmType defines the algorithm to use
    * @returns the current engine
    */

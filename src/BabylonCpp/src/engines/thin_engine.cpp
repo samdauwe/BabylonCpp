@@ -3830,6 +3830,11 @@ unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
   return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples);
 }
 
+void ThinEngine::bindAttachments(const std::vector<unsigned int>& attachments)
+{
+  return _multiRenderExtension->bindAttachments(attachments);
+}
+
 //--------------------------------------------------------------------------------------------------
 //                              Raw Texture Extension
 //--------------------------------------------------------------------------------------------------

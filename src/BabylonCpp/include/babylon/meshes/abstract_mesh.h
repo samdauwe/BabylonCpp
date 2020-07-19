@@ -1009,8 +1009,7 @@ protected:
 
   /**
    * @brief Gets a boolean indicating if facetData is enabled.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
+   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
    */
   bool get_isFacetDataEnabled() const;
 
@@ -1042,16 +1041,16 @@ protected:
   _OcclusionDataStoragePtr& get__occlusionDataStorage();
 
   /**
-   * @brief Gets whether the mesh is occluded or not, it is used also to set the
-   * intial state of the mesh to be occluded or not.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @brief Gets whether the mesh is occluded or not, it is used also to set the intial state of the
+   * mesh to be occluded or not.
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   bool get_isOccluded() const;
 
   /**
-   * @brief Sets whether the mesh is occluded or not, it is used also to set the
-   * intial state of the mesh to be occluded or not.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @brief Sets whether the mesh is occluded or not, it is used also to set the intial state of the
+   * mesh to be occluded or not.
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   void set_isOccluded(bool value);
 
@@ -1524,54 +1523,49 @@ public:
   ReadOnlyProperty<AbstractMesh, _OcclusionDataStoragePtr> _occlusionDataStorage;
 
   /**
-   * This number indicates the number of allowed retries before stop the
-   * occlusion query, this is useful if the occlusion query is taking long time
-   * before to the query result is retireved, the query result indicates if the
-   * object is visible within the scene or not and based on that Babylon.Js
-   * engine decideds to show or hide the object. The default value is -1 which
-   * means don't break the query and wait till the result
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * This number indicates the number of allowed retries before stop the occlusion query, this is
+   * useful if the occlusion query is taking long time before to the query result is retireved, the
+   * query result indicates if the object is visible within the scene or not and based on that
+   * Babylon.Js engine decideds to show or hide the object. The default value is -1 which means
+   * don't break the query and wait till the result
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, int> occlusionRetryCount;
 
   /**
-   * This property is responsible for starting the occlusion query within the
-   * Mesh or not, this property is also used to determine what should happen
-   * when the occlusionRetryCount is reached. It has supports 3 values:
-   * * OCCLUSION_TYPE_NONE (Default Value): this option means no occlusion query
-   * whith the Mesh.
-   * * OCCLUSION_TYPE_OPTIMISTIC: this option is means use occlusion query and
-   * if occlusionRetryCount is reached and the query is broken show the mesh.
-   * * OCCLUSION_TYPE_STRICT: this option is means use occlusion query and if
-   * occlusionRetryCount is reached and the query is broken restore the last
-   * state of the mesh occlusion if the mesh was visible then show the mesh if
-   * was hidden then hide don't show.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * This property is responsible for starting the occlusion query within the Mesh or not, this
+   * property is also used to determine what should happen when the occlusionRetryCount is reached.
+   * It has supports 3 values:
+   * * OCCLUSION_TYPE_NONE (Default Value): this option means no occlusion query whith the Mesh.
+   * * OCCLUSION_TYPE_OPTIMISTIC: this option is means use occlusion query and if
+   * occlusionRetryCount is reached and the query is broken show the mesh.
+   * * OCCLUSION_TYPE_STRICT: this option is means use occlusion query and if occlusionRetryCount is
+   * reached and the query is broken restore the last state of the mesh occlusion if the mesh was
+   * visible then show the mesh if was hidden then hide don't show.
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, unsigned int> occlusionType;
 
   /**
-   * This property determines the type of occlusion query algorithm to run in
-   * WebGl, you can use:
-   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_ACCURATE which is mapped to
-   * GL_ANY_SAMPLES_PASSED.
-   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE (Default Value) which
-   * is mapped to GL_ANY_SAMPLES_PASSED_CONSERVATIVE which is a false positive
-   * algorithm that is faster than GL_ANY_SAMPLES_PASSED but less accurate.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * This property determines the type of occlusion query algorithm to run in WebGl, you can use:
+   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_ACCURATE which is mapped to GL_ANY_SAMPLES_PASSED.
+   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE (Default Value) which is mapped to
+   * GL_ANY_SAMPLES_PASSED_CONSERVATIVE which is a false positive algorithm that is faster than
+   * GL_ANY_SAMPLES_PASSED but less accurate.
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, unsigned int> occlusionQueryAlgorithmType;
 
   /**
-   * Gets or sets whether the mesh is occluded or not, it is used also to set
-   * the intial state of the mesh to be occluded or not
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * Gets or sets whether the mesh is occluded or not, it is used also to set the intial state of
+   * the mesh to be occluded or not
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, bool> isOccluded;
 
   /**
    * Flag to check the progress status of the query
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, bool> isOcclusionQueryInProgress;
 
