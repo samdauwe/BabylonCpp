@@ -11,7 +11,7 @@ using AnaglyphGamepadCameraPtr = std::shared_ptr<AnaglyphGamepadCamera>;
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on GamepadCamera).
- * @see http://doc.babylonjs.com/features/cameras#anaglyph-cameras
+ * @see https://doc.babylonjs.com/features/cameras#anaglyph-cameras
  */
 class BABYLON_SHARED_EXPORT AnaglyphGamepadCamera : public GamepadCamera {
 

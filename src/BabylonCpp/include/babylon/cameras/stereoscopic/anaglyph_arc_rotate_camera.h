@@ -10,9 +10,8 @@ class AnaglyphArcRotateCamera;
 using AnaglyphArcRotateCameraPtr = std::shared_ptr<AnaglyphArcRotateCamera>;
 
 /**
- * @brief Camera used to simulate anaglyphic rendering (based on
- * ArcRotateCamera).
- * @see http://doc.babylonjs.com/features/cameras#anaglyph-cameras
+ * @brief Camera used to simulate anaglyphic rendering (based on ArcRotateCamera).
+ * @see https://doc.babylonjs.com/features/cameras#anaglyph-cameras
  */
 class BABYLON_SHARED_EXPORT AnaglyphArcRotateCamera : public ArcRotateCamera {
 

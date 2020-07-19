@@ -10,9 +10,8 @@ class StereoscopicArcRotateCamera;
 using StereoscopicArcRotateCameraPtr = std::shared_ptr<StereoscopicArcRotateCamera>;
 
 /**
- * @brief Camera used to simulate stereoscopic rendering (based on
- * ArcRotateCamera).
- * @see http://doc.babylonjs.com/features/cameras
+ * @brief Camera used to simulate stereoscopic rendering (based on ArcRotateCamera).
+ * @see https://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT StereoscopicArcRotateCamera : public ArcRotateCamera {
 
@@ -39,15 +38,14 @@ public:
 
 protected:
   /**
-   * @brief Creates a new StereoscopicArcRotateCamera
+   * @brief Creates a new StereoscopicArcRotateCamera.
    * @param name defines camera name
    * @param alpha defines alpha angle (in radians)
    * @param beta defines beta angle (in radians)
    * @param radius defines radius
    * @param target defines camera target
    * @param interaxialDistance defines distance between each color axis
-   * @param isStereoscopicSideBySide defines is stereoscopic is done side by
-   * side or over under
+   * @param isStereoscopicSideBySide defines is stereoscopic is done side by side or over under
    * @param scene defines the hosting scene
    */
   StereoscopicArcRotateCamera(const std::string& name, float alpha, float beta, float radius,

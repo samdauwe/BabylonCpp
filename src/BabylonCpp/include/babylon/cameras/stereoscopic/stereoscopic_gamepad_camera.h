@@ -10,9 +10,8 @@ class StereoscopicGamepadCamera;
 using StereoscopicGamepadCameraPtr = std::shared_ptr<StereoscopicGamepadCamera>;
 
 /**
- * @brief Camera used to simulate stereoscopic rendering (based on
- * GamepadCamera).
- * @see http://doc.babylonjs.com/features/cameras
+ * @brief Camera used to simulate stereoscopic rendering (based on GamepadCamera).
+ * @see https://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT StereoscopicGamepadCamera : public GamepadCamera {
 
@@ -43,8 +42,7 @@ protected:
    * @param name defines camera name
    * @param position defines initial position
    * @param interaxialDistance defines distance between each color axis
-   * @param isStereoscopicSideBySide defines is stereoscopic is done side by
-   * side or over under
+   * @param isStereoscopicSideBySide defines is stereoscopic is done side by side or over under
    * @param scene defines the hosting scene
    */
   StereoscopicGamepadCamera(const std::string& name, const Vector3& position,
