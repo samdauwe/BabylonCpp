@@ -22,6 +22,7 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     : Camera(iName, iPosition, scene, setActiveOnSceneIfNoneActive)
     , cameraDirection{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , cameraRotation{std::make_unique<Vector2>(0.f, 0.f)}
+    , ignoreParentScaling{false}
     , updateUpVectorFromRotation{false}
     , rotation{this, &TargetCamera::get_rotation, &TargetCamera::set_rotation}
     , rotationQuaternion{nullptr}
@@ -38,8 +39,8 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     , _cameraRotationMatrix{Matrix::Zero()}
     , _referencePoint{std::make_unique<Vector3>(0.f, 0.f, 1.f)}
     , _transformedReferencePoint{Vector3::Zero()}
-    , _globalCurrentTarget{Vector3::Zero()}
-    , _globalCurrentUpVector{Vector3::Zero()}
+    , _tmpUpVector{Vector3::Zero()}
+    , _tmpTargetVector{Vector3::Zero()}
     , _rotation{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , _defaultUp{Vector3::Up()}
     , _cachedRotationZ{0.f}
@@ -321,18 +322,15 @@ void TargetCamera::_checkInputs()
 
   // Rotate
   if (needToRotate) {
+    // Rotate, if quaternion is set and rotation was used
+    if (rotationQuaternion) {
+      rotationQuaternion->toEulerAnglesToRef(rotation());
+    }
+
     _rotation->x += cameraRotation->x * directionMultiplier;
     _rotation->y += cameraRotation->y * directionMultiplier;
 
-    // Rotate, if quaternion is set and rotation was used
-    if (rotationQuaternion) {
-      auto len = _rotation->lengthSquared();
-      if (len > 0) {
-        Quaternion::RotationYawPitchRollToRef(_rotation->y, _rotation->x, _rotation->z,
-                                              *rotationQuaternion);
-      }
-    }
-
+    // Apply constraints
     if (!noRotationConstraint) {
       const auto limit = 1.570796f;
 
@@ -341,6 +339,15 @@ void TargetCamera::_checkInputs()
       }
       if (_rotation->x < -limit) {
         _rotation->x = -limit;
+      }
+    }
+
+    // Rotate, if quaternion is set and rotation was used
+    if (rotationQuaternion) {
+      auto len = _rotation->lengthSquared();
+      if (len > 0) {
+        Quaternion::RotationYawPitchRollToRef(_rotation->y, _rotation->x, _rotation->z,
+                                              *rotationQuaternion);
       }
     }
   }
@@ -438,26 +445,46 @@ Matrix TargetCamera::_getViewMatrix()
 void TargetCamera::_computeViewMatrix(const Vector3& iPosition, const Vector3& target,
                                       const Vector3& up)
 {
-  if (parent()) {
-    auto parentWorldMatrix = parent()->getWorldMatrix();
-    Vector3::TransformCoordinatesToRef(iPosition, parentWorldMatrix, _globalPosition);
-    Vector3::TransformCoordinatesToRef(target, parentWorldMatrix, _globalCurrentTarget);
-    Vector3::TransformNormalToRef(up, parentWorldMatrix, _globalCurrentUpVector);
-    _markSyncedWithParent();
-  }
-  else {
-    _globalPosition.copyFrom(iPosition);
-    _globalCurrentTarget.copyFrom(target);
-    _globalCurrentUpVector.copyFrom(up);
+  if (ignoreParentScaling) {
+    if (parent()) {
+      auto parentWorldMatrix = parent()->getWorldMatrix();
+      Vector3::TransformCoordinatesToRef(iPosition, parentWorldMatrix, _globalPosition);
+      Vector3::TransformCoordinatesToRef(target, parentWorldMatrix, _tmpUpVector);
+      Vector3::TransformNormalToRef(up, parentWorldMatrix, _tmpUpVector);
+      _markSyncedWithParent();
+    }
+    else {
+      _globalPosition.copyFrom(iPosition);
+      _tmpTargetVector.copyFrom(target);
+      _tmpUpVector.copyFrom(up);
+    }
+
+    if (getScene()->useRightHandedSystem()) {
+      Matrix::LookAtRHToRef(_globalPosition, _tmpTargetVector, _tmpUpVector, _viewMatrix);
+    }
+    else {
+      Matrix::LookAtLHToRef(_globalPosition, _tmpTargetVector, _tmpUpVector, _viewMatrix);
+    }
+    return;
   }
 
   if (getScene()->useRightHandedSystem()) {
-    Matrix::LookAtRHToRef(_globalPosition, _globalCurrentTarget, _globalCurrentUpVector,
-                          _viewMatrix);
+    Matrix::LookAtRHToRef(position, target, up, _viewMatrix);
   }
   else {
-    Matrix::LookAtLHToRef(_globalPosition, _globalCurrentTarget, _globalCurrentUpVector,
-                          _viewMatrix);
+    Matrix::LookAtLHToRef(position, target, up, _viewMatrix);
+  }
+
+  if (parent()) {
+    const auto parentWorldMatrix = parent()->getWorldMatrix();
+    _viewMatrix.invert();
+    _viewMatrix.multiplyToRef(parentWorldMatrix, _viewMatrix);
+    _viewMatrix.getTranslationToRef(_globalPosition);
+    _viewMatrix.invert();
+    _markSyncedWithParent();
+  }
+  else {
+    _globalPosition.copyFrom(position);
   }
 }
 

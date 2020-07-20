@@ -12,8 +12,8 @@ using TargetCameraPtr = std::shared_ptr<TargetCamera>;
 
 /**
  * @brief A target camera takes a mesh or position as a target and continues to look at it while it
- * moves. This is the base of the follow, arc rotate cameras and Free camera
- * @see http://doc.babylonjs.com/features/cameras
+ * moves. This is the base of the follow, arc rotate cameras and Free camera.
+ * @see https://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT TargetCamera : public Camera {
 
@@ -141,9 +141,9 @@ public:
 
 protected:
   /**
-   * @brief Instantiates a target camera that takes a meshor position as a target and continues to
+   * @brief Instantiates a target camera that takes a mesh or position as a target and continues to
    * look at it while it moves. This is the base of the follow, arc rotate cameras and Free camera
-   * @see http://doc.babylonjs.com/features/cameras
+   * @see https://doc.babylonjs.com/features/cameras
    * @param name Defines the name of the camera in the scene
    * @param position Defines the start position of the camera in the scene
    * @param scene Defines the scene the camera belongs to
@@ -186,6 +186,12 @@ public:
    * Define the current rotation the camera is rotating to
    */
   std::unique_ptr<Vector2> cameraRotation;
+
+  /**
+   * Gets or sets a boolean indicating that the scaling of the parent hierarchy will not be taken in
+   * account by the camera
+   */
+  bool ignoreParentScaling;
 
   /**
    * When set, the up vector of the camera will be updated by the rotation of the camera
@@ -268,14 +274,14 @@ public:
   std::function<void()> _reset;
   std::string _waitingLockedTargetId;
 
-protected:
-  Vector3 _globalCurrentTarget;
-  Vector3 _globalCurrentUpVector;
-
 private:
   static Matrix _RigCamTransformMatrix;
   static Matrix _TargetTransformMatrix;
   static Vector3 _TargetFocalPoint;
+
+  Vector3 _tmpUpVector;
+  Vector3 _tmpTargetVector;
+
   Quaternion _tmpQuaternion;
   std::unique_ptr<Vector3> _rotation;
   Vector3 _defaultUp;
