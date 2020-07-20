@@ -313,6 +313,13 @@ bool HighlightLayer::_shouldRenderMesh(AbstractMesh* mesh) const
   return true;
 }
 
+bool HighlightLayer::_canRenderMesh(const AbstractMeshPtr& /*mesh*/,
+                                    const MaterialPtr& /*material*/) const
+{
+  // all meshes can be rendered in the highlight layer, even transparent ones
+  return true;
+}
+
 void HighlightLayer::_addCustomEffectDefines(std::vector<std::string>& defines)
 {
   defines.emplace_back("#define HIGHLIGHT");

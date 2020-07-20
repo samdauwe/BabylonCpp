@@ -208,6 +208,14 @@ protected:
   bool _shouldRenderMesh(AbstractMesh* mesh) const override;
 
   /**
+   * @brief Returns true if the mesh can be rendered, otherwise false.
+   * @param mesh The mesh to render
+   * @param material The material used on the mesh
+   * @returns true if it can be rendered otherwise false
+   */
+  bool _canRenderMesh(const AbstractMeshPtr& mesh, const MaterialPtr& material) const override;
+
+  /**
    * @brief Adds specific effects defines.
    * @param defines The defines to add specifics to.
    */
