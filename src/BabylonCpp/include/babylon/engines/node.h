@@ -130,7 +130,7 @@ public:
   // Behaviors
   /**
    * @brief Attach a behavior to the node.
-   * @see http://doc.babylonjs.com/features/behaviour
+   * @see https://doc.babylonjs.com/features/behaviour
    * @param behavior defines the behavior to attach
    * @param attachImmediately defines that the behavior must be attached even if the scene is still
    * loading
@@ -140,7 +140,7 @@ public:
 
   /**
    * @brief Remove an attached behavior.
-   * @see http://doc.babylonjs.com/features/behaviour
+   * @see https://doc.babylonjs.com/features/behaviour
    * @param behavior defines the behavior to attach
    * @returns the current Node
    */
@@ -149,7 +149,7 @@ public:
   /**
    * @brief Gets an attached behavior by name.
    * @param name defines the name of the behavior to look for
-   * @see http://doc.babylonjs.com/features/behaviour
+   * @see https://doc.babylonjs.com/features/behaviour
    * @returns null if behavior was not found else the requested behavior
    */
   Behavior<Node>* getBehaviorByName(const std::string& name) override;
@@ -445,7 +445,7 @@ protected:
 
   /**
    * @brief Gets the list of attached behaviors.
-   * @see http://doc.babylonjs.com/features/behaviour
+   * @see https://doc.babylonjs.com/features/behaviour
    */
   std::vector<Behavior<Node>*>& get_behaviors();
 
@@ -531,7 +531,8 @@ public:
   WriteOnlyProperty<Node, std::function<void(Node* node, EventState& es)>> onDispose;
 
   /**
-   * List of attached behaviors
+   * Gets the list of attached behaviors
+   * @see https://doc.babylonjs.com/features/behaviour
    */
   ReadOnlyProperty<Node, std::vector<Behavior<Node>*>> behaviors;
 
