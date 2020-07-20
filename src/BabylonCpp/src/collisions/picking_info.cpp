@@ -16,7 +16,8 @@ PickingInfo::PickingInfo()
     , pickedMesh{nullptr}
     , bu{0.f}
     , bv{0.f}
-    , faceId{0}
+    , faceId{-1}
+    , subMeshFaceId{-1}
     , subMeshId{0}
     , pickedSprite{nullptr}
     , originMesh{nullptr}
@@ -34,11 +35,9 @@ PickingInfo& PickingInfo::operator=(PickingInfo&& other) = default;
 
 PickingInfo::~PickingInfo() = default;
 
-std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
-                                              bool useVerticesNormals)
+std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates, bool useVerticesNormals)
 {
-  if (!pickedMesh
-      || !pickedMesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
+  if (!pickedMesh || !pickedMesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
     return std::nullopt;
   }
 
@@ -61,8 +60,7 @@ std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
     normal1 = normal1.scale(bv);
     normal2 = normal2.scale(1.f - bu - bv);
 
-    result = Vector3(normal0.x + normal1.x + normal2.x,
-                     normal0.y + normal1.y + normal2.y,
+    result = Vector3(normal0.x + normal1.x + normal2.x, normal0.y + normal1.y + normal2.y,
                      normal0.z + normal1.z + normal2.z);
   }
   else {

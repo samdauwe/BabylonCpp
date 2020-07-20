@@ -1486,8 +1486,8 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
     pickingInfo.pickedMesh  = shared_from_base<AbstractMesh>();
     pickingInfo.bu          = intersectInfo->bu.value_or(0.f);
     pickingInfo.bv          = intersectInfo->bv.value_or(0.f);
-    pickingInfo.faceId      = static_cast<unsigned>(intersectInfo->faceId);
-    pickingInfo.subMeshId   = static_cast<unsigned>(intersectInfo->subMeshId);
+    pickingInfo.faceId      = static_cast<int>(intersectInfo->faceId);
+    pickingInfo.subMeshId   = static_cast<int>(intersectInfo->subMeshId);
     return pickingInfo;
   }
 

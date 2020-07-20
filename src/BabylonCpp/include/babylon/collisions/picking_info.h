@@ -86,7 +86,13 @@ public:
    * The index of the face on the mesh that was picked, or the index of the Line
    * if the picked Mesh is a LinesMesh
    */
-  unsigned int faceId;
+  int faceId;
+
+  /**
+   * The index of the face on the subMesh that was picked, or the index of the Line if the picked
+   * Mesh is a LinesMesh
+   */
+  int subMeshFaceId;
 
   /**
    * Id of the the submesh that was picked
