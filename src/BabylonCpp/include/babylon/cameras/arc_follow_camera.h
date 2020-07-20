@@ -13,7 +13,7 @@ using ArcFollowCameraPtr = std::shared_ptr<ArcFollowCamera>;
 /**
  * @brief Arc Rotate version of the follow camera.
  * It still follows a Defined mesh but in an Arc Rotate Camera fashion.
- * @see http://doc.babylonjs.com/features/cameras#follow-camera
+ * @see https://doc.babylonjs.com/features/cameras#follow-camera
  */
 class BABYLON_SHARED_EXPORT ArcFollowCamera : public TargetCamera {
 
@@ -47,12 +47,10 @@ public:
 protected:
   /**
    * @brief Instantiates a new ArcFollowCamera.
-   * @see http://doc.babylonjs.com/features/cameras#follow-camera
+   * @see https://doc.babylonjs.com/features/cameras#follow-camera
    * @param name Define the name of the camera
-   * @param alpha Define the rotation angle of the camera around the logitudinal
-   * axis
-   * @param beta Define the rotation angle of the camera around the elevation
-   * axis
+   * @param alpha Define the rotation angle of the camera around the logitudinal axis
+   * @param beta Define the rotation angle of the camera around the elevation axis
    * @param radius Define the radius of the camera from its target point
    * @param target Define the target of the camera
    * @param scene Define the scene the camera belongs to
@@ -81,7 +79,7 @@ public:
   float radius;
 
   /**
-   * Define the camera target (the messh it should follow)
+   * Define the camera target (the mesh it should follow)
    */
   AbstractMesh* target;
 

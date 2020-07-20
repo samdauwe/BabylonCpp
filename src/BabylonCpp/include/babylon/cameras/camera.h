@@ -34,7 +34,7 @@ struct RigParamaters {
 
 /**
  * @brief This is the base class of all the camera used in the application.
- * @see http://doc.babylonjs.com/features/cameras
+ * @see https://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT Camera : public Node {
 
@@ -51,25 +51,24 @@ public:
   static constexpr unsigned int PERSPECTIVE_CAMERA = 0;
   /**
    * This helps creating camera with an orthographic mode.
-   * Orthographic is commonly used in engineering as a means to produce object
-   * specifications that communicate dimensions unambiguously, each line of 1
-   * unit length (cm, meter..whatever) will appear to have the same length
-   * everywhere on the drawing. This allows the drafter to dimension only a
-   * subset of lines and let the reader know that other lines of that length on
-   * the drawing are also that length in reality. Every parallel line in the
-   * drawing is also parallel in the object.
+   * Orthographic is commonly used in engineering as a means to produce object specifications that
+   * communicate dimensions unambiguously, each line of 1 unit length (cm, meter..whatever) will
+   * appear to have the same length everywhere on the drawing. This allows the drafter to dimension
+   * only a subset of lines and let the reader know that other lines of that length on the drawing
+   * are also that length in reality. Every parallel line in the drawing is also parallel in the
+   * object.
    */
   static constexpr unsigned int ORTHOGRAPHIC_CAMERA = 1;
 
   /**
    * This is the default FOV mode for perspective cameras.
-   * This setting aligns the upper and lower bounds of the viewport to the upper
-   * and lower bounds of the camera frustum.
+   * This setting aligns the upper and lower bounds of the viewport to the upper and lower bounds of
+   * the camera frustum.
    */
   static constexpr unsigned int FOVMODE_VERTICAL_FIXED = 0;
   /**
-   * This setting aligns the left and right bounds of the viewport to the left
-   * and right bounds of the camera frustum.
+   * This setting aligns the left and right bounds of the viewport to the left and right bounds of
+   * the camera frustum.
    */
   static constexpr unsigned int FOVMODE_HORIZONTAL_FIXED = 1;
 
@@ -84,13 +83,11 @@ public:
    */
   static constexpr unsigned int RIG_MODE_STEREOSCOPIC_ANAGLYPH = 10;
   /**
-   * Defines that both eyes of the camera will be rendered side by side with a
-   * parallel target.
+   * Defines that both eyes of the camera will be rendered side by side with a parallel target.
    */
   static constexpr unsigned int RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL = 11;
   /**
-   * Defines that both eyes of the camera will be rendered side by side with a
-   * none parallel target.
+   * Defines that both eyes of the camera will be rendered side by side with a none parallel target.
    */
   static constexpr unsigned int RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED = 12;
   /**
@@ -104,25 +101,22 @@ public:
    */
   static constexpr unsigned int RIG_MODE_STEREOSCOPIC_INTERLACED = 14;
   /**
-   * Defines that both eyes of the camera should be renderered in a VR mode
-   * (carbox).
+   * Defines that both eyes of the camera should be renderered in a VR mode (carbox).
    */
   static constexpr unsigned int RIG_MODE_VR = 20;
   /**
-   * Defines that both eyes of the camera should be renderered in a VR mode
-   * (webVR).
+   * Defines that both eyes of the camera should be renderered in a VR mode (webVR).
    */
   static constexpr unsigned int RIG_MODE_WEBVR = 21;
 
   /**
-   * Custom rig mode allowing rig cameras to be populated manually with any
-   * number of cameras.
+   * Custom rig mode allowing rig cameras to be populated manually with any number of cameras.
    */
   static constexpr unsigned int RIG_MODE_CUSTOM = 22;
 
   /**
-   * Defines if by default attaching controls should prevent the default
-   * javascript event to continue.
+   * Defines if by default attaching controls should prevent the default javascript event to
+   * continue.
    */
   static bool ForceAttachControlToAlwaysPreventDefault;
 
@@ -251,11 +245,10 @@ public:
 
   /**
    * @brief Attach a post process to the camera.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_postprocesses#attach-postprocess
+   * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses#attach-postprocess
    * @param postProcess The post process to attach to the camera
-   * @param insertAt The position of the post process in case several of them
-   * are in use in the scene
+   * @param insertAt The position of the post process in case several of them are in use in the
+   * scene
    * @returns the position the post process has been inserted at
    */
   int attachPostProcess(const PostProcessPtr& postProcess, int insertAt = -1);
@@ -270,8 +263,7 @@ public:
 
   /**
    * @brief Detach a post process to the camera.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_postprocesses#attach-postprocess
+   * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses#attach-postprocess
    * @param postProcess The post process to detach from the camera
    */
   void detachPostProcess(PostProcess* postProcess);
@@ -527,14 +519,13 @@ public:
 protected:
   /**
    * @brief Instantiates a new camera object.
-   * This should not be used directly but through the inherited cameras:
-   * ArcRotate, Free...
-   * @see http://doc.babylonjs.com/features/cameras
+   * This should not be used directly but through the inherited cameras: ArcRotate, Free...
+   * @see https://doc.babylonjs.com/features/cameras
    * @param name Defines the name of the camera in the scene
    * @param position Defines the position of the camera
    * @param scene Defines the scene the camera belongs too
-   * @param setActiveOnSceneIfNoneActive Defines if the camera should be set as
-   * active after creation if no other camera have been defined in the scene
+   * @param setActiveOnSceneIfNoneActive Defines if the camera should be set as active after
+   * creation if no other camera have been defined in the scene
    */
   Camera(const std::string& name, const Vector3& position, Scene* scene,
          bool setActiveOnSceneIfNoneActive = true);

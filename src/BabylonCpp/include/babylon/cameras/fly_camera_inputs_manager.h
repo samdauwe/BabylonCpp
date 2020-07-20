@@ -11,10 +11,9 @@ class FlyCamera;
 /**
  * @brief Default Inputs manager for the FlyCamera.
  * It groups all the default supported inputs for ease of use.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-struct BABYLON_SHARED_EXPORT FlyCameraInputsManager
-    : public CameraInputsManager<FlyCamera> {
+struct BABYLON_SHARED_EXPORT FlyCameraInputsManager : public CameraInputsManager<FlyCamera> {
 
   /**
    * @brief Instantiates a new FlyCameraInputsManager.

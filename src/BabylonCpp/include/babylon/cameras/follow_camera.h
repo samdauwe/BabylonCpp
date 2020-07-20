@@ -11,10 +11,9 @@ class FollowCamera;
 using FollowCameraPtr = std::shared_ptr<FollowCamera>;
 
 /**
- * @brief A follow camera takes a mesh as a target and follows it as it moves.
- * Both a free camera version followCamera and an arc rotate version
- * arcFollowCamera are available.
- * @see http://doc.babylonjs.com/features/cameras#follow-camera
+ * @brief A follow camera takes a mesh as a target and follows it as it moves. Both a free camera
+ * version followCamera and an arc rotate version arcFollowCamera are available.
+ * @see https://doc.babylonjs.com/features/cameras#follow-camera
  */
 class BABYLON_SHARED_EXPORT FollowCamera : public TargetCamera {
 
@@ -67,7 +66,7 @@ public:
 protected:
   /**
    * @brief Instantiates the follow camera.
-   * @see http://doc.babylonjs.com/features/cameras#follow-camera
+   * @see https://doc.babylonjs.com/features/cameras#follow-camera
    * @param name Define the name of the camera in the scene
    * @param position Define the position of the camera
    * @param scene Define the scene the camera belong to

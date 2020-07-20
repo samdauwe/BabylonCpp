@@ -28,7 +28,7 @@ using ColliderPtr        = std::shared_ptr<Collider>;
  * a spy satellite orbiting the earth. Its position relative to the target (earth) can be set by
  * three parameters, alpha (radians) the longitudinal rotation, beta (radians) the latitudinal
  * rotation and radius the distance from the target position.
- * @see http://doc.babylonjs.com/babylon101/cameras#arc-rotate-camera
+ * @see https://doc.babylonjs.com/babylon101/cameras#arc-rotate-camera
  */
 class BABYLON_SHARED_EXPORT ArcRotateCamera : public TargetCamera {
 
@@ -214,39 +214,39 @@ protected:
 
   /**
    * @brief Gets the bouncing behavior of the camera if it has been enabled.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
    */
   std::unique_ptr<BouncingBehavior>& get_bouncingBehavior();
 
   /**
    * @brief Defines if the bouncing behavior of the camera is enabled on the camera.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
    */
   bool get_useBouncingBehavior() const;
   void set_useBouncingBehavior(bool value);
 
   /**
    * @brief Gets the framing behavior of the camera if it has been enabled.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
    */
   std::unique_ptr<FramingBehavior>& get_framingBehavior();
 
   /**
    * @brief Defines if the framing behavior of the camera is enabled on the camera.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
    */
   bool get_useFramingBehavior() const;
   void set_useFramingBehavior(bool value);
 
   /**
    * @brief Gets the auto rotation behavior of the camera if it has been enabled.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
    */
   std::unique_ptr<AutoRotationBehavior>& get_autoRotationBehavior();
 
   /**
    * @brief Defines if the auto rotation behavior of the camera is enabled on the camera.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
    */
   bool get_useAutoRotationBehavior() const;
   void set_useAutoRotationBehavior(bool value);
@@ -431,25 +431,25 @@ public:
 
   /**
    * Gets the framing behavior of the camera if it has been enabled.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
    */
   ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<FramingBehavior>> framingBehavior;
 
   /**
    * Defines if the framing behavior of the camera is enabled on the camera.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
    */
   Property<ArcRotateCamera, bool> useFramingBehavior;
 
   /**
    * Gets the auto rotation behavior of the camera if it has been enabled.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
    */
   ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<AutoRotationBehavior>> autoRotationBehavior;
 
   /**
    * Defines if the auto rotation behavior of the camera is enabled on the camera.
-   * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
+   * @see https://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
    */
   Property<ArcRotateCamera, bool> useAutoRotationBehavior;
 
@@ -466,15 +466,14 @@ public:
   /**
    * Defines whether the camera should check collision with the objects oh the scene.
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#how-can-i-do-this
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#how-can-i-do-this
    */
   bool checkCollisions;
 
   /**
    * Defines the collision radius of the camera.
    * This simulates a sphere around the camera.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#arcrotatecamera
+   * @see https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#arcrotatecamera
    */
   std::unique_ptr<Vector3> collisionRadius;
 

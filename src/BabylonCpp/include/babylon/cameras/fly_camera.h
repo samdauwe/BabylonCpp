@@ -14,8 +14,8 @@ using ColliderPtr  = std::shared_ptr<Collider>;
 using FlyCameraPtr = std::shared_ptr<FlyCamera>;
 
 /**
- * @brief This is a flying camera, designed for 3D movement and rotation in all
- * directions, such as in a 3D Space Shooter or a Flight Simulator.
+ * @brief This is a flying camera, designed for 3D movement and rotation in all directions,
+ * such as in a 3D Space Shooter or a Flight Simulator.
  */
 class BABYLON_SHARED_EXPORT FlyCamera : public TargetCamera {
 
@@ -88,13 +88,13 @@ public:
 protected:
   /**
    * @brief Instantiates a FlyCamera.
-   * This is a flying camera, designed for 3D movement and rotation in all
-   * directions, such as in a 3D Space Shooter or a Flight Simulator.
+   * This is a flying camera, designed for 3D movement and rotation in all directions,
+   * such as in a 3D Space Shooter or a Flight Simulator.
    * @param name Define the name of the camera in the scene.
    * @param position Define the starting position of the camera in the scene.
    * @param scene Define the scene the camera belongs to.
-   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be
-   * marked as active, if no other camera has been defined as active.
+   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be marked as active, if no
+   * other camera has been defined as active.
    */
   FlyCamera(const std::string& name, const Vector3& position, Scene* scene,
             bool setActiveOnSceneIfNoneActive = true);
@@ -192,15 +192,14 @@ public:
   /**
    * Define the collision ellipsoid of the camera.
    * This is helpful for simulating a camera body, like a player's body.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#arcrotatecamera
+   * @see https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#arcrotatecamera
    */
   Vector3 ellipsoid;
 
   /**
    * Define an offset for the position of the ellipsoid around the camera.
-   * This can be helpful if the camera is attached away from the player's body
-   * center, such as at its head.
+   * This can be helpful if the camera is attached away from the player's body center,
+   * such as at its head.
    */
   Vector3 ellipsoidOffset;
 

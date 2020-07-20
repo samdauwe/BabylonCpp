@@ -13,10 +13,9 @@ using FreeCameraMouseInputPtr = std::shared_ptr<FreeCameraMouseInput>;
 /**
  * @brief Default Inputs manager for the FreeCamera.
  * It groups all the default supported inputs for ease of use.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
-struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
-    : public CameraInputsManager<FreeCamera> {
+struct BABYLON_SHARED_EXPORT FreeCameraInputsManager : public CameraInputsManager<FreeCamera> {
 
   /**
    * @brief Instantiates a new FreeCameraInputsManager.
@@ -33,8 +32,7 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
 
   /**
    * @brief Add mouse input support to the input manager.
-   * @param touchEnabled if the FreeCameraMouseInput should support touch
-   * (default: true)
+   * @param touchEnabled if the FreeCameraMouseInput should support touch (default: true)
    * @returns the current input manager
    */
   FreeCameraInputsManager& addMouse(bool touchEnabled = true);

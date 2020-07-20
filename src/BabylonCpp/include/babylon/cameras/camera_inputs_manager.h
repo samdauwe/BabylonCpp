@@ -2,8 +2,9 @@
 #define BABYLON_CAMERAS_CAMERA_INPUTS_MANAGER_H
 
 #include <functional>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
@@ -16,7 +17,7 @@ namespace BABYLON {
 /**
  * @brief This represents the input manager used within a camera.
  * It helps dealing with all the different kind of input attached to a camera.
- * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+ * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 template <class TCamera>
 class BABYLON_SHARED_EXPORT CameraInputsManager {
@@ -32,7 +33,7 @@ public:
 
   /**
    * @brief Add an input method to a camera.
-   * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
+   * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
    * @param input camera input method
    */
   void add(std::shared_ptr<ICameraInput<TCamera>>&& input);
@@ -111,8 +112,7 @@ public:
   /**
    * Defines the list of inputs attahed to the camera.
    */
-  std::unordered_map<std::string, std::shared_ptr<ICameraInput<TCamera>>>
-    attached;
+  std::unordered_map<std::string, std::shared_ptr<ICameraInput<TCamera>>> attached;
 
   /**
    * Defines the dom element the camera is collecting inputs from.
