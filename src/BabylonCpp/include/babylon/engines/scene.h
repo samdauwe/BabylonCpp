@@ -3082,7 +3082,7 @@ public:
 
   /**
    * Gets or sets the simplification queue attached to the scene
-   * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+   * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
    */
   Property<Scene, SimplificationQueuePtr> simplificationQueue;
 

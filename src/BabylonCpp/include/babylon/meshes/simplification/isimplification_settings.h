@@ -8,7 +8,7 @@ namespace BABYLON {
 /**
  * @brief Expected simplification settings.
  * Quality should be between 0 and 1 (1 being 100%, 0 being 0%)
- * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+ * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 struct BABYLON_SHARED_EXPORT ISimplificationSettings {
   /**

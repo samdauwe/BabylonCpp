@@ -8,10 +8,9 @@ namespace BABYLON {
 
 /**
  * @brief Class used to specify simplification options.
- * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+ * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
-class BABYLON_SHARED_EXPORT SimplificationSettings
-    : public ISimplificationSettings {
+class BABYLON_SHARED_EXPORT SimplificationSettings : public ISimplificationSettings {
 
 public:
   /**

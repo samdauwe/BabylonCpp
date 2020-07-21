@@ -65,9 +65,7 @@ enum class PointerType {
 /**
  * @brief Property types
  */
-enum class PropertyType : unsigned int {
-  ROTATION = 100
-}; // end of enum class PropertyType
+enum class PropertyType : unsigned int { ROTATION = 100 }; // end of enum class PropertyType
 
 /**
  * @brief Defines supported task for worker process.
@@ -134,7 +132,7 @@ enum class Orientation {
 /**
  * @brief The implemented types of simplification.
  * At the moment only Quadratic Error Decimation is implemented
- * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+ * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 enum class SimplificationType {
   /** Quadratic error decimation */

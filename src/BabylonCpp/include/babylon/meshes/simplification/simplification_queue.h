@@ -12,7 +12,7 @@ class ISimplifier;
 
 /**
  * @brief Queue used to order the simplification tasks.
- * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+ * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 class BABYLON_SHARED_EXPORT SimplificationQueue {
 
