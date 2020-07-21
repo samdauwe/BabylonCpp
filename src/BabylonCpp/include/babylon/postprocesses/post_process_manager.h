@@ -60,11 +60,13 @@ public:
    * 0,0,textureWidth,textureHeight
    * @param faceIndex defines the face to render to if a cubemap is defined as the target
    * @param lodLevel defines which lod of the texture to render to
+   * @param doNotBindFrambuffer If set to true, assumes that the framebuffer has been bound
+   * previously
    */
   void directRender(const std::vector<PostProcessPtr>& postProcesses,
                     const InternalTexturePtr& targetTexture = nullptr,
                     bool forceFullscreenViewport = false, unsigned int faceIndex = 0,
-                    int lodLevel = 0);
+                    int lodLevel = 0, bool doNotBindFrambuffer = false);
 
   /**
    * @brief Finalize the result of the output of the postprocesses.

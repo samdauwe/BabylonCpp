@@ -135,7 +135,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
-    if (subMesh->getRenderingMesh()->hasInstances()) {
+    if (subMesh->getRenderingMesh()->hasThinInstances()) {
       defines.emplace_back("#define THIN_INSTANCES");
     }
   }

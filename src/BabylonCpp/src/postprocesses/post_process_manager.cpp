@@ -86,7 +86,7 @@ bool PostProcessManager::_prepareFrame(const InternalTexturePtr& sourceTexture,
 void PostProcessManager::directRender(const std::vector<PostProcessPtr>& postProcesses,
                                       const InternalTexturePtr& targetTexture,
                                       bool forceFullscreenViewport, unsigned int faceIndex,
-                                      int lodLevel)
+                                      int lodLevel, bool doNotBindFrambuffer)
 {
   auto engine = _scene->getEngine();
 
@@ -99,7 +99,7 @@ void PostProcessManager::directRender(const std::vector<PostProcessPtr>& postPro
         engine->bindFramebuffer(targetTexture, faceIndex, std::nullopt, std::nullopt,
                                 forceFullscreenViewport, lodLevel);
       }
-      else {
+      else if (!doNotBindFrambuffer) {
         engine->restoreDefaultFramebuffer();
       }
     }

@@ -40,11 +40,14 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     , onBeforeRender{this, &PostProcess::set_onBeforeRender}
     , onAfterRender{this, &PostProcess::set_onAfterRender}
     , inputTexture{this, &PostProcess::get_inputTexture, &PostProcess::set_inputTexture}
+    , texelSize{this, &PostProcess::get_texelSize}
+    , isSupported{this, &PostProcess::get_isSupported}
+    , aspectRatio{this, &PostProcess::get_aspectRatio}
     , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
+    , _scene{nullptr}
     , _samples{1}
     , _camera{nullptr}
-    , _scene{nullptr}
     , _engine{nullptr}
     , _renderRatio{1.f}
     , _reusable{false}
@@ -183,12 +186,17 @@ void PostProcess::set_inputTexture(const InternalTexturePtr& value)
   _forcedOutputTexture = value;
 }
 
+void PostProcess::restoreDefaultInputTexture()
+{
+  _forcedOutputTexture = nullptr;
+}
+
 CameraPtr& PostProcess::getCamera()
 {
   return _camera;
 }
 
-Vector2 PostProcess::texelSize()
+Vector2& PostProcess::get_texelSize()
 {
   if (_shareOutputWithPostProcess) {
     return _shareOutputWithPostProcess->texelSize();
@@ -212,7 +220,7 @@ Engine* PostProcess::getEngine()
   return _engine;
 }
 
-EffectPtr& PostProcess::getEffect()
+const EffectPtr& PostProcess::getEffect() const
 {
   return _effect;
 }
@@ -401,12 +409,12 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
   return target;
 }
 
-bool PostProcess::isSupported() const
+bool PostProcess::get_isSupported() const
 {
   return _effect->isSupported();
 }
 
-float PostProcess::aspectRatio() const
+float PostProcess::get_aspectRatio() const
 {
   if (_shareOutputWithPostProcess) {
     return _shareOutputWithPostProcess->aspectRatio();

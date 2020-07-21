@@ -65,16 +65,16 @@ public:
   [[nodiscard]] std::string getEffectName() const;
 
   /**
+   * @brief Since inputTexture should always be defined, if we previously manually set
+   * `inputTexture`, the only way to unset it is to use this function to restore its internal state
+   */
+  void restoreDefaultInputTexture();
+
+  /**
    * @brief Gets the camera which post process is applied to.
    * @returns The camera the post process is applied to.
    */
   CameraPtr& getCamera();
-
-  /**
-   * @brief Gets the texel size of the postprocess.
-   * @see https://en.wikipedia.org/wiki/Texel_(graphics)
-   */
-  Vector2 texelSize();
 
   /**
    * @brief Gets a string idenfifying the name of the class.
@@ -92,7 +92,7 @@ public:
    * @brief The effect that is created when initializing the post process.
    * @returns The created effect corresponding the the postprocess.
    */
-  EffectPtr& getEffect();
+  const EffectPtr& getEffect() const;
 
   /**
    * @brief To avoid multiple redundant textures for multiple post process, the output the output
@@ -161,16 +161,6 @@ public:
   InternalTexturePtr activate(const CameraPtr& camera,
                               const InternalTexturePtr& sourceTexture = nullptr,
                               bool forceDepthStencil                  = false);
-
-  /**
-   * @brief If the post process is supported.
-   */
-  [[nodiscard]] bool isSupported() const;
-
-  /**
-   * @brief The aspect ratio of the output texture.
-   */
-  [[nodiscard]] float aspectRatio() const;
 
   /**
    * @brief Get a value indicating if the post-process is ready to be used
@@ -276,6 +266,22 @@ protected:
   InternalTexturePtr& get_inputTexture();
   void set_inputTexture(const InternalTexturePtr& value);
 
+  /**
+   * @brief Gets the texel size of the postprocess.
+   * @see https://en.wikipedia.org/wiki/Texel_(graphics)
+   */
+  Vector2& get_texelSize();
+
+  /**
+   * @brief If the post process is supported.
+   */
+  virtual bool get_isSupported() const;
+
+  /**
+   * @brief The aspect ratio of the output texture.
+   */
+  float get_aspectRatio() const;
+
 public:
   /**
    * Gets or sets the unique id of the post process
@@ -363,15 +369,16 @@ public:
   /**
    * Scale mode for the post process (default: Engine.SCALEMODE_FLOOR)
    *
-   * | Value | Type                          | Description                     |
-   * | ----- | ------------------------------| ------------------------------- |
-   * | 1     | SCALEMODE_FLOOR               | [engine.scalemode_floor](*)     |
-   * | 2     | SCALEMODE_NEAREST             | [engine.scalemode_nearest](**)  |
-   * | 3     | SCALEMODE_CEILING             | [engine.scalemode_ceiling](***) |
+   * | Value | Type                                | Description |
+   * | ----- | ----------------------------------- | ----------- |
+   * | 1     | SCALEMODE_FLOOR                     |
+   * [engine.scalemode_floor](https://doc.babylonjs.com/api/classes/babylon.engine#scalemode_floor)
+   * | | 2     | SCALEMODE_NEAREST                   |
+   * [engine.scalemode_nearest](https://doc.babylonjs.com/api/classes/babylon.engine#scalemode_nearest)
+   * | | 3     | SCALEMODE_CEILING                   |
+   * [engine.scalemode_ceiling](https://doc.babylonjs.com/api/classes/babylon.engine#scalemode_ceiling)
+   * |
    *
-   * * http://doc.babylonjs.com/api/classes/babylon.engine#scalemode_floor
-   * ** http://doc.babylonjs.com/api/classes/babylon.engine#scalemode_nearest
-   * *** http://doc.babylonjs.com/api/classes/babylon.engine#scalemode_ceiling
    */
   unsigned int scaleMode;
 
@@ -421,6 +428,22 @@ public:
   Property<PostProcess, InternalTexturePtr> inputTexture;
 
   /**
+   * Gets the texel size of the postprocess.
+   * See https://en.wikipedia.org/wiki/Texel_(graphics)
+   */
+  ReadOnlyProperty<PostProcess, Vector2> texelSize;
+
+  /**
+   * If the post process is supported.
+   */
+  ReadOnlyProperty<PostProcess, bool> isSupported;
+
+  /**
+   * The aspect ratio of the output texture.
+   */
+  ReadOnlyProperty<PostProcess, float> aspectRatio;
+
+  /**
    * Modify the scale of the post process to be the same as the viewport (default: false)
    */
   bool adaptScaleToCurrentViewport;
@@ -465,12 +488,12 @@ public:
   Observable<Effect> onAfterRenderObservable;
 
 protected:
+  Scene* _scene;
   std::unordered_map<std::string, unsigned int> _indexParameters;
 
 private:
   unsigned int _samples;
   CameraPtr _camera;
-  Scene* _scene;
   Engine* _engine;
   float _renderRatio;
   std::variant<float, PostProcessOptions> _options;

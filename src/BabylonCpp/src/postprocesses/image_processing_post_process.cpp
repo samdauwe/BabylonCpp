@@ -4,6 +4,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/color_curves.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/image_processing_configuration.h>
 
@@ -146,6 +147,12 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
   if (!doNotBuild) {
     _updateParameters();
   }
+}
+
+bool ImageProcessingPostProcess::get_isSupported() const
+{
+  const auto effect = getEffect();
+  return !effect || effect->isSupported();
 }
 
 std::shared_ptr<ColorCurves>& ImageProcessingPostProcess::get_colorCurves()
@@ -344,6 +351,9 @@ void ImageProcessingPostProcess::_updateParameters()
   else if (_defines.TONEMAPPING) {
     defines += "#define TONEMAPPING;\r\n";
   }
+  else if (_defines.TONEMAPPING_ACES) {
+    defines += "#define TONEMAPPING_ACES;\r\n";
+  }
   else if (_defines.CONTRAST) {
     defines += "#define CONTRAST;\r\n";
   }
@@ -356,6 +366,9 @@ void ImageProcessingPostProcess::_updateParameters()
   else if (_defines.COLORGRADING) {
     defines += "#define COLORGRADING;\r\n";
   }
+  else if (_defines.COLORGRADING3D) {
+    defines += "#define COLORGRADING3D;\r\n";
+  }
   else if (_defines.FROMLINEARSPACE) {
     defines += "#define FROMLINEARSPACE;\r\n";
   }
@@ -367,9 +380,6 @@ void ImageProcessingPostProcess::_updateParameters()
   }
   else if (_defines.IMAGEPROCESSINGPOSTPROCESS) {
     defines += "#define IMAGEPROCESSINGPOSTPROCESS;\r\n";
-  }
-  else if (_defines.EXPOSURE) {
-    defines += "#define EXPOSURE;\r\n";
   }
 
   std::vector<std::string> samplers{"textureSampler"};

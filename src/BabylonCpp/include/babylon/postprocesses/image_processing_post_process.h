@@ -40,6 +40,15 @@ public:
    */
   [[nodiscard]] std::string getClassName() const override;
 
+  /**
+   * @brief Hidden
+   */
+  void _updateParameters();
+
+  /**
+   * @brief Disposes the post process.
+   * @param camera The camera to dispose the post process on.
+   */
   void dispose(Camera* camera = nullptr) override;
 
 protected:
@@ -61,6 +70,11 @@ protected:
    * If sets to null, the scene one is in use.
    */
   void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
+
+  /**
+   * @brief If the post process is supported.
+   */
+  bool get_isSupported() const override;
 
   /**
    * @brief Gets Color curves setup used in the effect if colorCurvesEnabled is
@@ -241,8 +255,6 @@ protected:
    */
   void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration,
                                            bool doNotBuild = false);
-
-  void _updateParameters();
 
 public:
   /**
