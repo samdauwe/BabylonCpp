@@ -2027,6 +2027,11 @@ public:
   std::vector<InstancedMesh*> instances;
 
   /**
+   * true to use the edge renderer for all instances of this mesh
+   */
+  bool edgesShareWithInstances;
+
+  /**
    * Gets the file containing delay loading data for this mesh
    */
   std::string delayLoadingFile;

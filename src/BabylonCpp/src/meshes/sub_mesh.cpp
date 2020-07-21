@@ -24,7 +24,7 @@ namespace BABYLON {
 
 SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_t iVerticesCount,
                  unsigned int iIndexStart, size_t iIndexCount, const AbstractMeshPtr& mesh,
-                 const MeshPtr& renderingMesh, bool iCreateBoundingBox)
+                 const MeshPtr& renderingMesh, bool iCreateBoundingBox, bool addToMesh)
     : _materialDefines{nullptr}
     , _materialEffect{nullptr}
     , _effectOverride{nullptr}
@@ -41,11 +41,12 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
     , _renderId{0}
     , _alphaIndex{0}
     , _distanceToCamera{0.f}
-    , _mesh{mesh}
     , _boundingInfo{nullptr}
     , _linesIndexBuffer{nullptr}
     , _currentMaterial{nullptr}
+    , _addToMesh{addToMesh}
 {
+  _mesh          = mesh;
   _renderingMesh = renderingMesh ? renderingMesh : std::static_pointer_cast<Mesh>(mesh);
 
   _id = mesh->subMeshes.size() /*- 1*/; // Submesh is not yet to the list
@@ -87,7 +88,9 @@ void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defi
 
 void SubMesh::addToMesh(const std::shared_ptr<SubMesh>& newSubMesh)
 {
-  _mesh->subMeshes.emplace_back(newSubMesh);
+  if (_addToMesh) {
+    _mesh->subMeshes.emplace_back(newSubMesh);
+  }
 }
 
 SubMeshPtr SubMesh::AddToMesh(unsigned int materialIndex, unsigned int verticesStart,
@@ -149,7 +152,7 @@ MaterialPtr SubMesh::getMaterial()
   if (!rootMaterial) {
     return _mesh->getScene()->defaultMaterial();
   }
-  else if (rootMaterial && (rootMaterial->type() == Type::MULTIMATERIAL)) {
+  else if (rootMaterial && _IsMultiMaterial(*rootMaterial)) {
     auto multiMaterial     = std::static_pointer_cast<MultiMaterial>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
 
@@ -162,6 +165,11 @@ MaterialPtr SubMesh::getMaterial()
   }
 
   return rootMaterial;
+}
+
+bool SubMesh::_IsMultiMaterial(const Material& material) const
+{
+  return material.type() == Type::MULTIMATERIAL;
 }
 
 // Methods

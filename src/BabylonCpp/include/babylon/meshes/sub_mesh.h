@@ -194,9 +194,23 @@ public:
                                       const MeshPtr& renderingMesh = nullptr);
 
 protected:
+  /**
+   * @brief Creates a new submesh.
+   * @param materialIndex defines the material index to use
+   * @param verticesStart defines vertex index start
+   * @param verticesCount defines vertices count
+   * @param indexStart defines index start
+   * @param indexCount defines indices count
+   * @param mesh defines the parent mesh
+   * @param renderingMesh defines an optional rendering mesh
+   * @param createBoundingBox defines if bounding box should be created for this submesh
+   * @param addToMesh defines a boolean indicating that the submesh must be added to the
+   * mesh.subMeshes array (true by default)
+   */
   SubMesh(unsigned int materialIndex, unsigned int verticesStart, size_t verticesCount,
           unsigned int indexStart, size_t indexCount, const AbstractMeshPtr& mesh,
-          const MeshPtr& renderingMesh = nullptr, bool createBoundingBox = true);
+          const MeshPtr& renderingMesh = nullptr, bool createBoundingBox = true,
+          bool addToMesh = true);
 
   /**
    * @brief Gets material defines used by the effect associated to the sub mesh.
@@ -214,6 +228,8 @@ protected:
   EffectPtr& get_effect();
 
 private:
+  /** @hidden */
+  bool _IsMultiMaterial(const Material& material) const;
   /** @hidden */
   std::optional<IntersectionInfo> _intersectLines(Ray& ray, const std::vector<Vector3>& positions,
                                                   const IndicesArray& indices,
@@ -287,6 +303,7 @@ private:
   BoundingInfoPtr _boundingInfo;
   WebGLDataBufferPtr _linesIndexBuffer;
   MaterialPtr _currentMaterial;
+  bool _addToMesh;
 
 }; // end of class SubMesh
 

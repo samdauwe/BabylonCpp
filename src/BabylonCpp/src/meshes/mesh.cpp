@@ -77,6 +77,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , onBeforeDrawObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeDraw{this, &Mesh::set_onBeforeDraw}
     , delayLoadState{Constants::DELAYLOADSTATE_NONE}
+    , edgesShareWithInstances{false}
     , onLODLevelSelection{nullptr}
     , morphTargetManager{this, &Mesh::get_morphTargetManager, &Mesh::set_morphTargetManager}
     , _creationDataStorage{std::make_shared<_CreationDataStorage>()}

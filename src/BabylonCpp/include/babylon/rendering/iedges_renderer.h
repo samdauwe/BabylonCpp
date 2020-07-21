@@ -1,7 +1,10 @@
 #ifndef BABYLON_RENDERING_IEDGES_RENDERER_H
 #define BABYLON_RENDERING_IEDGES_RENDERER_H
 
+#include <vector>
+
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/maths/matrix.h>
 
 namespace BABYLON {
 
@@ -25,6 +28,11 @@ struct BABYLON_SHARED_EXPORT IEdgesRenderer : public IDisposable {
    * @return true if ready, otherwise false.
    */
   virtual bool isReady() = 0;
+
+  /**
+   * List of instances to render in case the source mesh has instances
+   */
+  std::vector<Matrix> customInstances;
 
 }; // end of struct IEdgesRenderer
 

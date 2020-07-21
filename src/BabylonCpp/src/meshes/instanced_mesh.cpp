@@ -1,5 +1,6 @@
 #include <babylon/meshes/instanced_mesh.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/scene.h>
@@ -242,7 +243,17 @@ bool InstancedMesh::_activate(int renderId, bool intermediateRendering)
 
 void InstancedMesh::_postActivate()
 {
-  if (_edgesRenderer && _edgesRenderer->isEnabled && _sourceMesh->_renderingGroup) {
+  if (_sourceMesh->edgesShareWithInstances && _sourceMesh->_edgesRenderer
+      && _sourceMesh->_edgesRenderer->isEnabled && _sourceMesh->_renderingGroup) {
+    // we are using the edge renderer of the source mesh
+    if (!stl_util::contains(_sourceMesh->_renderingGroup->_edgesRenderers,
+                            _sourceMesh->_edgesRenderer)) {
+      _sourceMesh->_renderingGroup->_edgesRenderers.emplace_back(_sourceMesh->_edgesRenderer);
+    }
+    _sourceMesh->_edgesRenderer->customInstances.emplace_back(getWorldMatrix());
+  }
+  else if (_edgesRenderer && _edgesRenderer->isEnabled && _sourceMesh->_renderingGroup) {
+    // we are using the edge renderer defined for this instance
     _sourceMesh->_renderingGroup->_edgesRenderers.emplace_back(_edgesRenderer);
   }
 }
