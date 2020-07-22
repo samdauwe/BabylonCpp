@@ -18,6 +18,12 @@ public:
   static void setDiffuseTextureEnabled(bool value);
 
   /**
+   * Are detail textures enabled in the application.
+   */
+  static bool DetailTextureEnabled();
+  static void setDetailTextureEnabled(bool value);
+
+  /**
    * Are ambient textures enabled in the application.
    */
   static bool AmbientTextureEnabled();
@@ -114,9 +120,9 @@ public:
   static void setThicknessTextureEnabled(bool value);
 
 private:
-  // Flags used to enable or disable a type of texture for all Standard
-  // Materials
+  // Flags used to enable or disable a type of texture for all Standard Materials
   static bool _DiffuseTextureEnabled;
+  static bool _DetailTextureEnabled;
   static bool _AmbientTextureEnabled;
   static bool _OpacityTextureEnabled;
   static bool _ReflectionTextureEnabled;

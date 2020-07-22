@@ -6,6 +6,7 @@
 namespace BABYLON {
 
 bool MaterialFlags::_DiffuseTextureEnabled       = true;
+bool MaterialFlags::_DetailTextureEnabled        = true;
 bool MaterialFlags::_AmbientTextureEnabled       = true;
 bool MaterialFlags::_OpacityTextureEnabled       = true;
 bool MaterialFlags::_ReflectionTextureEnabled    = true;
@@ -35,6 +36,21 @@ void MaterialFlags::setDiffuseTextureEnabled(bool value)
   }
 
   _DiffuseTextureEnabled = value;
+  Engine::MarkAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
+}
+
+bool MaterialFlags::DetailTextureEnabled()
+{
+  return _DetailTextureEnabled;
+}
+
+void MaterialFlags::setDetailTextureEnabled(bool value)
+{
+  if (_DetailTextureEnabled == value) {
+    return;
+  }
+
+  _DetailTextureEnabled = value;
   Engine::MarkAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
