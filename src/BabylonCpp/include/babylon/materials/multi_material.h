@@ -10,10 +10,9 @@ class MultiMaterial;
 using MultiMaterialPtr = std::shared_ptr<MultiMaterial>;
 
 /**
- * @brief A multi-material is used to apply different materials to different
- * parts of the same object without the need of separate meshes. This can be use
- * to improve performances.
- * @see http://doc.babylonjs.com/how_to/multi_materials
+ * @brief A multi-material is used to apply different materials to different parts of the same
+ * object without the need of separate meshes. This can be use to improve performances.
+ * @see https://doc.babylonjs.com/how_to/multi_materials
  */
 class BABYLON_SHARED_EXPORT MultiMaterial : public Material {
 
@@ -53,8 +52,8 @@ public:
   [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
-   * @brief Gets the current class name of the material e.g. "MultiMaterial"
-   * Mainly use in serialization.
+   * @brief Gets the current class name of the material e.g. "MultiMaterial" Mainly use in
+   * serialization.
    * @returns the class name
    */
   [[nodiscard]] std::string getClassName() const override;
@@ -63,8 +62,7 @@ public:
    * @brief Checks if the material is ready to render the requested sub mesh.
    * @param mesh Define the mesh the submesh belongs to
    * @param subMesh Define the sub mesh to look readyness for
-   * @param useInstances Define whether or not the material is used with
-   * instances
+   * @param useInstances Define whether or not the material is used with instances
    * @returns true if ready, otherwise false
    */
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
@@ -72,8 +70,7 @@ public:
   /**
    * @brief Clones the current material and its related sub materials.
    * @param name Define the name of the newly cloned material
-   * @param cloneChildren Define if submaterial will be cloned or shared with
-   * the parent instance
+   * @param cloneChildren Define if submaterial will be cloned or shared with the parent instance
    * @returns the cloned material
    */
   [[nodiscard]] MaterialPtr clone(const std::string& iName,
@@ -87,15 +84,12 @@ public:
 
   /**
    * @brief Dispose the material and release its associated resources.
-   * @param forceDisposeEffect Define if we want to force disposing the
-   * associated effect (if false the shader is not released and could be reuse
-   * later on)
-   * @param forceDisposeTextures Define if we want to force disposing the
-   * associated textures (if false, they will not be disposed and can still be
-   * use elsewhere in the app)
-   * @param forceDisposeChildren Define if we want to force disposing the
-   * associated submaterials (if false, they will not be disposed and can still
-   * be use elsewhere in the app)
+   * @param forceDisposeEffect Define if we want to force disposing the associated effect (if false
+   * the shader is not released and could be reuse later on)
+   * @param forceDisposeTextures Define if we want to force disposing the associated textures (if
+   * false, they will not be disposed and can still be use elsewhere in the app)
+   * @param forceDisposeChildren Define if we want to force disposing the associated submaterials
+   * (if false, they will not be disposed and can still be use elsewhere in the app)
    */
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool forceDisposeChildren = false) override;
@@ -111,10 +105,9 @@ public:
 protected:
   /**
    * @brief Instantiates a new Multi Material.
-   * A multi-material is used to apply different materials to different parts of
-   * the same object without the need of separate meshes. This can be use to
-   * improve performances.
-   * @see http://doc.babylonjs.com/how_to/multi_materials
+   * A multi-material is used to apply different materials to different parts of the same object
+   * without the need of separate meshes. This can be use to improve performances.
+   * @see https://doc.babylonjs.com/how_to/multi_materials
    * @param name Define the name in the scene
    * @param scene Define the scene the material belongs to
    */
@@ -122,15 +115,13 @@ protected:
 
   /**
    * @brief Gets the list of Materials used within the multi material.
-   * They need to be ordered according to the submeshes order in the associated
-   * mesh
+   * They need to be ordered according to the submeshes order in the associated mesh
    */
   std::vector<MaterialPtr>& get_subMaterials();
 
   /**
    * @brief Sets the list of Materials used within the multi material.
-   * They need to be ordered according to the submeshes order in the associated
-   * mesh
+   * They need to be ordered according to the submeshes order in the associated mesh
    */
   void set_subMaterials(const std::vector<MaterialPtr>& value);
 
@@ -140,8 +131,7 @@ private:
 public:
   /**
    * Gets or Sets the list of Materials used within the multi material.
-   * They need to be ordered according to the submeshes order in the associated
-   * mesh
+   * They need to be ordered according to the submeshes order in the associated mesh
    */
   Property<MultiMaterial, std::vector<MaterialPtr>> subMaterials;
 

@@ -1338,7 +1338,7 @@ public:
 
   /**
    * @brief Creates or updates the octree used to boost selection (picking).
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
    * @param maxCapacity defines the maximum capacity per leaf
    * @param maxDepth defines the maximum depth of the octree
    * @returns an octree of AbstractMesh
@@ -2145,7 +2145,7 @@ protected:
 
   /**
    * @brief Gets the octree used to boost mesh selection (picking).
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
    */
   Octree<AbstractMesh*>*& get_selectionOctree();
 
@@ -2987,8 +2987,8 @@ public:
 
   /**
    * Gets the postprocess render pipeline manager
-   * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
-   * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
+   * @see https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
+   * @see https://doc.babylonjs.com/how_to/using_default_rendering_pipeline
    */
   ReadOnlyProperty<Scene, std::unique_ptr<PostProcessRenderPipelineManager>>
     postProcessRenderPipelineManager;
@@ -3183,7 +3183,7 @@ public:
 
   /**
    * Gets the octree used to boost mesh selection (picking)
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
    */
   ReadOnlyProperty<Scene, Octree<AbstractMesh*>*> selectionOctree;
 

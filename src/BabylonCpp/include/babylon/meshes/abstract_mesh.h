@@ -647,16 +647,14 @@ public:
   /** Submeshes octree **/
 
   /**
-   * @brief This function will create an octree to help to select the right
-   * submeshes for rendering, picking and collision computations. Please note
-   * that you must have a decent number of submeshes to get performance
-   * improvements when using an octree.
+   * @brief This function will create an octree to help to select the right submeshes for rendering,
+   * picking and collision computations. Please note that you must have a decent number of submeshes
+   * to get performance improvements when using an octree.
    * @param maxCapacity defines the maximum size of each block (64 by default)
-   * @param maxDepth defines the maximum depth to use (no more than 2 levels by
-   * default)
+   * @param maxDepth defines the maximum depth to use (no more than 2 levels by default)
    * @returns the new octree
    * @see https://www.babylonjs-playground.com/#NA4OQ#12
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
    */
   Octree<SubMesh*>* createOrUpdateSubmeshesOctree(size_t maxCapacity = 64, size_t maxDepth = 2);
 

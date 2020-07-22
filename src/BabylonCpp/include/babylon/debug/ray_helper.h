@@ -18,9 +18,9 @@ using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
 
 /**
- * @brief As raycast might be hard to debug, the RayHelper can help rendering the different rays in
- * order to better appreciate the issue one might have.
- * @see http://doc.babylonjs.com/babylon101/raycasts#debugging
+ * @brief As raycast might be hard to debug, the RayHelper can help rendering the different rays
+ * in order to better appreciate the issue one might have.
+ * @see https://doc.babylonjs.com/babylon101/raycasts#debugging
  */
 class BABYLON_SHARED_EXPORT RayHelper {
 
@@ -38,9 +38,9 @@ public:
 public:
   /**
    * @brief Instantiate a new ray helper.
-   * As raycast might be hard to debug, the RayHelper can help rendering the different rays in order
-   * to better appreciate the issue one might have.
-   * @see http://doc.babylonjs.com/babylon101/raycasts#debugging
+   * As raycast might be hard to debug, the RayHelper can help rendering the different rays
+   * in order to better appreciate the issue one might have.
+   * @see https://doc.babylonjs.com/babylon101/raycasts#debugging
    * @param ray Defines the ray we are currently tryin to visualize
    */
   RayHelper(const Ray& ray);

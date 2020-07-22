@@ -21,7 +21,7 @@ using MorphTargetPtr  = std::shared_ptr<MorphTarget>;
 
 /**
  * @brief Defines a target to use with MorphTargetManager.
- * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
+ * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
 class BABYLON_SHARED_EXPORT MorphTarget : public IAnimatable {
 

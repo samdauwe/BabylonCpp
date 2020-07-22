@@ -12,7 +12,7 @@ using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
 
 /**
  * @brief This class is used to deform meshes using morphing between different targets.
- * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
+ * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
 class BABYLON_SHARED_EXPORT MorphTargetManager {
 

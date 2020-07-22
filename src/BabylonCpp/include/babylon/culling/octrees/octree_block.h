@@ -14,7 +14,7 @@ class Ray;
 
 /**
  * @brief Class used to store a cell in an octree.
- * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+ * @see https://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
  */
 template <class T>
 class BABYLON_SHARED_EXPORT OctreeBlock : public IOctreeContainer<T> {
