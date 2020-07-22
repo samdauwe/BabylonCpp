@@ -14,7 +14,7 @@ using ElasticEasePtr = std::shared_ptr<ElasticEase>;
 /**
  * @brief Easing function with an elastic shape (see link below).
  * @see https://easings.net/#easeInElastic
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT ElasticEase : public EasingFunction {
 

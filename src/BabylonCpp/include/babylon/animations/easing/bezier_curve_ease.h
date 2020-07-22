@@ -14,7 +14,7 @@ using BezierCurveEasePtr = std::shared_ptr<BezierCurveEase>;
 /**
  * @brief Easing function with a bezier shape (see link below).
  * @see http://cubic-bezier.com/#.17,.67,.83,.67
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT BezierCurveEase : public EasingFunction {
 

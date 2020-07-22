@@ -14,7 +14,7 @@ using CubicEasePtr = std::shared_ptr<CubicEase>;
 /**
  * @brief Easing function with a power of 3 shape (see link below).
  * @see https://easings.net/#easeInCubic
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT CubicEase : public EasingFunction {
 

@@ -4,6 +4,11 @@
 
 namespace BABYLON {
 
+std::string TargetedAnimation::getClassName() const
+{
+  return "TargetedAnimation";
+}
+
 json TargetedAnimation::serialize() const
 {
   return nullptr;

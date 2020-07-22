@@ -14,7 +14,7 @@ using BounceEasePtr = std::shared_ptr<BounceEase>;
 /**
  * @brief Easing function with a bouncing shape (see link below).
  * @see https://easings.net/#easeInBounce
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT BounceEase : public EasingFunction {
 

@@ -114,7 +114,7 @@ public:
    * @brief Set animation weight for all animatables.
    * @param weight defines the weight to use
    * @return the animationGroup
-   * @see http://doc.babylonjs.com/babylon101/animations#animation-weights
+   * @see https://doc.babylonjs.com/babylon101/animations#animation-weights
    */
   AnimationGroup& setWeightForAllAnimatables(float weight);
 
@@ -122,7 +122,7 @@ public:
    * @brief Synchronize and normalize all animatables with a source animatable.
    * @param root defines the root animatable to synchronize with
    * @return the animationGroup
-   * @see http://doc.babylonjs.com/babylon101/animations#animation-weights
+   * @see https://doc.babylonjs.com/babylon101/animations#animation-weights
    */
   AnimationGroup& syncAllAnimationsWith(Animatable* root);
 
@@ -204,7 +204,7 @@ protected:
   /**
    * @brief Instantiates a new Animation Group.
    * This helps managing several animations at once.
-   * @see http://doc.babylonjs.com/how_to/group
+   * @see https://doc.babylonjs.com/how_to/group
    * @param name Defines the name of the group
    * @param scene Defines the scene the group belongs to
    */
@@ -269,6 +269,11 @@ protected:
    * @brief Returning the list of animatables controlled by this animation group.
    */
   std::vector<AnimatablePtr>& get_animatables();
+
+  /**
+   * @brief Gets the list of target animations.
+   */
+  std::vector<std::unique_ptr<TargetedAnimation>>& get_children();
 
 private:
   void _processLoop(const AnimatablePtr& animatable, TargetedAnimation* targetedAnimation,
@@ -361,6 +366,11 @@ public:
    * Animatables controlled by this animation group.
    */
   ReadOnlyProperty<AnimationGroup, std::vector<AnimatablePtr>> animatables;
+
+  /**
+   * Gets the list of target animations
+   */
+  ReadOnlyProperty<AnimationGroup, std::vector<std::unique_ptr<TargetedAnimation>>> children;
 
 private:
   Scene* _scene;

@@ -17,10 +17,10 @@ using AnimationPtr   = std::shared_ptr<Animation>;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 /**
- * @brief This class defines the direct association between an animation and a
- * target.
+ * @brief This class defines the direct association between an animation and a target.
  */
 struct BABYLON_SHARED_EXPORT TargetedAnimation {
+
   /**
    * Animation to perform
    */
@@ -31,10 +31,17 @@ struct BABYLON_SHARED_EXPORT TargetedAnimation {
   IAnimatablePtr target = nullptr;
 
   /**
+   * @brief Returns the string "TargetedAnimation"
+   * @returns "TargetedAnimation"
+   */
+  std::string getClassName() const;
+
+  /**
    * @brief Serialize the object.
    * @returns the JSON object representing the current entity
    */
   [[nodiscard]] json serialize() const;
+
 }; // end of struct TargetedAnimation
 
 } // end of namespace BABYLON

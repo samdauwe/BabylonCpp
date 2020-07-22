@@ -132,6 +132,16 @@ public:
   static bool AllowMatrixDecomposeForInterpolation();
 
   /**
+   * Define the Url to load snippets
+   */
+  static constexpr const char* SnippetUrl = "https://snippet.babylonjs.com";
+
+  /**
+   * Snippet ID if the animation was created from the snippet server
+   */
+  std::string snippetId;
+
+  /**
    * @brief Hidden Internal use.
    */
   static AnimationPtr _PrepareAnimation(const std::string& name, const std::string& targetProperty,

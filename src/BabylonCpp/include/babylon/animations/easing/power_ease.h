@@ -14,7 +14,7 @@ using PowerEasePtr = std::shared_ptr<PowerEase>;
 /**
  * @brief Easing function with a power shape (see link below).
  * @see https://easings.net/#easeInQuad
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT PowerEase : public EasingFunction {
 

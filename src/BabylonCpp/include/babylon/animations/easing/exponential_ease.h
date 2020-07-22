@@ -14,7 +14,7 @@ using ExponentialEasePtr = std::shared_ptr<ExponentialEase>;
 /**
  * @brief Easing function with an exponential shape (see link below).
  * @see https://easings.net/#easeInExpo
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT ExponentialEase : public EasingFunction {
 

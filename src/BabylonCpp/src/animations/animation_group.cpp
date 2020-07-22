@@ -21,6 +21,7 @@ AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     , isAdditive{this, &AnimationGroup::get_isAdditive, &AnimationGroup::set_isAdditive}
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , animatables{this, &AnimationGroup::get_animatables}
+    , children{this, &AnimationGroup::get_children}
     , _from{std::numeric_limits<float>::max()}
     , _to{std::numeric_limits<float>::lowest()}
     , _isStarted{false}
@@ -123,6 +124,11 @@ std::vector<std::unique_ptr<TargetedAnimation>>& AnimationGroup::get_targetedAni
 std::vector<AnimatablePtr>& AnimationGroup::get_animatables()
 {
   return _animatables;
+}
+
+std::vector<std::unique_ptr<TargetedAnimation>>& AnimationGroup::get_children()
+{
+  return _targetedAnimations;
 }
 
 TargetedAnimation AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,

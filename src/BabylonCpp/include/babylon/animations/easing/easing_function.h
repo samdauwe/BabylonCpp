@@ -8,7 +8,7 @@ namespace BABYLON {
 
 /**
  * @brief Base class used for every default easing function.
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT EasingFunction : public IEasingFunction {
 

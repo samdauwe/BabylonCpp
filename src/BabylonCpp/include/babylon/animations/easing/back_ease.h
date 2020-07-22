@@ -14,7 +14,7 @@ using BackEasePtr = std::shared_ptr<BackEase>;
 /**
  * @brief Easing function with a ease back shape (see link below).
  * @see https://easings.net/#easeInBack
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT BackEase : public EasingFunction {
 

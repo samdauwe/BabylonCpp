@@ -14,7 +14,7 @@ using SineEasePtr = std::shared_ptr<SineEase>;
 /**
  * @brief Easing function with a sin shape (see link below).
  * @see https://easings.net/#easeInSine
- * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
  */
 class BABYLON_SHARED_EXPORT SineEase : public EasingFunction {
 

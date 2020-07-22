@@ -214,6 +214,9 @@ std::string Animation::toString(bool fullDetails) const
 void Animation::addEvent(const AnimationEvent& event)
 {
   _events.emplace_back(event);
+  std::sort(
+    _events.begin(), _events.end(),
+    [](const AnimationEvent& a, const AnimationEvent& b) -> int { return a.frame - b.frame; });
 }
 
 void Animation::removeEvents(float frame)

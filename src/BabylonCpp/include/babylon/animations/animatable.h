@@ -85,14 +85,14 @@ public:
 
   /**
    * @brief Allows the animatable to blend with current running animations.
-   * @see http://doc.babylonjs.com/babylon101/animations#animation-blending
+   * @see https://doc.babylonjs.com/babylon101/animations#animation-blending
    * @param blendingSpeed defines the blending speed to use
    */
   void enableBlending(float blendingSpeed);
 
   /**
    * @brief Disable animation blending.
-   * @see http://doc.babylonjs.com/babylon101/animations#animation-blending
+   * @see https://doc.babylonjs.com/babylon101/animations#animation-blending
    */
   void disableBlending();
 
