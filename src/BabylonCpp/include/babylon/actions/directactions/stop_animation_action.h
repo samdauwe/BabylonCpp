@@ -7,15 +7,14 @@
 namespace BABYLON {
 
 /**
- * @brief This defines an action responsible to stop an animation once
- * triggered.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+ * @brief This defines an action responsible to stop an animation once triggered.
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT StopAnimationAction : public Action {
 
 public:
   /**
-   * Instantiate the action
+   * @brief Instantiate the action.
    * @param triggerOptions defines the trigger options
    * @param target defines the target animation or animation name
    * @param condition defines the trigger related conditions

@@ -18,7 +18,7 @@ using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 /**
  * @brief The action to be carried out following a trigger.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions#available-actions
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions#available-actions
  */
 class BABYLON_SHARED_EXPORT Action : public std::enable_shared_from_this<Action>, public IAction {
 

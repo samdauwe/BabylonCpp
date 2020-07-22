@@ -28,7 +28,6 @@ Action::Action(const TriggerOptions& iTriggerOptions, Condition* condition)
 
 Action::~Action() = default;
 
-/** Methods **/
 void Action::_prepare()
 {
 }

@@ -7,9 +7,9 @@
 namespace BABYLON {
 
 /**
- * @brief This defines an action responsible to set a property of the target.
+ * @brief This defines an action responsible to set a property of the target
  *  to a desired value once triggered.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT SetValueAction : public Action {
 

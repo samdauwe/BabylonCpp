@@ -19,10 +19,9 @@ using ActionManagerPtr = std::shared_ptr<ActionManager>;
 using IAnimatablePtr   = std::shared_ptr<IAnimatable>;
 
 /**
- * @brief Action Manager manages all events to be triggered on a given mesh or
- * the global scene. A single scene can have many Action Managers to handle
- * predefined actions on specific meshes.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+ * @brief Action Manager manages all events to be triggered on a given mesh or the global scene.
+ * A single scene can have many Action Managers to handle predefined actions on specific meshes.
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT ActionManager : public AbstractActionManager {
 
@@ -32,104 +31,104 @@ public:
 public:
   /**
    * Nothing
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int NothingTrigger = Constants::ACTION_NothingTrigger;
 
   /**
    * On pick
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnPickTrigger = Constants::ACTION_OnPickTrigger;
 
   /**
    * On left pick
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnLeftPickTrigger = Constants::ACTION_OnLeftPickTrigger;
 
   /**
    * On right pick
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnRightPickTrigger = Constants::ACTION_OnRightPickTrigger;
 
   /**
    * On center pick
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnCenterPickTrigger = Constants::ACTION_OnCenterPickTrigger;
 
   /**
    * On pick down
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnPickDownTrigger = Constants::ACTION_OnPickDownTrigger;
 
   /**
    * On double pick
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnDoublePickTrigger = Constants::ACTION_OnDoublePickTrigger;
 
   /**
    * On pick up
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnPickUpTrigger = Constants::ACTION_OnPickUpTrigger;
   /**
    * On pick out.
    * This trigger will only be raised if you also declared a OnPickDown
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnPickOutTrigger = Constants::ACTION_OnPickOutTrigger;
 
   /**
    * On long press
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnLongPressTrigger = Constants::ACTION_OnLongPressTrigger;
 
   /**
    * On pointer over
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnPointerOverTrigger = Constants::ACTION_OnPointerOverTrigger;
 
   /**
    * On pointer out
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnPointerOutTrigger = Constants::ACTION_OnPointerOutTrigger;
 
   /**
    * On every frame
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnEveryFrameTrigger = Constants::ACTION_OnEveryFrameTrigger;
   /**
    * On intersection enter
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnIntersectionEnterTrigger
     = Constants::ACTION_OnIntersectionEnterTrigger;
 
   /**
    * On intersection exit
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnIntersectionExitTrigger
     = Constants::ACTION_OnIntersectionExitTrigger;
 
   /**
    * On key down
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnKeyDownTrigger = Constants::ACTION_OnKeyDownTrigger;
 
   /**
    * On key up
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions#triggers
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions#triggers
    */
   static constexpr unsigned int OnKeyUpTrigger = 15;
 

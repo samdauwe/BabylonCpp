@@ -7,9 +7,9 @@
 namespace BABYLON {
 
 /**
- * @brief This defines an action responsible to set the parent property of the
- * target once triggered.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+ * @brief This defines an action responsible to set the parent property of the target once
+ * triggered.
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT SetParentAction : public Action {
 
@@ -18,8 +18,7 @@ public:
    * @brief Instantiate the action.
    * @param triggerOptions defines the trigger options
    * @param target defines the target containing the parent property
-   * @param parent defines from where the animation should start (animation
-   * frame)
+   * @param parent defines from where the animation should start (animation frame)
    * @param condition defines the trigger related conditions
    */
   SetParentAction(unsigned int triggerOptions, const IAnimatablePtr& target, IAnimatable* parent,

@@ -9,7 +9,7 @@ namespace BABYLON {
 
 /**
  * @brief This defines an action responsible that does nothing once triggered.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT DoNothingAction : public Action {
 

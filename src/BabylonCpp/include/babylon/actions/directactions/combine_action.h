@@ -7,9 +7,8 @@
 namespace BABYLON {
 
 /**
- * @brief This defines an action responsible to trigger several actions once
- * triggered.
- * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+ * @brief This defines an action responsible to trigger several actions once triggered.
+ * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT CombineAction : public Action {
 
