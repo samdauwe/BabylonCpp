@@ -52,6 +52,10 @@ void SkeletonViewer::set_isEnabled(bool value)
 
   _isEnabled = value;
 
+  if (_debugMesh) {
+    _debugMesh->setEnabled(value);
+  }
+
   if (value) {
     _scene->registerBeforeRender(_renderFunction);
   }

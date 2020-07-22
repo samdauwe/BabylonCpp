@@ -185,6 +185,12 @@ bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(unsigned int sampl
   return false;
 }
 
+bool PostProcessRenderPipeline::setPrePassRenderer(const PrePassRendererPtr& /*prePassRenderer*/)
+{
+  // Do Nothing by default
+  return false;
+}
+
 void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   // Must be implemented by children

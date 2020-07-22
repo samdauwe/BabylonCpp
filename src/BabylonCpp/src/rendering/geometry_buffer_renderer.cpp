@@ -171,6 +171,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
          || (asPBRMaterial && asPBRMaterial->bumpTexture()))
         && StandardMaterial::BumpTextureEnabled()) {
       defines.emplace_back("#define BUMP");
+      defines.emplace_back("#define BUMPDIRECTUV 0");
       needUv = true;
     }
 
@@ -254,7 +255,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
-    if (subMesh->getRenderingMesh()->hasInstances()) {
+    if (subMesh->getRenderingMesh()->hasThinInstances()) {
       defines.emplace_back("#define THIN_INSTANCES");
     }
   }

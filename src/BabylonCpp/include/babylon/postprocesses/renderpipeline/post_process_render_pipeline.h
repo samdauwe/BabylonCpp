@@ -17,9 +17,11 @@ class Camera;
 class Engine;
 class PostProcessRenderEffect;
 class PostProcessRenderPipeline;
+class PrePassRenderer;
 using CameraPtr                    = std::shared_ptr<Camera>;
 using PostProcessRenderEffectPtr   = std::shared_ptr<PostProcessRenderEffect>;
 using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
+using PrePassRendererPtr           = std::shared_ptr<PrePassRenderer>;
 
 /**
  * @brief PostProcessRenderPipeline
@@ -82,6 +84,13 @@ public:
    * @brief Hidden
    */
   void _reset();
+
+  /**
+   * @brief Sets the required values to the prepass renderer.
+   * @param prePassRenderer defines the prepass renderer to setup.
+   * @returns true if the pre pass is needed.
+   */
+  virtual bool setPrePassRenderer(const PrePassRendererPtr& prePassRenderer);
 
   /**
    * @brief Disposes of the pipeline.

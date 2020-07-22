@@ -147,6 +147,7 @@ void RenderingGroup::render(
 
   // Transparent
   if (!_transparentSubMeshes.empty()) {
+    engine->setStencilBuffer(stencilState);
     _renderTransparent(_transparentSubMeshes);
     engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
@@ -156,7 +157,7 @@ void RenderingGroup::render(
 
   // Edges
   if (!_edgesRenderers.empty()) {
-    for (auto& edgesRenderer : _edgesRenderers) {
+    for (const auto& edgesRenderer : _edgesRenderers) {
       edgesRenderer->render();
     }
 
@@ -191,7 +192,7 @@ void RenderingGroup::renderSorted(
   const CameraPtr& camera, bool transparent)
 {
   auto cameraPosition = camera ? camera->globalPosition() : RenderingGroup::_zeroVector;
-  for (auto& subMesh : subMeshes) {
+  for (const auto& subMesh : subMeshes) {
     subMesh->_alphaIndex = subMesh->getMesh()->alphaIndex;
     subMesh->_distanceToCamera
       = Vector3::Distance(subMesh->getBoundingInfo()->boundingSphere.centerWorld, cameraPosition);
@@ -204,7 +205,7 @@ void RenderingGroup::renderSorted(
     std::stable_sort(sortedArray.begin(), sortedArray.end(), sortCompareFn);
   }
 
-  for (auto& subMesh : sortedArray) {
+  for (const auto& subMesh : sortedArray) {
     if (transparent) {
       auto material = subMesh->getMaterial();
 
@@ -223,7 +224,7 @@ void RenderingGroup::renderSorted(
 
 void RenderingGroup::renderUnsorted(const std::vector<SubMesh*>& subMeshes)
 {
-  for (auto& subMesh : subMeshes) {
+  for (const auto& subMesh : subMeshes) {
     subMesh->render(false);
   }
 }
@@ -345,7 +346,7 @@ void RenderingGroup::_renderParticles(const std::vector<AbstractMesh*>& activeMe
   // Particles
   const auto& activeCamera = _scene->activeCamera();
   _scene->onBeforeParticlesRenderingObservable.notifyObservers(_scene);
-  for (auto& particleSystem : _particleSystems) {
+  for (const auto& particleSystem : _particleSystems) {
     if ((activeCamera && activeCamera->layerMask & particleSystem->layerMask) == 0) {
       continue;
     }
@@ -369,7 +370,7 @@ void RenderingGroup::_renderSprites()
   // Sprites
   auto& activeCamera = _scene->activeCamera();
   _scene->onBeforeSpritesRenderingObservable.notifyObservers(_scene);
-  for (auto& spriteManager : _spriteManagers) {
+  for (const auto& spriteManager : _spriteManagers) {
     if (((activeCamera && activeCamera->layerMask & spriteManager->layerMask) != 0)) {
       spriteManager->render();
     }

@@ -1092,6 +1092,9 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
     if (material && material->needAlphaTesting()) {
       auto alphaTexture = material->getAlphaTestTexture();
       if (alphaTexture) {
+        if (!alphaTexture->isReady()) {
+          return false;
+        }
         defines.emplace_back("#define ALPHATEST");
         if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
           attribs.emplace_back(VertexBuffer::UVKind);

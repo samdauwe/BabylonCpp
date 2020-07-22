@@ -193,7 +193,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
-    if (subMesh->getRenderingMesh()->hasInstances()) {
+    if (subMesh->getRenderingMesh()->hasThinInstances()) {
       defines.emplace_back("#define THIN_INSTANCES");
     }
   }
@@ -226,7 +226,7 @@ void OutlineRenderer::_beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh,
   _savedDepthWrite = _engine->getDepthWrite();
   if (mesh->renderOutline) {
     auto material = subMesh->getMaterial();
-    if (material && material->needAlphaBlending()) {
+    if (material && material->needAlphaBlendingForMesh(*mesh)) {
       _engine->cacheStencilState();
       // Draw only to stencil buffer for the original mesh
       // The resulting stencil buffer will be used so the outline is not visible inside the mesh
@@ -249,7 +249,7 @@ void OutlineRenderer::_beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh,
     render(subMesh, batch);
     _engine->setDepthWrite(_savedDepthWrite);
 
-    if (material && material->needAlphaBlending()) {
+    if (material && material->needAlphaBlendingForMesh(*mesh)) {
       _engine->restoreStencilState();
     }
   }

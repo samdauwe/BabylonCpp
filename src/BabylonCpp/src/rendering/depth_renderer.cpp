@@ -161,7 +161,7 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
     MaterialHelper::PushAttributesForInstances(attribs);
-    if (subMesh->getRenderingMesh()->hasInstances()) {
+    if (subMesh->getRenderingMesh()->hasThinInstances()) {
       defines.emplace_back("#define THIN_INSTANCES");
     }
   }
