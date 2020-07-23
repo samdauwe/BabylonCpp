@@ -369,8 +369,9 @@ void BoundingBoxGizmo::setColor(const Color3& color)
   }
 }
 
-void BoundingBoxGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void BoundingBoxGizmo::_attachedNodeChanged(const NodePtr& iValue)
 {
+  AbstractMeshPtr value = iValue ? std::static_pointer_cast<AbstractMesh>(iValue) : nullptr;
   if (value) {
     // Reset anchor mesh to match attached mesh's scale
     // This is needed to avoid invalid box/sphere position on first drag

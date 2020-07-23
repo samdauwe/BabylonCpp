@@ -25,6 +25,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
     , _pointerObserver{nullptr}
     , _isEnabled{true}
     , _parent{nullptr}
+    , _useEulerRotation{useEulerRotation}
     , _tmpSnapEvent{0.f}
 {
   _parent = parent;
@@ -64,44 +65,37 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
   // _rootMesh->addBehavior(dragBehavior.get());
 
   dragBehavior->onDragStartObservable.add([&](DragStartOrEndEvent* e, EventState& /*es*/) {
-    if (attachedMesh()) {
+    if (attachedNode()) {
       _lastDragPosition.copyFrom(e->dragPlanePoint);
     }
   });
 
   _currentSnapDragDistance = 0.f;
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
-    if (attachedMesh()) {
-      if (!attachedMesh()->rotationQuaternion() || useEulerRotation) {
-        attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
-          attachedMesh()->rotation().y, attachedMesh()->rotation().x, attachedMesh()->rotation().z);
-      }
-
-      // Remove parent priort to rotating
-      auto attachedMeshParent = attachedMesh()->parent();
-      if (attachedMeshParent) {
-        attachedMesh()->setParent(nullptr);
-      }
-
+    if (attachedNode()) {
       // Calc angle over full 360 degree
       // (https://stackoverflow.com/questions/43493711/the-angle-between-two-3d-vectors-with-a-result-range-0-360)
-      auto Vector = event->dragPlanePoint.subtract(attachedMesh()->absolutePosition).normalize();
-      auto originalVector
-        = _lastDragPosition.subtract(attachedMesh()->absolutePosition).normalize();
-      auto cross = Vector3::Cross(Vector, originalVector);
-      auto dot   = Vector3::Dot(Vector, originalVector);
-      auto angle = std::atan2(cross.length(), dot);
+      std::optional<Vector3> nodeScale         = Vector3(1.f, 1.f, 1.f);
+      std::optional<Quaternion> nodeQuaternion = Quaternion(0.f, 0.f, 0.f, 1.f);
+      std::optional<Vector3> nodeTranslation   = Vector3(0.f, 0.f, 0.f);
+      attachedNode()->getWorldMatrix().decompose(nodeScale, nodeQuaternion, nodeTranslation);
+
+      auto newVector      = event->dragPlanePoint.subtract(*nodeTranslation).normalize();
+      auto originalVector = _lastDragPosition.subtract(*nodeTranslation).normalize();
+      auto cross          = Vector3::Cross(newVector, originalVector);
+      auto dot            = Vector3::Dot(newVector, originalVector);
+      auto angle          = std::atan2(cross.length(), dot);
       _planeNormalTowardsCamera.copyFrom(planeNormal);
       _localPlaneNormalTowardsCamera.copyFrom(planeNormal);
       if (updateGizmoRotationToMatchAttachedMesh) {
-        attachedMesh()->rotationQuaternion()->toRotationMatrix(_rotationMatrix);
+        nodeQuaternion->toRotationMatrix(_rotationMatrix);
         _localPlaneNormalTowardsCamera
           = Vector3::TransformCoordinates(_planeNormalTowardsCamera, _rotationMatrix);
       }
       // Flip up vector depending on which side the camera is on
       if (gizmoLayer->utilityLayerScene->activeCamera()) {
-        auto camVec = gizmoLayer->utilityLayerScene->activeCamera()->position().subtract(
-          attachedMesh()->position());
+        auto camVec
+          = gizmoLayer->utilityLayerScene->activeCamera()->position().subtract(*nodeTranslation);
         if (Vector3::Dot(camVec, _localPlaneNormalTowardsCamera) > 0.f) {
           _planeNormalTowardsCamera.scaleInPlace(-1.f);
           _localPlaneNormalTowardsCamera.scaleInPlace(-1.f);
@@ -126,17 +120,8 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
           snapped                  = true;
         }
         else {
-          angle = 0;
+          angle = 0.f;
         }
-      }
-
-      // If the mesh has a parent, convert needed world rotation to local rotation
-      _tmpMatrix.reset();
-      if (attachedMesh()->parent) {
-        attachedMesh()->parent()->computeWorldMatrix().invertToRef(_tmpMatrix);
-        _tmpMatrix.getRotationMatrixToRef(_tmpMatrix);
-        Vector3::TransformCoordinatesToRef(_planeNormalTowardsCamera, _tmpMatrix,
-                                           _planeNormalTowardsCamera);
       }
 
       // Convert angle and axis to quaternion
@@ -150,27 +135,24 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       // If the meshes local scale is inverted (eg. loaded gltf file parent with z scale of -1) the
       // rotation needs to be inverted on the y axis
       if (_tmpMatrix.determinant() > 0) {
-        _amountToRotate.toEulerAnglesToRef(_tmpVector);
-        Quaternion::RotationYawPitchRollToRef(_tmpVector.y, -_tmpVector.x, -_tmpVector.z,
+        auto iTmpVector = Vector3();
+        _amountToRotate.toEulerAnglesToRef(iTmpVector);
+        Quaternion::RotationYawPitchRollToRef(iTmpVector.y, -iTmpVector.x, -iTmpVector.z,
                                               _amountToRotate);
       }
 
       if (updateGizmoRotationToMatchAttachedMesh) {
         // Rotate selected mesh quaternion over fixed axis
-        attachedMesh()->rotationQuaternion()->multiplyToRef(_amountToRotate,
-                                                            *attachedMesh()->rotationQuaternion());
+        nodeQuaternion->multiplyToRef(_amountToRotate, *nodeQuaternion);
       }
       else {
         // Rotate selected mesh quaternion over rotated axis
-        _amountToRotate.multiplyToRef(*attachedMesh()->rotationQuaternion(),
-                                      *attachedMesh()->rotationQuaternion());
+        _amountToRotate.multiplyToRef(*nodeQuaternion, *nodeQuaternion);
       }
 
-      if (useEulerRotation) {
-        attachedMesh()->rotationQuaternion()->toEulerAnglesToRef(_tmpVector);
-        attachedMesh()->rotationQuaternion = std::nullopt;
-        attachedMesh()->rotation().copyFrom(_tmpVector);
-      }
+      // recompose matrix
+      attachedNode()->getWorldMatrix().copyFrom(
+        Matrix::Compose(*nodeScale, *nodeQuaternion, *nodeTranslation));
 
       _lastDragPosition.copyFrom(event->dragPlanePoint);
       if (snapped) {
@@ -178,10 +160,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
 
-      // Restore parent
-      if (attachedMeshParent) {
-        attachedMesh()->setParent(attachedMeshParent);
-      }
+      _matrixChanged();
     }
   });
 
@@ -209,7 +188,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
 
 PlaneRotationGizmo::~PlaneRotationGizmo() = default;
 
-void PlaneRotationGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void PlaneRotationGizmo::_attachedNodeChanged(const NodePtr& value)
 {
   if (dragBehavior) {
     dragBehavior->enabled = static_cast<bool>(value);

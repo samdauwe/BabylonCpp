@@ -41,6 +41,8 @@ public:
 protected:
   AbstractMeshPtr& get_attachedMesh() override;
   void set_attachedMesh(const AbstractMeshPtr& mesh) override;
+  NodePtr& get_attachedNode() override;
+  void set_attachedNode(const NodePtr& node) override;
 
   /**
    * @brief Gets if the planar drag gizmo is enabled.
@@ -117,6 +119,7 @@ private:
    * private variables
    */
   AbstractMeshPtr _meshAttached;
+  NodePtr _nodeAttached;
   bool _updateGizmoRotationToMatchAttachedMesh;
   float _snapDistance;
   float _scaleRatio;

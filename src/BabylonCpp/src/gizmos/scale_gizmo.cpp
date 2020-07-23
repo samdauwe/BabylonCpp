@@ -17,7 +17,6 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &ScaleGizmo::get_snapDistance, &ScaleGizmo::set_snapDistance}
     , sensitivity{this, &ScaleGizmo::get_sensitivity, &ScaleGizmo::set_sensitivity}
-    , _meshAttached{nullptr}
     , _updateGizmoRotationToMatchAttachedMesh{false}
     , _snapDistance{0.f}
     , _scaleRatio{1.f}
@@ -64,6 +63,7 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
   }
 
   attachedMesh = nullptr;
+  attachedNode = nullptr;
 }
 
 ScaleGizmo::~ScaleGizmo() = default;
@@ -76,12 +76,32 @@ AbstractMeshPtr& ScaleGizmo::get_attachedMesh()
 void ScaleGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   _meshAttached = mesh;
+  _nodeAttached = mesh;
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get(), uniformScaleGizmo.get()}) {
     if (gizmo->isEnabled()) {
       gizmo->attachedMesh = mesh;
     }
     else {
       gizmo->attachedMesh = nullptr;
+    }
+  }
+}
+
+NodePtr& ScaleGizmo::get_attachedNode()
+{
+  return _nodeAttached;
+}
+
+void ScaleGizmo::set_attachedNode(const NodePtr& node)
+{
+  _meshAttached = nullptr;
+  _nodeAttached = node;
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get(), uniformScaleGizmo.get()}) {
+    if (gizmo->isEnabled()) {
+      gizmo->attachedNode = node;
+    }
+    else {
+      gizmo->attachedNode = nullptr;
     }
   }
 }

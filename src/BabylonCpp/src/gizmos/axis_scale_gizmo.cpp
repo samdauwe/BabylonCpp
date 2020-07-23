@@ -77,7 +77,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   // _rootMesh->addBehavior(dragBehavior);
 
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
-    if (attachedMesh()) {
+    if (attachedNode()) {
       // Drag strength is modified by the scale of the gizmo (eg. for small objects like boombox the
       // strength will be increased to match the behavior of larger objects)
       const auto dragStrength
@@ -87,7 +87,12 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       auto snapped   = false;
       auto dragSteps = 0;
       if (uniformScaling) {
-        attachedMesh()->scaling().normalizeToRef(_tmpVector);
+        std::optional<Vector3> iScale       = _tmpVector;
+        std::optional<Quaternion> iRotation = std::nullopt;
+        std::optional<Vector3> iTranslation = std::nullopt;
+        attachedNode()->getWorldMatrix().decompose(iScale, iRotation, iTranslation);
+        _tmpVector = *iScale;
+        _tmpVector.normalize();
         if (_tmpVector.y < 0.f) {
           _tmpVector.scaleInPlace(-1.f);
         }
@@ -115,12 +120,17 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
         }
       }
 
-      attachedMesh()->scaling().addInPlace(_tmpVector);
+      Matrix scalingMatrix;
+      Matrix::ScalingToRef(1.f + _tmpVector.x, 1.f + _tmpVector.y, 1.f + _tmpVector.z,
+                           scalingMatrix);
+      attachedNode()->getWorldMatrix().copyFrom(
+        scalingMatrix.multiply(attachedNode()->getWorldMatrix()));
 
       if (snapped) {
         _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
+      _matrixChanged();
     }
   });
 
@@ -152,7 +162,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
 
 AxisScaleGizmo::~AxisScaleGizmo() = default;
 
-void AxisScaleGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void AxisScaleGizmo::_attachedNodeChanged(const NodePtr& value)
 {
   if (dragBehavior) {
     dragBehavior->enabled = value ? true : false;
@@ -164,10 +174,12 @@ void AxisScaleGizmo::set_isEnabled(bool value)
   _isEnabled = value;
   if (!value) {
     attachedMesh = nullptr;
+    attachedNode = nullptr;
   }
   else {
     if (_parent) {
       attachedMesh = _parent->attachedMesh();
+      attachedNode = _parent->attachedNode();
     }
   }
 }

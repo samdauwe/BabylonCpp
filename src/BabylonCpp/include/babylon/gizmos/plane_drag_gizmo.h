@@ -53,7 +53,7 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+  void _attachedNodeChanged(const NodePtr& value) override;
 
   /**
    * @brief Gets if the gizmo is enabled.

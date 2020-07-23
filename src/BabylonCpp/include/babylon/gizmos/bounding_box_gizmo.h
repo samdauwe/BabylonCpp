@@ -85,7 +85,7 @@ public:
   void setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial = false) override;
 
 protected:
-  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+  void _attachedNodeChanged(const NodePtr& value) override;
 
 private:
   void _updateRotationSpheres();
@@ -145,7 +145,7 @@ public:
    */
   Observable<DragStartOrEndEvent> onRotationSphereDragEndObservable;
   /**
-   * Relative bounding box pivot used when scaling the attached mesh. When null object with scale
+   * Relative bounding box pivot used when scaling the attached node. When null object with scale
    * from the opposite corner. 0.5,0.5,0.5 for center and 0.5,0,0.5 for bottom (Default: null)
    */
   std::optional<Vector3> scalePivot;
@@ -164,7 +164,7 @@ private:
   Matrix _tmpRotationMatrix;
 
   /**
-   * Mesh used as a pivot to rotate the attached mesh
+   * Mesh used as a pivot to rotate the attached node
    */
   AbstractMeshPtr _anchorMesh;
   Vector3 _existingMeshScale;

@@ -11,10 +11,12 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Mesh;
+class Node;
 class Scene;
 class UtilityLayerRenderer;
 using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
 using MeshPtr                 = std::shared_ptr<Mesh>;
+using NodePtr                 = std::shared_ptr<Node>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
@@ -67,6 +69,20 @@ protected:
   virtual void set_attachedMesh(const AbstractMeshPtr& value);
 
   /**
+   * @brief Gets the node that the gizmo will be attached to. (eg. on a drag gizmo the mesh, bone or
+   * NodeTransform that will be dragged)
+   * * When set, interactions will be enabled
+   */
+  virtual NodePtr& get_attachedNode();
+
+  /**
+   * @brief Sets the node that the gizmo will be attached to. (eg. on a drag gizmo the mesh, bone or
+   * NodeTransform that will be dragged)
+   * * When set, interactions will be enabled
+   */
+  virtual void set_attachedNode(const NodePtr& value);
+
+  /**
    * @brief Sets if set the gizmo's position will be updated to match the attached mesh each frame
    * (Default: true).
    */
@@ -81,13 +97,20 @@ protected:
   /**
    * @brief Hidden
    */
-  virtual void _attachedMeshChanged(const AbstractMeshPtr& value);
+  virtual void _attachedNodeChanged(const NodePtr& value);
 
   /**
    * Hidden
    * @brief Updates the gizmo to match the attached mesh's position/rotation.
    */
   void _update();
+
+  /**
+   * @brief computes the rotation/scaling/position of the transform once the Node world matrix has
+   * changed.
+   * @param value Node, TransformNode or mesh
+   */
+  void _matrixChanged();
 
 public:
   /**
@@ -105,6 +128,13 @@ public:
    * * When set, interactions will be enabled
    */
   Property<Gizmo, AbstractMeshPtr> attachedMesh;
+
+  /**
+   * Node that the gizmo will be attached to. (eg. on a drag gizmo the mesh, bone or NodeTransform
+   * that will be dragged)
+   * * When set, interactions will be enabled
+   */
+  Property<Gizmo, NodePtr> attachedNode;
 
   /**
    * The utility layer the gizmo will be added to
@@ -141,6 +171,7 @@ private:
   float _scaleRatio;
   bool _updateGizmoRotationToMatchAttachedMesh;
   AbstractMeshPtr _attachedMesh;
+  NodePtr _attachedNode;
   Matrix _tmpMatrix;
   Vector3 _tempVector;
   Observer<Scene>::Ptr _beforeRenderObserver;

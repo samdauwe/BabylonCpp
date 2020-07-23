@@ -5,6 +5,7 @@
 #include <babylon/gizmos/plane_rotation_gizmo.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
@@ -12,7 +13,6 @@ RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigne
                              bool useEulerRotation)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &RotationGizmo::get_snapDistance, &RotationGizmo::set_snapDistance}
-    , _meshAttached{nullptr}
 {
   xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
                                                 iGizmoLayer, tessellation, this, useEulerRotation);
@@ -34,6 +34,7 @@ RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigne
   }
 
   attachedMesh = nullptr;
+  attachedNode = nullptr;
 }
 
 RotationGizmo::~RotationGizmo() = default;
@@ -46,6 +47,7 @@ AbstractMeshPtr& RotationGizmo::get_attachedMesh()
 void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   _meshAttached = mesh;
+  _nodeAttached = mesh;
 
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
     if (gizmo->isEnabled()) {
@@ -55,6 +57,25 @@ void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
       gizmo->attachedMesh = nullptr;
     }
   }
+}
+
+NodePtr& RotationGizmo::get_attachedNode()
+{
+  return _nodeAttached;
+}
+
+void RotationGizmo::set_attachedNode(const NodePtr& node)
+{
+  _meshAttached = nullptr;
+  _nodeAttached = node;
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    if (gizmo->isEnabled()) {
+      gizmo->attachedNode = node;
+    }
+    else {
+      gizmo->attachedNode = nullptr;
+    }
+  };
 }
 
 void RotationGizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)

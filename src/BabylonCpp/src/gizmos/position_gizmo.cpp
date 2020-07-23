@@ -6,6 +6,7 @@
 #include <babylon/gizmos/plane_drag_gizmo.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
@@ -15,6 +16,7 @@ PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
                          &PositionGizmo::set_planarGizmoEnabled}
     , snapDistance{this, &PositionGizmo::get_snapDistance, &PositionGizmo::set_snapDistance}
     , _meshAttached{nullptr}
+    , _nodeAttached{nullptr}
     , _updateGizmoRotationToMatchAttachedMesh{false}
     , _snapDistance{0.f}
     , _scaleRatio{1.f}
@@ -69,6 +71,7 @@ AbstractMeshPtr& PositionGizmo::get_attachedMesh()
 void PositionGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   _meshAttached = mesh;
+  _nodeAttached = std::static_pointer_cast<Node>(mesh);
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
     if (gizmo->isEnabled()) {
       gizmo->attachedMesh = mesh;
@@ -87,6 +90,33 @@ void PositionGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
   }
 }
 
+NodePtr& PositionGizmo::get_attachedNode()
+{
+  return _nodeAttached;
+}
+
+void PositionGizmo::set_attachedNode(const NodePtr& node)
+{
+  _meshAttached = nullptr;
+  _nodeAttached = nullptr;
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    if (gizmo->isEnabled()) {
+      gizmo->attachedNode = node;
+    }
+    else {
+      gizmo->attachedNode = nullptr;
+    }
+  }
+  for (const auto& gizmo : {xPlaneGizmo.get(), yPlaneGizmo.get(), zPlaneGizmo.get()}) {
+    if (gizmo->isEnabled()) {
+      gizmo->attachedNode = node;
+    }
+    else {
+      gizmo->attachedNode = nullptr;
+    }
+  }
+}
+
 void PositionGizmo::set_planarGizmoEnabled(bool value)
 {
   _planarGizmoEnabled = value;
@@ -94,7 +124,12 @@ void PositionGizmo::set_planarGizmoEnabled(bool value)
     if (gizmo) {
       gizmo->isEnabled = value;
       if (value) {
-        gizmo->attachedMesh = attachedMesh();
+        if (gizmo->attachedMesh()) {
+          gizmo->attachedMesh = attachedMesh();
+        }
+        else {
+          gizmo->attachedNode = attachedNode();
+        }
       }
     }
   }

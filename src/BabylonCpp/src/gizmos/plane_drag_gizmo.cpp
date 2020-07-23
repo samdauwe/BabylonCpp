@@ -71,8 +71,7 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
   _plane->parent = _rootMesh.get();
 
   currentSnapDragDistance = 0.f;
-  // Add dragPlaneNormal drag behavior to handle events when the gizmo is
-  // dragged
+  // Add dragPlaneNormal drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
   options.dragPlaneNormal    = dragPlaneNormal;
   dragBehavior               = std::make_shared<PointerDragBehavior>(options);
@@ -80,13 +79,13 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
   // _rootMesh->addBehavior(dragBehavior);
 
   dragBehavior->onDragObservable.add([this](DragMoveEvent* event, EventState & /*es*/) -> void {
-    if (attachedMesh()) {
+    if (attachedNode()) {
       currentSnapDragDistance = 0.f;
       Vector3 localDelta;
       Matrix tmpMatrix;
       // Convert delta to local translation if it has a parent
-      if (attachedMesh()->parent()) {
-        attachedMesh()->parent()->computeWorldMatrix().invertToRef(tmpMatrix);
+      if (attachedNode()->parent()) {
+        attachedNode()->parent()->computeWorldMatrix().invertToRef(tmpMatrix);
         tmpMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
         Vector3::TransformCoordinatesToRef(event->delta, tmpMatrix, localDelta);
       }
@@ -95,7 +94,8 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
       }
       // Snapping logic
       if (snapDistance == 0.f) {
-        attachedMesh()->position().addInPlace(localDelta);
+        attachedNode()->getWorldMatrix().addTranslationFromFloats(localDelta.x, localDelta.y,
+                                                                  localDelta.z);
       }
       else {
         currentSnapDragDistance += event->dragDistance;
@@ -104,11 +104,13 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
           currentSnapDragDistance = std::fmod(currentSnapDragDistance, snapDistance);
           localDelta.normalizeToRef(tmpVector);
           tmpVector.scaleInPlace(snapDistance * dragSteps);
-          attachedMesh()->position().addInPlace(tmpVector);
+          attachedNode()->getWorldMatrix().addTranslationFromFloats(tmpVector.x, tmpVector.y,
+                                                                    tmpVector.z);
           tmpSnapEvent.snapDistance = snapDistance * dragSteps;
           onSnapObservable.notifyObservers(&tmpSnapEvent);
         }
       }
+      _matrixChanged();
     }
   });
 
@@ -131,20 +133,20 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
 
 PlaneDragGizmo::~PlaneDragGizmo() = default;
 
-void PlaneDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void PlaneDragGizmo::_attachedNodeChanged(const NodePtr& value)
 {
-  dragBehavior->enabled = static_cast<bool>(value);
+  dragBehavior->enabled = value ? true : false;
 }
 
 void PlaneDragGizmo::set_isEnabled(bool value)
 {
   _isEnabled = value;
   if (!value) {
-    attachedMesh = nullptr;
+    attachedNode = nullptr;
   }
   else {
     if (_parent) {
-      attachedMesh = _parent->attachedMesh();
+      attachedNode = _parent->attachedNode();
     }
   }
 }

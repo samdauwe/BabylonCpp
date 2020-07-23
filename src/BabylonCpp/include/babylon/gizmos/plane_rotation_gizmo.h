@@ -40,7 +40,7 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+  void _attachedNodeChanged(const NodePtr& value) override;
 
   /**
    * @brief Gets If the gizmo is enabled.
@@ -78,6 +78,7 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   bool _isEnabled;
   RotationGizmo* _parent;
+  bool _useEulerRotation;
 
   Vector3 _lastDragPosition;
   Matrix _rotationMatrix;
