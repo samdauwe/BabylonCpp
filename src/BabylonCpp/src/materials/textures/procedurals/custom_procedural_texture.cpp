@@ -1,10 +1,10 @@
 #include <babylon/materials/textures/procedurals/custom_procedural_texture.h>
 
+#include <babylon/asio/asio.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
-#include <babylon/asio/asio.h>
 
 namespace BABYLON {
 
@@ -29,13 +29,11 @@ CustomProceduralTexture::~CustomProceduralTexture() = default;
 
 void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
 {
-  const auto noConfigFile = [jsonUrl, this](const std::string & errorMessage) {
+  const auto noConfigFile = [jsonUrl, this](const std::string& errorMessage) {
     BABYLON_LOGF_WARN(
       "CustomProceduralTexture",
       "No config file found in %s trying to use ShadersStore or DOM element, message: %s",
-      jsonUrl.c_str(),
-      errorMessage.c_str()
-      )
+      jsonUrl.c_str(), errorMessage.c_str())
     try {
       setFragment(_texturePath);
     }
@@ -47,8 +45,8 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
 
   const auto onSuccessLoadJson = [noConfigFile, this](const std::string& configJSON) {
     try {
-      _config         = json::parse(configJSON);
-      _configSet      = true;
+      _config    = json::parse(configJSON);
+      _configSet = true;
 
       updateShaderUniforms();
       updateTextures();

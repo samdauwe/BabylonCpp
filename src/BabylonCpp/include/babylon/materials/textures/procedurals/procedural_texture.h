@@ -21,7 +21,7 @@ using WebGLDataBufferPtr   = std::shared_ptr<WebGLDataBuffer>;
  * procedural textures: code-only, and code that references some classic 2D images, sometimes
  * calmpler' images. This is the base class of any Procedural texture and contains most of the
  * shareable code.
- * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
+ * @see https://doc.babylonjs.com/how_to/how_to_use_procedural_textures
  */
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
 
@@ -211,17 +211,17 @@ protected:
    * procedural textures: code-only, and code that references some classic 2D images, sometimes
    * called 'refMaps' or 'sampler' images. This is the base class of any Procedural texture and
    * contains most of the shareable code.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
+   * @see https://doc.babylonjs.com/how_to/how_to_use_procedural_textures
    * @param name  Define the name of the texture
    * @param size Define the size of the texture to create
-   * @param fragment Define the fragment shader to use to generate the texture
-   * or null if it is defined later
+   * @param fragment Define the fragment shader to use to generate the texture or null if it is
+   * defined later
    * @param scene Define the scene the texture belongs to
-   * @param fallbackTexture Define a fallback texture in case there were issues
-   * to create the custom texture
+   * @param fallbackTexture Define a fallback texture in case there were issues to create the custom
+   * texture
    * @param generateMipMaps Define if the texture should creates mip maps or not
-   * @param isCube Define if the texture is a cube texture or not (this will
-   * render each faces of the cube)
+   * @param isCube Define if the texture is a cube texture or not (this will render each faces of
+   * the cube)
    */
   ProceduralTexture(const std::string& name, const Size& size,
                     const std::unordered_map<std::string, std::string>& fragment, Scene* scene,

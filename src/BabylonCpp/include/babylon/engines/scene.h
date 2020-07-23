@@ -62,7 +62,6 @@ class OutlineRenderer;
 class PostProcess;
 class PostProcessManager;
 class PostProcessRenderPipelineManager;
-class ProceduralTexture;
 struct RenderingGroupInfo;
 class RenderingManager;
 class RuntimeAnimation;
@@ -86,7 +85,6 @@ using NodePtr                         = std::shared_ptr<Node>;
 using MeshPtr                         = std::shared_ptr<Mesh>;
 using OutlineRendererPtr              = std::shared_ptr<OutlineRenderer>;
 using PostProcessPtr                  = std::shared_ptr<PostProcess>;
-using ProceduralTexturePtr            = std::shared_ptr<ProceduralTexture>;
 using SimplificationQueuePtr          = std::shared_ptr<SimplificationQueue>;
 using SoundTrackPtr                   = std::shared_ptr<SoundTrack>;
 using SubMeshPtr                      = std::shared_ptr<SubMesh>;
@@ -3057,12 +3055,6 @@ public:
    * this scene
    */
   bool proceduralTexturesEnabled;
-
-  /**
-   * The list of procedural textures added to the scene
-   * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
-   */
-  std::vector<ProceduralTexturePtr> proceduralTextures;
 
   // Sound Tracks
 

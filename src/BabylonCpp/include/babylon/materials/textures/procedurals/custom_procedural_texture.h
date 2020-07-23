@@ -19,7 +19,7 @@ using CustomProceduralTexturePtr = std::shared_ptr<CustomProceduralTexture>;
  * 'refMaps' or 'sampler' images. Custom Procedural textures are the easiest way to create your own
  * procedural in your application.
  * @see
- * http://doc.babylonjs.com/how_to/how_to_use_procedural_textures#creating-custom-procedural-textures
+ * https://doc.babylonjs.com/how_to/how_to_use_procedural_textures#creating-custom-procedural-textures
  */
 class BABYLON_SHARED_EXPORT CustomProceduralTexture : public ProceduralTexture {
 
@@ -65,7 +65,7 @@ protected:
    * called 'refMaps' or 'sampler' images. Custom Procedural textures are the easiest way to create
    * your own procedural in your application.
    * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_procedural_textures#creating-custom-procedural-textures
+   * https://doc.babylonjs.com/how_to/how_to_use_procedural_textures#creating-custom-procedural-textures
    * @param name Define the name of the texture
    * @param texturePath Define the folder path containing all the cutom texture related files
    * (config, shaders...)

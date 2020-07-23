@@ -33,6 +33,7 @@ class Material;
 class MorphTargetManager;
 class MultiMaterial;
 class Node;
+class ProceduralTexture;
 class ReflectionProbe;
 class Scene;
 class Skeleton;
@@ -57,6 +58,7 @@ using MaterialPtr              = std::shared_ptr<Material>;
 using MorphTargetManagerPtr    = std::shared_ptr<MorphTargetManager>;
 using MultiMaterialPtr         = std::shared_ptr<MultiMaterial>;
 using NodePtr                  = std::shared_ptr<Node>;
+using ProceduralTexturePtr     = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr       = std::shared_ptr<ReflectionProbe>;
 using SkeletonPtr              = std::shared_ptr<Skeleton>;
 using SoundPtr                 = std::shared_ptr<Sound>;
@@ -338,6 +340,12 @@ public:
    * Environment texture for the scene
    */
   Property<AbstractScene, BaseTexturePtr> environmentTexture;
+
+  /**
+   * The list of procedural textures added to the scene
+   * @see https://doc.babylonjs.com/how_to/how_to_use_procedural_textures
+   */
+  std::vector<ProceduralTexturePtr> proceduralTextures;
 
 protected:
   /**
