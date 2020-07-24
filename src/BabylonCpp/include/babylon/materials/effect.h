@@ -653,6 +653,8 @@ public:
 
   /** Hidden */
   bool _bonesComputationForcedToCPU;
+  /** @hidden */
+  bool _multiTarget;
   /**
    * Observable that will be called when effect is bound.
    */

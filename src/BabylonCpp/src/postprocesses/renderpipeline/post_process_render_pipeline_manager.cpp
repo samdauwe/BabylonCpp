@@ -9,14 +9,13 @@ PostProcessRenderPipelineManager::PostProcessRenderPipelineManager() = default;
 
 PostProcessRenderPipelineManager::~PostProcessRenderPipelineManager() = default;
 
-std::vector<PostProcessRenderPipelinePtr>
-PostProcessRenderPipelineManager::supportedPipelines()
+std::vector<PostProcessRenderPipelinePtr> PostProcessRenderPipelineManager::supportedPipelines()
 {
   std::vector<PostProcessRenderPipelinePtr> result;
 
   for (auto& renderPipelineItem : _renderPipelines) {
     auto pipeline = renderPipelineItem.second;
-    if (pipeline->isSupported) {
+    if (pipeline->isSupported()) {
       result.emplace_back(pipeline);
     }
   }
@@ -38,8 +37,7 @@ void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
 }
 
 void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
-  const std::string& renderPipelineName, const std::vector<CameraPtr>& cameras,
-  bool unique)
+  const std::string& renderPipelineName, const std::vector<CameraPtr>& cameras, bool unique)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -65,24 +63,23 @@ void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
   _renderPipelines[renderPipelineName]->_detachCameras(cameras);
 }
 
-void PostProcessRenderPipelineManager::enableEffectInPipeline(
-  const std::string& renderPipelineName, const std::string& renderEffectName,
-  const CameraPtr& camera)
+void PostProcessRenderPipelineManager::enableEffectInPipeline(const std::string& renderPipelineName,
+                                                              const std::string& renderEffectName,
+                                                              const CameraPtr& camera)
 {
   std::vector<CameraPtr> cameras{camera};
   enableEffectInPipeline(renderPipelineName, renderEffectName, cameras);
 }
 
-void PostProcessRenderPipelineManager::enableEffectInPipeline(
-  const std::string& renderPipelineName, const std::string& renderEffectName,
-  const std::vector<CameraPtr>& cameras)
+void PostProcessRenderPipelineManager::enableEffectInPipeline(const std::string& renderPipelineName,
+                                                              const std::string& renderEffectName,
+                                                              const std::vector<CameraPtr>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 
-  _renderPipelines[renderPipelineName]->_enableEffect(renderEffectName,
-                                                      cameras);
+  _renderPipelines[renderPipelineName]->_enableEffect(renderEffectName, cameras);
 }
 
 void PostProcessRenderPipelineManager::disableEffectInPipeline(
@@ -101,8 +98,7 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
     return;
   }
 
-  _renderPipelines[renderPipelineName]->_disableEffect(renderEffectName,
-                                                       cameras);
+  _renderPipelines[renderPipelineName]->_disableEffect(renderEffectName, cameras);
 }
 
 void PostProcessRenderPipelineManager::update()

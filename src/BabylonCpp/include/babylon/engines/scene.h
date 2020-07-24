@@ -2843,6 +2843,11 @@ public:
    */
   float fogEnd;
 
+  /**
+   * Flag indicating that the frame buffer binding is handled by another component
+   */
+  bool prePass;
+
   // Lights
 
   /**

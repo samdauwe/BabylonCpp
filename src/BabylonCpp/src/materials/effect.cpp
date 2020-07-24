@@ -46,6 +46,7 @@ Effect::Effect(
     , onBind{nullptr}
     , _wasPreviouslyReady{false}
     , _bonesComputationForcedToCPU{false}
+    , _multiTarget{false}
     , onBindObservable{this, &Effect::get_onBindObservable}
     , _pipelineContext{nullptr}
     , vertexSourceCode{this, &Effect::get_vertexSourceCode}

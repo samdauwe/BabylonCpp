@@ -812,6 +812,12 @@ void Material::_markAllSubMeshesAsTexturesAndMiscDirty()
   _markAllSubMeshesAsDirty(Material::_TextureAndMiscDirtyCallBack);
 }
 
+bool Material::setPrePassRenderer(const PrePassRendererPtr& /*prePassRenderer*/)
+{
+  // Do Nothing by default
+  return false;
+}
+
 void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, bool notBoundToMesh)
 {
   auto& scene = *getScene();

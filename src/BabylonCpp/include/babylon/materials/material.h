@@ -25,6 +25,7 @@ class Material;
 struct MaterialDefines;
 class Mesh;
 class MultiMaterial;
+class PrePassRenderer;
 class RenderTargetTexture;
 class Scene;
 class ShadowDepthWrapper;
@@ -35,6 +36,7 @@ using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
+using PrePassRendererPtr     = std::shared_ptr<PrePassRenderer>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 using ShadowDepthWrapperPtr  = std::shared_ptr<ShadowDepthWrapper>;
 
@@ -405,6 +407,13 @@ public:
    * have to be marked as dirty
    */
   void markAsDirty(unsigned int flag) override;
+
+  /**
+   * @brief Sets the required values to the prepass renderer.
+   * @param prePassRenderer defines the prepass renderer to setup.
+   * @returns true if the pre pass is needed.
+   */
+  virtual bool setPrePassRenderer(const PrePassRendererPtr& prePassRenderer);
 
   /**
    * @brief Disposes the material.

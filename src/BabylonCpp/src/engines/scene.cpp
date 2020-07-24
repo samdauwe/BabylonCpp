@@ -143,6 +143,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , fogDensity{0.1f}
     , fogStart{0.f}
     , fogEnd{1000.f}
+    , prePass{false}
     , shadowsEnabled{this, &Scene::get_shadowsEnabled, &Scene::set_shadowsEnabled}
     , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
     , _activeCamera{nullptr}
