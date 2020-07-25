@@ -16,7 +16,7 @@ using SubSurfaceScatteringPostProcessPtr = std::shared_ptr<SubSurfaceScatteringP
 
 /**
  * @brief Contains all parameters needed for the prepass to perform screen space subsurface
- * scattering
+ * scattering.
  */
 class BABYLON_SHARED_EXPORT SubSurfaceConfiguration : public PrePassEffectConfiguration {
 

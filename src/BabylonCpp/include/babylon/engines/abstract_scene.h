@@ -204,6 +204,17 @@ public:
    */
   std::vector<NodePtr> getNodes() const;
 
+protected:
+  /**
+   * @brief Returns the environment texture for the scene.
+   */
+  virtual BaseTexturePtr& get_environmentTexture();
+
+  /**
+   * @brief Sets the environment texture for the scene.
+   */
+  virtual void set_environmentTexture(const BaseTexturePtr& value);
+
 private:
   /**
    * @brief Adds the individual component parser to the scene parsers.
@@ -346,17 +357,6 @@ public:
    * @see https://doc.babylonjs.com/how_to/how_to_use_procedural_textures
    */
   std::vector<ProceduralTexturePtr> proceduralTextures;
-
-protected:
-  /**
-   * @brief Returns the environment texture for the scene.
-   */
-  virtual BaseTexturePtr& get_environmentTexture();
-
-  /**
-   * @brief Sets the environment texture for the scene.
-   */
-  virtual void set_environmentTexture(const BaseTexturePtr& value);
 
 private:
   /**

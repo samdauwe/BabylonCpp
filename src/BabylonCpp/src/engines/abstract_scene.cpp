@@ -10,6 +10,7 @@
 #include <babylon/engines/asset_container.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/node.h>
+#include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/effect_layer.h>
 #include <babylon/layers/glow_layer.h>
@@ -21,6 +22,8 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/particles/gpu_particle_system.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 
@@ -157,6 +160,24 @@ void AbstractScene::_addParsers()
       }
 
       loadedSounds.clear();
+    });
+  // Pre-pass renderer parsers
+  AbstractScene::AddParser(
+    SceneComponentConstants::NAME_PREPASSRENDERER,
+    [](const json& parsedData, Scene* scene, AssetContainer& /*container*/,
+       const std::string& /*rootUrl*/) {
+      // Diffusion profiles
+      if (json_util::has_valid_key_value(parsedData, "ssDiffusionProfileColors")) {
+        scene->enablePrePassRenderer();
+        if (scene->prePassRenderer()) {
+          for (const auto& color :
+               json_util::get_array<json>(parsedData, "ssDiffusionProfileColors")) {
+            scene->prePassRenderer()->subSurfaceConfiguration->addDiffusionProfile(Color3(
+              json_util::get_number<float>(color, "r"), json_util::get_number<float>(color, "g"),
+              json_util::get_number<float>(color, "b")));
+          }
+        }
+      }
     });
 }
 

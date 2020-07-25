@@ -62,6 +62,7 @@ class OutlineRenderer;
 class PostProcess;
 class PostProcessManager;
 class PostProcessRenderPipelineManager;
+class PrePassRenderer;
 struct RenderingGroupInfo;
 class RenderingManager;
 class RuntimeAnimation;
@@ -85,6 +86,7 @@ using NodePtr                         = std::shared_ptr<Node>;
 using MeshPtr                         = std::shared_ptr<Mesh>;
 using OutlineRendererPtr              = std::shared_ptr<OutlineRenderer>;
 using PostProcessPtr                  = std::shared_ptr<PostProcess>;
+using PrePassRendererPtr              = std::shared_ptr<PrePassRenderer>;
 using SimplificationQueuePtr          = std::shared_ptr<SimplificationQueue>;
 using SoundTrackPtr                   = std::shared_ptr<SoundTrack>;
 using SubMeshPtr                      = std::shared_ptr<SubMesh>;
@@ -1295,6 +1297,17 @@ public:
   void disableGeometryBufferRenderer();
 
   /**
+   * @brief Enables the prepass and associates it with the scene.
+   * @returns the PrePassRenderer
+   */
+  PrePassRendererPtr& enablePrePassRenderer();
+
+  /**
+   * @brief Disables the prepass associated with the scene.
+   */
+  void disablePrePassRenderer();
+
+  /**
    * @brief Freeze all materials.
    * A frozen material will not be updatable but should be faster to render
    */
@@ -2134,6 +2147,16 @@ protected:
    * @brief Sets the current geometry buffer for the scene.
    */
   void set_geometryBufferRenderer(const GeometryBufferRendererPtr& value);
+
+  /**
+   * @brief Gets the current prepass renderer associated to the scene.
+   */
+  PrePassRendererPtr& get_prePassRenderer();
+
+  /**
+   * @brief Sets the current prepass renderer associated to the scene.
+   */
+  void set_prePassRenderer(const PrePassRendererPtr& value);
 
   /**
    * @brief Gets the debug layer (aka Inspector) associated with the scene.
@@ -3173,6 +3196,11 @@ public:
   Property<Scene, GeometryBufferRendererPtr> geometryBufferRenderer;
 
   /**
+   * Gets or Sets the current prepass renderer associated to the scene.
+   */
+  Property<Scene, PrePassRendererPtr> prePassRenderer;
+
+  /**
    * Gets the debug layer (aka Inspector) associated with the scene
    * @see http://doc.babylonjs.com/features/playground_debuglayer
    */
@@ -3624,6 +3652,9 @@ private:
   AbstractMesh* _pickedUpMesh;
   std::string _uid;
   bool _blockMaterialDirtyMechanism;
+
+  /** @hidden (Backing field) */
+  PrePassRendererPtr _prePassRenderer;
 
   /**
    * List of components to register on the next registration step

@@ -81,7 +81,9 @@
 #include <babylon/rendering/geometry_buffer_renderer.h>
 #include <babylon/rendering/irendering_manager_auto_clear_setup.h>
 #include <babylon/rendering/outline_renderer.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/rendering_manager.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {
@@ -186,6 +188,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , depthRenderer{this, &Scene::get_depthRenderer}
     , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
                              &Scene::set_geometryBufferRenderer}
+    , prePassRenderer{this, &Scene::get_prePassRenderer, &Scene::set_prePassRenderer}
     , debugLayer{this, &Scene::get_debugLayer}
     , selectionOctree{this, &Scene::get_selectionOctree}
     , meshUnderPointer{this, &Scene::get_meshUnderPointer}
@@ -296,6 +299,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _pickedUpMesh{nullptr}
     , _uid{GUID::RandomId()}
     , _blockMaterialDirtyMechanism{false}
+    , _prePassRenderer{nullptr}
     , _tempPickingRay{std::make_unique<Ray>(Ray::Zero())}
     , _cachedRayForTransform{nullptr}
     , _audioEnabled{std::nullopt}
@@ -780,6 +784,18 @@ void Scene::set_geometryBufferRenderer(const GeometryBufferRendererPtr& value)
 {
   if (value && value->isSupported()) {
     _geometryBufferRenderer = value;
+  }
+}
+
+PrePassRendererPtr& Scene::get_prePassRenderer()
+{
+  return _prePassRenderer;
+}
+
+void Scene::set_prePassRenderer(const PrePassRendererPtr& value)
+{
+  if (value && value->isSupported()) {
+    _prePassRenderer = value;
   }
 }
 
@@ -4135,6 +4151,34 @@ void Scene::disableGeometryBufferRenderer()
 
   _geometryBufferRenderer->dispose();
   _geometryBufferRenderer = nullptr;
+}
+
+PrePassRendererPtr& Scene::enablePrePassRenderer()
+{
+  if (_prePassRenderer) {
+    return _prePassRenderer;
+  }
+
+  _prePassRenderer = std::make_shared<PrePassRenderer>(this);
+
+  if (!_prePassRenderer->isSupported()) {
+    _prePassRenderer = nullptr;
+    BABYLON_LOG_ERROR("Scene",
+                      "PrePassRenderer needs WebGL 2 support.\nMaybe you tried to use the "
+                      "following features that need the PrePassRenderer :\nSubsurface Scattering");
+  }
+
+  return _prePassRenderer;
+}
+
+void Scene::disablePrePassRenderer()
+{
+  if (!_prePassRenderer) {
+    return;
+  }
+
+  _prePassRenderer->dispose();
+  _prePassRenderer = nullptr;
 }
 
 void Scene::freezeMaterials()

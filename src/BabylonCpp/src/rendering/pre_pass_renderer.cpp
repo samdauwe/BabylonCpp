@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/image_processing_configuration.h>
@@ -13,6 +14,7 @@
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
 #include <babylon/postprocesses/sub_surface_scattering_post_process.h>
+#include <babylon/rendering/pre_pass_renderer_scene_component.h>
 #include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
@@ -39,7 +41,13 @@ PrePassRenderer::PrePassRenderer(Scene* scene)
   _scene  = scene;
   _engine = scene->getEngine();
 
-  // PrePassRenderer::_SceneComponentInitialization(_scene);
+  // Register the G Buffer component to the scene.
+  auto component = std::static_pointer_cast<PrePassRendererSceneComponent>(
+    scene->_getComponent(SceneComponentConstants::NAME_PREPASSRENDERER));
+  if (!component) {
+    component = PrePassRendererSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
 
   subSurfaceConfiguration = std::make_unique<SubSurfaceConfiguration>(_scene);
 }
