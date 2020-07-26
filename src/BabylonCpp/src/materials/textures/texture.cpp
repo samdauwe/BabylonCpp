@@ -503,7 +503,14 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
             json_util::get_bool(parsedTexture, "invertY", true));
         }
         else {
-          auto url2 = rootUrl + json_util::get_string(parsedTexture, "name");
+          std::string url2;
+          if (json_util::has_valid_key_value(parsedTexture, "name")
+              && StringTools::indexOf(json_util::get_string(parsedTexture, "name"), "://") > 0) {
+            url2 = json_util::get_string(parsedTexture, "name");
+          }
+          else {
+            url2 = rootUrl + json_util::get_string(parsedTexture, "name");
+          }
 
           if (Texture::UseSerializedUrlIfAny
               && json_util::has_valid_key_value(parsedTexture, "url")) {

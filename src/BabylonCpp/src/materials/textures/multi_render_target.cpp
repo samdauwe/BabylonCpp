@@ -18,6 +18,7 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
                             true}
     , isSupported{this, &MultiRenderTarget::get_isSupported}
     , textures{this, &MultiRenderTarget::get_textures}
+    , count{this, &MultiRenderTarget::get_count}
     , depthTexture{this, &MultiRenderTarget::get_depthTexture}
     , wrapU{this, &MultiRenderTarget::set_wrapU}
     , wrapV{this, &MultiRenderTarget::set_wrapV}
@@ -74,6 +75,8 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
     Constants::TEXTURETYPE_UNSIGNED_INT // defaultType
   };
 
+  _count = count;
+
   _createInternalTextures();
   _createInternalTextures();
 }
@@ -88,6 +91,11 @@ bool MultiRenderTarget::get_isSupported() const
 std::vector<TexturePtr>& MultiRenderTarget::get_textures()
 {
   return _textures;
+}
+
+size_t MultiRenderTarget::get_count() const
+{
+  return _count;
 }
 
 TexturePtr& MultiRenderTarget::get_depthTexture()
@@ -124,7 +132,11 @@ void MultiRenderTarget::_rebuild()
   }
 
   // Keeps references to frame buffer and stencil/depth buffer
-  _texture = (!_internalTextures.empty()) ? _internalTextures[0] : nullptr;
+  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
+
+  if (samples() != 1) {
+    _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, samples());
+  }
 }
 
 void MultiRenderTarget::_createInternalTextures()
@@ -144,7 +156,7 @@ void MultiRenderTarget::_createTextures()
   }
 
   // Keeps references to frame buffer and stencil/depth buffer
-  _texture = (!_internalTextures.empty()) ? _internalTextures[0] : nullptr;
+  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
 }
 
 unsigned int MultiRenderTarget::get_samples() const
@@ -163,9 +175,8 @@ void MultiRenderTarget::set_samples(unsigned int value)
 
 void MultiRenderTarget::resize(Size size)
 {
-  releaseInternalTextures();
   _size = RenderTargetSize{size.width, size.height};
-  _createInternalTextures();
+  _rebuild();
 }
 
 void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex)

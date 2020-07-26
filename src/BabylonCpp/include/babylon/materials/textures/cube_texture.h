@@ -150,7 +150,7 @@ protected:
 
   /**
    * @brief Returns the bounding box size.
-   * @see http://doc.babylonjs.com/how_to/reflect#using-local-cubemap-mode
+   * @see https://doc.babylonjs.com/how_to/reflect#using-local-cubemap-mode
    */
   std::optional<Vector3>& get_boundingBoxSize() override;
 
@@ -183,9 +183,9 @@ public:
   std::string url;
 
   /**
-   * Gets or sets the center of the bounding box associated with the cube
-   * texture. It must define where the camera used to render the texture was set
-   * @see http://doc.babylonjs.com/how_to/reflect#using-local-cubemap-mode
+   * Gets or sets the center of the bounding box associated with the cube texture.
+   * It must define where the camera used to render the texture was set
+   * @see https://doc.babylonjs.com/how_to/reflect#using-local-cubemap-mode
    */
   Vector3 boundingBoxPosition;
 

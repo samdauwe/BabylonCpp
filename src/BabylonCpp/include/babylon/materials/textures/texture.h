@@ -20,7 +20,7 @@ using TexturePtr       = std::shared_ptr<Texture>;
 /**
  * @brief This represents a texture in babylon. It can be easily loaded from a network, base64 or
  * html input.
- * @see http://doc.babylonjs.com/babylon101/materials#texture
+ * @see https://doc.babylonjs.com/babylon101/materials#texture
  */
 class BABYLON_SHARED_EXPORT Texture : public BaseTexture {
 
@@ -186,7 +186,7 @@ protected:
    * @brief Instantiates a new texture.
    * This represents a texture in babylon. It can be easily loaded from a network, base64 or html
    * input.
-   * @see http://doc.babylonjs.com/babylon101/materials#texture
+   * @see https://doc.babylonjs.com/babylon101/materials#texture
    * @param url defines the url of the picture to load as a texture
    * @param sceneOrEngine defines the scene or engine the texture will belong to
    * @param noMipmap defines if the texture will require mip maps or not
@@ -249,44 +249,44 @@ public:
 
   /**
    * Define an offset on the texture to offset the u coordinates of the UVs
-   * @see http://doc.babylonjs.com/how_to/more_materials#offsetting
+   * @see https://doc.babylonjs.com/how_to/more_materials#offsetting
    */
   float uOffset;
 
   /**
    * Define an offset on the texture to offset the v coordinates of the UVs
-   * @see http://doc.babylonjs.com/how_to/more_materials#offsetting
+   * @see https://doc.babylonjs.com/how_to/more_materials#offsetting
    */
   float vOffset;
 
   /**
    * Define an offset on the texture to scale the u coordinates of the UVs
-   * @see http://doc.babylonjs.com/how_to/more_materials#tiling
+   * @see https://doc.babylonjs.com/how_to/more_materials#tiling
    */
   float uScale;
 
   /**
    * Define an offset on the texture to scale the v coordinates of the UVs
-   * @see http://doc.babylonjs.com/how_to/more_materials#tiling
+   * @see https://doc.babylonjs.com/how_to/more_materials#tiling
    */
   float vScale;
 
   /**
    * Define an offset on the texture to rotate around the u coordinates of the UVs
-   * @see http://doc.babylonjs.com/how_to/more_materials
+   * @see https://doc.babylonjs.com/how_to/more_materials
    */
   float uAng;
 
   /**
    * Define an offset on the texture to rotate around the v coordinates of the UVs
-   * @see http://doc.babylonjs.com/how_to/more_materials
+   * @see https://doc.babylonjs.com/how_to/more_materials
    */
   float vAng;
 
   /**
    * Define an offset on the texture to rotate around the w coordinates of the UVs (in case of 3d
    * texture)
-   * @see http://doc.babylonjs.com/how_to/more_materials
+   * @see https://doc.babylonjs.com/how_to/more_materials
    */
   float wAng;
 

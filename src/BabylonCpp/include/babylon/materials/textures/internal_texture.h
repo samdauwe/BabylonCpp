@@ -272,11 +272,11 @@ public:
   /** @hidden */
   WebGLFramebufferPtr _MSAAFramebuffer;
   /** @hidden */
+  WebGLRenderbufferPtr _MSAARenderBuffer;
+  /** @hidden */
   Uint32Array _attachments;
   /** @hidden */
   std::vector<InternalTexturePtr> _textureArray;
-  /** @hidden */
-  WebGLRenderbufferPtr _MSAARenderBuffer;
   /** @hidden */
   int _cachedCoordinatesMode;
   /** @hidden */
