@@ -357,14 +357,14 @@ public:
 
   /**
    * @brief Gets a boolean indicating that the engine is running in deterministic lock step mode.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns true if engine is in deterministic lock step mode
    */
   virtual bool isDeterministicLockStep() const;
 
   /**
    * @brief Gets the max steps when engine is running in deterministic lock step.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns the max steps
    */
   virtual unsigned int getLockstepMaxSteps() const;
@@ -634,9 +634,9 @@ public:
   virtual void _submitVRFrame();
 
   /**
-   * @brief Call this function to leave webVR mode
+   * @brief Call this function to leave webVR mode.
    * Will do nothing if webVR is not supported or if there is no webVR device
-   * @see http://doc.babylonjs.com/how_to/webvr_camera
+   * @see https://doc.babylonjs.com/how_to/webvr_camera
    */
   virtual void disableVR();
 
@@ -749,8 +749,9 @@ public:
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
+   * @returns true if the size was changed
    */
-  void setSize(int width = 0, int height = 0) override;
+  bool setSize(int width = 0, int height = 0) override;
 
   /**
    * @brief Updates a dynamic vertex buffer.
@@ -832,7 +833,7 @@ public:
 
   /**
    * @brief Updates the sample count of a render target texture.
-   * @see http://doc.babylonjs.com/features/webgl2#multisample-render-targets
+   * @see https://doc.babylonjs.com/features/webgl2#multisample-render-targets
    * @param texture defines the texture to update
    * @param samples defines the sample count to set
    * @returns the effective sample count (could be 0 if multisample render targets are not
@@ -894,13 +895,13 @@ public:
 
   /**
    * @brief Display the loading screen.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   virtual void displayLoadingUI();
 
   /**
    * @brief Hide the loading screen.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   virtual void hideLoadingUI();
 
@@ -1103,31 +1104,31 @@ protected:
 
   /**
    * @brief Gets the performance monitor attached to this engine.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
    */
   std::unique_ptr<PerformanceMonitor>& get_performanceMonitor();
 
   /**
    * @brief Gets the current loading screen object.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   ILoadingScreenPtr& get_loadingScreen();
 
   /**
    * @brief Sets the current loading screen object.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   void set_loadingScreen(const ILoadingScreenPtr& loadingScreen);
 
   /**
    * @brief Sets the current loading screen text.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   void set_loadingUIText(std::string text);
 
   /**
    * @brief Sets the current loading screen background color.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   void set_loadingUIBackgroundColor(std::string color);
 
@@ -1221,7 +1222,7 @@ public:
 
   /**
    * Gets the audio engine
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    * @ignorenaming
    */
   static AudioEnginePtr audioEngine;
@@ -1242,25 +1243,25 @@ public:
 
   /**
    * Gets the performance monitor attached to this engine
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
    */
   ReadOnlyProperty<Engine, std::unique_ptr<PerformanceMonitor>> performanceMonitor;
 
   /**
    * Gets or sets the current loading screen object.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   Property<Engine, ILoadingScreenPtr> loadingScreen;
 
   /**
    * Sets the current loading screen text.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   WriteOnlyProperty<Engine, std::string> loadingUIText;
 
   /**
    * @brief Sets the current loading screen background color.
-   * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
+   * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   WriteOnlyProperty<Engine, std::string> loadingUIBackgroundColor;
 

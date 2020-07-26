@@ -24,14 +24,14 @@ public:
 
   /**
    * @see Gets a boolean indicating that the engine is running in deterministic lock step mode.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns true if engine is in deterministic lock step mode
    */
   bool isDeterministicLockStep() const override;
 
   /**
    * @see Gets the max steps when engine is running in deterministic lock step.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns the max steps
    */
   unsigned int getLockstepMaxSteps() const override;
@@ -300,7 +300,7 @@ public:
    * @param mode defines the mode to use (one of the Engine.ALPHA_XXX)
    * @param noDepthWriteChange defines if depth writing state should remains unchanged (false by
    * default)
-   * @see http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
+   * @see https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered
    */
   void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false) override;
 

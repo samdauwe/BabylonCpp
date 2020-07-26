@@ -34,6 +34,11 @@ struct BABYLON_SHARED_EXPORT NullEngineOptions {
    * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
   unsigned int lockstepMaxSteps = 4;
+
+  /**
+   * Make the matrix computations to be performed in 64 bits instead of 32 bits. False by default
+   */
+  bool useHighPrecisionMatrix;
 }; // end of struct NullEngineOptions
 
 } // end of namespace BABYLON

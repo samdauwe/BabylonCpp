@@ -754,6 +754,10 @@ class BABYLON_SHARED_EXPORT IGLRenderingContext {
 public:
   // Half floating-point type (16-bit).
   unsigned int HALF_FLOAT_OES = GL::HALF_FLOAT_OES;
+  // Constants
+  unsigned int RGBA16F          = GL::RGBA16F;
+  unsigned int RGBA32F          = GL::RGBA32F;
+  unsigned int DEPTH24_STENCIL8 = GL::DEPTH24_STENCIL8;
   // Drawing buffer width and height
   int drawingBufferWidth;
   int drawingBufferHeight;

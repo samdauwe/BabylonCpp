@@ -278,8 +278,9 @@ public:
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
+   * @returns true if the size was changed
    */
-  virtual void setSize(int width = 0, int height = 0);
+  virtual bool setSize(int width = 0, int height = 0);
 
   /**
    * @brief Binds the frame buffer to the specified texture.
@@ -363,7 +364,7 @@ public:
 
   /**
    * @brief Records a vertex array object.
-   * @see http://doc.babylonjs.com/features/webgl2#vertex-array-objects
+   * @see https://doc.babylonjs.com/features/webgl2#vertex-array-objects
    * @param vertexBuffers defines the list of vertex buffers to store
    * @param indexBuffer defines the index buffer to store
    * @param effect defines the effect to store
@@ -375,7 +376,7 @@ public:
 
   /**
    * @brief Bind a specific vertex array object.
-   * @see http://doc.babylonjs.com/features/webgl2#vertex-array-objects
+   * @see https://doc.babylonjs.com/features/webgl2#vertex-array-objects
    * @param vertexArrayObject defines the vertex array object to bind
    * @param indexBuffer defines the index buffer to bind
    */
@@ -1611,7 +1612,7 @@ protected:
 
   /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    */
   bool get_supportsUniformBuffers() const;
 
@@ -1630,14 +1631,14 @@ protected:
   /**
    * @brief Gets a boolean indicating if resources should be retained to be able to handle context
    * lost events.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
    */
   bool get_doNotHandleContextLost() const;
 
   /**
    * @brief Sets a boolean indicating if resources should be retained to be able to handle context
    * lost events.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
    */
   void set_doNotHandleContextLost(bool value);
 
@@ -1827,7 +1828,7 @@ public:
 
   /**
    * Gets a boolean indicating that the engine supports uniform buffers
-   * @see http://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
+   * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    */
   ReadOnlyProperty<ThinEngine, bool> supportsUniformBuffers;
 
@@ -1875,7 +1876,7 @@ public:
   /**
    * Gets or sets a boolean indicating if resources should be retained to be able to handle context
    * lost events
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
    */
   Property<ThinEngine, bool> doNotHandleContextLost;
 

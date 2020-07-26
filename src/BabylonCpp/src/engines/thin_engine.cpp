@@ -415,6 +415,20 @@ void ThinEngine::_initGLContext()
     _glRenderer = "Unknown renderer";
   }
 
+  // Constants
+  if (_gl->HALF_FLOAT_OES != 0x8D61) {
+    _gl->HALF_FLOAT_OES = 0x8D61; // Half floating-point type (16-bit).
+  }
+  if (_gl->RGBA16F != 0x881A) {
+    _gl->RGBA16F = 0x881A; // RGBA 16-bit floating-point color-renderable internal sized format.
+  }
+  if (_gl->RGBA32F != 0x8814) {
+    _gl->RGBA32F = 0x8814; // RGBA 32-bit floating-point color-renderable internal sized format.
+  }
+  if (_gl->DEPTH24_STENCIL8 != 35056) {
+    _gl->DEPTH24_STENCIL8 = 35056;
+  }
+
   // Extensions
   auto extensionList = StringTools::split(_gl->getString(GL::EXTENSIONS), ' ');
   std::set<std::string> extensions;
@@ -439,7 +453,9 @@ void ThinEngine::_initGLContext()
   _caps.textureHalfFloat                = (_webGLVersion > 1.f);
   _caps.textureHalfFloatLinearFiltering = (_webGLVersion > 1.f);
   if (_webGLVersion > 1) {
-    _gl->HALF_FLOAT_OES = 0x140B;
+    if (_gl->HALF_FLOAT_OES != 0x140B) {
+      _gl->HALF_FLOAT_OES = 0x140B;
+    }
   }
   _caps.textureHalfFloatRender = _caps.textureHalfFloat && _canRenderToHalfFloatFramebuffer();
 
@@ -747,18 +763,20 @@ void ThinEngine::resize()
           static_cast<int>(height / _hardwareScalingLevel));
 }
 
-void ThinEngine::setSize(int width, int height)
+bool ThinEngine::setSize(int width, int height)
 {
   if (!_renderingCanvas) {
-    return;
+    return false;
   }
 
   if (_renderingCanvas->width == width && _renderingCanvas->height == height) {
-    return;
+    return false;
   }
 
   _renderingCanvas->width  = width;
   _renderingCanvas->height = height;
+
+  return true;
 }
 
 void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture, unsigned int faceIndex,
@@ -862,6 +880,12 @@ void ThinEngine::unBindFramebuffer(const InternalTexturePtr& texture, bool disab
   auto& gl = *_gl;
 
   if (texture->_MSAAFramebuffer) {
+    if (!texture->_textureArray.empty()) {
+      // This texture is part of a MRT texture, we need to treat all attachments
+      unBindMultiColorAttachmentFramebuffer(texture->_textureArray, disableGenerateMipMaps,
+                                            onBeforeUnbind);
+      return;
+    }
     gl.bindFramebuffer(GL::READ_FRAMEBUFFER, texture->_MSAAFramebuffer.get());
     gl.bindFramebuffer(GL::DRAW_FRAMEBUFFER, texture->_framebuffer.get());
     gl.blitFramebuffer(0, 0, texture->width, texture->height, 0, 0, texture->width, texture->height,
@@ -1333,7 +1357,11 @@ void ThinEngine::bindInstancesBuffer(const WebGLDataBufferPtr& instancesBuffer,
 
   for (auto& ai : attributesInfo) {
     if (!ai.index.has_value()) {
-      ai.index = _currentEffect->getAttributeLocationByName(ai.attributeName);
+      auto index = _currentEffect->getAttributeLocationByName(ai.attributeName);
+      if (index < 0) {
+        continue;
+      }
+      ai.index = static_cast<unsigned>(index);
     }
 
     if (!stl_util::contains(_vertexAttribArraysEnabled, *ai.index)
@@ -2196,7 +2224,7 @@ InternalTexturePtr ThinEngine::createTexture(
   IInternalTextureLoaderPtr loader = nullptr;
 
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
-    if (availableLoader->canLoad(extension)) {
+    if (availableLoader->canLoad(extension, mimeType)) {
       loader = availableLoader;
       break;
     }

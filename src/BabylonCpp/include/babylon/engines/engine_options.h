@@ -26,24 +26,24 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
   int limitDeviceRatio = false;
   /**
    * Defines if webvr should be enabled automatically
-   * @see http://doc.babylonjs.com/how_to/webvr_camera
+   * @see https://doc.babylonjs.com/how_to/webvr_camera
    */
   bool autoEnableWebVR       = false;
   bool preserveDrawingBuffer = true;
   bool stencil               = true;
   /**
    * Defines if webgl2 should be turned off even if supported
-   * @see http://doc.babylonjs.com/features/webgl2
+   * @see https://doc.babylonjs.com/features/webgl2
    */
   bool disableWebGL2Support = false;
   /**
    * Defines if webaudio should be initialized as well
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   bool audioEngine = false;
   /**
    * Defines if animations should run using a deterministic lock step
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
   bool deterministicLockstep = false;
   /**
@@ -74,6 +74,14 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    * default
    */
   bool premultipliedAlpha = true;
+  /**
+   * Make the canvas XR Compatible for XR sessions
+   */
+  bool xrCompatible = false;
+  /**
+   * Make the matrix computations to be performed in 64 bits instead of 32 bits. False by default
+   */
+  bool useHighPrecisionMatrix = false;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON

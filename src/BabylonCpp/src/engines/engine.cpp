@@ -625,13 +625,15 @@ void Engine::resize()
   ThinEngine::resize();
 }
 
-void Engine::setSize(int width, int height)
+bool Engine::setSize(int width, int height)
 {
   if (!_renderingCanvas) {
-    return;
+    return false;
   }
 
-  ThinEngine::setSize(width, height);
+  if (!ThinEngine::setSize(width, height)) {
+    return false;
+  }
 
   if (!scenes.empty()) {
     for (const auto& scene : scenes) {
@@ -644,6 +646,8 @@ void Engine::setSize(int width, int height)
       onResizeObservable.notifyObservers(this);
     }
   }
+
+  return true;
 }
 
 void Engine::updateDynamicVertexBuffer(const WebGLDataBufferPtr& vertexBuffer,
