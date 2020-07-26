@@ -21,9 +21,10 @@ struct BABYLON_SHARED_EXPORT _KTXTextureLoader : public IInternalTextureLoader {
   /**
    * @brief This returns if the loader support the current file information.
    * @param extension defines the file extension of the file being loaded
+   * @param mimeType defines the optional mime type of the file being loaded
    * @returns true if the loader can load the specified file
    */
-  bool canLoad(const std::string& extension) override;
+  bool canLoad(const std::string& extension, const std::string& mimeType = "") override;
 
   /**
    * @brief Uploads the cube texture data to the WebGL texture. It has already been bound.

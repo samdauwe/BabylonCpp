@@ -17,7 +17,7 @@ bool _ENVTextureLoader::supportCascades() const
   return false;
 }
 
-bool _ENVTextureLoader::canLoad(const std::string& extension)
+bool _ENVTextureLoader::canLoad(const std::string& extension, const std::string& /*mimeType*/)
 {
   return StringTools::endsWith(extension, ".env");
 }

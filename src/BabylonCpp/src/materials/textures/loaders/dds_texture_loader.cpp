@@ -16,7 +16,7 @@ bool _DDSTextureLoader::supportCascades() const
   return true;
 }
 
-bool _DDSTextureLoader::canLoad(const std::string& extension)
+bool _DDSTextureLoader::canLoad(const std::string& extension, const std::string& /*mimeType*/)
 {
   return StringTools::endsWith(extension, ".dds");
 }

@@ -17,11 +17,12 @@ bool _KTXTextureLoader::supportCascades() const
   return false;
 }
 
-bool _KTXTextureLoader::canLoad(const std::string& extension)
+bool _KTXTextureLoader::canLoad(const std::string& extension, const std::string& mimeType)
 {
   // The ".ktx2" file extension is still up for debate:
   // https://github.com/KhronosGroup/KTX-Specification/issues/18
-  return StringTools::endsWith(extension, ".ktx") || StringTools::endsWith(extension, ".ktx2");
+  return StringTools::endsWith(extension, ".ktx") || StringTools::endsWith(extension, ".ktx2")
+         || mimeType == "image/ktx" || mimeType == "image/ktx2";
 }
 
 void _KTXTextureLoader::loadCubeData(

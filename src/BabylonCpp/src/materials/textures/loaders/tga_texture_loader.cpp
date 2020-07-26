@@ -16,7 +16,7 @@ bool _TGATextureLoader::supportCascades() const
   return false;
 }
 
-bool _TGATextureLoader::canLoad(const std::string& extension)
+bool _TGATextureLoader::canLoad(const std::string& extension, const std::string& /*mimeType*/)
 {
   return StringTools::endsWith(extension, ".tga");
 }
