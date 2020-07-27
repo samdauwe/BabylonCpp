@@ -150,6 +150,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void PrepareDefinesForMultiview(Scene* scene, MaterialDefines& defines);
 
   /**
+   * @brief Prepares the defines related to the prepass.
+   * @param scene The scene we are intending to draw
+   * @param defines The defines to update
+   * @param canRenderToMRT Indicates if this material renders to several textures in the prepass
+   */
+  static void PrepareDefinesForPrePass(Scene* scene, MaterialDefines& defines, bool canRenderToMRT);
+
+  /**
    * @brief Prepares the defines related to the light information passed in parameter
    * @param scene The scene we are intending to draw
    * @param mesh The mesh the effect is compiling for

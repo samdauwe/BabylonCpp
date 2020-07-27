@@ -23,6 +23,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 
 namespace BABYLON {
 
@@ -266,6 +267,25 @@ void MaterialHelper::PrepareDefinesForMultiview(Scene* scene, MaterialDefines& d
     if (defines["MULTIVIEW"] != previousMultiview) {
       defines.markAsUnprocessed();
     }
+  }
+}
+
+void MaterialHelper::PrepareDefinesForPrePass(Scene* scene, MaterialDefines& defines,
+                                              bool canRenderToMRT)
+{
+  const auto previousPrePass = defines["PREPASS"];
+
+  if (scene->prePassRenderer() && canRenderToMRT) {
+    defines.boolDef["PREPASS"]        = true;
+    defines.intDef["SCENE_MRT_COUNT"] = static_cast<int>(scene->prePassRenderer()->mrtCount);
+  }
+  else {
+    defines.boolDef["PREPASS"] = false;
+  }
+
+  if (defines["PREPASS"] != previousPrePass) {
+    defines.markAsUnprocessed();
+    defines.markAsImageProcessingDirty();
   }
 }
 
