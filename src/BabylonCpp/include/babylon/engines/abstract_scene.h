@@ -234,13 +234,13 @@ public:
 
   /**
    * All of the cameras added to this scene
-   * @see http://doc.babylonjs.com/babylon101/cameras
+   * @see https://doc.babylonjs.com/babylon101/cameras
    */
   std::vector<CameraPtr> cameras;
 
   /**
    * All of the lights added to this scene
-   * @see http://doc.babylonjs.com/babylon101/lights
+   * @see https://doc.babylonjs.com/babylon101/lights
    */
   std::vector<LightPtr> lights;
 
@@ -251,13 +251,13 @@ public:
 
   /**
    * The list of skeletons added to the scene
-   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+   * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   std::vector<SkeletonPtr> skeletons;
 
   /**
    * All of the particle systems added to this scene
-   * @see http://doc.babylonjs.com/babylon101/particles
+   * @see https://doc.babylonjs.com/babylon101/particles
    */
   std::vector<IParticleSystemPtr> particleSystems;
 
@@ -268,13 +268,13 @@ public:
 
   /**
    * All of the animation groups added to this scene
-   * @see http://doc.babylonjs.com/how_to/group
+   * @see https://doc.babylonjs.com/how_to/group
    */
   std::vector<AnimationGroupPtr> animationGroups;
 
   /**
    * All of the multi-materials added to this scene
-   * @see http://doc.babylonjs.com/how_to/multi_materials
+   * @see https://doc.babylonjs.com/how_to/multi_materials
    */
   std::vector<MultiMaterialPtr> multiMaterials;
 
@@ -283,13 +283,13 @@ public:
    * In the context of a Scene, it is not supposed to be modified manually.
    * Any addition or removal should be done using the addMaterial and removeMaterial Scene methods.
    * Note also that the order of the Material within the array is not significant and might change.
-   * @see http://doc.babylonjs.com/babylon101/materials
+   * @see https://doc.babylonjs.com/babylon101/materials
    */
   std::vector<MaterialPtr> materials;
 
   /**
    * The list of morph target managers added to the scene
-   * @see http://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh
+   * @see https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh
    */
   std::vector<MorphTargetManagerPtr> morphTargetManagers;
 
@@ -304,7 +304,7 @@ public:
    * Any addition or removal should be done using the addTransformNode and removeTransformNode Scene
    * methods. Note also that the order of the TransformNode wihin the array is not significant and
    * might change.
-   * @see http://doc.babylonjs.com/how_to/transformnode
+   * @see https://doc.babylonjs.com/how_to/transformnode
    */
   std::vector<TransformNodePtr> transformNodes;
 
