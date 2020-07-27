@@ -64,7 +64,10 @@
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>
+#include <babylon/rendering/edges_renderer.h>
 #include <babylon/rendering/outline_renderer.h>
+#include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/rendering_group.h>
 
 namespace BABYLON {
 
@@ -773,6 +776,16 @@ void Mesh::_afterComputeWorldMatrix()
   }
 }
 
+void Mesh::_postActivate()
+{
+  if (edgesShareWithInstances && edgesRenderer() && edgesRenderer()->isEnabled && _renderingGroup) {
+    if (!stl_util::contains(_renderingGroup->_edgesRenderers, edgesRenderer())) {
+      _renderingGroup->_edgesRenderers.emplace_back(edgesRenderer());
+    }
+    edgesRenderer()->customInstances.emplace_back(getWorldMatrix());
+  }
+}
+
 Mesh& Mesh::refreshBoundingInfo(bool applySkeleton)
 {
   if (_boundingInfo && _boundingInfo->isLocked()) {
@@ -850,7 +863,9 @@ void Mesh::subdivide(size_t count)
     }
 
     SubMesh::CreateFromIndices(0, static_cast<unsigned>(offset),
-                               std::min(subdivisionSize, totalIndices - offset),
+                               static_cast<int>(index) == static_cast<int>(count) - 1 ?
+                                 totalIndices - offset :
+                                 subdivisionSize,
                                shared_from_base<Mesh>());
 
     offset += subdivisionSize;
@@ -1705,6 +1720,11 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
 
   if (!effect) {
     return *this;
+  }
+
+  // Render to MRT
+  if (scene.prePassRenderer()) {
+    scene.prePassRenderer()->bindAttachmentsForEffect(*effect);
   }
 
   auto& effectiveMesh = effectiveMeshReplacement ? *effectiveMeshReplacement : *_effectiveMesh();
@@ -2710,9 +2730,9 @@ void Mesh::forceSharedVertices()
     // lists facet vertex positions (a,b,c) as string "a|b|c"
     std::vector<std::string> pstring;
 
-    auto indexPtr = 0ull;                     // pointer to next available index value
-    std::vector<std::string> uniquePositions; // unique vertex positions
-    auto ptr = 0;                             // pointer to element in uniquePositions
+    auto indexPtr = 0ull;                                 // pointer to next available index value
+    std::unordered_map<std::string, int> uniquePositions; // unique vertex positions
+    auto ptr = 0;                                         // pointer to element in uniquePositions
     IndicesArray facet;
 
     for (size_t i = 0; i < currentIndices.size(); i += 3) {
@@ -2728,7 +2748,6 @@ void Mesh::forceSharedVertices()
           }
           pstring[j] += std::to_string(currentPositions[3 * facet[j] + k]) + "|";
         }
-        pstring[j] = pstring[j].substr(0, pstring[j].size() - 1);
       }
       // check facet vertices to see that none are repeated
       // do not process any facet that has a repeated vertex, ie is a line
@@ -2737,10 +2756,10 @@ void Mesh::forceSharedVertices()
         // if not listed add to uniquePositions and set index pointer
         // if listed use its index in uniquePositions and new index pointer
         for (size_t j = 0; j < 3; j++) {
-          auto ptrTmp = stl_util::index_of(uniquePositions, pstring[j]);
-          if (ptrTmp < 0) {
-            uniquePositions.emplace_back(pstring[j]);
-            ptrTmp = static_cast<int>(indexPtr++);
+          ptr = stl_util::contains(uniquePositions, pstring[j]) ? uniquePositions[pstring[j]] : -1;
+          if (ptr == -1) {
+            uniquePositions[pstring[j]] = indexPtr;
+            ptr                         = static_cast<int>(indexPtr++);
             // not listed so add individual x, y, z coordinates to positions
             for (unsigned k = 0; k < 3; k++) {
               positions.emplace_back(currentPositions[3 * facet[j] + k]);
@@ -2757,7 +2776,6 @@ void Mesh::forceSharedVertices()
             }
           }
           // add new index pointer to indices array
-          ptr = static_cast<int32_t>(ptrTmp);
           indices.emplace_back(ptr);
         }
       }

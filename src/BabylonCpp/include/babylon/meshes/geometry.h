@@ -466,6 +466,13 @@ public:
   std::vector<Vector3> centroids;
 
   /**
+   * If set to true (false by defaut), the bounding info applied to the meshes sharing this geometry
+   * will be the bounding info defined at the class level and won't be computed based on the vertex
+   * positions (which is what we get when useBoundingInfoFromGeometry = false)
+   */
+  bool useBoundingInfoFromGeometry;
+
+  /**
    * Gets the current extend of the geometry
    */
   ReadOnlyProperty<Geometry, MinMax> extend;

@@ -28,6 +28,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
     : delayLoadState{Constants::DELAYLOADSTATE_NONE}
     , boundingBias(this, &Geometry::get_boundingBias, &Geometry::set_boundingBias)
     , meshes(this, &Geometry::get_meshes)
+    , useBoundingInfoFromGeometry{false}
     , extend(this, &Geometry::get_extend)
     , doNotSerialize(this, &Geometry::get_doNotSerialize)
     , _totalVertices{0}
@@ -545,11 +546,19 @@ void Geometry::applyToMesh(Mesh* mesh)
 
 void Geometry::_updateExtend(Float32Array data)
 {
-  if (data.empty()) {
-    data = getVerticesData(VertexBuffer::PositionKind);
+  if (useBoundingInfoFromGeometry && _boundingInfo) {
+    _extend = MinMax{
+      _boundingInfo->minimum().copy(), // minimum
+      _boundingInfo->maximum().copy()  // maximum
+    };
   }
+  else {
+    if (data.empty()) {
+      data = getVerticesData(VertexBuffer::PositionKind);
+    }
 
-  _extend = extractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
+    _extend = extractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
+  }
 }
 
 void Geometry::_applyToMesh(Mesh* mesh)

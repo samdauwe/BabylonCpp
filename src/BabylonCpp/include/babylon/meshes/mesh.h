@@ -470,6 +470,11 @@ public:
   Mesh& _registerInstanceForRenderId(InstancedMesh* instance, int renderId);
 
   /**
+   * @brief Hidden
+   */
+  virtual void _postActivate() override;
+
+  /**
    * @brief This method recomputes and sets a new BoundingInfo to the mesh
    * unless it is locked. This means the mesh underlying bounding box and sphere
    * are recomputed.
@@ -594,7 +599,7 @@ public:
    * @brief This method updates the vertex positions of an updatable mesh
    * according to the `positionFunction` returned values.
    * @see
-   * http://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#other-shapes-updatemeshpositions
+   * https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#other-shapes-updatemeshpositions
    * @param positionFunction is a simple JS function what is passed the mesh
    * `positions` array. It doesn't need to return anything
    * @param computeNormals is a boolean (default true) to enable/disable the
@@ -922,7 +927,7 @@ public:
    * the same transformation. Note that, under the hood, this method sets a new
    * VertexBuffer each call.
    * @param transform defines the transform matrix to use
-   * @see http://doc.babylonjs.com/resources/baking_transformations
+   * @see https://doc.babylonjs.com/resources/baking_transformations
    * @returns the current mesh
    */
   Mesh& bakeTransformIntoVertices(const Matrix& transform);
@@ -932,7 +937,7 @@ public:
    * The mesh World Matrix is then reset.
    * This method returns nothing but really modifies the mesh even if it's originally not set as
    * updatable. Note that, under the hood, this method sets a new VertexBuffer each call.
-   * @see http://doc.babylonjs.com/resources/baking_transformations
+   * @see https://doc.babylonjs.com/resources/baking_transformations
    * @param bakeIndependenlyOfChildren indicates whether to preserve all child nodes' World Matrix
    * during baking
    * @returns the current mesh
@@ -1098,7 +1103,7 @@ public:
   /**
    * @brief Creates a new InstancedMesh object from the mesh model.
    * Warning : this method is not supported for Line mesh and LineSystem
-   * @see http://doc.babylonjs.com/how_to/how_to_use_instances
+   * @see https://doc.babylonjs.com/how_to/how_to_use_instances
    * @param name defines the name of the new instance
    * @returns a new InstancedMesh
    */
@@ -1133,8 +1138,8 @@ public:
    * prevent seams when using textures. So use carefully.
    *
    * More information on the need for extra facets, which turn out to be lines,
-   * can be found in http://babylonjsguide.github.io/advanced/Facets.html
-   * @see http://babylonjsguide.github.io/snippets/Minimise_Vertices
+   * can be found in https://babylonjsguide.github.io/advanced/Facets.html
+   * @see https://babylonjsguide.github.io/snippets/Minimise_Vertices
    */
   void minimizeVertices();
 
@@ -1183,7 +1188,7 @@ public:
   /**
    * @brief Creates a ribbon mesh. Please consider using the same method from
    * the MeshBuilder class instead.
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes
    * @param name defines the name of the mesh to create
    * @param pathArray is a required array of paths, what are each an array of
    * successive Vector3. The pathArray parameter depicts the ribbon geometry.
@@ -1196,10 +1201,10 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @param instance defines an instance of an existing Ribbon object to be
    * updated with the passed `pathArray` parameter
-   * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#ribbon)
+   * (https://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#ribbon)
    * @returns a new Mesh
    */
   static MeshPtr CreateRibbon(const std::string& name,
@@ -1220,7 +1225,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateDisc(const std::string& name, float radius = 0.5f,
@@ -1236,7 +1241,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateBox(const std::string& name, float size = 1.f, Scene* = nullptr,
@@ -1253,7 +1258,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateSphere(const std::string& name, unsigned int segments = 32,
@@ -1290,7 +1295,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateCylinder(const std::string& name, float height = 2.f,
@@ -1313,7 +1318,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateTorus(const std::string& name, float diameter = 1.f, float thickness = 0.5f,
@@ -1338,7 +1343,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateTorusKnot(const std::string& name, float radius = 2.f, float tube = 0.5f,
@@ -1357,7 +1362,7 @@ public:
    * @param updatable defines if the mesh must be flagged as updatable
    * @param instance is an instance of an existing LineMesh object to be updated
    * with the passed `points` parameter
-   * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#lines-and-dashedlines).
+   * (https://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#lines-and-dashedlines).
    * @returns a new Mesh
    */
   static LinesMeshPtr CreateLines(const std::string& name, const std::vector<Vector3>& points,
@@ -1379,7 +1384,7 @@ public:
    * @param updatable defines if the mesh must be flagged as updatable
    * @param instance is an instance of an existing LineMesh object to be updated
    * with the passed `points` parameter
-   * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#lines-and-dashedlines)
+   * (https://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#lines-and-dashedlines)
    * @returns a new Mesh
    */
   static LinesMeshPtr CreateDashedLines(const std::string& name, std::vector<Vector3>& points,
@@ -1391,7 +1396,7 @@ public:
   /**
    * @brief Creates a polygon mesh.Please consider using the same method from
    * the MeshBuilder class instead.
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#non-regular-polygon
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#non-regular-polygon
    * @param name defines the name of the mesh to create
    * @param shape is a required array of successive Vector3 representing the
    * corners of the polygon in th XoZ plane, that is y = 0 for all vectors
@@ -1400,7 +1405,7 @@ public:
    * defines holes in the polygon
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreatePolygon(const std::string& name, const std::vector<Vector3>& shape,
@@ -1412,7 +1417,7 @@ public:
    * @brief Creates an extruded polygon mesh, with depth in the Y direction.
    * Please consider using the same method from the MeshBuilder class instead.
    * @see
-   * http://doc.babylonjs.com/how_to/parametric_shapes#extruded-non-regular-polygon
+   * https://doc.babylonjs.com/how_to/parametric_shapes#extruded-non-regular-polygon
    * @param name defines the name of the mesh to create
    * @param shape is a required array of successive Vector3 representing the
    * corners of the polygon in th XoZ plane, that is y = 0 for all vectors
@@ -1422,7 +1427,7 @@ public:
    * defines holes in the polygon
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr ExtrudePolygon(const std::string& name, const std::vector<Vector3>& shape,
@@ -1436,8 +1441,8 @@ public:
    * The extrusion is a parametric shape. It has no predefined shape. Its final
    * shape will depend on the input parameters. Please consider using the same
    * method from the MeshBuilder class instead.
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    * @param name defines the name of the mesh to create
    * @param shape is a required array of successive Vector3. This array depicts
    * the shape to be extruded in its local space : the shape must be designed in
@@ -1453,10 +1458,10 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @param instance is an instance of an existing ExtrudedShape object to be
    * updated with the passed `shape`, `path`, `scale` or `rotation` parameters
-   * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#extruded-shape)
+   * (https://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#extruded-shape)
    * @returns a new Mesh
    */
   static MeshPtr ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
@@ -1472,7 +1477,7 @@ public:
    * It has no predefined shape. Its final shape will depend on the input
    * parameters. Please consider using the same method from the MeshBuilder
    * class instead.
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    * @param name defines the name of the mesh to create
    * @param shape is a required array of successive Vector3. This array depicts
    * the shape to be extruded in its local space : the shape must be designed in
@@ -1493,10 +1498,10 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @param instance is an instance of an existing ExtrudedShape object to be
    * updated with the passed `shape`, `path`, `scale` or `rotation` parameters
-   * (http://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape)
+   * (https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape)
    * @returns a new Mesh
    */
   static MeshPtr
@@ -1524,7 +1529,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
@@ -1541,7 +1546,7 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
   static MeshPtr CreatePlane(const std::string& name, float size, Scene* = nullptr,
@@ -1591,7 +1596,7 @@ public:
   /**
    * @brief Creates a ground mesh from a height map.
    * Please consider using the same method from the MeshBuilder class instead.
-   * @see http://doc.babylonjs.com/babylon101/height_map
+   * @see https://doc.babylonjs.com/babylon101/height_map
    * @param name defines the name of the mesh to create
    * @param url sets the URL of the height map image resource
    * @param width set the ground width size
@@ -1620,7 +1625,7 @@ public:
    * It has no predefined shape. Its final shape will depend on the input
    * parameters. Please consider using the same method from the MeshBuilder
    * class instead
-   * @see http://doc.babylonjs.com/how_to/parametric_shapes
+   * @see https://doc.babylonjs.com/how_to/parametric_shapes
    * @param name defines the name of the mesh to create
    * @param path is a required array of successive Vector3. It is the curve used
    * as the axis of the tube
@@ -1635,10 +1640,10 @@ public:
    * @param scene defines the hosting scene
    * @param updatable defines if the mesh must be flagged as updatable
    * @param sideOrientation defines the mesh side orientation
-   * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @param instance is an instance of an existing Tube object to be updated
    * with the passed `pathArray` parameter
-   * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#tube)
+   * (https://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#tube)
    * @returns a new Mesh
    */
   static MeshPtr
@@ -1680,7 +1685,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh to create
@@ -1709,14 +1714,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns a new Mesh
-   * @see http://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
+   * @see https://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
    */
   static MeshPtr CreateIcoSphere(const std::string& name, IcoSphereOptions& options, Scene* scene);
 
@@ -1875,13 +1880,13 @@ protected:
 
   /**
    * @brief Gets the morph target manager.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
+   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
    */
   MorphTargetManagerPtr& get_morphTargetManager();
 
   /**
    * @brief Sets the morph target manager.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
+   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
    */
   void set_morphTargetManager(const MorphTargetManagerPtr& value);
 
@@ -2013,16 +2018,16 @@ public:
   // Members
   /**
    * Gets the delay loading state of the mesh (when delay loading is turned on)
-   * @see http://doc.babylonjs.com/how_to/using_the_incremental_loading_system
+   * @see https://doc.babylonjs.com/how_to/using_the_incremental_loading_system
    */
   int delayLoadState;
 
   /**
    * Gets the list of instances created from this mesh
    * it is not supposed to be modified manually.
-   * Note also that the order of the InstancedMesh wihin the array is not
-   * significant and might change.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_instances
+   * Note also that the order of the InstancedMesh wihin the array is not significant and might
+   * change.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_instances
    */
   std::vector<InstancedMesh*> instances;
 
@@ -2043,13 +2048,13 @@ public:
 
   /**
    * User defined function used to change how LOD level selection is done
-   * @see http://doc.babylonjs.com/how_to/how_to_use_lod
+   * @see https://doc.babylonjs.com/how_to/how_to_use_lod
    */
   std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)> onLODLevelSelection;
 
   /**
    * Gets or sets the morph target manager
-   * @see http://doc.babylonjs.com/how_to/how_to_use_morphtargets
+   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
    */
   Property<Mesh, MorphTargetManagerPtr> morphTargetManager;
 

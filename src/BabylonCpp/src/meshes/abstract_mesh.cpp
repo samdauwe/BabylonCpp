@@ -28,6 +28,7 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/particles/solid_particle.h>
@@ -1480,14 +1481,17 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
     auto pickedPoint    = worldDirection.addInPlace(worldOrigin);
 
     // Return result
-    pickingInfo.hit         = true;
-    pickingInfo.distance    = Vector3::Distance(worldOrigin, pickedPoint);
-    pickingInfo.pickedPoint = pickedPoint;
-    pickingInfo.pickedMesh  = shared_from_base<AbstractMesh>();
-    pickingInfo.bu          = intersectInfo->bu.value_or(0.f);
-    pickingInfo.bv          = intersectInfo->bv.value_or(0.f);
-    pickingInfo.faceId      = static_cast<int>(intersectInfo->faceId);
-    pickingInfo.subMeshId   = static_cast<int>(intersectInfo->subMeshId);
+    pickingInfo.hit           = true;
+    pickingInfo.distance      = Vector3::Distance(worldOrigin, pickedPoint);
+    pickingInfo.pickedPoint   = pickedPoint;
+    pickingInfo.pickedMesh    = shared_from_base<AbstractMesh>();
+    pickingInfo.bu            = intersectInfo->bu.value_or(0.f);
+    pickingInfo.bv            = intersectInfo->bv.value_or(0.f);
+    pickingInfo.subMeshFaceId = static_cast<int>(intersectInfo->faceId);
+    pickingInfo.faceId        = intersectInfo->faceId
+                         + subMeshes[intersectInfo->subMeshId]->indexStart
+                             / (StringTools::indexOf(getClassName(), "LinesMesh") != -1 ? 2 : 3);
+    pickingInfo.subMeshId = static_cast<int>(intersectInfo->subMeshId);
     return pickingInfo;
   }
 
@@ -2061,6 +2065,18 @@ bool AbstractMesh::_checkOcclusionQuery()
   }
 
   return dataStorage.isOccluded;
+}
+
+std::vector<IParticleSystemPtr> AbstractMesh::getConnectedParticleSystems()
+{
+  std::vector<IParticleSystemPtr> particleSystems;
+  for (const auto& particleSystem : _scene->particleSystems) {
+    if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+        && std::get<AbstractMeshPtr>(particleSystem->emitter).get() == this) {
+      particleSystems.emplace_back(particleSystem);
+    }
+  }
+  return particleSystems;
 }
 
 } // end of namespace BABYLON

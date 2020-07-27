@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
+#include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/maths/axis.h>
 #include <babylon/maths/vector2.h>
@@ -20,6 +21,11 @@ VertexData::~VertexData() = default;
 
 void VertexData::set(const Float32Array& data, const std::string& kind)
 {
+  if (data.empty()) {
+    BABYLON_LOGF_WARN("VertexData", "Setting vertex data kind '%s' with an empty array",
+                      kind.c_str())
+  }
+
   if (kind == VertexBuffer::PositionKind) {
     positions = data;
   }

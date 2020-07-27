@@ -32,6 +32,7 @@ class BoundingInfo;
 class Camera;
 class Collider;
 struct IEdgesRenderer;
+class IParticleSystem;
 class Light;
 class Material;
 struct MaterialDefines;
@@ -48,6 +49,7 @@ using BoundingInfoPtr          = std::shared_ptr<BoundingInfo>;
 using ColliderPtr              = std::shared_ptr<Collider>;
 using CameraPtr                = std::shared_ptr<Camera>;
 using IEdgesRendererPtr        = std::shared_ptr<IEdgesRenderer>;
+using IParticleSystemPtr       = std::shared_ptr<IParticleSystem>;
 using LightPtr                 = std::shared_ptr<Light>;
 using MaterialPtr              = std::shared_ptr<Material>;
 using PhysicsImpostorPtr       = std::shared_ptr<PhysicsImpostor>;
@@ -638,7 +640,7 @@ public:
   /**
    * @brief Move the mesh using collision engine.
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    * @param displacement defines the requested displacement vector
    * @returns the current mesh
    */
@@ -692,7 +694,7 @@ public:
    * @param onlyBoundingInfo defines a boolean indicating if picking should only happen using
    * bounding info (false by default)
    * @returns the picking info
-   * @see http://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
+   * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
   virtual PickingInfo intersects(Ray& ray, const std::optional<bool>& fastCheck = std::nullopt,
                                  const TrianglePickingPredicate& trianglePredicate = nullptr,
@@ -746,7 +748,7 @@ public:
    * when you update/morph a mesh with the methods CreateXXX() as they
    * automatically manage this computation
    * @returns the current mesh
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   AbstractMesh& updateFacetData();
 
@@ -754,7 +756,7 @@ public:
    * @brief Returns the facetLocalNormals array.
    * The normals are expressed in the mesh local spac
    * @returns an array of Vector3
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   std::vector<Vector3>& getFacetLocalNormals();
 
@@ -762,14 +764,14 @@ public:
    * @brief Returns the facetLocalPositions array.
    * The facet positions are expressed in the mesh local space
    * @returns an array of Vector3
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   std::vector<Vector3>& getFacetLocalPositions();
 
   /**
    * @brief Returns the facetLocalPartioning array.
    * @returns an array of array of numbers
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   std::vector<Uint32Array>& getFacetLocalPartitioning();
 
@@ -778,7 +780,7 @@ public:
    * This method allocates a new Vector3 per call
    * @param i defines the facet index
    * @returns a new Vector3
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   Vector3 getFacetPosition(unsigned int i);
 
@@ -788,7 +790,7 @@ public:
    * @param i defines the facet index
    * @param ref defines the target vector
    * @returns the current mesh
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   AbstractMesh& getFacetPositionToRef(unsigned int i, Vector3& ref);
 
@@ -797,7 +799,7 @@ public:
    * This method allocates a new Vector3 per call
    * @param i defines the facet index
    * @returns a new Vector3
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   Vector3 getFacetNormal(unsigned int i);
 
@@ -807,7 +809,7 @@ public:
    * @param i defines the facet index
    * @param ref defines the target vector
    * @returns the current mesh
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   AbstractMesh& getFacetNormalToRef(unsigned int i, Vector3& ref);
 
@@ -819,7 +821,7 @@ public:
    * @param y defines y coordinate
    * @param z defines z coordinate
    * @returns the array of facet indexes
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   Uint32Array getFacetsAtLocalCoordinates(float x, float y, float z);
 
@@ -838,7 +840,7 @@ public:
    * @param y defines y coordinate
    * @param z defines z coordinate
    * @returns the face index if found (or null instead)
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   int getClosestFacetAtCoordinates(float x, float y, float z, Vector3& projected,
                                    bool projectedSet = true, bool checkFace = false,
@@ -859,7 +861,7 @@ public:
    * @param y defines y coordinate
    * @param z defines z coordinate
    * @returns the face index if found (or null instead)
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   int getClosestFacetAtLocalCoordinates(float x, float y, float z, Vector3& projected,
                                         bool projectedSet = true, bool checkFace = false,
@@ -869,14 +871,14 @@ public:
    * @brief Returns the object "parameter" set with all the expected parameters
    * for facetData computation by ComputeNormals().
    * @returns the parameters
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   FacetParameters& getFacetDataParameters();
 
   /**
    * @brief Disables the feature FacetData and frees the related memory.
    * @returns the current mesh
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
   AbstractMesh& disableFacetData();
 
@@ -916,6 +918,13 @@ public:
    */
   bool _checkOcclusionQuery();
 
+  /**
+   * @brief This function returns all of the particle systems in the scene that use the mesh as an
+   * emitter.
+   * @returns an array of particle systems in the scene that use the mesh as an emitter
+   */
+  std::vector<IParticleSystemPtr> getConnectedParticleSystems();
+
 protected:
   // Constructor
 
@@ -934,80 +943,67 @@ protected:
 protected:
   /**
    * @brief Gets the number of facets in the mesh.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
    */
   size_t get_facetNb() const;
 
   /**
-   * @brief Gets the number (integer) of subdivisions per axis in the partioning
-   * space.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   * @brief Gets the number (integer) of subdivisions per axis in the partioning space.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   unsigned int get_partitioningSubdivisions() const;
 
   /**
-   * @brief Set the number (integer) of subdivisions per axis in the partioning
-   * space.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   * @brief Set the number (integer) of subdivisions per axis in the partioning space.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   void set_partitioningSubdivisions(unsigned int nb);
 
   /**
-   * @brief Gets the ratio (float) to apply to the bouding box size to set to
-   * the partioning space. Ex : 1.01 (default) the partioning space is 1% bigger
-   * than the bounding box
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   * @brief Gets the ratio (float) to apply to the bouding box size to set to the partioning space.
+   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding box
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   float get_partitioningBBoxRatio() const;
 
   /**
-   * @brief Set the ratio (float) to apply to the bouding box size to set to the
-   * partioning space. Ex : 1.01 (default) the partioning space is 1% bigger
-   * than the bounding box
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   * @brief Set the ratio (float) to apply to the bouding box size to set to the partioning space.
+   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding box
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   void set_partitioningBBoxRatio(float ratio);
 
   /**
-   * @brief Gets a boolean indicating that the facets must be depth sorted on
-   * next call to `updateFacetData()`. Works only for updatable meshes. Doesn't
-   * work with multi-materials
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   * @brief Gets a boolean indicating that the facets must be depth sorted on next call to
+   * `updateFacetData()`. Works only for updatable meshes. Doesn't work with multi-materials
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
    */
   bool get_mustDepthSortFacets() const;
 
   /**
-   * @brief Sets a boolean indicating that the facets must be depth sorted on
-   * next call to `updateFacetData()`. Works only for updatable meshes. Doesn't
-   * work with multi-materials
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   * @brief Sets a boolean indicating that the facets must be depth sorted on next call to
+   * `updateFacetData()`. Works only for updatable meshes. Doesn't work with multi-materials
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
    */
   void set_mustDepthSortFacets(bool sort);
 
   /**
-   * @brief Gets the location (Vector3) where the facet depth sort must be
-   * computed from. By default, the active camera position. Used only when facet
-   * depth sort is enabled
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   * @brief Gets the location (Vector3) where the facet depth sort must be computed from. By
+   * default, the active camera position. Used only when facet depth sort is enabled
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
    */
   Vector3& get_facetDepthSortFrom();
 
   /**
-   * @brief Sets the location (Vector3) where the facet depth sort must be
-   * computed from. By default, the active camera position. Used only when facet
-   * depth sort is enabled
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   * @brief Sets the location (Vector3) where the facet depth sort must be computed from. By
+   * default, the active camera position. Used only when facet depth sort is enabled
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
    */
   void set_facetDepthSortFrom(const Vector3& location);
 
   /**
    * @brief Gets a boolean indicating if facetData is enabled.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
    */
   bool get_isFacetDataEnabled() const;
 
@@ -1023,13 +1019,13 @@ protected:
 
   /**
    * @brief Gets the flag to check the progress status of the query.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   bool get_isOcclusionQueryInProgress() const;
 
   /**
    * @brief Sets the flag to check the progress status of the query.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @see https://doc.babylonjs.com/features/occlusionquery
    */
   void set_isOcclusionQueryInProgress(bool value);
 
@@ -1053,46 +1049,42 @@ protected:
   void set_isOccluded(bool value);
 
   /**
-   * @brief Gets the property that determines the type of occlusion query
-   * algorithm to run in WebGl.
+   * @brief Gets the property that determines the type of occlusion query algorithm to run in WebGl.
    */
   unsigned int get_occlusionQueryAlgorithmType() const;
 
   /**
-   * @brief Sets the property that determines the type of occlusion query
-   * algorithm to run in WebGl.
+   * @brief Sets the property that determines the type of occlusion query algorithm to run in WebGl.
    */
   void set_occlusionQueryAlgorithmType(unsigned int value);
 
   /**
-   * @brief Gets the property that is responsible for starting the occlusion
-   * query within the Mesh or not, this property is also used to determine what
-   * should happen when the occlusionRetryCount is reached.
+   * @brief Gets the property that is responsible for starting the occlusion query within the Mesh
+   * or not, this property is also used to determine what should happen when the occlusionRetryCount
+   * is reached.
    */
   unsigned int get_occlusionType() const;
 
   /**
-   * @brief Sets the property that is responsible for starting the occlusion
-   * query within the Mesh or not, this property is also used to determine what
-   * should happen when the occlusionRetryCount is reached.
+   * @brief Sets the property that is responsible for starting the occlusion query within the Mesh
+   * or not, this property is also used to determine what should happen when the occlusionRetryCount
+   * is reached.
    */
   void set_occlusionType(unsigned int value);
 
   /**
-   * @brief Gets the number that indicates the number of allowed retries before
-   * stop the occlusion query, this is useful if the occlusion query is taking
-   * long time before to the query result is retireved, the query result
-   * indicates if the object is visible within the scene or not and based on
-   * that Babylon.Js engine decideds to show or hide the object.
+   * @brief Gets the number that indicates the number of allowed retries before stop the occlusion
+   * query, this is useful if the occlusion query is taking long time before to the query result is
+   * retireved, the query result indicates if the object is visible within the scene or not and
+   * based on that Babylon.Js engine decideds to show or hide the object.
    */
   int get_occlusionRetryCount() const;
 
   /**
-   * @brief Sets the number that indicates the number of allowed retries before
-   * stop the occlusion query, this is useful if the occlusion query is taking
-   * long time before to the query result is retireved, the query result
-   * indicates if the object is visible within the scene or not and based on
-   * that Babylon.Js engine decideds to show or hide the object.
+   * @brief Sets the number that indicates the number of allowed retries before stop the occlusion
+   * query, this is useful if the occlusion query is taking long time before to the query result is
+   * retireved, the query result indicates if the object is visible within the scene or not and
+   * based on that Babylon.Js engine decideds to show or hide the object.
    */
   void set_occlusionRetryCount(int value);
 
@@ -1139,108 +1131,100 @@ protected:
   virtual void set_material(const MaterialPtr& value);
 
   /**
-   * @brief Gets a boolean indicating that this mesh can receive realtime
-   * shadows.
-   * @see http://doc.babylonjs.com/babylon101/shadows
+   * @brief Gets a boolean indicating that this mesh can receive realtime shadows.
+   * @see https://doc.babylonjs.com/babylon101/shadows
    */
   virtual bool get_receiveShadows() const;
 
   /**
-   * @brief Sets a boolean indicating that this mesh can receive realtime
-   * shadows.
-   * @see http://doc.babylonjs.com/babylon101/shadows
+   * @brief Sets a boolean indicating that this mesh can receive realtime shadows.
+   * @see https://doc.babylonjs.com/babylon101/shadows
    */
   void set_receiveShadows(bool value);
 
   /**
-   * @brief Gets a boolean indicating that this mesh contains vertex color data
-   * with alpha values.
+   * @brief Gets a boolean indicating that this mesh contains vertex color data with alpha values.
    */
   bool get_hasVertexAlpha() const;
 
   /**
-   * @brief Sets a boolean indicating that this mesh contains vertex color data
-   * with alpha values.
+   * @brief Sets a boolean indicating that this mesh contains vertex color data with alpha values.
    */
   void set_hasVertexAlpha(bool value);
 
   /**
-   * @brief Gets a boolean indicating that this mesh needs to use vertex color
-   * data to render (if this kind of vertex data is available in the geometry).
+   * @brief Gets a boolean indicating that this mesh needs to use vertex color data to render (if
+   * this kind of vertex data is available in the geometry).
    */
   bool get_useVertexColors() const;
 
   /**
-   * @brief Sets a boolean indicating that this mesh needs to use vertex color
-   * data to render (if this kind of vertex data is available in the geometry).
+   * @brief Sets a boolean indicating that this mesh needs to use vertex color data to render (if
+   * this kind of vertex data is available in the geometry).
    */
   void set_useVertexColors(bool value);
 
   /**
-   * @brief Gets a boolean indicating that bone animations must be computed by
-   * the CPU (false by default).
+   * @brief Gets a boolean indicating that bone animations must be computed by the CPU (false by
+   * default).
    */
   bool get_computeBonesUsingShaders() const;
 
   /**
-   * @brief Sets a boolean indicating that bone animations must be computed by
-   * the CPU (false by default).
+   * @brief Sets a boolean indicating that bone animations must be computed by the CPU (false by
+   * default).
    */
   void set_computeBonesUsingShaders(bool value);
 
   /**
-   * @brief Gets the number of allowed bone influences per vertex (4 by
-   * default).
+   * @brief Gets the number of allowed bone influences per vertex (4 by default).
    */
   unsigned int get_numBoneInfluencers() const;
 
   /**
-   * @brief Sets the number of allowed bone influences per vertex (4 by
-   * default).
+   * @brief Sets the number of allowed bone influences per vertex (4 by default).
    */
   void set_numBoneInfluencers(unsigned int value);
 
   /**
-   * @brief Gets a boolean indicating that this mesh will allow fog to be
-   * rendered on it (true by default).
+   * @brief Gets a boolean indicating that this mesh will allow fog to be rendered on it (true by
+   * default).
    */
   bool get_applyFog() const;
 
   /**
-   * @brief Sets a boolean indicating that this mesh will allow fog to be
-   * rendered on it (true by default).
+   * @brief Sets a boolean indicating that this mesh will allow fog to be rendered on it (true by
+   * default).
    */
   void set_applyFog(bool value);
 
   /**
    * @brief Gets the current layer mask (default is 0x0FFFFFFF).
-   * @see http://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
+   * @see https://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
    */
   unsigned int get_layerMask() const;
 
   /**
    * @brief Sets the current layer mask (default is 0x0FFFFFFF).
-   * @see http://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
+   * @see https://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
    */
   void set_layerMask(unsigned int value);
 
   /**
-   * @brief Gets a collision mask used to mask collisions (default is -1). A
-   * collision between A and B will happen if A.collisionGroup & b.collisionMask
-   * !== 0
+   * @brief Gets a collision mask used to mask collisions (default is -1). A collision between A and
+   * B will happen if A.collisionGroup & b.collisionMask !== 0
    */
   int get_collisionMask() const;
 
   /**
-   * @brief Sets a collision mask used to mask collisions (default is -1). A
-   * collision between A and B will happen if A.collisionGroup & b.collisionMask
-   * !== 0
+   * @brief Sets a collision mask used to mask collisions (default is -1). A collision between A and
+   * B will happen if A.collisionGroup & b.collisionMask !== 0
    */
   void set_collisionMask(int mask);
 
   /**
-   * @brief Gets the current collision group mask (-1 by default). A collision
-   * between A and B will happen if A.collisionGroup & b.collisionMask !== 0
+   * @brief Gets the current collision group mask (-1 by default). A collision between A and B will
+   * happen if A.collisionGroup & b.collisionMask !== 0
    */
   int get_collisionGroup() const;
 
@@ -1284,13 +1268,13 @@ protected:
 
   /**
    * @brief Sets a skeleton to apply skining transformations.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+   * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   void set_skeleton(const SkeletonPtr& value);
 
   /**
    * @brief Gets a skeleton to apply skining transformations.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+   * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   virtual SkeletonPtr& get_skeleton();
 
@@ -1300,14 +1284,14 @@ protected:
   Node* _getEffectiveParent();
 
   /**
-   * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
-   * Y, Z.  Default is (1.0, 1.0, 1.0).
+   * @brief Gets a Vector3 depicting the mesh scaling along each local axis X, Y, Z.  Default is
+   * (1.0, 1.0, 1.0).
    */
   Vector3& get_scaling() override;
 
   /**
-   * @brief Sets a Vector3 depicting the mesh scaling along each local axis X,
-   * Y, Z.  Default is (1.0, 1.0, 1.0).
+   * @brief Sets a Vector3 depicting the mesh scaling along each local axis X, Y, Z.  Default is
+   * (1.0, 1.0, 1.0).
    */
   void set_scaling(const Vector3& newScaling) override;
 
@@ -1322,14 +1306,12 @@ protected:
   virtual bool get_isBlocked() const;
 
   /**
-   * @brief Gets a boolean indicating if this mesh has skinning data and an
-   * attached skeleton.
+   * @brief Gets a boolean indicating if this mesh has skinning data and an attached skeleton.
    */
   bool get_useBones() const;
 
   /**
-   * @brief Gets a boolean indicating if this mesh is an instance or a regular
-   * mesh
+   * @brief Gets a boolean indicating if this mesh is an instance or a regular mesh
    */
   virtual bool get_isAnInstance() const;
 
@@ -1346,25 +1328,20 @@ protected:
   /** Collisions **/
 
   /**
-   * @brief Gets a boolean indicating that this mesh can be used in the
-   * collision engine.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * @brief Gets a boolean indicating that this mesh can be used in the collision engine.
+   * @see https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   virtual bool get_checkCollisions() const;
 
   /**
-   * @brief Sets a boolean indicating that this mesh can be used in the
-   * collision engine.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * @brief Sets a boolean indicating that this mesh can be used in the collision engine.
+   * @see https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   void set_checkCollisions(bool collisionEnabled);
 
   /**
    * @brief Gets Collider object used to compute collisions (not physics).
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * @see https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   ColliderPtr& get_collider();
 
@@ -1372,13 +1349,13 @@ protected:
 
   /**
    * @brief Gets the impostor used for physic simulation.
-   * @see http://doc.babylonjs.com/features/physics_engine
+   * @see https://doc.babylonjs.com/features/physics_engine
    */
   PhysicsImpostorPtr& get_physicsImpostor();
 
   /**
    * @brief Sets the impostor used for physic simulation.
-   * @see http://doc.babylonjs.com/features/physics_engine
+   * @see https://doc.babylonjs.com/features/physics_engine
    */
   void set_physicsImpostor(const PhysicsImpostorPtr& value);
 
@@ -1575,7 +1552,7 @@ public:
   /**
    * Gets or sets the alpha index used to sort transparent meshes
    * @see
-   * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#alpha-index
+   * https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#alpha-index
    */
   int alphaIndex;
 
@@ -1606,7 +1583,7 @@ public:
   /**
    * Gets or sets a boolean indicating if the mesh must be considered as a ray
    * blocker for lens flares (false by default)
-   * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
+   * @see https://doc.babylonjs.com/how_to/how_to_use_lens_flares
    */
   bool isBlocker;
 
@@ -1619,7 +1596,7 @@ public:
   /**
    * Specifies the rendering group id for this mesh (0 by default)
    * @see
-   * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
+   * https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
    */
   Property<AbstractMesh, int> renderingGroupId;
 
@@ -1736,7 +1713,7 @@ public:
 
   /**
    * Gets or sets the current action manager
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions
    */
   AbstractActionManagerPtr actionManager;
 
@@ -1752,7 +1729,7 @@ public:
    * Gets or sets the ellipsoid used to impersonate this mesh when using
    * collision engine (default is (0.5, 1, 0.5))
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   Vector3 ellipsoid;
 
@@ -1760,7 +1737,7 @@ public:
    * Gets or sets the ellipsoid offset used to impersonate this mesh when using
    * collision engine (default is (0, 0, 0))
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   Vector3 ellipsoidOffset;
 
@@ -1820,7 +1797,7 @@ public:
 
   /**
    * Gets or sets the list of subMeshes
-   * @see http://doc.babylonjs.com/how_to/multi_materials
+   * @see https://doc.babylonjs.com/how_to/multi_materials
    */
   std::vector<std::shared_ptr<SubMesh>> subMeshes;
 
@@ -1909,14 +1886,14 @@ public:
   /**
    * A boolean indicating that this mesh can be used in the collision engine.
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   Property<AbstractMesh, bool> checkCollisions;
 
   /**
    * Gets Collider object used to compute collisions (not physics).
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   ReadOnlyProperty<AbstractMesh, ColliderPtr> collider;
 
