@@ -187,6 +187,20 @@ public:
    */
   static constexpr unsigned int MATERIAL_ALPHATESTANDBLEND = 3;
 
+  /**
+   * The Whiteout method is used to blend normals.
+   * Details of the algorithm can be found here:
+   * https://blog.selfshadow.com/publications/blending-in-detail/
+   */
+  static constexpr unsigned int MATERIAL_NORMALBLENDMETHOD_WHITEOUT = 0;
+
+  /**
+   * The Reoriented Normal Mapping method is used to blend normals.
+   * Details of the algorithm can be found here:
+   * https://blog.selfshadow.com/publications/blending-in-detail/
+   */
+  static constexpr unsigned int MATERIAL_NORMALBLENDMETHOD_RNM = 1;
+
   ~Material() override; // = default
 
   [[nodiscard]] Type type() const override;
