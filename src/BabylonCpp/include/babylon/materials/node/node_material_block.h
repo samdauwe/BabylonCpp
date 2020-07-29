@@ -222,6 +222,13 @@ public:
                        const NodeMaterialDefines& defines, bool useInstances = false);
 
   /**
+   * @brief Validates the new name for the block node.
+   * @param newName the new name to be given to the node.
+   * @returns false if the name is a reserve word, else true.
+   */
+  virtual bool validateBlockName(const std::string& newName) const;
+
+  /**
    * @brief Compile the current node and generate the shader code.
    * @param state defines the current compilation state (uniforms, samplers, current string)
    * @param activeBlocks defines the list of active blocks (i.e. blocks to compile)

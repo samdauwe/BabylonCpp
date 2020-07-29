@@ -16,9 +16,11 @@ namespace BABYLON {
 ReflectionTextureBlock::ReflectionTextureBlock(const std::string& iName)
     : ReflectionTextureBaseBlock{iName}
     , rgb{this, &ReflectionTextureBlock::get_rgb}
+    , rgba{this, &ReflectionTextureBlock::get_rgba}
     , r{this, &ReflectionTextureBlock::get_r}
     , g{this, &ReflectionTextureBlock::get_g}
     , b{this, &ReflectionTextureBlock::get_b}
+    , a{this, &ReflectionTextureBlock::get_a}
 {
   registerInput("position", NodeMaterialBlockConnectionPointTypes::Vector3, false,
                 NodeMaterialBlockTargets::Vertex);
@@ -37,11 +39,15 @@ ReflectionTextureBlock::ReflectionTextureBlock(const std::string& iName)
 
   registerOutput("rgb", NodeMaterialBlockConnectionPointTypes::Color3,
                  NodeMaterialBlockTargets::Fragment);
+  registerOutput("rgba", NodeMaterialBlockConnectionPointTypes::Color4,
+                 NodeMaterialBlockTargets::Fragment);
   registerOutput("r", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Fragment);
   registerOutput("g", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Fragment);
   registerOutput("b", NodeMaterialBlockConnectionPointTypes::Float,
+                 NodeMaterialBlockTargets::Fragment);
+  registerOutput("a", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Fragment);
 
   _inputs[0]->acceptedConnectionPointTypes.emplace_back(
@@ -90,19 +96,29 @@ NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_rgb()
   return _outputs[0];
 }
 
-NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_r()
+NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_rgba()
 {
   return _outputs[1];
 }
 
-NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_g()
+NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_r()
 {
   return _outputs[2];
 }
 
-NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_b()
+NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_g()
 {
   return _outputs[3];
+}
+
+NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_b()
+{
+  return _outputs[4];
+}
+
+NodeMaterialConnectionPointPtr& ReflectionTextureBlock::get_a()
+{
+  return _outputs[5];
 }
 
 void ReflectionTextureBlock::autoConfigure(const NodeMaterialPtr& material)
@@ -147,7 +163,7 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
 
   state.compilationString += handleFragmentSideCodeReflectionCoords(normalWUnit);
 
-  state.compilationString += handleFragmentSideCodeReflectionColor();
+  state.compilationString += handleFragmentSideCodeReflectionColor("", "");
 
   state.compilationString += writeOutputs(state, _reflectionColorName);
 

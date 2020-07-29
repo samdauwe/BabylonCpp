@@ -80,6 +80,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_rgb();
 
   /**
+   * @brief Gets the rgba output component.
+   */
+  NodeMaterialConnectionPointPtr& get_rgba();
+
+  /**
    * @brief Gets the r output component.
    */
   NodeMaterialConnectionPointPtr& get_r();
@@ -95,6 +100,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_b();
 
   /**
+   * @brief Gets the a output component.
+   */
+  NodeMaterialConnectionPointPtr& get_a();
+
+  /**
    * @brief Hidden
    */
   ReflectionTextureBlock& _buildBlock(NodeMaterialBuildState& state) override;
@@ -104,6 +114,11 @@ public:
    * Gets the rgb output component
    */
   ReadOnlyProperty<ReflectionTextureBlock, NodeMaterialConnectionPointPtr> rgb;
+
+  /**
+   * Gets the rgba output component
+   */
+  ReadOnlyProperty<ReflectionTextureBlock, NodeMaterialConnectionPointPtr> rgba;
 
   /**
    *Gets the r output component
@@ -119,6 +134,11 @@ public:
    * Gets the b output component
    */
   ReadOnlyProperty<ReflectionTextureBlock, NodeMaterialConnectionPointPtr> b;
+
+  /**
+   * Gets the a output component
+   */
+  ReadOnlyProperty<ReflectionTextureBlock, NodeMaterialConnectionPointPtr> a;
 
 }; // end of class ReflectionTextureBlock
 

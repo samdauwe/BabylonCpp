@@ -355,17 +355,19 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
     += StringTools::printf("%s = %s.%s%s;\r\n", _declareOutput(output, state).c_str(),
                            _tempTextureRead.c_str(), swizzle.c_str(), complement.c_str());
 
-  state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
-  state.compilationString
-    += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
-                           output->associatedVariableName().c_str());
-  state.compilationString += "#endif\r\n";
+  if (swizzle != "a") { // no conversion if the output is "a" (alpha)
+    state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
+    state.compilationString
+      += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
+                             output->associatedVariableName().c_str());
+    state.compilationString += "#endif\r\n";
 
-  state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
-  state.compilationString
-    += StringTools::printf("%s = toLinearSpace(%s);\r\n", output->associatedVariableName().c_str(),
-                           output->associatedVariableName().c_str());
-  state.compilationString += "#endif\r\n";
+    state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
+    state.compilationString += StringTools::printf("%s = toLinearSpace(%s);\r\n",
+                                                   output->associatedVariableName().c_str(),
+                                                   output->associatedVariableName().c_str());
+    state.compilationString += "#endif\r\n";
+  }
 }
 
 TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
