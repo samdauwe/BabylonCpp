@@ -167,6 +167,8 @@ public:
   std::string _vReflectionMicrosurfaceInfosName;
   /** @hidden */
   std::string _vReflectionInfosName;
+  /** @hidden */
+  std::string _vReflectionFilteringInfoName;
 
   /**
    * The three properties below are set by the main PBR block prior to calling methods of this

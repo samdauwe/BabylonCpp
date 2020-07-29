@@ -187,9 +187,10 @@ void RefractionBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeM
   }
 
   auto iIndexOfRefraction = 1.f;
-  indexOfRefraction()->connectInputBlock()->value() ?
+  (indexOfRefraction() && indexOfRefraction()->connectInputBlock()
+   && indexOfRefraction()->connectInputBlock()->value()) ?
     indexOfRefraction()->connectInputBlock()->value()->get<float>() :
-    1.f;
+    1.5f;
 
   effect->setFloat4(_vRefractionInfosName, refractionTexture->level, 1.f / iIndexOfRefraction,
                     depth, invertRefractionY ? -1.f : 1.f);

@@ -18,7 +18,6 @@ SheenBlock::SheenBlock(const std::string& iName)
     , intensity{this, &SheenBlock::get_intensity}
     , color{this, &SheenBlock::get_color}
     , roughness{this, &SheenBlock::get_roughness}
-    , texture{this, &SheenBlock::get_texture}
     , sheen{this, &SheenBlock::get_sheen}
 {
   _isUnique = true;
@@ -33,8 +32,6 @@ void SheenBlock::RegisterConnections(const SheenBlockPtr& sheenBlock)
   sheenBlock->registerInput("color", NodeMaterialBlockConnectionPointTypes::Color3, true,
                             NodeMaterialBlockTargets::Fragment);
   sheenBlock->registerInput("roughness", NodeMaterialBlockConnectionPointTypes::Float, true,
-                            NodeMaterialBlockTargets::Fragment);
-  sheenBlock->registerInput("texture", NodeMaterialBlockConnectionPointTypes::Color4, true,
                             NodeMaterialBlockTargets::Fragment);
 
   sheenBlock->registerOutput(
@@ -73,11 +70,6 @@ NodeMaterialConnectionPointPtr& SheenBlock::get_roughness()
   return _inputs[2];
 }
 
-NodeMaterialConnectionPointPtr& SheenBlock::get_texture()
-{
-  return _inputs[3];
-}
-
 NodeMaterialConnectionPointPtr& SheenBlock::get_sheen()
 {
   return _outputs[0];
@@ -93,7 +85,6 @@ void SheenBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeM
   defines.setValue("SHEEN_LINKWITHALBEDO", linkSheenWithAlbedo, true);
   defines.setValue("SHEEN_ROUGHNESS", roughness()->isConnected(), true);
   defines.setValue("SHEEN_ALBEDOSCALING", albedoScaling, true);
-  defines.setValue("SHEEN_TEXTURE", texture()->isConnected(), true);
 }
 
 std::string SheenBlock::getCode(const ReflectionBlockPtr& reflectionBlock) const
@@ -101,7 +92,7 @@ std::string SheenBlock::getCode(const ReflectionBlockPtr& reflectionBlock) const
   const auto iColor     = color()->isConnected() ? color()->associatedVariableName() : "vec3(1.)";
   const auto iIntensity = intensity()->isConnected() ? intensity()->associatedVariableName() : "1.";
   const auto iRoughness = roughness()->isConnected() ? roughness()->associatedVariableName() : "0.";
-  const auto iTexture = texture()->isConnected() ? texture()->associatedVariableName() : "vec4(0.)";
+  const auto iTexture   = "vec4(0.)";
 
   const auto code = StringTools::printf(
     R"(#ifdef SHEEN
@@ -166,7 +157,7 @@ std::string SheenBlock::getCode(const ReflectionBlockPtr& reflectionBlock) const
     )",
     iColor.c_str(), iIntensity.c_str(),                                                //
     iRoughness.c_str(),                                                                //
-    iTexture.c_str(),                                                                  //
+    iTexture,                                                                          //
     reflectionBlock->_vReflectionMicrosurfaceInfosName.c_str(),                        //
     reflectionBlock->_vReflectionInfosName.c_str(),                                    //
     reflectionBlock->reflectionColor().c_str(),                                        //

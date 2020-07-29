@@ -23,7 +23,6 @@ ClearCoatBlock::ClearCoatBlock(const std::string& iName)
     , tintColor{this, &ClearCoatBlock::get_tintColor}
     , tintAtDistance{this, &ClearCoatBlock::get_tintAtDistance}
     , tintThickness{this, &ClearCoatBlock::get_tintThickness}
-    , tintTexture{this, &ClearCoatBlock::get_tintTexture}
     , worldTangent{this, &ClearCoatBlock::get_worldTangent}
     , clearcoat{this, &ClearCoatBlock::get_clearcoat}
     , _scene{nullptr}
@@ -52,8 +51,6 @@ void ClearCoatBlock::RegisterConnections(const ClearCoatBlockPtr& clearCoatBlock
   clearCoatBlock->registerInput("tintAtDistance", NodeMaterialBlockConnectionPointTypes::Float,
                                 true, NodeMaterialBlockTargets::Fragment);
   clearCoatBlock->registerInput("tintThickness", NodeMaterialBlockConnectionPointTypes::Float, true,
-                                NodeMaterialBlockTargets::Fragment);
-  clearCoatBlock->registerInput("tintTexture", NodeMaterialBlockConnectionPointTypes::Color4, true,
                                 NodeMaterialBlockTargets::Fragment);
   clearCoatBlock->registerInput("worldTangent", NodeMaterialBlockConnectionPointTypes::Vector4,
                                 true);
@@ -125,14 +122,9 @@ NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintThickness()
   return _inputs[8];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintTexture()
-{
-  return _inputs[9];
-}
-
 NodeMaterialConnectionPointPtr& ClearCoatBlock::get_worldTangent()
 {
-  return _inputs[10];
+  return _inputs[9];
 }
 
 NodeMaterialConnectionPointPtr& ClearCoatBlock::get_clearcoat()
@@ -160,9 +152,8 @@ void ClearCoatBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& n
   defines.setValue("CLEARCOAT_TEXTURE", texture()->isConnected(), true);
   defines.setValue("CLEARCOAT_TINT",
                    tintColor()->isConnected() || tintThickness()->isConnected()
-                     || tintAtDistance()->isConnected() || tintTexture()->isConnected(),
+                     || tintAtDistance()->isConnected(),
                    true);
-  defines.setValue("CLEARCOAT_TINT_TEXTURE", tintTexture()->isConnected(), true);
   defines.setValue("CLEARCOAT_BUMP", bumpTexture()->isConnected(), true);
   defines.setValue("CLEARCOAT_DEFAULTIOR",
                    ior()->isConnected() ?
@@ -254,9 +245,7 @@ std::string ClearCoatBlock::GetCode(NodeMaterialBuildState& state, const ClearCo
   const auto tintAtDistance = ccBlock->tintAtDistance()->isConnected() ?
                                 ccBlock->tintAtDistance()->associatedVariableName() :
                                 "1.";
-  const auto tintTexture = ccBlock->tintTexture()->isConnected() ?
-                             ccBlock->tintTexture()->associatedVariableName() :
-                             "vec4(0.)";
+  const auto tintTexture = "vec4(0.)";
 
   if (ccBlock) {
     state._emitUniformFromString("vClearCoatRefractionParams", "vec4");
@@ -344,7 +333,7 @@ std::string ClearCoatBlock::GetCode(NodeMaterialBuildState& state, const ClearCo
     worldPosVarName.c_str(),                                    //
     texture.c_str(),                                            //
     tintAtDistance.c_str(),                                     //
-    tintTexture.c_str(),                                        //
+    tintTexture,                                                //
     bumpTexture.c_str(),                                        //
     uv.c_str(),                                                 //
     vTBNAvailable ? "TANGENT" : "IGNORE",                       //

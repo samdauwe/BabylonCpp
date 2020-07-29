@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/node/node_material_block.h>
+#include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
@@ -44,11 +45,22 @@ public:
   std::string getClassName() const override;
 
   /**
+   * @brief Bind data to effect. Will only be called for blocks with isBindable === true
+   * @param effect defines the effect to bind data to
+   * @param nodeMaterial defines the hosting NodeMaterial
+   * @param mesh defines the mesh that will be rendered
+   * @param subMesh defines the submesh that will be rendered
+   */
+  void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr,
+            SubMesh* subMesh = nullptr) override;
+
+  /**
    * @brief Gets the main code of the block (fragment side).
+   * @param state current state of the node material building
    * @param aoIntensityVarName name of the variable with the ambient occlusion intensity
    * @returns the shader code
    */
-  std::string getCode(const std::string& aoIntensityVarName) const;
+  std::string getCode(NodeMaterialBuildState& state, const std::string& aoIntensityVarName);
 
   /**
    * @brief Update defines for shader compilation.
@@ -111,6 +123,16 @@ protected:
   std::string _dumpPropertiesCode() override;
 
 public:
+  /** @hidden */
+  std::string _vMetallicReflectanceFactorsName;
+
+  /**
+   * The property below is set by the main PBR block prior to calling methods of this class.
+   */
+
+  /** @hidden */
+  NodeMaterialConnectionPointPtr indexOfRefractionConnectionPoint;
+
   /**
    * Specifies if the metallic texture contains the ambient occlusion information in its red
    * channel.
@@ -159,6 +181,10 @@ public:
    * Gets the reflectivity object output component
    */
   ReadOnlyProperty<ReflectivityBlock, NodeMaterialConnectionPointPtr> reflectivity;
+
+private:
+  Color3 _metallicReflectanceColor;
+  float _metallicF0Factor;
 
 }; // end of class ReflectivityBlock
 

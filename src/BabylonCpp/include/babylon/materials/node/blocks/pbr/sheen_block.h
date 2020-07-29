@@ -98,11 +98,6 @@ protected:
   NodeMaterialConnectionPointPtr& get_roughness();
 
   /**
-   * @brief Gets the texture input component.
-   */
-  NodeMaterialConnectionPointPtr& get_texture();
-
-  /**
    * @brief Gets the sheen object output component.
    */
   NodeMaterialConnectionPointPtr& get_sheen();
@@ -148,11 +143,6 @@ public:
    * Gets the roughness input component
    */
   ReadOnlyProperty<SheenBlock, NodeMaterialConnectionPointPtr> roughness;
-
-  /**
-   * Gets the texture input component
-   */
-  ReadOnlyProperty<SheenBlock, NodeMaterialConnectionPointPtr> texture;
 
   /**
    * Gets the sheen object output component

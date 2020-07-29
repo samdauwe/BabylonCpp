@@ -1,17 +1,21 @@
 #include <babylon/materials/node/blocks/pbr/reflectivity_block.h>
 
 #include <babylon/core/json_util.h>
+#include <babylon/materials/effect.h>
+#include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_connection_point_custom_object.h>
 #include <babylon/materials/node/node_material_defines.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 ReflectivityBlock::ReflectivityBlock(const std::string& iName)
     : NodeMaterialBlock(iName, NodeMaterialBlockTargets::Fragment)
+    , indexOfRefractionConnectionPoint{nullptr}
     , useAmbientOcclusionFromMetallicTextureRed{false}
     , useMetallnessFromMetallicTextureBlue{true}
     , useRoughnessFromMetallicTextureAlpha{false}
@@ -20,6 +24,8 @@ ReflectivityBlock::ReflectivityBlock(const std::string& iName)
     , roughness{this, &ReflectivityBlock::get_roughness}
     , texture{this, &ReflectivityBlock::get_texture}
     , reflectivity{this, &ReflectivityBlock::get_reflectivity}
+    , _metallicReflectanceColor{Color3::White()}
+    , _metallicF0Factor{1.f}
 {
   _isUnique = true;
 }
@@ -79,12 +85,41 @@ NodeMaterialConnectionPointPtr& ReflectivityBlock::get_reflectivity()
   return _outputs[0];
 }
 
-std::string ReflectivityBlock::getCode(const std::string& aoIntensityVarName) const
+void ReflectivityBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
+                             Mesh* mesh, SubMesh* subMesh)
+{
+  NodeMaterialBlock::bind(effect, nodeMaterial, mesh, subMesh);
+
+  const auto outside_ior
+    = 1.f; // consider air as clear coat and other layers would remap in the shader.
+  const auto ior
+    = (indexOfRefractionConnectionPoint && indexOfRefractionConnectionPoint->connectInputBlock()) ?
+        indexOfRefractionConnectionPoint->connectInputBlock()->value()->get<float>() :
+        1.5f;
+
+  // We are here deriving our default reflectance from a common value for none metallic surface.
+  // Based of the schlick fresnel approximation model
+  // for dielectrics.
+  const auto f0 = std::pow((ior - outside_ior) / (ior + outside_ior), 2.f);
+
+  // Tweak the default F0 and F90 based on our given setup
+  _metallicReflectanceColor.scaleToRef(f0 * _metallicF0Factor, TmpVectors::Color3Array[0]);
+  const auto metallicF90 = _metallicF0Factor;
+
+  effect->setColor4(_vMetallicReflectanceFactorsName, TmpVectors::Color3Array[0], metallicF90);
+}
+
+std::string ReflectivityBlock::getCode(NodeMaterialBuildState& state,
+                                       const std::string& aoIntensityVarName)
 {
   const auto metalRoughTexture
     = texture()->isConnected() ? texture()->connectedPoint()->associatedVariableName() : "null";
 
-  // note: metallic F0 factor = 0.04
+  _vMetallicReflectanceFactorsName = state._getFreeVariableName("vMetallicReflectanceFactors");
+
+  state._emitUniformFromString(_vMetallicReflectanceFactorsName, "vec4");
+
+  // note: metallic F0 factor = 1
   const auto code = StringTools::printf(
     R"(vec3 baseColor = surfaceAlbedo;
        vec4 metallicReflectanceFactors = vec4(1.);
@@ -94,7 +129,7 @@ std::string ReflectivityBlock::getCode(const std::string& aoIntensityVarName) co
            vec4(%s, %s, 0., 0.),
        #ifdef METALLICWORKFLOW
            surfaceAlbedo,
-           metallicReflectanceFactors,
+           %s,
        #endif
        #ifdef REFLECTIVITY
            vec3(0., 0., %s),
@@ -120,6 +155,7 @@ std::string ReflectivityBlock::getCode(const std::string& aoIntensityVarName) co
        #endif\r\n
       )",
     metallic()->associatedVariableName().c_str(), roughness()->associatedVariableName().c_str(), //
+    _vMetallicReflectanceFactorsName.c_str(),                                                    //
     aoIntensityVarName.c_str(),                                                                  //
     metalRoughTexture.c_str());
 
@@ -145,6 +181,7 @@ ReflectivityBlock& ReflectivityBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   if (state.target == NodeMaterialBlockTargets::Fragment) {
     state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
+    state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   }
 
   return *this;

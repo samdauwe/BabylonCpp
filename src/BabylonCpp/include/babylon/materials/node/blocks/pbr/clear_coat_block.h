@@ -144,11 +144,6 @@ protected:
   NodeMaterialConnectionPointPtr& get_tintThickness();
 
   /**
-   * @brief Gets the tint texture input component.
-   */
-  NodeMaterialConnectionPointPtr& get_tintTexture();
-
-  /**
    * @brief Gets the world tangent input component.
    */
   NodeMaterialConnectionPointPtr& get_worldTangent();
@@ -213,11 +208,6 @@ public:
    * Gets the tint thickness input component
    */
   ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> tintThickness;
-
-  /**
-   * Gets the tint texture input component
-   */
-  ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> tintTexture;
 
   /**
    * Gets the world tangent input component

@@ -11,6 +11,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/maths/spherical_polynomial.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/string_tools.h>
@@ -176,9 +177,12 @@ void ReflectionBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeM
     effect->setTexture(_2DSamplerName, reflectionTexture);
   }
 
-  effect->setFloat3(
-    _vReflectionMicrosurfaceInfosName, static_cast<float>(reflectionTexture->getSize().width),
-    reflectionTexture->lodGenerationScale(), reflectionTexture->lodGenerationOffset());
+  const auto width = static_cast<float>(reflectionTexture->getSize().width);
+
+  effect->setFloat3(_vReflectionMicrosurfaceInfosName, width,
+                    reflectionTexture->lodGenerationScale(),
+                    reflectionTexture->lodGenerationOffset());
+  effect->setFloat2(_vReflectionFilteringInfoName, width, Scalar::Log2(width));
 
   auto defines = std::static_pointer_cast<NodeMaterialDefines>(subMesh->_materialDefines);
 
@@ -329,6 +333,10 @@ std::string ReflectionBlock::getCode(NodeMaterialBuildState& state,
   state._emitUniformFromString(_vReflectionMicrosurfaceInfosName, "vec3");
 
   _vReflectionInfosName = state._getFreeVariableName("vReflectionInfos");
+
+  _vReflectionFilteringInfoName = state._getFreeVariableName("vReflectionFilteringInfo");
+
+  state._emitUniformFromString(_vReflectionFilteringInfoName, "vec2");
 
   code += StringTools::printf(
     R"(
