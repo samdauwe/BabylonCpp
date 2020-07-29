@@ -34,6 +34,13 @@ public:
   ~InputBlock() override;
 
   /**
+   * @brief Validates if a name is a reserve word.
+   * @param newName the new name to be given to the node.
+   * @returns false if the name is a reserve word, else true.
+   */
+  bool validateBlockName(const std::string& newName) const override;
+
+  /**
    * @brief Set the source of this connection point to a vertex attribute.
    * @param attributeName defines the attribute name (position, uv, normal, etc...). If not
    * specified it will take the connection point name

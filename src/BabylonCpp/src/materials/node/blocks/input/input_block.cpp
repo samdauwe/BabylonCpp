@@ -16,16 +16,18 @@
 namespace BABYLON {
 
 static const std::unordered_map<std::string, std::string> remapAttributeName{
-  {"position2d", "position"},             //
-  {"particle_uv", "vUV"},                 //
-  {"particle_color", "vColor"},           //
-  {"particle_texturemask", "textureMask"} //
+  {"position2d", "position"},              //
+  {"particle_uv", "vUV"},                  //
+  {"particle_color", "vColor"},            //
+  {"particle_texturemask", "textureMask"}, //
+  {"particle_positionw", "vPositionW"}     //
 };
 
 static const std::unordered_map<std::string, bool> attributeInFragmentOnly{
-  {"particle_uv", true},         //
-  {"particle_color", true},      //
-  {"particle_texturemask", true} //
+  {"particle_uv", true},          //
+  {"particle_color", true},       //
+  {"particle_texturemask", true}, //
+  {"particle_positionw", true}    //
 };
 
 static const std::unordered_map<std::string, bool> attributeAsUniform{
@@ -108,7 +110,8 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
     }
 
     if (isAttribute()) {
-      if (name == "position" || name == "normal" || name == "tangent") {
+      if (name == "position" || name == "normal" || name == "tangent"
+          || name == "particle_positionw") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector3;
         return _type;
       }
@@ -158,12 +161,20 @@ NodeMaterialConnectionPointPtr& InputBlock::get_output()
   return _outputs[0];
 }
 
+bool InputBlock::validateBlockName(const std::string& newName) const
+{
+  if (!isAttribute()) {
+    return NodeMaterialBlock::validateBlockName(newName);
+  }
+  return true;
+}
+
 InputBlock& InputBlock::setAsAttribute(const std::string& attributeName)
 {
+  _mode = NodeMaterialBlockConnectionPointMode::Attribute;
   if (!attributeName.empty()) {
     name = attributeName;
   }
-  _mode = NodeMaterialBlockConnectionPointMode::Attribute;
   return *this;
 }
 
