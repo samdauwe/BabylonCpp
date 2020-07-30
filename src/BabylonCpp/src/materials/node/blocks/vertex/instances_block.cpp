@@ -139,8 +139,8 @@ void InstancesBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPt
     changed = true;
   }
 
-  if (subMesh && defines["THIN_INSTANCES"] != subMesh->getRenderingMesh()->hasInstances()) {
-    defines.setValue("THIN_INSTANCES", subMesh->getRenderingMesh()->hasInstances());
+  if (subMesh && defines["THIN_INSTANCES"] != subMesh->getRenderingMesh()->hasThinInstances()) {
+    defines.setValue("THIN_INSTANCES", subMesh->getRenderingMesh()->hasThinInstances());
     changed = true;
   }
 
