@@ -22,6 +22,7 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , innerType{this, &NodeMaterialConnectionPoint::get_innerType}
     , type{this, &NodeMaterialConnectionPoint::get_type, &NodeMaterialConnectionPoint::set_type}
     , isOptional{false}
+    , isExposedOnFrame{false}
     , _prioritizeVertex{false}
     , target{this, &NodeMaterialConnectionPoint::get_target,
              &NodeMaterialConnectionPoint::set_target}

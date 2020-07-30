@@ -297,6 +297,11 @@ public:
   bool isOptional;
 
   /**
+   * Gets or sets a boolean indicating that this connection point is exposed on a frame
+   */
+  bool isExposedOnFrame;
+
+  /**
    * Gets or sets a string indicating that this uniform must be defined under a #ifdef
    */
   std::string define;
