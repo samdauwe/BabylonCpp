@@ -29,6 +29,18 @@ public:
   std::string getClassName() const override;
 
   /**
+   * @brief Update defines for shader compilation.
+   * @param mesh defines the mesh to be rendered
+   * @param nodeMaterial defines the node material requesting the update
+   * @param defines defines the material defines to update
+   * @param useInstances specifies that instances should be used
+   * @param subMesh defines which submesh to render
+   */
+  void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+                      NodeMaterialDefines& defines, bool useInstances = false,
+                      const SubMeshPtr& subMesh = nullptr) override;
+
+  /**
    * @brief Serializes this block in a JSON representation.
    * @returns the serialized block object
    */
