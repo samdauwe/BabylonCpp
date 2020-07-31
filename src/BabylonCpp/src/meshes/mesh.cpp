@@ -68,6 +68,7 @@
 #include <babylon/rendering/outline_renderer.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/rendering_group.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 
@@ -1303,7 +1304,7 @@ bool Mesh::thinInstanceSetMatrixAt(size_t index, const Matrix& iMatrix, bool ref
   auto& matrixData = _thinInstanceDataStorage->matrixData;
 
   auto matrix = iMatrix;
-  matrix.copyToArray(matrixData, index * 16);
+  matrix.copyToArray(matrixData, static_cast<unsigned>(index) * 16);
 
   if (refresh) {
     thinInstanceBufferUpdated("matrix");
@@ -1444,7 +1445,7 @@ void Mesh::thinInstanceRefreshBoundingInfo(bool forceRefreshParentInfo)
   TmpVectors::Vector3Array[0].setAll(std::numeric_limits<float>::max());    // min
   TmpVectors::Vector3Array[1].setAll(std::numeric_limits<float>::lowest()); // max
 
-  for (size_t i = 0; i < _thinInstanceDataStorage->instancesCount; ++i) {
+  for (unsigned int i = 0; i < _thinInstanceDataStorage->instancesCount; ++i) {
     Matrix::FromArrayToRef(matrixData, i * 16, TmpVectors::MatrixArray[0]);
 
     for (size_t v = 0; v < vectors.size(); ++v) {
@@ -1781,12 +1782,12 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
 
   if (!_effectiveMaterial->backFaceCulling() && _effectiveMaterial->separateCullingPass) {
     engine->setState(true, _effectiveMaterial->zOffset, false, !reverse);
-    _processRendering(
-      this, subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
-      [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
-        _onBeforeDraw(isInstance, world, effectiveMaterial);
-      },
-      _effectiveMaterial.get());
+    _processRendering(this, subMesh, effect, static_cast<int>(fillMode), batch,
+                      hardwareInstancedRendering,
+                      [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
+                        _onBeforeDraw(isInstance, world, effectiveMaterial);
+                      },
+                      _effectiveMaterial.get());
     engine->setState(true, _effectiveMaterial->zOffset, false, reverse);
   }
 
@@ -2060,26 +2061,26 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 
   const auto getBinaryData = StringTools::contains(delayLoadingFile, ".babylonbinarymeshdata");
 
-  FileTools::LoadFile(
-    delayLoadingFile,
-    [this, &scene](const std::variant<std::string, ArrayBufferView>& data,
-                   const std::string & /*responseURL*/) -> void {
-      if (std::holds_alternative<ArrayBufferView>(data)) {
-        // _delayLoadingFunction(data, shared_from_base<Mesh>());
-      }
-      else {
-        _delayLoadingFunction(json::parse(std::get<std::string>(data)), shared_from_base<Mesh>());
-      }
+  FileTools::LoadFile(delayLoadingFile,
+                      [this, &scene](const std::variant<std::string, ArrayBufferView>& data,
+                                     const std::string & /*responseURL*/) -> void {
+                        if (std::holds_alternative<ArrayBufferView>(data)) {
+                          // _delayLoadingFunction(data, shared_from_base<Mesh>());
+                        }
+                        else {
+                          _delayLoadingFunction(json::parse(std::get<std::string>(data)),
+                                                shared_from_base<Mesh>());
+                        }
 
-      for (const auto& instance : instances) {
-        instance->refreshBoundingInfo();
-        instance->_syncSubMeshes();
-      }
+                        for (const auto& instance : instances) {
+                          instance->refreshBoundingInfo();
+                          instance->_syncSubMeshes();
+                        }
 
-      delayLoadState = Constants::DELAYLOADSTATE_LOADED;
-      scene->_removePendingData(this);
-    },
-    nullptr, /* scene->offlineProvider, */ getBinaryData);
+                        delayLoadState = Constants::DELAYLOADSTATE_LOADED;
+                        scene->_removePendingData(this);
+                      },
+                      nullptr, /* scene->offlineProvider, */ getBinaryData);
 
   return *this;
 }
@@ -2312,20 +2313,20 @@ Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float 
                                  const std::optional<Vector2>& uvOffset,
                                  const std::optional<Vector2>& uvScale, bool forceUpdate)
 {
-  FileTools::LoadImageFromUrl(
-    url,
-    [&](const Image& img) {
-      auto heightMapWidth  = static_cast<unsigned>(img.width);
-      auto heightMapHeight = static_cast<unsigned>(img.height);
-      // Create VertexData from map data
-      applyDisplacementMapFromBuffer(img.data, heightMapWidth, heightMapHeight, minHeight,
-                                     maxHeight, uvOffset, uvScale, forceUpdate);
-      // execute success callback, if set
-      if (onSuccess) {
-        onSuccess(this);
-      }
-    },
-    nullptr, false);
+  FileTools::LoadImageFromUrl(url,
+                              [&](const Image& img) {
+                                auto heightMapWidth  = static_cast<unsigned>(img.width);
+                                auto heightMapHeight = static_cast<unsigned>(img.height);
+                                // Create VertexData from map data
+                                applyDisplacementMapFromBuffer(
+                                  img.data, heightMapWidth, heightMapHeight, minHeight, maxHeight,
+                                  uvOffset, uvScale, forceUpdate);
+                                // execute success callback, if set
+                                if (onSuccess) {
+                                  onSuccess(this);
+                                }
+                              },
+                              nullptr, false);
 
   return *this;
 }
@@ -2758,7 +2759,7 @@ void Mesh::forceSharedVertices()
         for (size_t j = 0; j < 3; j++) {
           ptr = stl_util::contains(uniquePositions, pstring[j]) ? uniquePositions[pstring[j]] : -1;
           if (ptr == -1) {
-            uniquePositions[pstring[j]] = indexPtr;
+            uniquePositions[pstring[j]] = static_cast<int>(indexPtr);
             ptr                         = static_cast<int>(indexPtr++);
             // not listed so add individual x, y, z coordinates to positions
             for (unsigned k = 0; k < 3; k++) {

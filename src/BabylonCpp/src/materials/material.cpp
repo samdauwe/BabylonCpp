@@ -16,6 +16,7 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/guid.h>
 #include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 

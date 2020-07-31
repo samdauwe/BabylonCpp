@@ -147,9 +147,9 @@ void DetailMapConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Scene*
   }
 }
 
-bool DetailMapConfiguration::hasTexture(const BaseTexturePtr& texture) const
+bool DetailMapConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
-  if (_texture == texture) {
+  if (_texture == iTexture) {
     return true;
   }
 

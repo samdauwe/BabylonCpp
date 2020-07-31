@@ -271,7 +271,7 @@ int ShaderCodeInliner::_extractBetweenMarkers(char markerOpen, char markerClose,
     }
   }
 
-  return openMarkers == 0 ? currPos - 1 : -1;
+  return openMarkers == 0 ? static_cast<int>(currPos) - 1 : -1;
 }
 
 size_t ShaderCodeInliner::_skipWhitespaces(const std::string& s, size_t index)
@@ -476,7 +476,7 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
   return doAgain;
 }
 
-int ShaderCodeInliner::_findBackward(const std::string& s, int index, char c)
+int ShaderCodeInliner::_findBackward(const std::string& s, int index, char c) const
 {
   while (index >= 0 && s[index] != c) {
     index--;
@@ -485,24 +485,24 @@ int ShaderCodeInliner::_findBackward(const std::string& s, int index, char c)
   return index;
 }
 
-std::string ShaderCodeInliner::_escapeRegExp(const std::string& s)
+std::string ShaderCodeInliner::_escapeRegExp(const std::string& s) const
 {
   return StringTools::regexReplace(s, R"([.*+?^%s()|[\]\\])", R"(\\$&)");
 }
 
-std::string ShaderCodeInliner::_replaceNames(std::string code,
+std::string ShaderCodeInliner::_replaceNames(std::string iCode,
                                              const std::vector<std::string>& sources,
-                                             const std::vector<std::string>& destinations)
+                                             const std::vector<std::string>& destinations) const
 {
 
   for (size_t i = 0; i < sources.size(); ++i) {
     const auto source       = _escapeRegExp(sources[i]);
     const auto& destination = destinations[i];
 
-    code = StringTools::regexReplace(code, source, destination);
+    iCode = StringTools::regexReplace(iCode, source, destination);
   }
 
-  return code;
+  return iCode;
 }
 
 } // end of namespace BABYLON

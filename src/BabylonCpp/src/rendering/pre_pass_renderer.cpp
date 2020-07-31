@@ -108,7 +108,7 @@ void PrePassRenderer::_createCompositionEffect()
   _initializeAttachments();
 
   imageProcessingPostProcess
-    = ImageProcessingPostProcess::New("sceneCompositionPass", 1, nullptr, std::nullopt, _engine);
+    = ImageProcessingPostProcess::New("sceneCompositionPass", 1.f, nullptr, std::nullopt, _engine);
   imageProcessingPostProcess->autoClear = false;
 }
 
@@ -196,13 +196,13 @@ void PrePassRenderer::clear()
   }
 }
 
-void PrePassRenderer::_setState(bool enabled)
+void PrePassRenderer::_setState(bool iEnabled)
 {
-  _enabled        = enabled;
-  _scene->prePass = enabled;
+  _enabled        = iEnabled;
+  _scene->prePass = iEnabled;
 
   if (imageProcessingPostProcess) {
-    imageProcessingPostProcess->imageProcessingConfiguration()->applyByPostProcess = enabled;
+    imageProcessingPostProcess->imageProcessingConfiguration()->applyByPostProcess = iEnabled;
   }
 }
 

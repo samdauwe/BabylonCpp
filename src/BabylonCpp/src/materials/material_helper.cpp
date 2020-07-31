@@ -24,6 +24,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 
