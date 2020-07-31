@@ -14,6 +14,7 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/color_curves.h>
+#include <babylon/materials/detail_map_configuration.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/fresnel_parameters.h>
@@ -136,6 +137,8 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
                                 &StandardMaterial::set_cameraColorGradingTexture}
     , cameraColorCurves{this, &StandardMaterial::get_cameraColorCurves,
                         &StandardMaterial::set_cameraColorCurves}
+    , detailMap{std::make_unique<DetailMapConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
@@ -437,6 +440,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
   // Multiview
   MaterialHelper::PrepareDefinesForMultiview(scene, defines);
 
+  // PrePass
+  MaterialHelper::PrepareDefinesForPrePass(scene, defines, canRenderToMRT);
+
   // Textures
   if (defines._areTexturesDirty) {
     defines._needUVs           = false;
@@ -640,6 +646,10 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
         || needAlphaBlendingForMesh(*mesh); // check on null for backward compatibility
   }
 
+  if (!detailMap->isReadyForSubMesh(defines, scene)) {
+    return false;
+  }
+
   if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
     if (!_imageProcessingConfiguration->isReady()) {
       return false;
@@ -697,6 +707,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
   MaterialHelper::PrepareDefinesForFrameBoundValues(
     scene, engine, defines, useInstances, std::nullopt,
     subMesh->getRenderingMesh()->hasThinInstances());
+
+  // External config
+  detailMap->prepareDefines(defines, scene);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -857,8 +870,13 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
       "refractionCubeSampler", "refraction2DSampler", "boneSampler"};
     std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
-    ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
-    ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
+    DetailMapConfiguration::AddUniforms(uniforms);
+    DetailMapConfiguration::AddSamplers(samplers);
+
+    /* if (ImageProcessingConfiguration) */ {
+      ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
+      ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
+    }
 
     std::unordered_map<std::string, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
@@ -876,6 +894,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
     options.onError               = onError;
     options.indexParameters       = std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.multiTarget           = defines["PREPASS"];
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
@@ -969,6 +988,8 @@ void StandardMaterial::buildUniformLayout()
   ubo.addUniform("vEmissiveColor", 3);
   ubo.addUniform("visibility", 1);
   ubo.addUniform("vDiffuseColor", 4);
+
+  DetailMapConfiguration::PrepareUniformBuffer(ubo);
 
   ubo.create();
 }
@@ -1225,6 +1246,8 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
       }
     }
 
+    detailMap->bindForSubMesh(ubo, scene, isFrozen());
+
     // Clip plane
     MaterialHelper::BindClipPlane(effect, scene);
 
@@ -1311,6 +1334,8 @@ std::vector<IAnimatablePtr> StandardMaterial::getAnimatables()
     results.emplace_back(_refractionTexture);
   }
 
+  detailMap->getAnimatables(results);
+
   return results;
 }
 
@@ -1353,6 +1378,8 @@ std::vector<BaseTexturePtr> StandardMaterial::getActiveTextures() const
   if (_refractionTexture) {
     activeTextures.emplace_back(_refractionTexture);
   }
+
+  detailMap->getActiveTextures(activeTextures);
 
   return activeTextures;
 }
@@ -1399,7 +1426,7 @@ bool StandardMaterial::hasTexture(const BaseTexturePtr& texture) const
     return true;
   }
 
-  return false;
+  return detailMap->hasTexture(texture);
 }
 
 void StandardMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
@@ -1442,6 +1469,8 @@ void StandardMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTexture
       _refractionTexture->dispose();
     }
   }
+
+  detailMap->dispose(forceDisposeTextures);
 
   if (_imageProcessingConfiguration && _imageProcessingObserver) {
     _imageProcessingConfiguration->onUpdateParameters.remove(_imageProcessingObserver);
@@ -2060,6 +2089,11 @@ void StandardMaterial::set_cameraColorCurves(const std::shared_ptr<ColorCurves>&
   _imageProcessingConfiguration->colorCurves = value;
 }
 
+bool StandardMaterial::get_canRenderToMRT() const
+{
+  return true;
+}
+
 StandardMaterialPtr StandardMaterial::Parse(const json& source, Scene* scene,
                                             const std::string& rootUrl)
 {
@@ -2078,6 +2112,16 @@ bool StandardMaterial::DiffuseTextureEnabled()
 void StandardMaterial::SetDiffuseTextureEnabled(bool value)
 {
   MaterialFlags::setDiffuseTextureEnabled(value);
+}
+
+bool StandardMaterial::DetailTextureEnabled()
+{
+  return MaterialFlags::DetailTextureEnabled();
+}
+
+void StandardMaterial::SetDetailTextureEnabled(bool value)
+{
+  MaterialFlags::setDetailTextureEnabled(value);
 }
 
 bool StandardMaterial::AmbientTextureEnabled()

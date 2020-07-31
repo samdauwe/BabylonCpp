@@ -11,6 +11,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"MAINUV1", false},                                     //
     {"MAINUV2", false},                                     //
     {"DIFFUSE", false},                                     //
+    {"DETAIL", false},                                      //
     {"AMBIENT", false},                                     //
     {"OPACITY", false},                                     //
     {"OPACITYRGB", false},                                  //
@@ -82,6 +83,8 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"ALPHATEST_AFTERALLALPHACOMPUTATIONS", false}, //
     {"ALPHABLEND", true},                           //
 
+    {"PREPASS", false}, //
+
     {"RGBDLIGHTMAP", false},   //
     {"RGBDREFLECTION", false}, //
     {"RGBDREFRACTION", false}, //
@@ -114,16 +117,19 @@ StandardMaterialDefines::StandardMaterialDefines()
   };
 
   intDef = {
-    {"DIFFUSEDIRECTUV", 0},       //
-    {"AMBIENTDIRECTUV", 0},       //
-    {"OPACITYDIRECTUV", 0},       //
-    {"EMISSIVEDIRECTUV", 0},      //
-    {"SPECULARDIRECTUV", 0},      //
-    {"BUMPDIRECTUV", 0},          //
-    {"NUM_BONE_INFLUENCERS", 0},  //
-    {"BonesPerMesh", 0},          //
-    {"LIGHTMAPDIRECTUV", 0},      //
-    {"NUM_MORPH_INFLUENCERS", 0}, //
+    {"DIFFUSEDIRECTUV", 0},          //
+    {"DETAILDIRECTUV", 0},           //
+    {"DETAIL_NORMALBLENDMETHOD", 0}, //
+    {"AMBIENTDIRECTUV", 0},          //
+    {"OPACITYDIRECTUV", 0},          //
+    {"EMISSIVEDIRECTUV", 0},         //
+    {"SPECULARDIRECTUV", 0},         //
+    {"BUMPDIRECTUV", 0},             //
+    {"NUM_BONE_INFLUENCERS", 0},     //
+    {"BonesPerMesh", 0},             //
+    {"LIGHTMAPDIRECTUV", 0},         //
+    {"NUM_MORPH_INFLUENCERS", 0},    //
+    {"SCENE_MRT_COUNT", 0},          //
   };
 }
 

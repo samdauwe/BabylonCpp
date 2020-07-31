@@ -15,6 +15,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/guid.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 
 namespace BABYLON {
 
@@ -55,10 +56,12 @@ const Material::MaterialDefinesCallback Material::_RunDirtyCallBacks
 Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     : customShaderNameResolve{nullptr}
     , shadowDepthWrapper{nullptr}
+    , allowShaderHotSwapping{true}
     , id{!iName.empty() ? iName : GUID::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
+    , canRenderToMRT{this, &Material::get_canRenderToMRT}
     , alpha{this, &Material::get_alpha, &Material::set_alpha}
     , backFaceCulling{this, &Material::get_backFaceCulling, &Material::set_backFaceCulling}
     , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
@@ -129,6 +132,13 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
 }
 
 Material::~Material() = default;
+
+bool Material::get_canRenderToMRT() const
+{
+  // By default, shaders are not compatible with MRTs
+  // Base classes should override that if their shader supports MRT
+  return false;
+}
 
 void Material::set_alpha(float value)
 {
@@ -612,7 +622,7 @@ std::vector<AbstractMeshPtr> Material::getBindedMeshes()
   return result;
 }
 
-void Material::forceCompilation(AbstractMesh* mesh,
+void Material::forceCompilation(const AbstractMeshPtr& mesh,
                                 const std::function<void(Material* material)>& iOnCompiled,
                                 const std::optional<IMaterialCompilationOptions>& options,
                                 const std::function<void(const std::string& reason)>& iOnError)
@@ -626,7 +636,9 @@ void Material::forceCompilation(AbstractMesh* mesh,
     localOptions.useInstances = options->useInstances;
   }
 
-  auto scene = getScene();
+  auto scene                        = getScene();
+  const auto currentHotSwapingState = allowShaderHotSwapping;
+  allowShaderHotSwapping = false; // Turned off to let us evaluate the real compilation state
 
   const auto checkReady = [=]() {
     if (!_scene || !_scene->getEngine()) {
@@ -643,41 +655,23 @@ void Material::forceCompilation(AbstractMesh* mesh,
       bool allDone = true;
       std::string lastError;
       if (!mesh->subMeshes.empty()) {
-        for (const auto& subMesh : mesh->subMeshes) {
-          auto effectiveMaterial = subMesh->getMaterial();
-          if (effectiveMaterial) {
-            if (effectiveMaterial->_storeEffectOnSubMeshes) {
-              if (!effectiveMaterial->isReadyForSubMesh(mesh, subMesh.get(),
-                                                        localOptions.useInstances)) {
-                if (subMesh->effect() && !subMesh->effect()->getCompilationError().empty()
-                    && subMesh->effect()->allFallbacksProcessed()) {
-                  lastError = subMesh->effect()->getCompilationError();
-                }
-                else {
-                  allDone = false;
-                  // setTimeout(checkReady, 16);
-                  break;
-                }
-              }
-            }
-            else {
-              if (!effectiveMaterial->isReady(mesh, localOptions.useInstances)) {
-                if (effectiveMaterial->getEffect()
-                    && !effectiveMaterial->getEffect()->getCompilationError().empty()
-                    && effectiveMaterial->getEffect()->allFallbacksProcessed()) {
-                  lastError = effectiveMaterial->getEffect()->getCompilationError();
-                }
-                else {
-                  allDone = false;
-                  // setTimeout(checkReady, 16);
-                  break;
-                }
-              }
-            }
+        const auto tempSubMesh = SubMesh::New(0, 0, 0, 0, 0, mesh, nullptr, false, false);
+        if (tempSubMesh->_materialDefines) {
+          tempSubMesh->_materialDefines->_renderId = -1;
+        }
+        if (!isReadyForSubMesh(mesh.get(), tempSubMesh.get(), localOptions.useInstances)) {
+          if (tempSubMesh->effect() && !tempSubMesh->effect()->getCompilationError().empty()
+              && tempSubMesh->effect()->allFallbacksProcessed()) {
+            lastError = tempSubMesh->effect()->getCompilationError();
+          }
+          else {
+            allDone = false;
+            // setTimeout(checkReady, 16);
           }
         }
       }
       if (allDone) {
+        allowShaderHotSwapping = currentHotSwapingState;
         if (!lastError.empty()) {
           if (onError) {
             iOnError(lastError);
@@ -690,6 +684,7 @@ void Material::forceCompilation(AbstractMesh* mesh,
     }
     else {
       if (isReady()) {
+        allowShaderHotSwapping = currentHotSwapingState;
         if (iOnCompiled) {
           iOnCompiled(this);
         }
@@ -764,6 +759,18 @@ void Material::_markAllSubMeshesAsDirty(const Material::MaterialDefinesCallback&
 
       func(*subMesh->_materialDefines);
     }
+  }
+}
+
+void Material::_markScenePrePassDirty()
+{
+  if (getScene()->blockMaterialDirtyMechanism()) {
+    return;
+  }
+
+  const auto prePassRenderer = getScene()->enablePrePassRenderer();
+  if (prePassRenderer) {
+    prePassRenderer->markAsDirty();
   }
 }
 

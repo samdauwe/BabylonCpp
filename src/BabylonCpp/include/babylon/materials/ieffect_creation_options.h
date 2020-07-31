@@ -77,6 +77,10 @@ struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
    */
   std::function<std::string(const std::string& shaderType, const std::string& code)>
     processFinalCode = nullptr;
+  /**
+   * Is this effect rendering to several color attachments ?
+   */
+  std::optional<bool> multiTarget{std::nullopt};
 }; // end of class IEffectCreationOptions
 
 } // end of namespace BABYLON

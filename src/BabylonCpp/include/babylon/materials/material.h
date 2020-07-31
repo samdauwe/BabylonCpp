@@ -409,7 +409,7 @@ public:
    * @param options defines the options to configure the compilation
    * @param onError defines a function to execute if the material fails compiling
    */
-  void forceCompilation(AbstractMesh* mesh,
+  void forceCompilation(const AbstractMeshPtr& mesh,
                         const std::function<void(Material* material)>& onCompiled,
                         const std::optional<IMaterialCompilationOptions>& options = std::nullopt,
                         const std::function<void(const std::string& reason)>& onError = nullptr);
@@ -488,6 +488,11 @@ protected:
   bool get__disableAlphaBlending() const;
 
 protected:
+  /**
+   * @brief If the material can be rendered to several textures with MRT extension.
+   */
+  virtual bool get_canRenderToMRT() const;
+
   /**
    * @brief Sets the alpha value of the material.
    */
@@ -646,6 +651,11 @@ protected:
   void _markAllSubMeshesAsDirty(const MaterialDefinesCallback& func);
 
   /**
+   * Indicates that the scene should check if the rendering now needs a prepass
+   */
+  void _markScenePrePassDirty();
+
+  /**
    * @brief Indicates that we need to re-calculated for all submeshes.
    */
   void _markAllSubMeshesAsAllDirty();
@@ -721,6 +731,14 @@ public:
   ShadowDepthWrapperPtr shadowDepthWrapper;
 
   /**
+   * Gets or sets a boolean indicating that the material is allowed (if supported) to do shader hot
+   * swapping. This means that the material can keep using a previous shader while a new one is
+   * being compiled. This is mostly used when shader parallel compilation is supported (true by
+   * default)
+   */
+  bool allowShaderHotSwapping;
+
+  /**
    * The ID of the material
    */
   std::string id;
@@ -744,6 +762,16 @@ public:
    * Specifies if the ready state should be checked once
    */
   bool checkReadyOnlyOnce;
+
+  /**
+   * The state of the material
+   */
+  std::string state;
+
+  /**
+   * If the material can be rendered to several textures with MRT extension
+   */
+  ReadOnlyProperty<Material, bool> canRenderToMRT;
 
   /**
    * List of inspectable custom properties (used by the Inspector)

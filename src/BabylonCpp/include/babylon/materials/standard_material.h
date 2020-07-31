@@ -9,6 +9,7 @@
 namespace BABYLON {
 
 class ColorCurves;
+class DetailMapConfiguration;
 class FresnelParameters;
 class IAnimatable;
 class ImageProcessingConfiguration;
@@ -21,7 +22,7 @@ using StandardMaterialPtr  = std::shared_ptr<StandardMaterial>;
 /**
  * @brief This is the default material used in Babylon. It is the best trade off between quality and
  * performances.
- * @see http://doc.babylonjs.com/babylon101/materials
+ * @see https://doc.babylonjs.com/babylon101/materials
  */
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
@@ -57,21 +58,21 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
-  [[nodiscard]] Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  [[nodiscard]] bool needAlphaBlending() const override;
+  bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
    * @returns a boolean specifying if an alpha test is needed.
    */
-  [[nodiscard]] bool needAlphaTesting() const override;
+  bool needAlphaTesting() const override;
 
   /**
    * @brief Get the texture used for alpha test purpose.
@@ -119,14 +120,14 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Disposes the material.
@@ -143,21 +144,19 @@ public:
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  [[nodiscard]] MaterialPtr clone(const std::string& name,
-                                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a standard material from parsed material data.
    * @param source defines the JSON representation of the material
    * @param scene defines the hosting scene
-   * @param rootUrl defines the root URL to use to load textures and relative
-   * dependencies
+   * @param rootUrl defines the root URL to use to load textures and relative dependencies
    * @returns a new standard material
    */
   static StandardMaterialPtr Parse(const json& source, Scene* scene, const std::string& rootUrl);
@@ -167,6 +166,12 @@ public:
    */
   static bool DiffuseTextureEnabled();
   static void SetDiffuseTextureEnabled(bool value);
+
+  /**
+   * Are detail textures enabled in the application.
+   */
+  static bool DetailTextureEnabled();
+  static void SetDetailTextureEnabled(bool value);
 
   /**
    * Are ambient textures enabled in the application.
@@ -233,7 +238,7 @@ protected:
    * @brief Instantiates a new standard material.
    * This is the default material used in Babylon. It is the best trade off
    * between quality and performances.
-   * @see http://doc.babylonjs.com/babylon101/materials
+   * @see https://doc.babylonjs.com/babylon101/materials
    * @param name Define the name of the material in the scene
    * @param scene Define the scene the material belong to
    */
@@ -259,27 +264,27 @@ protected:
   BaseTexturePtr& get_refractionTexture();
   void set_refractionTexture(const BaseTexturePtr& value);
 
-  [[nodiscard]] bool get_useAlphaFromDiffuseTexture() const;
+  bool get_useAlphaFromDiffuseTexture() const;
   void set_useAlphaFromDiffuseTexture(bool value);
-  [[nodiscard]] bool get_useEmissiveAsIllumination() const;
+  bool get_useEmissiveAsIllumination() const;
   void set_useEmissiveAsIllumination(bool value);
-  [[nodiscard]] bool get_linkEmissiveWithDiffuse() const;
+  bool get_linkEmissiveWithDiffuse() const;
   void set_linkEmissiveWithDiffuse(bool value);
-  [[nodiscard]] bool get_useSpecularOverAlpha() const;
+  bool get_useSpecularOverAlpha() const;
   void set_useSpecularOverAlpha(bool value);
-  [[nodiscard]] bool get_useReflectionOverAlpha() const;
+  bool get_useReflectionOverAlpha() const;
   void set_useReflectionOverAlpha(bool value);
-  [[nodiscard]] bool get_disableLighting() const;
+  bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  [[nodiscard]] bool get_useObjectSpaceNormalMap() const;
+  bool get_useObjectSpaceNormalMap() const;
   void set_useObjectSpaceNormalMap(bool value);
-  [[nodiscard]] bool get_useParallax() const;
+  bool get_useParallax() const;
   void set_useParallax(bool value);
-  [[nodiscard]] bool get_useParallaxOcclusion() const;
+  bool get_useParallaxOcclusion() const;
   void set_useParallaxOcclusion(bool value);
-  [[nodiscard]] float get_roughness() const;
+  float get_roughness() const;
   void set_roughness(float value);
-  [[nodiscard]] bool get_useLightmapAsShadowmap() const;
+  bool get_useLightmapAsShadowmap() const;
   void set_useLightmapAsShadowmap(bool value);
 
   // Fresnel
@@ -293,17 +298,17 @@ protected:
   void set_refractionFresnelParameters(const FresnelParametersPtr& value);
   FresnelParametersPtr& get_emissiveFresnelParameters();
   void set_emissiveFresnelParameters(const FresnelParametersPtr& value);
-  [[nodiscard]] bool get_useReflectionFresnelFromSpecular() const;
+  bool get_useReflectionFresnelFromSpecular() const;
   void set_useReflectionFresnelFromSpecular(bool value);
-  [[nodiscard]] bool get_useGlossinessFromSpecularMapAlpha() const;
+  bool get_useGlossinessFromSpecularMapAlpha() const;
   void set_useGlossinessFromSpecularMapAlpha(bool value);
-  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
+  unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  [[nodiscard]] bool get_invertNormalMapX() const;
+  bool get_invertNormalMapX() const;
   void set_invertNormalMapX(bool value);
-  [[nodiscard]] bool get_invertNormalMapY() const;
+  bool get_invertNormalMapY() const;
   void set_invertNormalMapY(bool value);
-  [[nodiscard]] bool get_twoSidedLighting() const;
+  bool get_twoSidedLighting() const;
   void set_twoSidedLighting(bool value);
 
   /**
@@ -323,7 +328,7 @@ protected:
   /**
    * @brief Gets whether the color curves effect is enabled.
    */
-  [[nodiscard]] bool get_cameraColorCurvesEnabled() const;
+  bool get_cameraColorCurvesEnabled() const;
 
   /**
    * @brief Sets whether the color curves effect is enabled.
@@ -333,7 +338,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  [[nodiscard]] bool get_cameraColorGradingEnabled() const;
+  bool get_cameraColorGradingEnabled() const;
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -343,7 +348,7 @@ protected:
   /**
    * @brief Gets wether tonemapping is enabled or not.
    */
-  [[nodiscard]] bool get_cameraToneMappingEnabled() const;
+  bool get_cameraToneMappingEnabled() const;
 
   /**
    * @brief Sets wether tonemapping is enabled or not
@@ -356,7 +361,7 @@ protected:
    * without full screen post process.
    * This corresponds to a photographic exposure.
    */
-  [[nodiscard]] float get_cameraExposure() const;
+  float get_cameraExposure() const;
 
   /**
    * @brief The camera exposure used on this material.
@@ -369,7 +374,7 @@ protected:
   /**
    * @brief Gets The camera contrast used on this material.
    */
-  [[nodiscard]] float get_cameraContrast() const;
+  float get_cameraContrast() const;
 
   /**
    * @brief Sets The camera contrast used on this material.
@@ -387,45 +392,42 @@ protected:
   void set_cameraColorGradingTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
+   * @brief The color grading curves provide additional color adjustmnent that is applied after any
+   * color grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
+   * adjustments, along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects. These are similar to controls found in many professional imaging or colorist
+   * software. The global controls are applied to the entire image. For advanced tuning, extra
+   * controls are provided to adjust the shadow, midtone and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas respectively.
    */
   std::shared_ptr<ColorCurves>& get_cameraColorCurves();
 
   /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
+   * @brief The color grading curves provide additional color adjustmnent that is applied after any
+   * color grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
+   * adjustments, along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects. These are similar to controls found in many professional imaging or colorist
+   * software. The global controls are applied to the entire image. For advanced tuning, extra
+   * controls are provided to adjust the shadow, midtone and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas respectively.
    */
   void set_cameraColorCurves(const std::shared_ptr<ColorCurves>& value);
+
+  /**
+   * @brief Can this material render to several textures at once.
+   */
+  bool get_canRenderToMRT() const override;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
+  bool get_hasRenderTargetTextures() const override;
 
   /**
    * @brief Gets the logarithmic depth setting.
    */
-  [[nodiscard]] bool get_useLogarithmicDepth() const override;
+  bool get_useLogarithmicDepth() const override;
 
   /**
    * @brief Sets the logarithmic depth setting.
@@ -439,7 +441,7 @@ protected:
    */
   void _attachImageProcessingConfiguration(ImageProcessingConfiguration* configuration);
 
-  [[nodiscard]] bool _shouldUseAlphaFromDiffuseTexture() const;
+  bool _shouldUseAlphaFromDiffuseTexture() const;
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:
@@ -465,7 +467,7 @@ public:
   /**
    * Define the texture used to display the reflection.
    * @see
-   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   Property<StandardMaterial, BaseTexturePtr> reflectionTexture;
 
@@ -486,7 +488,7 @@ public:
    * surface. These are made by creating a normal map from an image. The means
    * to do this can be found on the web, a search for 'normal map generator'
    * will bring up free and paid for methods of doing this.
-   * @see http://doc.babylonjs.com/how_to/more_materials#bump-map
+   * @see https://doc.babylonjs.com/how_to/more_materials#bump-map
    */
   Property<StandardMaterial, BaseTexturePtr> bumpTexture;
 
@@ -494,20 +496,20 @@ public:
    * Complex lighting can be computationally expensive to compute at runtime.
    * To save on computation, lightmaps may be used to store calculated lighting
    * in a texture which will be applied to a given mesh.
-   * @see http://doc.babylonjs.com/babylon101/lights#lightmaps
+   * @see https://doc.babylonjs.com/babylon101/lights#lightmaps
    */
   Property<StandardMaterial, BaseTexturePtr> lightmapTexture;
 
   /**
    * Define the texture used to display the refraction.
    * @see
-   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   Property<StandardMaterial, BaseTexturePtr> refractionTexture;
 
   /**
    * The color of the material lit by the environmental background lighting.
-   * @see http://doc.babylonjs.com/babylon101/materials#ambient-color-example
+   * @see https://doc.babylonjs.com/babylon101/materials#ambient-color-example
    */
   Color3 ambientColor;
 
@@ -583,7 +585,7 @@ public:
 
   /**
    * Is parallax enabled or not.
-   * @see http://doc.babylonjs.com/how_to/using_parallax_mapping
+   * @see https://doc.babylonjs.com/how_to/using_parallax_mapping
    */
   Property<StandardMaterial, bool> useParallax;
 
@@ -591,7 +593,7 @@ public:
    * Is parallax occlusion enabled or not.
    * If true, the outcome is way more realistic than traditional Parallax but
    * you can expect a performance hit that worthes consideration.
-   * @see http://doc.babylonjs.com/how_to/using_parallax_mapping
+   * @see https://doc.babylonjs.com/how_to/using_parallax_mapping
    */
   Property<StandardMaterial, bool> useParallaxOcclusion;
 
@@ -610,7 +612,7 @@ public:
   /**
    * In case of refraction, define the value of the index of refraction.
    * @see
-   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   float indexOfRefraction;
 
@@ -618,7 +620,7 @@ public:
    * Invert the refraction texture alongside the y axis.
    * It can be useful with procedural textures or probe for instance.
    * @see
-   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   bool invertRefractionY;
 
@@ -637,38 +639,38 @@ public:
 
   /**
    * Define the diffuse fresnel parameters of the material.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, FresnelParametersPtr> diffuseFresnelParameters;
 
   /**
    * Define the opacity fresnel parameters of the material.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, FresnelParametersPtr> opacityFresnelParameters;
 
   /**
    * Define the reflection fresnel parameters of the material.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, FresnelParametersPtr> reflectionFresnelParameters;
 
   /**
    * Define the refraction fresnel parameters of the material.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, FresnelParametersPtr> refractionFresnelParameters;
 
   /**
    * Define the emissive fresnel parameters of the material.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, FresnelParametersPtr> emissiveFresnelParameters;
 
   /**
    * If true automatically deducts the fresnels values from the material
    * specularity.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, bool> useReflectionFresnelFromSpecular;
 
@@ -738,19 +740,20 @@ public:
   Property<StandardMaterial, BaseTexturePtr> cameraColorGradingTexture;
 
   /**
-   * The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
+   * The color grading curves provide additional color adjustmnent that is applied after any color
+   * grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
+   * adjustments, along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects. These are similar to controls found in many professional imaging or colorist
+   * software. The global controls are applied to the entire image. For advanced tuning, extra
+   * controls are provided to adjust the shadow, midtone and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas respectively.
    */
   Property<StandardMaterial, std::shared_ptr<ColorCurves>> cameraColorCurves;
+
+  /**
+   * Defines the detail map parameters for the material.
+   */
+  std::unique_ptr<DetailMapConfiguration> detailMap;
 
 protected:
   std::vector<RenderTargetTexturePtr> _renderTargets;

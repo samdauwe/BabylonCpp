@@ -72,6 +72,7 @@ Effect::Effect(
     _fallbacks                 = std::move(options.fallbacks);
     _indexParameters           = options.indexParameters;
     _transformFeedbackVaryings = options.transformFeedbackVaryings;
+    _multiTarget               = options.multiTarget.value_or(false);
 
     stl_util::concat(_uniformsNames, options.samplers);
 
