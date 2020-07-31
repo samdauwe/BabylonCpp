@@ -76,6 +76,7 @@ BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
     , useEquirectangularFOV{false}
     , maxSimultaneousLights{this, &BackgroundMaterial::get_maxSimultaneousLights,
                             &BackgroundMaterial::set_maxSimultaneousLights}
+    , shadowOnly{this, &BackgroundMaterial::get_shadowOnly, &BackgroundMaterial::set_shadowOnly}
     , imageProcessingConfiguration{this, &BackgroundMaterial::get_imageProcessingConfiguration,
                                    &BackgroundMaterial::set_imageProcessingConfiguration}
     , cameraColorCurvesEnabled{this, &BackgroundMaterial::get_cameraColorCurvesEnabled,
@@ -112,6 +113,7 @@ BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
     , _imageProcessingConfiguration{nullptr}
     , _fovMultiplier{1.f}
     , _maxSimultaneousLights{4}
+    , _shadowOnly{false}
     , switchToBGR{false}
     , _imageProcessingObserver{nullptr}
     , _reflectionControls{Vector4::Zero()}
@@ -444,6 +446,21 @@ void BackgroundMaterial::set_maxSimultaneousLights(unsigned int value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
+bool BackgroundMaterial::get_shadowOnly() const
+{
+  return _shadowOnly;
+}
+
+void BackgroundMaterial::set_shadowOnly(bool value)
+{
+  if (_shadowOnly == value) {
+    return;
+  }
+
+  _shadowOnly = value;
+  _markAllSubMeshesAsLightsDirty();
+}
+
 void BackgroundMaterial::_attachImageProcessingConfiguration(
   const ImageProcessingConfigurationPtr& configuration)
 {
@@ -578,7 +595,8 @@ bool BackgroundMaterial::needAlphaTesting() const
 
 bool BackgroundMaterial::needAlphaBlending() const
 {
-  return ((alpha() < 0.f) || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()));
+  return ((alpha() < 1.f) || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha())
+          || _shadowOnly);
 }
 
 bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
@@ -737,6 +755,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   if (defines._areLightsDirty) {
     defines.boolDef["USEHIGHLIGHTANDSHADOWCOLORS"]
       = !_useRGBColor && (_primaryColorShadowLevel != 0.f || _primaryColorHighlightLevel != 0.f);
+    defines.boolDef["BACKMAT_SHADOWONLY"] = _shadowOnly;
   }
 
   if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {

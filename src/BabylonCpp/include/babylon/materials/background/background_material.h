@@ -417,6 +417,16 @@ protected:
   [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
 
   /**
+   * Gets the make the material only render shadows flag.
+   */
+  bool get_shadowOnly() const;
+
+  /**
+   * @brief Sets the make the material only render shadows flag.
+   */
+  void set_shadowOnly(bool value);
+
+  /**
    * @brief Sets the number of Simultaneous lights allowed on the material.
    */
   void set_maxSimultaneousLights(unsigned int value);
@@ -692,6 +702,11 @@ public:
   Property<BackgroundMaterial, unsigned int> maxSimultaneousLights;
 
   /**
+   * Make the material only render shadows.
+   */
+  Property<BackgroundMaterial, bool> shadowOnly;
+
+  /**
    * Gets the image processing configuration used either in this material.
    */
   Property<BackgroundMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
@@ -899,6 +914,11 @@ private:
    * Number of Simultaneous lights allowed on the material.
    */
   unsigned int _maxSimultaneousLights;
+
+  /**
+   * Make the material only render shadows
+   */
+  bool _shadowOnly;
 
   /**
    * Due to a bug in iOS10, video tags (which are using the background material)

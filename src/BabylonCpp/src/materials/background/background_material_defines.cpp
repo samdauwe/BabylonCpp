@@ -66,6 +66,11 @@ BackgroundMaterialDefines::BackgroundMaterialDefines()
     {"USEHIGHLIGHTANDSHADOWCOLORS", false}, //
 
     /**
+     * True if only shadows must be rendered
+     */
+    {"BACKMAT_SHADOWONLY", false}, //
+
+    /**
      * True to add noise in order to reduce the banding effect.
      */
     {"NOISE", false}, //
