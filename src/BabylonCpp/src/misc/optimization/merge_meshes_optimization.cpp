@@ -14,23 +14,26 @@ bool MergeMeshesOptimization::UpdateSelectionTree()
   return MergeMeshesOptimization::_UpdateSelectionTree;
 }
 
-void MergeMeshesOptimization::UpdateSelectionTree(bool value)
+void MergeMeshesOptimization::setUpdateSelectionTree(bool value)
 {
   MergeMeshesOptimization::_UpdateSelectionTree = value;
 }
 
-MergeMeshesOptimization::MergeMeshesOptimization(int iPriority)
-    : SceneOptimization{iPriority}
+MergeMeshesOptimization::MergeMeshesOptimization(int iPriority) : SceneOptimization{iPriority}
 {
 }
 
 MergeMeshesOptimization::~MergeMeshesOptimization() = default;
 
+std::string MergeMeshesOptimization::getDescription() const
+{
+  return "Merging similar meshes together";
+}
+
 bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
 {
   // Check if instance of Mesh
-  if (!((abstractMesh->type() == Type::MESH)
-        || (abstractMesh->type() == Type::GROUNDMESH)
+  if (!((abstractMesh->type() == Type::MESH) || (abstractMesh->type() == Type::GROUNDMESH)
         || (abstractMesh->type() == Type::LINESMESH))) {
     return false;
   }
@@ -56,7 +59,7 @@ bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
   return true;
 }
 
-bool MergeMeshesOptimization::apply(Scene* scene)
+bool MergeMeshesOptimization::apply(Scene* scene, SceneOptimizer* /*optimizer*/)
 {
   return _apply(scene, false);
 }

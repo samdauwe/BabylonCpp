@@ -1,19 +1,24 @@
 #include <babylon/misc/optimization/render_targets_optimization.h>
 
 #include <babylon/engines/scene.h>
+#include <babylon/misc/optimization/scene_optimizer.h>
 
 namespace BABYLON {
 
-RenderTargetsOptimization::RenderTargetsOptimization(int iPriority)
-    : SceneOptimization{iPriority}
+RenderTargetsOptimization::RenderTargetsOptimization(int iPriority) : SceneOptimization{iPriority}
 {
 }
 
 RenderTargetsOptimization::~RenderTargetsOptimization() = default;
 
-bool RenderTargetsOptimization::apply(Scene* scene)
+std::string RenderTargetsOptimization::getDescription() const
 {
-  scene->renderTargetsEnabled = false;
+  return "Turning render targets off";
+}
+
+bool RenderTargetsOptimization::apply(Scene* scene, SceneOptimizer* optimizer)
+{
+  scene->renderTargetsEnabled = optimizer->isInImprovementMode();
   return true;
 }
 

@@ -5,20 +5,37 @@
 
 namespace BABYLON {
 
-HardwareScalingOptimization::HardwareScalingOptimization(int iPriority, int iMaximumSize)
-    : SceneOptimization{iPriority}, maximumScale{iMaximumSize}, _currentScale{1}
+HardwareScalingOptimization::HardwareScalingOptimization(int iPriority, float iMaximumScale,
+                                                         float iStep)
+    : SceneOptimization{iPriority}
+    , maximumScale{iMaximumScale}
+    , step{iStep}
+    , _currentScale{-1.f}
+    , _directionOffset{1.f}
 {
 }
 
 HardwareScalingOptimization::~HardwareScalingOptimization() = default;
 
-bool HardwareScalingOptimization::apply(Scene* scene)
+std::string HardwareScalingOptimization::getDescription() const
 {
-  ++_currentScale;
+  return "Setting hardware scaling level to " + std::to_string(_currentScale);
+}
 
-  scene->getEngine()->setHardwareScalingLevel(static_cast<float>(_currentScale));
+bool HardwareScalingOptimization::apply(Scene* scene, SceneOptimizer* /*optimizer*/)
+{
+  if (_currentScale == -1.f) {
+    _currentScale = scene->getEngine()->getHardwareScalingLevel();
+    if (_currentScale > maximumScale) {
+      _directionOffset = -1;
+    }
+  }
 
-  return _currentScale >= maximumScale;
+  _currentScale += _directionOffset * step;
+
+  scene->getEngine()->setHardwareScalingLevel(_currentScale);
+
+  return _directionOffset == 1.f ? _currentScale >= maximumScale : _currentScale <= maximumScale;
 }
 
 } // end of namespace BABYLON

@@ -1,5 +1,6 @@
 #include <babylon/misc/optimization/scene_optimizer_options.h>
 
+#include <babylon/misc/optimization/custom_optimization.h>
 #include <babylon/misc/optimization/hardware_scaling_optimization.h>
 #include <babylon/misc/optimization/lens_flares_optimization.h>
 #include <babylon/misc/optimization/merge_meshes_optimization.h>
@@ -11,8 +12,7 @@
 
 namespace BABYLON {
 
-SceneOptimizerOptions::SceneOptimizerOptions(float iTargetFrameRate,
-                                             int iTrackerDuration)
+SceneOptimizerOptions::SceneOptimizerOptions(float iTargetFrameRate, int iTrackerDuration)
     : targetFrameRate{iTargetFrameRate}, trackerDuration{iTrackerDuration}
 {
 }
@@ -21,92 +21,106 @@ SceneOptimizerOptions::SceneOptimizerOptions(const SceneOptimizerOptions& other)
 
 SceneOptimizerOptions::SceneOptimizerOptions(SceneOptimizerOptions&& other) = default;
 
-SceneOptimizerOptions& SceneOptimizerOptions::
-operator=(const SceneOptimizerOptions& other) = default;
+SceneOptimizerOptions& SceneOptimizerOptions::operator=(const SceneOptimizerOptions& other)
+  = default;
 
-SceneOptimizerOptions& SceneOptimizerOptions::
-operator=(SceneOptimizerOptions&& other) = default;
+SceneOptimizerOptions& SceneOptimizerOptions::operator=(SceneOptimizerOptions&& other) = default;
 
 SceneOptimizerOptions::~SceneOptimizerOptions() = default;
 
-SceneOptimizerOptions
-SceneOptimizerOptions::LowDegradationAllowed(float targetFrameRate)
+SceneOptimizerOptions& SceneOptimizerOptions::addOptimization(const SceneOptimization& optimization)
+{
+  optimizations.emplace_back(optimization);
+  return *this;
+}
+
+SceneOptimizerOptions& SceneOptimizerOptions::addCustomOptimization(
+  const std::function<bool(Scene* scene, SceneOptimizer* optimizer)>& onApply,
+  const std::function<std::string()>& onGetDescription, int priority)
+{
+  CustomOptimization optimization(priority);
+  optimization.onApply          = onApply;
+  optimization.onGetDescription = onGetDescription;
+
+  optimizations.emplace_back(optimization);
+  return *this;
+}
+
+SceneOptimizerOptions SceneOptimizerOptions::LowDegradationAllowed(float targetFrameRate)
 {
   SceneOptimizerOptions result(targetFrameRate);
 
   int priority = 0;
-  result.optimizations.emplace_back(MergeMeshesOptimization(priority));
-  result.optimizations.emplace_back(ShadowsOptimization(priority));
-  result.optimizations.emplace_back(LensFlaresOptimization(priority));
+  result.addOptimization(MergeMeshesOptimization(priority));
+  result.addOptimization(ShadowsOptimization(priority));
+  result.addOptimization(LensFlaresOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(PostProcessesOptimization(priority));
-  result.optimizations.emplace_back(ParticlesOptimization(priority));
+  result.addOptimization(PostProcessesOptimization(priority));
+  result.addOptimization(ParticlesOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(TextureOptimization(priority, 1024));
+  result.addOptimization(TextureOptimization(priority, 1024));
 
   return result;
 }
 
-SceneOptimizerOptions
-SceneOptimizerOptions::ModerateDegradationAllowed(float targetFrameRate)
+SceneOptimizerOptions SceneOptimizerOptions::ModerateDegradationAllowed(float targetFrameRate)
 {
   SceneOptimizerOptions result(targetFrameRate);
 
   int priority = 0;
-  result.optimizations.emplace_back(MergeMeshesOptimization(priority));
-  result.optimizations.emplace_back(ShadowsOptimization(priority));
-  result.optimizations.emplace_back(LensFlaresOptimization(priority));
+  result.addOptimization(MergeMeshesOptimization(priority));
+  result.addOptimization(ShadowsOptimization(priority));
+  result.addOptimization(LensFlaresOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(PostProcessesOptimization(priority));
-  result.optimizations.emplace_back(ParticlesOptimization(priority));
+  result.addOptimization(PostProcessesOptimization(priority));
+  result.addOptimization(ParticlesOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(TextureOptimization(priority, 512));
+  result.addOptimization(TextureOptimization(priority, 512));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(RenderTargetsOptimization(priority));
+  result.addOptimization(RenderTargetsOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(HardwareScalingOptimization(priority, 2));
+  result.addOptimization(HardwareScalingOptimization(priority, 2.f));
 
   return result;
 }
 
-SceneOptimizerOptions
-SceneOptimizerOptions::HighDegradationAllowed(float targetFrameRate)
+SceneOptimizerOptions SceneOptimizerOptions::HighDegradationAllowed(float targetFrameRate)
 {
   SceneOptimizerOptions result(targetFrameRate);
 
   int priority = 0;
-  result.optimizations.emplace_back(MergeMeshesOptimization(priority));
-  result.optimizations.emplace_back(ShadowsOptimization(priority));
-  result.optimizations.emplace_back(LensFlaresOptimization(priority));
+  result.addOptimization(MergeMeshesOptimization(priority));
+  result.addOptimization(ShadowsOptimization(priority));
+  result.addOptimization(LensFlaresOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(PostProcessesOptimization(priority));
-  result.optimizations.emplace_back(ParticlesOptimization(priority));
+  result.addOptimization(PostProcessesOptimization(priority));
+  result.addOptimization(ParticlesOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(TextureOptimization(priority, 256));
+  result.addOptimization(TextureOptimization(priority, 256));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(RenderTargetsOptimization(priority));
+  result.addOptimization(RenderTargetsOptimization(priority));
 
   // Next priority
   ++priority;
-  result.optimizations.emplace_back(HardwareScalingOptimization(priority, 4));
+  result.addOptimization(HardwareScalingOptimization(priority, 4.f));
 
   return result;
 }

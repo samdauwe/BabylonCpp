@@ -1,19 +1,24 @@
 #include <babylon/misc/optimization/shadows_optimization.h>
 
 #include <babylon/engines/scene.h>
+#include <babylon/misc/optimization/scene_optimizer.h>
 
 namespace BABYLON {
 
-ShadowsOptimization::ShadowsOptimization(int iPriority)
-    : SceneOptimization{iPriority}
+ShadowsOptimization::ShadowsOptimization(int iPriority) : SceneOptimization{iPriority}
 {
 }
 
 ShadowsOptimization::~ShadowsOptimization() = default;
 
-bool ShadowsOptimization::apply(Scene* scene)
+std::string ShadowsOptimization::getDescription() const
 {
-  scene->shadowsEnabled = false;
+  return "Turning shadows on/off";
+}
+
+bool ShadowsOptimization::apply(Scene* scene, SceneOptimizer* optimizer)
+{
+  scene->shadowsEnabled = optimizer->isInImprovementMode();
   return true;
 }
 

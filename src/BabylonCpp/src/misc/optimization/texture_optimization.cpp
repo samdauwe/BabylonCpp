@@ -5,16 +5,21 @@
 
 namespace BABYLON {
 
-TextureOptimization::TextureOptimization(int iPriority, int iMaximumSize)
-    : SceneOptimization{iPriority}, maximumSize{iMaximumSize}
+TextureOptimization::TextureOptimization(int iPriority, int iMaximumSize, float iStep)
+    : SceneOptimization{iPriority}, maximumSize{iMaximumSize}, step{iStep}
 {
 }
 
 TextureOptimization::~TextureOptimization() = default;
 
-bool TextureOptimization::apply(Scene* scene)
+std::string TextureOptimization::getDescription() const
 {
-  bool allDone = true;
+  return "Reducing render target texture size to " + std::to_string(maximumSize);
+}
+
+bool TextureOptimization::apply(Scene* scene, SceneOptimizer* /*optimizer*/)
+{
+  auto allDone = true;
   for (auto& texture : scene->textures) {
     if (!texture->canRescale()) {
       continue;
@@ -24,7 +29,7 @@ bool TextureOptimization::apply(Scene* scene)
     auto maxDimension = std::max(currentSize.width, currentSize.height);
 
     if (maxDimension > maximumSize) {
-      texture->scale(0.5f);
+      texture->scale(step);
       allDone = false;
     }
   }

@@ -8,7 +8,12 @@ SceneOptimization::SceneOptimization(int iPriority) : priority{iPriority}
 
 SceneOptimization::~SceneOptimization() = default;
 
-bool SceneOptimization::apply(Scene* /*scene*/)
+std::string SceneOptimization::getDescription() const
+{
+  return "";
+}
+
+bool SceneOptimization::apply(Scene* /*scene*/, SceneOptimizer* /*optimizer*/)
 {
   return true; // Return true if everything that can be done was applied
 }
