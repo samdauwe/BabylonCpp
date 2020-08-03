@@ -11,7 +11,7 @@ namespace BABYLON {
 class AbstractMesh;
 class IParticleSystem;
 struct IRenderingManagerAutoClearSetup;
-struct ISpriteManager;
+class ISpriteManager;
 class Material;
 class RenderingGroup;
 struct RenderingGroupInfo;

@@ -15,7 +15,7 @@ class Camera;
 class EdgesRenderer;
 struct IEdgesRenderer;
 class IParticleSystem;
-struct ISpriteManager;
+class ISpriteManager;
 class Material;
 class Scene;
 class SubMesh;

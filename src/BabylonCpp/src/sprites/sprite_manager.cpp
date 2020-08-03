@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
+#include <babylon/core/json_util.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -20,6 +21,7 @@
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
 #include <babylon/sprites/sprite_scene_component.h>
+#include <babylon/states/depth_culling_state.h>
 
 namespace BABYLON {
 
@@ -31,7 +33,8 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     , spriteJSON{iSpriteJSON}
     , fogEnabled{true}
     , onDispose{this, &SpriteManager::set_onDispose}
-    , texture{this, &SpriteManager::get_texture, &SpriteManager::set_texture}
+    , children{this, &SpriteManager::get_children}
+    , capacity{this, &SpriteManager::get_capacity}
     , blendMode{this, &SpriteManager::get_blendMode, &SpriteManager::set_blendMode}
     , disableDepthWrite{false}
     , _packedAndReady{false}
@@ -52,11 +55,14 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     renderingGroupId = 0;
   }
 
-  _capacity             = capacity;
-  _fromPacked           = fromPacked;
-  _spriteTexture        = Texture::New(imgUrl, scene, true, false, samplingMode);
-  _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-  _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+  _capacity   = capacity;
+  _fromPacked = fromPacked;
+
+  if (!imgUrl.empty()) {
+    _spriteTexture        = Texture::New(imgUrl, scene, true, false, samplingMode);
+    _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+    _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+  }
 
   if (cellSize.width != -1 && cellSize.height != -1) {
     cellWidth  = cellSize.width;
@@ -75,10 +81,11 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
   }
 
   _epsilon = epsilon;
-  _scene   = scene;
+  _scene   = scene ? scene : Engine::LastCreatedScene();
+  uniqueId = scene->getUniqueId();
 
   IndicesArray indices;
-  int index = 0;
+  auto index = 0;
   for (unsigned int count = 0; count < capacity; ++count) {
     indices.emplace_back(index + 0);
     indices.emplace_back(index + 1);
@@ -153,6 +160,21 @@ void SpriteManager::set_onDispose(const std::function<void(SpriteManager*, Event
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
+std::vector<SpritePtr>& SpriteManager::get_children()
+{
+  return sprites;
+}
+
+Scene*& SpriteManager::get_scene()
+{
+  return _scene;
+}
+
+size_t SpriteManager::get_capacity() const
+{
+  return _capacity;
+}
+
 TexturePtr& SpriteManager::get_texture()
 {
   return _spriteTexture;
@@ -160,8 +182,10 @@ TexturePtr& SpriteManager::get_texture()
 
 void SpriteManager::set_texture(const TexturePtr& value)
 {
-  _spriteTexture  = value;
-  _textureContent = {};
+  _spriteTexture        = value;
+  _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+  _textureContent       = {};
 }
 
 unsigned int SpriteManager::get_blendMode() const
@@ -172,6 +196,11 @@ unsigned int SpriteManager::get_blendMode() const
 void SpriteManager::set_blendMode(unsigned int iBlendMode)
 {
   _blendMode = iBlendMode;
+}
+
+std::string SpriteManager::getClassName() const
+{
+  return "SpriteManager";
 }
 
 void SpriteManager::_makePacked(const std::string& /*imgUrl*/, const std::string& /*spriteJSON*/)
@@ -211,8 +240,13 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offset
   _vertexData[arrayOffset + 5] = static_cast<float>(sprite.height);
   _vertexData[arrayOffset + 6] = offsetXVal;
   _vertexData[arrayOffset + 7] = offsetYVal;
-  // Inverts
-  _vertexData[arrayOffset + 8] = sprite.invertU ? 1.f : 0.f;
+  // Inverts according to Right Handed
+  if (_scene->useRightHandedSystem()) {
+    _vertexData[arrayOffset + 8] = sprite.invertU ? 0.f : 1.f;
+  }
+  else {
+    _vertexData[arrayOffset + 8] = sprite.invertU ? 1.f : 0.f;
+  }
   _vertexData[arrayOffset + 9] = sprite.invertV ? 1.f : 0.f;
   // CellIfo
   if (_packedAndReady) {
@@ -500,6 +534,13 @@ void SpriteManager::render()
   // VBOs
   engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 
+  // Handle Right Handed
+  const auto culling = engine->depthCullingState()->cull().value_or(true);
+  const auto zOffset = engine->depthCullingState()->zOffset();
+  if (_scene->useRightHandedSystem()) {
+    engine->setState(culling, zOffset, false, false);
+  }
+
   // Draw order
   engine->setDepthFunctionToLessOrEqual();
   if (!disableDepthWrite) {
@@ -513,6 +554,11 @@ void SpriteManager::render()
   engine->setAlphaMode(_blendMode);
   engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
   engine->setAlphaMode(Constants::ALPHA_DISABLE);
+
+  // Restore Right Handed
+  if (_scene->useRightHandedSystem()) {
+    engine->setState(culling, zOffset, false, true);
+  }
 }
 
 void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
@@ -540,6 +586,17 @@ void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndText
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
+}
+
+json SpriteManager::serialize(bool /*serializeTexture*/) const
+{
+  return nullptr;
+}
+
+SpriteManagerPtr SpriteManager::Parse(const json& /*parsedManager*/, Scene* /*scene*/,
+                                      const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

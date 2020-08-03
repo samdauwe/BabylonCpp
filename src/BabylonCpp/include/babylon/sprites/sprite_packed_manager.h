@@ -10,9 +10,8 @@ class SpritePackedManager;
 using SpritePackedManagerPtr = std::shared_ptr<SpritePackedManager>;
 
 /**
- * @brief Class used to manage multiple sprites of different sizes on the same
- * spritesheet
- * @see http://doc.babylonjs.com/babylon101/sprites
+ * @brief Class used to manage multiple sprites of different sizes on the same spritesheet.
+ * @see https://doc.babylonjs.com/babylon101/sprites
  */
 class BABYLON_SHARED_EXPORT SpritePackedManager : public SpriteManager {
 

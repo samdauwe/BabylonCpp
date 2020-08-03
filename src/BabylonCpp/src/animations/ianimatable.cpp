@@ -4,8 +4,7 @@ namespace BABYLON {
 
 IAnimatable::IAnimatable()
     : parent{this, &IAnimatable::get_parent, &IAnimatable::set_parent}
-    , animationPropertiesOverride{this,
-                                  &IAnimatable::get_animationPropertiesOverride,
+    , animationPropertiesOverride{this, &IAnimatable::get_animationPropertiesOverride,
                                   &IAnimatable::set_animationPropertiesOverride}
     , nullNode{nullptr}
     , _identityMatrix{Matrix::Identity()}
@@ -30,8 +29,7 @@ AnimationPropertiesOverridePtr& IAnimatable::get_animationPropertiesOverride()
   return _nullAnimationPropertiesOverride;
 }
 
-void IAnimatable::set_animationPropertiesOverride(
-  const AnimationPropertiesOverridePtr& /*value*/)
+void IAnimatable::set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& /*value*/)
 {
 }
 
@@ -74,20 +72,17 @@ std::optional<Matrix>& IAnimatable::getRestPose()
   return _nullMatrix;
 }
 
-AnimationValue
-IAnimatable::getProperty(const std::vector<std::string>& /*targetPropertyPath*/)
+AnimationValue IAnimatable::getProperty(const std::vector<std::string>& /*targetPropertyPath*/)
 {
   return AnimationValue();
 }
 
-void IAnimatable::setProperty(
-  const std::vector<std::string>& /*targetPropertyPath*/,
-  const AnimationValue& /*value*/)
+void IAnimatable::setProperty(const std::vector<std::string>& /*targetPropertyPath*/,
+                              const AnimationValue& /*value*/)
 {
 }
 
-AnimationValue IAnimatable::getProperty(const std::string& key,
-                                        const Color3& color)
+AnimationValue IAnimatable::getProperty(const std::string& key, const Color3& color)
 {
   if (key == "r") {
     return AnimationValue(color.r);
@@ -102,8 +97,7 @@ AnimationValue IAnimatable::getProperty(const std::string& key,
   return AnimationValue();
 }
 
-AnimationValue IAnimatable::getProperty(const std::string& key,
-                                        const Color4& color)
+AnimationValue IAnimatable::getProperty(const std::string& key, const Color4& color)
 {
   if (key == "r") {
     return AnimationValue(color.r);
@@ -121,8 +115,7 @@ AnimationValue IAnimatable::getProperty(const std::string& key,
   return AnimationValue();
 }
 
-AnimationValue IAnimatable::getProperty(const std::string& key,
-                                        const Vector2& vector)
+AnimationValue IAnimatable::getProperty(const std::string& key, const Vector2& vector)
 {
   if (key == "x") {
     return AnimationValue(vector.x);
@@ -134,8 +127,7 @@ AnimationValue IAnimatable::getProperty(const std::string& key,
   return AnimationValue();
 }
 
-AnimationValue IAnimatable::getProperty(const std::string& key,
-                                        const Vector3& vector)
+AnimationValue IAnimatable::getProperty(const std::string& key, const Vector3& vector)
 {
   if (key == "x") {
     return AnimationValue(vector.x);
@@ -150,8 +142,7 @@ AnimationValue IAnimatable::getProperty(const std::string& key,
   return AnimationValue();
 }
 
-AnimationValue IAnimatable::getProperty(const std::string& key,
-                                        const Quaternion& quaternion)
+AnimationValue IAnimatable::getProperty(const std::string& key, const Quaternion& quaternion)
 {
   if (key == "x") {
     return AnimationValue(quaternion.x);
@@ -169,8 +160,7 @@ AnimationValue IAnimatable::getProperty(const std::string& key,
   return AnimationValue();
 }
 
-void IAnimatable::setProperty(const std::string& key, Color3& color,
-                              float value)
+void IAnimatable::setProperty(const std::string& key, Color3& color, float value)
 {
   if (key == "r") {
     color.r = value;
@@ -183,8 +173,7 @@ void IAnimatable::setProperty(const std::string& key, Color3& color,
   }
 }
 
-void IAnimatable::setProperty(const std::string& key, Color4& color,
-                              float value)
+void IAnimatable::setProperty(const std::string& key, Color4& color, float value)
 {
   if (key == "r") {
     color.r = value;
@@ -200,8 +189,7 @@ void IAnimatable::setProperty(const std::string& key, Color4& color,
   }
 }
 
-void IAnimatable::setProperty(const std::string& key, Vector2& vector,
-                              float value)
+void IAnimatable::setProperty(const std::string& key, Vector2& vector, float value)
 {
   if (key == "x") {
     vector.x = value;
@@ -211,8 +199,7 @@ void IAnimatable::setProperty(const std::string& key, Vector2& vector,
   }
 }
 
-void IAnimatable::setProperty(const std::string& key, Vector3& vector,
-                              float value)
+void IAnimatable::setProperty(const std::string& key, Vector3& vector, float value)
 {
   if (key == "x") {
     vector.x = value;
@@ -225,8 +212,7 @@ void IAnimatable::setProperty(const std::string& key, Vector3& vector,
   }
 }
 
-void IAnimatable::setProperty(const std::string& key, Quaternion& quaternion,
-                              float value)
+void IAnimatable::setProperty(const std::string& key, Quaternion& quaternion, float value)
 {
   if (key == "x") {
     quaternion.x = value;

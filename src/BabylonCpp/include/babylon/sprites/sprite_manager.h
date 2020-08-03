@@ -28,9 +28,20 @@ using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Class used to manage multiple sprites on the same spritesheet.
- * @see http://doc.babylonjs.com/babylon101/sprites
+ * @see https://doc.babylonjs.com/babylon101/sprites
  */
 class BABYLON_SHARED_EXPORT SpriteManager : public ISpriteManager {
+
+public:
+  /**
+   * Define the Url to load snippets
+   */
+  static constexpr const char* SnippetUrl = "https://snippet.babylonjs.com";
+
+  /**
+   * Snippet ID if the manager was created from the snippet server
+   */
+  std::string snippetId;
 
 public:
   template <typename... Ts>
@@ -44,7 +55,16 @@ public:
   }
   ~SpriteManager() override; // = default
 
+  /**
+   * @brief Hidden
+   */
   void addToScene(const SpriteManagerPtr& newSpriteManager);
+
+  /**
+   * @brief Returns the string "SpriteManager".
+   * @returns "SpriteManager"
+   */
+  std::string getClassName() const;
 
   /**
    * @brief Intersects the sprites with a ray.
@@ -80,6 +100,23 @@ public:
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
+  /**
+   * @brief Serializes the sprite manager to a JSON object.
+   * @param serializeTexture defines if the texture must be serialized as well
+   * @returns the JSON object
+   */
+  json serialize(bool serializeTexture = false) const;
+
+  /**
+   * @brief Parses a JSON object to create a new sprite manager.
+   * @param parsedManager The JSON object to parse
+   * @param scene The scene to create the sprite managerin
+   * @param rootUrl The root url to use to load external dependencies like texture
+   * @returns the new sprite manager
+   */
+  static SpriteManagerPtr Parse(const json& parsedManager, Scene* scene,
+                                const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a new sprite manager.
@@ -104,14 +141,29 @@ protected:
   void set_onDispose(const std::function<void(SpriteManager*, EventState&)>& callback);
 
   /**
+   * @brief Gets the array of sprites
+   */
+  std::vector<SpritePtr>& get_children();
+
+  /**
+   * @brief Gets the hosting scene
+   */
+  Scene*& get_scene() override;
+
+  /**
+   * @brief Gets the capacity of the manager
+   */
+  size_t get_capacity() const;
+
+  /**
    * @brief Gets the spritesheet texture.
    */
-  TexturePtr& get_texture();
+  TexturePtr& get_texture() override;
 
   /**
    * @brief Sets the spritesheet texture.
    */
-  void set_texture(const TexturePtr& value);
+  void set_texture(const TexturePtr& value) override;
 
   /**
    * @brief Gets theBlend mode use to render the particle, it can be any of the static
@@ -149,16 +201,6 @@ public:
   bool fogEnabled;
 
   /**
-   * Defines the default width of a cell in the spritesheet
-   */
-  int cellWidth;
-
-  /**
-   * Defines the default height of a cell in the spritesheet
-   */
-  int cellHeight;
-
-  /**
    * An event triggered when the manager is disposed.
    */
   Observable<SpriteManager> onDisposeObservable;
@@ -169,9 +211,19 @@ public:
   WriteOnlyProperty<SpriteManager, std::function<void(SpriteManager*, EventState&)>> onDispose;
 
   /**
-   * Gets or sets the spritesheet texture
+   * Gets or sets the unique id of the sprite
    */
-  Property<SpriteManager, TexturePtr> texture;
+  unsigned int uniqueId;
+
+  /**
+   * Gets the array of sprites
+   */
+  ReadOnlyProperty<SpriteManager, std::vector<SpritePtr>> children;
+
+  /**
+   * Gets the capacity of the manager
+   */
+  ReadOnlyProperty<SpriteManager, size_t> capacity;
 
   /**
    * Blend mode use to render the particle, it can be any of

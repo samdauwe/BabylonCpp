@@ -3,10 +3,9 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
-#include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
@@ -14,14 +13,26 @@ namespace BABYLON {
 class Camera;
 class PickingInfo;
 class Ray;
+class Scene;
 class Sprite;
-using CameraPtr = std::shared_ptr<Camera>;
-using SpritePtr = std::shared_ptr<Sprite>;
+class Texture;
+using CameraPtr  = std::shared_ptr<Camera>;
+using SpritePtr  = std::shared_ptr<Sprite>;
+using TexturePtr = std::shared_ptr<Texture>;
 
 /**
  * @brief Defines the minimum interface to fullfil in order to be a sprite manager.
  */
-struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
+class BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
+
+public:
+  ISpriteManager();
+  ~ISpriteManager();
+
+  /**
+   * Gets manager's name
+   */
+  std::string name;
 
   /**
    * Restricts the camera to viewing objects with the same layerMask.
@@ -36,9 +47,14 @@ struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
   bool isPickable = false;
 
   /**
+   * Gets the hosting scene
+   */
+  ReadOnlyProperty<ISpriteManager, Scene*> scene;
+
+  /**
    * Specifies the rendering group id for this mesh (0 by default)
    * @see
-   * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
+   * https://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
    */
   unsigned int renderingGroupId = 0;
 
@@ -46,6 +62,21 @@ struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
    * Defines the list of sprites managed by the manager.
    */
   std::vector<SpritePtr> sprites;
+
+  /**
+   * Gets or sets the spritesheet texture
+   */
+  Property<ISpriteManager, TexturePtr> texture;
+
+  /**
+   * Defines the default width of a cell in the spritesheet
+   */
+  int cellWidth = 0;
+
+  /**
+   * Defines the default height of a cell in the spritesheet
+   */
+  int cellHeight = 0;
 
   /**
    * @brief Tests the intersection of a sprite with a specific ray.
@@ -77,7 +108,23 @@ struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
    */
   virtual void render() = 0;
 
-}; // end of struct ISpriteManager
+protected:
+  /**
+   * @brief Gets the hosting scene.
+   */
+  virtual Scene*& get_scene() = 0;
+
+  /**
+   * @brief Gets the spritesheet texture.
+   */
+  virtual TexturePtr& get_texture() = 0;
+
+  /**
+   * @brief Sets the spritesheet texture.
+   */
+  virtual void set_texture(const TexturePtr& value) = 0;
+
+}; // end of class ISpriteManager
 
 } // end of namespace BABYLON
 
