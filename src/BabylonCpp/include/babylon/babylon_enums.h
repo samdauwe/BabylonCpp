@@ -183,8 +183,10 @@ enum class Type : unsigned int {
   TEXTURE     = 251,
   // Morph
   MORPHTARGET = 300,
+  // Sprite
+  SPRITE = 350,
   // Piplines
-  STANDARDRENDERINGPIPLINE = 350
+  STANDARDRENDERINGPIPLINE = 400
 }; // end of enum class Type
 
 } // end of namespace BABYLON
