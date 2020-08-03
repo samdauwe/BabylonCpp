@@ -53,7 +53,7 @@ struct IPhysicsEnginePlugin;
 struct IRenderingManagerAutoClearSetup;
 struct ISceneComponent;
 struct ISceneSerializableComponent;
-struct ISpriteManager;
+class ISpriteManager;
 class KeyboardInfo;
 class KeyboardInfoPre;
 class Mesh;
@@ -93,7 +93,7 @@ using SubMeshPtr                      = std::shared_ptr<SubMesh>;
 
 /**
  * @brief Represents a scene to be rendered by the engine.
- * @see http://doc.babylonjs.com/features/scene
+ * @see https://doc.babylonjs.com/features/scene
  */
 class BABYLON_SHARED_EXPORT Scene : public AbstractScene, public IAnimatable {
 
@@ -116,13 +116,13 @@ public:
 
   /**
    * Gets or sets the minimum deltatime when deterministic lock step is enabled
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
   static microseconds_t MinDeltaTime;
 
   /**
    * Gets or sets the maximum deltatime when deterministic lock step is enabled
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
   static microseconds_t MaxDeltaTime;
 
@@ -177,21 +177,21 @@ public:
 
   /**
    * @brief Sets the step Id used by deterministic lock step.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @param newStepId defines the step Id
    */
   void setStepId(unsigned int newStepId);
 
   /**
    * @brief Gets the step Id used by deterministic lock step.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns the step Id
    */
   unsigned int getStepId() const;
 
   /**
    * @brief Gets the internal step used by deterministic lock step.
-   * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
+   * @see https://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    * @returns the internal step
    */
   unsigned int getInternalStep() const;
@@ -665,10 +665,14 @@ public:
 
   /**
    * @brief Sets the current transform matrix.
-   * @param view defines the View matrix to use
-   * @param projection defines the Projection matrix to use
+   * @param viewL defines the View matrix to use
+   * @param projectionL defines the Projection matrix to use
+   * @param viewR defines the right View matrix to use (if provided)
+   * @param projectionR defines the right Projection matrix to use (if provided)
    */
-  void setTransformMatrix(Matrix& view, Matrix& projection);
+  void setTransformMatrix(Matrix& viewL, Matrix& projectionL,
+                          const std::optional<Matrix>& viewR       = std::nullopt,
+                          const std::optional<Matrix>& projectionR = std::nullopt);
 
   /**
    * @brief Hidden
@@ -1985,7 +1989,7 @@ protected:
 
   /**
    * @brief Gets the gamepad manager associated with the scene.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
+   * @see https://doc.babylonjs.com/how_to/how_to_use_gamepads
    */
   std::unique_ptr<GamepadManager>& get_gamepadManager();
 
@@ -2011,25 +2015,25 @@ protected:
 
   /**
    * @brief Gets or sets a boolean indicating if fog is enabled on this scene.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    */
   void set_fogEnabled(bool value);
 
   /**
    * @brief Gets or sets a boolean indicating if fog is enabled on this scene.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    */
   bool get_fogEnabled() const;
 
   /**
    * @brief Sets the fog mode to use.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    */
   void set_fogMode(unsigned int value);
 
   /**
    * @brief Gets the fog mode to use.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    */
   unsigned int get_fogMode() const;
 
@@ -2100,8 +2104,8 @@ protected:
 
   /**
    * @brief Gets the postprocess render pipeline manager.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
-   * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
+   * @see https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
+   * @see https://doc.babylonjs.com/how_to/using_default_rendering_pipeline
    */
   std::unique_ptr<PostProcessRenderPipelineManager>& get_postProcessRenderPipelineManager();
 
@@ -2113,13 +2117,13 @@ protected:
 
   /**
    * Gets the simplification queue attached to the scene.
-   * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+   * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
    */
   SimplificationQueuePtr& get_simplificationQueue();
 
   /**
    * Sets the simplification queue attached to the scene.
-   * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+   * @see https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
    */
   void set_simplificationQueue(const SimplificationQueuePtr& value);
 
@@ -2160,7 +2164,7 @@ protected:
 
   /**
    * @brief Gets the debug layer (aka Inspector) associated with the scene.
-   * @see http://doc.babylonjs.com/features/playground_debuglayer
+   * @see https://doc.babylonjs.com/features/playground_debuglayer
    */
   std::unique_ptr<DebugLayer>& get_debugLayer();
 
@@ -2197,25 +2201,25 @@ protected:
 
   /**
    * @brief Gets the performance counter for total vertices.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   PerfCounter& get_totalVerticesPerfCounter();
 
   /**
    * @brief Gets the performance counter for active indices.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   PerfCounter& get_totalActiveIndicesPerfCounter();
 
   /**
    * @brief Gets the performance counter for active particles.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   PerfCounter& get_activeParticlesPerfCounter();
 
   /**
    * @brief Gets the performance counter for active bones.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   PerfCounter& get_activeBonesPerfCounter();
 
@@ -2234,25 +2238,25 @@ protected:
 
   /**
    * @brief Gets if audio support is enabled.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   std::optional<bool>& get_audioEnabled();
 
   /**
    * @brief Sets if audio support is enabled.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   void set_audioEnabled(const std::optional<bool>& value);
 
   /**
    * @brief Gets if audio will be output to headphones.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   std::optional<bool>& get_headphone();
 
   /**
    * @brief Sets if audio will be output to headphones.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   void set_headphone(const std::optional<bool>& value);
 
@@ -2368,6 +2372,12 @@ public:
    * An event triggered after rendering the scene
    */
   Observable<Scene> onAfterRenderObservable;
+
+  /**
+   * An event triggered after rendering the scene for an active camera (When scene.render is called
+   * this will be called after each camera)
+   */
+  Observable<Camera> onAfterRenderCameraObservable;
 
   /**
    * Sets a function to be executed after rendering this scene
@@ -2822,13 +2832,13 @@ public:
 
   /**
    * Gets or sets a boolean indicating if fog is enabled on this scene
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    */
   Property<Scene, bool> fogEnabled;
 
   /**
    * Gets or sets the fog mode to use
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    * | mode | value |
    * | --- | --- |
    * | FOGMODE_NONE | 0 |
@@ -2840,28 +2850,28 @@ public:
 
   /**
    * Gets or sets the fog color to use
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    * (Default is Color3(0.2, 0.2, 0.3))
    */
   Color3 fogColor;
 
   /**
    * Gets or sets the fog density to use
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    * (Default is 0.1)
    */
   float fogDensity;
 
   /**
    * Gets or sets the fog start distance to use
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    * (Default is 0)
    */
   float fogStart;
 
   /**
    * Gets or sets the fog end distance to use
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * @see https://doc.babylonjs.com/babylon101/environment#fog
    * (Default is 1000)
    */
   float fogEnd;
@@ -2955,7 +2965,7 @@ public:
 
   /**
    * All of the sprite managers added to this scene
-   * @see http://doc.babylonjs.com/babylon101/sprites
+   * @see https://doc.babylonjs.com/babylon101/sprites
    */
   std::vector<ISpriteManagerPtr> spriteManagers;
 
@@ -2980,7 +2990,7 @@ public:
   /**
    * Gets or sets a boolean indicating if collisions are enabled on this scene
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   bool collisionsEnabled;
 
@@ -2990,7 +3000,7 @@ public:
   /**
    * Defines the gravity applied to this scene (used only for collisions)
    * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   Vector3 gravity;
   // Postprocesses
@@ -3030,7 +3040,7 @@ public:
   /**
    * Gets or sets a boolean indicating if next render targets must be dumped as
    * image for debugging purposes We recommend not using it and instead rely on
-   * Spector.js: http://spector.babylonjs.com
+   * Spector.js: https://spector.babylonjs.com
    */
   bool dumpNextRenderTargets;
 
@@ -3072,7 +3082,7 @@ public:
 
   /**
    * Gets or sets the action manager associated with the scene
-   * @see http://doc.babylonjs.com/how_to/how_to_use_actions
+   * @see https://doc.babylonjs.com/how_to/how_to_use_actions
    */
   AbstractActionManagerPtr actionManager;
 
@@ -3088,7 +3098,7 @@ public:
 
   /**
    * The list of sound tracks added to the scene
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   std::vector<SoundTrack*> soundTracks;
 
@@ -3202,7 +3212,7 @@ public:
 
   /**
    * Gets the debug layer (aka Inspector) associated with the scene
-   * @see http://doc.babylonjs.com/features/playground_debuglayer
+   * @see https://doc.babylonjs.com/features/playground_debuglayer
    */
   ReadOnlyProperty<Scene, std::unique_ptr<DebugLayer>> debugLayer;
 
@@ -3229,25 +3239,25 @@ public:
 
   /**
    * Gets the performance counter for total vertices
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   ReadOnlyProperty<Scene, PerfCounter> totalVerticesPerfCounter;
 
   /**
    * Gets the performance counter for active indices
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   ReadOnlyProperty<Scene, PerfCounter> totalActiveIndicesPerfCounter;
 
   /**
    * Gets the performance counter for active particles
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   ReadOnlyProperty<Scene, PerfCounter> activeParticlesPerfCounter;
 
   /**
    * Gets the performance counter for active bones
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
    */
   ReadOnlyProperty<Scene, PerfCounter> activeBonesPerfCounter;
 
@@ -3266,13 +3276,13 @@ public:
 
   /**
    * Gets if audio support is enabled
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   Property<Scene, std::optional<bool>> audioEnabled;
 
   /**
    * Gets if audio will be output to headphones
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   * @see https://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
   Property<Scene, std::optional<bool>> headphone;
 

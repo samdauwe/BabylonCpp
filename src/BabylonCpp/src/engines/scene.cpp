@@ -2349,37 +2349,34 @@ Matrix Scene::getTransformMatrix()
   return _useAlternateCameraConfiguration ? *_alternateTransformMatrix : _transformMatrix;
 }
 
-void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
+void Scene::setTransformMatrix(Matrix& viewL, Matrix& projectionL,
+                               const std::optional<Matrix>& viewR,
+                               const std::optional<Matrix>& projectionR)
 {
-  if (_viewUpdateFlag == view.updateFlag && _projectionUpdateFlag == projection.updateFlag) {
+  if (_viewUpdateFlag == viewL.updateFlag && _projectionUpdateFlag == projectionL.updateFlag) {
     return;
   }
 
-  _viewUpdateFlag       = view.updateFlag;
-  _projectionUpdateFlag = projection.updateFlag;
-  _viewMatrix           = view;
-  _projectionMatrix     = projection;
+  _viewUpdateFlag       = viewL.updateFlag;
+  _projectionUpdateFlag = projectionL.updateFlag;
+  _viewMatrix           = viewL;
+  _projectionMatrix     = projectionL;
 
   _viewMatrix.multiplyToRef(_projectionMatrix, _transformMatrix);
 
   // Update frustum
   if (!_frustumPlanesSet) {
-    _frustumPlanes    = Frustum::GetPlanes(_transformMatrix);
     _frustumPlanesSet = true;
+    _frustumPlanes    = Frustum::GetPlanes(_transformMatrix);
   }
   else {
     Frustum::GetPlanesToRef(_transformMatrix, _frustumPlanes);
   }
 
-  /*if (_activeCamera && _activeCamera->_alternateCamera) {
-    auto& otherCamera = _activeCamera->_alternateCamera;
-    otherCamera->getViewMatrix().multiplyToRef(
-      otherCamera->getProjectionMatrix(), TmpVectors::MatrixArray[0]);
-    // Replace right plane by second camera right plane
-    Frustum::GetRightPlaneToRef(TmpVectors::MatrixArray[0], _frustumPlanes[3]);
-  }*/
-
-  if (_sceneUbo->useUbo()) {
+  if (_multiviewSceneUbo && _multiviewSceneUbo->useUbo()) {
+    _updateMultiviewUbo(viewR, projectionR);
+  }
+  else if (_sceneUbo->useUbo()) {
     _sceneUbo->updateMatrix("viewProjection", _transformMatrix);
     _sceneUbo->updateMatrix("view", _viewMatrix);
     _sceneUbo->update();
@@ -3491,6 +3488,12 @@ void Scene::_evaluateActiveMeshes()
       }
     }
 
+    if (!_activeParticleSystems.empty()) {
+      for (const auto& particleSystem : _activeParticleSystems) {
+        particleSystem->animate();
+      }
+    }
+
     return;
   }
 
@@ -3523,7 +3526,7 @@ void Scene::_evaluateActiveMeshes()
 
     _totalVertices.addCount(mesh->getTotalVertices(), false);
 
-    if (!mesh->isReady() || !mesh->isEnabled()) {
+    if (!mesh->isReady() || !mesh->isEnabled() || mesh->scaling().lengthSquared() == 0.f) {
       continue;
     }
 
@@ -3620,7 +3623,6 @@ void Scene::updateTransformMatrix(bool force)
   if (!_activeCamera) {
     return;
   }
-
   setTransformMatrix(_activeCamera->getViewMatrix(force),
                      _activeCamera->getProjectionMatrix(force));
 }
@@ -3666,6 +3668,7 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
 
   auto engine = _engine;
 
+  // Use _activeCamera instead of activeCamera to avoid onActiveCameraChanged
   _activeCamera = camera;
 
   if (!_activeCamera) {
@@ -3679,12 +3682,17 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
   // Camera
   resetCachedMaterial();
   ++_renderId;
-  updateTransformMatrix();
 
-  /*if (camera->_alternateCamera) {
-    updateAlternateTransformMatrix(camera->_alternateCamera);
-    _alternateRendering = true;
-  }*/
+  const auto useMultiview = getEngine()->getCaps().multiview && camera->outputRenderTarget
+                            && camera->outputRenderTarget->getViewCount() > 1;
+  if (useMultiview) {
+    setTransformMatrix(
+      camera->_rigCameras[0]->getViewMatrix(), camera->_rigCameras[0]->getProjectionMatrix(),
+      camera->_rigCameras[1]->getViewMatrix(), camera->_rigCameras[1]->getProjectionMatrix());
+  }
+  else {
+    updateTransformMatrix();
+  }
 
   onBeforeCameraRenderObservable.notifyObservers(_activeCamera.get());
 
@@ -3712,6 +3720,7 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
     step.action(_renderTargets);
   }
 
+  auto needRebind = false;
   if (renderTargetsEnabled) {
     _intermediateRendering = true;
 
@@ -3720,9 +3729,10 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
       for (const auto& renderTarget : _renderTargets) {
         if (renderTarget->_shouldRender()) {
           ++_renderId;
-          bool hasSpecialRenderTargetCamera
+          const auto hasSpecialRenderTargetCamera
             = renderTarget->activeCamera && renderTarget->activeCamera != _activeCamera;
           renderTarget->render(hasSpecialRenderTargetCamera, dumpNextRenderTargets);
+          needRebind = true;
         }
       }
       Tools::EndPerformanceCounter("Render targets", !_renderTargets.empty());
@@ -3731,18 +3741,26 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
     }
 
     for (const auto& step : _cameraDrawRenderTargetStage) {
-      step.action(_activeCamera.get());
+      needRebind = step.action(_activeCamera.get());
     }
 
     _intermediateRendering = false;
 
-    engine->restoreDefaultFramebuffer(); // Restore back buffer
+    // Need to bind if sub-camera has an outputRenderTarget eg. for webXR
+    if (activeCamera() && activeCamera()->outputRenderTarget) {
+      needRebind = true;
+    }
+  }
+
+  // Restore framebuffer after rendering to targets
+  if (needRebind && !prePass) {
+    _bindFrameBuffer();
   }
 
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
 
   // Prepare Frame
-  if (postProcessManager) {
+  if (postProcessManager && !camera->_multiviewTexture && !prePass) {
     postProcessManager->_prepareFrame(nullptr);
   }
 
@@ -3762,32 +3780,39 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
   }
 
   // Finalize frame
-  if (postProcessManager) {
+  if (postProcessManager && !camera->_multiviewTexture) {
     postProcessManager->_finalizeFrame(camera->isIntermediate);
   }
 
   // Reset some special arrays
   _renderTargets.clear();
 
-  _alternateRendering = false;
-
   onAfterCameraRenderObservable.notifyObservers(_activeCamera.get());
 }
 
 void Scene::_processSubCameras(const CameraPtr& camera)
 {
-  if (camera->cameraRigMode == Camera::RIG_MODE_NONE) {
+  if (camera->cameraRigMode == Camera::RIG_MODE_NONE
+      || (camera->outputRenderTarget && camera->outputRenderTarget->getViewCount() > 1
+          && getEngine()->getCaps().multiview)) {
     _renderForCamera(camera);
+    onAfterRenderCameraObservable.notifyObservers(camera.get());
     return;
   }
 
-  // rig cameras
-  for (const auto& rigCamera : camera->_rigCameras) {
-    _renderForCamera(rigCamera, camera);
+  if (camera->_useMultiviewToSingleView) {
+    _renderMultiviewToSingleView(camera);
+  }
+  else {
+    // rig cameras
+    for (const auto& rigCamera : camera->_rigCameras) {
+      _renderForCamera(rigCamera, camera);
+    }
   }
 
   _activeCamera = camera;
   setTransformMatrix(_activeCamera->getViewMatrix(), _activeCamera->getProjectionMatrix());
+  onAfterRenderCameraObservable.notifyObservers(camera.get());
 }
 
 void Scene::_checkIntersections()
@@ -3949,14 +3974,15 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
       }
     }
     Tools::EndPerformanceCounter("Custom render targets", !customRenderTargets.empty());
-
     _intermediateRendering = false;
     ++_renderId;
   }
 
   // Restore back buffer
   activeCamera = currentActiveCamera;
-  _bindFrameBuffer();
+  if (_activeCamera && _activeCamera->cameraRigMode != Camera::RIG_MODE_CUSTOM && !prePass) {
+    _bindFrameBuffer();
+  }
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
 
   for (const auto& step : _beforeClearStage) {
@@ -3964,7 +3990,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   }
 
   // Clear
-  if (autoClearDepthAndStencil || autoClear) {
+  if ((autoClearDepthAndStencil || autoClear) && !prePass) {
     _engine->clear(clearColor, autoClear || forceWireframe() || forcePointsCloud(),
                    autoClearDepthAndStencil, autoClearDepthAndStencil);
   }
@@ -3976,7 +4002,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
 
   // Multi-cameras?
   if (!activeCameras.empty()) {
-    for (unsigned int cameraIndex = 0; cameraIndex < activeCameras.size(); ++cameraIndex) {
+    for (auto cameraIndex = 0u; cameraIndex < activeCameras.size(); ++cameraIndex) {
       if (cameraIndex > 0) {
         _engine->clear(std::nullopt, false, true, true);
       }
