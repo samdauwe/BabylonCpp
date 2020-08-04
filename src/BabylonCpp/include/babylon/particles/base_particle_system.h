@@ -32,26 +32,26 @@ public:
    * Source color is added to the destination color without alpha affecting the
    * result
    */
-  static constexpr int BLENDMODE_ONEONE = 0;
+  static constexpr unsigned int BLENDMODE_ONEONE = 0;
   /**
    * Blend current color and particle color using particle’s alpha
    */
-  static constexpr int BLENDMODE_STANDARD = 1;
+  static constexpr unsigned int BLENDMODE_STANDARD = 1;
 
   /**
    * Add current color and particle color multiplied by particle’s alpha
    */
-  static constexpr int BLENDMODE_ADD = 2;
+  static constexpr unsigned int BLENDMODE_ADD = 2;
   /**
    * Multiply current color with particle color
    */
-  static constexpr int BLENDMODE_MULTIPLY = 3;
+  static constexpr unsigned int BLENDMODE_MULTIPLY = 3;
 
   /**
    * Multiply current color with particle color then add current color and
    * particle color multiplied by particle’s alpha
    */
-  static constexpr int BLENDMODE_MULTIPLYADD = 4;
+  static constexpr unsigned int BLENDMODE_MULTIPLYADD = 4;
 
 public:
   /**
