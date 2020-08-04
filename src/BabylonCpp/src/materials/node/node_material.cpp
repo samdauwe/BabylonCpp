@@ -27,6 +27,8 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
+#include <babylon/particles/base_particle_system.h>
+#include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
@@ -382,7 +384,9 @@ void NodeMaterial::build(bool verbose)
   _buildWasSuccessful = false;
   auto engine         = getScene()->getEngine();
 
-  if (_vertexOutputNodes.empty()) {
+  const auto allowEmptyVertexProgram = _mode == NodeMaterialModes::Particle;
+
+  if (_vertexOutputNodes.empty() && !allowEmptyVertexProgram) {
     throw std::runtime_error("You must define at least one vertexOutputNode");
   }
 
@@ -406,6 +410,7 @@ void NodeMaterial::build(bool verbose)
   _sharedData->emitComments             = _options->emitComments;
   _sharedData->verbose                  = verbose;
   _sharedData->scene                    = getScene();
+  _sharedData->allowEmptyVertexProgram  = allowEmptyVertexProgram;
 
   // Initialize blocks
   std::vector<NodeMaterialBlockPtr> vertexNodes;
@@ -507,6 +512,158 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
       || oldUV1 != defines["UV1"]) {
     defines.markAsAttributesDirty();
   }
+}
+
+PostProcessPtr
+NodeMaterial::createPostProcess(const CameraPtr& camera,
+                                const std::variant<float, PostProcessOptions>& options,
+                                unsigned int samplingMode, Engine* engine, bool reusable,
+                                unsigned int textureType, unsigned int textureFormat)
+{
+  return _createEffectOrPostProcess(nullptr, camera, options, samplingMode, engine, reusable,
+                                    textureType, textureFormat);
+}
+
+void NodeMaterial::createEffectForPostProcess(const PostProcessPtr& postProcess)
+{
+  _createEffectOrPostProcess(postProcess);
+}
+
+PostProcessPtr
+NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const CameraPtr& camera,
+                                         const std::variant<float, PostProcessOptions>& options,
+                                         unsigned int samplingMode, Engine* engine, bool reusable,
+                                         unsigned int textureType, unsigned int textureFormat)
+{
+  auto tempName = name + std::to_string(_buildId);
+
+  NodeMaterialDefines defines;
+
+  const auto dummyMesh = AbstractMesh::New(tempName + "PostProcess", getScene());
+
+  // const auto buildId = _buildId;
+
+  _processDefines(dummyMesh.get(), defines);
+
+  Effect::RegisterShader(tempName, _fragmentCompilationState->_builtCompilationString,
+                         _vertexCompilationState->_builtCompilationString);
+
+  std::unordered_map<std::string, unsigned int> indexParameters{
+    {"maxSimultaneousLights", maxSimultaneousLights}};
+  if (!postProcess) {
+    postProcess = PostProcess::New(
+      name + "PostProcess", tempName, _fragmentCompilationState->uniforms,
+      _fragmentCompilationState->samplers, options, camera, samplingMode, engine, reusable,
+      defines.toString(), textureType, tempName, indexParameters, false, textureFormat);
+  }
+  else {
+    postProcess->updateEffect(defines.toString(), _fragmentCompilationState->uniforms,
+                              _fragmentCompilationState->samplers, indexParameters, nullptr,
+                              nullptr, tempName, tempName);
+  }
+
+  postProcess->nodeMaterialSource = shared_from_this();
+
+  postProcess->onApplyObservable.add([](Effect* /*effect*/, EventState & /*es*/) -> void {
+    // TODO
+  });
+
+  return postProcess;
+}
+
+void NodeMaterial::_createEffectForParticles(
+  const IParticleSystemPtr& /*particleSystem*/, unsigned int /*blendMode*/,
+  const std::function<void(Effect* effect)>& /*nCompiled*/,
+  const std::function<void(Effect* effect, const std::string& errors)>& /*onError*/,
+  Effect* /*effect*/, NodeMaterialDefines* /*defines*/, AbstractMesh* /*dummyMesh*/)
+{
+}
+
+void NodeMaterial::createEffectForParticles(
+  const IParticleSystemPtr& particleSystem, const std::function<void(Effect* effect)>& onCompiled,
+  const std::function<void(Effect* effect, const std::string& errors)>& onError)
+{
+  _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_ONEONE, onCompiled,
+                            onError);
+  _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_MULTIPLY, onCompiled,
+                            onError);
+}
+
+std::optional<_ProcessedDefinesResult> NodeMaterial::_processDefines(AbstractMesh* mesh,
+                                                                     NodeMaterialDefines& defines,
+                                                                     bool useInstances,
+                                                                     const SubMeshPtr& subMesh)
+{
+  std::optional<_ProcessedDefinesResult> result = std::nullopt;
+
+  // Shared defines
+  for (const auto& b : _sharedData->blocksWithDefines) {
+    b->initializeDefines(mesh, shared_from_this(), defines, useInstances);
+  }
+
+  for (const auto& b : _sharedData->blocksWithDefines) {
+    b->prepareDefines(mesh, shared_from_this(), defines, useInstances, subMesh);
+  }
+
+  // Need to recompile?
+  if (defines.isDirty()) {
+    const auto lightDisposed = defines._areLightsDisposed;
+    defines.markAsProcessed();
+
+    // Repeatable content generators
+    _vertexCompilationState->compilationString = _vertexCompilationState->_builtCompilationString;
+    _fragmentCompilationState->compilationString
+      = _fragmentCompilationState->_builtCompilationString;
+
+    for (const auto& b : _sharedData->repeatableContentBlocks) {
+      b->replaceRepeatableContent(*_vertexCompilationState, *_fragmentCompilationState, mesh,
+                                  defines);
+    }
+
+    // Uniforms
+    std::vector<std::string> uniformBuffers;
+    for (const auto& b : _sharedData->dynamicUniformBlocks) {
+      b->updateUniformsAndSamples(*_vertexCompilationState, shared_from_this(), defines,
+                                  uniformBuffers);
+    }
+
+    auto& mergedUniforms = _vertexCompilationState->uniforms;
+
+    for (const auto& u : _fragmentCompilationState->uniforms) {
+      const auto index = stl_util::index_of(mergedUniforms, u);
+
+      if (index == -1) {
+        mergedUniforms.emplace_back(u);
+      }
+    }
+
+    // Samplers
+    auto& mergedSamplers = _vertexCompilationState->samplers;
+
+    for (const auto& s : _fragmentCompilationState->samplers) {
+      const auto index = stl_util::index_of(mergedSamplers, s);
+
+      if (index == -1) {
+        mergedSamplers.emplace_back(s);
+      }
+    };
+
+    auto fallbacks = std::make_shared<EffectFallbacks>();
+
+    for (const auto& b : _sharedData->blocksWithFallbacks) {
+      b->provideFallbacks(mesh, fallbacks.get());
+    }
+
+    result = {
+      lightDisposed,  // lightDisposed
+      uniformBuffers, // uniformBuffers
+      mergedUniforms, // mergedUniforms
+      mergedSamplers, // mergedSamplers
+      fallbacks,      // fallbacks
+    };
+  }
+
+  return result;
 }
 
 bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)

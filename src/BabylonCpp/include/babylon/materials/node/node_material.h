@@ -2,16 +2,23 @@
 #define BABYLON_MATERIALS_NODE_NODE_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/structs.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/node/enums/node_material_modes.h>
 #include <babylon/materials/push_material.h>
 
 namespace BABYLON {
 
+class Camera;
 class CurrentScreenBlock;
+class Effect;
+class EffectFallbacks;
+class Engine;
 class ImageProcessingConfiguration;
 struct INodeMaterialOptions;
 struct INodeMaterialEditorOptions;
 class InputBlock;
+class IParticleSystem;
 class NodeMaterial;
 class NodeMaterialBlock;
 class NodeMaterialBuildState;
@@ -19,23 +26,37 @@ struct NodeMaterialDefines;
 struct NodeMaterialOptimizer;
 struct NodeMaterialBuildStateSharedData;
 class ParticleTextureBlock;
+class PostProcess;
 class ReflectionTextureBlock;
 class RefractionBlock;
 class TextureBlock;
+using CameraPtr                           = std::shared_ptr<Camera>;
 using CurrentScreenBlockPtr               = std::shared_ptr<CurrentScreenBlock>;
+using EffectFallbacksPtr                  = std::shared_ptr<EffectFallbacks>;
 using ImageProcessingConfigurationPtr     = std::shared_ptr<ImageProcessingConfiguration>;
 using INodeMaterialEditorOptionsPtr       = std::shared_ptr<INodeMaterialEditorOptions>;
 using INodeMaterialOptionsPtr             = std::shared_ptr<INodeMaterialOptions>;
 using InputBlockPtr                       = std::shared_ptr<InputBlock>;
+using IParticleSystemPtr                  = std::shared_ptr<IParticleSystem>;
 using NodeMaterialPtr                     = std::shared_ptr<NodeMaterial>;
 using NodeMaterialBlockPtr                = std::shared_ptr<NodeMaterialBlock>;
 using NodeMaterialBuildStatePtr           = std::shared_ptr<NodeMaterialBuildState>;
 using NodeMaterialOptimizerPtr            = std::shared_ptr<NodeMaterialOptimizer>;
 using NodeMaterialBuildStateSharedDataPtr = std::shared_ptr<NodeMaterialBuildStateSharedData>;
 using ParticleTextureBlockPtr             = std::shared_ptr<ParticleTextureBlock>;
+using PostProcessPtr                      = std::shared_ptr<PostProcess>;
 using ReflectionTextureBlockPtr           = std::shared_ptr<ReflectionTextureBlock>;
 using RefractionBlockPtr                  = std::shared_ptr<RefractionBlock>;
+using SubMeshPtr                          = std::shared_ptr<SubMesh>;
 using TextureBlockPtr                     = std::shared_ptr<TextureBlock>;
+
+struct _ProcessedDefinesResult {
+  bool lightDisposed                      = false;
+  std::vector<std::string> uniformBuffers = {};
+  std::vector<std::string> mergedUniforms = {};
+  std::vector<std::string> mergedSamplers = {};
+  EffectFallbacksPtr fallbacks            = nullptr;
+}; // end of struct _ProcessedDefinesResult
 
 /**
  * @brief Class used to create a node based material built by assembling shader
@@ -164,6 +185,44 @@ public:
    * @brief Runs an otpimization phase to try to improve the shader code.
    */
   void optimize();
+
+  /**
+   * @brief Create a post process from the material.
+   * @param camera The camera to apply the render pass to.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
+   * (Use 1.0 for full size)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
+   * @param textureType Type of textures used when performing the post process. (default: 0)
+   * @param textureFormat Format of textures used when performing the post process. (default:
+   * TEXTUREFORMAT_RGBA)
+   * @returns the post process created
+   */
+  PostProcessPtr createPostProcess(const CameraPtr& camera                                = nullptr,
+                                   const std::variant<float, PostProcessOptions>& options = 1.f,
+                                   unsigned int samplingMode
+                                   = Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+                                   Engine* engine = nullptr, bool reusable = false,
+                                   unsigned int textureType   = Constants::TEXTURETYPE_UNSIGNED_INT,
+                                   unsigned int textureFormat = Constants::TEXTUREFORMAT_RGBA);
+
+  /**
+   * @brief Create the post process effect from the material.
+   * @param postProcess The post process to create the effect for
+   */
+  void createEffectForPostProcess(const PostProcessPtr& postProcess);
+
+  /**
+   * @brief Create the effect to be used as the custom effect for a particle system.
+   * @param particleSystem Particle system to create the effect for
+   * @param onCompiled defines a function to call when the effect creation is successful
+   * @param onError defines a function to call when the effect creation has failed
+   */
+  void createEffectForParticles(
+    const IParticleSystemPtr& particleSystem,
+    const std::function<void(Effect* effect)>& onCompiled                         = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>& onError = nullptr);
 
   /**
    * @brief Get if the submesh is ready to be used and all its information available. Child classes
@@ -344,6 +403,24 @@ private:
                         std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState);
   void _resetDualBlocks(const NodeMaterialBlockPtr& node, size_t id);
   void _prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterialDefines& defines);
+  PostProcessPtr
+  _createEffectOrPostProcess(PostProcessPtr postProcess, const CameraPtr& camera = nullptr,
+                             const std::variant<float, PostProcessOptions>& options = 1.f,
+                             unsigned int samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+                             Engine* engine = nullptr, bool reusable = false,
+                             unsigned int textureType   = Constants::TEXTURETYPE_UNSIGNED_INT,
+                             unsigned int textureFormat = Constants::TEXTUREFORMAT_RGBA);
+  void _createEffectForParticles(
+    const IParticleSystemPtr& particleSystem, unsigned int blendMode,
+    const std::function<void(Effect* effect)>& onCompiled                         = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>& onError = nullptr,
+    Effect* effect = nullptr, NodeMaterialDefines* defines = nullptr,
+    AbstractMesh* dummyMesh = nullptr);
+  std::optional<_ProcessedDefinesResult> _processDefines(AbstractMesh* mesh,
+                                                         NodeMaterialDefines& defines,
+                                                         bool useInstances         = false,
+                                                         const SubMeshPtr& subMesh = nullptr);
+
   /**
    * @brief CCreates the node editor window.
    */
