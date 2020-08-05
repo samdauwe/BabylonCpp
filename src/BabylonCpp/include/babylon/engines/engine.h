@@ -12,6 +12,7 @@ namespace BABYLON {
 class AudioEngine;
 class Camera;
 class EffectFallbacks;
+struct IEffectFallbacks;
 class ILoadingScreen;
 class IParticleSystem;
 class Material;
@@ -868,7 +869,7 @@ public:
    */
   EffectPtr createEffectForParticles(
     const std::string& fragmentName, const std::vector<std::string>& uniformsNames,
-    std::vector<std::string> samplers, std::string defines, EffectFallbacks* fallbacks = nullptr,
+    std::vector<std::string> samplers, std::string defines, IEffectFallbacks* fallbacks = nullptr,
     const std::function<void(Effect* effect)>& onCompiled                         = nullptr,
     const std::function<void(Effect* effect, const std::string& errors)>& onError = nullptr,
     const IParticleSystemPtr& particleSystem                                      = nullptr);

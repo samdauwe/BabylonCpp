@@ -980,7 +980,7 @@ void Engine::updateTextureComparisonFunction(const InternalTexturePtr& texture,
 
 EffectPtr Engine::createEffectForParticles(
   const std::string& fragmentName, const std::vector<std::string>& uniformsNames,
-  std::vector<std::string> samplers, std::string defines, EffectFallbacks* /*fallbacks*/,
+  std::vector<std::string> samplers, std::string defines, IEffectFallbacks* /*fallbacks*/,
   const std::function<void(Effect* effect)>& onCompiled,
   const std::function<void(Effect* effect, const std::string& errors)>& onError,
   const IParticleSystemPtr& particleSystem)
