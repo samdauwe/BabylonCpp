@@ -148,7 +148,7 @@ void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
     if (material->mode() == NodeMaterialModes::PostProcess) {
       auto uvInput
         = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
-            return inputBlock->isAttribute() && inputBlock->name == "uv";
+            return inputBlock->isAttribute() && inputBlock->name() == "uv";
           });
 
       if (uvInput) {
@@ -161,7 +161,7 @@ void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
 
       auto uvInput = material->getInputBlockByPredicate(
         [&attributeName](const InputBlockPtr& inputBlock) -> bool {
-          return inputBlock->isAttribute() && inputBlock->name == attributeName;
+          return inputBlock->isAttribute() && inputBlock->name() == attributeName;
         });
 
       if (!uvInput) {
@@ -380,7 +380,7 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 
   if ((!_isMixed && state.target == NodeMaterialBlockTargets::Fragment)
       || (_isMixed && state.target == NodeMaterialBlockTargets::Vertex)) {
-    _samplerName = state._getFreeVariableName(name + "Sampler");
+    _samplerName = state._getFreeVariableName(name() + "Sampler");
 
     state._emit2DSampler(_samplerName);
 
@@ -413,7 +413,7 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
   _linearDefineName = state._getFreeDefineName("ISLINEAR");
   _gammaDefineName  = state._getFreeDefineName("ISGAMMA");
 
-  auto iComments = StringTools::printf("//%s", name.c_str());
+  auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunctionFromInclude("helperFunctions", iComments);
 
   if (_isMixed) {

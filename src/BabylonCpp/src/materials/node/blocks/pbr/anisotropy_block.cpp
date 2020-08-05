@@ -92,7 +92,7 @@ std::string AnisotropyBlock::_generateTBNSpace(NodeMaterialBuildState& state) co
 {
   std::string code = "";
 
-  auto iComments     = StringTools::printf("//%s", name.c_str());
+  auto iComments     = StringTools::printf("//%s", name().c_str());
   auto iUv           = uv();
   auto worldPosition = worldPositionConnectionPoint;
   auto worldNormal   = worldNormalConnectionPoint;

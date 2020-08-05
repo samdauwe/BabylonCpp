@@ -60,7 +60,7 @@ void NodeMaterialBuildStateSharedData::emitErrors()
   }
   for (const auto& notConnectedInput : checks.notConnectedNonOptionalInputs) {
     errorMessage << "input " << notConnectedInput->name << " from block "
-                 << notConnectedInput->ownerBlock()->name << "["
+                 << notConnectedInput->ownerBlock()->name() << "["
                  << notConnectedInput->ownerBlock()->getClassName()
                  << "] is not connected and is not optional.\r\n";
   }

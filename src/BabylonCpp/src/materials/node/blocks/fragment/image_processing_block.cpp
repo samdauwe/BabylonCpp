@@ -116,7 +116,7 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
   // Emit code
   const auto& iColor   = color();
   const auto& iOutput  = _outputs[0];
-  const auto iComments = StringTools::printf("//%s", name.c_str());
+  const auto iComments = StringTools::printf("//%s", name().c_str());
 
   state._emitFunctionFromInclude("helperFunctions", iComments);
   state._emitFunctionFromInclude("imageProcessingDeclaration", iComments);

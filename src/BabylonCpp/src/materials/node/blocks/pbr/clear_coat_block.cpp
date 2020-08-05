@@ -192,7 +192,7 @@ std::string ClearCoatBlock::_generateTBNSpace(NodeMaterialBuildState& state,
 {
   std::string code = "";
 
-  const auto iComments     = StringTools::printf("//%s", name.c_str());
+  const auto iComments     = StringTools::printf("//%s", name().c_str());
   const auto iWorldTangent = worldTangent();
 
   state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");

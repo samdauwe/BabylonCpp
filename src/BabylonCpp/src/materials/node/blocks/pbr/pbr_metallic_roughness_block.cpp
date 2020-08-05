@@ -584,7 +584,7 @@ void PBRMetallicRoughnessBlock::bind(const EffectPtr& effect, const NodeMaterial
 void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
 {
   const auto& worldPos = worldPosition();
-  const auto iComments = StringTools::printf("//%s", name.c_str());
+  const auto iComments = StringTools::printf("//%s", name().c_str());
 
   // Declaration
   if (!light) { // Emit for all lights
@@ -714,7 +714,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
-  const auto iComments       = StringTools::printf("//%s", name.c_str());
+  const auto iComments       = StringTools::printf("//%s", name().c_str());
   const auto worldPosVarName = "v_" + worldPosition()->associatedVariableName();
   const auto normalShading   = perturbedNormal();
 

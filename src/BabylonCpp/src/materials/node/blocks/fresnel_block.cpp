@@ -81,7 +81,7 @@ FresnelBlock& FresnelBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto iComments = StringTools::printf("//%s", name.c_str());
+  const auto iComments = StringTools::printf("//%s", name().c_str());
 
   EmitFunctionFromIncludeOptions options;
   options.removeIfDef = true;

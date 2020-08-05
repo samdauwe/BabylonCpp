@@ -102,7 +102,7 @@ void PerturbNormalBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
     auto uvInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "uv"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "uv"; });
 
     if (!uvInput) {
       uvInput = InputBlock::New("uv");
@@ -122,7 +122,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto iComments       = StringTools::printf("//%s", name.c_str());
+  const auto iComments       = StringTools::printf("//%s", name().c_str());
   const auto& _uv            = uv();
   const auto& _worldPosition = worldPosition();
   const auto& _worldNormal   = worldNormal();

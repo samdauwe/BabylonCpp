@@ -15,6 +15,7 @@ namespace BABYLON {
 NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlockTargets target,
                                      bool isFinalMerger, bool isInput)
     : inputsAreExclusive{false}
+    , name{this, &NodeMaterialBlock::get_name, &NodeMaterialBlock::set_name}
     , isUnique{this, &NodeMaterialBlock::get_isUnique}
     , isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
     , isInput{this, &NodeMaterialBlock::get_isInput}
@@ -25,16 +26,29 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
     , _isUnique{false}
     , _target{NodeMaterialBlockTargets::Undefined}
 {
-  name = iName;
-
   _target = target;
 
   _isFinalMerger = isFinalMerger;
   _isInput       = isInput;
+  _name          = iName;
   uniqueId       = UniqueIdGenerator::UniqueId();
 }
 
 NodeMaterialBlock::~NodeMaterialBlock() = default;
+
+std::string NodeMaterialBlock::get_name() const
+{
+  return _name;
+}
+
+void NodeMaterialBlock::set_name(std::string newName)
+{
+  if (!validateBlockName(newName)) {
+    return;
+  }
+
+  _name = std::move(newName);
+}
 
 bool NodeMaterialBlock::get_isUnique() const
 {
@@ -432,7 +446,7 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
     const auto logStr = StringTools::printf(
       "%s: Building %s [%s]",
       state.target == NodeMaterialBlockTargets::Vertex ? "Vertex shader" : "Fragment shader",
-      name.c_str(), getClassName().c_str());
+      name().c_str(), getClassName().c_str());
     BABYLON_LOG_INFO("NodeMaterialBlock", logStr)
   }
 
@@ -451,7 +465,7 @@ bool NodeMaterialBlock::build(NodeMaterialBuildState& state,
   }
 
   if (!isInput && state.sharedData->emitComments) {
-    state.compilationString += StringTools::printf("\r\n//%s\r\n", name.c_str());
+    state.compilationString += StringTools::printf("\r\n//%s\r\n", name().c_str());
   }
 
   _buildBlock(state);
@@ -499,7 +513,7 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   std::string codeString;
 
   // Get unique name
-  auto nameAsVariableName = StringTools::regexReplace(name, "[^A-Za-z_]+", "");
+  auto nameAsVariableName = StringTools::regexReplace(name(), "[^A-Za-z_]+", "");
   _codeVariableName       = !nameAsVariableName.empty() ?
                         nameAsVariableName :
                         StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
@@ -520,7 +534,7 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
     codeString += StringTools::printf("// %s\r\n", comments.c_str());
   }
   codeString += StringTools::printf("auto %s = %s::New(\"%s\");\r\n", _codeVariableName.c_str(),
-                                    getClassName().c_str(), name.c_str());
+                                    getClassName().c_str(), name().c_str());
 
   // Properties
   codeString += _dumpPropertiesCode();

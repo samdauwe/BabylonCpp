@@ -287,6 +287,16 @@ protected:
                     bool isFinalMerger = false, bool isInput = false);
 
   /**
+   * @brief Gets the name of the block.
+   */
+  std::string get_name() const;
+
+  /**
+   * @brief Sets the name of the block.
+   */
+  void set_name(std::string newName);
+
+  /**
    * @brief Gets a boolean indicating that this block can only be used once per NodeMaterial.
    */
   bool get_isUnique() const;
@@ -366,7 +376,7 @@ public:
   /**
    * Gets or sets the name of the block
    */
-  std::string name;
+  Property<NodeMaterialBlock, std::string> name;
 
   /**
    * Gets or sets the unique id of the node
@@ -426,6 +436,7 @@ private:
   NodeMaterialBlockTargets _target;
   bool _isFinalMerger;
   bool _isInput;
+  std::string _name;
 
 }; // end of enum class NodeMaterialBlockTargets
 

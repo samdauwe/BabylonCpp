@@ -42,7 +42,7 @@ void ReflectionTextureBaseBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!position()->isConnected()) {
     auto positionInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "position"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "position"; });
 
     if (!positionInput) {
       positionInput = InputBlock::New("position");
@@ -211,10 +211,10 @@ void ReflectionTextureBaseBlock::handleFragmentSideInits(NodeMaterialBuildState&
   //  std::static_pointer_cast<ReflectionTextureBlock>(shared_from_this()));
 
   // Samplers
-  _cubeSamplerName = state._getFreeVariableName(name + "CubeSampler");
+  _cubeSamplerName = state._getFreeVariableName(name() + "CubeSampler");
   state.samplers.emplace_back(_cubeSamplerName);
 
-  _2DSamplerName = state._getFreeVariableName(name + "2DSampler");
+  _2DSamplerName = state._getFreeVariableName(name() + "2DSampler");
   state.samplers.emplace_back(_2DSamplerName);
 
   state._samplerDeclaration += StringTools::printf("#ifdef %s\r\n", _define3DName.c_str());
@@ -229,7 +229,7 @@ void ReflectionTextureBaseBlock::handleFragmentSideInits(NodeMaterialBuildState&
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
-  const auto iComments = StringTools::printf("//%s", name.c_str());
+  const auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunction("ReciprocalPI", "#define RECIPROCAL_PI2 0.15915494", "");
   EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
   emitFunctionFromIncludeOptions.replaceStrings

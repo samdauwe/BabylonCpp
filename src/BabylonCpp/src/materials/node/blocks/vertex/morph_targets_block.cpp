@@ -92,7 +92,7 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!position()->isConnected()) {
     auto positionInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "position"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "position"; });
 
     if (!positionInput) {
       positionInput = InputBlock::New("position");
@@ -102,7 +102,7 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!normal()->isConnected()) {
     auto normalInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "normal"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "normal"; });
 
     if (!normalInput) {
       normalInput = InputBlock::New("normal");
@@ -112,7 +112,7 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!tangent()->isConnected()) {
     auto tangentInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "tangent"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "tangent"; });
 
     if (!tangentInput) {
       tangentInput = InputBlock::New("tangent");
@@ -122,7 +122,7 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!uv()->isConnected()) {
     auto uvInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "uv"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "uv"; });
 
     if (!uvInput) {
       uvInput = InputBlock::New("uv");
@@ -258,7 +258,7 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& _normalOutput   = normalOutput();
   const auto& _tangentOutput  = tangentOutput();
   const auto& _uvOutput       = uvOutput;
-  auto iComments              = StringTools::printf("//%s", name.c_str());
+  auto iComments              = StringTools::printf("//%s", name().c_str());
 
   state.uniforms.emplace_back("morphTargetInfluences");
 

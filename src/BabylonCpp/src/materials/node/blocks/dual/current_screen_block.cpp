@@ -297,7 +297,7 @@ CurrentScreenBlock& CurrentScreenBlock::_buildBlock(NodeMaterialBuildState& stat
   _linearDefineName = state._getFreeDefineName("ISLINEAR");
   _gammaDefineName  = state._getFreeDefineName("ISGAMMA");
 
-  const auto iComments = StringTools::printf("//%s", name.c_str());
+  const auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunctionFromInclude("helperFunctions", iComments);
 
   _writeTextureRead(state);

@@ -77,7 +77,7 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!world0()->connectedPoint()) {
     auto world0Input = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world0"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "world0"; });
 
     if (!world0Input) {
       world0Input = InputBlock::New("world0");
@@ -87,7 +87,7 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!world1()->connectedPoint()) {
     auto world1Input = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world1"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "world1"; });
 
     if (!world1Input) {
       world1Input = InputBlock::New("world1");
@@ -97,7 +97,7 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!world2()->connectedPoint()) {
     auto world2Input = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world2"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "world2"; });
 
     if (!world2Input) {
       world2Input = InputBlock::New("world2");
@@ -107,7 +107,7 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!world3()->connectedPoint()) {
     auto world3Input = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world3"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "world3"; });
 
     if (!world3Input) {
       world3Input = InputBlock::New("world3");
@@ -117,7 +117,7 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
   }
   if (!world()->connectedPoint()) {
     auto worldInput = material->getInputBlockByPredicate(
-      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name == "world"; });
+      [](const InputBlockPtr& b) -> bool { return b->isAttribute() && b->name() == "world"; });
 
     if (!worldInput) {
       worldInput = InputBlock::New("world");

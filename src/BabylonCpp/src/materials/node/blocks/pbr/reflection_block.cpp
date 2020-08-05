@@ -227,7 +227,7 @@ std::string ReflectionBlock::handleVertexSide(NodeMaterialBuildState& state)
     = {{R"(uniform vec3 vSphericalL00;[\s\S]*?uniform vec3 vSphericalL22;)", ""},
        {R"(uniform vec3 vSphericalX;[\s\S]*?uniform vec3 vSphericalZX;)", ""}};
 
-  state._emitFunctionFromInclude("harmonicsFunctions", StringTools::printf("//%s", name.c_str()),
+  state._emitFunctionFromInclude("harmonicsFunctions", StringTools::printf("//%s", name().c_str()),
                                  replaceOptions);
 
   const auto reflectionVectorName = state._getFreeVariableName("reflectionVector");
@@ -284,7 +284,7 @@ std::string ReflectionBlock::getCode(NodeMaterialBuildState& state,
 
   handleFragmentSideInits(state);
 
-  const auto iComment = StringTools::printf("//%s", name.c_str());
+  const auto iComment = StringTools::printf("//%s", name().c_str());
 
   EmitFunctionFromIncludeOptions replaceOptions;
   replaceOptions.replaceStrings

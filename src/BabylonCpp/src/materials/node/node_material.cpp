@@ -137,7 +137,7 @@ NodeMaterialBlockPtr NodeMaterial::getBlockByName(const std::string& iName) cons
 {
   NodeMaterialBlockPtr result = nullptr;
   for (const auto& block : attachedBlocks) {
-    if (block->name == iName) {
+    if (block->name() == iName) {
       if (!result) {
         result = block;
       }
@@ -1362,7 +1362,8 @@ void NodeMaterial::_restoreConnections(const NodeMaterialBlockPtr& block, const 
   }
 }
 
-void NodeMaterial::loadFromSerialization(const json& /*source*/, const std::string& /*rootUrl*/)
+void NodeMaterial::loadFromSerialization(const json& /*source*/, const std::string& /*rootUrl*/,
+                                         bool /*merge*/)
 {
 }
 

@@ -110,21 +110,22 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
     }
 
     if (isAttribute()) {
-      if (name == "position" || name == "normal" || name == "tangent"
-          || name == "particle_positionw") {
+      const auto iName = name();
+      if (iName == "position" || iName == "normal" || iName == "tangent"
+          || iName == "particle_positionw") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector3;
         return _type;
       }
-      else if (name == "uv" || name == "uv2" || name == "position2d" || name == "particle_uv") {
+      else if (iName == "uv" || iName == "uv2" || iName == "position2d" || iName == "particle_uv") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector2;
         return _type;
       }
-      else if (name == "matricesIndices" || name == "matricesWeights" || name == "world0"
-               || name == "world1" || name == "world2" || name == "world3") {
+      else if (iName == "matricesIndices" || iName == "matricesWeights" || iName == "world0"
+               || iName == "world1" || iName == "world2" || iName == "world3") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector4;
         return _type;
       }
-      else if (name == "color" || name == "particle_color" || name == "particle_texturemask") {
+      else if (iName == "color" || iName == "particle_color" || iName == "particle_texturemask") {
         _type = NodeMaterialBlockConnectionPointTypes::Color4;
         return _type;
       }
@@ -403,15 +404,17 @@ std::string InputBlock::_emitConstant(NodeMaterialBuildState& state)
 
 bool InputBlock::get__noContextSwitch() const
 {
-  return attributeInFragmentOnly.at(name);
+  return attributeInFragmentOnly.at(name());
 }
 
 void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
 {
+  const auto iName = name();
+
   // Uniforms
   if (isUniform) {
     if (associatedVariableName().empty()) {
-      associatedVariableName = state._getFreeVariableName("u_" + name);
+      associatedVariableName = state._getFreeVariableName("u_" + iName);
     }
 
     if (isConstant) {
@@ -465,12 +468,12 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
   // Attribute
   if (isAttribute) {
     associatedVariableName
-      = stl_util::contains(remapAttributeName, name) ? remapAttributeName.at(name) : name;
+      = stl_util::contains(remapAttributeName, iName) ? remapAttributeName.at(iName) : iName;
 
     if (target() == NodeMaterialBlockTargets::Vertex
         && state._vertexState) { // Attribute for fragment need to be carried over by varyings
-      if (stl_util::contains(attributeInFragmentOnly, name) && attributeInFragmentOnly.at(name)) {
-        if (stl_util::contains(attributeAsUniform, name) && attributeAsUniform.at(name)) {
+      if (stl_util::contains(attributeInFragmentOnly, iName) && attributeInFragmentOnly.at(iName)) {
+        if (stl_util::contains(attributeAsUniform, iName) && attributeAsUniform.at(iName)) {
           state._emitUniformFromString(associatedVariableName, state._getGLType(type), define);
         }
         else {
@@ -489,8 +492,8 @@ void InputBlock::_emit(NodeMaterialBuildState& state, const std::string& define)
 
     state.attributes.emplace_back(associatedVariableName);
 
-    if (stl_util::contains(attributeInFragmentOnly, name) && attributeInFragmentOnly.at(name)) {
-      if (stl_util::contains(attributeAsUniform, name) && attributeAsUniform.at(name)) {
+    if (stl_util::contains(attributeInFragmentOnly, iName) && attributeInFragmentOnly.at(iName)) {
+      if (stl_util::contains(attributeAsUniform, iName) && attributeAsUniform.at(iName)) {
         state._emitUniformFromString(associatedVariableName, state._getGLType(type), define);
       }
       else {
@@ -622,7 +625,7 @@ std::string InputBlock::_dumpPropertiesCode()
 
   if (isAttribute()) {
     return StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", variableName.c_str(),
-                               name.c_str());
+                               name().c_str());
   }
   if (isSystemValue()) {
     return StringTools::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",

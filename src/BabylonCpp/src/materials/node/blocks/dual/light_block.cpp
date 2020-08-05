@@ -194,7 +194,7 @@ void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMateri
 void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
 {
   const auto& worldPos = worldPosition();
-  auto iComments       = StringTools::printf("//%s", name.c_str());
+  auto iComments       = StringTools::printf("//%s", name().c_str());
 
   // Declaration
   if (!light) { // Emit for all lights
@@ -269,7 +269,7 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
-  auto iComments       = StringTools::printf("//%s", name.c_str());
+  auto iComments       = StringTools::printf("//%s", name().c_str());
   const auto& worldPos = worldPosition();
 
   state._emitFunctionFromInclude("helperFunctions", iComments);

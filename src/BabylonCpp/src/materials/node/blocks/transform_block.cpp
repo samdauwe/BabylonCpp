@@ -30,7 +30,7 @@ TransformBlock::TransformBlock(const std::string& iName)
       if (other && other->ownerBlock()->isInput()) {
         const auto otherAsInput = std::static_pointer_cast<InputBlock>(other->ownerBlock());
 
-        if (otherAsInput->name == "normal" || otherAsInput->name == "tangent") {
+        if (otherAsInput->name() == "normal" || otherAsInput->name() == "tangent") {
           complementW = 0.f;
         }
       }
@@ -77,7 +77,7 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
 
     // None uniform scaling case.
     if (complementW == 0.f) {
-      auto iComments = StringTools::printf("//%s", name.c_str());
+      auto iComments = StringTools::printf("//%s", name().c_str());
       state._emitFunctionFromInclude("helperFunctions", iComments);
       state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 

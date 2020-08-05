@@ -209,10 +209,10 @@ std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
     std::static_pointer_cast<RefractionBlock>(shared_from_this()));
 
   // Samplers
-  _cubeSamplerName = state._getFreeVariableName(name + "CubeSampler");
+  _cubeSamplerName = state._getFreeVariableName(name() + "CubeSampler");
   state.samplers.emplace_back(_cubeSamplerName);
 
-  _2DSamplerName = state._getFreeVariableName(name + "2DSampler");
+  _2DSamplerName = state._getFreeVariableName(name() + "2DSampler");
   state.samplers.emplace_back(_2DSamplerName);
 
   _define3DName = state._getFreeDefineName("SS_REFRACTIONMAP_3D");
@@ -237,7 +237,7 @@ std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
 
   state._emitUniformFromString(_refractionMatrixName, "mat4");
 
-  const auto iComment = StringTools::printf("//%s", name.c_str());
+  const auto iComment = StringTools::printf("//%s", name().c_str());
 
   state._emitFunction("sampleRefraction",
                       StringTools::printf(

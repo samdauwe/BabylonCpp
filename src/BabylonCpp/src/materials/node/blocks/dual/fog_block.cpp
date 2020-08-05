@@ -132,7 +132,7 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
     state.sharedData->bindableBlocks.emplace_back(shared_from_this());
 
     state._emitFunctionFromInclude(
-      "fogFragmentDeclaration", StringTools::printf("//%s", name.c_str()),
+      "fogFragmentDeclaration", StringTools::printf("//%s", name().c_str()),
       EmitFunctionFromIncludeOptions{
         "",           // repeatKey
         std::nullopt, // removeAttributes

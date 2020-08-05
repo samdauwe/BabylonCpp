@@ -82,7 +82,7 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
   if (!matricesIndices()->isConnected()) {
     auto matricesIndicesInput
       = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "matricesIndices";
+          return b->isAttribute() && b->name() == "matricesIndices";
         });
 
     if (!matricesIndicesInput) {
@@ -94,7 +94,7 @@ void BonesBlock::autoConfigure(const NodeMaterialPtr& material)
   if (!matricesWeights()->isConnected()) {
     auto matricesWeightsInput
       = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-          return b->isAttribute() && b->name == "matricesWeights";
+          return b->isAttribute() && b->name() == "matricesWeights";
         });
 
     if (!matricesWeightsInput) {
@@ -160,7 +160,7 @@ BonesBlock& BonesBlock::_buildBlock(NodeMaterialBuildState& state)
   state.samplers.emplace_back("boneSampler");
 
   // Emit code
-  auto iComments = StringTools::printf("//%s", name.c_str());
+  auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunctionFromInclude("bonesDeclaration", iComments,
                                  EmitFunctionFromIncludeOptions{
                                    "",    // repeatKey
