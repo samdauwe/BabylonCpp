@@ -131,7 +131,7 @@ void InstancesBlock::autoConfigure(const NodeMaterialPtr& material)
 
 void InstancesBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
                                     NodeMaterialDefines& defines, bool useInstances,
-                                    const SubMeshPtr& subMesh)
+                                    SubMesh* subMesh)
 {
   auto changed = false;
   if (defines["INSTANCES"] != useInstances) {

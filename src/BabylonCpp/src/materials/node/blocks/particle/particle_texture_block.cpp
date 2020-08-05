@@ -116,7 +116,7 @@ void ParticleTextureBlock::autoConfigure(const NodeMaterialPtr& material)
 void ParticleTextureBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                           const NodeMaterialPtr& /*nodeMaterial*/,
                                           NodeMaterialDefines& defines, bool /*useInstances*/,
-                                          const SubMeshPtr& /*subMesh*/)
+                                          SubMesh* /*subMesh*/)
 {
   defines.setValue(_linearDefineName, convertToGammaSpace, true);
   defines.setValue(_gammaDefineName, convertToLinearSpace, true);

@@ -45,7 +45,7 @@ public:
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                       NodeMaterialDefines& defines, bool useInstances = false,
-                      const SubMeshPtr& subMesh = nullptr) override;
+                      SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Add uniforms, samplers and uniform buffers at compilation time.

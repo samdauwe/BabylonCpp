@@ -121,7 +121,7 @@ void RefractionBlock::autoConfigure(const NodeMaterialPtr& material)
 
 void RefractionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                                      NodeMaterialDefines& defines, bool /*useInstances*/,
-                                     const SubMeshPtr& /*subMesh*/)
+                                     SubMesh* /*subMesh*/)
 {
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 

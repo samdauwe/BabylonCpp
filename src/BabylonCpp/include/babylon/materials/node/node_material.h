@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
+#include <babylon/materials/ieffect_fallbacks.h>
 #include <babylon/materials/node/enums/node_material_modes.h>
 #include <babylon/materials/push_material.h>
 
@@ -12,9 +13,9 @@ namespace BABYLON {
 class Camera;
 class CurrentScreenBlock;
 class Effect;
-class EffectFallbacks;
 class Engine;
 class ImageProcessingConfiguration;
+struct IEffectFallbacks;
 struct INodeMaterialOptions;
 struct INodeMaterialEditorOptions;
 class InputBlock;
@@ -32,7 +33,6 @@ class RefractionBlock;
 class TextureBlock;
 using CameraPtr                           = std::shared_ptr<Camera>;
 using CurrentScreenBlockPtr               = std::shared_ptr<CurrentScreenBlock>;
-using EffectFallbacksPtr                  = std::shared_ptr<EffectFallbacks>;
 using ImageProcessingConfigurationPtr     = std::shared_ptr<ImageProcessingConfiguration>;
 using INodeMaterialEditorOptionsPtr       = std::shared_ptr<INodeMaterialEditorOptions>;
 using INodeMaterialOptionsPtr             = std::shared_ptr<INodeMaterialOptions>;
@@ -51,11 +51,11 @@ using SubMeshPtr                          = std::shared_ptr<SubMesh>;
 using TextureBlockPtr                     = std::shared_ptr<TextureBlock>;
 
 struct _ProcessedDefinesResult {
-  bool lightDisposed                      = false;
-  std::vector<std::string> uniformBuffers = {};
-  std::vector<std::string> mergedUniforms = {};
-  std::vector<std::string> mergedSamplers = {};
-  EffectFallbacksPtr fallbacks            = nullptr;
+  bool lightDisposed                          = false;
+  std::vector<std::string> uniformBuffers     = {};
+  std::vector<std::string> mergedUniforms     = {};
+  std::vector<std::string> mergedSamplers     = {};
+  std::unique_ptr<IEffectFallbacks> fallbacks = nullptr;
 }; // end of struct _ProcessedDefinesResult
 
 /**
@@ -301,6 +301,16 @@ public:
   void setToDefault();
 
   /**
+   * @brief Clear the current material and set it to a default state for post process.
+   */
+  void setToDefaultPostProcess();
+
+  /**
+   * @brief Clear the current material and set it to a default state for particle.
+   */
+  void setToDefaultParticle();
+
+  /**
    * @brief Loads the current Node Material from a url pointing to a file save by the Node Material
    * Editor.
    * @param url defines the url to load from
@@ -414,12 +424,12 @@ private:
     const IParticleSystemPtr& particleSystem, unsigned int blendMode,
     const std::function<void(Effect* effect)>& onCompiled                         = nullptr,
     const std::function<void(Effect* effect, const std::string& errors)>& onError = nullptr,
-    Effect* effect = nullptr, NodeMaterialDefines* defines = nullptr,
-    AbstractMesh* dummyMesh = nullptr);
+    EffectPtr effect = nullptr, NodeMaterialDefines* defines = nullptr,
+    AbstractMeshPtr dummyMesh = nullptr);
   std::optional<_ProcessedDefinesResult> _processDefines(AbstractMesh* mesh,
                                                          NodeMaterialDefines& defines,
-                                                         bool useInstances         = false,
-                                                         const SubMeshPtr& subMesh = nullptr);
+                                                         bool useInstances = false,
+                                                         SubMesh* subMesh  = nullptr);
 
   /**
    * @brief CCreates the node editor window.

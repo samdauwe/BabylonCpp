@@ -67,7 +67,7 @@ bool ImageProcessingBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr
 void ImageProcessingBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                           const NodeMaterialPtr& nodeMaterial,
                                           NodeMaterialDefines& defines, bool /*useInstances*/,
-                                          const SubMeshPtr& /*subMesh*/)
+                                          SubMesh* /*subMesh*/)
 {
   if (defines._areImageProcessingDirty && nodeMaterial->imageProcessingConfiguration()) {
     nodeMaterial->imageProcessingConfiguration()->prepareDefines(defines);

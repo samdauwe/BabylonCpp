@@ -134,7 +134,7 @@ void MorphTargetsBlock::autoConfigure(const NodeMaterialPtr& material)
 
 void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
                                        NodeMaterialDefines& defines, bool /*useInstances*/,
-                                       const SubMeshPtr& /*subMesh*/)
+                                       SubMesh* /*subMesh*/)
 {
   if (!defines._areAttributesDirty) {
     return;

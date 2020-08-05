@@ -82,7 +82,7 @@ NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_output()
 void PerturbNormalBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                         const NodeMaterialPtr& /*nodeMaterial*/,
                                         NodeMaterialDefines& defines, bool /*useInstances*/,
-                                        const SubMeshPtr& /*subMesh*/)
+                                        SubMesh* /*subMesh*/)
 {
   defines.setValue("BUMP", true);
 }

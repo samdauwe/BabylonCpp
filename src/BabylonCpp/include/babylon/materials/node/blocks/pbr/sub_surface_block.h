@@ -60,7 +60,7 @@ public:
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                       NodeMaterialDefines& defines, bool useInstances = false,
-                      const SubMeshPtr& subMesh = nullptr) override;
+                      SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Gets the main code of the block (fragment side).

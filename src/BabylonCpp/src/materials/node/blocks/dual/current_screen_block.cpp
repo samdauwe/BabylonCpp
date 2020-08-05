@@ -146,7 +146,7 @@ NodeMaterialBlockTargets& CurrentScreenBlock::get_target()
 void CurrentScreenBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                         const NodeMaterialPtr& /*nodeMaterial*/,
                                         NodeMaterialDefines& defines, bool /*useInstances*/,
-                                        const SubMeshPtr& /*subMesh*/)
+                                        SubMesh* /*subMesh*/)
 {
   defines.setValue(_linearDefineName, convertToGammaSpace, true);
   defines.setValue(_gammaDefineName, convertToLinearSpace, true);

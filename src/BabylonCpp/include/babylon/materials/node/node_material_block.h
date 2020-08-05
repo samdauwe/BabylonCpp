@@ -191,7 +191,7 @@ public:
    */
   virtual void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                               NodeMaterialDefines& defines, bool useInstances = false,
-                              const SubMeshPtr& subMesh = nullptr);
+                              SubMesh* subMesh = nullptr);
 
   /**
    * @brief Lets the block try to connect some inputs automatically.

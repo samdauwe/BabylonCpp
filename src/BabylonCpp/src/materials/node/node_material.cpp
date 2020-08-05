@@ -8,11 +8,19 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/node/blocks/color_splitter_block.h>
+#include <babylon/materials/node/blocks/dual/current_screen_block.h>
 #include <babylon/materials/node/blocks/dual/reflection_texture_block.h>
 #include <babylon/materials/node/blocks/dual/texture_block.h>
 #include <babylon/materials/node/blocks/fragment/fragment_output_block.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
+#include <babylon/materials/node/blocks/multiply_block.h>
+#include <babylon/materials/node/blocks/particle/particle_blend_multiply_block.h>
+#include <babylon/materials/node/blocks/particle/particle_ramp_gradient_block.h>
+#include <babylon/materials/node/blocks/particle/particle_texture_block.h>
+#include <babylon/materials/node/blocks/remap_block.h>
 #include <babylon/materials/node/blocks/transform_block.h>
+#include <babylon/materials/node/blocks/vector_merger_block.h>
 #include <babylon/materials/node/blocks/vertex/vertex_output_block.h>
 #include <babylon/materials/node/inode_material_options.h>
 #include <babylon/materials/node/node_material_block.h>
@@ -541,7 +549,7 @@ NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const Camer
 
   const auto dummyMesh = AbstractMesh::New(tempName + "PostProcess", getScene());
 
-  // const auto buildId = _buildId;
+  auto buildId = _buildId;
 
   _processDefines(dummyMesh.get(), defines);
 
@@ -564,19 +572,173 @@ NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const Camer
 
   postProcess->nodeMaterialSource = shared_from_this();
 
-  postProcess->onApplyObservable.add([](Effect* /*effect*/, EventState & /*es*/) -> void {
-    // TODO
-  });
+  postProcess->onApplyObservable.add(
+    [this, &buildId, &tempName, &defines, &dummyMesh](Effect* effect, EventState & /*es*/) -> void {
+      if (buildId != _buildId) {
+        Effect::ShadersStore().erase(tempName + "VertexShader");
+        Effect::ShadersStore().erase(tempName + "PixelShader");
+
+        tempName = name + std::to_string(_buildId);
+
+        defines.markAsUnprocessed();
+
+        buildId = _buildId;
+      }
+
+      const auto result = _processDefines(dummyMesh.get(), defines);
+
+      if (result) {
+        Effect::RegisterShader(tempName, _fragmentCompilationState->_builtCompilationString,
+                               _vertexCompilationState->_builtCompilationString);
+
+#if 0
+  TimingTools.SetImmediate(() =>
+      postProcess!.updateEffect(defines.toString(), _fragmentCompilationState.uniforms,
+                                _fragmentCompilationState.samplers,
+                                { maxSimultaneousLights: maxSimultaneousLights }, undefined,
+                                undefined, tempName, tempName)
+  );
+#endif
+      }
+
+      // Animated blocks
+      if (!_sharedData->animatedInputs.empty()) {
+        const auto scene = getScene();
+
+        const auto frameId = scene->getFrameId();
+
+        if (_animationFrame != frameId) {
+          for (const auto& input : _sharedData->animatedInputs) {
+            input->animate(scene);
+          }
+
+          _animationFrame = frameId;
+        }
+      }
+
+// Bindable blocks
+#if 0
+      for (const auto& block : _sharedData->bindableBlocks) {
+          block->bind(effect, shared_from_this());
+      }
+#endif
+
+      // Connection points
+      for (const auto& inputBlock : _sharedData->inputBlocks) {
+        inputBlock->_transmit(effect, getScene());
+      }
+    });
 
   return postProcess;
 }
 
 void NodeMaterial::_createEffectForParticles(
-  const IParticleSystemPtr& /*particleSystem*/, unsigned int /*blendMode*/,
-  const std::function<void(Effect* effect)>& /*nCompiled*/,
-  const std::function<void(Effect* effect, const std::string& errors)>& /*onError*/,
-  Effect* /*effect*/, NodeMaterialDefines* /*defines*/, AbstractMesh* /*dummyMesh*/)
+  const IParticleSystemPtr& particleSystem, unsigned int blendMode,
+  const std::function<void(Effect* effect)>& onCompiled,
+  const std::function<void(Effect* effect, const std::string& errors)>& onError, EffectPtr effect,
+  NodeMaterialDefines* defines, AbstractMeshPtr dummyMesh)
 {
+  auto tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
+
+  if (!defines) {
+    defines = new NodeMaterialDefines();
+  }
+
+  if (!dummyMesh) {
+    dummyMesh = getScene()->getMeshByName(name + "Particle");
+    if (!dummyMesh) {
+      dummyMesh = AbstractMesh::New(name + "Particle", getScene());
+    }
+  }
+
+  auto buildId = _buildId;
+
+  std::vector<std::string> particleSystemDefines;
+  std::string particleSystemDefinesJoined;
+
+  if (!effect) {
+    const auto result = _processDefines(dummyMesh.get(), *defines);
+
+    Effect::RegisterShader(tempName, _fragmentCompilationState->_builtCompilationString);
+
+    particleSystem->fillDefines(particleSystemDefines, blendMode);
+
+    particleSystemDefinesJoined = StringTools::join(particleSystemDefines, "\n");
+
+    effect = getScene()->getEngine()->createEffectForParticles(
+      tempName, _fragmentCompilationState->uniforms, _fragmentCompilationState->samplers,
+      defines->toString() + "\n" + particleSystemDefinesJoined,
+      result && result->fallbacks ? result->fallbacks.get() : nullptr, onCompiled, onError,
+      particleSystem);
+
+    particleSystem->setCustomEffect(effect, blendMode);
+  }
+
+  effect->onBindObservable().add([this, &buildId, &tempName, &blendMode, &defines,
+                                  &particleSystemDefines, &particleSystem,
+                                  &particleSystemDefinesJoined, &dummyMesh, onCompiled, onError,
+                                  &effect](Effect* /*effect*/, EventState & /*es*/) -> void {
+    if (buildId != _buildId) {
+      Effect::ShadersStore().erase(tempName + "PixelShader");
+
+      tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
+
+      defines->markAsUnprocessed();
+
+      buildId = _buildId;
+    }
+
+    particleSystemDefines.clear();
+
+    particleSystem->fillDefines(particleSystemDefines, blendMode);
+
+    const auto particleSystemDefinesJoinedCurrent = StringTools::join(particleSystemDefines, "\n");
+
+    if (particleSystemDefinesJoinedCurrent != particleSystemDefinesJoined) {
+      defines->markAsUnprocessed();
+      particleSystemDefinesJoined = particleSystemDefinesJoinedCurrent;
+    }
+
+    const auto result = _processDefines(dummyMesh.get(), *defines);
+
+    if (result) {
+      Effect::RegisterShader(tempName, _fragmentCompilationState->_builtCompilationString);
+
+      effect = getScene()->getEngine()->createEffectForParticles(
+        tempName, _fragmentCompilationState->uniforms, _fragmentCompilationState->samplers,
+        defines->toString() + "\n" + particleSystemDefinesJoined, result->fallbacks.get(),
+        onCompiled, onError, particleSystem);
+      particleSystem->setCustomEffect(effect, blendMode);
+      _createEffectForParticles(particleSystem, blendMode, onCompiled, onError, effect, defines,
+                                dummyMesh); // add the effect.onBindObservable observer
+      return;
+    }
+
+    // Animated blocks
+    if (!_sharedData->animatedInputs.empty()) {
+      const auto scene = getScene();
+
+      const auto frameId = scene->getFrameId();
+
+      if (_animationFrame != frameId) {
+        for (const auto& input : _sharedData->animatedInputs) {
+          input->animate(scene);
+        }
+
+        _animationFrame = frameId;
+      }
+    }
+
+    // Bindable blocks
+    for (const auto& block : _sharedData->bindableBlocks) {
+      block->bind(effect, shared_from_this());
+    }
+
+    // Connection points
+    for (const auto& inputBlock : _sharedData->inputBlocks) {
+      inputBlock->_transmit(effect.get(), getScene());
+    }
+  });
 }
 
 void NodeMaterial::createEffectForParticles(
@@ -592,7 +754,7 @@ void NodeMaterial::createEffectForParticles(
 std::optional<_ProcessedDefinesResult> NodeMaterial::_processDefines(AbstractMesh* mesh,
                                                                      NodeMaterialDefines& defines,
                                                                      bool useInstances,
-                                                                     const SubMeshPtr& subMesh)
+                                                                     SubMesh* subMesh)
 {
   std::optional<_ProcessedDefinesResult> result = std::nullopt;
 
@@ -648,18 +810,18 @@ std::optional<_ProcessedDefinesResult> NodeMaterial::_processDefines(AbstractMes
       }
     };
 
-    auto fallbacks = std::make_shared<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
 
     for (const auto& b : _sharedData->blocksWithFallbacks) {
       b->provideFallbacks(mesh, fallbacks.get());
     }
 
     result = {
-      lightDisposed,  // lightDisposed
-      uniformBuffers, // uniformBuffers
-      mergedUniforms, // mergedUniforms
-      mergedSamplers, // mergedSamplers
-      fallbacks,      // fallbacks
+      lightDisposed,        // lightDisposed
+      uniformBuffers,       // uniformBuffers
+      mergedUniforms,       // mergedUniforms
+      mergedSamplers,       // mergedSamplers
+      std::move(fallbacks), // fallbacks
     };
   }
 
@@ -711,59 +873,9 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     }
   }
 
-  // Shared defines
-  for (const auto& b : _sharedData->blocksWithDefines) {
-    b->initializeDefines(mesh, shared_from_this(), *defines, useInstances);
-  }
+  auto result = _processDefines(mesh, *defines, useInstances, subMesh);
 
-  for (const auto& b : _sharedData->blocksWithDefines) {
-    b->prepareDefines(mesh, shared_from_this(), *defines, useInstances);
-  }
-
-  // Need to recompile?
-  if (defines->isDirty()) {
-    defines->markAsProcessed();
-
-    // Repeatable content generators
-    _vertexCompilationState->compilationString = _vertexCompilationState->_builtCompilationString;
-    _fragmentCompilationState->compilationString
-      = _fragmentCompilationState->_builtCompilationString;
-
-    for (const auto& b : _sharedData->repeatableContentBlocks) {
-      b->replaceRepeatableContent(*_vertexCompilationState, *_fragmentCompilationState, mesh,
-                                  *defines);
-    }
-
-    // Uniforms
-    std::vector<std::string> uniformBuffers;
-    for (const auto& b : _sharedData->dynamicUniformBlocks) {
-      b->updateUniformsAndSamples(*_vertexCompilationState, shared_from_this(), *defines,
-                                  uniformBuffers);
-    }
-
-    auto mergedUniforms = _vertexCompilationState->uniforms;
-
-    for (const auto& u : _fragmentCompilationState->uniforms) {
-      if (!stl_util::contains(mergedUniforms, u)) {
-        mergedUniforms.emplace_back(u);
-      }
-    }
-
-    // Samplers
-    auto mergedSamplers = _vertexCompilationState->samplers;
-
-    for (const auto& s : _fragmentCompilationState->samplers) {
-      if (!stl_util::contains(mergedSamplers, s)) {
-        mergedSamplers.emplace_back(s);
-      }
-    }
-
-    auto fallbacks = std::make_unique<EffectFallbacks>();
-
-    for (const auto& b : _sharedData->blocksWithFallbacks) {
-      b->provideFallbacks(mesh, fallbacks.get());
-    }
-
+  if (result) {
     auto previousEffect = subMesh->effect();
     // Compilation
     auto join = defines->toString();
@@ -781,12 +893,12 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
 
     IEffectCreationOptions iOptions;
     iOptions.attributes            = _vertexCompilationState->attributes;
-    iOptions.uniformsNames         = std::move(mergedUniforms);
-    iOptions.uniformBuffersNames   = std::move(uniformBuffers);
-    iOptions.samplers              = std::move(mergedSamplers);
+    iOptions.uniformsNames         = std::move(result->mergedUniforms);
+    iOptions.uniformBuffersNames   = std::move(result->uniformBuffers);
+    iOptions.samplers              = std::move(result->mergedSamplers);
     iOptions.materialDefines       = defines.get();
     iOptions.defines               = std::move(join);
-    iOptions.fallbacks             = std::move(fallbacks);
+    iOptions.fallbacks             = std::move(result->fallbacks);
     iOptions.onCompiled            = onCompiled;
     iOptions.onError               = onError;
     iOptions.indexParameters       = std::move(indexParameters);
@@ -805,6 +917,12 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
       if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
         effect = previousEffect;
         defines->markAsUnprocessed();
+
+        if (result->lightDisposed) {
+          // re register in case it takes more than one frame.
+          defines->_areLightsDisposed = true;
+          return false;
+        }
       }
       else {
         scene->resetCachedMaterial();
@@ -874,7 +992,7 @@ void NodeMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     if (effect && scene->getCachedEffect() != effect) {
       // Bindable blocks
       for (const auto& block : sharedData->bindableBlocks) {
-        block->bind(effect, shared_from_this(), mesh);
+        block->bind(effect, shared_from_this(), mesh, subMesh);
       }
 
       // Connection points
@@ -1013,6 +1131,108 @@ void NodeMaterial::setToDefault()
   // Add to nodes
   addOutputNode(vertexOutput);
   addOutputNode(fragmentOutput);
+
+  _mode = NodeMaterialModes::Material;
+}
+
+void NodeMaterial::setToDefaultPostProcess()
+{
+  clear();
+
+  // editorData = nullptr;
+
+  const auto position = InputBlock::New("Position");
+  position->setAsAttribute("position2d");
+
+  const auto const1  = InputBlock::New("Constant1");
+  const1->isConstant = true;
+  const1->value      = std::make_shared<AnimationValue>(1.f);
+
+  const auto vmerger = VectorMergerBlock::New("Position3D");
+
+  position->connectTo(vmerger);
+  const1->connectTo(vmerger, NodeMaterialBlockConnectionOptions{
+                               "w", // input
+                             });
+
+  const auto vertexOutput = VertexOutputBlock::New("VertexOutput");
+  vmerger->connectTo(vertexOutput);
+
+  // Pixel
+  const auto scale          = InputBlock::New("scale");
+  scale->visibleInInspector = true;
+  scale->value              = std::make_shared<AnimationValue>(Vector2(1.f, 1.f));
+
+  const auto uv0 = RemapBlock::New("uv0");
+  position->connectTo(uv0);
+
+  const auto uv = MultiplyBlock::New("uv");
+  uv0->connectTo(uv);
+  scale->connectTo(uv);
+
+  const auto currentScreen = CurrentScreenBlock::New("CurrentScreen");
+  uv->connectTo(currentScreen);
+
+  currentScreen->texture
+    = Texture::New("https://assets.babylonjs.com/nme/currentScreenPostProcess.png", getScene());
+
+  const auto fragmentOutput = FragmentOutputBlock::New("FragmentOutput");
+  currentScreen->connectTo(fragmentOutput, NodeMaterialBlockConnectionOptions{
+                                             "",     // input
+                                             "rgba", // output
+                                           });
+
+  // Add to nodes
+  addOutputNode(vertexOutput);
+  addOutputNode(fragmentOutput);
+
+  _mode = NodeMaterialModes::PostProcess;
+}
+
+void NodeMaterial::setToDefaultParticle()
+{
+  clear();
+
+  // editorData = nullptr;
+
+  // Pixel
+  const auto uv = InputBlock::New("uv");
+  uv->setAsAttribute("particle_uv");
+
+  const auto texture = ParticleTextureBlock::New("ParticleTexture");
+  uv->connectTo(texture);
+
+  const auto color = InputBlock::New("Color");
+  color->setAsAttribute("particle_color");
+
+  const auto multiply = MultiplyBlock::New("Texture * Color");
+  texture->connectTo(multiply);
+  color->connectTo(multiply);
+
+  const auto rampGradient = ParticleRampGradientBlock::New("ParticleRampGradient");
+  multiply->connectTo(rampGradient);
+
+  const auto cSplitter = ColorSplitterBlock::New("ColorSplitter");
+  color->connectTo(cSplitter);
+
+  const auto blendMultiply = ParticleBlendMultiplyBlock::New("ParticleBlendMultiply");
+  rampGradient->connectTo(blendMultiply);
+  texture->connectTo(blendMultiply, NodeMaterialBlockConnectionOptions{
+                                      "",  // input
+                                      "a", // output
+                                    });
+  cSplitter->connectTo(blendMultiply, NodeMaterialBlockConnectionOptions{
+                                        "",  // input
+                                        "a", // output
+                                      });
+
+  const auto fragmentOutput = FragmentOutputBlock::New("FragmentOutput");
+  blendMultiply->connectTo(fragmentOutput);
+
+  // Add to nodes
+  addOutputNode(fragmentOutput);
+
+  _mode = NodeMaterialModes::Particle;
 }
 
 void NodeMaterial::loadAsync(const std::string& url)

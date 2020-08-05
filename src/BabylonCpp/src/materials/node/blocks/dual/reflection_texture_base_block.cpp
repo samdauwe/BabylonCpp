@@ -79,7 +79,7 @@ void ReflectionTextureBaseBlock::autoConfigure(const NodeMaterialPtr& material)
 void ReflectionTextureBaseBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                                 const NodeMaterialPtr& /*nodeMaterial*/,
                                                 NodeMaterialDefines& defines, bool /*useInstances*/,
-                                                const SubMeshPtr& /*subMesh*/)
+                                                SubMesh* /*subMesh*/)
 {
   if (!defines._areTexturesDirty) {
     return;

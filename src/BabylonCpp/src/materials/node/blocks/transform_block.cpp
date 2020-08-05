@@ -156,7 +156,7 @@ TransformBlock& TransformBlock::_buildBlock(NodeMaterialBuildState& state)
 
 void TransformBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& /*nodeMaterial*/,
                                     NodeMaterialDefines& defines, bool /*useInstances*/,
-                                    const SubMeshPtr& /*subMesh*/)
+                                    SubMesh* /*subMesh*/)
 {
   // Do nothing
   if (mesh->nonUniformScaling()) {

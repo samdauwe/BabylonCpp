@@ -127,7 +127,7 @@ void SubSurfaceBlock::autoConfigure(const NodeMaterialPtr& /*material*/)
 
 void SubSurfaceBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                                      NodeMaterialDefines& defines, bool /*useInstances*/,
-                                     const SubMeshPtr& /*subMesh*/)
+                                     SubMesh* /*subMesh*/)
 {
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 

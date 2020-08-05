@@ -44,7 +44,7 @@ public:
    */
   void prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                       NodeMaterialDefines& defines, bool useInstances = false,
-                      const SubMeshPtr& subMesh = nullptr) override;
+                      SubMesh* subMesh = nullptr) override;
 
 protected:
   /**

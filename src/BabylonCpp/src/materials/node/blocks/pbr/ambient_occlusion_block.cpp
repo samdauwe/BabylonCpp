@@ -99,7 +99,7 @@ std::string AmbientOcclusionBlock::GetCode(const AmbientOcclusionBlockPtr& block
 
 void AmbientOcclusionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                                            NodeMaterialDefines& defines, bool /*useInstances*/,
-                                           const SubMeshPtr& /*subMesh*/)
+                                           SubMesh* /*subMesh*/)
 {
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 

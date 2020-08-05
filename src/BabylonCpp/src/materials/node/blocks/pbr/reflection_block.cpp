@@ -121,7 +121,7 @@ BaseTexturePtr ReflectionBlock::_getTexture() const
 
 void ReflectionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
                                      NodeMaterialDefines& defines, bool /*useInstances*/,
-                                     const SubMeshPtr& /*subMesh*/)
+                                     SubMesh* /*subMesh*/)
 {
   ReflectionTextureBaseBlock::prepareDefines(mesh, nodeMaterial, defines);
 
