@@ -2148,6 +2148,11 @@ public:
    */
   Property<Mesh, size_t> thinInstanceCount;
 
+  /**
+   * Hidden
+   */
+  std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
+
 private:
   // Internal data
   std::unique_ptr<_InternalMeshDataInfo> _internalMeshDataInfo;
@@ -2155,7 +2160,6 @@ private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
   // Morph
   std::vector<VertexBuffer*> _delayInfo;
-  std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
   std::unique_ptr<_ThinInstanceDataStorage> _thinInstanceDataStorage;
   std::unique_ptr<_UserThinInstanceBuffersStorage> _userThinInstanceBuffersStorage;
   MaterialPtr _effectiveMaterial;
