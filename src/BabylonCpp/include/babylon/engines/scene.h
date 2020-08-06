@@ -66,6 +66,7 @@ class PrePassRenderer;
 struct RenderingGroupInfo;
 class RenderingManager;
 class RuntimeAnimation;
+class ShaderMaterial;
 class SimplificationQueue;
 class SoundTrack;
 class UniformBuffer;
@@ -87,6 +88,7 @@ using MeshPtr                         = std::shared_ptr<Mesh>;
 using OutlineRendererPtr              = std::shared_ptr<OutlineRenderer>;
 using PostProcessPtr                  = std::shared_ptr<PostProcess>;
 using PrePassRendererPtr              = std::shared_ptr<PrePassRenderer>;
+using ShaderMaterialPtr               = std::shared_ptr<ShaderMaterial>;
 using SimplificationQueuePtr          = std::shared_ptr<SimplificationQueue>;
 using SoundTrackPtr                   = std::shared_ptr<SoundTrack>;
 using SubMeshPtr                      = std::shared_ptr<SubMesh>;
@@ -3209,6 +3211,11 @@ public:
    * Gets or Sets the current prepass renderer associated to the scene.
    */
   Property<Scene, PrePassRendererPtr> prePassRenderer;
+
+  /**
+   * Hidden
+   */
+  ShaderMaterialPtr _edgeRenderLineShader;
 
   /**
    * Gets the debug layer (aka Inspector) associated with the scene

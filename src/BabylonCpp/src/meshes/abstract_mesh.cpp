@@ -767,12 +767,13 @@ AbstractMesh& AbstractMesh::disableEdgesRendering()
   return *this;
 }
 
-AbstractMesh& AbstractMesh::enableEdgesRendering(float epsilon, bool checkVerticesInsteadOfIndices)
+AbstractMesh&
+AbstractMesh::enableEdgesRendering(float epsilon, bool checkVerticesInsteadOfIndices,
+                                   const std::optional<IEdgesRendererOptions>& options)
 {
   disableEdgesRendering();
-
   _edgesRenderer = std::make_unique<EdgesRenderer>(shared_from_base<AbstractMesh>(), epsilon,
-                                                   checkVerticesInsteadOfIndices);
+                                                   checkVerticesInsteadOfIndices, true, options);
 
   return *this;
 }

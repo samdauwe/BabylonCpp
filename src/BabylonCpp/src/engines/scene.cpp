@@ -189,6 +189,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
                              &Scene::set_geometryBufferRenderer}
     , prePassRenderer{this, &Scene::get_prePassRenderer, &Scene::set_prePassRenderer}
+    , _edgeRenderLineShader{nullptr}
     , debugLayer{this, &Scene::get_debugLayer}
     , selectionOctree{this, &Scene::get_selectionOctree}
     , meshUnderPointer{this, &Scene::get_meshUnderPointer}

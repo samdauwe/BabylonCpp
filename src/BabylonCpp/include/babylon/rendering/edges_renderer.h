@@ -7,11 +7,13 @@
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 #include <babylon/rendering/iedges_renderer.h>
+#include <babylon/rendering/iedges_renderer_options.h>
 
 namespace BABYLON {
 
 class AbstractMesh;
 class Node;
+class Scene;
 class ShaderMaterial;
 class VertexBuffer;
 class WebGLDataBuffer;
@@ -21,25 +23,26 @@ using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
 using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
- * @brief This class is used to generate edges of the mesh that could then
- * easily be rendered in a scene.
+ * @brief This class is used to generate edges of the mesh that could then easily be rendered in a
+ * scene.
  */
 class BABYLON_SHARED_EXPORT EdgesRenderer : public IEdgesRenderer {
 
 public:
   /**
-   * @brief Creates an instance of the EdgesRenderer. It is primarily use to
-   * display edges of a mesh. Beware when you use this class with complex
-   * objects as the adjacencies computation can be really long.
+   * @brief Creates an instance of the EdgesRenderer. It is primarily use to display edges of a
+   * mesh. Beware when you use this class with complex objects as the adjacencies computation can be
+   * really long.
    * @param  source Mesh used to create edges
    * @param  epsilon sum of angles in adjacency to check for edge
-   * @param  checkVerticesInsteadOfIndices bases the edges detection on vertices
-   * vs indices
-   * @param  generateEdgesLines - should generate Lines or only prepare
-   * resources.
+   * @param  checkVerticesInsteadOfIndices bases the edges detection on vertices vs indices. Note
+   * that this parameter is not used if options.useAlternateEdgeFinder = true
+   * @param  generateEdgesLines - should generate Lines or only prepare resources.
+   * @param  options The options to apply when generating the edges
    */
   EdgesRenderer(const AbstractMeshPtr& source, float epsilon = 0.95f,
-                bool checkVerticesInsteadOfIndices = false, bool generateEdgesLines = true);
+                bool checkVerticesInsteadOfIndices = false, bool generateEdgesLines = true,
+                const std::optional<IEdgesRendererOptions>& options = std::nullopt);
   ~EdgesRenderer() override; // = default
 
   /**
@@ -92,6 +95,17 @@ protected:
    */
   void _generateEdgesLines();
 
+private:
+  static ShaderMaterialPtr GetShader(Scene* scene);
+
+  /**
+   * See https://playground.babylonjs.com/#R3JR6V#1 for a visual display of the algorithm
+   */
+  void _tessellateTriangle(const std::vector<std::vector<std::array<float, 2>>>& edgePoints,
+                           size_t indexTriangle, IndicesArray& indices,
+                           const IndicesArray& remapVertexIndices);
+  void _generateEdgesLinesAlternate();
+
 public:
   /**
    * Define the size of the edges with an orthographic camera
@@ -113,7 +127,9 @@ protected:
   ShaderMaterialPtr _lineShader;
   WebGLDataBufferPtr _ib;
   std::unordered_map<std::string, VertexBufferPtr> _buffers;
+  std::unordered_map<std::string, VertexBufferPtr> _buffersForInstances;
   bool _checkVerticesInsteadOfIndices;
+  std::optional<IEdgesRendererOptions> _options;
 
 private:
   Observer<AbstractMesh>::Ptr _meshRebuildObserver;

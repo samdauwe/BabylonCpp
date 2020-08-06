@@ -21,6 +21,7 @@
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 #include <babylon/physics/physics_impostor.h>
+#include <babylon/rendering/iedges_renderer_options.h>
 
 using json = nlohmann::json;
 
@@ -294,8 +295,9 @@ public:
    * @returns the currentAbstractMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
-  AbstractMesh& enableEdgesRendering(float epsilon                      = 0.95f,
-                                     bool checkVerticesInsteadOfIndices = false);
+  AbstractMesh&
+  enableEdgesRendering(float epsilon = 0.95f, bool checkVerticesInsteadOfIndices = false,
+                       const std::optional<IEdgesRendererOptions>& options = std::nullopt);
 
   /**
    * @brief Returns the mesh itself by default. Implemented by child classes.
