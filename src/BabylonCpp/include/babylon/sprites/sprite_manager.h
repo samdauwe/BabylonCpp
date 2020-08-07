@@ -213,7 +213,7 @@ public:
   /**
    * Gets or sets the unique id of the sprite
    */
-  unsigned int uniqueId;
+  size_t uniqueId;
 
   /**
    * Gets the array of sprites

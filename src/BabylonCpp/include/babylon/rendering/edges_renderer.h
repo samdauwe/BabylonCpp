@@ -101,7 +101,7 @@ private:
   /**
    * See https://playground.babylonjs.com/#R3JR6V#1 for a visual display of the algorithm
    */
-  void _tessellateTriangle(const std::vector<std::vector<std::array<float, 2>>>& edgePoints,
+  void _tessellateTriangle(const std::vector<std::vector<std::array<uint32_t, 2>>>& edgePoints,
                            size_t indexTriangle, IndicesArray& indices,
                            const IndicesArray& remapVertexIndices);
   void _generateEdgesLinesAlternate();

@@ -97,12 +97,12 @@ protected:
   /**
    * @brief Gets the current interval between two checks (every 2000ms by default).
    */
-  float get_trackerDuration() const;
+  int get_trackerDuration() const;
 
   /**
    * @brief Sets the current interval between two checks (every 2000ms by default).
    */
-  void set_trackerDuration(float value);
+  void set_trackerDuration(int value);
 
   /**
    * @brief Gets the list of active optimizations.
@@ -151,7 +151,7 @@ public:
   /**
    * Gets or sets the current interval between two checks (every 2000ms by default)
    */
-  Property<SceneOptimizer, float> trackerDuration;
+  Property<SceneOptimizer, int> trackerDuration;
 
   /**
    * Gets the list of active optimizations

@@ -24,6 +24,7 @@
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
 #include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 

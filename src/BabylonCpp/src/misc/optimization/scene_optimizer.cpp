@@ -79,12 +79,12 @@ void SceneOptimizer::set_targetFrameRate(float value)
   _targetFrameRate = value;
 }
 
-float SceneOptimizer::get_trackerDuration() const
+int SceneOptimizer::get_trackerDuration() const
 {
   return _trackerDuration;
 }
 
-void SceneOptimizer::set_trackerDuration(float value)
+void SceneOptimizer::set_trackerDuration(int value)
 {
   _trackerDuration = value;
 }

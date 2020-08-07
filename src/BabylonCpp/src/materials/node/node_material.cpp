@@ -524,11 +524,11 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
 
 PostProcessPtr
 NodeMaterial::createPostProcess(const CameraPtr& camera,
-                                const std::variant<float, PostProcessOptions>& options,
+                                const std::variant<float, PostProcessOptions>& iOptions,
                                 unsigned int samplingMode, Engine* engine, bool reusable,
                                 unsigned int textureType, unsigned int textureFormat)
 {
-  return _createEffectOrPostProcess(nullptr, camera, options, samplingMode, engine, reusable,
+  return _createEffectOrPostProcess(nullptr, camera, iOptions, samplingMode, engine, reusable,
                                     textureType, textureFormat);
 }
 
@@ -539,7 +539,7 @@ void NodeMaterial::createEffectForPostProcess(const PostProcessPtr& postProcess)
 
 PostProcessPtr
 NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const CameraPtr& camera,
-                                         const std::variant<float, PostProcessOptions>& options,
+                                         const std::variant<float, PostProcessOptions>& iOptions,
                                          unsigned int samplingMode, Engine* engine, bool reusable,
                                          unsigned int textureType, unsigned int textureFormat)
 {
@@ -561,7 +561,7 @@ NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const Camer
   if (!postProcess) {
     postProcess = PostProcess::New(
       name + "PostProcess", tempName, _fragmentCompilationState->uniforms,
-      _fragmentCompilationState->samplers, options, camera, samplingMode, engine, reusable,
+      _fragmentCompilationState->samplers, iOptions, camera, samplingMode, engine, reusable,
       defines.toString(), textureType, tempName, indexParameters, false, textureFormat);
   }
   else {
@@ -634,8 +634,8 @@ NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const Camer
 
 void NodeMaterial::_createEffectForParticles(
   const IParticleSystemPtr& particleSystem, unsigned int blendMode,
-  const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)>& onError, EffectPtr effect,
+  const std::function<void(Effect* effect)>& iOnCompiled,
+  const std::function<void(Effect* effect, const std::string& errors)>& iOnError, EffectPtr effect,
   NodeMaterialDefines* defines, AbstractMeshPtr dummyMesh)
 {
   auto tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
@@ -668,7 +668,7 @@ void NodeMaterial::_createEffectForParticles(
     effect = getScene()->getEngine()->createEffectForParticles(
       tempName, _fragmentCompilationState->uniforms, _fragmentCompilationState->samplers,
       defines->toString() + "\n" + particleSystemDefinesJoined,
-      result && result->fallbacks ? result->fallbacks.get() : nullptr, onCompiled, onError,
+      result && result->fallbacks ? result->fallbacks.get() : nullptr, iOnCompiled, iOnError,
       particleSystem);
 
     particleSystem->setCustomEffect(effect, blendMode);
@@ -676,7 +676,7 @@ void NodeMaterial::_createEffectForParticles(
 
   effect->onBindObservable().add([this, &buildId, &tempName, &blendMode, &defines,
                                   &particleSystemDefines, &particleSystem,
-                                  &particleSystemDefinesJoined, &dummyMesh, onCompiled, onError,
+                                  &particleSystemDefinesJoined, &dummyMesh, iOnCompiled, iOnError,
                                   &effect](Effect* /*effect*/, EventState & /*es*/) -> void {
     if (buildId != _buildId) {
       Effect::ShadersStore().erase(tempName + "PixelShader");
@@ -707,9 +707,9 @@ void NodeMaterial::_createEffectForParticles(
       effect = getScene()->getEngine()->createEffectForParticles(
         tempName, _fragmentCompilationState->uniforms, _fragmentCompilationState->samplers,
         defines->toString() + "\n" + particleSystemDefinesJoined, result->fallbacks.get(),
-        onCompiled, onError, particleSystem);
+        iOnCompiled, iOnError, particleSystem);
       particleSystem->setCustomEffect(effect, blendMode);
-      _createEffectForParticles(particleSystem, blendMode, onCompiled, onError, effect, defines,
+      _createEffectForParticles(particleSystem, blendMode, iOnCompiled, iOnError, effect, defines,
                                 dummyMesh); // add the effect.onBindObservable observer
       return;
     }
@@ -742,13 +742,13 @@ void NodeMaterial::_createEffectForParticles(
 }
 
 void NodeMaterial::createEffectForParticles(
-  const IParticleSystemPtr& particleSystem, const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)>& onError)
+  const IParticleSystemPtr& particleSystem, const std::function<void(Effect* effect)>& iOnCompiled,
+  const std::function<void(Effect* effect, const std::string& errors)>& iOnError)
 {
-  _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_ONEONE, onCompiled,
-                            onError);
-  _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_MULTIPLY, onCompiled,
-                            onError);
+  _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_ONEONE, iOnCompiled,
+                            iOnError);
+  _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_MULTIPLY, iOnCompiled,
+                            iOnError);
 }
 
 std::optional<_ProcessedDefinesResult> NodeMaterial::_processDefines(AbstractMesh* mesh,
@@ -1237,21 +1237,20 @@ void NodeMaterial::setToDefaultParticle()
 
 void NodeMaterial::loadAsync(const std::string& url)
 {
-  FileTools::LoadFile(
-    url,
-    [this](const std::variant<std::string, ArrayBufferView>& data,
-           const std::string & /*responseURL*/) -> void {
-      if (std::holds_alternative<std::string>(data)) {
-        auto serializationObject = json::parse(std::get<std::string>(data));
+  FileTools::LoadFile(url,
+                      [this](const std::variant<std::string, ArrayBufferView>& data,
+                             const std::string & /*responseURL*/) -> void {
+                        if (std::holds_alternative<std::string>(data)) {
+                          auto serializationObject = json::parse(std::get<std::string>(data));
 
-        loadFromSerialization(serializationObject, "");
-      }
-    },
-    nullptr, false,
-    [url](const std::string& message, const std::string & /*exception*/) -> void {
-      BABYLON_LOG_ERROR("NodeMaterial", "Could not load file %s, reason: %s", url.c_str(),
-                        message.c_str())
-    });
+                          loadFromSerialization(serializationObject, "");
+                        }
+                      },
+                      nullptr, false,
+                      [url](const std::string& message, const std::string & /*exception*/) -> void {
+                        BABYLON_LOG_ERROR("NodeMaterial", "Could not load file %s, reason: %s",
+                                          url.c_str(), message.c_str())
+                      });
 }
 
 void NodeMaterial::_gatherBlocks(const NodeMaterialBlockPtr& rootNode,

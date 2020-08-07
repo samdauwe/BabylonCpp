@@ -213,10 +213,10 @@ void EdgesRenderer::createLine(const Vector3& p0, const Vector3& p1, uint32_t of
 }
 
 void EdgesRenderer::_tessellateTriangle(
-  const std::vector<std::vector<std::array<float, 2>>>& edgePoints, size_t indexTriangle,
+  const std::vector<std::vector<std::array<uint32_t, 2>>>& edgePoints, size_t indexTriangle,
   IndicesArray& indices, const IndicesArray& remapVertexIndices)
 {
-  const auto makePointList = [](const std::vector<std::array<float, 2>>& edgePoints,
+  const auto makePointList = [](const std::vector<std::array<uint32_t, 2>>& edgePoints,
                                 IndicesArray& pointIndices, int firstIndex) -> void {
     if (firstIndex >= 0) {
       pointIndices.emplace_back(static_cast<uint32_t>(firstIndex));
@@ -241,13 +241,15 @@ void EdgesRenderer::_tessellateTriangle(
   for (auto e = 0ull; e < 3; ++e) {
     if (e == startEdge) {
       stl_util::sort_js_style(
-        edgePoints[e], [](const std::array<float, 2>& a, const std::array<float, 2>& b) -> int {
+        edgePoints[e],
+        [](const std::array<uint32_t, 2>& a, const std::array<uint32_t, 2>& b) -> int {
           return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0;
         });
     }
     else {
       stl_util::sort_js_style(
-        edgePoints[e], [](const std::array<float, 2>& a, const std::array<float, 2>& b) -> int {
+        edgePoints[e],
+        [](const std::array<uint32_t, 2>& a, const std::array<uint32_t, 2>& b) -> int {
           return a[1] > b[1] ? -1 : a[1] < b[1] ? 1 : 0;
         });
     }
@@ -338,26 +340,26 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
    * vertex
    */
   const auto useFastVertexMerger = _options ? _options->useFastVertexMerger.value_or(true) : true;
-  const auto epsilonVertexMerge  = _options ? _options->epsilonVertexMerge.value_or(1e-6) : 1e-6;
+  const auto epsilonVertexMerge  = _options ? _options->epsilonVertexMerge.value_or(1e-6f) : 1e-6f;
   const auto epsVertexMerge      = useFastVertexMerger ?
-                                std::round(-std::log(epsilonVertexMerge) / std::log(10)) :
+                                std::round(-std::log(epsilonVertexMerge) / std::log(10.f)) :
                                 epsilonVertexMerge;
   IndicesArray remapVertexIndices;
   IndicesArray uniquePositions; // list of unique index of vertices - needed for tessellation
 
   const auto toFixed = [](float var, float epsilon) -> float {
     const auto epsilonI = static_cast<int>(std::min(std::max(0.f, epsilon), 20.f));
-    float value         = static_cast<int>(var * epsilonI + .5);
+    float value         = static_cast<float>(static_cast<int>(var * epsilonI + .5));
     return value / epsilonI;
   };
 
   if (useFastVertexMerger) {
     std::unordered_map<std::string, uint32_t> mapVertices;
-    for (auto v1 = 0ull; v1 < positions.size(); v1 += 3) {
+    for (auto v1 = 0u; v1 < positions.size(); v1 += 3) {
       const auto x1 = positions[v1 + 0], y1 = positions[v1 + 1], z1 = positions[v1 + 2];
 
       const auto key
-        = StringTools::printf("%f|%f|", toFixed(x1, epsVertexMerge), toFixed(y1, epsVertexMerge),
+        = StringTools::printf("%f|%f|%f", toFixed(x1, epsVertexMerge), toFixed(y1, epsVertexMerge),
                               toFixed(z1, epsVertexMerge));
 
       if (stl_util::contains(mapVertices, key)) {
@@ -372,10 +374,10 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
     }
   }
   else {
-    for (auto v1 = 0ull; v1 < positions.size(); v1 += 3) {
+    for (auto v1 = 0u; v1 < positions.size(); v1 += 3) {
       const auto x1 = positions[v1 + 0], y1 = positions[v1 + 1], z1 = positions[v1 + 2];
       auto found = false;
-      for (auto v2 = 0ull; v2 < v1 && !found; v2 += 3) {
+      for (auto v2 = 0u; v2 < v1 && !found; v2 += 3) {
         const auto x2 = positions[v2 + 0], y2 = positions[v2 + 1], z2 = positions[v2 + 2];
 
         if (std::abs(x1 - x2) < epsVertexMerge && std::abs(y1 - y2) < epsVertexMerge
@@ -420,8 +422,8 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
     const auto epsVertexAligned = _options ? _options->epsilonVertexAligned.value_or(1e-6) : 1e-6;
     struct TesselateItem {
       size_t index = 0;
-      std::vector<std::vector<std::array<float, 2>>> edgesPoints;
-    };                                        // ens of struct TesselateItem
+      std::vector<std::vector<std::array<uint32_t, 2>>> edgesPoints;
+    };                                        // end of struct TesselateItem
     std::vector<TesselateItem> mustTesselate; // liste of triangles that must be tessellated
 
     for (auto index = 0ull; index < indices.size(); index += 3) { // loop over all triangles
@@ -472,7 +474,7 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
               mustTesselate.emplace_back(*triangleToTessellate);
             }
             triangleToTessellate->edgesPoints[i].emplace_back(
-              std::array<float, 2>{static_cast<float>(vIndex), p0p});
+              std::array<uint32_t, 2>{vIndex, static_cast<uint32_t>(p0p)});
           }
         }
       }
@@ -539,7 +541,7 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
 
           if (dotProduct < _epsilon) {
             createLine(TmpVectors::Vector3Array[0], TmpVectors::Vector3Array[1],
-                       _linesPositions.size() / 3);
+                       static_cast<uint32_t>(_linesPositions.size() / 3));
           }
 
           ei.done = true;
@@ -569,7 +571,7 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
         positions[p1Index * 3 + 0], positions[p1Index * 3 + 1], positions[p1Index * 3 + 2]);
 
       createLine(TmpVectors::Vector3Array[0], TmpVectors::Vector3Array[1],
-                 _linesPositions.size() / 3);
+                 static_cast<uint32_t>(_linesPositions.size() / 3));
     }
   }
 
@@ -776,7 +778,7 @@ void EdgesRenderer::render()
       instanceCount = customInstances.size();
 
       if (!instanceStorage->isFrozen) {
-        auto offset = 0ull;
+        auto offset = 0u;
 
         for (auto i = 0ull; i < instanceCount; ++i) {
           customInstances.data()[i].copyToArray(instanceStorage->instancesData, offset);

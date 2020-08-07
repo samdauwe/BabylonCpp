@@ -123,13 +123,13 @@ void Sprite::set_delay(float value)
   playAnimation(_fromIndex, _toIndex, _loopAnimation, value, _onAnimationEnd);
 }
 
-void Sprite::playAnimation(int from, int to, bool loop, float delay,
+void Sprite::playAnimation(int from, int to, bool loop, float iDelay,
                            const std::function<void()>& onAnimationEnd)
 {
   _fromIndex        = from;
   _toIndex          = to;
   _loopAnimation    = loop;
-  _delay            = delay;
+  _delay            = iDelay;
   _animationStarted = true;
 
   if (from < to) {
