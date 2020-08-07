@@ -54,9 +54,9 @@ using TexturePtr                         = std::shared_ptr<Texture>;
 
 /**
  * @brief Interface representing a particle system in Babylon.js.
- * This groups the common functionalities that needs to be implemented in order
- * to create a particle system. A particle system represents a way to manage
- * particles from their emission to their animation and rendering.
+ * This groups the common functionalities that needs to be implemented in order to create a particle
+ * system. A particle system represents a way to manage particles from their emission to their
+ * animation and rendering.
  */
 class BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
@@ -80,14 +80,13 @@ public:
   std::string name;
 
   /**
-   * The emitter represents the Mesh or position we are attaching the particle
-   * system to.
+   * The emitter represents the Mesh or position we are attaching the particle system to.
    */
   std::variant<AbstractMeshPtr, Vector3> emitter;
 
   /**
-   * Gets or sets a boolean indicating if the particles must be rendered as
-   * billboard or aligned with the direction
+   * Gets or sets a boolean indicating if the particles must be rendered as billboard or aligned
+   * with the direction
    */
   Property<IParticleSystem, bool> isBillboardBased;
 
@@ -102,14 +101,12 @@ public:
   unsigned int layerMask = 0x0FFFFFFF;
 
   /**
-   * The overall motion speed (0.01 is default update speed, faster updates =
-   * faster animation)
+   * The overall motion speed (0.01 is default update speed, faster updates = faster animation)
    */
   float updateSpeed;
 
   /**
-   * The amount of time the particle system is running (depends of the overall
-   * update speed).
+   * The amount of time the particle system is running (depends of the overall update speed).
    */
   int targetStopDuration;
 
@@ -119,9 +116,8 @@ public:
   TexturePtr particleTexture = nullptr;
 
   /**
-   * Blend mode use to render the particle, it can be either
-   * ParticleSystem.BLENDMODE_ONEONE, ParticleSystem.BLENDMODE_STANDARD or
-   * ParticleSystem.BLENDMODE_ADD.
+   * Blend mode use to render the particle, it can be either ParticleSystem.BLENDMODE_ONEONE,
+   * ParticleSystem.BLENDMODE_STANDARD or ParticleSystem.BLENDMODE_ADD.
    */
   unsigned int blendMode;
 
@@ -166,14 +162,12 @@ public:
   float maxScaleY = 1.f;
 
   /**
-   * Random color of each particle after it has been emitted, between color1 and
-   * color2 vectors.
+   * Random color of each particle after it has been emitted, between color1 and color2 vectors.
    */
   Color4 color1;
 
   /**
-   * Random color of each particle after it has been emitted, between color1 and
-   * color2 vectors.
+   * Random color of each particle after it has been emitted, between color1 and color2 vectors.
    */
   Color4 color2;
 
@@ -183,8 +177,7 @@ public:
   Color4 colorDead;
 
   /**
-   * The maximum number of particles to emit per frame until we reach the
-   * activeParticleCount value
+   * The maximum number of particles to emit per frame until we reach the activeParticleCount value
    */
   int emitRate;
 
@@ -204,14 +197,12 @@ public:
   float maxEmitPower;
 
   /**
-   * Minimum angular speed of emitting particles (Z-axis rotation for each
-   * particle).
+   * Minimum angular speed of emitting particles (Z-axis rotation for each particle).
    */
   float minAngularSpeed;
 
   /**
-   * Maximum angular speed of emitting particles (Z-axis rotation for each
-   * particle).
+   * Maximum angular speed of emitting particles (Z-axis rotation for each particle).
    */
   float maxAngularSpeed;
 
@@ -237,58 +228,50 @@ public:
   int startDelay = 0;
 
   /**
-   * Gets or sets a value indicating how many cycles (or frames) must be
-   * executed before first rendering (this value has to be set before starting
-   * the system). Default is 0
+   * Gets or sets a value indicating how many cycles (or frames) must be executed before first
+   * rendering (this value has to be set before starting the system). Default is 0
    */
   size_t preWarmCycles;
 
   /**
-   * Gets or sets a value indicating the time step multiplier to use in pre-warm
-   * mode (default is 1)
+   * Gets or sets a value indicating the time step multiplier to use in pre-warm mode (default is 1)
    */
   size_t preWarmStepOffset;
 
   /**
-   * If using a spritesheet (isAnimationSheetEnabled) defines the speed of the
-   * sprite loop (default is 1 meaning the animation will play once during the
-   * entire particle lifetime)
+   * If using a spritesheet (isAnimationSheetEnabled) defines the speed of the sprite loop (default
+   * is 1 meaning the animation will play once during the entire particle lifetime)
    */
   float spriteCellChangeSpeed;
 
   /**
-   * If using a spritesheet (isAnimationSheetEnabled) defines the first sprite
-   * cell to display
+   * If using a spritesheet (isAnimationSheetEnabled) defines the first sprite cell to display
    */
   unsigned int startSpriteCellID;
 
   /**
-   * If using a spritesheet (isAnimationSheetEnabled) defines the last sprite
-   * cell to display
+   * If using a spritesheet (isAnimationSheetEnabled) defines the last sprite cell to display
    */
   unsigned int endSpriteCellID;
 
   /**
-   * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell
-   * width to use
+   * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell width to use
    */
   unsigned int spriteCellWidth;
 
   /**
-   * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell
-   * height to use
+   * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell height to use
    */
   unsigned int spriteCellHeight;
 
   /**
-   * This allows the system to random pick the start cell ID between
-   * startSpriteCellID and endSpriteCellID
+   * This allows the system to random pick the start cell ID between startSpriteCellID and
+   * endSpriteCellID
    */
   bool spriteRandomStartCell;
 
   /**
-   * Gets or sets a boolean indicating if a spritesheet is used to animate the
-   * particles texture
+   * Gets or sets a boolean indicating if a spritesheet is used to animate the particles texture
    */
   Property<IParticleSystem, bool> isAnimationSheetEnabled;
 
@@ -304,51 +287,46 @@ public:
   Property<IParticleSystem, ProceduralTexturePtr> noiseTexture;
 
   /**
-   * Gets or sets the strength to apply to the noise value (default is (10, 10,
-   * 10))
+   * Gets or sets the strength to apply to the noise value (default is (10, 10, 10))
    */
   Vector3 noiseStrength;
 
   /**
    * Gets or sets the billboard mode to use when isBillboardBased = true.
-   * Value can be: ParticleSystem.BILLBOARDMODE_ALL,
-   * ParticleSystem.BILLBOARDMODE_Y, ParticleSystem.BILLBOARDMODE_STRETCHED
+   * Value can be: ParticleSystem.BILLBOARDMODE_ALL, ParticleSystem.BILLBOARDMODE_Y,
+   * ParticleSystem.BILLBOARDMODE_STRETCHED
    */
   unsigned int billboardMode;
 
   /**
-   * Gets or sets a value indicating the damping to apply if the limit velocity
-   * factor is reached
+   * Gets or sets a value indicating the damping to apply if the limit velocity factor is reached
    */
   float limitVelocityDamping;
 
   /**
-   * Gets or sets a boolean indicating that hosted animations (in the
-   * system.animations array) must be started when system.start() is called
+   * Gets or sets a boolean indicating that hosted animations (in the system.animations array) must
+   * be started when system.start() is called
    */
   bool beginAnimationOnStart;
 
   /**
-   * Gets or sets the frame to start the animation from when
-   * beginAnimationOnStart is true
+   * Gets or sets the frame to start the animation from when beginAnimationOnStart is true
    */
   int beginAnimationFrom;
 
   /**
-   * Gets or sets the frame to end the animation on when beginAnimationOnStart
-   * is true
+   * Gets or sets the frame to end the animation on when beginAnimationOnStart is true
    */
   int beginAnimationTo;
 
   /**
-   * Gets or sets a boolean indicating if animations must loop when
-   * beginAnimationOnStart is true
+   * Gets or sets a boolean indicating if animations must loop when beginAnimationOnStart is true
    */
   bool beginAnimationLoop;
 
   /**
-   * Specifies whether the particle system will be disposed once it reaches the
-   * end of the animation.
+   * Specifies whether the particle system will be disposed once it reaches the end of the
+   * animation.
    */
   bool disposeOnStop;
 
@@ -381,8 +359,8 @@ public:
   virtual size_t getActiveCount() const = 0;
 
   /**
-   * @brief Gets if the system has been started. (Note: this will still be true
-   * after stop is called).
+   * @brief Gets if the system has been started. (Note: this will still be true after stop is
+   * called).
    * @returns True if it has been started, otherwise false.
    */
   virtual bool isStarted() const = 0;
@@ -396,16 +374,15 @@ public:
 
   /**
    * @brief Renders the particle system in its current state.
-   * @param preWarm defines if the system should only update the particles but
-   * not render them
+   * @param preWarm defines if the system should only update the particles but not render them
    * @returns the current number of particles
    */
   virtual size_t render(bool preWarm = false) = 0;
 
   /**
    * @brief Dispose the particle system and frees its associated resources.
-   * @param disposeTexture defines if the particule texture must be disposed as
-   * well (true by default)
+   * @param disposeTexture defines if the particule texture must be disposed as well
+   * (true by default)
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override = 0;
 
@@ -521,8 +498,8 @@ public:
    * @brief Adds a new color gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param color1 defines the color to affect to the specified gradient
-   * @param color2 defines an additional color used to define a range ([color,
-   * color2]) with main color to pick the final color from
+   * @param color2 defines an additional color used to define a range ([color, color2]) with main
+   * color to pick the final color from
    * @returns the current particle system
    */
   virtual IParticleSystem& addColorGradient(float gradient, const Color4& color1,
@@ -540,8 +517,8 @@ public:
    * @brief Adds a new size gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the size factor to affect to the specified gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addSizeGradient(float gradient, float factor,
@@ -564,8 +541,7 @@ public:
 
   /**
    * @brief Gets the current list of angular speed gradients.
-   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to
-   * udpate this list
+   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to udpate this list
    * @returns the list of angular speed gradients
    */
   virtual std::vector<FactorGradient>& getAngularSpeedGradients() = 0;
@@ -574,8 +550,8 @@ public:
    * @brief Adds a new angular speed gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the angular speed to affect to the specified gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addAngularSpeedGradient(float gradient, float factor,
@@ -592,8 +568,7 @@ public:
 
   /**
    * @brief Gets the current list of velocity gradients.
-   * You must use addVelocityGradient and removeVelocityGradient to udpate this
-   * list
+   * You must use addVelocityGradient and removeVelocityGradient to udpate this list
    * @returns the list of velocity gradients
    */
   virtual std::vector<FactorGradient>& getVelocityGradients() = 0;
@@ -602,8 +577,8 @@ public:
    * @brief Adds a new velocity gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the velocity to affect to the specified gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addVelocityGradient(float gradient, float factor,
@@ -619,8 +594,7 @@ public:
 
   /**
    * @brief Gets the current list of limit velocity gradients.
-   * You must use addLimitVelocityGradient and removeLimitVelocityGradient to
-   * udpate this list
+   * You must use addLimitVelocityGradient and removeLimitVelocityGradient to udpate this list
    * @returns the list of limit velocity gradients
    */
   virtual std::vector<FactorGradient>& getLimitVelocityGradients() = 0;
@@ -628,10 +602,9 @@ public:
   /**
    * @brief Adds a new limit velocity gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the limit velocity to affect to the specified
-   * gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor defines the limit velocity to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addLimitVelocityGradient(float gradient, float factor,
@@ -650,8 +623,8 @@ public:
    * @brief Adds a new drag gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the drag to affect to the specified gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addDragGradient(float gradient, float factor,
@@ -673,12 +646,12 @@ public:
   virtual std::vector<FactorGradient>& getDragGradients() = 0;
 
   /**
-   * @brief Adds a new emit rate gradient (please note that this will only work
-   * if you set the targetStopDuration property).
+   * @brief Adds a new emit rate gradient (please note that this will only work if you set the
+   * targetStopDuration property).
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the emit rate to affect to the specified gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addEmitRateGradient(float gradient, float factor,
@@ -694,19 +667,18 @@ public:
 
   /**
    * @brief Gets the current list of emit rate gradients.
-   * You must use addEmitRateGradient and removeEmitRateGradient to udpate this
-   * list
+   * You must use addEmitRateGradient and removeEmitRateGradient to udpate this list
    * @returns the list of emit rate gradients
    */
   virtual std::vector<FactorGradient>& getEmitRateGradients() = 0;
 
   /**
-   * @brief Adds a new start size gradient (please note that this will only work
-   * if you set the targetStopDuration property).
+   * @brief Adds a new start size gradient (please note that this will only work if you set the
+   * targetStopDuration property).
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the start size to affect to the specified gradient
-   * @param factor2 defines an additional factor used to define a range
-   * ([factor, factor2]) with main value to pick the final value from
+   * @param factor2 defines an additional factor used to define a range ([factor, factor2]) with
+   * main value to pick the final value from
    * @returns the current particle system
    */
   virtual IParticleSystem& addStartSizeGradient(float gradient, float factor,
@@ -722,8 +694,7 @@ public:
 
   /**
    * @brief Gets the current list of start size gradients.
-   * You must use addStartSizeGradient and removeStartSizeGradient to udpate
-   * this list
+   * You must use addStartSizeGradient and removeStartSizeGradient to udpate this list
    * @returns the list of start size gradients
    */
   virtual std::vector<FactorGradient>& getStartSizeGradients() = 0;
@@ -731,8 +702,7 @@ public:
   /**
    * @brief Adds a new life time gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the life time factor to affect to the specified
-   * gradient
+   * @param factor defines the life time factor to affect to the specified gradient
    * @param factor2 defines an additional factor used to define a range
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
@@ -750,8 +720,7 @@ public:
 
   /**
    * @brief Gets the current list of life time gradients.
-   * You must use addLifeTimeGradient and removeLifeTimeGradient to udpate this
-   * list
+   * You must use addLifeTimeGradient and removeLifeTimeGradient to udpate this list
    * @returns the list of life time gradients
    */
   virtual std::vector<FactorGradient>& getLifeTimeGradients() = 0;
@@ -809,8 +778,7 @@ public:
 
   /**
    * @brief Gets the current list of color remap gradients.
-   * You must use addColorRemapGradient and removeColorRemapGradient to udpate
-   * this list
+   * You must use addColorRemapGradient and removeColorRemapGradient to udpate this list
    * @returns the list of color remap gradients
    */
   virtual std::vector<FactorGradient>& getColorRemapGradients() = 0;
@@ -833,19 +801,18 @@ public:
 
   /**
    * @brief Gets the current list of alpha remap gradients.
-   * You must use addAlphaRemapGradient and removeAlphaRemapGradient to udpate
-   * this list
+   * You must use addAlphaRemapGradient and removeAlphaRemapGradient to udpate this list
    * @returns the list of alpha remap gradients
    */
   virtual std::vector<FactorGradient>& getAlphaRemapGradients() = 0;
 
   /**
-   * @brief Creates a Point Emitter for the particle system (emits directly from
-   * the emitter position).
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the box
+   * @brief Creates a Point Emitter for the particle system (emits directly from the emitter
+   * position).
+   * @param direction1 Particles are emitted between the direction1 and direction2 from within the
+   * box
+   * @param direction2 Particles are emitted between the direction1 and direction2 from within the
+   * box
    * @returns the emitter
    */
   virtual PointParticleEmitterPtr createPointEmitter(const Vector3& direction1,
@@ -853,11 +820,11 @@ public:
     = 0;
 
   /**
-   * @brief Creates a Hemisphere Emitter for the particle system (emits along
-   * the hemisphere radius).
+   * @brief Creates a Hemisphere Emitter for the particle system (emits along the hemisphere
+   * radius).
    * @param radius The radius of the hemisphere to emit from
-   * @param radiusRange The range of the hemisphere to emit from [0-1] 0 Surface
-   * Only, 1 Entire Radius
+   * @param radiusRange The range of the hemisphere to emit from [0-1] 0 Surface Only, 1 Entire
+   * Radius
    * @returns the emitter
    */
   virtual HemisphericParticleEmitterPtr createHemisphericEmitter(float radius      = 1.f,
@@ -865,24 +832,22 @@ public:
     = 0;
 
   /**
-   * @brief Creates a Sphere Emitter for the particle system (emits along the
-   * sphere radius).
+   * @brief Creates a Sphere Emitter for the particle system (emits along the sphere radius).
    * @param radius The radius of the sphere to emit from
-   * @param radiusRange The range of the sphere to emit from [0-1] 0 Surface
-   * Only, 1 Entire Radius
+   * @param radiusRange The range of the sphere to emit from [0-1] 0 Surface Only, 1 Entire Radius
    * @returns the emitter
    */
   virtual SphereParticleEmitterPtr createSphereEmitter(float radius = 1.f, float radiusRange = 1.f)
     = 0;
 
   /**
-   * @brief Creates a Directed Sphere Emitter for the particle system (emits
-   * between direction1 and direction2).
+   * @brief Creates a Directed Sphere Emitter for the particle system (emits between direction1 and
+   * direction2).
    * @param radius The radius of the sphere to emit from
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the sphere
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the sphere
+   * @param direction1 Particles are emitted between the direction1 and direction2 from within the
+   * sphere
+   * @param direction2 Particles are emitted between the direction1 and direction2 from within the
+   * sphere
    * @returns the emitter
    */
   virtual SphereDirectedParticleEmitterPtr
@@ -892,14 +857,12 @@ public:
     = 0;
 
   /**
-   * @brief Creates a Cylinder Emitter for the particle system (emits from the
-   * cylinder to the particle position).
+   * @brief Creates a Cylinder Emitter for the particle system (emits from the cylinder to the
+   * particle position).
    * @param radius The radius of the emission cylinder
    * @param height The height of the emission cylinder
-   * @param radiusRange The range of emission [0-1] 0 Surface only, 1 Entire
-   * Radius
-   * @param directionRandomizer How much to randomize the particle direction
-   * [0-1]
+   * @param radiusRange The range of emission [0-1] 0 Surface only, 1 Entire Radius
+   * @param directionRandomizer How much to randomize the particle direction [0-1]
    * @returns the emitter
    */
   virtual CylinderParticleEmitterPtr createCylinderEmitter(float radius = 1.f, float height = 1.f,
@@ -908,16 +871,16 @@ public:
     = 0;
 
   /**
-   * @brief Creates a Directed Cylinder Emitter for the particle system (emits
-   * between direction1 and direction2).
+   * @brief Creates a Directed Cylinder Emitter for the particle system (emits between direction1
+   * and direction2)
    * @param radius The radius of the cylinder to emit from
    * @param height The height of the emission cylinder
-   * @param radiusRange the range of the emission cylinder [0-1] 0 Surface only,
-   * 1 Entire Radius (1 by default)
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the cylinder
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the cylinder
+   * @param radiusRange the range of the emission cylinder [0-1] 0 Surface only, 1 Entire Radius (1
+   * by default)
+   * @param direction1 Particles are emitted between the direction1 and direction2 from within the
+   * cylinder
+   * @param direction2 Particles are emitted between the direction1 and direction2 from within the
+   * cylinder
    * @returns the emitter
    */
   virtual CylinderDirectedParticleEmitterPtr
@@ -927,8 +890,8 @@ public:
     = 0;
 
   /**
-   * @brief Creates a Cone Emitter for the particle system (emits from the cone
-   * to the particle position).
+   * @brief Creates a Cone Emitter for the particle system (emits from the cone to the particle
+   * position).
    * @param radius The radius of the cone to emit from
    * @param angle The base angle of the cone
    * @returns the emitter
@@ -937,17 +900,14 @@ public:
     = 0;
 
   /**
-   * @brief Creates a Box Emitter for the particle system. (emits between
-   * direction1 and direction2 from withing the box defined by minEmitBox and
-   * maxEmitBox).
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @param minEmitBox Particles are emitted from the box between minEmitBox and
-   * maxEmitBox
-   * @param maxEmitBox  Particles are emitted from the box between minEmitBox
-   * and maxEmitBox
+   * @brief Creates a Box Emitter for the particle system. (emits between direction1 and direction2
+   * from withing the box defined by minEmitBox and maxEmitBox)
+   * @param direction1 Particles are emitted between the direction1 and direction2 from within the
+   * box
+   * @param direction2 Particles are emitted between the direction1 and direction2 from within the
+   * box
+   * @param minEmitBox Particles are emitted from the box between minEmitBox and maxEmitBox
+   * @param maxEmitBox  Particles are emitted from the box between minEmitBox and maxEmitBox
    * @returns the emitter
    */
   virtual BoxParticleEmitterPtr
@@ -1008,14 +968,14 @@ protected:
   /**
    * @brief Not supported by GPUParticleSystem.
    * Gets a boolean indicating that ramp gradients must be used
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   * @see @see https://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
   virtual bool get_useRampGradients() const = 0;
 
   /**
    * @brief Not supported by GPUParticleSystem
    * Sets a boolean indicating that ramp gradients must be used
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   * @see @see https://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
   virtual void set_useRampGradients(bool value) = 0;
 
