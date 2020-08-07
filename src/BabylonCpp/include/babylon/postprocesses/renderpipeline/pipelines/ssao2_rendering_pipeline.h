@@ -85,8 +85,11 @@ public:
    */
   [[nodiscard]] std::string getClassName() const override;
 
-  /** Methods */
+  /**
+   *  @brief Support test.
+   */
   static bool IsSupported();
+
   /** Hidden */
   void _rebuild() override;
 
@@ -112,19 +115,27 @@ public:
   static std::unique_ptr<SSAO2RenderingPipeline> Parse(const json& source, Scene* scene,
                                                        const std::string& url);
 
+  /**
+   * @brief Sets the required values to the prepass renderer.
+   * @param prePassRenderer defines the prepass renderer to setup
+   * @returns true if the pre pass is needed.
+   */
+  bool setPrePassRenderer(const PrePassRendererPtr& prePassRenderer) override;
+
 protected:
   /**
    * @brief Constructor
-   * @param name The rendering pipeline name
+   * @param name The rendering pipeline name.
    * @param scene The scene linked to this pipeline
    * @param ratio The size of the postprocesses. Can be a number shared between passes or an object
    * for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
    * @param cameras The array of cameras that the rendering pipeline will be attached to
+   * @param forceGeometryBuffer Set to true if you want to use the legacy geometry buffer renderer
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<CameraPtr>& cameras);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
-                         const std::vector<CameraPtr>& cameras);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
 
 private:
   void set_samples(unsigned int n);
@@ -139,6 +150,7 @@ private:
   std::array<float, 2> _hammersley(uint32_t i, uint32_t n);
   Vector3 _hemisphereSample_uniform(float u, float v);
   Float32Array _generateHemisphere();
+  std::string _getDefinesForSSAO();
   void _createSSAOPostProcess(float ratio);
   void _createSSAOCombinePostProcess(float ratio);
   void _createRandomTexture();
@@ -190,8 +202,8 @@ public:
 
   /**
    * Related to area, used to interpolate SSAO samples (second interpolate function input) based on
-   * the occlusion difference of each pixel Must not be equal to area and inferior to area. Default
-   * value is 0.000001
+   * the occlusion difference of each pixel Must not be equal to area and inferior to area.
+   * Default value is 0.000001
    */
   float fallOff;
 
@@ -211,6 +223,11 @@ private:
    * Number of samples to use for antialiasing
    */
   unsigned int _textureSamples;
+
+  /**
+   * Force rendering the geometry through geometry buffer
+   */
+  bool _forceGeometryBuffer;
 
   /**
    * Ratio object used for SSAO ratio and blur ratio
@@ -235,8 +252,6 @@ private:
 
   Scene* _scene;
   std::vector<CameraPtr> _cameraList;
-  TexturePtr _depthTexture;
-  TexturePtr _normalTexture;
   DynamicTexturePtr _randomTexture;
 
   PassPostProcessPtr _originalColorPostProcess;
@@ -244,6 +259,8 @@ private:
   PostProcessPtr _blurHPostProcess;
   PostProcessPtr _blurVPostProcess;
   PostProcessPtr _ssaoCombinePostProcess;
+
+  PrePassRendererPtr _prePassRenderer;
 
   Uint32Array _bits;
 
