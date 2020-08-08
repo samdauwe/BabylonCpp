@@ -205,7 +205,7 @@ bool GPUParticleSystem::isReady()
   }
 
   if (!hasEmitter() || !_updateEffect->isReady() || !_imageProcessingConfiguration->isReady()
-      || !_renderEffect->isReady() || !particleTexture || !particleTexture->isReady()) {
+      || !_getEffect()->isReady() || !particleTexture || !particleTexture->isReady()) {
     return false;
   }
 
@@ -266,16 +266,6 @@ void GPUParticleSystem::reset()
   _targetIndex        = 0;
 }
 
-Observable<Effect>& GPUParticleSystem::get_onBeforeDrawParticlesObservable()
-{
-  return _onBeforeDrawParticlesObservable;
-}
-
-std::string GPUParticleSystem::get_vertexShaderName() const
-{
-  return "gpuRenderParticles";
-}
-
 std::string GPUParticleSystem::getClassName() const
 {
   return "GPUParticleSystem";
@@ -290,6 +280,16 @@ EffectPtr GPUParticleSystem::getCustomEffect(unsigned int iBlendMode)
 void GPUParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int iBlendMode)
 {
   _customEffect[iBlendMode] = effect;
+}
+
+Observable<Effect>& GPUParticleSystem::get_onBeforeDrawParticlesObservable()
+{
+  return _onBeforeDrawParticlesObservable;
+}
+
+std::string GPUParticleSystem::get_vertexShaderName() const
+{
+  return "gpuRenderParticles";
 }
 
 BaseParticleSystem&
@@ -692,7 +692,7 @@ WebGLVertexArrayObjectPtr GPUParticleSystem::_createUpdateVAO(Buffer* source)
     // offset += 3;
   }
 
-  auto vao = _engine->recordVertexArrayObject(updateVertexBuffers, nullptr, _updateEffect);
+  auto vao = _engine->recordVertexArrayObject(updateVertexBuffers, nullptr, _getEffect());
   _engine->bindArrayBuffer(nullptr);
 
   return vao;
@@ -971,6 +971,10 @@ void GPUParticleSystem::_recreateUpdateEffect()
     definesStream << "\n#define NOISE";
   }
 
+  if (isLocal()) {
+    definesStream << "\n#define LOCAL";
+  }
+
   auto defines = definesStream.str();
 
   if (_updateEffect && _updateEffectOptions->defines == defines) {
@@ -1016,6 +1020,11 @@ void GPUParticleSystem::_recreateUpdateEffect()
   _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
 }
 
+EffectPtr GPUParticleSystem::_getEffect()
+{
+  return getCustomEffect() ? getCustomEffect() : _renderEffect;
+}
+
 void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int iBlendMode)
 {
   if (_scene->clipPlane.has_value()) {
@@ -1056,6 +1065,8 @@ void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned 
         defines.emplace_back("#define BILLBOARDSTRETCHED");
         break;
       case ParticleSystem::BILLBOARDMODE_ALL:
+        defines.emplace_back("#define BILLBOARDMODE_ALL");
+        break;
       default:
         break;
     }
@@ -1374,7 +1385,10 @@ size_t GPUParticleSystem::render(bool preWarm)
     auto emitterPosition = std::get<Vector3>(emitter);
     emitterWM = Matrix::Translation(emitterPosition.x, emitterPosition.y, emitterPosition.z);
   }
-  _updateEffect->setMatrix("emitterWM", emitterWM);
+
+  if (!isLocal()) {
+    _updateEffect->setMatrix("emitterWM", emitterWM);
+  }
 
   // Bind source VAO
   _engine->bindVertexArrayObject(_updateVAO[_targetIndex], nullptr);
@@ -1390,46 +1404,55 @@ size_t GPUParticleSystem::render(bool preWarm)
 
   if (!preWarm) {
     // Enable render effect
-    _engine->enableEffect(_renderEffect);
+    const auto effect = _getEffect();
+
+    _engine->enableEffect(effect);
     auto viewMatrix = _scene->getViewMatrix();
-    _renderEffect->setMatrix("view", viewMatrix);
-    _renderEffect->setMatrix("projection", _scene->getProjectionMatrix());
-    _renderEffect->setTexture("textureSampler", particleTexture);
-    _renderEffect->setVector2("translationPivot", translationPivot);
-    _renderEffect->setVector3("worldOffset", worldOffset);
+    effect->setMatrix("view", viewMatrix);
+    effect->setMatrix("projection", _scene->getProjectionMatrix());
+    effect->setTexture("diffuseSampler", particleTexture);
+    effect->setVector2("translationPivot", translationPivot);
+    effect->setVector3("worldOffset", worldOffset);
+    if (isLocal()) {
+      effect->setMatrix("emitterWM", emitterWM);
+    }
     if (_colorGradientsTexture) {
-      _renderEffect->setTexture("colorGradientSampler", _colorGradientsTexture);
+      effect->setTexture("colorGradientSampler", _colorGradientsTexture);
     }
     else {
-      _renderEffect->setDirectColor4("colorDead", colorDead);
+      effect->setDirectColor4("colorDead", colorDead);
     }
 
     if (_isAnimationSheetEnabled && particleTexture) {
       auto baseSize = particleTexture->getBaseSize();
-      _renderEffect->setFloat3(
-        "sheetInfos", static_cast<float>(spriteCellWidth) / static_cast<float>(baseSize.width),
-        static_cast<float>(spriteCellHeight) / static_cast<float>(baseSize.height),
-        static_cast<float>(baseSize.width) / static_cast<float>(spriteCellWidth));
+      effect->setFloat3("sheetInfos",
+                        static_cast<float>(spriteCellWidth) / static_cast<float>(baseSize.width),
+                        static_cast<float>(spriteCellHeight) / static_cast<float>(baseSize.height),
+                        static_cast<float>(baseSize.width) / static_cast<float>(spriteCellWidth));
     }
 
     if (_isBillboardBased) {
       const auto& camera = _scene->activeCamera();
-      _renderEffect->setVector3("eyePosition", camera->globalPosition);
+      effect->setVector3("eyePosition", camera->globalPosition);
     }
+
+    const auto& defines = effect->defines;
 
     if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
         || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
         || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
+      MaterialHelper::BindClipPlane(effect, _scene);
+    }
+
+    if (StringTools::indexOf(defines, "#define BILLBOARDMODE_ALL") >= 0) {
       auto invView = viewMatrix;
       invView.invert();
-      _renderEffect->setMatrix("invView", invView);
-
-      MaterialHelper::BindClipPlane(_renderEffect, _scene);
+      effect->setMatrix("invView", invView);
     }
 
     // image processing
     if (_imageProcessingConfiguration && !_imageProcessingConfiguration->applyByPostProcess) {
-      _imageProcessingConfiguration->bind(_renderEffect.get());
+      _imageProcessingConfiguration->bind(effect.get());
     }
 
     // Draw order
@@ -1454,6 +1477,10 @@ size_t GPUParticleSystem::render(bool preWarm)
 
     // Bind source VAO
     _engine->bindVertexArrayObject(_renderVAO[_targetIndex], nullptr);
+
+    /* if (_onBeforeDrawParticlesObservable) */ {
+      _onBeforeDrawParticlesObservable.notifyObservers(effect.get());
+    }
 
     // Render
     _engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,

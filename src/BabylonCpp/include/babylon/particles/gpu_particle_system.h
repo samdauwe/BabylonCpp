@@ -123,14 +123,14 @@ public:
   [[nodiscard]] std::string getClassName() const override;
 
   /**
-   * @brief Gets the custom effect used to render the particles.
+   * @brief Gets the custom effect used to render the particles
    * @param blendMode Blend mode for which the effect should be retrieved
    * @returns The effect
    */
   EffectPtr getCustomEffect(unsigned int blendMode = 0) override;
 
   /**
-   * @brief Sets the custom effect used to render the particles.
+   * @brief Sets the custom effect used to render the particles
    * @param effect The effect to set
    * @param blendMode Blend mode for which the effect should be set
    */
@@ -336,8 +336,8 @@ public:
 
   /**
    * @brief Not supported by GPUParticleSystem.
-   * Gets a boolean indicating that ramp gradients must be used
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   * Gets or sets a boolean indicating that ramp gradients must be used
+   * @see https://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
   [[nodiscard]] bool get_useRampGradients() const override;
 
@@ -372,7 +372,7 @@ public:
   void _recreateUpdateEffect();
 
   /**
-   * @brief Fill the defines array according to the current settings of the particle system.
+   * @brief Fill the defines array according to the current settings of the particle system
    * @param defines Array to be updated
    * @param blendMode blend mode to take into account when updating the array
    */
@@ -514,6 +514,7 @@ private:
   WebGLVertexArrayObjectPtr _createUpdateVAO(Buffer* source);
   WebGLVertexArrayObjectPtr _createRenderVAO(Buffer* source, Buffer* spriteSource);
   void _initialize(bool force = false);
+  EffectPtr _getEffect();
   RawTexture* _getRawTextureByName(const std::string& textureName);
   void _setRawTextureByName(const std::string& textureName,
                             std::unique_ptr<RawTexture>&& rawTexture);
@@ -533,12 +534,16 @@ public:
   /**
    * An event triggered when the system is disposed.
    */
-  Observable<GPUParticleSystem> onDisposeObservable;
+  Observable<IParticleSystem> onDisposeObservable;
 
   /**
    * Gets or set the number of active particles
    */
   Property<GPUParticleSystem, size_t> activeParticleCount;
+
+protected:
+  /** @hidden */
+  Observable<Effect> _onBeforeDrawParticlesObservable;
 
 private:
   size_t _capacity;
@@ -579,9 +584,6 @@ private:
   Vector3 _zeroVector3;
   unsigned int _rawTextureWidth;
   bool _preWarmDone;
-
-  /** @hidden */
-  Observable<Effect> _onBeforeDrawParticlesObservable;
 
   RawTexturePtr _colorGradientsTexture;
   RawTexturePtr _angularSpeedGradientsTexture;
