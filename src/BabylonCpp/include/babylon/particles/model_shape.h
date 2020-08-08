@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -11,6 +12,7 @@ namespace BABYLON {
 
 class Material;
 class SolidParticle;
+class SolidParticleVertex;
 class Vector3;
 using MaterialPtr = std::shared_ptr<Material>;
 
@@ -29,7 +31,8 @@ public:
   ModelShape(int id, const std::vector<Vector3>& shape, const IndicesArray& indices,
              const Float32Array& normals, const Float32Array& colors, const Float32Array& shapeUV,
              const std::function<void(SolidParticle* particle, size_t i, size_t s)>& posFunction,
-             const std::function<void(SolidParticle* particle, const Vector3& vertex,
+             const std::function<void(SolidParticle* particle,
+                                      const std::variant<Vector3, SolidParticleVertex>& vertex,
                                       unsigned int i)>& vtxFunction,
              const MaterialPtr& material);
   ~ModelShape(); // = default
@@ -79,7 +82,8 @@ public:
    * Custom vertex function (internal use)
    * Hidden
    */
-  std::function<void(SolidParticle* particle, const Vector3& vertex, unsigned int i)>
+  std::function<void(SolidParticle* particle,
+                     const std::variant<Vector3, SolidParticleVertex>& vertex, unsigned int i)>
     _vertexFunction;
   /**
    * Model material (internal use)
