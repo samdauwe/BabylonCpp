@@ -21,6 +21,7 @@
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
 #include <babylon/particles/solid_particle.h>
+#include <babylon/particles/solid_particle_vertex.h>
 
 namespace BABYLON {
 
@@ -121,6 +122,8 @@ SolidParticleSystem::SolidParticleSystem(const std::string& iName, Scene* scene,
   _materialSortFunction = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) -> bool {
     return p2.materialIndex < p1.materialIndex;
   };
+
+  _tmpVertex = std::make_unique<SolidParticleVertex>();
 }
 
 SolidParticleSystem::~SolidParticleSystem() = default;
@@ -175,6 +178,24 @@ MeshPtr SolidParticleSystem::buildMesh()
 
   vertexData->applyToMesh(*mesh, _updatable);
   mesh->isPickable = _pickable;
+
+  if (_pickable) {
+    auto faceId = 0ull;
+    for (auto p = 0ull; p < nbParticles; ++p) {
+      const auto& part = particles[p];
+      const auto lind  = part->_model->_indicesLength;
+      for (auto i = 0ull; i < lind; ++i) {
+        const auto f = i % 3;
+        if (f == 0) {
+          pickedParticles[faceId] = PickedParticle{
+            part->idx, // idx
+            faceId     // faceId;
+          };
+          ++faceId;
+        }
+      }
+    }
+  }
 
   if (_multimaterialEnabled) {
     setMultiMaterial(_materials);
@@ -419,7 +440,10 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   }
 
   auto& rotMatrix            = TmpVectors::MatrixArray[0];
-  auto& tmpVertex            = TmpVectors::Vector3Array[0];
+  auto& tmpVertex            = *_tmpVertex;
+  auto& tmpVector            = tmpVertex.position;
+  auto& tmpColor             = tmpVertex.color;
+  auto& tmpUV                = tmpVertex.uv;
   auto& tmpRotated           = TmpVectors::Vector3Array[1];
   auto& pivotBackTranslation = TmpVectors::Vector3Array[2];
   auto& scaledPivot          = TmpVectors::Vector3Array[3];
@@ -429,7 +453,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   copy.pivot.multiplyToRef(copy.scaling, scaledPivot);
 
   if (copy.translateFromPivot) {
-    pivotBackTranslation.setAll(0.0);
+    pivotBackTranslation.setAll(0.f);
   }
   else {
     pivotBackTranslation.copyFrom(scaledPivot);
@@ -437,24 +461,31 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
 
   auto someVertexFunction = (options && options->vertexFunction);
   for (i = 0; i < shape.size(); i++) {
-    tmpVertex.copyFrom(shape[i]);
+    tmpVector.copyFrom(shape[i]);
+    if (copy.color) {
+      tmpColor.copyFrom(*copy.color);
+    }
+    if (!meshUV.empty() && u + 1 >= meshUV.size()) {
+      tmpUV.copyFromFloats(meshUV[u], meshUV[u + 1]);
+    }
     if (someVertexFunction) {
       options->vertexFunction(&copy, tmpVertex, i);
     }
 
-    tmpVertex.multiplyInPlace(copy.scaling).subtractInPlace(scaledPivot);
-    Vector3::TransformCoordinatesToRef(tmpVertex, rotMatrix, tmpRotated);
+    tmpVector.multiplyInPlace(copy.scaling).subtractInPlace(scaledPivot);
+    Vector3::TransformCoordinatesToRef(tmpVector, rotMatrix, tmpRotated);
     tmpRotated.addInPlace(pivotBackTranslation).addInPlace(copy.position);
     stl_util::concat(positions, {tmpRotated.x, tmpRotated.y, tmpRotated.z});
+
     if (!meshUV.empty()) {
       auto copyUvs = copy.uvs;
-      stl_util::concat(uvs, {(copyUvs.z - copyUvs.x) * meshUV[u] + copyUvs.x,
-                             (copyUvs.w - copyUvs.y) * meshUV[u + 1] + copyUvs.y});
+      stl_util::concat(uvs, {(copyUvs.z - copyUvs.x) * tmpUV.x + copyUvs.x,
+                             (copyUvs.w - copyUvs.y) * tmpUV.y + copyUvs.y});
       u += 2;
     }
 
     if (copy.color) {
-      _color = std::make_unique<Color4>(copy.color.value());
+      _color->copyFrom(tmpColor);
     }
     else {
       auto& color = *_color;
@@ -476,8 +507,8 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
 
     if (!recomputeNormals && (n + 2) < meshNor.size()) {
       Vector3::TransformNormalFromFloatsToRef(meshNor[n], meshNor[n + 1], meshNor[n + 2], rotMatrix,
-                                              tmpVertex);
-      stl_util::concat(normals, {tmpVertex.x, tmpVertex.y, tmpVertex.z});
+                                              tmpVector);
+      stl_util::concat(normals, {tmpVector.x, tmpVector.y, tmpVector.z});
       n += 3;
     }
   }
@@ -488,16 +519,6 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     indices.emplace_back(current_ind);
     if (current_ind > 65535) {
       _needs32Bits = true;
-    }
-  }
-
-  if (_pickable) {
-    auto nbfaces = meshInd.size() / 3;
-    for (i = 0; i < nbfaces; ++i) {
-      pickedParticles.emplace_back(PickedParticle{
-        idx, // idx
-        i    // faceId
-      });
     }
   }
 
@@ -843,6 +864,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
   auto& maximum             = tempVectors[9].setAll(std::numeric_limits<float>::lowest());
   auto& camInvertedPosition = tempVectors[10].setAll(0.f);
 
+  auto& tmpVertex = *_tmpVertex;
+  auto& tmpVector = tmpVertex.position;
+  auto& tmpColor  = tmpVertex.color;
+  auto& tmpUV     = tmpVertex.uv;
+
   // cases when the World Matrix is to be computed first
   if (billboard || _depthSort) {
     mesh->computeWorldMatrix(true);
@@ -851,9 +877,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
   // if the particles will always face the camera
   if (billboard) {
     // compute the camera position and un-rotate it by the current mesh rotation
-    auto& tmpVertex = tempVectors[0];
-    _camera->getDirectionToRef(Axis::Z(), tmpVertex);
-    Vector3::TransformNormalToRef(tmpVertex, invertedMatrix, camAxisZ);
+    auto& tmpVector0 = tempVectors[0];
+    _camera->getDirectionToRef(Axis::Z(), tmpVector0);
+    Vector3::TransformNormalToRef(tmpVector0, invertedMatrix, camAxisZ);
     camAxisZ.normalize();
     // same for camera up vector extracted from the cam view matrix
     auto& view        = _camera->getViewMatrix(true);
@@ -1037,20 +1063,27 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
 
       // particle vertex loop
       for (pt = 0; pt < shape.size(); ++pt) {
-        idx    = index + pt * 3;
-        colidx = colorIndex + pt * 4;
-        uvidx  = uvIndex + pt * 2;
+        idx           = index + pt * 3;
+        colidx        = colorIndex + pt * 4;
+        uvidx         = uvIndex + pt * 2;
+        const auto iu = 2 * pt;
+        const auto iv = iu + 1;
 
-        auto& tmpVertex = tempVectors[0];
-        tmpVertex.copyFrom(shape[pt]);
+        tmpVector.copyFrom(shape[pt]);
+        if (_computeParticleColor && particle->color) {
+          tmpColor.copyFrom(*particle->color);
+        }
+        if (_computeParticleTexture) {
+          tmpUV.copyFromFloats(shapeUV[iu], shapeUV[iv]);
+        }
         if (_computeParticleVertex) {
           updateParticleVertex(particle, tmpVertex, pt);
         }
 
         // positions
-        auto vertexX = tmpVertex.x * particleScaling.x - scaledPivot.x;
-        auto vertexY = tmpVertex.y * particleScaling.y - scaledPivot.y;
-        auto vertexZ = tmpVertex.z * particleScaling.z - scaledPivot.z;
+        auto vertexX = tmpVector.x * particleScaling.x - scaledPivot.x;
+        auto vertexY = tmpVector.y * particleScaling.y - scaledPivot.y;
+        auto vertexZ = tmpVector.z * particleScaling.z - scaledPivot.z;
 
         auto rotatedX = vertexX * particleRotationMatrix[0] + vertexY * particleRotationMatrix[3]
                         + vertexZ * particleRotationMatrix[6];
@@ -1100,17 +1133,16 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
         }
 
         if (_computeParticleColor && particle->color.has_value()) {
-          const auto& color     = particle->color.value();
-          _colors32[colidx]     = color.r;
-          _colors32[colidx + 1] = color.g;
-          _colors32[colidx + 2] = color.b;
-          _colors32[colidx + 3] = color.a;
+          _colors32[colidx]     = tmpColor.r;
+          _colors32[colidx + 1] = tmpColor.g;
+          _colors32[colidx + 2] = tmpColor.b;
+          _colors32[colidx + 3] = tmpColor.a;
         }
 
         if (_computeParticleTexture) {
           const auto& uvs  = particle->uvs;
-          uvs32[uvidx]     = shapeUV[pt * 2] * (uvs.z - uvs.x) + uvs.x;
-          uvs32[uvidx + 1] = shapeUV[pt * 2 + 1] * (uvs.w - uvs.y) + uvs.y;
+          uvs32[uvidx]     = tmpUV.x * (uvs.z - uvs.x) + uvs.x;
+          uvs32[uvidx + 1] = tmpUV.y * (uvs.w - uvs.y) + uvs.y;
         }
       }
     }
@@ -1231,12 +1263,23 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
       std::sort(depthSortedParticles.begin(), depthSortedParticles.end(), _depthSortFunction);
       const auto dspl = depthSortedParticles.size();
       auto sid        = 0ull;
+      auto faceId     = 0ull;
       for (size_t sorted = 0; sorted < dspl; ++sorted) {
-        const auto lind = depthSortedParticles[sorted].indicesLength;
-        const auto sind = depthSortedParticles[sorted].ind;
+        const auto sortedParticle = depthSortedParticles[sorted];
+        const auto lind           = sortedParticle.indicesLength;
+        const auto sind           = sortedParticle.ind;
         for (size_t i = 0; i < lind; i++) {
           indices32[sid] = indices[sind + i];
           ++sid;
+          if (_pickable) {
+            const auto f = i % 3;
+            if (f == 0) {
+              auto& pickedData  = pickedParticles[faceId];
+              pickedData.idx    = sortedParticle.idx;
+              pickedData.faceId = faceId;
+              ++faceId;
+            }
+          }
         }
       }
       mesh->updateIndices(indices32);
@@ -1379,20 +1422,20 @@ SolidParticleSystem& SolidParticleSystem::_sortParticlesByMaterial()
   auto& indices32 = _indices32;
   auto& indices   = _indices;
 
-  auto subMeshIndex  = 0;
-  auto subMeshFaceId = 0;
+  auto subMeshIndex  = 0ull;
+  auto subMeshFaceId = 0ull;
   auto sid           = 0ull;
   auto lastMatIndex  = depthSortedParticles[0].materialIndex;
   materialIndexes.emplace_back(lastMatIndex);
   if (_pickable) {
     pickedBySubMesh = {};
-    // pickedParticles = this.pickedBySubMesh[0];
+    // pickedParticles = pickedBySubMesh[0];
     pickedParticles = {};
   }
   for (size_t sorted = 0; sorted < length; ++sorted) {
     auto& sortedPart = depthSortedParticles[sorted];
-    auto lind        = sortedPart.indicesLength;
-    auto sind        = sortedPart.ind;
+    const auto lind  = sortedPart.indicesLength;
+    const auto sind  = sortedPart.ind;
     if (sortedPart.materialIndex != lastMatIndex) {
       lastMatIndex = sortedPart.materialIndex;
       indicesByMaterial.emplace_back(sid);
@@ -1405,16 +1448,23 @@ SolidParticleSystem& SolidParticleSystem::_sortParticlesByMaterial()
       }
     }
     auto faceId = 0ull;
-    for (size_t i = 0; i < lind; i++) {
+    for (size_t i = 0; i < lind; ++i) {
       indices32[sid] = indices[sind + i];
       if (_pickable) {
         auto f = i % 3;
         if (f == 0) {
-          pickedBySubMesh[subMeshIndex].resize(subMeshFaceId + 1);
-          pickedBySubMesh[subMeshIndex][subMeshFaceId] = PickedParticle{
-            sortedPart.idx, // idx
-            faceId          // faceId
-          };
+          if (subMeshIndex < pickedBySubMesh.size()
+              && subMeshFaceId < pickedBySubMesh[subMeshIndex].size()) {
+            auto& pickedData  = pickedBySubMesh[subMeshIndex][subMeshFaceId];
+            pickedData.idx    = sortedPart.idx;
+            pickedData.faceId = faceId;
+          }
+          else {
+            pickedBySubMesh[subMeshIndex][subMeshFaceId] = PickedParticle{
+              sortedPart.idx, // idx
+              faceId          // faceId
+            };
+          }
           ++subMeshFaceId;
           ++faceId;
         }
@@ -1627,10 +1677,11 @@ SolidParticle* SolidParticleSystem::updateParticle(SolidParticle* particle)
   return particle;
 }
 
-Vector3 SolidParticleSystem::updateParticleVertex(SolidParticle* /*particle*/,
-                                                  const Vector3& vertex, size_t /*pt*/)
+SolidParticleSystem&
+SolidParticleSystem::updateParticleVertex(SolidParticle* /*particle*/,
+                                          const SolidParticleVertex& /*vertex*/, size_t /*pt*/)
 {
-  return vertex;
+  return *this;
 }
 
 void SolidParticleSystem::beforeUpdateParticles(size_t /*start*/, size_t /*stop*/, bool /*update*/)

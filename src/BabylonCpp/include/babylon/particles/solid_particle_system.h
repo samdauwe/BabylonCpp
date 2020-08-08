@@ -17,6 +17,7 @@ class Mesh;
 class MultiMaterial;
 class PickingInfo;
 class SolidParticleSystem;
+class SolidParticleVertex;
 class Scene;
 class TargetCamera;
 using BoundingInfoPtr        = std::shared_ptr<BoundingInfo>;
@@ -49,8 +50,9 @@ struct SolidParticleSystemDigestOptions {
 
 struct SolidParticleSystemMeshBuilderOptions {
   std::function<void(SolidParticle* particle, size_t i, size_t s)> positionFunction = nullptr;
-  std::function<void(SolidParticle* particle, const Vector3& vertex, size_t i)> vertexFunction
-    = nullptr;
+  std::function<void(SolidParticle* particle,
+                     const std::variant<Vector3, SolidParticleVertex>& vertex, size_t i)>
+    vertexFunction                                     = nullptr;
   std::optional<std::vector<SolidParticlePtr>> storage = std::nullopt;
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 
@@ -62,7 +64,7 @@ struct SolidParticleSystemMeshBuilderOptions {
  * it is behavior agnostic. This means it has no emitter, no particle physics, no particle recycler.
  * You have to implement your own behavior.
  *
- * Full documentation here : http://doc.babylonjs.com/how_to/Solid_Particle_System
+ * Full documentation here : https://doc.babylonjs.com/how_to/Solid_Particle_System
  */
 class BABYLON_SHARED_EXPORT SolidParticleSystem : public IDisposable {
 
@@ -101,7 +103,7 @@ public:
   /**
    * @brief Adds some particles to the SPS from the model shape. Returns the shape id.
    * Please read the doc :
-   * http://doc.babylonjs.com/how_to/Solid_Particle_System#create-an-immutable-sps
+   * https://doc.babylonjs.com/how_to/Solid_Particle_System#create-an-immutable-sps
    * @param mesh is any Mesh object that will be used as a model for the solid particles.
    * @param nb (positive integer) the number of particles to be created from this model
    * @param options {positionFunction} is an optional javascript function to called for each
@@ -115,7 +117,7 @@ public:
   /**
    * @brief Adds some particles to the SPS from the model shape. Returns the shape id.
    * Please read the doc :
-   * http://doc.babylonjs.com/how_to/Solid_Particle_System#create-an-immutable-sps
+   * https://doc.babylonjs.com/how_to/Solid_Particle_System#create-an-immutable-sps
    * @param mesh is any Mesh object that will be used as a model for the solid particles.
    * @param nb (positive integer) the number of particles to be created from this model
    * @param options {positionFunction} is an optional javascript function to called for each
@@ -219,7 +221,7 @@ public:
   /**
    * @brief Visibilty helper : Recomputes the visible size according to the mesh
    * bounding box
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    * @returns the SPS.
    */
   SolidParticleSystem& refreshVisibleSize();
@@ -229,33 +231,33 @@ public:
    * bounding box.
    * @param size the size (float) of the visibility box
    * note : this doesn't lock the SPS mesh bounding box.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   void setVisibilityBox(float size);
 
   /**
    * @brief Gets whether the SPS as always visible or not.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   bool isAlwaysVisible() const;
 
   /**
    * @brief Sets the SPS as always visible or not.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   void setIsAlwaysVisible(bool val);
 
   /**
    * @brief Sets the SPS visibility box as locked or not. This enables/disables the underlying mesh
    * bounding box updates.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   void setIsVisibilityBoxLocked(bool val);
 
   /**
    * @brief Sets the SPS visibility box as locked or not. This enables/disables the underlying mesh
    * bounding box updates.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    */
   bool isVisibilityBoxLocked() const;
 
@@ -274,14 +276,14 @@ public:
   /**
    * @brief This function does nothing. It may be overwritten to set all the particle first values.
    * The SPS doesn't call this function, you may have to call it by your own.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
    */
   virtual void initParticles();
 
   /**
    * @brief This function does nothing. It may be overwritten to recycle a particle.
    * The SPS doesn't call this function, you may have to call it by your own.
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
    * @param particle The particle to recycle
    * @returns the recycled particle
    */
@@ -290,7 +292,7 @@ public:
   /**
    * @brief Updates a particle : this function should  be overwritten by the user.
    * It is called on each particle by `setParticles()`. This is the place to code each particle
-   * behavior. doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
+   * behavior. doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#particle-management
    * @example : just set a particle position or velocity and recycle conditions
    * @param particle The particle to update
    * @returns the updated particle
@@ -302,13 +304,14 @@ public:
    * This will be called on each vertex particle by `setParticles()` if `computeParticleVertex` is
    * set to true only.
    * @param particle the current particle
-   * @param vertex the current index of the current particle
+   * @param vertex the current vertex of the current particle : a SolidParticleVertex object
    * @param pt the index of the current vertex in the particle shape
-   * doc : http://doc.babylonjs.com/how_to/Solid_Particle_System#update-each-particle-shape
-   * @example : just set a vertex particle position
-   * @returns the updated vertex
+   * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#update-each-particle-shape
+   * @example : just set a vertex particle position or color
+   * @returns the sps
    */
-  virtual Vector3 updateParticleVertex(SolidParticle* particle, const Vector3& vertex, size_t pt);
+  virtual SolidParticleSystem& updateParticleVertex(SolidParticle* particle,
+                                                    const SolidParticleVertex& vertex, size_t pt);
 
   /**
    * @brief This will be called before any other treatment by `setParticles()` and will be passed
@@ -695,7 +698,7 @@ public:
    * This array is the first element of the pickedBySubMesh array : sps.pickBySubMesh[0].
    * It's not pertinent to use it when using a SPS with the support for MultiMaterial enabled.
    * Use the method SPS.pickedParticle(pickingInfo) instead.
-   * Please read : http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
+   * Please read : https://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
    */
   std::vector<PickedParticle> pickedParticles;
 
@@ -708,7 +711,7 @@ public:
    * `idx` is the picked particle index in the `SPS.particles` array
    * `faceId` is the picked face index counted within this particle.
    * It's better to use the method SPS.pickedParticle(pickingInfo) rather than using directly this
-   * array. Please read : http://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
+   * array. Please read : https://doc.babylonjs.com/how_to/Solid_Particle_System#pickable-particles
    */
   std::vector<std::vector<PickedParticle>> pickedBySubMesh;
 
@@ -861,6 +864,7 @@ private:
   std::unordered_map<size_t, size_t> _materialIndexesById;
   MaterialPtr _defaultMaterial;
   bool _autoUpdateSubMeshes;
+  std::unique_ptr<SolidParticleVertex> _tmpVertex;
 
 }; // end of class SolidParticleSystem
 
