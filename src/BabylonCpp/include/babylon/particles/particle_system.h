@@ -513,12 +513,12 @@ protected:
   void set_onDispose(const std::function<void(IParticleSystem*, EventState&)>& callback);
 
   /** @brief Gets a boolean indicating that ramp gradients must be used.
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   * @see https://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
   [[nodiscard]] bool get_useRampGradients() const override;
 
   /** @brief Sets a boolean indicating that ramp gradients must be used.
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   * @see https://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
   void set_useRampGradients(bool value) override;
 

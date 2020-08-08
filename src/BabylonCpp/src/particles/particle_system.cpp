@@ -1404,6 +1404,8 @@ void ParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int
         defines.emplace_back("#define BILLBOARDSTRETCHED");
         break;
       case ParticleSystem::BILLBOARDMODE_ALL:
+        defines.emplace_back("#define BILLBOARDMODE_ALL");
+        break;
       default:
         break;
     }
@@ -1657,14 +1659,18 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
     effect->setTexture("rampSampler", _rampGradientsTexture);
   }
 
+  const auto defines = effect->defines;
+
   if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
       || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
       || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
+    MaterialHelper::BindClipPlane(effect, _scene);
+  }
+
+  if (StringTools::indexOf(defines, "#define BILLBOARDMODE_ALL") >= 0) {
     auto invView = viewMatrix;
     invView.invert();
     effect->setMatrix("invView", invView);
-
-    MaterialHelper::BindClipPlane(effect, _scene);
   }
 
   // VBOs
@@ -1809,24 +1815,6 @@ std::vector<AnimationPtr> ParticleSystem::getAnimations()
 
 IParticleSystem* ParticleSystem::clone(const std::string& /*iName*/, Mesh* /*newEmitter*/)
 {
-  // ParticleSystem* result = new ParticleSystem(_name, _capacity, _scene);
-
-  // TODO FIXME
-  // Tools.DeepCopy(this, result, ["particles"],
-  //               [ "_vertexDeclaration", "_vertexStrideSize" ]);
-
-  // if (newEmitter == nullptr) {
-  //  newEmitter = emitter;
-  //}
-
-  /*result->emitter = newEmitter;
-  if (particleTexture) {
-    result->particleTexture = new Texture(particleTexture->url, _scene);
-  }
-
-  result->start();
-
-  return result;*/
   return nullptr;
 }
 
