@@ -13,8 +13,15 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT SolidParticleVertex {
 
+public:
   SolidParticleVertex();
   ~SolidParticleVertex() = default;
+  SolidParticleVertex(const SolidParticleVertex& otherSolidParticleVertex);
+  SolidParticleVertex(SolidParticleVertex&& otherSolidParticleVertex);
+  SolidParticleVertex& operator=(const SolidParticleVertex& otherSolidParticleVertex);
+  SolidParticleVertex& operator=(SolidParticleVertex&& otherSolidParticleVertex);
+  friend bool operator==(const SolidParticleVertex& lhs, const SolidParticleVertex& rhs);
+  friend bool operator!=(const SolidParticleVertex& lhs, const SolidParticleVertex& rhs);
 
 protected:
   // Getters and Setters for back-compatibility
