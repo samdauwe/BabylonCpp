@@ -20,6 +20,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"GAMMAALBEDO", false}, //
     {"VERTEXCOLOR", false}, //
 
+    {"DETAIL", false}, //
+
     {"AMBIENT", false},            //
     {"AMBIENTINGRAYSCALE", false}, //
 
@@ -98,6 +100,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"INSTANCES", false},      //
     {"THIN_INSTANCES", false}, //
 
+    {"PREPASS", false}, //
+
     {"BONETEXTURE", false}, //
 
     {"NONUNIFORMSCALING", false}, //
@@ -165,7 +169,7 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"SS_REFRACTION", false},   //
     {"SS_TRANSLUCENCY", false}, //
-    {"SS_SCATERRING", false},   //
+    {"SS_SCATTERING", false},   //
 
     {"SS_THICKNESSANDMASK_TEXTURE", false}, //
 
@@ -176,6 +180,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"SS_RGBDREFRACTION", false},               //
     {"SS_LINEARSPECULARREFRACTION", false},     //
     {"SS_LINKREFRACTIONTOTRANSPARENCY", false}, //
+    {"SS_ALBEDOFORREFRACTIONTINT", false},      //
 
     {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
 
@@ -186,6 +191,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"NUM_SAMPLES", 0},                         //
     {"AMBIENTDIRECTUV", 0},                     //
     {"ALBEDODIRECTUV", 0},                      //
+    {"DETAILDIRECTUV", 0},                      //
+    {"DETAIL_NORMALBLENDMETHOD", 0},            //
     {"OPACITYDIRECTUV", 0},                     //
     {"EMISSIVEDIRECTUV", 0},                    //
     {"REFLECTIVITYDIRECTUV", 0},                //
@@ -195,6 +202,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"LIGHTMAPDIRECTUV", 0},                    //
     {"NUM_BONE_INFLUENCERS", 0},                //
     {"BonesPerMesh", 0},                        //
+    {"SCENE_MRT_COUNT", 0},                     //
     {"NUM_MORPH_INFLUENCERS", 0},               //
     {"CLEARCOAT_TEXTUREDIRECTUV", 0},           //
     {"CLEARCOAT_BUMPDIRECTUV", 0},              //

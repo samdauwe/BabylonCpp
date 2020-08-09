@@ -3,15 +3,15 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
-#include <babylon/materials/material_defines.h>
+#include <babylon/materials/imaterial_detail_map_defines.h>
 
 namespace BABYLON {
 
 /**
  * @brief Manages the defines for the PBR Material.
  */
-struct BABYLON_SHARED_EXPORT PBRMaterialDefines : public MaterialDefines,
-                                                  public IImageProcessingConfigurationDefines {
+struct BABYLON_SHARED_EXPORT PBRMaterialDefines : public IImageProcessingConfigurationDefines,
+                                                  public IMaterialDetailMapDefines {
 
   /**
    * @brief Initializes the PBR Material defines.
