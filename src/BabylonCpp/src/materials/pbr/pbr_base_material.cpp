@@ -4,6 +4,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/detail_map_configuration.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -36,6 +37,8 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/brdf_texture_tools.h>
+#include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 
@@ -56,9 +59,8 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
         [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
     , sheen{std::make_shared<PBRSheenConfiguration>(
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , subSurface{std::make_shared<PBRSubSurfaceConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); },
-        [this]() -> void { _markScenePrePassDirty(); }, scene)}
+    , detailMap{std::make_shared<DetailMapConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}
@@ -150,6 +152,9 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
   };
 
   _environmentBRDFTexture = BRDFTextureTools::GetEnvironmentBRDFTexture(scene);
+  subSurface              = std::make_shared<PBRSubSurfaceConfiguration>(
+    [this]() -> void { _markAllSubMeshesAsTexturesDirty(); },
+    [this]() -> void { _markScenePrePassDirty(); }, scene);
 }
 
 PBRBaseMaterial::~PBRBaseMaterial() = default;
@@ -218,6 +223,11 @@ void PBRBaseMaterial::set_realTimeFilteringQuality(unsigned int n)
 {
   _realTimeFilteringQuality = n;
   markAsDirty(Constants::MATERIAL_TextureDirtyFlag);
+}
+
+bool PBRBaseMaterial::get_canRenderToMRT() const
+{
+  return true;
 }
 
 bool PBRBaseMaterial::get_hasRenderTargetTextures() const
@@ -394,8 +404,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 
   if (!subSurface->isReadyForSubMesh(defines, scene)
       || !clearCoat->isReadyForSubMesh(defines, scene, engine, _disableBumpMap)
-      || !sheen->isReadyForSubMesh(defines, scene)
-      || !anisotropy->isReadyForSubMesh(defines, scene)) {
+      || !sheen->isReadyForSubMesh(defines, scene) || !anisotropy->isReadyForSubMesh(defines, scene)
+      || !detailMap->isReadyForSubMesh(defines, scene)) {
     return false;
   }
 
@@ -675,6 +685,9 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
 
   std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
+  DetailMapConfiguration::AddUniforms(uniforms);
+  DetailMapConfiguration::AddSamplers(samplers);
+
   PBRSubSurfaceConfiguration::AddUniforms(uniforms);
   PBRSubSurfaceConfiguration::AddSamplers(samplers);
 
@@ -719,6 +732,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   options.indexParameters       = std::move(indexParameters);
   options.processFinalCode      = csnrOptions.processFinalCode;
   options.maxSimultaneousLights = _maxSimultaneousLights;
+  options.multiTarget           = defines["PREPASS"];
 
   MaterialHelper::PrepareUniformsAndSamplersList(options);
 
@@ -740,6 +754,9 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
   // Multiview
   MaterialHelper::PrepareDefinesForMultiview(scene, defines);
+
+  // PrePass
+  MaterialHelper::PrepareDefinesForPrePass(scene, defines, canRenderToMRT());
 
   // Textures
   defines.boolDef["METALLICWORKFLOW"] = isMetallicWorkflow();
@@ -1041,6 +1058,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
   }
 
   // External config
+  detailMap->prepareDefines(defines, scene);
   subSurface->prepareDefines(defines, scene);
   clearCoat->prepareDefines(defines, scene);
   anisotropy->prepareDefines(defines, *mesh, scene);
@@ -1128,6 +1146,7 @@ void PBRBaseMaterial::buildUniformLayout()
   PBRAnisotropicConfiguration::PrepareUniformBuffer(ubo);
   PBRSheenConfiguration::PrepareUniformBuffer(ubo);
   PBRSubSurfaceConfiguration::PrepareUniformBuffer(ubo);
+  DetailMapConfiguration::PrepareUniformBuffer(ubo);
 
   ubo.create();
 }
@@ -1463,6 +1482,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       }
     }
 
+    detailMap->bindForSubMesh(ubo, scene, isFrozen());
     subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(), defines["LODBASEDMICROSFURACE"],
                                _realTimeFiltering);
     clearCoat->bindForSubMesh(ubo, scene, engine, _disableBumpMap, isFrozen(), _invertNormalMapX,
@@ -1561,6 +1581,7 @@ std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables()
     results.emplace_back(_lightmapTexture);
   }
 
+  detailMap->getAnimatables(results);
   subSurface->getAnimatables(results);
   clearCoat->getAnimatables(results);
   sheen->getAnimatables(results);
@@ -1626,6 +1647,7 @@ std::vector<BaseTexturePtr> PBRBaseMaterial::getActiveTextures() const
     activeTextures.emplace_back(_lightmapTexture);
   }
 
+  detailMap->getActiveTextures(activeTextures);
   subSurface->getActiveTextures(activeTextures);
   clearCoat->getActiveTextures(activeTextures);
   sheen->getActiveTextures(activeTextures);
@@ -1680,8 +1702,19 @@ bool PBRBaseMaterial::hasTexture(const BaseTexturePtr& texture) const
     return true;
   }
 
-  return subSurface->hasTexture(texture) || clearCoat->hasTexture(texture)
-         || sheen->hasTexture(texture) || anisotropy->hasTexture(texture);
+  return detailMap->hasTexture(texture) || subSurface->hasTexture(texture)
+         || clearCoat->hasTexture(texture) || sheen->hasTexture(texture)
+         || anisotropy->hasTexture(texture);
+}
+
+bool PBRBaseMaterial::setPrePassRenderer(const PrePassRendererPtr& prePassRenderer)
+{
+  if (subSurface->isScatteringEnabled()) {
+    prePassRenderer->subSurfaceConfiguration->enabled = true;
+    prePassRenderer->materialsShouldRenderIrradiance  = true;
+  }
+
+  return true;
 }
 
 void PBRBaseMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
@@ -1702,6 +1735,7 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures
     }
   }
 
+  detailMap->dispose(forceDisposeTextures);
   subSurface->dispose(forceDisposeTextures);
   clearCoat->dispose(forceDisposeTextures);
   sheen->dispose(forceDisposeTextures);

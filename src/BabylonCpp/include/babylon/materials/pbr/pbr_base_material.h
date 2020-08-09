@@ -8,6 +8,7 @@
 
 namespace BABYLON {
 
+class DetailMapConfiguration;
 class IAnimatable;
 class ImageProcessingConfiguration;
 class PBRAnisotropicConfiguration;
@@ -16,6 +17,7 @@ class PBRClearCoatConfiguration;
 struct PBRMaterialDefines;
 class PBRSheenConfiguration;
 class PBRSubSurfaceConfiguration;
+using DetailMapConfigurationPtr       = std::shared_ptr<DetailMapConfiguration>;
 using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
 using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
 using PBRAnisotropicConfigurationPtr  = std::shared_ptr<PBRAnisotropicConfiguration>;
@@ -183,6 +185,12 @@ public:
   [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
+   * @brief Sets the required values to the prepass renderer.
+   * @param prePassRenderer defines the prepass renderer to setup
+   */
+  bool setPrePassRenderer(const PrePassRendererPtr& prePassRenderer) override;
+
+  /**
    * @brief Disposes the resources of the material.
    * @param forceDisposeEffect - Forces the disposal of effects.
    * @param forceDisposeTextures - Forces the disposal of all textures.
@@ -210,6 +218,11 @@ protected:
    */
   unsigned int get_realTimeFilteringQuality() const;
   void set_realTimeFilteringQuality(unsigned int n);
+
+  /**
+   * @brief Can this material render to several textures at once.
+   */
+  bool get_canRenderToMRT() const override;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
@@ -306,6 +319,11 @@ public:
    * Defines the SubSurface parameters for the material.
    */
   PBRSubSurfaceConfigurationPtr subSurface;
+
+  /**
+   * Defines the detail map parameters for the material.
+   */
+  DetailMapConfigurationPtr detailMap;
 
 protected:
   /**
