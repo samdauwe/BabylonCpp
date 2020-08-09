@@ -57,7 +57,8 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , sheen{std::make_shared<PBRSheenConfiguration>(
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , subSurface{std::make_shared<PBRSubSurfaceConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); },
+        [this]() -> void { _markScenePrePassDirty(); }, scene)}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}

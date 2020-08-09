@@ -12,24 +12,33 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/scalar.h>
+#include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 
 PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
-  const std::function<void()>& markAllSubMeshesAsTexturesDirty)
+  const std::function<void()>& markAllSubMeshesAsTexturesDirty,
+  const std::function<void()>& markScenePrePassDirty, Scene* scene)
     : isRefractionEnabled{this, &PBRSubSurfaceConfiguration::get_isRefractionEnabled,
                           &PBRSubSurfaceConfiguration::set_isRefractionEnabled}
     , isTranslucencyEnabled{this, &PBRSubSurfaceConfiguration::get_isTranslucencyEnabled,
                             &PBRSubSurfaceConfiguration::set_isTranslucencyEnabled}
+    , isScatteringEnabled{this, &PBRSubSurfaceConfiguration::get_isScatteringEnabled,
+                          &PBRSubSurfaceConfiguration::set_isScatteringEnabled}
+    , scatteringDiffusionProfile{this, &PBRSubSurfaceConfiguration::get_scatteringDiffusionProfile,
+                                 &PBRSubSurfaceConfiguration::set_scatteringDiffusionProfile}
     , refractionIntensity{1.f}
     , translucencyIntensity{1.f}
-    , scatteringIntensity{1.f}
+    , useAlbedoToTintRefraction{false}
     , thicknessTexture{this, &PBRSubSurfaceConfiguration::get_thicknessTexture,
                        &PBRSubSurfaceConfiguration::set_thicknessTexture}
     , refractionTexture{this, &PBRSubSurfaceConfiguration::get_refractionTexture,
                         &PBRSubSurfaceConfiguration::set_refractionTexture}
     , indexOfRefraction{this, &PBRSubSurfaceConfiguration::get_indexOfRefraction,
                         &PBRSubSurfaceConfiguration::set_indexOfRefraction}
+    , volumeIndexOfRefraction{this, &PBRSubSurfaceConfiguration::get_volumeIndexOfRefraction,
+                              &PBRSubSurfaceConfiguration::set_volumeIndexOfRefraction}
     , invertRefractionY{this, &PBRSubSurfaceConfiguration::get_invertRefractionY,
                         &PBRSubSurfaceConfiguration::set_invertRefractionY}
     , linkRefractionWithTransparency{this,
@@ -48,14 +57,19 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
     , _isRefractionEnabled{false}
     , _isTranslucencyEnabled{false}
     , _isScatteringEnabled{false}
+    , _scatteringDiffusionProfileIndex{0ull}
+    , _nullColor{std::nullopt}
     , _thicknessTexture{nullptr}
     , _refractionTexture{nullptr}
     , _indexOfRefraction{1.5f}
+    , _volumeIndexOfRefraction{-1.f}
     , _invertRefractionY{false}
     , _linkRefractionWithTransparency{false}
     , _useMaskFromThicknessTexture{false}
-    , _internalMarkAllSubMeshesAsTexturesDirty{markAllSubMeshesAsTexturesDirty}
 {
+  _internalMarkAllSubMeshesAsTexturesDirty = markAllSubMeshesAsTexturesDirty;
+  _internalMarkScenePrePassDirty           = markScenePrePassDirty;
+  _scene                                   = scene;
 }
 
 PBRSubSurfaceConfiguration::~PBRSubSurfaceConfiguration() = default;
@@ -88,6 +102,47 @@ void PBRSubSurfaceConfiguration::set_isTranslucencyEnabled(bool value)
 
   _isTranslucencyEnabled = value;
   _markAllSubMeshesAsTexturesDirty();
+}
+
+bool PBRSubSurfaceConfiguration::get_isScatteringEnabled() const
+{
+  return _isScatteringEnabled;
+}
+
+void PBRSubSurfaceConfiguration::set_isScatteringEnabled(bool value)
+{
+  if (_isScatteringEnabled == value) {
+    return;
+  }
+
+  _isScatteringEnabled = value;
+  _markScenePrePassDirty();
+}
+
+std::optional<Color3>& PBRSubSurfaceConfiguration::get_scatteringDiffusionProfile()
+{
+  if (!_scene->prePassRenderer()) {
+    return _nullColor;
+  }
+
+  _scatteringDiffusionProfile
+    = _scene->prePassRenderer()
+        ->subSurfaceConfiguration->ssDiffusionProfileColors[_scatteringDiffusionProfileIndex];
+  return _scatteringDiffusionProfile;
+}
+
+void PBRSubSurfaceConfiguration::set_scatteringDiffusionProfile(const std::optional<Color3>& c)
+{
+  if (!_scene->enablePrePassRenderer()) {
+    // Not supported
+    return;
+  }
+
+  // addDiffusionProfile automatically checks for doubles
+  if (c) {
+    _scatteringDiffusionProfileIndex
+      = _scene->prePassRenderer()->subSurfaceConfiguration->addDiffusionProfile(*c);
+  }
 }
 
 BaseTexturePtr& PBRSubSurfaceConfiguration::get_thicknessTexture()
@@ -133,6 +188,30 @@ void PBRSubSurfaceConfiguration::set_indexOfRefraction(float value)
 
   _indexOfRefraction = value;
   _markAllSubMeshesAsTexturesDirty();
+}
+
+float PBRSubSurfaceConfiguration::get_volumeIndexOfRefraction() const
+{
+  if (_volumeIndexOfRefraction >= 1.f) {
+    return _volumeIndexOfRefraction;
+  }
+  return _indexOfRefraction;
+}
+
+void PBRSubSurfaceConfiguration::set_volumeIndexOfRefraction(float value)
+{
+  const auto oldValue = _volumeIndexOfRefraction;
+
+  if (value >= 1.f) {
+    _volumeIndexOfRefraction = value;
+  }
+  else {
+    _volumeIndexOfRefraction = -1.f;
+  }
+
+  if (!stl_util::almost_equal(oldValue, _volumeIndexOfRefraction)) {
+    _markAllSubMeshesAsTexturesDirty();
+  }
 }
 
 bool PBRSubSurfaceConfiguration::get_invertRefractionY() const
@@ -185,6 +264,11 @@ void PBRSubSurfaceConfiguration::_markAllSubMeshesAsTexturesDirty()
   _internalMarkAllSubMeshesAsTexturesDirty();
 }
 
+void PBRSubSurfaceConfiguration::_markScenePrePassDirty()
+{
+  _internalMarkScenePrePassDirty();
+}
+
 bool PBRSubSurfaceConfiguration::isReadyForSubMesh(const MaterialDefines& defines,
                                                    Scene* scene) const
 {
@@ -214,7 +298,7 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
     defines.boolDef["SUBSURFACE"] = false;
 
     defines.boolDef["SS_TRANSLUCENCY"]                 = _isTranslucencyEnabled;
-    defines.boolDef["SS_SCATERRING"]                   = _isScatteringEnabled;
+    defines.boolDef["SS_SCATTERING"]                   = _isScatteringEnabled;
     defines.boolDef["SS_THICKNESSANDMASK_TEXTURE"]     = false;
     defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE"]  = false;
     defines.boolDef["SS_REFRACTION"]                   = false;
@@ -225,6 +309,7 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
     defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]      = false;
     defines.boolDef["SS_LODINREFRACTIONALPHA"]         = false;
     defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"] = false;
+    defines.boolDef["SS_ALBEDOFORREFRACTIONTINT"]      = false;
 
     if (_isRefractionEnabled || _isTranslucencyEnabled || _isScatteringEnabled) {
       defines.boolDef["SUBSURFACE"] = true;
@@ -246,13 +331,14 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
         auto refractTexture = _getRefractionTexture(scene);
         if (refractTexture && MaterialFlags::RefractionTextureEnabled()) {
           defines.boolDef["SS_REFRACTION"]                   = true;
-          defines.boolDef["SS_REFRACTIONMAP_3D"]             = refractTexture->isCube;
-          defines.boolDef["SS_GAMMAREFRACTION"]              = refractTexture->gammaSpace;
+          defines.boolDef["SS_REFRACTIONMAP_3D"]             = refractTexture->isCube();
+          defines.boolDef["SS_GAMMAREFRACTION"]              = refractTexture->gammaSpace();
           defines.boolDef["SS_RGBDREFRACTION"]               = refractTexture->isRGBD;
           defines.boolDef["SS_LINEARSPECULARREFRACTION"]     = refractTexture->linearSpecularLOD();
           defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]      = refractTexture->invertZ;
           defines.boolDef["SS_LODINREFRACTIONALPHA"]         = refractTexture->lodLevelInAlpha;
           defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"] = _linkRefractionWithTransparency;
+          defines.boolDef["SS_ALBEDOFORREFRACTIONTINT"]      = useAlbedoToTintRefraction;
         }
       }
     }
@@ -286,8 +372,11 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sc
         }*/
       }
 
-      auto width = static_cast<float>(refractionTexture()->getSize().width);
+      const auto width = static_cast<float>(refractionTexture()->getSize().width);
 
+      const auto refractionIor = volumeIndexOfRefraction();
+      uniformBuffer.updateFloat4("vRefractionInfos", refractionTexture()->level,
+                                 1.f / refractionIor, depth, _invertRefractionY ? -1.f : 1.f, "");
       uniformBuffer.updateFloat4("vRefractionInfos", refractTexture->level,
                                  1.f / _indexOfRefraction, depth, _invertRefractionY ? -1.f : 1.f,
                                  "");
@@ -300,13 +389,17 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sc
       }
     }
 
+    if (isScatteringEnabled()) {
+      uniformBuffer.updateFloat("scatteringDiffusionProfile",
+                                static_cast<float>(_scatteringDiffusionProfileIndex));
+    }
     uniformBuffer.updateColor3("vDiffusionDistance", diffusionDistance, "");
 
     uniformBuffer.updateFloat4("vTintColor", tintColor.r, tintColor.g, tintColor.b,
                                tintColorAtDistance, "");
 
     uniformBuffer.updateFloat3("vSubSurfaceIntensity", refractionIntensity, translucencyIntensity,
-                               scatteringIntensity, "");
+                               0.f, "");
   }
 
   // Textures
@@ -435,8 +528,8 @@ unsigned int PBRSubSurfaceConfiguration::AddFallbacks(const MaterialDefines& def
                                                       EffectFallbacks& fallbacks,
                                                       unsigned int currentRank)
 {
-  if (defines["SS_SCATERRING"]) {
-    fallbacks.addFallback(currentRank++, "SS_SCATERRING");
+  if (defines["SS_SCATTERING"]) {
+    fallbacks.addFallback(currentRank++, "SS_SCATTERING");
   }
   if (defines["SS_TRANSLUCENCY"]) {
     fallbacks.addFallback(currentRank++, "SS_TRANSLUCENCY");
@@ -446,10 +539,10 @@ unsigned int PBRSubSurfaceConfiguration::AddFallbacks(const MaterialDefines& def
 
 void PBRSubSurfaceConfiguration::AddUniforms(std::vector<std::string>& uniforms)
 {
-  stl_util::concat(uniforms,
-                   {"vDiffusionDistance", "vTintColor", "vSubSurfaceIntensity",
-                    "vRefractionMicrosurfaceInfos", "vRefractionFilteringInfo", "vRefractionInfos",
-                    "vThicknessInfos", "vThicknessParam", "refractionMatrix", "thicknessMatrix"});
+  stl_util::concat(uniforms, {"vDiffusionDistance", "vTintColor", "vSubSurfaceIntensity",
+                              "vRefractionMicrosurfaceInfos", "vRefractionFilteringInfo",
+                              "vRefractionInfos", "vThicknessInfos", "vThicknessParam",
+                              "refractionMatrix", "thicknessMatrix", "scatteringDiffusionProfile"});
 }
 
 void PBRSubSurfaceConfiguration::AddSamplers(std::vector<std::string>& samplers)
@@ -470,6 +563,7 @@ void PBRSubSurfaceConfiguration::PrepareUniformBuffer(UniformBuffer& uniformBuff
   uniformBuffer.addUniform("vDiffusionDistance", 3);
   uniformBuffer.addUniform("vTintColor", 4);
   uniformBuffer.addUniform("vSubSurfaceIntensity", 3);
+  uniformBuffer.addUniform("scatteringDiffusionProfile", 1);
 }
 
 void PBRSubSurfaceConfiguration::copyTo(PBRSubSurfaceConfiguration& /*configuration*/)

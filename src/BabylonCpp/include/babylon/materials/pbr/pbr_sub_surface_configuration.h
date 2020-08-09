@@ -34,14 +34,22 @@ public:
   /**
    * @brief Instantiate a new istance of sub surface configuration.
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
+   * @param markScenePrePassDirty Callback to flag the scene as prepass dirty
+   * @param scene The scene
    */
-  PBRSubSurfaceConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
+  PBRSubSurfaceConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty,
+                             const std::function<void()>& markScenePrePassDirty, Scene* scene);
   ~PBRSubSurfaceConfiguration(); // = default
 
   /**
    * @brief Hidden
    */
   void _markAllSubMeshesAsTexturesDirty();
+
+  /**
+   * @brief Hidden
+   */
+  void _markScenePrePassDirty();
 
   /**
    * @brief Gets wehter the submesh is ready to be used or not.
@@ -81,7 +89,7 @@ public:
   /**
    * @brief Returns true if alpha blending should be disabled.
    */
-  [[nodiscard]] bool disableAlphaBlending() const;
+  bool disableAlphaBlending() const;
 
   /**
    * @brief Fills the list of render target textures.
@@ -94,13 +102,13 @@ public:
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
+  bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register RTT.
    * @returns true if this uses a render target otherwise false.
    */
-  [[nodiscard]] bool hasRenderTargetTextures() const;
+  bool hasRenderTargetTextures() const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -124,7 +132,7 @@ public:
    * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRSubSurfaceConfiguration"
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.
@@ -164,7 +172,7 @@ public:
    * @brief Serializes this Sub Surface configuration.
    * @returns - An object with the serialized config.
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses a Sub Surface Configuration from a serialized object.
@@ -175,21 +183,27 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  [[nodiscard]] bool get_isRefractionEnabled() const;
+  bool get_isRefractionEnabled() const;
   void set_isRefractionEnabled(bool value);
-  [[nodiscard]] bool get_isTranslucencyEnabled() const;
+  bool get_isTranslucencyEnabled() const;
   void set_isTranslucencyEnabled(bool value);
+  bool get_isScatteringEnabled() const;
+  void set_isScatteringEnabled(bool value);
+  std::optional<Color3>& get_scatteringDiffusionProfile();
+  void set_scatteringDiffusionProfile(const std::optional<Color3>& c);
   BaseTexturePtr& get_thicknessTexture();
   void set_thicknessTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_refractionTexture();
   void set_refractionTexture(const BaseTexturePtr& value);
-  [[nodiscard]] float get_indexOfRefraction() const;
+  float get_indexOfRefraction() const;
   void set_indexOfRefraction(float value);
-  [[nodiscard]] bool get_invertRefractionY() const;
+  float get_volumeIndexOfRefraction() const;
+  void set_volumeIndexOfRefraction(float value);
+  bool get_invertRefractionY() const;
   void set_invertRefractionY(bool value);
-  [[nodiscard]] bool get_linkRefractionWithTransparency() const;
+  bool get_linkRefractionWithTransparency() const;
   void set_linkRefractionWithTransparency(bool value);
-  [[nodiscard]] bool get_useMaskFromThicknessTexture() const;
+  bool get_useMaskFromThicknessTexture() const;
   void set_useMaskFromThicknessTexture(bool value);
 
 private:
@@ -213,6 +227,17 @@ public:
   Property<PBRSubSurfaceConfiguration, bool> isTranslucencyEnabled;
 
   /**
+   * Defines if the sub surface scattering is enabled in the material.
+   */
+  Property<PBRSubSurfaceConfiguration, bool> isScatteringEnabled;
+
+  /**
+   * Diffusion profile for subsurface scattering.
+   * Useful for better scattering in the skins or foliages.
+   */
+  Property<PBRSubSurfaceConfiguration, std::optional<Color3>> scatteringDiffusionProfile;
+
+  /**
    * Defines the refraction intensity of the material.
    * The refraction when enabled replaces the Diffuse part of the material.
    * The intensity helps transitionning between diffuse and refraction.
@@ -227,11 +252,10 @@ public:
   float translucencyIntensity;
 
   /**
-   * Defines the scattering intensity of the material.
-   * When scattering has been enabled, this defines how much of the "scattered light" is addded to
-   * the diffuse part of the material.
+   * When enabled, transparent surfaces will be tinted with the albedo colour (independent of
+   * thickness)
    */
-  float scatteringIntensity;
+  bool useAlbedoToTintRefraction;
 
   /**
    * Stores the average thickness of a mesh in a texture (The texture is holding the values
@@ -255,6 +279,15 @@ public:
    * From dielectric fresnel rules: F0 = square((iorT - iorI) / (iorT + iorI))
    */
   Property<PBRSubSurfaceConfiguration, float> indexOfRefraction;
+
+  /**
+   * Index of refraction of the material's volume.
+   * https://en.wikipedia.org/wiki/List_of_refractive_indices
+   *
+   * This ONLY impacts refraction. If not provided or given a non-valid value,
+   * the volume will use the same IOR as the surface.
+   */
+  Property<PBRSubSurfaceConfiguration, float> volumeIndexOfRefraction;
 
   /**
    * Controls if refraction needs to be inverted on Y. This could be useful for procedural texture.
@@ -309,15 +342,20 @@ private:
   bool _isRefractionEnabled;
   bool _isTranslucencyEnabled;
   bool _isScatteringEnabled;
+  size_t _scatteringDiffusionProfileIndex;
+  std::optional<Color3> _nullColor, _scatteringDiffusionProfile;
   BaseTexturePtr _thicknessTexture;
   BaseTexturePtr _refractionTexture;
   float _indexOfRefraction;
+  float _volumeIndexOfRefraction;
   bool _invertRefractionY;
   bool _linkRefractionWithTransparency;
   bool _useMaskFromThicknessTexture;
+  Scene* _scene;
 
   /** Hidden */
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;
+  std::function<void()> _internalMarkScenePrePassDirty;
 
 }; // end of class PBRSubSurfaceConfiguration
 
