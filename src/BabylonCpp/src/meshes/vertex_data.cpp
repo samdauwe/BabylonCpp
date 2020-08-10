@@ -2586,45 +2586,45 @@ std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& option
     2, 4  // 23: B + 12
   }};
 
-  /**
-   * Vertices[0, 1, ...9, A, B] : position on UV plane
-   *  '+' indicate duplicate position to be fixed (3,9:0,2,3,4,7,8,A,B)
-   *  First island of uv mapping
-   *  v = 4h          3+  2
-   *  v = 3h        9+  4
-   *  v = 2h      9+  5   B
-   *  v = 1h    9   1   0
-   *  v = 0h  3   8   7   A
-   *      u = 0 1 2 3 4 5 6  *a
-   *
-   * Second island of uv mapping
-   * v = 4h  0+  B+  4+
-   * v = 3h    A+  2+
-   * v = 2h  7+  6   3+
-   * v = 1h    8+  3+
-   * v = 0h
-   *     u = 0 1 2 3 4 5 6  *a
-   *
-   * Face layout on texture UV mapping
-   * ============
-   * \ 4  /\ 16 /   ======
-   *  \  /  \  /   /\ 11 /
-   *   \/ 7  \/   /  \  /
-   *    ======   / 10 \/
-   *   /\ 17 /\  ======
-   *  /  \  /  \ \ 15 /\
-   * / 8  \/ 12 \ \  /  \
-   * ============  \/ 6  \
-   * \ 18 /\  ============
-   *  \  /  \ \ 5  /\ 0  /
-   *   \/ 13 \ \  /  \  /
-   *    ======  \/ 1  \/
-   *       ============
-   *      /\ 19 /\  2 /\
-   *     /  \  /  \  /  \
-   *    / 14 \/ 9  \/  3 \
-   *   ===================
-   */
+  // clang-format off
+  // Vertices[0, 1, ...9, A, B] : position on UV plane
+  // '+' indicate duplicate position to be fixed (3,9:0,2,3,4,7,8,A,B)
+  // First island of uv mapping
+  // v = 4h          3+  2
+  // v = 3h        9+  4
+  // v = 2h      9+  5   B
+  // v = 1h    9   1   0
+  // v = 0h  3   8   7   A
+  //     u = 0 1 2 3 4 5 6  *a
+
+  // Second island of uv mapping
+  // v = 4h  0+  B+  4+
+  // v = 3h    A+  2+
+  // v = 2h  7+  6   3+
+  // v = 1h    8+  3+
+  // v = 0h
+  //     u = 0 1 2 3 4 5 6  *a
+
+  // Face layout on texture UV mapping
+  // ============
+  // \ 4  /\ 16 /   ======
+  //  \  /  \  /   /\ 11 /
+  //   \/ 7  \/   /  \  /
+  //    =======  / 10 \/
+  //   /\ 17 /\  =======
+  //  /  \  /  \ \ 15 /\
+  // / 8  \/ 12 \ \  /  \
+  // ============  \/ 6  \
+  // \ 18 /\  ============
+  //  \  /  \ \ 5  /\ 0  /
+  //   \/ 13 \ \  /  \  /
+  //   =======  \/ 1  \/
+  //       =============
+  //      /\ 19 /\  2 /\
+  //     /  \  /  \  /  \
+  //    / 14 \/ 9  \/  3 \
+  //   ===================
+  // clang-format on
 
   // uv step is u:1 or 0.5, v:cos(30)=sqrt(3)/2, ratio approx is 84/97
   const auto ustep   = 138.f / 1024.f;
@@ -2678,46 +2678,44 @@ std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& option
         ico_vertexuv[2 * v_id + 1] * vstep + voffset + island[face] * island_v_offset);
     }
 
-    /**
-     * Subdivide the face (interpolate pos, norm, uv)
-     * - pos is linear interpolation, then projected to sphere (converge
-     * polyhedron to sphere)
-     * - norm is linear interpolation of vertex corner normal
-     *   (to be checked if better to re-calc from face vertex, or if
-     * approximation is OK ??? )
-     * - uv is linear interpolation
-     *
-     * Topology is as below for sub-divide by 2
-     * vertex shown as v0,v1,v2
-     * interp index is i1 to progress in range [v0,v1[
-     * nterp index is i2 to progress in range [v0,v2[
-     * face index as  (i1,i2)  for /\  : (i1,i2),(i1+1,i2),(i1,i2+1)
-     *            and (i1,i2)' for \/  : (i1+1,i2),(i1+1,i2+1),(i1,i2+1)
-     *
-     *
-     *                    i2    v2
-     *                    ^    ^
-     *                   /    / \
-     *                  /    /   \
-     *                 /    /     \
-     *                /    / (0,1) \
-     *               /    #---------\
-     *              /    / \ (0,0)'/ \
-     *             /    /   \     /   \
-     *            /    /     \   /     \
-     *           /    / (0,0) \ / (1,0) \
-     *          /    #---------#---------\
-     *              v0                    v1
-     *
-     *              --------------------> i1
-     *
-     * interp of (i1,i2):
-     *  along i2 :  x0=lerp(v0,v2, i2/S) <---> x1=lerp(v1,v2, i2/S)
-     *  along i1 :  lerp(x0,x1, i1/(S-i2))
-     *
-     * centroid of triangle is needed to get help normal computation
-     *  (c1,c2) are used for centroid location
-     */
+    // clang-format off
+    // Subdivide the face (interpolate pos, norm, uv)
+    // - pos is linear interpolation, then projected to sphere (converge polyhedron to sphere)
+    // - norm is linear interpolation of vertex corner normal
+    //   (to be checked if better to re-calc from face vertex, or if approximation is OK ??? )
+    // - uv is linear interpolation
+    //
+    // Topology is as below for sub-divide by 2
+    // vertex shown as v0,v1,v2
+    // interp index is i1 to progress in range [v0,v1[
+    // interp index is i2 to progress in range [v0,v2[
+    // face index as  (i1,i2)  for /\  : (i1,i2),(i1+1,i2),(i1,i2+1)
+    //            and (i1,i2)' for \/  : (i1+1,i2),(i1+1,i2+1),(i1,i2+1)
+    //
+    //
+    //                    i2    v2
+    //                    ^    ^
+    //                   /    / \
+    //                  /    /   \
+    //                 /    /     \
+    //                /    / (0,1) \
+    //               /    #---------\
+    //              /    / \ (0,0)'/ \
+    //             /    /   \     /   \
+    //            /    /     \   /     \
+    //           /    / (0,0) \ / (1,0) \
+    //          /    #---------#---------\
+    //              v0                    v1
+    //
+    //              --------------------> i1
+    //
+    // interp of (i1,i2):
+    //  along i2 :  x0=lerp(v0,v2, i2/S) <---> x1=lerp(v1,v2, i2/S)
+    //  along i1 :  lerp(x0,x1, i1/(S-i2))
+    //
+    // centroid of triangle is needed to get help normal computation
+    //  (c1,c2) are used for centroid location
+    // clang-format on
 
     const auto interp_vertex = [&](float i1, uint32_t i2, float c1, float c2) {
       // vertex is interpolated from
