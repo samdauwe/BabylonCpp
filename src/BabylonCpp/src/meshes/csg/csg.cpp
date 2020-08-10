@@ -17,13 +17,20 @@ CSG::CSG::CSG() = default;
 
 CSG::CSG::CSG(const BABYLON::CSG::CSG& otherCSG) = default;
 
+CSG::CSG::CSG(BABYLON::CSG::CSG&& otherArc) = default;
+
+BABYLON::CSG::CSG& BABYLON::CSG::CSG::operator=(const BABYLON::CSG::CSG& otherCSG) = default;
+
+BABYLON::CSG::CSG& BABYLON::CSG::CSG::operator=(BABYLON::CSG::CSG&& otherCSG) = default;
+
 CSG::CSG::~CSG() = default;
 
 std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
 {
   Vector3 normal;
-  Vector2 uv;
+  std::optional<Vector2> uv = std::nullopt;
   Vector3 position;
+  std::optional<Color4> vertColor = std::nullopt;
   std::vector<Polygon> polygons;
 
   Matrix matrix;
@@ -32,21 +39,24 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
   std::optional<Quaternion> meshRotationQuaternion = std::nullopt;
   Vector3 meshScaling;
 
-  mesh->computeWorldMatrix(true);
-  matrix       = mesh->getWorldMatrix();
-  meshPosition = mesh->position();
-  meshRotation = mesh->rotation();
-  if (mesh->rotationQuaternion()) {
-    meshRotationQuaternion = *mesh->rotationQuaternion();
+  {
+    mesh->computeWorldMatrix(true);
+    matrix       = mesh->getWorldMatrix();
+    meshPosition = mesh->position();
+    meshRotation = mesh->rotation();
+    if (mesh->rotationQuaternion()) {
+      meshRotationQuaternion = *mesh->rotationQuaternion();
+    }
+    meshScaling = mesh->scaling();
   }
-  meshScaling = mesh->scaling();
 
-  IndicesArray indices   = mesh->getIndices();
-  Float32Array positions = mesh->getVerticesData(VertexBuffer::PositionKind);
-  Float32Array normals   = mesh->getVerticesData(VertexBuffer::NormalKind);
-  Float32Array uvs       = mesh->getVerticesData(VertexBuffer::UVKind);
+  IndicesArray indices    = mesh->getIndices();
+  Float32Array positions  = mesh->getVerticesData(VertexBuffer::PositionKind);
+  Float32Array normals    = mesh->getVerticesData(VertexBuffer::NormalKind);
+  Float32Array uvs        = mesh->getVerticesData(VertexBuffer::UVKind);
+  Float32Array vertColors = mesh->getVerticesData(VertexBuffer::ColorKind);
 
-  unsigned int sm = 0;
+  auto sm = 0u;
   for (auto& subMesh : mesh->subMeshes) {
     for (size_t i = subMesh->indexStart, il = subMesh->indexCount + subMesh->indexStart; i < il;
          i += 3) {
@@ -54,13 +64,20 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
       for (unsigned int j = 0; j < 3; ++j) {
         Vector3 sourceNormal(normals[indices[i + j] * 3], normals[indices[i + j] * 3 + 1],
                              normals[indices[i + j] * 3 + 2]);
-        Vector2 _uv(uvs[indices[i + j] * 2], uvs[indices[i + j] * 2 + 1]);
+        if (!uvs.empty()) {
+          uv = Vector2(uvs[indices[i + j] * 2], uvs[indices[i + j] * 2 + 1]);
+        }
+        if (!vertColors.empty()) {
+          vertColor
+            = Color4(vertColors[indices[i + j] * 4 + 0], vertColors[indices[i + j] * 4 + 1],
+                     vertColors[indices[i + j] * 4 + 2], vertColors[indices[i + j] * 4 + 3]);
+        }
         Vector3 sourcePosition(positions[indices[i + j] * 3], positions[indices[i + j] * 3 + 1],
                                positions[indices[i + j] * 3 + 2]);
         position = Vector3::TransformCoordinates(sourcePosition, matrix);
         normal   = Vector3::TransformNormal(sourceNormal, matrix);
 
-        vertices.emplace_back(Vertex(position, normal, _uv));
+        vertices.emplace_back(Vertex(position, normal, uv, vertColor));
       }
 
       PolygonOptions shared;
@@ -74,7 +91,7 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
       // To handle the case of degenerated triangle
       // polygon.plane == null <=> the polygon does not represent 1 single plane
       // <=> the triangle is degenerated
-      if (polygon.plane.first) {
+      if (polygon.plane) {
         polygons.emplace_back(polygon);
       }
     }
@@ -93,10 +110,10 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
 }
 
 std::unique_ptr<BABYLON::CSG::CSG>
-CSG::CSG::FromPolygons(const std::vector<BABYLON::CSG::Polygon>& _polygons)
+CSG::CSG::FromPolygons(const std::vector<BABYLON::CSG::Polygon>& iPolygons)
 {
   auto csg       = std::make_unique<BABYLON::CSG::CSG>();
-  csg->_polygons = _polygons;
+  csg->_polygons = iPolygons;
   return csg;
 }
 
@@ -242,16 +259,18 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
   Float32Array vertices;
   Uint32Array indices;
   Float32Array normals;
-  Float32Array uvs;
-  auto vertex   = Vector3::Zero();
-  auto normal   = Vector3::Zero();
-  auto uv       = Vector2::Zero();
-  auto polygons = _polygons;
-  std::array<unsigned int, 3> polygonIndices{{0, 0, 0}};
+  std::optional<Float32Array> uvs        = std::nullopt;
+  std::optional<Float32Array> vertColors = std::nullopt;
+  auto vertex                            = Vector3::Zero();
+  auto normal                            = Vector3::Zero();
+  auto uv                                = Vector2::Zero();
+  auto vertColor                         = Color4(0.f, 0.f, 0.f, 0.f);
+  auto polygons                          = _polygons;
+  std::array<unsigned int, 3> polygonIndices{{0u, 0u, 0u}};
   std::unordered_map<std::string, size_t> vertice_dict;
-  bool vertexIdxDefined     = false;
-  size_t vertex_idx         = 0;
-  unsigned int currentIndex = 0;
+  auto vertexIdxDefined = false;
+  auto vertex_idx       = 0ull;
+  auto currentIndex     = 0u;
   std::unordered_map<unsigned int, std::unordered_map<unsigned int, SubMeshObj>> subMesh_dict;
   SubMeshObj subMesh_obj;
 
@@ -267,7 +286,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
     });
   }
 
-  for (auto& polygon : polygons) {
+  for (const auto& polygon : polygons) {
     // Building SubMeshes
     if (subMesh_dict.find(polygon.shared.meshId) == subMesh_dict.end()) {
       subMesh_dict[polygon.shared.meshId] = std::unordered_map<unsigned int, SubMeshObj>();
@@ -279,43 +298,76 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
         = std::numeric_limits<unsigned int>::max();
       // IndexEnd
       subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId][1]
-        = std::numeric_limits<unsigned int>::min();
+        = std::numeric_limits<unsigned int>::lowest();
       // materialIndex
       subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId][2]
         = polygon.shared.materialIndex;
     }
     subMesh_obj = subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId];
 
-    for (unsigned int j = 2; j < polygon.vertices.size(); ++j) {
+    for (auto j = 2u; j < polygon.vertices.size(); ++j) {
 
       polygonIndices[0] = 0;
       polygonIndices[1] = j - 1;
       polygonIndices[2] = j;
 
-      for (unsigned int k = 0; k < 3; ++k) {
+      for (auto k = 0u; k < 3; ++k) {
         vertex.copyFrom(polygon.vertices[polygonIndices[k]].pos);
         normal.copyFrom(polygon.vertices[polygonIndices[k]].normal);
-        uv.copyFrom(polygon.vertices[polygonIndices[k]].uv);
-        Vector3 localVertex = Vector3::TransformCoordinates(vertex, _matrix);
-        Vector3 localNormal = Vector3::TransformNormal(normal, _matrix);
+        if (polygon.vertices[polygonIndices[k]].uv) {
+          if (!uvs) {
+            uvs = Float32Array();
+          }
+          uv.copyFrom(*polygon.vertices[polygonIndices[k]].uv);
+        }
 
-        std::string vertexId
-          = StringTools::concat(localVertex.x, ",", localVertex.y, ",", localVertex.z);
+        if (polygon.vertices[polygonIndices[k]].vertColor) {
+          if (!vertColors) {
+            vertColors = Float32Array();
+          }
+          vertColor.copyFrom(*polygon.vertices[polygonIndices[k]].vertColor);
+        }
+        auto localVertex = Vector3::TransformCoordinates(vertex, _matrix);
+        auto localNormal = Vector3::TransformNormal(normal, _matrix);
+
+        auto vertexId = StringTools::concat(localVertex.x, ",", localVertex.y, ",", localVertex.z);
 
         if (stl_util::contains(vertice_dict, vertexId)) {
           vertex_idx       = vertice_dict[vertexId];
           vertexIdxDefined = true;
         }
 
+        auto areUvsDifferent = false;
+
+        if (uvs && ((*uvs).size() > vertex_idx * 2 + 1)
+            && !(stl_util::almost_equal((*uvs)[vertex_idx * 2], uv.x)
+                 || stl_util::almost_equal((*uvs)[vertex_idx * 2 + 1], uv.y))) {
+          areUvsDifferent = true;
+        }
+
+        auto areColorsDifferent = false;
+
+        if (vertColors && ((*vertColors).size() > vertex_idx * 4 + 3)
+            && !(stl_util::almost_equal((*vertColors)[vertex_idx * 4], vertColor.r)
+                 || stl_util::almost_equal((*vertColors)[vertex_idx * 4 + 1], vertColor.g)
+                 || stl_util::almost_equal((*vertColors)[vertex_idx * 4 + 2], vertColor.b)
+                 || stl_util::almost_equal((*vertColors)[vertex_idx * 4 + 3], vertColor.a))) {
+          areColorsDifferent = true;
+        }
+
         // Check if 2 points can be merged
-        if (!(vertexIdxDefined && stl_util::almost_equal(normals[vertex_idx * 3], localNormal.x)
-              && stl_util::almost_equal(normals[vertex_idx * 3 + 1], localNormal.y)
-              && stl_util::almost_equal(normals[vertex_idx * 3 + 2], localNormal.z)
-              && stl_util::almost_equal(uvs[vertex_idx * 2], uv.x)
-              && stl_util::almost_equal(uvs[vertex_idx * 2 + 1], uv.y))) {
+        if (!((vertexIdxDefined && stl_util::almost_equal(normals[vertex_idx * 3], localNormal.x)
+               && stl_util::almost_equal(normals[vertex_idx * 3 + 1], localNormal.y)
+               && stl_util::almost_equal(normals[vertex_idx * 3 + 2], localNormal.z))
+              || areUvsDifferent || areColorsDifferent)) {
           stl_util::concat(vertices, {localVertex.x, localVertex.y, localVertex.z});
-          stl_util::concat(uvs, {uv.x, uv.y});
+          if (uvs) {
+            stl_util::concat(*uvs, {uv.x, uv.y});
+          }
           stl_util::concat(normals, {normal.x, normal.y, normal.z});
+          if (vertColors) {
+            stl_util::concat(*vertColors, {vertColor.r, vertColor.g, vertColor.b, vertColor.a});
+          }
           vertex_idx             = (vertices.size() / 3) - 1;
           vertice_dict[vertexId] = vertex_idx;
           vertexIdxDefined       = true;
@@ -334,20 +386,24 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
 
   mesh->setVerticesData(VertexBuffer::PositionKind, vertices);
   mesh->setVerticesData(VertexBuffer::NormalKind, normals);
-  mesh->setVerticesData(VertexBuffer::UVKind, uvs);
+  if (uvs) {
+    mesh->setVerticesData(VertexBuffer::UVKind, *uvs);
+  }
+  if (vertColors) {
+    mesh->setVerticesData(VertexBuffer::ColorKind, *vertColors);
+  }
   mesh->setIndices(indices);
 
   if (keepSubMeshes) {
-    // We offset the materialIndex by the previous number of materials in the
-    // CSG mixed meshes
-    unsigned int materialIndexOffset = 0;
-    int materialMaxIndex;
+    // We offset the materialIndex by the previous number of materials in the CSG mixed meshes
+    auto materialIndexOffset = 0u;
+    auto materialMaxIndex    = 0;
 
     mesh->subMeshes.clear();
 
-    for (auto& m : subMesh_dict) {
+    for (const auto& m : subMesh_dict) {
       materialMaxIndex = -1;
-      for (auto& sm : m.second) {
+      for (const auto& sm : m.second) {
         subMesh_obj = sm.second;
         SubMesh::CreateFromIndices(subMesh_obj[2] + materialIndexOffset, subMesh_obj[0],
                                    subMesh_obj[1] - subMesh_obj[0] + 1, mesh);

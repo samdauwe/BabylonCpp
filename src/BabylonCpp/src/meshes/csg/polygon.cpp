@@ -7,16 +7,15 @@
 
 namespace BABYLON {
 
-CSG::Polygon::Polygon()
-    : shared{PolygonOptions{0, 0, 0}}, plane{std::make_pair(false, Plane())}
+CSG::Polygon::Polygon() : shared{PolygonOptions{0u, 0u, 0u}}, plane{std::nullopt}
 {
 }
 
-CSG::Polygon::Polygon(const std::vector<Vertex>& iVertices,
-                      const PolygonOptions& iShared)
-    : vertices{iVertices}, shared{iShared}
+CSG::Polygon::Polygon(const std::vector<Vertex>& iVertices, const PolygonOptions& iShared)
 {
-  plane = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
+  vertices = iVertices;
+  shared   = iShared;
+  plane    = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
 }
 
 CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon) = default;
@@ -68,10 +67,8 @@ void CSG::Polygon::flip()
   for (auto& vertex : vertices) {
     vertex.flip();
   }
-  if (plane.first) {
-    auto planeTmp = plane.second;
-    planeTmp.flip();
-    plane.second = planeTmp;
+  if (plane) {
+    plane->flip();
   }
 }
 

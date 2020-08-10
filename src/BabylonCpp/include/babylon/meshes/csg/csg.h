@@ -28,6 +28,9 @@ class BABYLON_SHARED_EXPORT CSG {
 public:
   CSG();
   CSG(const CSG& otherCSG);
+  CSG(CSG&& otherArc);
+  CSG& operator=(const CSG& otherCSG);
+  CSG& operator=(CSG&& otherCSG);
   ~CSG(); // = default
 
   /**

@@ -92,14 +92,13 @@ std::vector<BABYLON::CSG::Polygon> BABYLON::CSG::Node::allPolygons()
   return polygons;
 }
 
-void BABYLON::CSG::Node::build(
-  const std::vector<BABYLON::CSG::Polygon>& polygons)
+void BABYLON::CSG::Node::build(const std::vector<BABYLON::CSG::Polygon>& polygons)
 {
   if (polygons.empty()) {
     return;
   }
-  if (!_plane) {
-    _plane = polygons[0].plane.second.cloneToNewObject();
+  if (!_plane && polygons[0].plane) {
+    _plane = polygons[0].plane->cloneToNewObject();
   }
   std::vector<Polygon> front, back;
   for (auto& polygon : polygons) {

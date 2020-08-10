@@ -18,8 +18,8 @@ struct BABYLON_SHARED_EXPORT PolygonOptions {
 }; //  end of struct PolygonOptions
 
 /**
- * @brief Represents a convex polygon. The vertices used to initialize a polygon
- * must be coplanar and form a convex loop.
+ * @brief Represents a convex polygon. The vertices used to initialize a polygon must
+ * be coplanar and form a convex loop.
  *
  * Each convex polygon has a `shared` property, which is shared between all
  * polygons that are clones of each other or were split from the same polygon.
@@ -45,11 +45,11 @@ public:
   /**
    * @brief Clones, or makes a deep copy, or the polygon.
    */
-  [[nodiscard]] Polygon clone() const;
+  Polygon clone() const;
 
-  [[nodiscard]] std::unique_ptr<Polygon> cloneToNewObject() const;
+  std::unique_ptr<Polygon> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
-  [[nodiscard]] std::string toString() const;
+  std::string toString() const;
 
   /**
    * @brief Flips the faces of the polygon.
@@ -70,7 +70,7 @@ public:
   /**
    * A plane formed from the vertices of the polygon
    */
-  std::pair<bool, Plane> plane;
+  std::optional<Plane> plane;
 
 }; // end of class Polygon
 

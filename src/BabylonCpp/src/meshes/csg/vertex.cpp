@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-CSG::Vertex::Vertex(const Vector3& iPos, const Vector3& iNormal, const Vector2& iUv,
+CSG::Vertex::Vertex(const Vector3& iPos, const Vector3& iNormal, const std::optional<Vector2>& iUv,
                     const std::optional<Color4>& iVertColor)
     : pos{iPos}, normal{iNormal}, uv{iUv}, vertColor{iVertColor}
 {
@@ -29,13 +29,19 @@ std::unique_ptr<CSG::Vertex> CSG::Vertex::cloneToNewObject() const
 namespace CSG {
 std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Vertex& vertex)
 {
-  os << "{\"Position\":" << vertex.pos << ",\"Normal\":" << vertex.normal << ",\"UV\":" << vertex.uv
-     << ",\"Color\":";
+  os << "{\"Position\":" << vertex.pos << ",\"Normal\":" << vertex.normal << ",\"UV\":";
+  if (vertex.uv) {
+    os << *vertex.uv;
+  }
+  else {
+    os << "\"undefined\"";
+  }
+  os << ",\"Color\":";
   if (vertex.vertColor) {
     os << *vertex.vertColor;
   }
   else {
-    os << "undefined";
+    os << "\"undefined\"";
   }
   os << "}";
   return os;
@@ -57,7 +63,8 @@ void CSG::Vertex::flip()
 CSG::Vertex CSG::Vertex::interpolate(const BABYLON::CSG::Vertex& other, float t)
 {
   return Vertex(Vector3::Lerp(pos, other.pos, t), Vector3::Lerp(normal, other.normal, t),
-                Vector2::Lerp(uv, other.uv, t),
+                uv && other.uv ? std::optional<Vector2>(Vector2::Lerp(*uv, *other.uv, t)) :
+                                 std::nullopt,
                 vertColor && other.vertColor ?
                   std::optional<Color4>(Color4::Lerp(*vertColor, *other.vertColor, t)) :
                   std::nullopt);

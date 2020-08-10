@@ -10,14 +10,14 @@ namespace BABYLON {
 namespace CSG {
 
 /**
- * @brief Represents a vertex of a polygon. Use your own vertex class instead of
- * this one to provide additional features like texture coordinates and vertex
+ * @brief Represents a vertex of a polygon. Use your own vertex class instead of this
+ * one to provide additional features like texture coordinates and vertex
  * colors. Custom vertex classes need to provide a `pos` property and `clone()`,
  * `flip()`, and `interpolate()` methods that behave analogous to the ones
  * defined by `BABYLON.CSG.Vertex`. This class provides `normal` so convenience
- * functions like `BABYLON.CSG.sphere()` can return a smooth vertex normal, but
- * `normal` is not used anywhere else. Same goes for uv, it allows to keep the
- * original vertex uv coordinates of the 2 meshes
+ * functions like `BABYLON.CSG.sphere()` can return a smooth vertex normal, but `normal`
+ * is not used anywhere else.
+ * Same goes for uv, it allows to keep the original vertex uv coordinates of the 2 meshes
  */
 class BABYLON_SHARED_EXPORT Vertex {
 
@@ -29,7 +29,7 @@ public:
    * @param uv The texture coordinate of the vertex
    * @param vertColor The RGBA color of the vertex
    */
-  Vertex(const Vector3& pos, const Vector3& normal, const Vector2& uv,
+  Vertex(const Vector3& pos, const Vector3& normal, const std::optional<Vector2>& uv = std::nullopt,
          const std::optional<Color4>& vertColor = std::nullopt);
   Vertex(const Vertex& otherVertex);
   Vertex(Vertex&& otherVertex);
@@ -75,7 +75,7 @@ public:
   /**
    * The texture coordinate of the vertex
    */
-  Vector2 uv;
+  std::optional<Vector2> uv;
 
   /**
    * The texture coordinate of the vertex

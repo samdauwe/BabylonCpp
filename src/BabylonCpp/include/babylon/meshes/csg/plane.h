@@ -84,7 +84,7 @@ public:
    * @param b Point b
    * @param c Point c
    */
-  static std::pair<bool, Plane> FromPoints(const Vector3& a, const Vector3& b, const Vector3& c);
+  static std::optional<Plane> FromPoints(const Vector3& a, const Vector3& b, const Vector3& c);
 
 public:
   Vector3 normal;
