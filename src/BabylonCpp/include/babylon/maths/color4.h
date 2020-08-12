@@ -82,6 +82,15 @@ public:
   const Color4& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
+   * @brief Update the current color with values stored in an array from the starting index of the
+   * given array.
+   * @param array defines the source array
+   * @param offset defines an offset in the source array
+   * @returns the current Color4 object
+   */
+  Color4& fromArray(const Float32Array& array, unsigned int offset = 0);
+
+  /**
    * @brief Determines equality between Color4 objects.
    * @param otherColor defines the second operand
    * @returns true if the rgba values are equal to the given ones
@@ -301,6 +310,14 @@ public:
    * @returns a new Color4 object
    */
   static Color4 FromArray(const Float32Array& array, unsigned int offset = 0);
+
+  /**
+   * @brief Creates a new Color4 from the starting index element of the given array.
+   * @param array defines the source array to read from
+   * @param offset defines the offset in the source array
+   * @param result defines the target Color4 object
+   */
+  static void FromArrayToRef(const Float32Array& array, unsigned int offset, Color4& result);
 
   /**
    * @brief Creates a new Color3 from integer values (< 256).

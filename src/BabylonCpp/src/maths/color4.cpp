@@ -111,6 +111,12 @@ const Color4& Color4::toArray(Float32Array& array, unsigned int index) const
   return *this;
 }
 
+Color4& Color4::fromArray(const Float32Array& array, unsigned int offset)
+{
+  Color4::FromArrayToRef(array, offset, *this);
+  return *this;
+}
+
 bool Color4::equals(const Color4& otherColor) const
 {
   return stl_util::almost_equal(r, otherColor.r) && stl_util::almost_equal(g, otherColor.g)
@@ -358,6 +364,14 @@ Color4 Color4::FromArray(const Float32Array& array, unsigned int offset)
     return Color4(array[offset], array[offset + 1], array[offset + 2], array[offset + 3]);
   else
     return Color4(array[offset], array[offset + 1], array[offset + 2], 1.f);
+}
+
+void Color4::FromArrayToRef(const Float32Array& array, unsigned int offset, Color4& result)
+{
+  result.r = array[offset];
+  result.g = array[offset + 1];
+  result.b = array[offset + 2];
+  result.a = array[offset + 3];
 }
 
 Color4 Color4::FromInts(int r, int g, int b, int a)

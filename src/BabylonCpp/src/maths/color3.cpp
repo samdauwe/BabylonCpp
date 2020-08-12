@@ -78,6 +78,12 @@ const Color3& Color3::toArray(Float32Array& array, unsigned int index) const
   return *this;
 }
 
+Color3& Color3::fromArray(const Float32Array& array, unsigned int offset)
+{
+  Color3::FromArrayToRef(array, offset, *this);
+  return *this;
+}
+
 Color4 Color3::toColor4(float alpha) const
 {
   return Color4(r, g, b, alpha);
@@ -387,6 +393,13 @@ Color3 Color3::FromHexString(const std::string& hex)
 Color3 Color3::FromArray(const Float32Array& array, unsigned int offset)
 {
   return Color3(array[offset], array[offset + 1], array[offset + 2]);
+}
+
+void Color3::FromArrayToRef(const Float32Array& array, unsigned int offset, Color3& result)
+{
+  result.r = array[offset];
+  result.g = array[offset + 1];
+  result.b = array[offset + 2];
 }
 
 Color3 Color3::FromInt(int rgb)

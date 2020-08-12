@@ -71,6 +71,15 @@ public:
   const Color3& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
+   * @brief Update the current color with values stored in an array from the starting index of the
+   * given array.
+   * @param array defines the source array
+   * @param offset defines an offset in the source array
+   * @returns the current Color3 object
+   */
+  Color3& fromArray(const Float32Array& array, unsigned int offset = 0);
+
+  /**
    * @brief Returns a new Color4 object from the current Color3 and the given
    * alpha
    * @param alpha defines the alpha component on the new Color4 object (default
@@ -303,6 +312,14 @@ public:
    * @returns a new Color3 object
    */
   static Color3 FromArray(const Float32Array& array, unsigned int offset = 0);
+
+  /**
+   * @brief Creates a new Color3 from the starting index element of the given array.
+   * @param array defines the source array to read from
+   * @param offset defines the offset in the source array
+   * @param result defines the target Color3 object
+   */
+  static void FromArrayToRef(const Float32Array& array, unsigned int offset, Color3& result);
 
   /**
    * @brief Creates a new Color3 from an integer value.
