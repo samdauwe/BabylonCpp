@@ -65,6 +65,7 @@ def main():
     current, previous = "4.2.0-alpha.11", "4.1.0"
     current, previous = "4.2.0-alpha.17", "4.2.0-alpha.11"
     current, previous = "4.2.0-alpha.25", "4.2.0-alpha.17"
+    current, previous = "4.2.0-alpha.32", "4.2.0-alpha.25"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.0.0"         : "4.0.0_2019_04_30",
@@ -74,7 +75,8 @@ def main():
         "4.1.0"         : "4.1.0_2020_02_27",
         "4.2.0-alpha.11": "4.2.0-alpha.11_2020_04_10",
         "4.2.0-alpha.17": "4.2.0-alpha.17_2020_05_20",
-        "4.2.0-alpha.25": "4.2.0-alpha.25_2020_07_17"
+        "4.2.0-alpha.25": "4.2.0-alpha.25_2020_07_17",
+        "4.2.0-alpha.32": "4.2.0-alpha.32_2020_08_12"
     }
     # List containing the files to ignore
     whiteList = [
