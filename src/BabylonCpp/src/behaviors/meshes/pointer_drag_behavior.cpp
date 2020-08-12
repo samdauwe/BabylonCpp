@@ -42,10 +42,7 @@ PointerDragBehavior::PointerDragBehavior(const PointerDragBehaviorOptions& iOpti
     , _attachedElement{nullptr}
     , _startDragRay{Ray(Vector3(), Vector3())}
     , _pointA{Vector3{0.f, 0.f, 0.f}}
-    , _pointB{Vector3{0.f, 0.f, 0.f}}
     , _pointC{Vector3{0.f, 0.f, 0.f}}
-    , _lineA{Vector3{0.f, 0.f, 0.f}}
-    , _lineB{Vector3{0.f, 0.f, 0.f}}
     , _localAxis{Vector3{0.f, 0.f, 0.f}}
     , _lookAt{Vector3{0.f, 0.f, 0.f}}
 {
@@ -386,18 +383,26 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
       _localAxis.copyFrom(*_options.dragAxis);
     }
 
-    // Calculate plane normal in direction of camera but perpendicular to drag axis
-    _pointA.addToRef(_localAxis, _pointB); // towards drag axis
+    // Calculate plane normal that is the cross product of local axis and (eye-dragPlanePosition)
     ray.origin.subtractToRef(_pointA, _pointC);
-    _pointA.addToRef(_pointC.normalize(), _pointC); // towards camera
-    // Get perpendicular line from direction to camera and drag axis
-    _pointB.subtractToRef(_pointA, _lineA);
-    _pointC.subtractToRef(_pointA, _lineB);
-    Vector3::CrossToRef(_lineA, _lineB, _lookAt);
-    // Get perpendicular line from previous result and drag axis to adjust lineB to be perpendiculat
-    // to camera
-    Vector3::CrossToRef(_lineA, _lookAt, _lookAt);
-    _lookAt.normalize();
+    _pointC.normalize();
+    if (std::abs(Vector3::Dot(_localAxis, _pointC)) > 0.999f) {
+      // the drag axis is colinear with the (eye to position) ray. The cross product will give
+      // jittered values. A new axis vector need to be computed
+      if (std::abs(Vector3::Dot(Vector3::UpReadOnly(), _pointC)) > 0.999f) {
+        _lookAt.copyFrom(Vector3::Right());
+      }
+      else {
+        _lookAt.copyFrom(Vector3::UpReadOnly());
+      }
+    }
+    else {
+      Vector3::CrossToRef(_localAxis, _pointC, _lookAt);
+      // Get perpendicular line from previous result and drag axis to adjust lineB to be
+      // perpendiculat to camera
+      Vector3::CrossToRef(_localAxis, _lookAt, _lookAt);
+      _lookAt.normalize();
+    }
 
     _dragPlane->position().copyFrom(_pointA);
     _pointA.addToRef(_lookAt, _lookAt);

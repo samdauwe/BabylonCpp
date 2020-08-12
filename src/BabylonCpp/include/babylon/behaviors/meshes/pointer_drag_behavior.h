@@ -231,10 +231,7 @@ private:
 
   // Variables to avoid instantiation in the method _updateDragPlanePosition
   Vector3 _pointA;
-  Vector3 _pointB;
   Vector3 _pointC;
-  Vector3 _lineA;
-  Vector3 _lineB;
   Vector3 _localAxis;
   Vector3 _lookAt;
 
