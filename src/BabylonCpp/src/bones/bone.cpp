@@ -40,6 +40,7 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* /*parentBone*/,
   _skeleton    = skeleton;
   _localMatrix = localMatrix ? *localMatrix : Matrix::Identity();
   _restPose    = iRestPose ? *iRestPose : _localMatrix;
+  _bindPose    = _localMatrix;
   _baseMatrix  = baseMatrix ? *baseMatrix : _localMatrix;
   _index       = index;
 }
@@ -167,6 +168,24 @@ std::optional<Matrix>& Bone::getRestPose()
   return _restPose;
 }
 
+void Bone::setRestPose(const Matrix& matrix)
+{
+  if (!_restPose) {
+    _restPose = Matrix::Identity();
+  }
+  _restPose->copyFrom(matrix);
+}
+
+Matrix& Bone::getBindPose()
+{
+  return _bindPose;
+}
+
+void Bone::setBindPose(const Matrix& matrix)
+{
+  _bindPose.copyFrom(matrix);
+}
+
 Matrix& Bone::getWorldMatrix()
 {
   return _worldTransform;
@@ -174,7 +193,12 @@ Matrix& Bone::getWorldMatrix()
 
 void Bone::returnToRest()
 {
-  updateMatrix(_restPose.value_or(Matrix::Identity()));
+  if (_skeleton->_numBonesWithLinkedTransformNode > 0) {
+    updateMatrix(_restPose.value_or(Matrix::Identity()), false, false);
+  }
+  else {
+    updateMatrix(_restPose.value_or(Matrix::Identity()));
+  }
 }
 
 Matrix& Bone::getInvertedAbsoluteTransform()
@@ -465,6 +489,9 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
         tmat.copyFrom(_parent->getAbsoluteTransform());
       }
     }
+    else {
+      Matrix::IdentityToRef(tmat);
+    }
 
     tmat.setTranslationFromFloats(0.f, 0.f, 0.f);
     tmat.invert();
@@ -508,9 +535,13 @@ void Bone::setPosition(const Vector3& iPosition, Space space, AbstractMesh* mesh
       else {
         tmat.copyFrom(_parent->getAbsoluteTransform());
       }
+
+      tmat.invert();
+    }
+    else {
+      Matrix::IdentityToRef(tmat);
     }
 
-    tmat.invert();
     Vector3::TransformCoordinatesToRef(iPosition, tmat, vec);
     lm.setTranslationFromFloats(vec.x, vec.y, vec.z);
   }

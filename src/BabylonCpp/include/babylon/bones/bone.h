@@ -116,8 +116,25 @@ public:
   std::optional<Matrix>& getRestPose() override;
 
   /**
-   * @brief Gets a matrix used to store world matrix (ie. the matrix sent to
-   * shaders).
+   * @brief Sets the rest pose matrix.
+   * @param matrix the local-space rest pose to set for this bone
+   */
+  void setRestPose(const Matrix& matrix);
+
+  /**
+   * @brief Gets the bind pose matrix.
+   * @returns the bind pose matrix
+   */
+  Matrix& getBindPose();
+
+  /**
+   * @brief Sets the bind pose matrix.
+   * @param matrix the local-space bind pose to set for this bone
+   */
+  void setBindPose(const Matrix& matrix);
+
+  /**
+   * @brief Gets a matrix used to store world matrix (ie. the matrix sent to shaders).
    */
   Matrix& getWorldMatrix() override;
 
@@ -622,6 +639,7 @@ private:
   Skeleton* _skeleton;
   Matrix _localMatrix;
   std::optional<Matrix> _restPose;
+  Matrix _bindPose;
   Matrix _baseMatrix;
   Matrix _absoluteTransform;
   std::unique_ptr<Matrix> _invertedAbsoluteTransform;

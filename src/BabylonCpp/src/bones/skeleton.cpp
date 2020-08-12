@@ -267,7 +267,20 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& iName,
 void Skeleton::returnToRest()
 {
   for (const auto& bone : bones) {
-    bone->returnToRest();
+    if (bone->_index && *bone->_index != -1) {
+      bone->returnToRest();
+      if (bone->_linkedTransformNode) {
+        std::optional<Vector3> _localScaling     = TmpVectors::Vector3Array[0];
+        std::optional<Quaternion> _localRotation = TmpVectors::QuaternionArray[0];
+        std::optional<Vector3> _localPosition    = TmpVectors::Vector3Array[1];
+
+        bone->getRestPose()->decompose(_localScaling, _localRotation, _localPosition);
+
+        bone->_linkedTransformNode->position           = *_localPosition;
+        bone->_linkedTransformNode->rotationQuaternion = *_localRotation;
+        bone->_linkedTransformNode->scaling            = *_localScaling;
+      }
+    }
   }
 }
 
