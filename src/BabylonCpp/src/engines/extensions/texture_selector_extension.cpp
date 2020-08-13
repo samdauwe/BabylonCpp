@@ -18,18 +18,20 @@ TextureSelectorExtension::~TextureSelectorExtension() = default;
 std::string TextureSelectorExtension::transformTextureUrl(Engine* /*engine*/,
                                                           const std::string& url) const
 {
-  const auto lastDot = StringTools::lastIndexOf(url, ".");
-  return (lastDot > -1 ? url.substr(0, lastDot) : url) + _textureFormatInUse;
+  const auto lastDot          = StringTools::lastIndexOf(url, ".");
+  const auto lastQuestionMark = StringTools::lastIndexOf(url, "?");
+  const auto querystring = lastQuestionMark > -1 ? url.substr(lastQuestionMark, url.size()) : "";
+  return (lastDot > -1 ? url.substr(0, lastDot) : url) + _textureFormatInUse + querystring;
 }
 
 std::vector<std::string>& TextureSelectorExtension::get_texturesSupported()
 {
   if (_texturesSupported.empty()) {
     // Intelligently add supported compressed formats in order to check for.
-    // Check for ASTC support first as it is most powerful and to be very cross platform.
-    // Next PVRTC & DXT, which are probably superior to ETC1/2.
-    // Likely no hardware which supports both PVR & DXT, so order matters little.
-    // ETC2 is newer and handles ETC1 (no alpha capability), so check for first.
+    // Check for ASTC support first as it is most powerful and to be very cross platform. Next PVRTC
+    // & DXT, which are probably superior to ETC1/2. Likely no hardware which supports both PVR &
+    // DXT, so order matters little. ETC2 is newer and handles ETC1 (no alpha capability), so check
+    // for first.
     if (_this->_caps.astc) {
       _texturesSupported.emplace_back("-astc.ktx");
     }
@@ -75,8 +77,8 @@ TextureSelectorExtension::setTextureFormatToUse(const std::vector<std::string>& 
       }
     }
   }
-  // actively set format to nothing, to allow this to be called more than once and possibly fail the
-  // 2nd time
+  // actively set format to nothing, to allow this to be called more than once
+  // and possibly fail the 2nd time
   _textureFormatInUse.clear();
   _this->_transformTextureUrl = nullptr;
   return "";
