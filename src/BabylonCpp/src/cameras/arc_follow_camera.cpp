@@ -10,23 +10,21 @@ bool ArcFollowCamera::NodeConstructorAdded = false;
 
 void ArcFollowCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "ArcFollowCamera", [](const std::string& iName, Scene* scene,
-                          const std::optional<json>& /*options*/) {
-      return ArcFollowCamera::New(iName, 0.f, 0.f, 1.f, nullptr, scene);
-    });
+  Node::AddNodeConstructor("ArcFollowCamera", [](const std::string& iName, Scene* scene,
+                                                 const std::optional<json>& /*options*/) {
+    return ArcFollowCamera::New(iName, 0.f, 0.f, 1.f, nullptr, scene);
+  });
   ArcFollowCamera::NodeConstructorAdded = true;
 }
 
-ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha,
-                                 float iBeta, float iRadius,
+ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha, float iBeta, float iRadius,
                                  AbstractMesh* iTarget, Scene* scene)
     : TargetCamera{iName, Vector3::Zero(), scene}
     , alpha{iAlpha}
     , beta{iBeta}
     , radius{iRadius}
-    , target{iTarget}
     , _cartesianCoordinates{Vector3::Zero()}
+    , _meshTarget{iTarget}
 {
   _follow();
 }
@@ -40,7 +38,7 @@ Type ArcFollowCamera::type() const
 
 void ArcFollowCamera::_follow()
 {
-  if (!target) {
+  if (!_meshTarget) {
     return;
   }
 
@@ -48,7 +46,7 @@ void ArcFollowCamera::_follow()
   _cartesianCoordinates.y = radius * std::sin(beta);
   _cartesianCoordinates.z = radius * std::sin(alpha) * std::cos(beta);
 
-  auto targetPosition = target->getAbsolutePosition();
+  auto targetPosition = _meshTarget->getAbsolutePosition();
   position            = targetPosition.add(_cartesianCoordinates);
   setTarget(targetPosition);
 }

@@ -78,13 +78,13 @@ public:
 
   float radius;
 
+private:
+  Vector3 _cartesianCoordinates;
+
   /**
    * Define the camera target (the mesh it should follow)
    */
-  AbstractMesh* target;
-
-private:
-  Vector3 _cartesianCoordinates;
+  AbstractMesh* _meshTarget;
 
   static bool NodeConstructorAdded;
 
