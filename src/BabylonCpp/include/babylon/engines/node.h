@@ -110,7 +110,7 @@ public:
   void _removeFromSceneRootNodes();
 
   /**
-   * @brief Gets a string idenfifying the name of the class.
+   * @brief Gets a string identifying the name of the class.
    * @returns "Node" string
    */
   virtual std::string getClassName() const;
