@@ -20,6 +20,7 @@
 #include <babylon/materials/textures/multiview_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/maths/frustum.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
@@ -603,17 +604,31 @@ bool Camera::isCompletelyInFrustum(ICullable* target)
 Ray Camera::getForwardRay(float length, const std::optional<Matrix>& iTransform,
                           const std::optional<Vector3>& iOrigin)
 {
-  const auto transform = iTransform.has_value() ? *iTransform : getWorldMatrix();
 
-  const auto origin = iOrigin.has_value() ? *iOrigin : position();
+  return getForwardRayToRef(Ray(Vector3::Zero(), Vector3::Zero(), length), length, iTransform,
+                            iOrigin);
+}
 
-  const auto forward
-    = _scene->useRightHandedSystem ? Vector3(0.f, 0.f, -1.f) : Vector3(0.f, 0.f, 1.f);
-  const auto forwardWorld = Vector3::TransformNormal(forward, transform);
+Ray Camera::getForwardRayToRef(Ray refRay, float length, const std::optional<Matrix>& iTransform,
+                               const std::optional<Vector3>& iOrigin)
+{
+  const auto transform = iTransform.value_or(getWorldMatrix());
 
-  const auto direction = Vector3::Normalize(forwardWorld);
+  refRay.length = length;
 
-  return Ray(origin, direction, length);
+  if (!iOrigin) {
+    refRay.origin.copyFrom(position());
+  }
+  else {
+    refRay.origin.copyFrom(*iOrigin);
+  }
+  TmpVectors::Vector3Array[2].set(0.f, 0.f, _scene->useRightHandedSystem() ? -1.f : 1.f);
+  Vector3::TransformNormalToRef(TmpVectors::Vector3Array[2], transform,
+                                TmpVectors::Vector3Array[3]);
+
+  Vector3::NormalizeToRef(TmpVectors::Vector3Array[3], refRay.direction);
+
+  return refRay;
 }
 
 void Camera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)

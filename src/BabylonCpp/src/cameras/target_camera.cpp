@@ -39,6 +39,8 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition, S
     , _cameraRotationMatrix{Matrix::Zero()}
     , _referencePoint{std::make_unique<Vector3>(0.f, 0.f, 1.f)}
     , _transformedReferencePoint{Vector3::Zero()}
+    , _reset{nullptr}
+    , target{this, &TargetCamera::get_target, &TargetCamera::set_target}
     , _tmpUpVector{Vector3::Zero()}
     , _tmpTargetVector{Vector3::Zero()}
     , _rotation{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
@@ -284,6 +286,16 @@ void TargetCamera::setTarget(const Vector3& target)
     Quaternion::RotationYawPitchRollToRef(_rotation->y, _rotation->x, _rotation->z,
                                           *rotationQuaternion);
   }
+}
+
+Vector3& TargetCamera::get_target()
+{
+  return getTarget();
+}
+
+void TargetCamera::set_target(const Vector3& value)
+{
+  setTarget(value);
 }
 
 Vector3& TargetCamera::getTarget()

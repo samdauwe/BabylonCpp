@@ -40,7 +40,7 @@ void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/, bool iNoPreventDef
 
       if (p->type == PointerEventTypes::POINTERDOWN) {
 
-        {
+        if (!noPreventDefault) {
           evt.preventDefault();
         }
 

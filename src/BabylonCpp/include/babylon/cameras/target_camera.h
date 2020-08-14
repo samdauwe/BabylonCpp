@@ -165,6 +165,16 @@ protected:
    */
   void set_rotation(const Vector3& newRotation);
 
+  /**
+   * @brief Get the target point of the camera.
+   */
+  Vector3& get_target();
+
+  /**
+   * @brief Set the target point of the camera.
+   */
+  void set_target(const Vector3& value);
+
 private:
   /**
    * @brief Update the up vector to apply the rotation of the camera (So if you changed the camera
@@ -273,6 +283,12 @@ public:
    */
   std::function<void()> _reset;
   std::string _waitingLockedTargetId;
+
+  /**
+   * Defines the target point of the camera.
+   * The camera looks towards it form the radius distance.
+   */
+  Property<TargetCamera, Vector3> target;
 
 private:
   static Matrix _RigCamTransformMatrix;

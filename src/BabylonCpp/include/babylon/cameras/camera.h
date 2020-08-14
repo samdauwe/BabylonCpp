@@ -350,6 +350,19 @@ public:
                     const std::optional<Vector3>& origin = std::nullopt);
 
   /**
+   * @brief Gets a ray in the forward direction from the camera.
+   * @param refRay the ray to (re)use when setting the values
+   * @param length Defines the length of the ray to create
+   * @param transform Defines the transform to apply to the ray, by default the world matrx is used
+   * to create a workd space ray
+   * @param origin Defines the start point of the ray which defaults to the camera position
+   * @returns the forward ray
+   */
+  Ray getForwardRayToRef(Ray refRay, float length = 100.f,
+                         const std::optional<Matrix>& transform = std::nullopt,
+                         const std::optional<Vector3>& origin   = std::nullopt);
+
+  /**
    * @brief Releases resources associated with this node.
    * @param doNotRecurse Set to true to not recurse into each children (recurse
    * into each children by default)

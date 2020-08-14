@@ -199,6 +199,8 @@ protected:
   /**
    * @brief Defines the target point of the camera.
    * The camera looks towards it form the radius distance.
+   * Please note that you can set the target to a mesh and thus the target will be copied from
+   * mesh.position
    */
   Vector3& get_target();
   void set_target(const Vector3& value);
@@ -270,6 +272,8 @@ public:
   /**
    * Defines the target point of the camera.
    * The camera looks towards it form the radius distance.
+   * Please note that you can set the target to a mesh and thus the target will be copied from
+   * mesh.position
    */
   Property<ArcRotateCamera, Vector3> target;
 

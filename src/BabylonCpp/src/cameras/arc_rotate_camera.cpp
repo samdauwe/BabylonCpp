@@ -545,6 +545,10 @@ Matrix ArcRotateCamera::_getViewMatrix()
     sinb = 0.0001f;
   }
 
+  if (radius == 0.f) {
+    radius = 0.0001; // Just to avoid division by zero
+  }
+
   auto targetPostion = _getTargetPosition();
   _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb, radius * sina * sinb);
 
