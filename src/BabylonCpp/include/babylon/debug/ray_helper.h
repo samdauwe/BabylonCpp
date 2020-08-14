@@ -7,6 +7,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/event_state.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
@@ -105,7 +106,8 @@ private:
   std::function<void(Scene*, EventState&)> _renderFunction;
   Scene* _scene;
 
-  std::function<void(Scene*, EventState&)> _updateToMeshFunction;
+  Observer<Scene>::Ptr _onAfterRenderObserver;
+  Observer<Scene>::Ptr _onAfterStepObserver;
   AbstractMeshPtr _attachedToMesh;
   Vector3 _meshSpaceDirection;
   Vector3 _meshSpaceOrigin;

@@ -22,8 +22,10 @@ RayHelper::RayHelper(const Ray& iRay)
     , _renderLine{nullptr}
     , _renderFunction{nullptr}
     , _scene{nullptr}
-    , _updateToMeshFunction{nullptr}
+    , _onAfterRenderObserver{nullptr}
+    , _onAfterStepObserver{nullptr}
     , _attachedToMesh{nullptr}
+    , _meshSpaceDirection{Vector3(0.f, 0.f, -1.f)}
 {
 }
 
@@ -32,10 +34,11 @@ RayHelper::~RayHelper() = default;
 void RayHelper::show(Scene* scene)
 {
   if (!_renderFunction && ray) {
-    _renderFunction = [this](Scene*, EventState&) { _render(); };
-    _scene          = scene;
-    _renderPoints   = {ray->origin, ray->origin.add(ray->direction.scale(ray->length))};
-    _renderLine     = Mesh::CreateLines("ray", _renderPoints, scene, true);
+    _renderFunction         = [this](Scene*, EventState&) { _render(); };
+    _scene                  = scene;
+    _renderPoints           = {ray->origin, ray->origin.add(ray->direction.scale(ray->length))};
+    _renderLine             = Mesh::CreateLines("ray", _renderPoints, scene, true);
+    _renderLine->isPickable = false;
 
     if (_renderFunction) {
       _scene->registerBeforeRender(_renderFunction);
@@ -98,22 +101,34 @@ void RayHelper::attachToMesh(const AbstractMeshPtr& mesh, const Vector3& meshSpa
   _meshSpaceDirection = meshSpaceDirection;
   _meshSpaceOrigin    = meshSpaceOrigin;
 
-  if (!_updateToMeshFunction) {
-    _updateToMeshFunction = [this](Scene*, EventState&) { _updateToMesh(); };
-    _attachedToMesh->getScene()->registerBeforeRender(_updateToMeshFunction);
+  if (!_scene) {
+    _scene = mesh->getScene();
   }
+
+  if (!_onAfterRenderObserver) {
+    _onAfterRenderObserver = _scene->onBeforeRenderObservable.add(
+      [this](Scene* /*scene*/, EventState & /*es*/) -> void { _updateToMesh(); });
+    _onAfterStepObserver = _scene->onAfterStepObservable.add(
+      [this](Scene* /*scene*/, EventState & /*es*/) -> void { _updateToMesh(); });
+  }
+
+  // force world matrix computation before the first ray helper computation
+  _attachedToMesh->computeWorldMatrix(true);
 
   _updateToMesh();
 }
 
 void RayHelper::detachFromMesh()
 {
-  if (_attachedToMesh) {
-    if (_updateToMeshFunction) {
-      _attachedToMesh->getScene()->unregisterBeforeRender(_updateToMeshFunction);
+  if (_attachedToMesh && _scene) {
+    if (_onAfterRenderObserver) {
+      _scene->onBeforeRenderObservable.remove(_onAfterRenderObserver);
+      _scene->onAfterStepObservable.remove(_onAfterStepObserver);
     }
-    _attachedToMesh       = nullptr;
-    _updateToMeshFunction = nullptr;
+    _attachedToMesh        = nullptr;
+    _onAfterRenderObserver = nullptr;
+    _onAfterStepObserver   = nullptr;
+    _scene                 = nullptr;
   }
 }
 
