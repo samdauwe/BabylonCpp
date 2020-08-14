@@ -16,11 +16,13 @@ class BABYLON_SHARED_EXPORT ScaleGizmo : public Gizmo {
 
 public:
   /**
-   * @brief Creates a ScaleGizmo
+   * @brief Creates a ScaleGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
+   * @param thickness display gizmo axis thickness
    */
   ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
-             = UtilityLayerRenderer::DefaultUtilityLayer());
+             = UtilityLayerRenderer::DefaultUtilityLayer(),
+             float thickness = 1.f);
   ~ScaleGizmo() override; // = default
 
   /**

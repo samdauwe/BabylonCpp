@@ -22,10 +22,12 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    * @param tessellation Amount of tessellation to be used when creating rotation circles
    * @param useEulerRotation Use and update Euler angle instead of quaternion
+   * @param thickness display gizmo axis thickness
    */
   RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
-                unsigned int tessellation = 32, bool useEulerRotation = false);
+                unsigned int tessellation = 32, bool useEulerRotation = false,
+                float thickness = 1.f);
   ~RotationGizmo() override; // = default
 
   /**

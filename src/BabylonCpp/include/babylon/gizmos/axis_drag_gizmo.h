@@ -26,7 +26,8 @@ public:
   /**
    * @brief Hidden
    */
-  static TransformNodePtr _CreateArrow(Scene* scene, const StandardMaterialPtr& material);
+  static TransformNodePtr _CreateArrow(Scene* scene, const StandardMaterialPtr& material,
+                                       float thickness = 1.f);
 
   /**
    * @brief Hidden
@@ -36,14 +37,15 @@ public:
 public:
   /**
    * @brief Creates an AxisDragGizmo.
+   * @param gizmoLayer The utility layer the gizmo will be added to
    * @param dragAxis The axis which the gizmo will be able to drag on
    * @param color The color of the gizmo
-   * @param gizmoLayer The utility layer the gizmo will be added to
+   * @param thickness display gizmo axis thickness
    */
   AxisDragGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
                 const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
-                PositionGizmo* parent = nullptr);
+                PositionGizmo* parent = nullptr, float thickness = 1.f);
   ~AxisDragGizmo() override; // = default
 
   /**

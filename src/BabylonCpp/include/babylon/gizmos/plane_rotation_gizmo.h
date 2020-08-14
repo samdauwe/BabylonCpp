@@ -26,12 +26,13 @@ public:
    * @param color The color of the gizmo
    * @param tessellation Amount of tessellation to be used when creating rotation circles
    * @param useEulerRotation Use and update Euler angle instead of quaternion
+   * @param thickness display gizmo axis thickness
    */
   PlaneRotationGizmo(const Vector3& planeNormal, const Color3& color = Color3::Gray(),
                      const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
                      = UtilityLayerRenderer::DefaultUtilityLayer(),
                      unsigned int tessellation = 32, RotationGizmo* parent = nullptr,
-                     bool useEulerRotation = false);
+                     bool useEulerRotation = false, float thickness = 1.f);
   ~PlaneRotationGizmo() override; // = default
 
   /**

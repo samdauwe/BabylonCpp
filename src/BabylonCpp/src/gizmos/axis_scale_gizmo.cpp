@@ -16,7 +16,8 @@
 namespace BABYLON {
 
 AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
-                               const UtilityLayerRendererPtr& iGizmoLayer, ScaleGizmo* parent)
+                               const UtilityLayerRendererPtr& iGizmoLayer, ScaleGizmo* parent,
+                               float thickness)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , uniformScaling{false}
@@ -43,14 +44,14 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   // Build mesh on root node
   _arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   BoxOptions boxOptions;
-  boxOptions.size = 0.4f;
+  boxOptions.size = 0.4f * (1.f + (thickness - 1.f) / 4.f);
   auto arrowMesh
     = BoxBuilder::CreateBox("yPosMesh", boxOptions, gizmoLayer->utilityLayerScene.get());
 
   CylinderOptions cylinderOptions;
-  cylinderOptions.diameterTop    = 0.005f;
+  cylinderOptions.diameterTop    = 0.005f * thickness;
   cylinderOptions.height         = 0.275f;
-  cylinderOptions.diameterBottom = 0.005f;
+  cylinderOptions.diameterBottom = 0.005f * thickness;
   cylinderOptions.tessellation   = 96;
   auto arrowTail                 = CylinderBuilder::CreateCylinder("cylinder", cylinderOptions,
                                                    gizmoLayer->utilityLayerScene.get());

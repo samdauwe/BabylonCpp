@@ -17,7 +17,7 @@ namespace BABYLON {
 PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3& color,
                                        const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
                                        unsigned int tessellation, RotationGizmo* parent,
-                                       bool useEulerRotation)
+                                       bool useEulerRotation, float thickness)
     : Gizmo{iGizmoLayer}
     , dragBehavior{nullptr}
     , snapDistance{0.f}
@@ -40,10 +40,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
   // Build mesh on root node
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
 
-  auto drag = Mesh::CreateTorus("", 0.6f, 0.03f, tessellation, gizmoLayer->utilityLayerScene.get());
-  drag->visibility = 0.f;
-  auto rotationMesh
-    = Mesh::CreateTorus("", 0.6f, 0.005f, tessellation, gizmoLayer->utilityLayerScene.get());
+  auto drag              = Mesh::CreateTorus("", 0.6f, 0.03f * thickness, tessellation,
+                                gizmoLayer->utilityLayerScene.get());
+  drag->visibility       = 0.f;
+  auto rotationMesh      = Mesh::CreateTorus("", 0.6f, 0.005f * thickness, tessellation,
+                                        gizmoLayer->utilityLayerScene.get());
   rotationMesh->material = coloredMaterial;
 
   // Position arrow pointing in its drag axis

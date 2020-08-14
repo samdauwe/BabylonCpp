@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
+PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer, float thickness)
     : Gizmo{iGizmoLayer}
     , planarGizmoEnabled{this, &PositionGizmo::get_planarGizmoEnabled,
                          &PositionGizmo::set_planarGizmoEnabled}
@@ -23,11 +23,11 @@ PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     , _planarGizmoEnabled{false}
 {
   xGizmo = std::make_unique<AxisDragGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
-                                           iGizmoLayer, this);
+                                           iGizmoLayer, this, thickness);
   yGizmo = std::make_unique<AxisDragGizmo>(Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f),
-                                           iGizmoLayer, this);
+                                           iGizmoLayer, this, thickness);
   zGizmo = std::make_unique<AxisDragGizmo>(Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f),
-                                           iGizmoLayer, this);
+                                           iGizmoLayer, this, thickness);
 
   xPlaneGizmo = std::make_unique<PlaneDragGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
                                                  iGizmoLayer, this);

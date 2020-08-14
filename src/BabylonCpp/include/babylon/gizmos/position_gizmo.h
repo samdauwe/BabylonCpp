@@ -21,9 +21,11 @@ public:
   /**
    * @brief Creates a PositionGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
+   * @param thickness display gizmo axis thickness
    */
   PositionGizmo(const UtilityLayerRendererPtr& gizmoLayer
-                = UtilityLayerRenderer::DefaultUtilityLayer());
+                = UtilityLayerRenderer::DefaultUtilityLayer(),
+                float thickness = 1.f);
   ~PositionGizmo() override; // = default
 
   /**

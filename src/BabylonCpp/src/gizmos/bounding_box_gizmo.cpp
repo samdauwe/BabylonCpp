@@ -231,7 +231,8 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
         PointerDragBehaviorOptions options;
         options.dragAxis = dragAxis;
         PointerDragBehavior _dragBehavior(options);
-        _dragBehavior.moveAttached = false;
+        _dragBehavior.updateDragPlane = false;
+        _dragBehavior.moveAttached    = false;
         // box->addBehavior(&_dragBehavior);
         _dragBehavior.onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
           onScaleBoxDragObservable.notifyObservers(nullptr);

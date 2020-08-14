@@ -14,19 +14,20 @@
 
 namespace BABYLON {
 
-TransformNodePtr AxisDragGizmo::_CreateArrow(Scene* scene, const StandardMaterialPtr& material)
+TransformNodePtr AxisDragGizmo::_CreateArrow(Scene* scene, const StandardMaterialPtr& material,
+                                             float thickness)
 {
   auto arrow = TransformNode::New("arrow", scene);
   CylinderOptions cylinder1Options;
   cylinder1Options.diameterTop    = 0.f;
   cylinder1Options.height         = 0.075f;
-  cylinder1Options.diameterBottom = 0.0375f;
+  cylinder1Options.diameterBottom = 0.0375f * (1.f + (thickness - 1.f) / 4.f);
   cylinder1Options.tessellation   = 96;
   auto cylinder = CylinderBuilder::CreateCylinder("cylinder", cylinder1Options, scene);
   CylinderOptions cylinder2Options;
-  cylinder2Options.diameterTop    = 0.005f;
+  cylinder2Options.diameterTop    = 0.005f * thickness;
   cylinder2Options.height         = 0.275f;
-  cylinder2Options.diameterBottom = 0.005f;
+  cylinder2Options.diameterBottom = 0.005f * thickness;
   cylinder2Options.tessellation   = 96;
   auto line        = CylinderBuilder::CreateCylinder("cylinder", cylinder2Options, scene);
   line->material   = material;
@@ -56,7 +57,8 @@ TransformNodePtr AxisDragGizmo::_CreateArrowInstance(Scene* scene, const Transfo
 }
 
 AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
-                             const UtilityLayerRendererPtr& iGizmoLayer, PositionGizmo* parent)
+                             const UtilityLayerRendererPtr& iGizmoLayer, PositionGizmo* parent,
+                             float thickness)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , isEnabled{this, &AxisDragGizmo::get_isEnabled, &AxisDragGizmo::set_isEnabled}
@@ -79,7 +81,8 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
   _hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
-  _arrow = AxisDragGizmo::_CreateArrow(gizmoLayer->utilityLayerScene.get(), _coloredMaterial);
+  _arrow
+    = AxisDragGizmo::_CreateArrow(gizmoLayer->utilityLayerScene.get(), _coloredMaterial, thickness);
 
   _arrow->lookAt(_rootMesh->position().add(dragAxis));
   _arrow->scaling().scaleInPlace(1.f / 3.f);

@@ -13,7 +13,7 @@
 
 namespace BABYLON {
 
-ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
+ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer, float thickness)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &ScaleGizmo::get_snapDistance, &ScaleGizmo::set_snapDistance}
     , sensitivity{this, &ScaleGizmo::get_sensitivity, &ScaleGizmo::set_sensitivity}
@@ -25,11 +25,11 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _sensitivity{1.f}
 {
   xGizmo = std::make_unique<AxisScaleGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
-                                            iGizmoLayer, this);
+                                            iGizmoLayer, this, thickness);
   yGizmo = std::make_unique<AxisScaleGizmo>(Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f),
-                                            iGizmoLayer, this);
+                                            iGizmoLayer, this, thickness);
   zGizmo = std::make_unique<AxisScaleGizmo>(Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f),
-                                            iGizmoLayer, this);
+                                            iGizmoLayer, this, thickness);
 
   // Create uniform scale gizmo
   uniformScaleGizmo = std::make_unique<AxisScaleGizmo>(

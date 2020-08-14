@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/matrix.h>
+#include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 
@@ -173,8 +174,10 @@ private:
   AbstractMeshPtr _attachedMesh;
   NodePtr _attachedNode;
   Matrix _tmpMatrix;
-  Vector3 _tempVector;
   Observer<Scene>::Ptr _beforeRenderObserver;
+  std::optional<Quaternion> _tempQuaternion;
+  std::optional<Vector3> _tempVector;
+  std::optional<Vector3> _tempVector2;
 
 }; // end of class Gizmo
 

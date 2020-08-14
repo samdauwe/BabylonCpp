@@ -23,14 +23,15 @@ class BABYLON_SHARED_EXPORT AxisScaleGizmo : public Gizmo {
 public:
   /**
    * @brief Creates an AxisScaleGizmo.
-   * @param dragAxis The axis which the gizmo will be able to drag on
-   * @param color The color of the gizmo
    * @param gizmoLayer The utility layer the gizmo will be added to
+   * @param dragAxis The axis which the gizmo will be able to scale on
+   * @param color The color of the gizmo
+   * @param thickness display gizmo axis thickness
    */
   AxisScaleGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
                  const UtilityLayerRendererPtr& gizmoLayer
                  = UtilityLayerRenderer::DefaultUtilityLayer(),
-                 ScaleGizmo* parent = nullptr);
+                 ScaleGizmo* parent = nullptr, float thickness = 1.f);
   ~AxisScaleGizmo() override; // = default
 
   /**

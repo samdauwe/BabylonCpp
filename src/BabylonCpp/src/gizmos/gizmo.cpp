@@ -2,6 +2,7 @@
 
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/cameras/target_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
@@ -24,6 +25,10 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _updateGizmoRotationToMatchAttachedMesh{true}
     , _attachedMesh{nullptr}
     , _attachedNode{nullptr}
+    , _beforeRenderObserver{nullptr}
+    , _tempQuaternion{Quaternion(0.f, 0.f, 0.f, 1.f)}
+    , _tempVector{Vector3()}
+    , _tempVector2{Vector3()}
 {
   _rootMesh                     = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _rootMesh->rotationQuaternion = Quaternion::Identity();
@@ -132,8 +137,8 @@ void Gizmo::_update()
     if (updateScale) {
       const auto& activeCamera   = gizmoLayer->utilityLayerScene->activeCamera();
       const auto& cameraPosition = activeCamera->globalPosition();
-      _rootMesh->position().subtractToRef(cameraPosition, _tempVector);
-      const auto dist = _tempVector.length() * scaleRatio;
+      _rootMesh->position().subtractToRef(cameraPosition, *_tempVector);
+      const auto dist = _tempVector->length() * scaleRatio;
       _rootMesh->scaling().set(dist, dist, dist);
 
       // Account for handedness, similar to Matrix.decompose
@@ -152,7 +157,42 @@ void Gizmo::_matrixChanged()
   if (!_attachedNode) {
     return;
   }
-  if (_attachedNode->getClassName() == "Mesh" || _attachedNode->getClassName() == "TransformNode") {
+
+  auto camera = std::static_pointer_cast<Camera>(_attachedNode);
+
+  if (camera && camera->_isCamera) {
+    if (camera->parent()) {
+      Matrix parentInv;
+      Matrix localMat;
+      camera->parent()->getWorldMatrix().invertToRef(parentInv);
+      _attachedNode->getWorldMatrix().multiplyToRef(parentInv, localMat);
+      localMat.decompose(_tempVector2, _tempQuaternion, _tempVector);
+    }
+    else {
+      _attachedNode->getWorldMatrix().decompose(_tempVector2, _tempQuaternion, _tempVector);
+    }
+
+    const auto inheritsTargetCamera = _attachedNode->getClassName() == "FreeCamera"
+                                      || _attachedNode->getClassName() == "FlyCamera"
+                                      || _attachedNode->getClassName() == "ArcFollowCamera"
+                                      || _attachedNode->getClassName() == "TargetCamera"
+                                      || _attachedNode->getClassName() == "TouchCamera"
+                                      || _attachedNode->getClassName() == "UniversalCamera";
+
+    if (inheritsTargetCamera) {
+      auto targetCamera      = std::static_pointer_cast<TargetCamera>(_attachedNode);
+      targetCamera->rotation = _tempQuaternion->toEulerAngles();
+      if (targetCamera->rotationQuaternion) {
+        targetCamera->rotationQuaternion->copyFrom(*_tempQuaternion);
+      }
+    }
+
+    camera->position().copyFrom(*_tempVector);
+  }
+  else if ((std::static_pointer_cast<Mesh>(_attachedNode)
+            && std::static_pointer_cast<Mesh>(_attachedNode)->_isMesh())
+           || _attachedNode->getClassName() == "AbstractMesh"
+           || _attachedNode->getClassName() == "TransformNode") {
     auto transform = std::static_pointer_cast<TransformNode>(_attachedNode);
     Quaternion transformQuaternion(0.f, 0.f, 0.f, 1.f);
     if (transform->parent()) {
@@ -160,26 +200,25 @@ void Gizmo::_matrixChanged()
       Matrix localMat;
       transform->parent()->getWorldMatrix().invertToRef(parentInv);
       _attachedNode->_worldMatrix.multiplyToRef(parentInv, localMat);
-      std::optional<Vector3> iScaling                = transform->scaling();
-      std::optional<Quaternion> iTransformQuaternion = transformQuaternion;
-      std::optional<Vector3> iPosition               = transform->position();
-      localMat.decompose(iScaling, iTransformQuaternion, iPosition);
+      std::optional<Vector3> iScaling  = transform->scaling();
+      std::optional<Vector3> iPosition = transform->position();
+      localMat.decompose(iScaling, _tempQuaternion, iPosition);
       transform->scaling  = *iScaling;
-      transformQuaternion = *iTransformQuaternion;
       transform->position = *iPosition;
     }
     else {
-      std::optional<Vector3> iScaling                = transform->scaling();
-      std::optional<Quaternion> iTransformQuaternion = transformQuaternion;
-      std::optional<Vector3> iPosition               = transform->position();
-      _attachedNode->_worldMatrix.decompose(iScaling, iTransformQuaternion, iPosition);
+      std::optional<Vector3> iScaling  = transform->scaling();
+      std::optional<Vector3> iPosition = transform->position();
+      _attachedNode->_worldMatrix.decompose(iScaling, _tempQuaternion, iPosition);
       transform->scaling  = *iScaling;
-      transformQuaternion = *iTransformQuaternion;
       transform->position = *iPosition;
     }
-    transform->rotation = transformQuaternion.toEulerAngles();
+
     if (transform->rotationQuaternion()) {
-      transform->rotationQuaternion = transformQuaternion;
+      transform->rotationQuaternion()->copyFrom(*_tempQuaternion);
+    }
+    else {
+      transform->rotation = _tempQuaternion->toEulerAngles();
     }
   }
   else if (_attachedNode->getClassName() == "Bone") {

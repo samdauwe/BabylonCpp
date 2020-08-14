@@ -11,6 +11,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class BoundingBoxGizmo;
+class Node;
 class PointerInfo;
 class PositionGizmo;
 class RotationGizmo;
@@ -19,6 +20,7 @@ class Scene;
 class SixDofDragBehavior;
 class UtilityLayerRenderer;
 using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
+using NodePtr                 = std::shared_ptr<Node>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 struct Gizmos {
@@ -36,7 +38,7 @@ struct GizmosEnabledSettings {
 }; // end of struct GizmosEnabledSettings
 
 /**
- * @brief Helps setup gizmo's in the scene to rotate/scale/position meshes.
+ * @brief Helps setup gizmo's in the scene to rotate/scale/position nodes.
  */
 class BABYLON_SHARED_EXPORT GizmoManager : public IDisposable {
 
@@ -44,8 +46,9 @@ public:
   /**
    * @brief Instatiates a gizmo manager.
    * @param scene the scene to overlay the gizmos on top of
+   * @param thickness display gizmo axis thickness
    */
-  GizmoManager(Scene* scene);
+  GizmoManager(Scene* scene, float thickness = 1);
   ~GizmoManager() override; // = default
 
   /**
@@ -53,6 +56,12 @@ public:
    * @param mesh The mesh the gizmo's should be attached to
    */
   void attachToMesh(const AbstractMeshPtr& mesh);
+
+  /**
+   * @brief Attaches a set of gizmos to the specified node.
+   * @param node The node the gizmo's should be attached to
+   */
+  void attachToNode(const NodePtr& node);
 
   /**
    * @brief Disposes of the gizmo manager.
@@ -130,6 +139,11 @@ public:
   Observable<AbstractMesh> onAttachedToMeshObservable;
 
   /**
+   * Fires an event when the manager is attached to a node
+   */
+  Observable<Node> onAttachedToNodeObservable;
+
+  /**
    * When bounding box gizmo is enabled, this can be used to track drag/end events
    */
   std::unique_ptr<SixDofDragBehavior> boundingBoxDragBehavior;
@@ -139,6 +153,12 @@ public:
    * meshes are attachable. (Default: null)
    */
   std::optional<std::vector<AbstractMeshPtr>> attachableMeshes;
+
+  /**
+   * Array of nodes which will have the gizmo attached when a pointer selected them. If null, all
+   * nodes are attachable. (Default: null)
+   */
+  std::optional<std::vector<NodePtr>> attachableNodes;
 
   /**
    * If pointer events should perform attaching/detaching a gizmo, if false this can be done
@@ -181,9 +201,11 @@ private:
   GizmosEnabledSettings _gizmosEnabled;
   Observer<PointerInfo>::Ptr _pointerObserver;
   AbstractMeshPtr _attachedMesh;
+  NodePtr _attachedNode;
   Color3 _boundingBoxColor;
   UtilityLayerRendererPtr _defaultUtilityLayer;
   UtilityLayerRendererPtr _defaultKeepDepthUtilityLayer;
+  float _thickness;
 
 }; // end of class GizmoManager
 

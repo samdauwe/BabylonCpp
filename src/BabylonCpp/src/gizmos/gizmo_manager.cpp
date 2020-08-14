@@ -12,10 +12,11 @@
 
 namespace BABYLON {
 
-GizmoManager::GizmoManager(Scene* iScene)
+GizmoManager::GizmoManager(Scene* iScene, float thickness)
     : clearGizmoOnEmptyPointerEvent{false}
     , boundingBoxDragBehavior{std::make_unique<SixDofDragBehavior>()}
     , attachableMeshes{std::nullopt}
+    , attachableNodes{std::nullopt}
     , usePointerToAttachGizmos{true}
     , keepDepthUtilityLayer{this, &GizmoManager::get_keepDepthUtilityLayer}
     , utilityLayer{this, &GizmoManager::get_utilityLayer}
@@ -31,11 +32,15 @@ GizmoManager::GizmoManager(Scene* iScene)
     , _gizmosEnabled{false, false, false, false}
     , _pointerObserver{nullptr}
     , _attachedMesh{nullptr}
+    , _attachedNode{nullptr}
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
+    , _thickness{1.f}
 {
   _defaultKeepDepthUtilityLayer = UtilityLayerRenderer::New(iScene);
   _defaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil = false;
   _defaultUtilityLayer = UtilityLayerRenderer::DefaultUtilityLayer();
+
+  _thickness = thickness;
 
   // Instatiate/dispose gizmos based on pointer actions
   _pointerObserver
@@ -93,8 +98,11 @@ void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
   if (_attachedMesh) {
     // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
   }
+  if (_attachedNode) {
+    // _attachedNode->removeBehavior(boundingBoxDragBehavior);
+  }
   _attachedMesh = mesh;
-
+  _attachedNode = nullptr;
   if (gizmos.positionGizmo && _gizmosEnabled.positionGizmo) {
     gizmos.positionGizmo->attachedMesh = mesh;
   }
@@ -114,6 +122,36 @@ void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
   onAttachedToMeshObservable.notifyObservers(mesh.get());
 }
 
+void GizmoManager::attachToNode(const NodePtr& node)
+{
+  if (_attachedMesh) {
+    // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
+  }
+  if (_attachedNode) {
+    // _attachedNode->removeBehavior(boundingBoxDragBehavior);
+  }
+  _attachedMesh = nullptr;
+  _attachedNode = node;
+  {
+    if (gizmos.positionGizmo && _gizmosEnabled.positionGizmo) {
+      gizmos.positionGizmo->attachedNode = node;
+    }
+    if (gizmos.rotationGizmo && _gizmosEnabled.rotationGizmo) {
+      gizmos.rotationGizmo->attachedNode = node;
+    }
+    if (gizmos.scaleGizmo && _gizmosEnabled.scaleGizmo) {
+      gizmos.scaleGizmo->attachedNode = node;
+    }
+    if (gizmos.boundingBoxGizmo && _gizmosEnabled.boundingBoxGizmo) {
+      gizmos.boundingBoxGizmo->attachedNode = node;
+    }
+  }
+  if (boundingBoxGizmoEnabled && _attachedNode) {
+    // _attachedNode->addBehavior(boundingBoxDragBehavior);
+  }
+  onAttachedToNodeObservable.notifyObservers(node.get());
+}
+
 UtilityLayerRendererPtr& GizmoManager::get_keepDepthUtilityLayer()
 {
   return _defaultKeepDepthUtilityLayer;
@@ -128,12 +166,17 @@ void GizmoManager::set_positionGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.positionGizmo) {
-      gizmos.positionGizmo = std::make_unique<PositionGizmo>(_defaultUtilityLayer);
+      gizmos.positionGizmo = std::make_unique<PositionGizmo>(_defaultUtilityLayer, _thickness);
     }
-    gizmos.positionGizmo->attachedMesh = _attachedMesh;
+    if (_attachedNode) {
+      gizmos.positionGizmo->attachedNode = _attachedNode;
+    }
+    else {
+      gizmos.positionGizmo->attachedMesh = _attachedMesh;
+    }
   }
   else if (gizmos.positionGizmo) {
-    gizmos.positionGizmo->attachedMesh = nullptr;
+    gizmos.positionGizmo->attachedNode = nullptr;
   }
   _gizmosEnabled.positionGizmo = value;
 }
@@ -147,13 +190,17 @@ void GizmoManager::set_rotationGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.rotationGizmo) {
-      gizmos.rotationGizmo = std::make_unique<RotationGizmo>(_defaultUtilityLayer);
+      gizmos.rotationGizmo = std::make_unique<RotationGizmo>(_defaultUtilityLayer, _thickness);
     }
-    gizmos.rotationGizmo->updateGizmoRotationToMatchAttachedMesh = false;
-    gizmos.rotationGizmo->attachedMesh                           = _attachedMesh;
+    if (_attachedNode) {
+      gizmos.rotationGizmo->attachedNode = _attachedNode;
+    }
+    else {
+      gizmos.rotationGizmo->attachedMesh = _attachedMesh;
+    }
   }
   else if (gizmos.rotationGizmo) {
-    gizmos.rotationGizmo->attachedMesh = nullptr;
+    gizmos.rotationGizmo->attachedNode = nullptr;
   }
   _gizmosEnabled.rotationGizmo = value;
 }
@@ -167,12 +214,17 @@ void GizmoManager::set_scaleGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.scaleGizmo) {
-      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>(_defaultUtilityLayer);
+      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>(_defaultUtilityLayer, _thickness);
     }
-    gizmos.scaleGizmo->attachedMesh = _attachedMesh;
+    if (_attachedNode) {
+      gizmos.scaleGizmo->attachedNode = _attachedNode;
+    }
+    else {
+      gizmos.scaleGizmo->attachedMesh = _attachedMesh;
+    }
   }
   else if (gizmos.scaleGizmo) {
-    gizmos.scaleGizmo->attachedMesh = nullptr;
+    gizmos.scaleGizmo->attachedNode = nullptr;
   }
   _gizmosEnabled.scaleGizmo = value;
 }
@@ -189,17 +241,30 @@ void GizmoManager::set_boundingBoxGizmoEnabled(bool value)
       gizmos.boundingBoxGizmo
         = std::make_unique<BoundingBoxGizmo>(_boundingBoxColor, _defaultKeepDepthUtilityLayer);
     }
-    gizmos.boundingBoxGizmo->attachedMesh = _attachedMesh;
+    if (_attachedMesh) {
+      gizmos.boundingBoxGizmo->attachedMesh = _attachedMesh;
+    }
+    else {
+      gizmos.boundingBoxGizmo->attachedNode = _attachedNode;
+    }
+
     if (_attachedMesh) {
       // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
       // _attachedMesh->addBehavior(boundingBoxDragBehavior);
+    }
+    else if (_attachedNode) {
+      // _attachedNode->removeBehavior(boundingBoxDragBehavior);
+      // _attachedNode->addBehavior(boundingBoxDragBehavior);
     }
   }
   else if (gizmos.boundingBoxGizmo) {
     if (_attachedMesh) {
       // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
     }
-    gizmos.boundingBoxGizmo->attachedMesh = nullptr;
+    else if (_attachedNode) {
+      // _attachedNode->removeBehavior(boundingBoxDragBehavior);
+    }
+    gizmos.boundingBoxGizmo->attachedNode = nullptr;
   }
   _gizmosEnabled.boundingBoxGizmo = value;
 }

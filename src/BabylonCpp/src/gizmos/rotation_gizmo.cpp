@@ -10,16 +10,19 @@
 namespace BABYLON {
 
 RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigned int tessellation,
-                             bool useEulerRotation)
+                             bool useEulerRotation, float thickness)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &RotationGizmo::get_snapDistance, &RotationGizmo::set_snapDistance}
 {
   xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
-                                                iGizmoLayer, tessellation, this, useEulerRotation);
+                                                iGizmoLayer, tessellation, this, useEulerRotation,
+                                                thickness);
   yGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f),
-                                                iGizmoLayer, tessellation, this, useEulerRotation);
+                                                iGizmoLayer, tessellation, this, useEulerRotation,
+                                                thickness);
   zGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f),
-                                                iGizmoLayer, tessellation, this, useEulerRotation);
+                                                iGizmoLayer, tessellation, this, useEulerRotation,
+                                                thickness);
 
   // Relay drag events
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
