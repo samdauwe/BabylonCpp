@@ -650,29 +650,6 @@ bool Engine::setSize(int width, int height)
   return true;
 }
 
-void Engine::updateDynamicVertexBuffer(const WebGLDataBufferPtr& vertexBuffer,
-                                       const Float32Array& data, int byteOffset, int byteLength)
-{
-  bindArrayBuffer(vertexBuffer);
-
-  if (byteOffset == -1) {
-    byteOffset = 0;
-  }
-
-  const auto dataLength = static_cast<int>(data.size() * sizeof(float));
-
-  if (byteLength == -1 || (byteLength >= dataLength && byteOffset == 0)) {
-    _gl->bufferSubData(GL::ARRAY_BUFFER, byteOffset, data);
-  }
-  else {
-    auto byteArray = stl_util::to_array<uint8_t>(data, static_cast<size_t>(byteOffset),
-                                                 static_cast<size_t>(byteLength));
-    _gl->bufferSubData(GL::ARRAY_BUFFER, 0, byteArray);
-  }
-
-  _resetVertexBufferBinding();
-}
-
 void Engine::_deletePipelineContext(const IPipelineContextPtr& pipelineContext)
 {
   auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
@@ -850,19 +827,6 @@ void Engine::_uploadImageToTexture(const InternalTexturePtr& texture, const Imag
   _gl->texImage2D(target, lod, static_cast<int>(internalFormat), image.width, image.height, 0,
                   format, textureType, &image.data);
   _bindTextureDirectly(bindTarget, nullptr, true);
-}
-
-void Engine::updateDynamicIndexBuffer(const WebGLDataBufferPtr& indexBuffer,
-                                      const IndicesArray& indices, int /*offset*/)
-{
-  // Force cache update
-  _currentBoundBuffer[GL::ELEMENT_ARRAY_BUFFER] = nullptr;
-  bindIndexBuffer(indexBuffer);
-  auto arrayBuffer = indices;
-
-  _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, arrayBuffer, GL::DYNAMIC_DRAW);
-
-  _resetIndexBufferBinding();
 }
 
 unsigned int Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,

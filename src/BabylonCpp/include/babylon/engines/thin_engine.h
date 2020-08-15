@@ -26,6 +26,7 @@ class CubeTextureExtension;
 struct CubeTextureData;
 class DepthCullingState;
 struct DepthTextureCreationOptions;
+class DynamicBufferExtension;
 class DynamicTextureExtension;
 class Color4;
 class Effect;
@@ -1248,6 +1249,30 @@ public:
   void _setCubeMapTextureParams(bool loadMipmap);
 
   //------------------------------------------------------------------------------------------------
+  //                              Dynamic Buffer Extension
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * @brief Update a dynamic index buffer.
+   * @param indexBuffer defines the target index buffer
+   * @param indices defines the data to update
+   * @param offset defines the offset in the target index buffer where update should start
+   */
+  virtual void updateDynamicIndexBuffer(const WebGLDataBufferPtr& indexBuffer,
+                                        const IndicesArray& indices, int offset = 0);
+
+  /**
+   * @brief Updates a dynamic vertex buffer.
+   * @param vertexBuffer the vertex buffer to update
+   * @param data the data used to update the vertex buffer
+   * @param byteOffset the byte offset of the data
+   * @param byteLength the byte length of the data
+   */
+  virtual void updateDynamicVertexBuffer(const WebGLDataBufferPtr& vertexBuffer,
+                                         const Float32Array& data, int byteOffset = -1,
+                                         int byteLength = -1);
+
+  //------------------------------------------------------------------------------------------------
   //                              Dynamic Texture Extension
   //------------------------------------------------------------------------------------------------
 
@@ -2089,6 +2114,7 @@ private:
   /** Extensions */
   std::unique_ptr<AlphaExtension> _alphaExtension;
   std::unique_ptr<CubeTextureExtension> _cubeTextureExtension;
+  std::unique_ptr<DynamicBufferExtension> _dynamicBufferExtension;
   std::unique_ptr<DynamicTextureExtension> _dynamicTextureExtension;
   std::unique_ptr<MultiRenderExtension> _multiRenderExtension;
   std::unique_ptr<RawTextureExtension> _rawTextureExtension;
@@ -2098,6 +2124,7 @@ private:
   std::unique_ptr<UniformBufferExtension> _uniformBufferExtension;
 
   // Friend classes
+  friend class DynamicBufferExtension;
   friend class ReadTextureExtension;
   friend class RenderTargetExtension;
 

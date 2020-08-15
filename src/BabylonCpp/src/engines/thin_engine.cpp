@@ -6,6 +6,7 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/alpha_extension.h>
 #include <babylon/engines/extensions/cube_texture_extension.h>
+#include <babylon/engines/extensions/dynamic_buffer_extension.h>
 #include <babylon/engines/extensions/dynamic_texture_extension.h>
 #include <babylon/engines/extensions/multi_render_extension.h>
 #include <babylon/engines/extensions/raw_texture_extension.h>
@@ -104,6 +105,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , _supportsHardwareTextureRescaling{this, &ThinEngine::get__supportsHardwareTextureRescaling}
     , _alphaExtension{std::make_unique<AlphaExtension>(this)}
     , _cubeTextureExtension{std::make_unique<CubeTextureExtension>(this)}
+    , _dynamicBufferExtension{std::make_unique<DynamicBufferExtension>(this)}
     , _dynamicTextureExtension{std::make_unique<DynamicTextureExtension>(this)}
     , _multiRenderExtension{std::make_unique<MultiRenderExtension>(this)}
     , _rawTextureExtension{std::make_unique<RawTextureExtension>(this)}
@@ -3813,6 +3815,22 @@ void ThinEngine::_cascadeLoadImgs(
 void ThinEngine::_setCubeMapTextureParams(bool loadMipmap)
 {
   _cubeTextureExtension->_setCubeMapTextureParams(loadMipmap);
+}
+
+//--------------------------------------------------------------------------------------------------
+//                              Dynamic Buffer Extension
+//--------------------------------------------------------------------------------------------------
+
+void ThinEngine::updateDynamicIndexBuffer(const WebGLDataBufferPtr& indexBuffer,
+                                          const IndicesArray& indices, int offset)
+{
+  _dynamicBufferExtension->updateDynamicIndexBuffer(indexBuffer, indices, offset);
+}
+
+void ThinEngine::updateDynamicVertexBuffer(const WebGLDataBufferPtr& vertexBuffer,
+                                           const Float32Array& data, int byteOffset, int byteLength)
+{
+  _dynamicBufferExtension->updateDynamicVertexBuffer(vertexBuffer, data, byteOffset, byteLength);
 }
 
 //--------------------------------------------------------------------------------------------------
