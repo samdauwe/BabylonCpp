@@ -713,7 +713,7 @@ public:
    * @returns the thin instance index number. If you pass an array of matrices, other instance
    * indexes are index+1, index+2, etc
    */
-  size_t thinInstanceAdd(const Matrix& matrix, bool refresh = true);
+  size_t thinInstanceAdd(Matrix& matrix, bool refresh = true);
 
   /**
    * @brief Creates a new thin instance.
@@ -723,7 +723,7 @@ public:
    * @returns the thin instance index number. If you pass an array of matrices, other instance
    * indexes are index+1, index+2, etc
    */
-  size_t thinInstanceAdd(const std::vector<Matrix>& matrix, bool refresh = true);
+  size_t thinInstanceAdd(std::vector<Matrix>& matrix, bool refresh = true);
 
   /**
    * @brief Adds the transformation (matrix) of the current mesh as a thin instance.
@@ -747,7 +747,7 @@ public:
    * @param refresh true to refresh the underlying gpu buffer (default: true). If you do multiple
    * calls to this method in a row, set refresh to true only for the last call to save performance
    */
-  bool thinInstanceSetMatrixAt(size_t index, const Matrix& matrix, bool refresh = true);
+  bool thinInstanceSetMatrixAt(size_t index, Matrix& matrix, bool refresh = true);
 
   /**
    * @brief Sets the value of a custom attribute for a thin instance.
@@ -771,6 +771,12 @@ public:
    */
   void thinInstanceSetBuffer(const std::string& kind, const Float32Array& buffer,
                              unsigned int stride = 0, bool staticBuffer = false);
+
+  /**
+   * @brief Gets the list of world matrices.
+   * @return an array containing all the world matrices from the thin instances
+   */
+  std::vector<Matrix> thinInstanceGetWorldMatrices();
 
   /**
    * @brief Synchronize the gpu buffers with a thin instance buffer. Call this method if you update
@@ -1843,6 +1849,16 @@ protected:
                    bool clonePhysicsImpostor);
 
   /**
+   * @brief Gets to use shaders on bones.
+   */
+  bool get_computeBonesUsingShaders() const;
+
+  /**
+   * @brief Sets to use shaders on bones.
+   */
+  void set_computeBonesUsingShaders(bool value);
+
+  /**
    * @brief An event triggered before rendering the mesh.
    */
   Observable<Mesh>& get_onBeforeRenderObservable();
@@ -1987,6 +2003,11 @@ private:
   Mesh& _queueLoad(Scene* scene);
 
 public:
+  /**
+   * Sets of gets to use shaders on bones
+   */
+  Property<Mesh, bool> computeBonesUsingShaders;
+
   /** Events **/
 
   /**
@@ -2141,6 +2162,11 @@ public:
    * instanced InterleavedVertexBuffer are used rather than InstancedMeshs
    */
   WriteOnlyProperty<Mesh, size_t> overridenInstanceCount;
+
+  /**
+   * Gets or sets a boolean defining if we want picking to pick thin instances as well
+   */
+  bool thinInstanceEnablePicking;
 
   /**
    * Gets / sets the number of thin instances to display. Note that you can't set a number higher

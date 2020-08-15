@@ -57,7 +57,8 @@ public:
 
   PickingInfo intersects(Ray& ray, const std::optional<bool>& fastCheck = std::nullopt,
                          const TrianglePickingPredicate& trianglePredicate = nullptr,
-                         bool onlyBoundingInfo                             = false) override;
+                         bool onlyBoundingInfo                             = false,
+                         const std::optional<Matrix>& worldToUse           = std::nullopt) override;
 
   /**
    * @brief Disposes of the line mesh.

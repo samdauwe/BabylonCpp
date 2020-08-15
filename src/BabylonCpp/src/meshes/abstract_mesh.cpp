@@ -1415,7 +1415,7 @@ bool AbstractMesh::_generatePointsArray()
 
 PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastCheck,
                                      const TrianglePickingPredicate& trianglePredicate,
-                                     bool onlyBoundingInfo)
+                                     bool onlyBoundingInfo, const std::optional<Matrix>& worldToUse)
 {
   const auto fastCheck = iFastCheck.value_or(true);
   PickingInfo pickingInfo;
@@ -1473,7 +1473,9 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
 
   if (intersectInfo) {
     // Get picked point
-    auto world        = getWorldMatrix();
+    auto world        = worldToUse.value_or((skeleton() && skeleton()->overrideMesh ?
+                                        skeleton()->overrideMesh->getWorldMatrix() :
+                                        getWorldMatrix()));
     auto& worldOrigin = TmpVectors::Vector3Array[0];
     auto& direction   = TmpVectors::Vector3Array[1];
     Vector3::TransformCoordinatesToRef(ray.origin, world, worldOrigin);

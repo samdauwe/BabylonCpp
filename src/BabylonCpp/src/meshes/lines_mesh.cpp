@@ -177,7 +177,8 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/, size_t instancesCount,
 
 PickingInfo LinesMesh::intersects(Ray& /*ray*/, const std::optional<bool>& /*fastCheck*/,
                                   const TrianglePickingPredicate& /*trianglePredicate*/,
-                                  bool /*onlyBoundingInfo*/)
+                                  bool /*onlyBoundingInfo*/,
+                                  const std::optional<Matrix>& /*worldToUse*/)
 {
   return PickingInfo();
 }

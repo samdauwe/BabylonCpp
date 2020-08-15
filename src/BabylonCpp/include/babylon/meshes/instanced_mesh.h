@@ -228,12 +228,16 @@ public:
   bool _generatePointsArray() override;
 
   /**
+   * @brief Hidden
+   */
+  AbstractMesh& _updateBoundingInfo();
+
+  /**
    * @brief Creates a new InstancedMesh from the current mesh.
    * @param name (string) : the cloned mesh name
-   * @param  newParent (optional Node) : the optional Node to parent the clone
-   * to.
-   * @param  doNotCloneChildren (optional boolean, default `false`) : if `true`
-   * the model children aren't cloned.
+   * @param  newParent (optional Node) : the optional Node to parent the clone to.
+   * @param  doNotCloneChildren (optional boolean, default `false`) : if `true` the model children
+   * aren't cloned.
    * @returns The clone.
    */
   InstancedMeshPtr clone(const std::string& name, Node* newParent, bool doNotCloneChildren = false);

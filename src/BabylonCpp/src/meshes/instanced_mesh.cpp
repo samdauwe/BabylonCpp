@@ -321,6 +321,20 @@ bool InstancedMesh::_generatePointsArray()
   return _sourceMesh->_generatePointsArray();
 }
 
+AbstractMesh& InstancedMesh::_updateBoundingInfo()
+{
+  const auto effectiveMesh = static_cast<AbstractMesh*>(this);
+  if (_boundingInfo) {
+    _boundingInfo->update(effectiveMesh->worldMatrixFromCache());
+  }
+  else {
+    _boundingInfo = std::make_shared<BoundingInfo>(absolutePosition(), absolutePosition(),
+                                                   effectiveMesh->worldMatrixFromCache());
+  }
+  _updateSubMeshesBoundingInfo(effectiveMesh->worldMatrixFromCache());
+  return *this;
+}
+
 InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/, Node* newParent,
                                       bool doNotCloneChildren)
 {

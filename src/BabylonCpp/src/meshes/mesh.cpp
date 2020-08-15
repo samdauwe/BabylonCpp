@@ -75,6 +75,8 @@ namespace BABYLON {
 Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
            bool doNotCloneChildren, bool clonePhysicsImpostor, bool postInitialize)
     : AbstractMesh{iName, scene}
+    , computeBonesUsingShaders{this, &Mesh::get_computeBonesUsingShaders,
+                               &Mesh::set_computeBonesUsingShaders}
     , onBeforeRenderObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeBindObservable{this, &Mesh::get_onBeforeBindObservable}
     , onAfterRenderObservable{this, &Mesh::get_onAfterRenderObservable}
@@ -100,6 +102,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , geometry{this, &Mesh::get_geometry}
     , areNormalsFrozen{this, &Mesh::get_areNormalsFrozen}
     , overridenInstanceCount{this, &Mesh::set_overridenInstanceCount}
+    , thinInstanceEnablePicking{false}
     , thinInstanceCount{this, &Mesh::get_thinInstanceCount, &Mesh::set_thinInstanceCount}
     , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
     , _internalMeshDataInfo{std::make_unique<_InternalMeshDataInfo>()}
@@ -309,6 +312,29 @@ Type Mesh::type() const
 bool Mesh::get__isMesh() const
 {
   return true;
+}
+
+bool Mesh::get_computeBonesUsingShaders() const
+{
+  return _internalAbstractMeshDataInfo._computeBonesUsingShaders;
+}
+
+void Mesh::set_computeBonesUsingShaders(bool value)
+{
+  if (_internalAbstractMeshDataInfo._computeBonesUsingShaders == value) {
+    return;
+  }
+
+  if (value && !_internalMeshDataInfo->_sourcePositions.empty()
+      && !_internalMeshDataInfo->_sourceNormals.empty()) {
+    // switch from software to GPU computation: we need to reset the vertex and normal buffers that
+    // have been updated by the software process
+    setVerticesData(VertexBuffer::PositionKind, _internalMeshDataInfo->_sourcePositions, true);
+    setVerticesData(VertexBuffer::NormalKind, _internalMeshDataInfo->_sourceNormals, true);
+  }
+
+  _internalAbstractMeshDataInfo._computeBonesUsingShaders = value;
+  _markSubMeshesAsAttributesDirty();
 }
 
 Observable<Mesh>& Mesh::get_onBeforeRenderObservable()
@@ -1246,7 +1272,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   return *this;
 }
 
-size_t Mesh::thinInstanceAdd(const Matrix& matrix, bool refresh)
+size_t Mesh::thinInstanceAdd(Matrix& matrix, bool refresh)
 {
   _thinInstanceUpdateBufferSize("matrix", 1);
 
@@ -1257,7 +1283,7 @@ size_t Mesh::thinInstanceAdd(const Matrix& matrix, bool refresh)
   return index;
 }
 
-size_t Mesh::thinInstanceAdd(const std::vector<Matrix>& matrix, bool refresh)
+size_t Mesh::thinInstanceAdd(std::vector<Matrix>& matrix, bool refresh)
 {
   _thinInstanceUpdateBufferSize("matrix", matrix.size());
 
@@ -1273,7 +1299,8 @@ size_t Mesh::thinInstanceAdd(const std::vector<Matrix>& matrix, bool refresh)
 
 size_t Mesh::thinInstanceAddSelf(bool refresh)
 {
-  return thinInstanceAdd(Matrix::IdentityReadOnly(), refresh);
+  auto matrix = Matrix::IdentityReadOnly();
+  return thinInstanceAdd(matrix, refresh);
 }
 
 void Mesh::thinInstanceRegisterAttribute(const std::string& kind, unsigned int stride)
@@ -1294,7 +1321,7 @@ void Mesh::thinInstanceRegisterAttribute(const std::string& kind, unsigned int s
   setVerticesBuffer(_userThinInstanceBuffersStorage->vertexBuffers[kind]);
 }
 
-bool Mesh::thinInstanceSetMatrixAt(size_t index, const Matrix& iMatrix, bool refresh)
+bool Mesh::thinInstanceSetMatrixAt(size_t index, Matrix& iMatrix, bool refresh)
 {
   if (_thinInstanceDataStorage->matrixData.empty()
       || index >= _thinInstanceDataStorage->instancesCount) {
@@ -1303,8 +1330,14 @@ bool Mesh::thinInstanceSetMatrixAt(size_t index, const Matrix& iMatrix, bool ref
 
   auto& matrixData = _thinInstanceDataStorage->matrixData;
 
-  auto matrix = iMatrix;
-  matrix.copyToArray(matrixData, static_cast<unsigned>(index) * 16);
+  iMatrix.copyToArray(matrixData, static_cast<unsigned>(index) * 16);
+
+  if (_thinInstanceDataStorage->worldMatrices) {
+    if (index >= _thinInstanceDataStorage->worldMatrices->size()) {
+      _thinInstanceDataStorage->worldMatrices->resize(index + 1);
+    }
+    (*_thinInstanceDataStorage->worldMatrices)[index] = iMatrix;
+  }
 
   if (refresh) {
     thinInstanceBufferUpdated("matrix");
@@ -1352,6 +1385,7 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
     }
     _thinInstanceDataStorage->matrixBufferSize = !buffer.empty() ? buffer.size() : 32 * stride;
     _thinInstanceDataStorage->matrixData       = buffer;
+    _thinInstanceDataStorage->worldMatrices    = std::nullopt;
 
     if (!buffer.empty()) {
       _thinInstanceDataStorage->instancesCount = buffer.size() / stride;
@@ -1416,6 +1450,24 @@ void Mesh::thinInstanceBufferUpdated(const std::string& kind)
     _userThinInstanceBuffersStorage->vertexBuffers[kind]->updateDirectly(
       _userThinInstanceBuffersStorage->data[kind], 0);
   }
+}
+
+std::vector<Matrix> Mesh::thinInstanceGetWorldMatrices()
+{
+  if (_thinInstanceDataStorage->matrixData.empty() || !_thinInstanceDataStorage->matrixBuffer) {
+    return {};
+  }
+  const auto& matrixData = _thinInstanceDataStorage->matrixData;
+
+  if (!_thinInstanceDataStorage->worldMatrices) {
+    _thinInstanceDataStorage->worldMatrices = std::vector<Matrix>();
+
+    for (size_t i = 0; i < _thinInstanceDataStorage->instancesCount; ++i) {
+      _thinInstanceDataStorage->worldMatrices->emplace_back(Matrix::FromArray(matrixData, i * 16));
+    }
+  }
+
+  return *_thinInstanceDataStorage->worldMatrices;
 }
 
 void Mesh::thinInstanceRefreshBoundingInfo(bool forceRefreshParentInfo)
