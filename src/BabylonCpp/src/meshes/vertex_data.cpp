@@ -2366,14 +2366,17 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   stl_util::concat(uvs, {0.5f, 0.5f});
 
   auto theta = Math::PI2 * arc;
-  auto step  = theta / static_cast<float>(tessellation);
-  for (auto a = 0.f; a < theta; a += step) {
+  auto step  = arc == 1.f ? theta / static_cast<float>(tessellation) :
+                           theta / static_cast<float>(tessellation - 1);
+  auto a = 0.f;
+  for (unsigned int t = 0; t < tessellation; ++t) {
     auto x = std::cos(a);
     auto y = std::sin(a);
     auto u = (x + 1.f) / 2.f;
     auto v = (1.f - y) / 2.f;
     stl_util::concat(positions, {radius * x, radius * y, 0.f});
     stl_util::concat(uvs, {u, v});
+    a += step;
   }
   if (stl_util::almost_equal(arc, 1.f)) {
     // close the circle
