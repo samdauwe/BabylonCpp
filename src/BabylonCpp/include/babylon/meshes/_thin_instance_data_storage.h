@@ -23,6 +23,7 @@ struct BABYLON_SHARED_EXPORT _ThinInstanceDataStorage {
   size_t matrixBufferSize              = 32 * 16; // let's start with a maximum of 32 thin instances
   Float32Array matrixData              = {};
   std::vector<Vector3> boundingVectors = {};
+  std::optional<std::vector<Matrix>> worldMatrices = std::nullopt;
 }; // end of struct _ThinInstanceDataStorage
 
 } // end of namespace BABYLON
