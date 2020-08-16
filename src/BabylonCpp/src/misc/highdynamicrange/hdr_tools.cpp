@@ -117,7 +117,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
 CubeMapInfo HDRTools::GetCubeMapTextureData(const Uint8Array& buffer, size_t size)
 {
   auto hdrInfo = RGBE_ReadHeader(buffer);
-  auto data    = RGBE_ReadPixels_RLE(buffer, hdrInfo);
+  auto data    = RGBE_ReadPixels(buffer, hdrInfo);
 
   return PanoramaToCubeMapTools::ConvertPanoramaToCubemap(data, hdrInfo.width, hdrInfo.height,
                                                           size);
@@ -125,7 +125,6 @@ CubeMapInfo HDRTools::GetCubeMapTextureData(const Uint8Array& buffer, size_t siz
 
 Float32Array HDRTools::RGBE_ReadPixels(const Uint8Array& uint8array, const HDRInfo& hdrInfo)
 {
-  // Keep for multi format supports.
   return RGBE_ReadPixels_RLE(uint8array, hdrInfo);
 }
 
@@ -152,9 +151,8 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array, const H
     c = uint8array[dataIndex++];
     d = uint8array[dataIndex++];
 
-    if (a != 2 || b != 2 || (c & 0x80)) {
-      // this file is not run length encoded
-      throw std::runtime_error("HDR Bad header format, not RLE");
+    if (a != 2 || b != 2 || (c & 0x80) || hdrInfo.width < 8 || hdrInfo.width > 32767) {
+      return HDRTools::RGBE_ReadPixels_NOT_RLE(uint8array, hdrInfo);
     }
 
     if (static_cast<size_t>((c << 8) | d) != scanline_width) {
@@ -207,6 +205,40 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array, const H
       d = scanLineArray[i + 3 * scanline_width];
 
       Rgbe2float(resultArray, a, b, c, d,
+                 (hdrInfo.height - num_scanlines) * scanline_width * 3 + i * 3);
+    }
+
+    --num_scanlines;
+  }
+
+  return resultArray;
+}
+
+Float32Array HDRTools::RGBE_ReadPixels_NOT_RLE(const Uint8Array& uint8array, const HDRInfo& hdrInfo)
+{
+  // this file is not run length encoded
+  // read values sequentially
+
+  auto num_scanlines        = hdrInfo.height;
+  const auto scanline_width = hdrInfo.width;
+
+  uint8_t a = 0, b = 0, c = 0, d = 0;
+  auto i         = 0ull;
+  auto dataIndex = hdrInfo.dataPosition;
+
+  // 3 channels of 4 bytes per pixel in float.
+  Float32Array resultArray(hdrInfo.width * hdrInfo.height * 4 * 3);
+
+  // read in each successive scanline
+  while (num_scanlines > 0) {
+    for (i = 0; i < hdrInfo.width; i++) {
+      a = uint8array[dataIndex++];
+      b = uint8array[dataIndex++];
+      c = uint8array[dataIndex++];
+      d = uint8array[dataIndex++];
+
+      Rgbe2float(resultArray, //
+                 a, b, c, d,  //
                  (hdrInfo.height - num_scanlines) * scanline_width * 3 + i * 3);
     }
 

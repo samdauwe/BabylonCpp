@@ -7,11 +7,13 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/maths/matrix.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
 class AbstractMesh;
 class Effect;
+class Engine;
 class Mesh;
 class SubMesh;
 class MultiRenderTarget;
@@ -252,6 +254,7 @@ protected:
 
 private:
   Scene* _scene;
+  Observer<Engine>::Ptr _resizeObserver;
   MultiRenderTargetPtr _multiRenderTarget;
   float _ratio;
   bool _enablePosition;

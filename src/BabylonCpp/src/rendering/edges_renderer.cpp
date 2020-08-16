@@ -818,6 +818,10 @@ void EdgesRenderer::render()
                            static_cast<int>(instanceCount));
   _lineShader->unbind();
 
+  if (useBuffersWithInstances) {
+    engine->unbindInstanceAttributes();
+  }
+
   customInstances.clear();
 }
 

@@ -12,6 +12,7 @@
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/multi_render_target.h>
+#include <babylon/maths/size.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -38,6 +39,7 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , samples{this, &GeometryBufferRenderer::get_samples, &GeometryBufferRenderer::set_samples}
     , _effect{nullptr}
     , _cachedDefines{""}
+    , _resizeObserver{nullptr}
     , _multiRenderTarget{nullptr}
     , _enablePosition{false}
     , _enableVelocity{false}
@@ -317,6 +319,11 @@ void GeometryBufferRenderer::set_samples(unsigned int value)
 
 void GeometryBufferRenderer::dispose()
 {
+  if (_resizeObserver) {
+    const auto engine = _scene->getEngine();
+    engine->onResizeObservable.remove(_resizeObserver);
+    _resizeObserver = nullptr;
+  }
   getGBuffer()->dispose();
 }
 
@@ -365,6 +372,16 @@ void GeometryBufferRenderer::_createRenderTargets()
   _multiRenderTarget->onClearObservable.add([](Engine* engine, EventState&) {
     engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
   });
+
+  _resizeObserver
+    = engine->onResizeObservable.add([this](Engine* engine, EventState & /*es*/) -> void {
+        if (_multiRenderTarget) {
+          _multiRenderTarget->resize(Size{
+            static_cast<int>(engine->getRenderWidth() * _ratio), // width,
+            static_cast<int>(engine->getRenderHeight() * _ratio) // height
+          });
+        }
+      });
 
   // Custom render function
   _multiRenderTarget->customRenderFunction

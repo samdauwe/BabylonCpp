@@ -54,6 +54,7 @@ private:
                          float exponent, size_t index);
   static std::string readStringLine(const Uint8Array& uint8array, size_t startIndex);
   static Float32Array RGBE_ReadPixels_RLE(const Uint8Array& uint8array, const HDRInfo& hdrInfo);
+  static Float32Array RGBE_ReadPixels_NOT_RLE(const Uint8Array& uint8array, const HDRInfo& hdrInfo);
 
 }; // end of struct HDRTools
 

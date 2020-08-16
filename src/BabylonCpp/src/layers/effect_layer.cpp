@@ -490,7 +490,17 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   // Culling
-  engine->setState(material->backFaceCulling());
+  auto sideOrientation = renderingMesh->overrideMaterialSideOrientation.value_or(
+    static_cast<unsigned>(material->sideOrientation));
+  const auto mainDeterminant = renderingMesh->_getWorldMatrixDeterminant();
+  if (mainDeterminant < 0.f) {
+    sideOrientation = (sideOrientation == Material::ClockWiseSideOrientation ?
+                         Material::CounterClockWiseSideOrientation :
+                         Material::ClockWiseSideOrientation);
+  }
+
+  const auto reverse = sideOrientation == Material::ClockWiseSideOrientation;
+  engine->setState(material->backFaceCulling, material->zOffset, false, reverse);
 
   // Managing instances
   auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);

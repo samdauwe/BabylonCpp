@@ -121,6 +121,8 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     _scene->_addComponent(component);
   }
 
+  id = light->id;
+
   // Texture type fallback from float to int if not supported.
   const auto& caps = _scene->getEngine()->getCaps();
 

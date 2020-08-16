@@ -27,10 +27,17 @@ struct ShadowGeneratorCompileOptions {
 }; // end of struct ShadowGeneratorCompileOptions
 
 /**
- * @briefInterface to implement to create a shadow generator compatible with BJS.
+ * @brief Interface to implement to create a shadow generator compatible with BJS.
  */
 struct BABYLON_SHARED_EXPORT IShadowGenerator {
+
   virtual ~IShadowGenerator() = default;
+
+  /**
+   * Gets or set the id of the shadow generator. It will be the one from the light if not defined
+   */
+  std::string id;
+
   /**
    * @brief Gets the main RTT containing the shadow map (usually storing depth from the light point
    * of view).
