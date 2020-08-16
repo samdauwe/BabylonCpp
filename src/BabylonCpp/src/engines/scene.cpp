@@ -118,12 +118,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , forceWireframe{this, &Scene::get_forceWireframe, &Scene::set_forceWireframe}
     , skipFrustumClipping{this, &Scene::get_skipFrustumClipping, &Scene::set_skipFrustumClipping}
     , forcePointsCloud{this, &Scene::get_forcePointsCloud, &Scene::set_forcePointsCloud}
-    , clipPlane{std::nullopt}
-    , clipPlane2{std::nullopt}
-    , clipPlane3{std::nullopt}
-    , clipPlane4{std::nullopt}
-    , clipPlane5{std::nullopt}
-    , clipPlane6{std::nullopt}
     , forceShowBoundingBoxes{this, &Scene::get_forceShowBoundingBoxes,
                              &Scene::set_forceShowBoundingBoxes}
     , animationsEnabled{true}

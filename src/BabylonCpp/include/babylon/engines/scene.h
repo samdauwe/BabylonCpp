@@ -20,8 +20,8 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/matrix.h>
-#include <babylon/maths/plane.h>
 #include <babylon/misc/ifile_request.h>
+#include <babylon/misc/interfaces/iclip_planes_holder.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 #include <babylon/misc/perf_counter.h>
@@ -97,7 +97,9 @@ using SubMeshPtr                      = std::shared_ptr<SubMesh>;
  * @brief Represents a scene to be rendered by the engine.
  * @see https://doc.babylonjs.com/features/scene
  */
-class BABYLON_SHARED_EXPORT Scene : public AbstractScene, public IAnimatable {
+class BABYLON_SHARED_EXPORT Scene : public AbstractScene,
+                                    public IAnimatable,
+                                    public IClipPlanesHolder {
 
 public:
   using TrianglePickingPredicate
@@ -2659,36 +2661,6 @@ public:
    * Gets a boolean indicating if all rendering must be done in point cloud
    */
   Property<Scene, bool> forcePointsCloud;
-
-  /**
-   * Gets or sets the active clipplane 1
-   */
-  std::optional<Plane> clipPlane;
-
-  /**
-   * Gets or sets the active clipplane 2
-   */
-  std::optional<Plane> clipPlane2;
-
-  /**
-   * Gets or sets the active clipplane 3
-   */
-  std::optional<Plane> clipPlane3;
-
-  /**
-   * Gets or sets the active clipplane 4
-   */
-  std::optional<Plane> clipPlane4;
-
-  /**
-   * Gets or sets the active clipplane 5
-   */
-  std::optional<Plane> clipPlane5;
-
-  /**
-   * Gets or sets the active clipplane 6
-   */
-  std::optional<Plane> clipPlane6;
 
   /**
    * Gets or sets a boolean indicating if all bounding boxes must be rendered

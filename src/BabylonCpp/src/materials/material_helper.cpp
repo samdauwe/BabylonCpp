@@ -16,6 +16,7 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/materials/thin_material_helper.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/plane.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -779,36 +780,7 @@ void MaterialHelper::BindLogDepth(MaterialDefines& defines, const EffectPtr& eff
 
 void MaterialHelper::BindClipPlane(const EffectPtr& effect, Scene* scene)
 {
-  if (scene->clipPlane) {
-    const auto& clipPlane = *scene->clipPlane;
-    effect->setFloat4("vClipPlane", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
-                      clipPlane.d);
-  }
-  if (scene->clipPlane2) {
-    const auto& clipPlane = *scene->clipPlane2;
-    effect->setFloat4("vClipPlane2", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
-                      clipPlane.d);
-  }
-  if (scene->clipPlane3) {
-    const auto& clipPlane = *scene->clipPlane3;
-    effect->setFloat4("vClipPlane3", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
-                      clipPlane.d);
-  }
-  if (scene->clipPlane4) {
-    const auto& clipPlane = *scene->clipPlane4;
-    effect->setFloat4("vClipPlane4", clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z,
-                      clipPlane.d);
-  }
-  if (scene->clipPlane5) {
-    const auto& clipPlane = scene->clipPlane5;
-    effect->setFloat4("vClipPlane5", clipPlane->normal.x, clipPlane->normal.y, clipPlane->normal.z,
-                      clipPlane->d);
-  }
-  if (scene->clipPlane6) {
-    const auto& clipPlane = scene->clipPlane6;
-    effect->setFloat4("vClipPlane6", clipPlane->normal.x, clipPlane->normal.y, clipPlane->normal.z,
-                      clipPlane->d);
-  }
+  ThinMaterialHelper::BindClipPlane(effect, *scene);
 }
 
 } // end of namespace BABYLON
