@@ -24,6 +24,7 @@ InputManager::InputManager(Scene* scene)
     , unTranslatedPointer{this, &InputManager::get_unTranslatedPointer}
     , pointerX{this, &InputManager::get_pointerX, &InputManager::set_pointerX}
     , pointerY{this, &InputManager::get_pointerY, &InputManager::set_pointerY}
+    , _alreadyAttached{false}
     , _wheelEventName{""}
     , _onPointerMove{nullptr}
     , _onPointerDown{nullptr}
@@ -424,6 +425,20 @@ bool InputManager::isPointerCaptured(int pointerId)
 void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove,
                                  ICanvas* elementToAttachTo)
 {
+  auto scene = _scene;
+
+  if (!elementToAttachTo) {
+    elementToAttachTo = scene->getEngine()->getInputElement();
+  }
+
+  if (!elementToAttachTo) {
+    return;
+  }
+
+  if (_alreadyAttached) {
+    detachControl();
+  }
+
   _initActionManager = [this](AbstractActionManagerPtr act,
                               const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
@@ -596,6 +611,11 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
   };
 
   _onPointerMove = [this](PointerEvent&& evt) -> void {
+    // preserve compatibility with Safari when pointerId is not present
+    if (evt.pointerId == -1) {
+      evt.pointerId = 0;
+    }
+
     _updatePointerPosition(evt);
 
     // PreObservable support
@@ -646,6 +666,11 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     ++_totalPointersPressed;
     _pickedDownMesh  = nullptr;
     _meshPickProceed = false;
+
+    // preserve compatibility with Safari when pointerId is not present
+    if (evt.pointerId == -1) {
+      evt.pointerId = 0;
+    }
 
     _updatePointerPosition(evt);
 
@@ -704,6 +729,11 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     --_totalPointersPressed;
     _pickedUpMesh    = nullptr;
     _meshPickProceed = false;
+
+    // preserve compatibility with Safari when pointerId is not present
+    if (evt.pointerId == -1) {
+      evt.pointerId = 0;
+    }
 
     _updatePointerPosition(evt);
 
@@ -846,6 +876,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
   }
 
   canvas->tabIndex = 1;
+  _alreadyAttached = true;
 }
 
 void InputManager::detachControl()
@@ -854,6 +885,10 @@ void InputManager::detachControl()
   auto engine = _scene->getEngine();
 
   if (!canvas) {
+    return;
+  }
+
+  if (!_alreadyAttached) {
     return;
   }
 
@@ -878,6 +913,8 @@ void InputManager::detachControl()
   // Keyboard
   canvas->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
   canvas->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
+
+  _alreadyAttached = false;
 }
 
 void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh)

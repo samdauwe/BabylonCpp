@@ -190,6 +190,12 @@ public:
   Property<InputManager, int> pointerY;
 
 private:
+  /**
+   * This is a defensive check to not allow control attachment prior to an already active one. If
+   * already attached, previous control is unattached before attaching the new one.
+   */
+  bool _alreadyAttached;
+
   // Pointers
   std::string _wheelEventName;
   std::function<void(PointerEvent&& evt)> _onPointerMove;
