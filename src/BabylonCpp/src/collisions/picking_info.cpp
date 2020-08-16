@@ -20,6 +20,7 @@ PickingInfo::PickingInfo()
     , subMeshFaceId{-1}
     , subMeshId{0}
     , pickedSprite{nullptr}
+    , thinInstanceIndex{-1}
     , originMesh{nullptr}
     , ray{std::nullopt}
 {

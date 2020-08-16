@@ -105,6 +105,11 @@ public:
   SpritePtr pickedSprite;
 
   /**
+   * If we are picking a mesh with thin instance, this will give you the picked thin instance
+   */
+  int thinInstanceIndex;
+
+  /**
    * If a mesh was used to do the picking (eg. 6dof controller) this will be
    * populated.
    */
