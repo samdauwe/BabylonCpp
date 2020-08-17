@@ -116,18 +116,16 @@ public:
    */
   ISize getBaseSize();
 
+  // clang-format off
   /**
    * @brief Update the sampling mode of the texture.
    * Default is Trilinear mode.
    *
    * | Value | Type               | Description |
    * | ----- | ------------------ | ----------- |
-   * | 1     | NEAREST_SAMPLINGMODE or NEAREST_NEAREST_MIPLINEAR  | Nearest is:
-   *mag = nearest, min = nearest, mip = linear |
-   * | 2     | BILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPNEAREST | Bilinear is:
-   *mag = linear, min = linear, mip = nearest |
-   * | 3     | TRILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPLINEAR | Trilinear is:
-   *mag = linear, min = linear, mip = linear |
+   * | 1     | NEAREST_SAMPLINGMODE or NEAREST_NEAREST_MIPLINEAR  | Nearest is: mag = nearest, min = nearest, mip = linear |
+   * | 2     | BILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPNEAREST | Bilinear is: mag = linear, min = linear, mip = nearest |
+   * | 3     | TRILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPLINEAR | Trilinear is: mag = linear, min = linear, mip = linear |
    * | 4     | NEAREST_NEAREST_MIPNEAREST |             |
    * | 5    | NEAREST_LINEAR_MIPNEAREST |             |
    * | 6    | NEAREST_LINEAR_MIPLINEAR |             |
@@ -143,6 +141,7 @@ public:
    *    > _mip_: filter used between mip map levels
    *@param samplingMode Define the new sampling mode of the texture
    */
+  // clang-format on
   void updateSamplingMode(unsigned int samplingMode);
 
   /**
@@ -514,12 +513,14 @@ public:
   /** @hidden */
   ReadOnlyProperty<BaseTexture, BaseTexturePtr> _lodTextureLow;
 
+protected:
+  Scene* _scene;
+  ThinEngine* _engine;
+
 private:
   bool _hasAlpha;
   unsigned int _coordinatesMode;
   bool _gammaSpace;
-  Scene* _scene;
-  ThinEngine* _engine;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;

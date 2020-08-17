@@ -57,11 +57,11 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _lodTextureHigh{this, &BaseTexture::get__lodTextureHigh}
     , _lodTextureMid{this, &BaseTexture::get__lodTextureMid}
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
+    , _scene{nullptr}
+    , _engine{nullptr}
     , _hasAlpha{false}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _gammaSpace{true}
-    , _scene{nullptr}
-    , _engine{nullptr}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}

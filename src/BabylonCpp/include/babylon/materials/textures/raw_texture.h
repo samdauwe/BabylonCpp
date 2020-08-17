@@ -18,23 +18,20 @@ public:
   /**
    * @brief Instantiates a new RawTexture.
    * Raw texture can help creating a texture directly from an array of data.
-   * This can be super useful if you either get the data from an uncompressed
-   * source or if you wish to create your texture pixel by pixel.
+   * This can be super useful if you either get the data from an uncompressed source or
+   * if you wish to create your texture pixel by pixel.
    * @param data define the array of data to use to create the texture
    * @param width define the width of the texture
    * @param height define the height of the texture
-   * @param format define the format of the data (RGB, RGBA...
-   * Engine.TEXTUREFORMAT_xxx)
-   * @param scene  define the scene the texture belongs to
+   * @param format define the format of the data (RGB, RGBA... Engine.TEXTUREFORMAT_xxx)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
    * @param generateMipMaps define whether mip maps should be generated or not
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
-   * @param type define the format of the data (int, float...
-   * Engine.TEXTURETYPE_xxx)
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
+   * @param type define the format of the data (int, float... Engine.TEXTURETYPE_xxx)
    */
-  RawTexture(const ArrayBufferView& data, int width, int height, unsigned int format, Scene* scene,
+  RawTexture(const ArrayBufferView& data, int width, int height, unsigned int format,
+             const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
              bool generateMipMaps = true, bool invertY = false,
              unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
              unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
@@ -51,17 +48,15 @@ public:
    * @param data Define the texture data
    * @param width Define the width of the texture
    * @param height Define the height of the texture
-   * @param scene Define the scene the texture belongs to
-   * @param generateMipMaps Define whether or not to create mip maps for the
-   * texture
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
    * @returns the luminance texture
    */
   static std::unique_ptr<RawTexture>
-  CreateLuminanceTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+  CreateLuminanceTexture(const ArrayBufferView& data, int width, int height,
+                         const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
                          bool generateMipMaps = true, bool invertY = false,
                          unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
 
@@ -70,35 +65,33 @@ public:
    * @param data Define the texture data
    * @param width Define the width of the texture
    * @param height Define the height of the texture
-   * @param scene Define the scene the texture belongs to
-   * @param generateMipMaps Define whether or not to create mip maps for the
-   * texture
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
    * @returns the luminance alpha texture
    */
-  static std::unique_ptr<RawTexture> CreateLuminanceAlphaTexture(
-    const ArrayBufferView& data, int width, int height, Scene* scene, bool generateMipMaps = true,
-    bool invertY = false, unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
+  static std::unique_ptr<RawTexture>
+  CreateLuminanceAlphaTexture(const ArrayBufferView& data, int width, int height,
+                              const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
+                              bool generateMipMaps = true, bool invertY = false,
+                              unsigned int samplingMode
+                              = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
 
   /**
    * @brief Creates an alpha texture from some data.
    * @param data Define the texture data
    * @param width Define the width of the texture
    * @param height Define the height of the texture
-   * @param scene Define the scene the texture belongs to
-   * @param generateMipMaps Define whether or not to create mip maps for the
-   * texture
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
    * @returns the alpha texture
    */
   static std::unique_ptr<RawTexture>
-  CreateAlphaTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+  CreateAlphaTexture(const ArrayBufferView& data, int width, int height,
+                     const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
                      bool generateMipMaps = true, bool invertY = false,
                      unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE);
 
@@ -107,19 +100,16 @@ public:
    * @param data Define the texture data
    * @param width Define the width of the texture
    * @param height Define the height of the texture
-   * @param scene Define the scene the texture belongs to
-   * @param generateMipMaps Define whether or not to create mip maps for the
-   * texture
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
-   * @param type define the format of the data (int, float...
-   * Engine.TEXTURETYPE_xxx)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
+   * @param type define the format of the data (int, float... Engine.TEXTURETYPE_xxx)
    * @returns the RGB alpha texture
    */
   static std::unique_ptr<RawTexture>
-  CreateRGBTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+  CreateRGBTexture(const ArrayBufferView& data, int width, int height,
+                   const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
                    bool generateMipMaps = true, bool invertY = false,
                    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                    unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
@@ -129,19 +119,16 @@ public:
    * @param data Define the texture data
    * @param width Define the width of the texture
    * @param height Define the height of the texture
-   * @param scene Define the scene the texture belongs to
-   * @param generateMipMaps Define whether or not to create mip maps for the
-   * texture
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
-   * @param type define the format of the data (int, float...
-   * Engine.TEXTURETYPE_xxx)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
+   * @param type define the format of the data (int, float... Engine.TEXTURETYPE_xxx)
    * @returns the RGBA texture
    */
   static std::unique_ptr<RawTexture>
-  CreateRGBATexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+  CreateRGBATexture(const ArrayBufferView& data, int width, int height,
+                    const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
                     bool generateMipMaps = true, bool invertY = false,
                     unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                     unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
@@ -151,19 +138,16 @@ public:
    * @param data Define the texture data
    * @param width Define the width of the texture
    * @param height Define the height of the texture
-   * @param scene Define the scene the texture belongs to
-   * @param generateMipMaps Define whether or not to create mip maps for the
-   * texture
-   * @param invertY define if the data should be flipped on Y when uploaded to
-   * the GPU
-   * @param samplingMode define the texture sampling mode
-   * (Texture.xxx_SAMPLINGMODE)
-   * @param type define the format of the data (int, float...
-   * Engine.TEXTURETYPE_xxx)
+   * @param sceneOrEngine defines the scene or engine the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
+   * @param type define the format of the data (int, float... Engine.TEXTURETYPE_xxx)
    * @returns the R texture
    */
   static std::unique_ptr<RawTexture>
-  CreateRTexture(const ArrayBufferView& data, int width, int height, Scene* scene,
+  CreateRTexture(const ArrayBufferView& data, int width, int height,
+                 const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
                  bool generateMipMaps = true, bool invertY = false,
                  unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                  unsigned int type         = Constants::TEXTURETYPE_FLOAT);
