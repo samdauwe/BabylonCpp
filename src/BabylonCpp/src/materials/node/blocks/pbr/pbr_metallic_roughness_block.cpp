@@ -826,6 +826,8 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
 
   state.compilationString += AmbientOcclusionBlock::GetCode(aoBlock);
 
+  state.compilationString += state._emitCodeFromInclude("pbrBlockLightmapInit", iComments);
+
   // _____________________________ UNLIT  _______________________________
 
   state.compilationString += R"(#ifdef UNLIT

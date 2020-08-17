@@ -15,7 +15,8 @@
 namespace BABYLON {
 
 TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
-    : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment}
+    : NodeMaterialBlock{iName, fragmentOnly ? NodeMaterialBlockTargets::Fragment :
+                                              NodeMaterialBlockTargets::VertexAndFragment}
     , texture{nullptr}
     , convertToGammaSpace{false}
     , convertToLinearSpace{false}
@@ -99,6 +100,11 @@ NodeMaterialConnectionPointPtr& TextureBlock::get_a()
 
 NodeMaterialBlockTargets& TextureBlock::get_target()
 {
+  if (_fragmentOnly) {
+    _currentTarget = NodeMaterialBlockTargets::Fragment;
+    return _currentTarget;
+  }
+
   // TextureBlock has a special optimizations for uvs that come from the vertex shaders as they can
   // be packed into a single varyings. But we need to detect uvs coming from fragment then
   if (!uv()->isConnected()) {
@@ -307,7 +313,7 @@ void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexM
     return;
   }
 
-  if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment || _fragmentOnly) {
+  if (uv()->ownerBlock()->target() == NodeMaterialBlockTargets::Fragment) {
     state.compilationString
       += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
                              _samplerName.c_str(), uvInput->associatedVariableName().c_str());

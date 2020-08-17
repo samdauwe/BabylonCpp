@@ -427,7 +427,7 @@ private:
     const std::function<void(Effect* effect)>& onCompiled                         = nullptr,
     const std::function<void(Effect* effect, const std::string& errors)>& onError = nullptr,
     EffectPtr effect = nullptr, NodeMaterialDefines* defines = nullptr,
-    AbstractMeshPtr dummyMesh = nullptr);
+    AbstractMeshPtr dummyMesh = nullptr, const std::string& particleSystemDefinesJoined_ = "");
   std::optional<_ProcessedDefinesResult> _processDefines(AbstractMesh* mesh,
                                                          NodeMaterialDefines& defines,
                                                          bool useInstances = false,

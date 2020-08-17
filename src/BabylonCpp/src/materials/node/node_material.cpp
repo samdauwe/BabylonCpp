@@ -636,7 +636,8 @@ void NodeMaterial::_createEffectForParticles(
   const IParticleSystemPtr& particleSystem, unsigned int blendMode,
   const std::function<void(Effect* effect)>& iOnCompiled,
   const std::function<void(Effect* effect, const std::string& errors)>& iOnError, EffectPtr effect,
-  NodeMaterialDefines* defines, AbstractMeshPtr dummyMesh)
+  NodeMaterialDefines* defines, AbstractMeshPtr dummyMesh,
+  const std::string& particleSystemDefinesJoined_)
 {
   auto tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
 
@@ -654,7 +655,7 @@ void NodeMaterial::_createEffectForParticles(
   auto buildId = _buildId;
 
   std::vector<std::string> particleSystemDefines;
-  std::string particleSystemDefinesJoined;
+  auto particleSystemDefinesJoined = particleSystemDefinesJoined_;
 
   if (!effect) {
     const auto result = _processDefines(dummyMesh.get(), *defines);
@@ -709,8 +710,9 @@ void NodeMaterial::_createEffectForParticles(
         defines->toString() + "\n" + particleSystemDefinesJoined, result->fallbacks.get(),
         iOnCompiled, iOnError, particleSystem);
       particleSystem->setCustomEffect(effect, blendMode);
-      _createEffectForParticles(particleSystem, blendMode, iOnCompiled, iOnError, effect, defines,
-                                dummyMesh); // add the effect.onBindObservable observer
+      _createEffectForParticles(
+        particleSystem, blendMode, iOnCompiled, iOnError, effect, defines, dummyMesh,
+        particleSystemDefinesJoined); // add the effect.onBindObservable observer
       return;
     }
 
@@ -1237,20 +1239,21 @@ void NodeMaterial::setToDefaultParticle()
 
 void NodeMaterial::loadAsync(const std::string& url)
 {
-  FileTools::LoadFile(url,
-                      [this](const std::variant<std::string, ArrayBufferView>& data,
-                             const std::string & /*responseURL*/) -> void {
-                        if (std::holds_alternative<std::string>(data)) {
-                          auto serializationObject = json::parse(std::get<std::string>(data));
+  FileTools::LoadFile(
+    url,
+    [this](const std::variant<std::string, ArrayBufferView>& data,
+           const std::string & /*responseURL*/) -> void {
+      if (std::holds_alternative<std::string>(data)) {
+        auto serializationObject = json::parse(std::get<std::string>(data));
 
-                          loadFromSerialization(serializationObject, "");
-                        }
-                      },
-                      nullptr, false,
-                      [url](const std::string& message, const std::string & /*exception*/) -> void {
-                        BABYLON_LOG_ERROR("NodeMaterial", "Could not load file %s, reason: %s",
-                                          url.c_str(), message.c_str())
-                      });
+        loadFromSerialization(serializationObject, "");
+      }
+    },
+    nullptr, false,
+    [url](const std::string& message, const std::string & /*exception*/) -> void {
+      BABYLON_LOG_ERROR("NodeMaterial", "Could not load file %s, reason: %s", url.c_str(),
+                        message.c_str())
+    });
 }
 
 void NodeMaterial::_gatherBlocks(const NodeMaterialBlockPtr& rootNode,

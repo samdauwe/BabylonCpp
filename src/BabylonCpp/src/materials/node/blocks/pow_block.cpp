@@ -12,9 +12,12 @@ PowBlock::PowBlock(const std::string& iName)
     , power{this, &PowBlock::get_power}
     , output{this, &PowBlock::get_output}
 {
-  registerInput("value", NodeMaterialBlockConnectionPointTypes::Float);
-  registerInput("power", NodeMaterialBlockConnectionPointTypes::Float);
-  registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
+  registerInput("value", NodeMaterialBlockConnectionPointTypes::AutoDetect);
+  registerInput("power", NodeMaterialBlockConnectionPointTypes::AutoDetect);
+  registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
+
+  _outputs[0]->_typeConnectionSource = _inputs[0];
+  _linkConnectionTypes(0, 1);
 }
 
 PowBlock::~PowBlock() = default;
