@@ -16,8 +16,8 @@ namespace BABYLON {
 DetailMapConfiguration::DetailMapConfiguration(
   const std::function<void()>& markAllSubMeshesAsTexturesDirty)
     : texture{this, &DetailMapConfiguration::get_texture, &DetailMapConfiguration::set_texture}
-    , diffuseBlendLevel{0.5f}
-    , roughnessBlendLevel{0.5f}
+    , diffuseBlendLevel{1.f}
+    , roughnessBlendLevel{1.f}
     , bumpLevel{1.f}
     , normalBlendMethod{this, &DetailMapConfiguration::get_normalBlendMethod,
                         &DetailMapConfiguration::set_normalBlendMethod}
