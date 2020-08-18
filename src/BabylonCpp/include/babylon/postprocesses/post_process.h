@@ -3,6 +3,8 @@
 
 #include <variant>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
@@ -11,6 +13,8 @@
 #include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -77,7 +81,7 @@ public:
   CameraPtr& getCamera();
 
   /**
-   * @brief Gets a string idenfifying the name of the class.
+   * @brief Gets a string identifying the name of the class.
    * @returns "PostProcess" string
    */
   [[nodiscard]] virtual std::string getClassName() const;
@@ -182,28 +186,44 @@ public:
    */
   virtual void dispose(Camera* camera = nullptr);
 
+  /**
+   * @brief Serializes the particle system to a JSON object.
+   * @returns the JSON object
+   */
+  json serialize() const;
+
+  /**
+   * @brief Creates a material from parsed material data.
+   * @param parsedPostProcess defines parsed post process data
+   * @param scene defines the hosting scene
+   * @param rootUrl defines the root URL to use to load textures
+   * @returns a new post process
+   */
+  static PostProcessPtr Parse(const json& parsedPostProcess, Scene& scene,
+                              const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a new instance PostProcess.
    * @param name The name of the PostProcess.
    * @param fragmentUrl The url of the fragment shader to be used.
-   * @param parameters Array of the names of uniform non-sampler2D variables that will be passed to
+   * @param parameters Array of the names of uniform non-sampler2D variables that will be passed
+   * to the shader.
+   * @param samplers Array of the names of uniform sampler2D variables that will be passed to
    * the shader.
-   * @param samplers Array of the names of uniform sampler2D variables that will be passed to the
-   * shader.
-   * @param options The required width/height ratio to downsize to before computing the render pass.
-   * (Use 1.0 for full size)
+   * @param options The required width/height ratio to downsize to before computing the render
+   * pass. (Use 1.0 for full size)
    * @param camera The camera to apply the render pass to.
    * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
    * @param engine The engine which the post process will be applied. (default: current engine)
    * @param reusable If the post process can be reused on the same frame. (default: false)
-   * @param defines String of defines that will be set when running the fragment shader. (default:
-   * null)
+   * @param defines String of defines that will be set when running the fragment shader.
+   * (default: null)
    * @param textureType Type of textures used when performing the post process. (default: 0)
    * @param vertexUrl The url of the vertex shader to be used. (default: "postprocess")
    * @param indexParameters The index parameters to be used for babylons include syntax
-   * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage in
-   * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
+   * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage
+   * in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
    * @param blockCompilation If the shader should not be compiled imediatly. (default: false)
    * @param textureFormat Format of textures used when performing the post process. (default:
    * TEXTUREFORMAT_RGBA)

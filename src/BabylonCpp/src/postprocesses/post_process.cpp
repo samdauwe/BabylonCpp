@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -22,8 +23,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
                          unsigned int textureType, const std::string& vertexUrl,
                          const std::unordered_map<std::string, unsigned int>& indexParameters,
                          bool blockCompilation, unsigned int textureFormat)
-    : name{iName}
-    , width{-1}
+    : width{-1}
     , height{-1}
     , nodeMaterialSource{nullptr}
     , _outputTexture{nullptr}
@@ -64,6 +64,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
 {
+  name = iName;
   if (camera) {
     _camera = camera;
     _scene  = camera->getScene();
@@ -523,6 +524,17 @@ void PostProcess::dispose(Camera* camera)
   onApplyObservable.clear();
   onBeforeRenderObservable.clear();
   onSizeChangedObservable.clear();
+}
+
+json PostProcess::serialize() const
+{
+  return nullptr;
+}
+
+PostProcessPtr PostProcess::Parse(const json& /*parsedPostProcess*/, Scene& /*scene*/,
+                                  const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON
