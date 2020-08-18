@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 RefractionPostProcess::RefractionPostProcess(const std::string& iName,
-                                             const std::string& refractionTextureUrl,
+                                             const std::string& iRefractionTextureUrl,
                                              const Color3& iColor, float iDepth, int iColorLevel,
                                              float ratio, const CameraPtr& camera,
                                              const std::optional<unsigned int>& samplingMode,
@@ -21,14 +21,16 @@ RefractionPostProcess::RefractionPostProcess(const std::string& iName,
                   samplingMode,
                   engine,
                   reusable}
-    , color{iColor}
-    , depth{iDepth}
-    , colorLevel{iColorLevel}
     , refractionTexture{this, &RefractionPostProcess::get_refractionTexture,
                         &RefractionPostProcess::set_refractionTexture}
     , _refTexture{nullptr}
     , _ownRefractionTexture{true}
 {
+  color                = iColor;
+  depth                = iDepth;
+  colorLevel           = iColorLevel;
+  refractionTextureUrl = iRefractionTextureUrl;
+
   onActivateObservable.add([&](Camera* cam, EventState&) {
     _refTexture = _refTexture ? _refTexture : Texture::New(refractionTextureUrl, cam->getScene());
   });
@@ -42,6 +44,11 @@ RefractionPostProcess::RefractionPostProcess(const std::string& iName,
 }
 
 RefractionPostProcess::~RefractionPostProcess() = default;
+
+std::string RefractionPostProcess::getClassName() const
+{
+  return "RefractionPostProcess";
+}
 
 TexturePtr& RefractionPostProcess::get_refractionTexture()
 {
@@ -66,6 +73,14 @@ void RefractionPostProcess::dispose(Camera* camera)
   }
 
   PostProcess::dispose(camera);
+}
+
+RefractionPostProcessPtr RefractionPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                                       const CameraPtr& /*targetCamera*/,
+                                                       Scene* /*scene*/,
+                                                       const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

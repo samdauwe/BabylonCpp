@@ -36,20 +36,32 @@ FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio, const Ca
 
 FxaaPostProcess::~FxaaPostProcess() = default;
 
+std::string FxaaPostProcess::getClassName() const
+{
+  return "FxaaPostProcess";
+}
+
 std::string FxaaPostProcess::_getDefines()
 {
-  auto engine = getEngine();
+  const auto engine = getEngine();
   if (!engine) {
     return "";
   }
 
-  auto glInfo = engine->getGlInfo();
+  const auto glInfo = engine->getGlInfo();
   if (!glInfo.renderer.empty()
       && StringTools::contains(StringTools::toLowerCase(glInfo.renderer), "mali")) {
     return "#define MALI 1\n";
   }
 
   return "";
+}
+
+FxaaPostProcessPtr FxaaPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                           const CameraPtr& /*targetCamera*/, Scene* /*scene*/,
+                                           const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

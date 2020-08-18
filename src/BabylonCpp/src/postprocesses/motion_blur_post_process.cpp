@@ -74,6 +74,11 @@ MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* sc
 
 MotionBlurPostProcess::~MotionBlurPostProcess() = default;
 
+std::string MotionBlurPostProcess::getClassName() const
+{
+  return "MotionBlurPostProcess";
+}
+
 unsigned int MotionBlurPostProcess::get_motionBlurSamples() const
 {
   return _motionBlurSamples;
@@ -116,6 +121,14 @@ void MotionBlurPostProcess::dispose(Camera* camera)
   }
 
   PostProcess::dispose(camera);
+}
+
+MotionBlurPostProcessPtr MotionBlurPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                                       const CameraPtr& /*targetCamera*/,
+                                                       Scene* /*scene*/,
+                                                       const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

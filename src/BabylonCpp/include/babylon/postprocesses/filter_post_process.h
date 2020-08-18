@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+class FilterPostProcess;
+using FilterPostProcessPtr = std::shared_ptr<FilterPostProcess>;
+
 /**
  * @brief Applies a kernel filter to the image.
  */
@@ -17,21 +20,29 @@ public:
    * @brief Creates a filter post process.
    * @param name The name of the effect.
    * @param kernelMatrix The matrix to be applied to the image
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
    */
   FilterPostProcess(const std::string& name, const Matrix& kernelMatrix, float ratio,
                     const CameraPtr& camera,
                     const std::optional<unsigned int>& samplingMode = std::nullopt,
                     Engine* engine = nullptr, bool reusable = false);
   ~FilterPostProcess() override; // = default
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "FilterPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static FilterPostProcessPtr _Parse(const json& parsedPostProcess, const CameraPtr& targetCamera,
+                                     Scene* scene, const std::string& rootUrl);
 
 public:
   /**

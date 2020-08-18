@@ -18,4 +18,17 @@ BlackAndWhitePostProcess::BlackAndWhitePostProcess(const std::string& iName, flo
 
 BlackAndWhitePostProcess::~BlackAndWhitePostProcess() = default;
 
+std::string BlackAndWhitePostProcess::getClassName() const
+{
+  return "BlackAndWhitePostProcess";
+}
+
+BlackAndWhitePostProcessPtr BlackAndWhitePostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                                             const CameraPtr& /*targetCamera*/,
+                                                             Scene* /*scene*/,
+                                                             const std::string& /*rootUrl*/)
+{
+  return nullptr;
+}
+
 } // end of namespace BABYLON

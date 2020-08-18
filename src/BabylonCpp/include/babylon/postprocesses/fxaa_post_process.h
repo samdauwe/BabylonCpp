@@ -29,6 +29,18 @@ public:
   }
   ~FxaaPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "FxaaPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static FxaaPostProcessPtr _Parse(const json& parsedPostProcess, const CameraPtr& targetCamera,
+                                   Scene* scene, const std::string& rootUrl);
+
 protected:
   FxaaPostProcess(const std::string& iName, float ratio, const CameraPtr& camera = nullptr,
                   const std::optional<unsigned int>& samplingMode = std::nullopt,
@@ -37,17 +49,6 @@ protected:
 
 private:
   std::string _getDefines();
-
-public:
-  /**
-   * Hidden
-   */
-  float texelWidth;
-
-  /**
-   * Hidden
-   */
-  float texelHeight;
 
 }; // end of class FxaaPostProcess
 

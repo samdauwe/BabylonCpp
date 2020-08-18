@@ -26,21 +26,29 @@ public:
   }
   ~BlackAndWhitePostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "BlackAndWhitePostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static BlackAndWhitePostProcessPtr _Parse(const json& parsedPostProcess,
+                                            const CameraPtr& targetCamera, Scene* scene,
+                                            const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a black and white post process.
-   * @see
-   * https://doc.babylonjs.com/how_to/how_to_use_postprocesses#black-and-white
+   * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses#black-and-white
    * @param name The name of the effect.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
    */
   BlackAndWhitePostProcess(const std::string& name, float ratio, const CameraPtr& camera,
                            const std::optional<unsigned int>& samplingMode = std::nullopt,

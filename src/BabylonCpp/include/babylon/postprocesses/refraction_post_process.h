@@ -7,8 +7,10 @@
 
 namespace BABYLON {
 
+class RefractionPostProcess;
 class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+using RefractionPostProcessPtr = std::shared_ptr<RefractionPostProcess>;
+using TexturePtr               = std::shared_ptr<Texture>;
 
 /**
  * @brief Post process which applies a refractin texture.
@@ -24,17 +26,12 @@ public:
    * @param refractionTextureUrl Url of the refraction texture to use
    * @param color the base color of the refraction (used to taint the rendering)
    * @param depth simulated refraction depth
-   * @param colorLevel the coefficient of the base color (0 to remove base color
-   * tainting)
+   * @param colorLevel the coefficient of the base color (0 to remove base color tainting)
    * @param camera The camera to apply the render pass to.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
+   * @param options The required width/height ratio to downsize to before computing the render pass.
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
    */
   RefractionPostProcess(const std::string& name, const std::string& refractionTextureUrl,
                         const Color3& color, float depth, int colorLevel, float ratio,
@@ -44,10 +41,23 @@ public:
   ~RefractionPostProcess() override; // = default
 
   /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "RefractionPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
    * @brief Disposes of the post process.
    * @param camera Camera to dispose post process on
    */
   void dispose(Camera* camera = nullptr) override;
+
+  /**
+   * @brief Hidden
+   */
+  static RefractionPostProcessPtr _Parse(const json& parsedPostProcess,
+                                         const CameraPtr& targetCamera, Scene* scene,
+                                         const std::string& rootUrl);
 
 private:
   /**
@@ -80,6 +90,15 @@ public:
    */
   int colorLevel;
 
+  /**
+   * Gets the url used to load the refraction texture
+   */
+  std::string refractionTextureUrl;
+
+  /**
+   * Gets or sets the refraction texture
+   * Please note that you are responsible for disposing the texture if you set it manually
+   */
   Property<RefractionPostProcess, TexturePtr> refractionTexture;
 
 private:

@@ -26,4 +26,16 @@ GrainPostProcess::GrainPostProcess(const std::string& iName,
 
 GrainPostProcess::~GrainPostProcess() = default;
 
+std::string GrainPostProcess::getClassName() const
+{
+  return "GrainPostProcess";
+}
+
+GrainPostProcessPtr GrainPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                             const CameraPtr& /*targetCamera*/, Scene* /*scene*/,
+                                             const std::string& /*rootUrl*/)
+{
+  return nullptr;
+}
+
 } // end of namespace BABYLON
