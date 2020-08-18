@@ -19,11 +19,11 @@ public:
    * @param _operator defines the operator to use
    * @param exposureAdjustment defines the required exposure adjustement
    * @param camera defines the camera to use (can be null)
-   * @param samplingMode defines the required sampling mode
-   * (BABYLON.Texture.BILINEAR_SAMPLINGMODE by default)
+   * @param samplingMode defines the required sampling mode (BABYLON.Texture.BILINEAR_SAMPLINGMODE
+   * by default)
    * @param engine defines the hosting engine (can be ignore if camera is set)
-   * @param textureFormat defines the texture format to use
-   * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
+   * @param textureFormat defines the texture format to use (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT
+   * by default)
    */
   TonemapPostProcess(const std::string& name, const TonemappingOperator& operator_,
                      float exposureAdjustment, const CameraPtr& camera,
@@ -31,6 +31,12 @@ public:
                      Engine* engine                                  = nullptr,
                      unsigned int textureFormat = Constants::TEXTURETYPE_UNSIGNED_INT);
   ~TonemapPostProcess() override; // = default
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "TonemapPostProcess" string
+   */
+  std::string getClassName() const override;
 
 private:
   TonemappingOperator _operator;

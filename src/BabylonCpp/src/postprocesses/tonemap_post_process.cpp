@@ -50,4 +50,9 @@ TonemapPostProcess::TonemapPostProcess(const std::string& iName,
 
 TonemapPostProcess::~TonemapPostProcess() = default;
 
+std::string TonemapPostProcess::getClassName() const
+{
+  return "TonemapPostProcess";
+}
+
 } // end of namespace BABYLON
