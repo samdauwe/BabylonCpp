@@ -42,6 +42,12 @@ protected:
                       const std::optional<unsigned int>& samplingMode = std::nullopt,
                       Engine* engine = nullptr, bool reusable = false);
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "AnaglyphPostProcess" string
+   */
+  std::string getClassName() const override;
+
 private:
   PostProcessPtr _passedProcess;
 

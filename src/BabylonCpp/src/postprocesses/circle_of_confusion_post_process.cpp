@@ -62,6 +62,11 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
 
 CircleOfConfusionPostProcess::~CircleOfConfusionPostProcess() = default;
 
+std::string CircleOfConfusionPostProcess::getClassName() const
+{
+  return "CircleOfConfusionPostProcess";
+}
+
 void CircleOfConfusionPostProcess::set_depthTexture(const RenderTargetTexturePtr& value)
 {
   _depthTexture = value;

@@ -17,9 +17,10 @@ BloomMergePostProcess::BloomMergePostProcess(const std::string& iName,
                   options, camera, samplingMode, engine, reusable, "", textureType, "", {}, true)
     , originalFromInput{iOriginalFromInput}
     , blurred{iBlurred}
-    , weight{iWeight}
 {
-  onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
+  weight = iWeight;
+
+  onApplyObservable.add([this](Effect* effect, EventState& /*es*/) {
     effect->setTextureFromPostProcess("textureSampler", originalFromInput);
     effect->setTextureFromPostProcessOutput("bloomBlur", blurred);
     effect->setFloat("bloomWeight", weight);
@@ -31,5 +32,10 @@ BloomMergePostProcess::BloomMergePostProcess(const std::string& iName,
 }
 
 BloomMergePostProcess::~BloomMergePostProcess() = default;
+
+std::string BloomMergePostProcess::getClassName() const
+{
+  return "BloomMergePostProcess";
+}
 
 } // end of namespace BABYLON
