@@ -6,8 +6,10 @@
 
 namespace BABYLON {
 
+class ColorCorrectionPostProcess;
 class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+using ColorCorrectionPostProcessPtr = std::shared_ptr<ColorCorrectionPostProcess>;
+using TexturePtr                    = std::shared_ptr<Texture>;
 
 /**
  * @brief This post-process allows the modification of rendered colors by using
@@ -26,11 +28,31 @@ using TexturePtr = std::shared_ptr<Texture>;
 class BABYLON_SHARED_EXPORT ColorCorrectionPostProcess : public PostProcess {
 
 public:
-  ColorCorrectionPostProcess(const std::string& name, const std::string& colorTableUrl, float ratio,
+  ColorCorrectionPostProcess(const std::string& name, const std::string& colorTableUrl,
+                             const std::variant<float, PostProcessOptions>& options,
                              const CameraPtr& camera,
                              const std::optional<unsigned int>& samplingMode = std::nullopt,
                              Engine* engine = nullptr, bool reusable = false);
   ~ColorCorrectionPostProcess() override; // = default
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "ColorCorrectionPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static ColorCorrectionPostProcessPtr _Parse(const json& parsedPostProcess,
+                                              const CameraPtr& targetCamera, Scene* scene,
+                                              const std::string& rootUrl);
+
+public:
+  /**
+   * Gets the color table url used to create the LUT texture
+   */
+  std::string colorTableUrl;
 
 private:
   TexturePtr _colorTableTexture;

@@ -20,33 +20,27 @@ class BABYLON_SHARED_EXPORT ConvolutionPostProcess : public PostProcess {
 public:
   // Statics
   /**
-   * Edge detection 0 see
-   * https://en.wikipedia.org/wiki/Kernel_(image_processing)
+   * Edge detection 0 see https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
   static const Float32Array EdgeDetect0Kernel();
   /**
-   * Edge detection 1 see
-   * https://en.wikipedia.org/wiki/Kernel_(image_processing)
+   * Edge detection 1 see https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
   static const Float32Array EdgeDetect1Kernel();
   /**
-   * Edge detection 2 see
-   * https://en.wikipedia.org/wiki/Kernel_(image_processing)
+   * Edge detection 2 see https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
   static const Float32Array EdgeDetect2Kernel();
   /**
-   * Kernel to sharpen an image see
-   * https://en.wikipedia.org/wiki/Kernel_(image_processing)
+   * Kernel to sharpen an image see https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
   static const Float32Array SharpenKernel();
   /**
-   * Kernel to emboss an image see
-   * https://en.wikipedia.org/wiki/Kernel_(image_processing)
+   * Kernel to emboss an image see https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
   static const Float32Array EmbossKernel();
   /**
-   * Kernel to blur an image see
-   * https://en.wikipedia.org/wiki/Kernel_(image_processing)
+   * Kernel to blur an image see https://en.wikipedia.org/wiki/Kernel_(image_processing)
    */
   static const Float32Array GaussianKernel();
 
@@ -62,23 +56,30 @@ public:
   }
   ~ConvolutionPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "ConvolutionPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static ConvolutionPostProcessPtr _Parse(const json& parsedPostProcess,
+                                          const CameraPtr& targetCamera, Scene* scene,
+                                          const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
-   * @param kernel Array of 9 values corresponding to the 3x3 kernel to be
-   * applied
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
+   * @param kernel Array of 9 values corresponding to the 3x3 kernel to be applied
+   * @param options The required width/height ratio to downsize to before computing the render pass.
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
+   * @param textureType Type of textures used when performing the post process. (default: 0)
    */
   ConvolutionPostProcess(const std::string& name, const Float32Array& kernel, float ratio,
                          const CameraPtr& camera,
