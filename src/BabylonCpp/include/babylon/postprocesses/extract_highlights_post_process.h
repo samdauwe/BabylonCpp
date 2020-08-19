@@ -11,9 +11,8 @@ class ExtractHighlightsPostProcess;
 using ExtractHighlightsPostProcessPtr = std::shared_ptr<ExtractHighlightsPostProcess>;
 
 /**
- * @brief The extract highlights post process sets all pixels to black except
- * pixels above the specified luminance threshold. Used as the first step for a
- * bloom effect.
+ * @brief The extract highlights post process sets all pixels to black except pixels above the
+ * specified luminance threshold. Used as the first step for a bloom effect.
  */
 class BABYLON_SHARED_EXPORT ExtractHighlightsPostProcess : public PostProcess {
 
@@ -28,6 +27,12 @@ public:
     return postProcess;
   }
   ~ExtractHighlightsPostProcess() override; // = default
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "ExtractHighlightsPostProcess" string
+   */
+  std::string getClassName() const override;
 
 protected:
   ExtractHighlightsPostProcess(const std::string& name,
@@ -50,9 +55,8 @@ public:
   float _exposure;
 
   /**
-   * Post process which has the input texture to be used when performing
-   * highlight extraction
-   * Hidden
+   * Post process which has the input texture to be used when performing highlight extraction
+   * @hidden
    */
   PostProcessPtr _inputPostProcess;
 

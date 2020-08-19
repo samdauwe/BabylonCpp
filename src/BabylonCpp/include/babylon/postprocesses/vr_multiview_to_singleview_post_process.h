@@ -7,9 +7,9 @@
 namespace BABYLON {
 
 /**
- * @brief VRMultiviewToSingleview used to convert multiview texture arrays to
- * standard textures for scenarios such as webVR This will not be used for webXR
- * as it supports displaying texture arrays directly.
+ * @brief VRMultiviewToSingleview used to convert multiview texture arrays to standard textures for
+ * scenarios such as webVR This will not be used for webXR as it supports displaying texture arrays
+ * directly
  */
 class BABYLON_SHARED_EXPORT VRMultiviewToSingleviewPostProcess : public PostProcess {
 
@@ -23,6 +23,12 @@ public:
   VRMultiviewToSingleviewPostProcess(const std::string& name, const CameraPtr& camera,
                                      float scaleFactor);
   ~VRMultiviewToSingleviewPostProcess() override; // = default
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "VRMultiviewToSingleviewPostProcess" string
+   */
+  std::string getClassName() const override;
 
 }; // end of class VRDistortionCorrectionPostProcess
 

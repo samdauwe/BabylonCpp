@@ -20,7 +20,9 @@ DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
       textureType,     "#define DOF 1\r\n",
       blockCompilation}
 {
-  onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
+  direction = iDirection;
+
+  onApplyObservable.add([=](Effect* effect, EventState& /*es*/) {
     if (imageToBlur != nullptr) {
       effect->setTextureFromPostProcess("textureSampler", imageToBlur);
     }
@@ -32,5 +34,10 @@ DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
 }
 
 DepthOfFieldBlurPostProcess::~DepthOfFieldBlurPostProcess() = default;
+
+std::string DepthOfFieldBlurPostProcess::getClassName() const
+{
+  return "DepthOfFieldBlurPostProcess";
+}
 
 } // end of namespace BABYLON

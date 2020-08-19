@@ -28,7 +28,7 @@ ExtractHighlightsPostProcess::ExtractHighlightsPostProcess(
     , _exposure{1.f}
     , _inputPostProcess{nullptr}
 {
-  onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
+  onApplyObservable.add([this](Effect* effect, EventState& /*es*/) {
     if (_inputPostProcess) {
       effect->setTextureFromPostProcess("textureSampler", _inputPostProcess);
     }
@@ -38,5 +38,10 @@ ExtractHighlightsPostProcess::ExtractHighlightsPostProcess(
 }
 
 ExtractHighlightsPostProcess::~ExtractHighlightsPostProcess() = default;
+
+std::string ExtractHighlightsPostProcess::getClassName() const
+{
+  return "ExtractHighlightsPostProcess";
+}
 
 } // end of namespace BABYLON
