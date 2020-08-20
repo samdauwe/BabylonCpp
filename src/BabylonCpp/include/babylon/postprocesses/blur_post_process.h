@@ -13,9 +13,8 @@ class BlurPostProcess;
 using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
 
 /**
- * @brief  The Blur Post Process which blurs an image based on a kernel and
- * direction. Can be used twice in x and y directions to perform a guassian blur
- * in two passes.
+ * @brief  The Blur Post Process which blurs an image based on a kernel and direction.
+ * Can be used twice in x and y directions to perform a guassian blur in two passes.
  */
 class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
@@ -32,6 +31,12 @@ public:
   ~BlurPostProcess() override; // = default
 
   /**
+   * @brief Gets a string identifying the name of the class
+   * @returns "BlurPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
    * @brief Updates the effect with the current post process compile time values and recompiles the
    * shader.
    * @param defines Define statements that should be added at the beginning of the shader. (default:
@@ -43,10 +48,6 @@ public:
    * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
-   * @param vertexUrl The url of the vertex shader to be used (default: the one given at
-   * construction time)
-   * @param fragmentUrl The url of the fragment shader to be used (default: the one given at
-   * construction time)
    */
   void updateEffect(const std::string& defines = "", const std::vector<std::string>& uniforms = {},
                     const std::vector<std::string>& samplers                             = {},
@@ -57,27 +58,28 @@ public:
                     const std::string& vertexUrl   = "",
                     const std::string& fragmentUrl = "") override;
 
+  /**
+   * @brief Hidden
+   */
+  static BlurPostProcessPtr _Parse(const json& parsedPostProcess, const CameraPtr& targetCamera,
+                                   Scene* scene, const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a new instance BlurPostProcess.
    * @param name The name of the effect.
    * @param direction The direction in which to blur the image.
-   * @param kernel The size of the kernel to be used when computing the blur.
-   * eg. Size of 3 will blur the center pixel by 2 pixels surrounding it.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass. (Use 1.0 for full size)
+   * @param kernel The size of the kernel to be used when computing the blur. eg. Size of 3 will
+   * blur the center pixel by 2 pixels surrounding it.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
+   * (Use 1.0 for full size)
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
+   * @param textureType Type of textures used when performing the post process. (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in the constructor. The
+   * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
   BlurPostProcess(const std::string& name, const Vector2& iDrection, float kernel,
                   const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
@@ -92,26 +94,22 @@ protected:
                     = nullptr);
 
   /**
-   * @brief Best kernels are odd numbers that when divided by 2, their integer
-   * part is even, so 5, 9 or 13.
-   * Other odd kernels optimize correctly but require proportionally more
-   * samples, even kernels are
-   * possible but will produce minor visual artifacts. Since each new kernel
-   * requires a new shader we
-   * want to minimize kernel changes, having gaps between physical kernels is
-   * helpful in that regard.
-   * The gaps between physical kernels are compensated for in the weighting of
-   * the samples
+   * @brief Best kernels are odd numbers that when divided by 2, their integer part is even, so 5, 9
+   * or 13. Other odd kernels optimize correctly but require proportionally more samples, even
+   * kernels are possible but will produce minor visual artifacts. Since each new kernel requires a
+   * new shader we want to minimize kernel changes, having gaps between physical kernels is helpful
+   * in that regard. The gaps between physical kernels are compensated for in the weighting of the
+   * samples
    * @param idealKernel Ideal blur kernel.
    * @return Nearest best kernel.
    */
   [[nodiscard]] float _nearestBestKernel(float idealKernel) const;
 
   /**
-   * @brief Calculates the value of a Gaussian distribution with sigma 3 at a
-   * given point.
-   * @param x The point on the Gaussian distribution to sample.
-   * @return the value of the Gaussian function at x.
+   * @brief Generates a string that can be used as a floating point number in GLSL.
+   * @param x Value to print.
+   * @param decimalFigures Number of decimal places to print the number to (excluding trailing 0s).
+   * @return GLSL float string.
    */
   [[nodiscard]] float _gaussianWeight(float x) const;
 

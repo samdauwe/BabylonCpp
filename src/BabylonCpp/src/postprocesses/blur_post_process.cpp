@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-BlurPostProcess::BlurPostProcess(const std::string& iName, const Vector2& iDrection, float kernel,
+BlurPostProcess::BlurPostProcess(const std::string& iName, const Vector2& iDrection, float iKernel,
                                  const std::variant<float, PostProcessOptions>& options,
                                  const CameraPtr& camera,
                                  const std::optional<unsigned int>& samplingMode, Engine* engine,
@@ -28,16 +28,17 @@ BlurPostProcess::BlurPostProcess(const std::string& iName, const Vector2& iDrect
                   "kernelBlur",
                   {{"varyingCount", 0}, {"depCount", 0}},
                   true}
-    , direction{iDrection}
     , kernel{this, &BlurPostProcess::get_kernel, &BlurPostProcess::set_kernel}
     , packedFloat{this, &BlurPostProcess::get_packedFloat, &BlurPostProcess::set_packedFloat}
+    , _kernel{0.f}
+    , _idealKernel{0.f}
     , _packedFloat{false}
-    , _staticDefines{defines}
     , blockCompilation{iBlockCompilation}
 {
-  set_kernel(kernel);
+  _staticDefines = defines;
+  direction      = iDrection;
 
-  onApplyObservable.add([&](Effect* effect, EventState&) {
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     if (_outputTexture) {
       effect->setFloat2("delta", (1.f / static_cast<float>(_outputTexture->width)) * direction.x,
                         (1.f / static_cast<float>(_outputTexture->height)) * direction.y);
@@ -47,6 +48,8 @@ BlurPostProcess::BlurPostProcess(const std::string& iName, const Vector2& iDrect
                         (1.f / static_cast<float>(height)) * direction.y);
     }
   });
+
+  kernel = iKernel;
 }
 
 BlurPostProcess::~BlurPostProcess() = default;
@@ -84,6 +87,11 @@ void BlurPostProcess::set_packedFloat(bool v)
 bool BlurPostProcess::get_packedFloat() const
 {
   return _packedFloat;
+}
+
+std::string BlurPostProcess::getClassName() const
+{
+  return "BlurPostProcess";
 }
 
 void BlurPostProcess::updateEffect(
@@ -229,18 +237,17 @@ float BlurPostProcess::_nearestBestKernel(float idealKernel) const
 float BlurPostProcess::_gaussianWeight(float x) const
 {
   // reference: Engines/ImageProcessingBlur.cpp #dcc760
-  // We are evaluating the Gaussian (normal) distribution over a kernel
-  // parameter space of [-1,1], so we truncate at three standard deviations by
-  // setting stddev (sigma) to 1/3. The choice of 3-sigma truncation is common
-  // but arbitrary, and means that the signal is truncated at around 1.3% of
-  // peak strength.
+  // We are evaluating the Gaussian (normal) distribution over a kernel parameter space of [-1,1],
+  // so we truncate at three standard deviations by setting stddev (sigma) to 1/3.
+  // The choice of 3-sigma truncation is common but arbitrary, and means that the signal is
+  // truncated at around 1.3% of peak strength.
 
-  // the distribution is scaled to account for the difference between the actual
-  // kernel size and the requested kernel size
-  float sigma       = (1.f / 3.f);
-  float denominator = std::sqrt(2.f * Math::PI) * sigma;
-  float exponent    = -((x * x) / (2.f * sigma * sigma));
-  float weight      = (1.f / denominator) * std::exp(exponent);
+  // the distribution is scaled to account for the difference between the actual kernel size and the
+  // requested kernel size
+  const float sigma       = (1.f / 3.f);
+  const float denominator = std::sqrt(2.f * Math::PI) * sigma;
+  const float exponent    = -((x * x) / (2.f * sigma * sigma));
+  const float weight      = (1.f / denominator) * std::exp(exponent);
   return weight;
 }
 
@@ -250,6 +257,12 @@ std::string BlurPostProcess::_glslFloat(float x, unsigned int decimalFigures) co
   oss.precision(decimalFigures);
   oss << std::fixed << x;
   return oss.str();
+}
+
+BlurPostProcessPtr _Parse(const json& /*parsedPostProcess*/, const CameraPtr& /*targetCamera*/,
+                          Scene* /*scene*/, const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON
