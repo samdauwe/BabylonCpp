@@ -24,6 +24,12 @@ public:
                                     bool isRightEye, const VRCameraMetrics& vrMetrics);
   ~VRDistortionCorrectionPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "VRDistortionCorrectionPostProcess" string
+   */
+  std::string getClassName() const override;
+
 private:
   bool _isRightEye;
   Float32Array _distortionFactors;

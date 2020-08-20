@@ -26,6 +26,12 @@ public:
   }
   ~SubSurfaceScatteringPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "SubSurfaceScatteringPostProcess" string
+   */
+  std::string getClassName() const override;
+
 protected:
   /**
    * @brief Creates a sub surface scattering post process.
@@ -36,12 +42,6 @@ protected:
                                   const std::optional<unsigned int>& samplingMode = std::nullopt,
                                   Engine* engine = nullptr, bool reusable = false,
                                   unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
-
-public:
-  /** @hidden */
-  unsigned int texelWidth;
-  /** @hidden */
-  unsigned int texelHeight;
 
 }; // end of class SubSurfaceScatteringPostProcess
 

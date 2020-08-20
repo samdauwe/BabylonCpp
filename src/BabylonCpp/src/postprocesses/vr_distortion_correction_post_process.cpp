@@ -14,33 +14,35 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
                   vrMetrics.postProcessScaleFactor,
                   camera,
                   TextureConstants::BILINEAR_SAMPLINGMODE}
-    , _isRightEye{isRightEye}
-    , _distortionFactors{vrMetrics.distortionK}
-    , _postProcessScaleFactor{vrMetrics.postProcessScaleFactor}
-    , _lensCenterOffset{vrMetrics.lensCenterOffset}
 {
+  _isRightEye                 = isRightEye;
+  _distortionFactors          = vrMetrics.distortionK;
+  _postProcessScaleFactor     = vrMetrics.postProcessScaleFactor;
+  _lensCenterOffset           = vrMetrics.lensCenterOffset;
   adaptScaleToCurrentViewport = true;
 
   onSizeChangedObservable.add([this](PostProcess*, EventState&) {
-    _scaleIn = Vector2(2.f, 2.f / aspectRatio());
-    _scaleFactor
-      = Vector2(0.5f * (1.f / _postProcessScaleFactor),
-                0.5f * (1.f / _postProcessScaleFactor) * aspectRatio());
-    _lensCenter = Vector2(_isRightEye ? 0.5f - _lensCenterOffset * 0.5f :
-                                        0.5f + _lensCenterOffset * 0.5f,
-                          0.5f);
+    _scaleIn     = Vector2(2.f, 2.f / aspectRatio());
+    _scaleFactor = Vector2(0.5f * (1.f / _postProcessScaleFactor),
+                           0.5f * (1.f / _postProcessScaleFactor) * aspectRatio());
+    _lensCenter  = Vector2(
+      _isRightEye ? 0.5f - _lensCenterOffset * 0.5f : 0.5f + _lensCenterOffset * 0.5f, 0.5f);
   });
 
-  onApplyObservable.add([&](Effect* effect, EventState&) {
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     effect->setFloat2("LensCenter", _lensCenter.x, _lensCenter.y);
     effect->setFloat2("Scale", _scaleFactor.x, _scaleFactor.y);
     effect->setFloat2("ScaleIn", _scaleIn.x, _scaleIn.y);
-    effect->setFloat4("HmdWarpParam", _distortionFactors[0],
-                      _distortionFactors[1], _distortionFactors[2],
-                      _distortionFactors[3]);
+    effect->setFloat4("HmdWarpParam", _distortionFactors[0], _distortionFactors[1],
+                      _distortionFactors[2], _distortionFactors[3]);
   });
 }
 
 VRDistortionCorrectionPostProcess::~VRDistortionCorrectionPostProcess() = default;
+
+std::string VRDistortionCorrectionPostProcess::getClassName() const
+{
+  return "VRDistortionCorrectionPostProcess";
+}
 
 } // end of namespace BABYLON

@@ -12,7 +12,7 @@ using StereoscopicInterlacePostProcessIPtr = std::shared_ptr<StereoscopicInterla
 
 /**
  * @brief StereoscopicInterlacePostProcessI used to render stereo views from a rigged camera with
- * support for alternate line interlacing
+ * support for alternate line interlacing.
  */
 class BABYLON_SHARED_EXPORT StereoscopicInterlacePostProcessI : public PostProcess {
 
@@ -27,6 +27,12 @@ public:
     return postProcess;
   }
   ~StereoscopicInterlacePostProcessI() override; // = default
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "StereoscopicInterlacePostProcessI" string
+   */
+  std::string getClassName() const override;
 
 protected:
   /**

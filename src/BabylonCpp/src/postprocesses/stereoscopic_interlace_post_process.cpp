@@ -15,15 +15,20 @@ StereoscopicInterlacePostProcess::StereoscopicInterlacePostProcess(
   _passedProcess = rigCameras[0]->_rigPostProcess;
   _stepSize      = Vector2(1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
 
-  onSizeChangedObservable.add([&](PostProcess*, EventState&) {
+  onSizeChangedObservable.add([this](PostProcess*, EventState&) {
     _stepSize = Vector2(1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
   });
-  onApplyObservable.add([&](Effect* effect, EventState&) {
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("camASampler", _passedProcess);
     effect->setFloat2("stepSize", _stepSize.x, _stepSize.y);
   });
 }
 
 StereoscopicInterlacePostProcess::~StereoscopicInterlacePostProcess() = default;
+
+std::string StereoscopicInterlacePostProcess::getClassName() const
+{
+  return "StereoscopicInterlacePostProcess";
+}
 
 } // end of namespace BABYLON

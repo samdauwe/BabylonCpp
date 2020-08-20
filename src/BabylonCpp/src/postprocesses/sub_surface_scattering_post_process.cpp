@@ -51,4 +51,9 @@ SubSurfaceScatteringPostProcess::SubSurfaceScatteringPostProcess(
 
 SubSurfaceScatteringPostProcess::~SubSurfaceScatteringPostProcess() = default;
 
+std::string SubSurfaceScatteringPostProcess::getClassName() const
+{
+  return "SubSurfaceScatteringPostProcess";
+}
+
 } // end of namespace BABYLON

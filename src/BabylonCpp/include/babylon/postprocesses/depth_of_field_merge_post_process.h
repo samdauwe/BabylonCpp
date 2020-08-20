@@ -11,8 +11,8 @@ class DepthOfFieldMergePostProcess;
 using DepthOfFieldMergePostProcessPtr = std::shared_ptr<DepthOfFieldMergePostProcess>;
 
 /**
- * @brief The DepthOfFieldMergePostProcess merges blurred images with the
- * original based on the values of the circle of confusion.
+ * @brief The DepthOfFieldMergePostProcess merges blurred images with the original based on the
+ * values of the circle of confusion.
  */
 class BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
 
@@ -37,6 +37,12 @@ public:
   ~DepthOfFieldMergePostProcess() override; // = default
 
   /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "DepthOfFieldMergePostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
    * @brief Updates the effect with the current post process compile time values and recompiles the
    * shader.
    * @param defines Define statements that should be added at the beginning of the shader. (default:
@@ -48,10 +54,6 @@ public:
    * babylon.blurPostProcess.ts and kernelBlur.vertex.fx
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
-   * @param vertexUrl The url of the vertex shader to be used (default: the one given at
-   * construction time)
-   * @param fragmentUrl The url of the fragment shader to be used (default: the one given at
-   * construction time)
    */
   void updateEffect(const std::string& defines = "", const std::vector<std::string>& uniforms = {},
                     const std::vector<std::string>& samplers                             = {},
@@ -66,26 +68,19 @@ protected:
   /**
    * @brief Creates a new instance of DepthOfFieldMergePostProcess.
    * @param name The name of the effect.
-   * @param originalFromInput Post process which's input will be used for the
-   * merge.
-   * @param circleOfConfusion Circle of confusion post process which's output
-   * will be used to blur each pixel.
-   * @param blurSteps Blur post processes from low to high which will be mixed
-   * with the original image.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
+   * @param originalFromInput Post process which's input will be used for the merge.
+   * @param circleOfConfusion Circle of confusion post process which's output will be used to blur
+   * each pixel.
+   * @param blurSteps Blur post processes from low to high which will be mixed with the original
+   * image.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
+   * @param textureType Type of textures used when performing the post process. (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in the constructor. The
+   * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
   DepthOfFieldMergePostProcess(const std::string& name, const PostProcessPtr& originalFromInput,
                                const PostProcessPtr& circleOfConfusion,

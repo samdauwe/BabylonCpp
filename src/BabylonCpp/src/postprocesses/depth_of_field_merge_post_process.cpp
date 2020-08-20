@@ -19,13 +19,14 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
                   {},           true}
     , blurSteps{iBlurSteps}
 {
-  onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
-    effect->setTextureFromPostProcessOutput("circleOfConfusionSampler", circleOfConfusion);
-    effect->setTextureFromPostProcess("textureSampler", originalFromInput);
-    for (auto& blurStep : blurSteps)
-      effect->setTextureFromPostProcessOutput("blurStep" + std::to_string(blurSteps.size() - 1),
-                                              blurStep);
-  });
+  onApplyObservable.add(
+    [this, circleOfConfusion, originalFromInput](Effect* effect, EventState& /*es*/) {
+      effect->setTextureFromPostProcessOutput("circleOfConfusionSampler", circleOfConfusion);
+      effect->setTextureFromPostProcess("textureSampler", originalFromInput);
+      for (auto& blurStep : blurSteps)
+        effect->setTextureFromPostProcessOutput("blurStep" + std::to_string(blurSteps.size() - 1),
+                                                blurStep);
+    });
 
   // updateEffect() is a virtual method, and thus cannot be called in the constructor
   // it is instead called inside DepthOfFieldMergePostProcess::New(...)
@@ -50,6 +51,11 @@ void DepthOfFieldMergePostProcess::updateEffect(
     idefines += "#define BLUR_LEVEL " + std::to_string(blurSteps.size() - 1) + "\n";
   }
   PostProcess::updateEffect(idefines, uniforms, samplers, indexParameters, onCompiled, onError);
+}
+
+std::string DepthOfFieldMergePostProcess::getClassName() const
+{
+  return "DepthOfFieldMergePostProcess";
 }
 
 } // end of namespace BABYLON

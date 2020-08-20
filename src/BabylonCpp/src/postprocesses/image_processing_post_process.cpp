@@ -71,7 +71,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
     _imageProcessingConfiguration->applyByPostProcess = true;
   }
 
-  onApply = [&](Effect* effect, EventState& /*es*/) {
+  onApply = [this](Effect* effect, EventState& /*es*/) {
     _imageProcessingConfiguration->bind(effect, aspectRatio());
   };
 }

@@ -14,4 +14,9 @@ HighlightsPostProcess::HighlightsPostProcess(const std::string& iName, float rat
 
 HighlightsPostProcess::~HighlightsPostProcess() = default;
 
+std::string HighlightsPostProcess::getClassName() const
+{
+  return "HighlightsPostProcess";
+}
+
 } // end of namespace BABYLON
