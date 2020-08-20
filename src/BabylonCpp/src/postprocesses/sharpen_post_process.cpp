@@ -1,9 +1,9 @@
 #include <babylon/postprocesses/sharpen_post_process.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -28,5 +28,17 @@ SharpenPostProcess::SharpenPostProcess(const std::string& iName,
 }
 
 SharpenPostProcess::~SharpenPostProcess() = default;
+
+std::string SharpenPostProcess::getClassName() const
+{
+  return "SharpenPostProcess";
+}
+
+SharpenPostProcessPtr SharpenPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                                 const CameraPtr& /*targetCamera*/,
+                                                 Scene* /*scene*/, const std::string& /*rootUrl*/)
+{
+  return nullptr;
+}
 
 } // end of namespace BABYLON

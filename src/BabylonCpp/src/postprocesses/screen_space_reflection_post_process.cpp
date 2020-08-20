@@ -95,6 +95,11 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
 
 ScreenSpaceReflectionPostProcess::~ScreenSpaceReflectionPostProcess() = default;
 
+std::string ScreenSpaceReflectionPostProcess::getClassName() const
+{
+  return "ScreenSpaceReflectionPostProcess";
+}
+
 bool ScreenSpaceReflectionPostProcess::get_enableSmoothReflections() const
 {
   return _enableSmoothReflections;
@@ -154,6 +159,14 @@ void ScreenSpaceReflectionPostProcess::_updateEffectDefines()
   defines.emplace_back("#define SMOOTH_STEPS " + std::to_string(_smoothSteps >> 0));
 
   updateEffect(StringTools::join(defines, '\n'));
+}
+
+ScreenSpaceReflectionPostProcessPtr
+ScreenSpaceReflectionPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                         const CameraPtr& /*targetCamera*/, Scene* /*scene*/,
+                                         const std::string& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

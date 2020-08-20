@@ -27,6 +27,18 @@ public:
   }
   ~PassPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "PassPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static PassPostProcessPtr _Parse(const json& parsedPostProcess, const CameraPtr& targetCamera,
+                                   Scene* scene, const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates the PassPostProcess.

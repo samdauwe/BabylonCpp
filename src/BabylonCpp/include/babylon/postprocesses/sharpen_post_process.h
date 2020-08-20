@@ -28,24 +28,30 @@ public:
   }
   ~SharpenPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "SharpenPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static SharpenPostProcessPtr _Parse(const json& parsedPostProcess, const CameraPtr& targetCamera,
+                                      Scene* scene, const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
+   * @param options The required width/height ratio to downsize to before computing the render pass.
    * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
+   * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
+   * @param engine The engine which the post process will be applied. (default: current engine)
+   * @param reusable If the post process can be reused on the same frame. (default: false)
+   * @param textureType Type of textures used when performing the post process. (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in the constructor. The
+   * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
   SharpenPostProcess(const std::string& name,
                      const std::variant<float, PostProcessOptions>& options,
@@ -57,8 +63,8 @@ protected:
 
 public:
   /**
-   * How much of the original color should be applied. Setting this to 0 will
-   * display edge detection. (default: 1)
+   * How much of the original color should be applied. Setting this to 0 will display edge
+   * detection. (default: 1)
    */
   float colorAmount;
   /**

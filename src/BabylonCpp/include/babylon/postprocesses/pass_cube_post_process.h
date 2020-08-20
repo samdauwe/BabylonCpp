@@ -57,6 +57,18 @@ protected:
    */
   void set_face(unsigned int value);
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "PassCubePostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static PassCubePostProcessPtr _Parse(const json& parsedPostProcess, const CameraPtr& targetCamera,
+                                       Scene* scene, const std::string& rootUrl);
+
 public:
   /**
    * Gets or sets the cube face to display.

@@ -29,10 +29,11 @@ ChromaticAberrationPostProcess::ChromaticAberrationPostProcess(
     , radialIntensity{0.f}
     , direction{Vector2{0.707f, 0.707f}}
     , centerPosition{Vector2{0.5f, 0.5f}}
-    , screenWidth{static_cast<float>(iScreenWidth)}
-    , screenHeight{static_cast<float>(iScreenHeight)}
 {
-  onApplyObservable.add([&](Effect* effect, EventState&) {
+  screenWidth  = static_cast<float>(iScreenWidth);
+  screenHeight = static_cast<float>(iScreenHeight);
+
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     effect->setFloat("chromatic_aberration", aberrationAmount);
     effect->setFloat("screen_width", screenWidth);
     effect->setFloat("screen_height", screenHeight);
@@ -43,5 +44,18 @@ ChromaticAberrationPostProcess::ChromaticAberrationPostProcess(
 }
 
 ChromaticAberrationPostProcess::~ChromaticAberrationPostProcess() = default;
+
+std::string ChromaticAberrationPostProcess::getClassName() const
+{
+  return "ChromaticAberrationPostProcess";
+}
+
+ChromaticAberrationPostProcessPtr
+ChromaticAberrationPostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                       const CameraPtr& /*targetCamera*/, Scene* /*scene*/,
+                                       const std::string& /*rootUrl*/)
+{
+  return nullptr;
+}
 
 } // end of namespace BABYLON

@@ -55,4 +55,16 @@ void PassCubePostProcess::set_face(unsigned int value)
   }
 }
 
+std::string PassCubePostProcess::getClassName() const
+{
+  return "PassCubePostProcess";
+}
+
+PassCubePostProcessPtr PassCubePostProcess::_Parse(const json& /*parsedPostProcess*/,
+                                                   const CameraPtr& /*targetCamera*/,
+                                                   Scene* /*scene*/, const std::string& /*rootUrl*/)
+{
+  return nullptr;
+}
+
 } // end of namespace BABYLON

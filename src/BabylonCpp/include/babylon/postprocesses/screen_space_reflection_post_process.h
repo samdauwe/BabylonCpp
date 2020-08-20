@@ -30,6 +30,19 @@ public:
   }
   ~ScreenSpaceReflectionPostProcess() override; // = default
 
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "ScreenSpaceReflectionPostProcess" string
+   */
+  std::string getClassName() const override;
+
+  /**
+   * @brief Hidden
+   */
+  static ScreenSpaceReflectionPostProcessPtr _Parse(const json& parsedPostProcess,
+                                                    const CameraPtr& targetCamera, Scene* scene,
+                                                    const std::string& rootUrl);
+
 protected:
   /**
    * @brief Creates a new instance of ScreenSpaceReflectionPostProcess.
