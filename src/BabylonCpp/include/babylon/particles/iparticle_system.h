@@ -8,6 +8,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/color4.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/color_gradient.h>
@@ -113,7 +114,7 @@ public:
   /**
    * The texture used to render each particle. (this can be a spritesheet)
    */
-  TexturePtr particleTexture = nullptr;
+  BaseTexturePtr particleTexture = nullptr;
 
   /**
    * Blend mode use to render the particle, it can be either ParticleSystem.BLENDMODE_ONEONE,
@@ -339,6 +340,11 @@ public:
    * Snippet ID if the particle system was created from the snippet server
    */
   std::string snippetId;
+
+  /**
+   * Gets or sets a matrix to use to compute projection
+   */
+  std::optional<Matrix> defaultProjectionMatrix;
 
   /**
    * @brief Returns whether or not the particle system has an emitter.
