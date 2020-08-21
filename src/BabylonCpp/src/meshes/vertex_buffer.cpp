@@ -1,13 +1,13 @@
 ﻿#include <babylon/meshes/vertex_buffer.h>
 
 #include <babylon/core/data_view.h>
-#include <babylon/engines/engine.h>
+#include <babylon/engines/thin_engine.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
-VertexBuffer::VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*>& data,
+VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, Buffer*>& data,
                            const std::string& kind, bool updatable,
                            const std::optional<bool>& postponeInternalCreation,
                            std::optional<size_t> stride, const std::optional<bool>& instanced,

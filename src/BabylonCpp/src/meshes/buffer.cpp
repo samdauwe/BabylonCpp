@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
+Buffer::Buffer(ThinEngine* engine, const Float32Array& data, bool updatable,
                std::optional<size_t> stride, bool postponeInternalCreation, bool instanced,
                bool useBytes, const std::optional<unsigned int>& divisor)
     : _buffer{nullptr}

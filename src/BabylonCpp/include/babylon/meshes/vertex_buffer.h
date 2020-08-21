@@ -12,8 +12,8 @@ namespace BABYLON {
 
 class Buffer;
 class DataView;
-class Engine;
 class Scene;
+class ThinEngine;
 class WebGLDataBuffer;
 using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
@@ -158,7 +158,7 @@ public:
    * @param useBytes set to true if stride and offset are in bytes (optional)
    * @param divisor defines the instance divisor to use (1 by default)
    */
-  VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*>& data,
+  VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, Buffer*>& data,
                const std::string& kind, bool updatable,
                const std::optional<bool>& postponeInternalCreation = std::nullopt,
                std::optional<size_t> stride                        = std::nullopt,

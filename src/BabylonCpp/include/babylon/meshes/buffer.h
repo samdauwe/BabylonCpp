@@ -8,8 +8,8 @@
 
 namespace BABYLON {
 
-class Engine;
 class Mesh;
+class ThinEngine;
 class VertexBuffer;
 class WebGLDataBuffer;
 using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
@@ -32,7 +32,7 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    * @param divisor sets an optional divisor for instances (1 by default)
    */
-  Buffer(Engine* engine, const Float32Array& data, bool updatable,
+  Buffer(ThinEngine* engine, const Float32Array& data, bool updatable,
          std::optional<size_t> stride = std::nullopt, bool postponeInternalCreation = false,
          bool instanced = false, bool useBytes = false,
          const std::optional<unsigned int>& divisor = std::nullopt);
@@ -150,7 +150,7 @@ public:
   size_t byteStride;
 
 private:
-  Engine* _engine;
+  ThinEngine* _engine;
   WebGLDataBufferPtr _buffer;
   bool _updatable;
   bool _instanced;
