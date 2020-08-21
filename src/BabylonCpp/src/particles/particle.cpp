@@ -155,7 +155,7 @@ void Particle::copyTo(Particle& other)
   other.position.copyFrom(position);
   if (_initialDirection) {
     if (other._initialDirection) {
-      other._initialDirection = _initialDirection;
+      other._initialDirection->copyFrom(*_initialDirection);
     }
     else {
       other._initialDirection = _initialDirection;

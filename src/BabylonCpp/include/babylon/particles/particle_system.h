@@ -17,6 +17,7 @@ class Effect;
 class Mesh;
 class Particle;
 class Scene;
+class ThinEngine;
 class VertexBuffer;
 class WebGLDataBuffer;
 using EffectPtr          = std::shared_ptr<Effect>;
@@ -55,13 +56,14 @@ public:
    * smoke, water, or abstract visual effects like magic glitter and faery dust.
    * @param name The name of the particle system
    * @param capacity The max number of particles alive at the same time
-   * @param scene The scene the particle system belongs to
+   * @param sceneOrEngine The scene the particle system belongs to or the engine to use if no scene
    * @param customEffect a custom effect used to change the way particles are rendered by default
    * @param isAnimationSheetEnabled Must be true if using a spritesheet to animate the particles
    * texture
    * @param epsilon Offset used to render the particles
    */
-  ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
+  ParticleSystem(const std::string& name, size_t capacity,
+                 const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
                  const EffectPtr& customEffect = nullptr, bool isAnimationSheetEnabled = false,
                  float epsilon = 0.01f);
   ~ParticleSystem() override; // = default
@@ -619,6 +621,11 @@ public:
   float _currentStartSize1;
   /** Hidden */
   float _currentStartSize2;
+
+  /**
+   * Gets or sets a matrix to use to compute view
+   */
+  std::optional<Matrix> defaultViewMatrix;
 
   // Sub-emitters
   /**

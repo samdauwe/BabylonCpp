@@ -6,6 +6,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -17,6 +18,7 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/materials/thin_material_helper.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/buffer.h>
@@ -36,9 +38,10 @@
 
 namespace BABYLON {
 
-ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene* scene,
-                               const EffectPtr& customEffect, bool iIsAnimationSheetEnabled,
-                               float epsilon)
+ParticleSystem::ParticleSystem(
+  const std::string& iName, size_t capacity,
+  const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
+  const EffectPtr& customEffect, bool iIsAnimationSheetEnabled, float epsilon)
     : BaseParticleSystem{iName}
     , onDispose{this, &ParticleSystem::set_onDispose}
     , _currentEmitRateGradient{std::nullopt}
@@ -47,6 +50,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
     , _currentStartSizeGradient{std::nullopt}
     , _currentStartSize1{0.f}
     , _currentStartSize2{0.f}
+    , defaultViewMatrix{std::nullopt}
     , _disposeEmitterOnDispose{false}
     , _newPartsExcess{0}
     , _scaledColorStep{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -72,18 +76,24 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity, Scene*
   _epsilon                 = epsilon;
   _isAnimationSheetEnabled = iIsAnimationSheetEnabled;
 
-  _scene = scene ? scene : Engine::LastCreatedScene();
+  if (!sceneOrEngine || std::holds_alternative<Scene*>(*sceneOrEngine)) {
+    _scene = sceneOrEngine ? std::get<Scene*>(*sceneOrEngine) : EngineStore::LastCreatedScene();
 
-  uniqueId = _scene->getUniqueId();
+    _engine  = _scene->getEngine();
+    uniqueId = _scene->getUniqueId();
+    // _scene->particleSystems.push(this);
+  }
+  else {
+    _engine                 = std::get<ThinEngine*>(*sceneOrEngine);
+    defaultProjectionMatrix = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f);
+  }
 
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
 
   _customEffect[0] = customEffect;
 
-  _scene->particleSystems.emplace_back(this);
-
-  _useInstancing = _scene->getEngine()->getCaps().instancedArrays;
+  _useInstancing = _engine->getCaps().instancedArrays;
 
   _createIndexBuffer();
   _createVertexBuffers();
@@ -577,7 +587,7 @@ IParticleSystem& ParticleSystem::removeStartSizeGradient(float gradient)
 
 void ParticleSystem::_createRampGradientTexture()
 {
-  if (_rampGradients.empty() || _rampGradientsTexture) {
+  if (_rampGradients.empty() || _rampGradientsTexture || !_scene) {
     return;
   }
 
@@ -599,7 +609,7 @@ void ParticleSystem::_createRampGradientTexture()
   }
 
   _rampGradientsTexture = RawTexture::CreateRGBATexture(
-    data, _rawTextureWidth, 1, _scene, false, false, TextureConstants::NEAREST_SAMPLINGMODE);
+    data, _rawTextureWidth, 1, _scene, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE);
 }
 
 std::vector<Color3Gradient>& ParticleSystem::getRampGradients()
@@ -740,7 +750,7 @@ void ParticleSystem::_createVertexBuffers()
     _vertexBufferSize += 4;
   }
 
-  auto engine   = _scene->getEngine();
+  auto engine   = _engine;
   _vertexData   = Float32Array(_capacity * _vertexBufferSize * (_useInstancing ? 1 : 4));
   _vertexBuffer = std::make_unique<Buffer>(engine, _vertexData, true, _vertexBufferSize);
 
@@ -817,7 +827,7 @@ void ParticleSystem::_createIndexBuffer()
     index += 4;
   }
 
-  _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
+  _indexBuffer = _engine->createIndexBuffer(indices);
 }
 
 size_t ParticleSystem::getCapacity() const
@@ -883,9 +893,15 @@ void ParticleSystem::start(size_t delay)
   }
 
   if (preWarmCycles) {
+    // FIXME
     for (size_t index = 0; index < preWarmCycles; ++index) {
       animate(true);
     }
+  }
+
+  // Animations
+  if (beginAnimationOnStart && !animations.empty() && _scene) {
+    // _scene->beginAnimation(this, beginAnimationFrom, beginAnimationTo, beginAnimationLoop);
   }
 }
 
@@ -1357,28 +1373,30 @@ std::vector<std::string> ParticleSystem::_GetEffectCreationOptions(bool iIsAnima
 
 void ParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int iBlendMode)
 {
-  if (_scene->clipPlane.has_value()) {
-    defines.emplace_back("#define CLIPPLANE");
-  }
+  if (_scene) {
+    if (_scene->clipPlane.has_value()) {
+      defines.emplace_back("#define CLIPPLANE");
+    }
 
-  if (_scene->clipPlane2.has_value()) {
-    defines.emplace_back("#define CLIPPLANE2");
-  }
+    if (_scene->clipPlane2.has_value()) {
+      defines.emplace_back("#define CLIPPLANE2");
+    }
 
-  if (_scene->clipPlane3.has_value()) {
-    defines.emplace_back("#define CLIPPLANE3");
-  }
+    if (_scene->clipPlane3.has_value()) {
+      defines.emplace_back("#define CLIPPLANE3");
+    }
 
-  if (_scene->clipPlane4.has_value()) {
-    defines.emplace_back("#define CLIPPLANE4");
-  }
+    if (_scene->clipPlane4.has_value()) {
+      defines.emplace_back("#define CLIPPLANE4");
+    }
 
-  if (_scene->clipPlane5.has_value()) {
-    defines.emplace_back("#define CLIPPLANE5");
-  }
+    if (_scene->clipPlane5.has_value()) {
+      defines.emplace_back("#define CLIPPLANE5");
+    }
 
-  if (_scene->clipPlane6.has_value()) {
-    defines.emplace_back("#define CLIPPLANE6");
+    if (_scene->clipPlane6.has_value()) {
+      defines.emplace_back("#define CLIPPLANE6");
+    }
   }
 
   if (_isAnimationSheetEnabled) {
@@ -1466,7 +1484,7 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
     options.samplers      = std::move(samplers);
     options.defines       = std::move(join);
 
-    _effect = _scene->getEngine()->createEffect("particles", options, _scene->getEngine());
+    _effect = _engine->createEffect("particles", options, _scene->getEngine());
   }
 
   return _effect;
@@ -1478,7 +1496,7 @@ void ParticleSystem::animate(bool preWarmOnly)
     return;
   }
 
-  if (!preWarmOnly) {
+  if (!preWarmOnly && _scene) {
     // Check
     if (!isReady()) {
       return;
@@ -1491,10 +1509,10 @@ void ParticleSystem::animate(bool preWarmOnly)
   }
 
   _scaledUpdateSpeed = static_cast<int>(
-    updateSpeed * (preWarmOnly ? preWarmStepOffset : _scene->getAnimationRatio()));
+    updateSpeed * (preWarmOnly ? preWarmStepOffset : (_scene ? _scene->getAnimationRatio() : 1.f)));
 
   // Determine the number of particles we need to create
-  int newParticles = 0;
+  auto newParticles = 0;
 
   if (manualEmitCount > -1) {
     newParticles    = manualEmitCount;
@@ -1550,7 +1568,7 @@ void ParticleSystem::animate(bool preWarmOnly)
       if (onAnimationEnd) {
         onAnimationEnd();
       }
-      if (disposeOnStop) {
+      if (disposeOnStop && _scene) {
         _scene->_toBeDisposed.emplace_back(this);
       }
     }
@@ -1600,8 +1618,8 @@ void ParticleSystem::rebuild()
 bool ParticleSystem::isReady()
 {
   if (!std::holds_alternative<AbstractMeshPtr>(emitter) || !std::holds_alternative<Vector3>(emitter)
-      || !_imageProcessingConfiguration->isReady() || !particleTexture
-      || !particleTexture->isReady()) {
+      || (_imageProcessingConfiguration && !_imageProcessingConfiguration->isReady())
+      || !particleTexture || !particleTexture->isReady()) {
     return false;
   }
 
@@ -1626,15 +1644,16 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
 {
   auto effect = _getEffect(iBlendMode);
 
-  auto engine = _scene->getEngine();
+  auto engine = _engine;
 
   // Render
   engine->enableEffect(effect);
 
-  auto viewMatrix = _scene->getViewMatrix();
+  auto viewMatrix = defaultViewMatrix.value_or(_scene ? _scene->getViewMatrix() : Matrix());
   effect->setTexture("diffuseSampler", particleTexture);
   effect->setMatrix("view", viewMatrix);
-  effect->setMatrix("projection", _scene->getProjectionMatrix());
+  effect->setMatrix("projection", defaultProjectionMatrix.value_or(
+                                    _scene ? _scene->getProjectionMatrix() : Matrix()));
 
   if (_isAnimationSheetEnabled && particleTexture) {
     auto baseSize = particleTexture->getBaseSize();
@@ -1646,7 +1665,7 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   effect->setVector2("translationPivot", translationPivot);
   effect->setFloat4("textureMask", textureMask.r, textureMask.g, textureMask.b, textureMask.a);
 
-  if (_isBillboardBased) {
+  if (_isBillboardBased && _scene) {
     const auto& camera = _scene->activeCamera();
     effect->setVector3("eyePosition", camera->globalPosition);
   }
@@ -1661,16 +1680,17 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
 
   const auto defines = effect->defines;
 
-  if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
-      || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
-      || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
-    MaterialHelper::BindClipPlane(effect, _scene);
+  if (_scene) {
+    if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
+        || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
+        || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
+      ThinMaterialHelper::BindClipPlane(effect, *_scene);
+    }
   }
 
   if (StringTools::indexOf(defines, "#define BILLBOARDMODE_ALL") >= 0) {
-    auto invView = viewMatrix;
-    invView.invert();
-    effect->setMatrix("invView", invView);
+    viewMatrix.invertToRef(TmpVectors::MatrixArray[0]);
+    effect->setMatrix("invView", TmpVectors::MatrixArray[0]);
   }
 
   // VBOs
@@ -1702,11 +1722,11 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   if (_useInstancing) {
-    engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
+    engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4,
                            static_cast<int>(_particles.size()));
   }
   else {
-    engine->drawElementsType(Material::TriangleFillMode, 0,
+    engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0,
                              static_cast<int>(_particles.size() * 6));
   }
 
@@ -1721,10 +1741,12 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   }
 
   auto engine = _scene->getEngine();
-  engine->setState(false);
+  {
+    engine->setState(false);
 
-  if (forceDepthWrite) {
-    engine->setDepthWrite(true);
+    if (forceDepthWrite) {
+      engine->setDepthWrite(true);
+    }
   }
 
   size_t outparticles = 0;
@@ -1735,8 +1757,8 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   }
   outparticles = _render(blendMode);
 
-  engine->unbindInstanceAttributes();
-  engine->setAlphaMode(Constants::ALPHA_DISABLE);
+  _engine->unbindInstanceAttributes();
+  _engine->setAlphaMode(Constants::ALPHA_DISABLE);
 
   return outparticles;
 }
@@ -1754,7 +1776,7 @@ void ParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextu
   }
 
   if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer);
+    _engine->_releaseBuffer(_indexBuffer);
     _indexBuffer = nullptr;
   }
 
@@ -1795,11 +1817,13 @@ void ParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextu
   }
 
   // Remove from scene
-  stl_util::erase_remove_if(
-    _scene->particleSystems,
-    [this](const IParticleSystemPtr& particleSystem) { return particleSystem.get() == this; });
+  if (_scene) {
+    stl_util::erase_remove_if(
+      _scene->particleSystems,
+      [this](const IParticleSystemPtr& particleSystem) { return particleSystem.get() == this; });
 
-  _scene->_activeParticleSystems.clear();
+    _scene->_activeParticleSystems.clear();
+  }
 
   // Callback
   onDisposeObservable.notifyObservers(this);

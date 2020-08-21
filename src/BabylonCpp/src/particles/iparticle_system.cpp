@@ -11,6 +11,7 @@ IParticleSystem::IParticleSystem()
                               &IParticleSystem::set_isAnimationSheetEnabled}
     , noiseTexture{this, &IParticleSystem::get_noiseTexture, &IParticleSystem::set_noiseTexture}
     , isLocal{this, &IParticleSystem::get_isLocal, &IParticleSystem::set_isLocal}
+    , defaultProjectionMatrix{std::nullopt}
     , onBeforeDrawParticlesObservable{this, &IParticleSystem::get_onBeforeDrawParticlesObservable}
     , vertexShaderName{this, &IParticleSystem::get_vertexShaderName}
     , useRampGradients{this, &IParticleSystem::get_useRampGradients,
