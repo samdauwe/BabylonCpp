@@ -13,6 +13,7 @@ struct ImageProcessingConfigurationDefines;
 class ImageProcessingConfiguration;
 class RawTexture;
 class Scene;
+class ThinEngine;
 using ImageProcessingConfigurationPtr        = std::shared_ptr<ImageProcessingConfiguration>;
 using ImageProcessingConfigurationDefinesPtr = std::shared_ptr<ImageProcessingConfigurationDefines>;
 using RawTexturePtr                          = std::shared_ptr<RawTexture>;
@@ -368,7 +369,7 @@ protected:
   /**
    * Hidden
    */
-  virtual void _reset(); // FIXME: should it be IParticleSystem::reset() (no underscore)?
+  virtual void _reset();
 
   /**
    * Hidden
@@ -477,6 +478,11 @@ protected:
    * The scene the particle system belongs to.
    */
   Scene* _scene;
+
+  /**
+   * The engine the particle system belongs to.
+   */
+  ThinEngine* _engine;
 
   /**
    * Local cache of defines for image processing.

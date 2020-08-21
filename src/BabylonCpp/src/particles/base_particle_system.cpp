@@ -300,15 +300,15 @@ void BaseParticleSystem::_attachImageProcessingConfiguration(
   }
 
   // Pick the scene configuration if needed.
-  if (!configuration) {
-    // _imageProcessingConfiguration = _scene->imageProcessingConfiguration;
+  if (!configuration && _scene) {
+    _imageProcessingConfiguration = _scene->imageProcessingConfiguration();
   }
   else {
     _imageProcessingConfiguration = configuration;
   }
 }
 
-void BaseParticleSystem::_reset() // FIXME: should it be IParticleSystem::reset() (no underscore)?
+void BaseParticleSystem::_reset()
 {
 }
 
