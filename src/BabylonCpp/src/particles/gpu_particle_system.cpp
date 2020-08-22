@@ -7,6 +7,7 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -38,9 +39,10 @@ bool GPUParticleSystem::IsSupported()
   return Engine::LastCreatedEngine()->webGLVersion() > 1.f;
 }
 
-GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
-                                     std::optional<size_t> randomTextureSize, Scene* scene,
-                                     bool iIsAnimationSheetEnabled, const EffectPtr& customEffect)
+GPUParticleSystem::GPUParticleSystem(
+  const std::string& iName, size_t capacity, std::optional<size_t> randomTextureSize,
+  const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
+  bool iIsAnimationSheetEnabled, const EffectPtr& customEffect)
     : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
@@ -71,7 +73,17 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     , _limitVelocityGradientsTexture{nullptr}
     , _dragGradientsTexture{nullptr}
 {
-  _scene = scene ? scene : Engine::LastCreatedScene();
+  if (!sceneOrEngine || std::holds_alternative<Scene*>(*sceneOrEngine)) {
+    _scene = sceneOrEngine ? std::get<Scene*>(*sceneOrEngine) : EngineStore::LastCreatedScene();
+
+    _engine  = _scene->getEngine();
+    uniqueId = _scene->getUniqueId();
+    // _scene->particleSystems.push(this);
+  }
+  else {
+    _engine                 = std::get<ThinEngine*>(*sceneOrEngine);
+    defaultProjectionMatrix = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f);
+  }
 
   uniqueId = _scene->getUniqueId();
 
@@ -79,7 +91,6 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
 
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
-  _engine = _scene->getEngine();
 
   if (!randomTextureSize.has_value()) {
     randomTextureSize = _engine->getCaps().maxTextureSize;
@@ -89,8 +100,6 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _activeCount             = capacity;
   _currentActiveCount      = 0;
   _isAnimationSheetEnabled = iIsAnimationSheetEnabled;
-
-  _scene->particleSystems.emplace_back(this);
 
   _updateEffectOptions->attributes = {"position",
                                       "initialPosition",
@@ -143,10 +152,11 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture = std::make_unique<RawTexture>(
-    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA, _scene,
-    false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
-  _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
-  _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
+    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA,
+    sceneOrEngine, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+    Constants::TEXTURETYPE_FLOAT);
+  _randomTexture->wrapU = Constants::TEXTURE_WRAP_ADDRESSMODE;
+  _randomTexture->wrapV = Constants::TEXTURE_WRAP_ADDRESSMODE;
 
   d.clear();
   for (size_t i = 0; i < maxTextureSize; ++i) {
@@ -156,10 +166,11 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture2 = std::make_unique<RawTexture>(
-    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA, _scene,
-    false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
-  _randomTexture2->wrapU = TextureConstants::WRAP_ADDRESSMODE;
-  _randomTexture2->wrapV = TextureConstants::WRAP_ADDRESSMODE;
+    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA,
+    sceneOrEngine, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+    Constants::TEXTURETYPE_FLOAT);
+  _randomTexture2->wrapU = Constants::TEXTURE_WRAP_ADDRESSMODE;
+  _randomTexture2->wrapV = Constants::TEXTURE_WRAP_ADDRESSMODE;
 
   _randomTextureSize = maxTextureSize;
 }
@@ -204,7 +215,8 @@ bool GPUParticleSystem::isReady()
     return false;
   }
 
-  if (!hasEmitter() || !_updateEffect->isReady() || !_imageProcessingConfiguration->isReady()
+  if (!hasEmitter() || !_updateEffect->isReady()
+      || (_imageProcessingConfiguration && !_imageProcessingConfiguration->isReady())
       || !_getEffect()->isReady() || !particleTexture || !particleTexture->isReady()) {
     return false;
   }
@@ -248,7 +260,7 @@ void GPUParticleSystem::start(size_t delay)
 
   // Animations
   if (beginAnimationOnStart && !animations.empty()) {
-    // getScene()->beginAnimation(this, beginAnimationFrom, beginAnimationTo,
+    // _scene->beginAnimation(this, beginAnimationFrom, beginAnimationTo,
     //                            beginAnimationLoop);
   }
 }
@@ -780,7 +792,7 @@ void GPUParticleSystem::_initialize(bool force)
     return;
   }
 
-  auto engine = _scene->getEngine();
+  auto engine = _engine;
   Float32Array data;
 
   _attributesStrideSize = 21;
@@ -1017,7 +1029,7 @@ void GPUParticleSystem::_recreateUpdateEffect()
   }
 
   _updateEffectOptions->defines = std::move(defines);
-  _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
+  _updateEffect                 = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _engine);
 }
 
 EffectPtr GPUParticleSystem::_getEffect()
@@ -1027,23 +1039,25 @@ EffectPtr GPUParticleSystem::_getEffect()
 
 void GPUParticleSystem::fillDefines(std::vector<std::string>& defines, unsigned int iBlendMode)
 {
-  if (_scene->clipPlane.has_value()) {
-    defines.emplace_back("#define CLIPPLANE");
-  }
-  if (_scene->clipPlane2.has_value()) {
-    defines.emplace_back("#define CLIPPLANE2");
-  }
-  if (_scene->clipPlane3.has_value()) {
-    defines.emplace_back("#define CLIPPLANE3");
-  }
-  if (_scene->clipPlane4.has_value()) {
-    defines.emplace_back("#define CLIPPLANE4");
-  }
-  if (_scene->clipPlane5.has_value()) {
-    defines.emplace_back("#define CLIPPLANE5");
-  }
-  if (_scene->clipPlane6.has_value()) {
-    defines.emplace_back("#define CLIPPLANE6");
+  if (_scene) {
+    if (_scene->clipPlane.has_value()) {
+      defines.emplace_back("#define CLIPPLANE");
+    }
+    if (_scene->clipPlane2.has_value()) {
+      defines.emplace_back("#define CLIPPLANE2");
+    }
+    if (_scene->clipPlane3.has_value()) {
+      defines.emplace_back("#define CLIPPLANE3");
+    }
+    if (_scene->clipPlane4.has_value()) {
+      defines.emplace_back("#define CLIPPLANE4");
+    }
+    if (_scene->clipPlane5.has_value()) {
+      defines.emplace_back("#define CLIPPLANE5");
+    }
+    if (_scene->clipPlane6.has_value()) {
+      defines.emplace_back("#define CLIPPLANE6");
+    }
   }
 
   if (iBlendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
@@ -1136,14 +1150,15 @@ EffectPtr GPUParticleSystem::_recreateRenderEffect()
   renderEffectOptions.samplers      = std::move(samplers);
   renderEffectOptions.defines       = std::move(join);
 
-  _renderEffect = Effect::New("gpuRenderParticles", renderEffectOptions, _scene->getEngine());
+  _renderEffect = Effect::New("gpuRenderParticles", renderEffectOptions, _engine);
 
   return _renderEffect;
 }
 
 void GPUParticleSystem::animate(bool preWarm)
 {
-  _timeDelta = updateSpeed * (preWarm ? preWarmStepOffset : _scene->getAnimationRatio());
+  _timeDelta
+    = updateSpeed * (preWarm ? preWarmStepOffset : (_scene ? _scene->getAnimationRatio() : 1.f));
   _actualFrame += static_cast<int>(_timeDelta);
 
   if (!_stopped) {
@@ -1213,8 +1228,10 @@ void GPUParticleSystem::_createFactorGradientTexture(const std::vector<T>& facto
   }
 
   _setRawTextureByName(
-    textureName, RawTexture::CreateRTexture(data, static_cast<int>(_rawTextureWidth), 1, _scene,
-                                            false, false, TextureConstants::NEAREST_SAMPLINGMODE));
+    textureName, RawTexture::CreateRTexture(data, static_cast<int>(_rawTextureWidth), 1,
+                                            _scene ? std::variant<Scene*, ThinEngine*>(_scene) :
+                                                     std::variant<Scene*, ThinEngine*>(_engine),
+                                            false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE));
 }
 
 void GPUParticleSystem::_createSizeGradientTexture()
@@ -1267,7 +1284,7 @@ void GPUParticleSystem::_createColorGradientTexture()
 
   _colorGradientsTexture
     = RawTexture::CreateRGBATexture(data, static_cast<int>(_rawTextureWidth), 1, _scene, false,
-                                    false, TextureConstants::NEAREST_SAMPLINGMODE);
+                                    false, Constants::TEXTURE_NEAREST_SAMPLINGMODE);
 }
 
 size_t GPUParticleSystem::render(bool preWarm)
@@ -1290,7 +1307,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     return 0;
   }
 
-  if (!preWarm) {
+  if (!preWarm && _scene) {
     if (!_preWarmDone && preWarmCycles) {
       for (size_t index = 0; index < preWarmCycles; ++index) {
         animate(true);
@@ -1323,7 +1340,11 @@ size_t GPUParticleSystem::render(bool preWarm)
 
   // Enable update effect
   _engine->enableEffect(_updateEffect);
-  _engine->setState(false);
+  auto engine = static_cast<Engine*>(_engine);
+  if (!engine) {
+    throw std::runtime_error(
+      "GPU particles cannot work with a full Engine. ThinEngine is not supported");
+  }
 
   _updateEffect->setFloat("currentCount", static_cast<float>(_currentActiveCount));
   _updateEffect->setFloat("timeDelta", _timeDelta);
@@ -1394,22 +1415,24 @@ size_t GPUParticleSystem::render(bool preWarm)
   _engine->bindVertexArrayObject(_updateVAO[_targetIndex], nullptr);
 
   // Update
-  _engine->bindTransformFeedbackBuffer(_targetBuffer->getBuffer());
-  _engine->setRasterizerState(false);
-  _engine->beginTransformFeedback();
-  _engine->drawArraysType(Material::PointListDrawMode, 0, static_cast<int>(_currentActiveCount));
-  _engine->endTransformFeedback();
-  _engine->setRasterizerState(true);
-  _engine->bindTransformFeedbackBuffer(nullptr);
+  engine->bindTransformFeedbackBuffer(_targetBuffer->getBuffer());
+  engine->setRasterizerState(false);
+  engine->beginTransformFeedback();
+  engine->drawArraysType(Constants::MATERIAL_PointListDrawMode, 0,
+                         static_cast<int>(_currentActiveCount));
+  engine->endTransformFeedback();
+  engine->setRasterizerState(true);
+  engine->bindTransformFeedbackBuffer(nullptr);
 
   if (!preWarm) {
     // Enable render effect
     const auto effect = _getEffect();
 
     _engine->enableEffect(effect);
-    auto viewMatrix = _scene->getViewMatrix();
+    auto viewMatrix = _scene ? _scene->getViewMatrix() : Matrix::IdentityReadOnly();
     effect->setMatrix("view", viewMatrix);
-    effect->setMatrix("projection", _scene->getProjectionMatrix());
+    effect->setMatrix("projection", defaultProjectionMatrix.value_or(
+                                      _scene ? _scene->getProjectionMatrix() : Matrix()));
     effect->setTexture("diffuseSampler", particleTexture);
     effect->setVector2("translationPivot", translationPivot);
     effect->setVector3("worldOffset", worldOffset);
@@ -1431,17 +1454,19 @@ size_t GPUParticleSystem::render(bool preWarm)
                         static_cast<float>(baseSize.width) / static_cast<float>(spriteCellWidth));
     }
 
-    if (_isBillboardBased) {
+    if (_isBillboardBased && _scene) {
       const auto& camera = _scene->activeCamera();
       effect->setVector3("eyePosition", camera->globalPosition);
     }
 
     const auto& defines = effect->defines;
 
-    if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
-        || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
-        || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
-      MaterialHelper::BindClipPlane(effect, _scene);
+    if (_scene) {
+      if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
+          || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()
+          || _scene->clipPlane5.has_value() || _scene->clipPlane6.has_value()) {
+        MaterialHelper::BindClipPlane(effect, _scene);
+      }
     }
 
     if (StringTools::indexOf(defines, "#define BILLBOARDMODE_ALL") >= 0) {
@@ -1472,7 +1497,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     if (forceDepthWrite) {
-      _engine->setDepthWrite(true);
+      engine->setDepthWrite(true);
     }
 
     // Bind source VAO
@@ -1483,7 +1508,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     }
 
     // Render
-    _engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
+    _engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4,
                             static_cast<int>(_currentActiveCount));
     _engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
@@ -1541,7 +1566,9 @@ void GPUParticleSystem::_releaseVAOs()
 void GPUParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextures*/)
 {
   // Remove from scene
-  stl_util::remove_vector_elements_equal_sharedptr(_scene->particleSystems, this);
+  if (_scene) {
+    stl_util::remove_vector_elements_equal_sharedptr(_scene->particleSystems, this);
+  }
 
   _releaseBuffers();
   _releaseVAOs();

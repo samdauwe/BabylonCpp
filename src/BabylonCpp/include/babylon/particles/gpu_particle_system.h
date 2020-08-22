@@ -46,13 +46,15 @@ public:
    * smoke, water, or abstract visual effects like magic glitter and faery dust.
    * @param name The name of the particle system
    * @param options The options used to create the system
-   * @param scene The scene the particle system belongs to
+   * @param sceneOrEngine The scene the particle system belongs to or the engine to use if no scene
    * @param isAnimationSheetEnabled Must be true if using a spritesheet to animate the particles
    * texture
    * @param customEffect a custom effect used to change the way particles are rendered by default
    */
   GPUParticleSystem(const std::string& name, size_t capacity = 5000,
-                    std::optional<size_t> randomTextureSize = std::nullopt, Scene* scene = nullptr,
+                    std::optional<size_t> randomTextureSize = std::nullopt,
+                    const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine
+                    = std::nullopt,
                     bool isAnimationSheetEnabled = false, const EffectPtr& customEffect = nullptr);
   ~GPUParticleSystem() override; // = default
 
@@ -562,8 +564,6 @@ private:
   size_t _targetIndex;
   Buffer* _sourceBuffer;
   Buffer* _targetBuffer;
-
-  Engine* _engine;
 
   int _currentRenderId;
   bool _started;
