@@ -153,7 +153,7 @@ void MeshParticleEmitter::parse(const json& serializationObject, Scene* scene)
   Vector3::FromArrayToRef(json_util::get_array<float>(serializationObject, "direction2"), 0,
                           direction2);
 
-  if (json_util::has_valid_key_value(serializationObject, "meshId")) {
+  if (json_util::has_valid_key_value(serializationObject, "meshId") && scene) {
     mesh = scene->getLastMeshByID(json_util::get_string(serializationObject, "meshId"));
   }
 
