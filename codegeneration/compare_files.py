@@ -134,10 +134,10 @@ def main():
         "filesInputStore.ts", "instantiationTools.ts",
         "khronosTextureContainer2.ts", "logger.ts", "loadFileError.ts",
         "precisionDate.ts", "promise.ts", "retryStrategy.ts",
-        "sceneSerializer.ts", "screenshotTools.ts", "smartArray.ts",
-        "stringDictionary.ts", "tags.ts", "timer.ts", "typeStore.ts",
-        "videoRecorder.ts", "virtualJoystick.ts", "webRequest.ts",
-        "workerPool.ts",
+        "sceneRecorder.ts", "sceneSerializer.ts", "screenshotTools.ts",
+        "smartArray.ts", "stringDictionary.ts", "tags.ts", "timer.ts",
+        "typeStore.ts", "videoRecorder.ts", "virtualJoystick.ts",
+        "webRequest.ts", "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
