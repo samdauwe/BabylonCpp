@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
+#include <variant>
 #include <vector>
 
 #include <babylon/babylon_api.h>
@@ -15,6 +16,7 @@ namespace BABYLON {
 class ParticleSystem;
 class Scene;
 class SubEmitter;
+class ThinEngine;
 using ParticleSystemPtr = std::shared_ptr<ParticleSystem>;
 using SubEmitterPtr     = std::shared_ptr<SubEmitter>;
 
@@ -60,11 +62,13 @@ public:
   /**
    * @brief Creates a new SubEmitter from a serialized JSON version.
    * @param serializationObject defines the JSON object to read from
-   * @param scene defines the hosting scene
+   * @param sceneOrEngine defines the hosting scene or the hosting engine
    * @param rootUrl defines the rootUrl for data loading
    * @returns a new SubEmitter
    */
-  static SubEmitterPtr Parse(const json& parsedLight, Scene* scene, const std::string& rootUrl);
+  static SubEmitterPtr Parse(const json& parsedLight,
+                             const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
+                             const std::string& rootUrl);
 
   /**
    * @brief Release associated resources.
@@ -83,15 +87,15 @@ public:
   SubEmitterType type;
 
   /**
-   * If the particle should inherit the direction from the particle it's
-   * attached to. (+Y will face the direction the particle is moving) (Default:
-   * false) Note: This only is supported when using an emitter of type Mesh
+   * If the particle should inherit the direction from the particle it's attached to. (+Y will face
+   * the direction the particle is moving) (Default: false) Note: This only is supported when using
+   * an emitter of type Mesh
    */
   bool inheritDirection;
 
   /**
-   * How much of the attached particles speed should be added to the sub emitted
-   * particle (default: 0)
+   * How much of the attached particles speed should be added to the sub emitted particle (default:
+   * 0)
    */
   float inheritedVelocityAmount;
 

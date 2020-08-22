@@ -39,7 +39,8 @@ json SubEmitter::serialize() const
   return nullptr;
 }
 
-SubEmitterPtr SubEmitter::Parse(const json& /*parsedLight*/, Scene* /*scene*/,
+SubEmitterPtr SubEmitter::Parse(const json& /*parsedLight*/,
+                                const std::variant<Scene*, ThinEngine*>& /*sceneOrEngine*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;
