@@ -37,7 +37,8 @@ protected:
    * @param engine defines hosting engine
    * @param reusable defines if the postprocess will be reused multiple times per frame
    */
-  AnaglyphPostProcess(const std::string& name, float ratio,
+  AnaglyphPostProcess(const std::string& name,
+                      const std::variant<float, PostProcessOptions>& options,
                       const std::vector<CameraPtr>& rigCameras,
                       const std::optional<unsigned int>& samplingMode = std::nullopt,
                       Engine* engine = nullptr, bool reusable = false);
