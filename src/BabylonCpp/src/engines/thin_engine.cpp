@@ -1060,6 +1060,9 @@ void ThinEngine::updateArrayBuffer(const Float32Array& data)
 void ThinEngine::_vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
                                       unsigned int type, bool normalized, int stride, int offset)
 {
+  if (!stl_util::contains(_currentBufferPointers, indx)) {
+    return;
+  }
   auto& pointer = _currentBufferPointers[indx];
 
   auto changed = false;
@@ -2219,11 +2222,18 @@ InternalTexturePtr ThinEngine::createTexture(
 
   // establish the file extension, if possible
   const auto lastDot = StringTools::lastIndexOf(url, ".");
-  const auto extension
+  auto extension
     = !forcedExtension.empty() ?
         forcedExtension :
         (lastDot > -1 ? StringTools::toLowerCase(url.substr(static_cast<size_t>(lastDot))) : "");
   IInternalTextureLoaderPtr loader = nullptr;
+
+  // Remove query string
+  const auto queryStringIndex = StringTools::indexOf(extension, "?");
+
+  if (queryStringIndex > -1) {
+    extension = StringTools::split(extension, "?")[0];
+  }
 
   for (const auto& availableLoader : ThinEngine::_TextureLoaders) {
     if (availableLoader->canLoad(extension, mimeType)) {

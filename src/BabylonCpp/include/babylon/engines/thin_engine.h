@@ -132,7 +132,7 @@ public:
   virtual bool areAllEffectsReady() const;
 
   /**
-   * @brief Gets a string idenfifying the name of the class.
+   * @brief Gets a string identifying the name of the class.
    * @returns "Engine" string
    */
   std::string getClassName() const;
