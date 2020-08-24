@@ -83,6 +83,12 @@ const Vector3& Vector3::toArray(Float32Array& array, unsigned int index) const
   return *this;
 }
 
+Vector3& Vector3::fromArray(const Float32Array& array, unsigned int index)
+{
+  Vector3::FromArrayToRef(array, index, *this);
+  return *this;
+}
+
 Quaternion Vector3::toQuaternion() const
 {
   return Quaternion::RotationYawPitchRoll(y, x, z);

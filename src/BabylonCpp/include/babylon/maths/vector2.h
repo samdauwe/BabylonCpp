@@ -67,6 +67,14 @@ public:
   const Vector2& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
+   * @brief Update the current vector from an array.
+   * @param array defines the destination array
+   * @param index defines the offset in the destination array
+   * @returns the current Vector3
+   */
+  Vector2& fromArray(const Float32Array& array, unsigned int index = 0);
+
+  /**
    * @brief Copy the current vector to an array.
    * @returns a new array with 2 elements: the Vector2 coordinates.
    */

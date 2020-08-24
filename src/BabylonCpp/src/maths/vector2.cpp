@@ -63,6 +63,12 @@ const Vector2& Vector2::toArray(Float32Array& array, unsigned int index) const
   return *this;
 }
 
+Vector2& Vector2::fromArray(const Float32Array& array, unsigned int index)
+{
+  Vector2::FromArrayToRef(array, index, *this);
+  return *this;
+}
+
 Float32Array Vector2::asArray() const
 {
   Float32Array result;

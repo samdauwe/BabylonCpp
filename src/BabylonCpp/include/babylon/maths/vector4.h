@@ -70,6 +70,14 @@ public:
   const Vector4& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
+   * @brief Update the current vector from an array.
+   * @param array defines the destination array
+   * @param index defines the offset in the destination array
+   * @returns the current Vector3
+   */
+  Vector4& fromArray(const Float32Array& array, unsigned int index = 0);
+
+  /**
    * @brief Adds the given vector to the current Vector4.
    * @param otherVector the vector to add
    * @returns the updated Vector4.

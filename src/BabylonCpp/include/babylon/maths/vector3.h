@@ -84,6 +84,14 @@ public:
   const Vector3& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
+   * @brief Update the current vector from an array.
+   * @param array defines the destination array
+   * @param index defines the offset in the destination array
+   * @returns the current Vector3
+   */
+  Vector3& fromArray(const Float32Array& array, unsigned int index = 0);
+
+  /**
    * @brief Converts the current Vector3 into a quaternion (considering that the Vector3 contains
    * Euler angles representation of a rotation).
    * @returns a new Quaternion object, computed from the Vector3 coordinates

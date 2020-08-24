@@ -68,6 +68,12 @@ const Vector4& Vector4::toArray(Float32Array& array, unsigned int index) const
   return *this;
 }
 
+Vector4& Vector4::fromArray(const Float32Array& array, unsigned int index)
+{
+  Vector4::FromArrayToRef(array, index, *this);
+  return *this;
+}
+
 Vector4& Vector4::addInPlace(const Vector4& otherVector)
 {
   x += otherVector.x;
