@@ -872,6 +872,11 @@ void Scene::set_pointerY(int value)
   _pointerY = value;
 }
 
+std::string Scene::getClassName() const
+{
+  return "Scene";
+}
+
 std::vector<AbstractMesh*> Scene::_getDefaultMeshCandidates()
 {
   _defaultMeshCandidates = stl_util::to_raw_ptr_vector(meshes);
@@ -3081,17 +3086,18 @@ bool Scene::removeGeometry(Geometry* geometry)
   std::string id = geometry->id;
   if (index != geometries.size() - 1) {
     auto lastGeometry = geometries.back();
-    geometries[index] = lastGeometry;
-    if (!geometriesById.empty()) {
-      geometriesById[lastGeometry->id] = index;
-      geometriesById.erase(id);
+    if (lastGeometry) {
+      geometries[index] = lastGeometry;
+      if (!geometriesById.empty()) {
+        geometriesById[lastGeometry->id] = index;
+        geometriesById.erase(id);
+      }
     }
   }
 
   geometries.pop_back();
 
   onGeometryRemovedObservable.notifyObservers(geometry);
-
   return true;
 }
 
@@ -3342,6 +3348,41 @@ MorphTargetManagerPtr Scene::getMorphTargetManagerById(unsigned int id)
                          });
 
   return (it == morphTargetManagers.end()) ? nullptr : *it;
+}
+
+MorphTargetPtr Scene::getMorphTargetById(const std::string& id)
+{
+  for (const auto& morphTargetManager : morphTargetManagers) {
+    for (size_t index = 0; index < morphTargetManager->numTargets(); ++index) {
+      const auto target = morphTargetManager->getTarget(index);
+      if (target && target->id == id) {
+        return target;
+      }
+    }
+  }
+  return nullptr;
+}
+
+MorphTargetPtr Scene::getMorphTargetByName(const std::string& name)
+{
+  for (const auto& morphTargetManager : morphTargetManagers) {
+    for (size_t index = 0; index < morphTargetManager->numTargets(); ++index) {
+      const auto target = morphTargetManager->getTarget(index);
+      if (target && target->name == name) {
+        return target;
+      }
+    }
+  }
+  return nullptr;
+}
+
+PostProcessPtr Scene::getPostProcessByName(const std::string& name)
+{
+  auto it = std::find_if(
+    postProcesses.begin(), postProcesses.end(),
+    [&name](const PostProcessPtr& postProcess) { return postProcess->name == name; });
+
+  return (it == postProcesses.end()) ? nullptr : *it;
 }
 
 BaseTexturePtr Scene::getTextureByUniqueID(size_t uniqueId)

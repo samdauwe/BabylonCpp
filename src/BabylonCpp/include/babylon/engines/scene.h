@@ -57,9 +57,9 @@ class ISpriteManager;
 class KeyboardInfo;
 class KeyboardInfoPre;
 class Mesh;
+class MorphTarget;
 class Node;
 class OutlineRenderer;
-class PostProcess;
 class PostProcessManager;
 class PostProcessRenderPipelineManager;
 class PrePassRenderer;
@@ -85,8 +85,8 @@ using ISceneSerializableComponentPtr  = std::shared_ptr<ISceneSerializableCompon
 using ISpriteManagerPtr               = std::shared_ptr<ISpriteManager>;
 using NodePtr                         = std::shared_ptr<Node>;
 using MeshPtr                         = std::shared_ptr<Mesh>;
+using MorphTargetPtr                  = std::shared_ptr<MorphTarget>;
 using OutlineRendererPtr              = std::shared_ptr<OutlineRenderer>;
-using PostProcessPtr                  = std::shared_ptr<PostProcess>;
 using PrePassRendererPtr              = std::shared_ptr<PrePassRenderer>;
 using ShaderMaterialPtr               = std::shared_ptr<ShaderMaterial>;
 using SimplificationQueuePtr          = std::shared_ptr<SimplificationQueue>;
@@ -204,6 +204,12 @@ public:
    * @brief Hidden
    */
   void setMirroredCameraPosition(const Vector3& newPosition);
+
+  /**
+   * @brief Gets a string identifying the name of the class.
+   * @returns "Scene" string
+   */
+  std::string getClassName() const;
 
   /**
    * @brief Hidden
@@ -1182,6 +1188,30 @@ public:
    * @return the found morph target manager or null if not found at all.
    */
   MorphTargetManagerPtr getMorphTargetManagerById(unsigned int id);
+
+  /**
+   * @brief Gets a morph target using a given id (if many are found, this function will pick the
+   * first one).
+   * @param id defines the id to search for
+   * @return the found morph target or null if not found at all.
+   */
+  MorphTargetPtr getMorphTargetById(const std::string& id);
+
+  /**
+   * @brief Gets a morph target using a given name (if many are found, this function will pick the
+   * first one).
+   * @param name defines the name to search for
+   * @return the found morph target or null if not found at all.
+   */
+  MorphTargetPtr getMorphTargetByName(const std::string& name);
+
+  /**
+   * @brief Gets a post process using a given name (if many are found, this function will pick the
+   * first one).
+   * @param name defines the name to search for
+   * @return the found post process or null if not found at all.
+   */
+  PostProcessPtr getPostProcessByName(const std::string& name);
 
   /**
    * @brief Gets a texture using its unique id.
@@ -2977,12 +3007,8 @@ public:
    * https://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   Vector3 gravity;
-  // Postprocesses
 
-  /**
-   * The list of postprocesses added to the scene
-   */
-  std::vector<PostProcessPtr> postProcesses;
+  // Postprocesses
 
   /**
    * Gets or sets a boolean indicating if postprocesses are enabled on this
