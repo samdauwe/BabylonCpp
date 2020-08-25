@@ -33,6 +33,7 @@ class Material;
 class MorphTargetManager;
 class MultiMaterial;
 class Node;
+class PostProcess;
 class ProceduralTexture;
 class ReflectionProbe;
 class Scene;
@@ -58,6 +59,7 @@ using MaterialPtr              = std::shared_ptr<Material>;
 using MorphTargetManagerPtr    = std::shared_ptr<MorphTargetManager>;
 using MultiMaterialPtr         = std::shared_ptr<MultiMaterial>;
 using NodePtr                  = std::shared_ptr<Node>;
+using PostProcessPtr           = std::shared_ptr<PostProcess>;
 using ProceduralTexturePtr     = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr       = std::shared_ptr<ReflectionProbe>;
 using SkeletonPtr              = std::shared_ptr<Skeleton>;
@@ -357,6 +359,11 @@ public:
    * @see https://doc.babylonjs.com/how_to/how_to_use_procedural_textures
    */
   std::vector<ProceduralTexturePtr> proceduralTextures;
+
+  /**
+   * The list of postprocesses added to the scene
+   */
+  std::vector<PostProcessPtr> postProcesses;
 
 private:
   /**
