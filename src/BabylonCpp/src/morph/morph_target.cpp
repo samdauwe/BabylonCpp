@@ -10,14 +10,14 @@
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const std::string& name, float iInfluence, Scene* scene)
-    : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
+MorphTarget::MorphTarget(const std::string& iName, float iInfluence, Scene* scene)
+    : name{iName}
+    , influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
     , uniqueId{this, &MorphTarget::get_uniqueId}
     , hasPositions{this, &MorphTarget::get_hasPositions}
     , hasNormals{this, &MorphTarget::get_hasNormals}
     , hasTangents{this, &MorphTarget::get_hasTangents}
     , hasUVs{this, &MorphTarget::get_hasUVs}
-    , _name{name}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _influence{-1.f} // -1  means Undefined
     , _uniqueId{0}
@@ -223,11 +223,11 @@ std::string MorphTarget::getClassName() const
   return "MorphTarget";
 }
 
-std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
+MorphTargetPtr MorphTarget::Parse(const json& serializationObject)
 {
-  auto result = std::make_unique<MorphTarget>(
-    json_util::get_string(serializationObject, "name"),
-    json_util::get_number<float>(serializationObject, "influence", 0.f));
+  auto result
+    = MorphTarget::New(json_util::get_string(serializationObject, "name"),
+                       json_util::get_number<float>(serializationObject, "influence", 0.f));
 
   result->setPositions(json_util::get_array<float>(serializationObject, "positions"));
 

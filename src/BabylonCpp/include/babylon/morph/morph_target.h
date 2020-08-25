@@ -142,7 +142,7 @@ public:
    * @param serializationObject defines the serialized data to use
    * @returns a new MorphTarget
    */
-  static std::unique_ptr<MorphTarget> Parse(const json& serializationObject);
+  static MorphTargetPtr Parse(const json& serializationObject);
 
   /**
    * @brief Creates a MorphTarget from mesh data.
@@ -155,6 +155,14 @@ public:
                                  float influence = 0.f);
 
 protected:
+  /**
+   * @brief Creates a new MorphTarget.
+   * @param name defines the name of the target
+   * @param influence defines the influence to use
+   * @param scene defines the scene the morphtarget belongs to
+   */
+  MorphTarget(const std::string& name, float influence = 0.f, Scene* scene = nullptr);
+
   /**
    * @brief Gets the influence of this target (ie. its weight in the overall morphing).
    */
@@ -202,12 +210,9 @@ protected:
 
 public:
   /**
-   * @brief Creates a new MorphTarget.
-   * @param name defines the name of the target
-   * @param influence defines the influence to use
-   * @param scene defines the scene the morphtarget belongs to
+   * Defines the name of the target
    */
-  MorphTarget(const std::string& name, float influence = 0.f, Scene* scene = nullptr);
+  std::string name;
 
   /**
    * Gets or sets the list of animations
@@ -260,11 +265,6 @@ public:
   ReadOnlyProperty<MorphTarget, bool> hasUVs;
 
 private:
-  /**
-   * Defines the name of the target
-   */
-  std::string _name;
-
   Scene* _scene;
   Float32Array _positions;
   Float32Array _normals;
