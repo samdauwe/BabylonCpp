@@ -96,6 +96,7 @@ public:
   static constexpr const char* DirectionKind         = "direction";
   static constexpr const char* InitialDirectionKind  = "initialDirection";
   static constexpr const char* OffsetKind            = "offset";
+  static constexpr const char* OffsetsKind           = "offsets";
   static constexpr const char* SeedKind              = "seed";
   static constexpr const char* SizeKind              = "size";
   static constexpr const char* AngleKind             = "angle";
