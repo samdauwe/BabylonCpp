@@ -38,9 +38,20 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     , blendMode{this, &SpriteManager::get_blendMode, &SpriteManager::set_blendMode}
     , disableDepthWrite{false}
     , _packedAndReady{false}
+    , _useInstancing{false}
     , _onDisposeObserver{nullptr}
+    , _buffer{nullptr}
+    , _spriteBuffer{nullptr}
+    , _indexBuffer{nullptr}
+    , _effectBase{nullptr}
+    , _effectFog{nullptr}
+    , _vertexBufferSize{0ull}
     , _blendMode{Constants::ALPHA_COMBINE}
 {
+  if (!scene) {
+    scene = Engine::LastCreatedScene();
+  }
+
   auto component = std::static_pointer_cast<SpriteSceneComponent>(
     scene->_getComponent(SceneComponentConstants::NAME_SPRITE));
   if (!component) {
@@ -80,38 +91,63 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     return;
   }
 
-  _epsilon = epsilon;
-  _scene   = scene ? scene : Engine::LastCreatedScene();
-  uniqueId = scene->getUniqueId();
+  _epsilon          = epsilon;
+  _scene            = scene;
+  uniqueId          = scene->getUniqueId();
+  const auto engine = _scene->getEngine();
+  _useInstancing    = engine->getCaps().instancedArrays;
 
-  IndicesArray indices;
-  auto index = 0;
-  for (unsigned int count = 0; count < capacity; ++count) {
-    indices.emplace_back(index + 0);
-    indices.emplace_back(index + 1);
-    indices.emplace_back(index + 2);
-    indices.emplace_back(index + 0);
-    indices.emplace_back(index + 2);
-    indices.emplace_back(index + 3);
-    index += 4;
+  if (!_useInstancing) {
+    IndicesArray indices;
+    auto index = 0;
+    for (unsigned int count = 0; count < capacity; ++count) {
+      indices.emplace_back(index + 0);
+      indices.emplace_back(index + 1);
+      indices.emplace_back(index + 2);
+      indices.emplace_back(index + 0);
+      indices.emplace_back(index + 2);
+      indices.emplace_back(index + 3);
+      index += 4;
+    }
+
+    _indexBuffer = scene->getEngine()->createIndexBuffer(indices);
   }
-
-  _indexBuffer = scene->getEngine()->createIndexBuffer(indices);
 
   // VBO
   // 18 floats per sprite (x, y, z, angle, sizeX, sizeY, offsetX, offsetY, invertU, invertV,
   // cellLeft, cellTop, cellWidth, cellHeight, color r, color g, color b, color a)
-  _vertexData.resize(capacity * 18 * 4);
-  _buffer = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 18);
+  // 16 when using instances
+  _vertexBufferSize = _useInstancing ? 16 : 18;
+  _vertexData       = Float32Array(capacity * _vertexBufferSize * (_useInstancing ? 1 : 4), 0.f);
+  _buffer           = std::make_unique<Buffer>(engine, _vertexData, true, _vertexBufferSize);
 
-  auto positions = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4);
-  auto options   = _buffer->createVertexBuffer(VertexBuffer::OptionsKind, 4, 4);
-  auto inverts   = _buffer->createVertexBuffer(VertexBuffer::InvertsKind, 8, 2);
-  auto cellInfo  = _buffer->createVertexBuffer(VertexBuffer::CellInfoKind, 10, 4);
-  auto colors    = _buffer->createVertexBuffer(VertexBuffer::ColorKind, 14, 4);
+  auto positions = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4, _vertexBufferSize,
+                                               _useInstancing);
+  auto options   = _buffer->createVertexBuffer("options", 4, 2, _vertexBufferSize, _useInstancing);
+
+  auto offset                           = 6ull;
+  std::unique_ptr<VertexBuffer> offsets = nullptr;
+
+  if (_useInstancing) {
+    const Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
+    _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
+    offsets       = _spriteBuffer->createVertexBuffer("offsets", 0, 2);
+  }
+  else {
+    offsets = _buffer->createVertexBuffer("offsets", offset, 2, _vertexBufferSize, _useInstancing);
+    offset += 2;
+  }
+
+  auto inverts
+    = _buffer->createVertexBuffer("inverts", offset, 2, _vertexBufferSize, _useInstancing);
+  auto cellInfo
+    = _buffer->createVertexBuffer("cellInfo", offset + 2, 4, _vertexBufferSize, _useInstancing);
+  auto colors = _buffer->createVertexBuffer(VertexBuffer::ColorKind, offset + 6, 4,
+                                            _vertexBufferSize, _useInstancing);
 
   _vertexBuffers[VertexBuffer::PositionKind] = std::move(positions);
   _vertexBuffers[VertexBuffer::OptionsKind]  = std::move(options);
+  _vertexBuffers[VertexBuffer::OffsetsKind]  = std::move(offsets);
   _vertexBuffers[VertexBuffer::InvertsKind]  = std::move(inverts);
   _vertexBuffers[VertexBuffer::CellInfoKind] = std::move(cellInfo);
   _vertexBuffers[VertexBuffer::ColorKind]    = std::move(colors);
@@ -121,7 +157,8 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
   {
     IEffectCreationOptions spriteOptions;
     spriteOptions.attributes
-      = {VertexBuffer::PositionKind, "options", "inverts", "cellInfo", VertexBuffer::ColorKind};
+      = {VertexBuffer::PositionKind, "options", "offsets", "inverts", "cellInfo",
+         VertexBuffer::ColorKind};
     spriteOptions.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
     spriteOptions.samplers      = {"diffuseSampler"};
 
@@ -131,7 +168,8 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
   {
     IEffectCreationOptions spriteOptions;
     spriteOptions.attributes
-      = {VertexBuffer::PositionKind, "options", "inverts", "cellInfo", VertexBuffer::ColorKind};
+      = {VertexBuffer::PositionKind, "options", "offsets", "inverts", "cellInfo",
+         VertexBuffer::ColorKind};
     spriteOptions.uniformsNames
       = {"view", "projection", "textureInfos", "alphaTest", "vFogInfos", "vFogColor"};
     spriteOptions.samplers = {"diffuseSampler"};
@@ -211,7 +249,7 @@ void SpriteManager::_makePacked(const std::string& /*imgUrl*/, const std::string
 void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offsetX, int offsetY,
                                         const ISize& baseSize)
 {
-  size_t arrayOffset = index * 18;
+  size_t arrayOffset = index * _vertexBufferSize;
 
   auto offsetXVal = static_cast<float>(offsetX);
   auto offsetYVal = static_cast<float>(offsetY);
@@ -238,8 +276,15 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offset
   // Options
   _vertexData[arrayOffset + 4] = static_cast<float>(sprite.width);
   _vertexData[arrayOffset + 5] = static_cast<float>(sprite.height);
-  _vertexData[arrayOffset + 6] = offsetXVal;
-  _vertexData[arrayOffset + 7] = offsetYVal;
+
+  if (!_useInstancing) {
+    _vertexData[arrayOffset + 6] = offsetXVal;
+    _vertexData[arrayOffset + 7] = offsetYVal;
+  }
+  else {
+    arrayOffset -= 2;
+  }
+
   // Inverts according to Right Handed
   if (_scene->useRightHandedSystem()) {
     _vertexData[arrayOffset + 8] = sprite.invertU ? 0.f : 1.f;
@@ -499,9 +544,11 @@ void SpriteManager::render()
     sprite->_animate(deltaTime);
 
     _appendSpriteVertex(offset++, *sprite, 0, 0, baseSize);
-    _appendSpriteVertex(offset++, *sprite, 1, 0, baseSize);
-    _appendSpriteVertex(offset++, *sprite, 1, 1, baseSize);
-    _appendSpriteVertex(offset++, *sprite, 0, 1, baseSize);
+    if (!_useInstancing) {
+      _appendSpriteVertex(offset++, *sprite, 1, 0, baseSize);
+      _appendSpriteVertex(offset++, *sprite, 1, 1, baseSize);
+      _appendSpriteVertex(offset++, *sprite, 0, 1, baseSize);
+    }
   }
 
   if (noSprite) {
@@ -546,13 +593,23 @@ void SpriteManager::render()
   if (!disableDepthWrite) {
     effect->setBool("alphaTest", true);
     engine->setColorWrite(false);
-    engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
+    if (_useInstancing) {
+      engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
+    }
+    else {
+      engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
+    }
     engine->setColorWrite(true);
     effect->setBool("alphaTest", false);
   }
 
   engine->setAlphaMode(_blendMode);
-  engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
+  if (_useInstancing) {
+    engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
+  }
+  else {
+    engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
+  }
   engine->setAlphaMode(Constants::ALPHA_DISABLE);
 
   // Restore Right Handed
@@ -566,6 +623,11 @@ void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndText
   if (_buffer) {
     _buffer->dispose();
     _buffer = nullptr;
+  }
+
+  if (_spriteBuffer) {
+    _spriteBuffer->dispose();
+    _spriteBuffer = nullptr;
   }
 
   if (_indexBuffer) {

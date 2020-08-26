@@ -257,6 +257,8 @@ private:
 
   Uint8Array _textureContent;
 
+  bool _useInstancing;
+
   Observer<SpriteManager>::Ptr _onDisposeObserver;
   size_t _capacity;
   bool _fromPacked;
@@ -266,9 +268,11 @@ private:
   Float32Array _vertexData;
   std::unique_ptr<Buffer> _buffer;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
+  std::unique_ptr<Buffer> _spriteBuffer;
   WebGLDataBufferPtr _indexBuffer;
   EffectPtr _effectBase;
   EffectPtr _effectFog;
+  size_t _vertexBufferSize;
   unsigned int _blendMode;
 
 }; // end of class Sprite
