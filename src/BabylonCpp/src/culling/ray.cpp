@@ -11,8 +11,8 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 6> Ray::TmpVector3{Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
-                                       Vector3::Zero(), Vector3::Zero(), Vector3::Zero()};
+std::array<Vector3, 6> Ray::_TmpVector3{Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+                                        Vector3::Zero(), Vector3::Zero(), Vector3::Zero()};
 
 const float Ray::smallnum = 0.00000001f;
 const float Ray::rayl     = 10e8f;
@@ -75,12 +75,12 @@ std::ostream& operator<<(std::ostream& os, const Ray& ray)
 bool Ray::intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
                               float intersectionTreshold) const
 {
-  const auto& newMinimum = Ray::TmpVector3[0].copyFromFloats(minimum.x - intersectionTreshold,
-                                                             minimum.y - intersectionTreshold,
-                                                             minimum.z - intersectionTreshold);
-  const auto& newMaximum = Ray::TmpVector3[1].copyFromFloats(maximum.x + intersectionTreshold,
-                                                             maximum.y + intersectionTreshold,
-                                                             maximum.z + intersectionTreshold);
+  const auto& newMinimum = Ray::_TmpVector3[0].copyFromFloats(minimum.x - intersectionTreshold,
+                                                              minimum.y - intersectionTreshold,
+                                                              minimum.z - intersectionTreshold);
+  const auto& newMaximum = Ray::_TmpVector3[1].copyFromFloats(maximum.x + intersectionTreshold,
+                                                              maximum.y + intersectionTreshold,
+                                                              maximum.z + intersectionTreshold);
   auto d                 = 0.f;
   auto maxValue          = std::numeric_limits<float>::max();
   auto inv               = 0.f;
@@ -175,7 +175,7 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere, float intersectionTresh
   const auto x      = sphere.center.x - origin.x;
   const auto y      = sphere.center.y - origin.y;
   const auto z      = sphere.center.z - origin.z;
-  const auto pyth   = (x * x) + (y * y) + (z * z);
+  const auto pyth   = x * x + y * y + z * z;
   const auto radius = sphere.radius + intersectionTreshold;
   const auto rr     = radius * radius;
 
@@ -183,12 +183,12 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere, float intersectionTresh
     return true;
   }
 
-  const auto dot = (x * direction.x) + (y * direction.y) + (z * direction.z);
+  const auto dot = x * direction.x + y * direction.y + z * direction.z;
   if (dot < 0.f) {
     return false;
   }
 
-  const auto temp = pyth - (dot * dot);
+  const auto temp = pyth - dot * dot;
 
   return temp <= rr;
 }
@@ -196,11 +196,11 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere, float intersectionTresh
 std::optional<IntersectionInfo>
 Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
 {
-  auto& edge1 = Ray::TmpVector3[0];
-  auto& edge2 = Ray::TmpVector3[1];
-  auto& pvec  = Ray::TmpVector3[2];
-  auto& tvec  = Ray::TmpVector3[3];
-  auto& qvec  = Ray::TmpVector3[4];
+  auto& edge1 = Ray::_TmpVector3[0];
+  auto& edge2 = Ray::_TmpVector3[1];
+  auto& pvec  = Ray::_TmpVector3[2];
+  auto& tvec  = Ray::_TmpVector3[3];
+  auto& qvec  = Ray::_TmpVector3[4];
 
   vertex1.subtractToRef(vertex0, edge1);
   vertex2.subtractToRef(vertex0, edge2);
@@ -242,14 +242,14 @@ std::optional<float> Ray::intersectsPlane(const Plane& plane)
 {
   auto distance = 0.f;
   auto result1  = Vector3::Dot(plane.normal, direction);
-  if (std::abs(result1) < 9.99999997475243E-07f) {
+  if (std::abs(result1) < 9.99999997475243e-7f) {
     return std::nullopt;
   }
   else {
     const auto result2 = Vector3::Dot(plane.normal, origin);
     distance           = (-plane.d - result2) / result1;
     if (distance < 0.f) {
-      if (distance < -9.99999997475243E-07f) {
+      if (distance < -9.99999997475243e-7) {
         return std::nullopt;
       }
       else {
@@ -268,21 +268,21 @@ std::optional<Vector3> Ray::intersectsAxis(const std::string& axis, float offset
     if (t > 0.f) {
       return std::nullopt;
     }
-    return Vector3(origin.x + (direction.x * -t), offset, origin.z + (direction.z * -t));
+    return Vector3(origin.x + direction.x * -t, offset, origin.z + direction.z * -t);
   }
   if (axis == "x") {
     const auto t = (origin.x - offset) / direction.x;
     if (t > 0.f) {
       return std::nullopt;
     }
-    return Vector3(offset, origin.y + (direction.y * -t), origin.z + (direction.z * -t));
+    return Vector3(offset, origin.y + direction.y * -t, origin.z + direction.z * -t);
   }
   if (axis == "z") {
     const auto t = (origin.z - offset) / direction.z;
     if (t > 0.f) {
       return std::nullopt;
     }
-    return Vector3(origin.x + (direction.x * -t), origin.y + (direction.y * -t), offset);
+    return Vector3(origin.x + direction.x * -t, origin.y + direction.y * -t, offset);
   }
   else {
     return std::nullopt;
@@ -368,28 +368,33 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb, float t
   auto tc = 0.f, tN = 0.f, tD = D; // tc = tN / tD, default tD = D >= 0
 
   // compute the line parameters of the two closest points
-  if (D < Ray::smallnum) { // the lines are almost parallel
-    sN = 0.f;              // force using point P0 on segment S1
-    sD = 1.f;              // to prevent possible division by 0.0 later
+  if (D < Ray::smallnum) {
+    // the lines are almost parallel
+    sN = 0.f; // force using point P0 on segment S1
+    sD = 1.f; // to prevent possible division by 0.0 later
     tN = e;
     tD = c;
   }
-  else { // get the closest points on the infinite lines
+  else {
+    // get the closest points on the infinite lines
     sN = (b * e - c * d);
     tN = (a * e - b * d);
-    if (sN < 0.f) { // sc < 0 => the s=0 edge is visible
+    if (sN < 0.f) {
+      // sc < 0 => the s=0 edge is visible
       sN = 0.f;
       tN = e;
       tD = c;
     }
-    else if (sN > sD) { // sc > 1 => the s=1 edge is visible
+    else if (sN > sD) {
+      // sc > 1 => the s=1 edge is visible
       sN = sD;
       tN = e + b;
       tD = c;
     }
   }
 
-  if (tN < 0.f) { // tc < 0 => the t=0 edge is visible
+  if (tN < 0.f) {
+    // tc < 0 => the t=0 edge is visible
     tN = 0.f;
     // recompute sc for this edge
     if (-d < 0.f) {
@@ -403,23 +408,24 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb, float t
       sD = a;
     }
   }
-  else if (tN > tD) { // tc > 1 => the t=1 edge is visible
+  else if (tN > tD) {
+    // tc > 1 => the t=1 edge is visible
     tN = tD;
     // recompute sc for this edge
-    if ((-d + b) < 0.f) {
+    if (-d + b < 0.f) {
       sN = 0.f;
     }
-    else if ((-d + b) > a) {
+    else if (-d + b > a) {
       sN = sD;
     }
     else {
-      sN = (-d + b);
+      sN = -d + b;
       sD = a;
     }
   }
   // finally do the division to get sc and tc
-  sc = (std::abs(sN) < Ray::smallnum ? 0.f : sN / sD);
-  tc = (std::abs(tN) < Ray::smallnum ? 0.f : tN / tD);
+  sc = std::abs(sN) < Ray::smallnum ? 0.f : sN / sD;
+  tc = std::abs(tN) < Ray::smallnum ? 0.f : tN / tD;
 
   // get the difference of the two closest points
   auto& qtc = TmpVectors::Vector3Array[4];
@@ -431,8 +437,8 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb, float t
   qsc.subtractToRef(qtc, dP); // = S1(sc) - S2(tc)
 
   const auto isIntersected
-    = (tc > 0) && (tc <= length)
-      && (dP.lengthSquared() < (threshold * threshold)); // return intersection result
+    = tc > 0 && tc <= length
+      && dP.lengthSquared() < threshold * threshold; // return intersection result
 
   if (isIntersected) {
     return qsc.length();
@@ -462,9 +468,9 @@ Ray Ray::CreateNew(float x, float y, float viewportWidth, float viewportHeight, 
 
 Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end, const Matrix& world)
 {
-  auto direction    = end.subtract(origin);
-  const auto length = std::sqrt((direction.x * direction.x) + (direction.y * direction.y)
-                                + (direction.z * direction.z));
+  auto direction = end.subtract(origin);
+  const auto length
+    = std::sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
   direction.normalize();
 
   return Ray::Transform(Ray(origin, direction, length), world);
@@ -488,7 +494,7 @@ void Ray::TransformToRef(const Ray& ray, const Matrix& matrix, Ray& result)
   auto len  = dir.length();
 
   if (!(len == 0.f || len == 1.f)) {
-    float num = 1.f / len;
+    const auto num = 1.f / len;
     dir.x *= num;
     dir.y *= num;
     dir.z *= num;
@@ -504,8 +510,8 @@ void Ray::unprojectRayToRef(float sourceX, float sourceY, float viewportWidth, f
   matrix.multiplyToRef(projection, matrix);
   matrix.invert();
   auto& nearScreenSource = TmpVectors::Vector3Array[0];
-  nearScreenSource.x     = sourceX / viewportWidth * 2.f - 1.f;
-  nearScreenSource.y     = -(sourceY / viewportHeight * 2.f - 1.f);
+  nearScreenSource.x     = (sourceX / viewportWidth) * 2.f - 1.f;
+  nearScreenSource.y     = -((sourceY / viewportHeight) * 2.f - 1.f);
   nearScreenSource.z     = -1.f;
   auto& farScreenSource
     = TmpVectors::Vector3Array[1].copyFromFloats(nearScreenSource.x, nearScreenSource.y, 1.f);

@@ -240,7 +240,7 @@ public:
   float length;
 
 private:
-  static std::array<Vector3, 6> TmpVector3;
+  static std::array<Vector3, 6> _TmpVector3;
   std::unique_ptr<Ray> _tmpRay;
 
 }; // end of class Ray

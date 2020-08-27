@@ -4644,6 +4644,26 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result, Came
   return *this;
 }
 
+std::optional<PickingInfo> Scene::_internalPickForMesh(
+  const std::optional<PickingInfo>& pickingInfo,
+  const std::function<Ray(Matrix& world)>& rayFunction, const AbstractMeshPtr& mesh, Matrix& world,
+  const std::optional<bool>& fastCheck, const std::optional<bool>& onlyBoundingInfo,
+  const TrianglePickingPredicate& trianglePredicate)
+{
+  auto ray = rayFunction(world);
+
+  auto result = mesh->intersects(ray, fastCheck, trianglePredicate, onlyBoundingInfo, world);
+  if (/*!result || */ !result.hit) {
+    return std::nullopt;
+  }
+
+  if (!fastCheck && /*pickingInfo != null && */ result.distance >= pickingInfo->distance) {
+    return std::nullopt;
+  }
+
+  return result;
+}
+
 std::optional<PickingInfo>
 Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
@@ -4651,7 +4671,6 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::optional<bool>& onlyBoundingInfo,
                      const TrianglePickingPredicate& trianglePredicate)
 {
-  const auto fastCheck                   = iFastCheck.value_or(true);
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
   for (const auto& mesh : meshes) {
@@ -4664,34 +4683,49 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
       continue;
     }
 
-    auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
-                   mesh->skeleton()->overrideMesh->getWorldMatrix() :
-                   mesh->getWorldMatrix();
-    auto ray = rayFunction(world);
+    auto _mesh = std::static_pointer_cast<Mesh>(mesh);
+    if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
+      auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
+      for (size_t index = 0; index < thinMatrices.size(); ++index) {
+        auto world  = thinMatrices[index];
+        auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, iFastCheck,
+                                           onlyBoundingInfo, trianglePredicate);
 
-    auto result
-      = mesh->intersects(ray, fastCheck, trianglePredicate, onlyBoundingInfo.value_or(false));
-    if (/*!result || */ !result.hit) {
-      continue;
+        if (result) {
+          pickingInfo                    = result;
+          pickingInfo->thinInstanceIndex = index;
+
+          if (iFastCheck.value_or(false)) {
+            return pickingInfo;
+          }
+        }
+      }
     }
+    else {
+      auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
+                     mesh->skeleton()->overrideMesh->getWorldMatrix() :
+                     mesh->getWorldMatrix();
 
-    if (!fastCheck && pickingInfo != std::nullopt && result.distance >= (*pickingInfo).distance) {
-      continue;
-    }
+      const auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, iFastCheck,
+                                               onlyBoundingInfo, trianglePredicate);
 
-    pickingInfo = result;
+      if (result) {
+        pickingInfo = result;
 
-    if (fastCheck) {
-      break;
+        if (iFastCheck.value_or(false)) {
+          return pickingInfo;
+        }
+      }
     }
   }
 
-  return pickingInfo ? pickingInfo : PickingInfo();
+  return pickingInfo.value_or(PickingInfo());
 }
 
 std::vector<std::optional<PickingInfo>>
 Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
-                          const std::function<bool(AbstractMesh* mesh)>& predicate)
+                          const std::function<bool(AbstractMesh* mesh)>& predicate,
+                          const TrianglePickingPredicate& trianglePredicate)
 {
   std::vector<std::optional<PickingInfo>> pickingInfos;
 
@@ -4705,15 +4739,32 @@ Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
       continue;
     }
 
-    auto world = mesh->getWorldMatrix();
-    auto ray   = rayFunction(world);
+    auto _mesh = std::static_pointer_cast<Mesh>(mesh);
+    if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
+      auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
+      for (size_t index = 0; index < thinMatrices.size(); ++index) {
+        auto world  = thinMatrices[index];
+        auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, false, false,
+                                           trianglePredicate);
 
-    auto result = mesh->intersects(ray, false);
-    if (/*!result || */ !result.hit) {
-      continue;
+        if (result) {
+          result->thinInstanceIndex = index;
+          pickingInfos.emplace_back(result);
+        }
+      }
     }
+    else {
+      auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
+                     mesh->skeleton()->overrideMesh->getWorldMatrix() :
+                     mesh->getWorldMatrix();
 
-    pickingInfos.emplace_back(result);
+      auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, false, false,
+                                         trianglePredicate);
+
+      if (result) {
+        pickingInfos.emplace_back(result);
+      }
+    }
   }
 
   return pickingInfos;

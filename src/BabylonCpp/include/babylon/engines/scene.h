@@ -1548,11 +1548,10 @@ public:
    * @brief Launch a ray to try to pick a mesh in the scene.
    * @param x X position on screen
    * @param y Y position on screen
-   * @param predicate Predicate function used to determine eligible meshes. Can
-   * be set to null. In this case, a mesh must be enabled, visible and with
-   * isPickable set to true
-   * @param camera camera to use for computing the picking ray. Can be set to
-   * null. In this case, the scene.activeCamera will be used
+   * @param predicate Predicate function used to determine eligible meshes. Can be set to null. In
+   * this case, a mesh must be enabled, visible and with isPickable set to true
+   * @param camera camera to use for computing the picking ray. Can be set to null. In this case,
+   * the scene.activeCamera will be used
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
@@ -1562,9 +1561,8 @@ public:
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
    * @param ray Ray to use
-   * @param predicate Predicate function used to determine eligible meshes. Can
-   * be set to null. In this case, a mesh must be enabled, visible and with
-   * isPickable set to true
+   * @param predicate Predicate function used to determine eligible meshes. Can be set to null. In
+   * this case, a mesh must be enabled, visible and with isPickable set to true
    * @returns an array of PickingInfo
    */
   std::vector<std::optional<PickingInfo>>
@@ -1881,7 +1879,15 @@ private:
                 const TrianglePickingPredicate& trianglePredicate = nullptr);
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
-                     const std::function<bool(AbstractMesh* mesh)>& predicate);
+                     const std::function<bool(AbstractMesh* mesh)>& predicate,
+                     const TrianglePickingPredicate& trianglePredicate = nullptr);
+  std::optional<PickingInfo>
+  _internalPickForMesh(const std::optional<PickingInfo>& pickingInfo,
+                       const std::function<Ray(Matrix& world)>& rayFunction,
+                       const AbstractMeshPtr& mesh, Matrix& world,
+                       const std::optional<bool>& fastCheck              = std::nullopt,
+                       const std::optional<bool>& onlyBoundingInfo       = std::nullopt,
+                       const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief hidden
