@@ -216,6 +216,11 @@ std::string PostProcess::getClassName() const
   return "PostProcess";
 }
 
+std::string PostProcess::toString() const
+{
+  return "";
+}
+
 Engine* PostProcess::getEngine()
 {
   return _engine;
@@ -531,7 +536,7 @@ json PostProcess::serialize() const
   return nullptr;
 }
 
-PostProcessPtr PostProcess::Parse(const json& /*parsedPostProcess*/, Scene& /*scene*/,
+PostProcessPtr PostProcess::Parse(const json& /*parsedPostProcess*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

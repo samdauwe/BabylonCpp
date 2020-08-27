@@ -87,6 +87,12 @@ public:
   [[nodiscard]] virtual std::string getClassName() const;
 
   /**
+   * @brief Gets a string representation of the postprocess useful for debug purpose.
+   * @returns the string representation
+   */
+  std::string toString() const;
+
+  /**
    * @brief Gets the engine which this post process belongs to.
    * @returns The engine the post process was enabled with.
    */
@@ -199,7 +205,7 @@ public:
    * @param rootUrl defines the root URL to use to load textures
    * @returns a new post process
    */
-  static PostProcessPtr Parse(const json& parsedPostProcess, Scene& scene,
+  static PostProcessPtr Parse(const json& parsedPostProcess, Scene* scene,
                               const std::string& rootUrl);
 
 protected:

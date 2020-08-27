@@ -26,6 +26,7 @@
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/postprocesses/post_process.h>
 #include <babylon/probes/reflection_probe.h>
 
 namespace BABYLON {
@@ -698,6 +699,18 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       log << (index == 0 ? "\n\tCameras:" : "");
       log << "\n\t\t" << camera->toString(fullDetails);
       ++index;
+    }
+
+    // Postprocesses
+    index = 0;
+    for (const auto& parsedPostProcess : json_util::get_array<json>(parsedData, "postProcesses")) {
+      auto postProcess = PostProcess::Parse(parsedPostProcess, scene, rootUrl);
+      if (postProcess) {
+        container->postProcesses.emplace_back(postProcess);
+        log << (index == 0 ? "\n\tPostprocesses:" : "");
+        log << "\n\t\t" + postProcess->toString();
+        ++index;
+      }
     }
 
     // Animation Groups
