@@ -702,7 +702,7 @@ public:
    */
   virtual PickingInfo intersects(Ray& ray, const std::optional<bool>& fastCheck = std::nullopt,
                                  const TrianglePickingPredicate& trianglePredicate = nullptr,
-                                 bool onlyBoundingInfo                             = false,
+                                 const std::optional<bool>& onlyBoundingInfo       = std::nullopt,
                                  const std::optional<Matrix>& worldToUse           = std::nullopt);
 
   /**

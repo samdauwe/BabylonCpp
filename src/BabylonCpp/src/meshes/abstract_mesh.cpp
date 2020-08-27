@@ -1415,7 +1415,8 @@ bool AbstractMesh::_generatePointsArray()
 
 PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastCheck,
                                      const TrianglePickingPredicate& trianglePredicate,
-                                     bool onlyBoundingInfo, const std::optional<Matrix>& worldToUse)
+                                     const std::optional<bool>& onlyBoundingInfo,
+                                     const std::optional<Matrix>& worldToUse)
 {
   const auto fastCheck = iFastCheck.value_or(true);
   PickingInfo pickingInfo;
@@ -1431,7 +1432,7 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
     return pickingInfo;
   }
 
-  if (onlyBoundingInfo) {
+  if (onlyBoundingInfo && *onlyBoundingInfo) {
     pickingInfo.hit        = true;
     pickingInfo.pickedMesh = shared_from_base<AbstractMesh>();
     pickingInfo.distance   = Vector3::Distance(ray.origin, boundingInfo->boundingSphere.center);
