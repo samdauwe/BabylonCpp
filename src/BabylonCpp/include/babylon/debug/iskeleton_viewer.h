@@ -30,19 +30,19 @@ struct ISkeletonViewerDisplayOptions {
  */
 struct ISkeletonViewerOptions {
   /** Should the system pause animations before building the Viewer? */
-  bool pauseAnimations;
+  std::optional<bool> pauseAnimations = std::nullopt;
 
   /** Should the system return the skeleton to rest before building? */
-  bool returnToRest;
+  std::optional<bool> returnToRest = std::nullopt;
 
   /** public Display Mode of the Viewer */
-  unsigned int displayMode;
+  std::optional<unsigned int> displayMode = std::nullopt;
 
   /** Flag to toggle if the Viewer should use the CPU for animations or not? */
   ISkeletonViewerDisplayOptions displayOptions;
 
   /** Flag to toggle if the Viewer should use the CPU for animations or not? */
-  bool computeBonesUsingShaders;
+  std::optional<bool> computeBonesUsingShaders = std::nullopt;
 }; // end of struct ISkeletonViewerOptions
 
 } // end of namespace BABYLON
