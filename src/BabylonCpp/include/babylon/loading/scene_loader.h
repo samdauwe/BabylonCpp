@@ -32,8 +32,7 @@ using ISceneLoaderPluginFactoryPtr = std::shared_ptr<ISceneLoaderPluginFactory>;
 using SkeletonPtr                  = std::shared_ptr<Skeleton>;
 
 /**
- * @brief Class used to load scene from various file formats using registered
- * plugins.
+ * @brief Class used to load scene from various file formats using registered plugins.
  * @see http://doc.babylonjs.com/how_to/load_from_any_file_type
  */
 class BABYLON_SHARED_EXPORT SceneLoader {
@@ -47,30 +46,27 @@ public:
   /**
    * Minimal logging while loading
    */
-  static constexpr unsigned int MINIMAL_LOGGING
-    = Constants::SCENELOADER_MINIMAL_LOGGING;
+  static constexpr unsigned int MINIMAL_LOGGING = Constants::SCENELOADER_MINIMAL_LOGGING;
 
   /**
    * Summary logging while loading
    */
-  static constexpr unsigned int SUMMARY_LOGGING
-    = Constants::SCENELOADER_SUMMARY_LOGGING;
+  static constexpr unsigned int SUMMARY_LOGGING = Constants::SCENELOADER_SUMMARY_LOGGING;
 
   /**
    * Detailled logging while loading
    */
-  static constexpr unsigned int DETAILED_LOGGING
-    = Constants::SCENELOADER_DETAILED_LOGGING;
+  static constexpr unsigned int DETAILED_LOGGING = Constants::SCENELOADER_DETAILED_LOGGING;
 
   /**
-   * @brief Gets a boolean indicating if entire scene must be loaded even if
-   * scene contains incremental data.
+   * @brief Gets a boolean indicating if entire scene must be loaded even if scene contains
+   * incremental data.
    */
   static bool ForceFullSceneLoadingForIncremental();
 
   /**
-   * @brief Sets a boolean indicating if entire scene must be loaded even if
-   * scene contains incremental data.
+   * @brief Sets a boolean indicating if entire scene must be loaded even if scene contains
+   * incremental data.
    */
   static void setForceFullSceneLoadingForIncremental(bool value);
 
@@ -97,39 +93,38 @@ public:
   static void setLoggingLevel(unsigned int value);
 
   /**
-   * @brief Gets a boolean indicating if matrix weights must be cleaned upon
-   * loading.
+   * @brief Gets a boolean indicating if matrix weights must be cleaned upon loading.
    */
   static bool CleanBoneMatrixWeights();
 
   /**
-   * @brief Sets a boolean indicating if matrix weights must be cleaned upon
-   * loading.
+   * @brief Sets a boolean indicating if matrix weights must be cleaned upon loading.
    */
   static void setCleanBoneMatrixWeights(bool value);
+
+  /**
+   * @brief Gets the default plugin (used to load Babylon files).
+   * @returns the .babylon plugin
+   */
+  static IRegisteredPlugin GetDefaultPlugin();
 
 private:
   // Functions
   static void RegisterPlugins();
-  static IRegisteredPlugin _getDefaultPlugin();
-  static IRegisteredPlugin _getPluginForExtension(const std::string& extension);
-  static IRegisteredPlugin _getPluginForDirectLoad(const std::string& data);
-  static IRegisteredPlugin _getPluginForFilename(std::string sceneFilename);
-  static std::string _getDirectLoad(const std::string& sceneFilename);
-  static std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
-  _loadData(
+  static IRegisteredPlugin _GetPluginForExtension(const std::string& extension);
+  static IRegisteredPlugin _GetPluginForDirectLoad(const std::string& data);
+  static IRegisteredPlugin _GetPluginForFilename(std::string sceneFilename);
+  static std::string _GetDirectLoad(const std::string& sceneFilename);
+  static std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> _LoadData(
     const IFileInfo& fileInfo, Scene* scene,
-    const std::function<void(
-      const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>&
-        plugin,
-      const std::string& data, const std::string& responseURL)>& onSuccess,
-    const std::function<void(const SceneLoaderProgressEvent& event)>&
-      onProgress,
-    const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError,
+    const std::function<
+      void(const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
+           const std::string& data, const std::string& responseURL)>& onSuccess,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError,
     const std::function<void()>& onDispose, const std::string& pluginExtension);
-  static std::shared_ptr<IFileInfo>
-  _getFileInfo(std::string rootUrl, const std::string& sceneFilename);
+  static std::shared_ptr<IFileInfo> _GetFileInfo(std::string rootUrl,
+                                                 const std::string& sceneFilename);
 
 public:
   /**
@@ -153,42 +148,30 @@ public:
    * @param plugin defines the plugin to add
    */
   static void
-  RegisterPlugin(const std::variant<ISceneLoaderPluginPtr,
-                                    ISceneLoaderPluginAsyncPtr>& plugin);
+  RegisterPlugin(const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin);
 
   /**
    * @brief Import meshes into a scene.
-   * @param meshNames an array of mesh names, a single mesh name, or empty
-   * string for all meshes that filter what meshes are imported
-   * @param rootUrl a string that defines the root url for the scene and
-   * resources or the concatenation of rootURL and filename (e.g.
-   * http://example.com/test.glb)
-   * @param sceneFilename a string that defines the name of the scene file or
-   * starts with "data:" following by the stringified version of the scene or a
-   * File object (default: empty string)
+   * @param meshNames an array of mesh names, a single mesh name, or empty string for all meshes
+   * that filter what meshes are imported
+   * @param rootUrl a string that defines the root url for the scene and resources or the
+   * concatenation of rootURL and filename (e.g. http://example.com/test.glb)
+   * @param sceneFilename a string that defines the name of the scene file or starts with "data:"
+   * following by the stringified version of the scene or a File object (default: empty string)
    * @param scene the instance of BABYLON.Scene to append to
-   * @param onSuccess a callback with a list of imported meshes,
-   * particleSystems, and skeletons when import succeeds
-   * @param onProgress a callback with a progress event for each file being
-   * loaded
-   * @param onError a callback with the scene, a message, and possibly an
-   * exception when import fails
+   * @param onProgress a callback with a progress event for each file being loaded
    * @param pluginExtension the extension used to determine the plugin
-   * @returns The loaded plugin
+   * @returns The loaded list of imported meshes, particle systems, skeletons, and animation groups
    */
-  static std::optional<
-    std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
-  ImportMesh(
-    const std::vector<std::string>& meshNames, std::string rootUrl,
-    std::string sceneFilename, Scene* scene = nullptr,
-    const std::function<
-      void(const std::vector<AbstractMeshPtr>& meshes,
-           const std::vector<IParticleSystemPtr>& particleSystems,
-           const std::vector<SkeletonPtr>& skeletons,
-           const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess
+  static std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> ImportMesh(
+    const std::vector<std::string>& meshNames, std::string rootUrl, std::string sceneFilename,
+    Scene* scene = nullptr,
+    const std::function<void(const std::vector<AbstractMeshPtr>& meshes,
+                             const std::vector<IParticleSystemPtr>& particleSystems,
+                             const std::vector<SkeletonPtr>& skeletons,
+                             const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess
     = nullptr,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
     const std::function<void(Scene* scene, const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,
@@ -196,60 +179,49 @@ public:
 
   /**
    * @brief Load a scene.
-   * @param rootUrl a string that defines the root url for the scene and
-   * resources or the concatenation of rootURL and filename (e.g.
-   * http://example.com/test.glb)
-   * @param sceneFilename a string that defines the name of the scene file or
-   * starts with "data:" following by the stringified version of the scene or a
-   * File object (default: empty string)
+   * @param rootUrl a string that defines the root url for the scene and resources or the
+   * concatenation of rootURL and filename (e.g. http://example.com/test.glb)
+   * @param sceneFilename a string that defines the name of the scene file or starts with "data:"
+   * following by the stringified version of the scene or a File object (default: empty string)
    * @param engine is the instance of BABYLON.Engine to use to create the scene
    * @param onSuccess a callback with the scene when import succeeds
-   * @param onProgress a callback with a progress event for each file being
-   * loaded
-   * @param onError a callback with the scene, a message, and possibly an
-   * exception when import fails
+   * @param onProgress a callback with a progress event for each file being loaded
+   * @param onError a callback with the scene, a message, and possibly an exception when import
+   * fails
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static std::unique_ptr<Scene> Load(
-    const std::string& rootUrl, const std::string& sceneFilename,
-    Engine* engine,
-    const std::function<void(Scene* scene)>& onsuccess = nullptr,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::function<void(Scene* scene, const std::string& message,
-                             const std::string& exception)>& onError
-    = nullptr,
-    const std::string& pluginExtension = "");
+  static std::unique_ptr<Scene>
+  Load(const std::string& rootUrl, const std::string& sceneFilename, Engine* engine,
+       const std::function<void(Scene* scene)>& onsuccess                           = nullptr,
+       const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
+       const std::function<void(Scene* scene, const std::string& message,
+                                const std::string& exception)>& onError
+       = nullptr,
+       const std::string& pluginExtension = "");
 
   /**
    * @brief Append a scene.
-   * @param rootUrl a string that defines the root url for the scene and
-   * resources or the concatenation of rootURL and filename (e.g.
-   * http://example.com/test.glb)
-   * @param sceneFilename a string that defines the name of the scene file or
-   * starts with "data:" following by the stringified version of the scene or a
-   * File object (default: empty string)
+   * @param rootUrl a string that defines the root url for the scene and resources or the
+   * concatenation of rootURL and filename (e.g. http://example.com/test.glb)
+   * @param sceneFilename a string that defines the name of the scene file or starts with "data:"
+   * following by the stringified version of the scene or a File object (default: empty string)
    * @param scene is the instance of BABYLON.Scene to append to
    * @param onSuccess a callback with the scene when import succeeds
-   * @param onProgress a callback with a progress event for each file being
-   * loaded
-   * @param onError a callback with the scene, a message, and possibly an
-   * exception when import fails
+   * @param onProgress a callback with a progress event for each file being loaded
+   * @param onError a callback with the scene, a message, and possibly an exception when import
+   * fails
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static std::optional<
-    std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
-  Append(
-    std::string rootUrl, std::string sceneFilename = "", Scene* scene = nullptr,
-    const std::function<void(Scene* scene)>& onSuccess = nullptr,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
-    = nullptr,
-    const std::function<void(Scene* scene, const std::string& message,
-                             const std::string& exception)>& onError
-    = nullptr,
-    const std::string& pluginExtension = "");
+  static std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
+  Append(std::string rootUrl, std::string sceneFilename = "", Scene* scene = nullptr,
+         const std::function<void(Scene* scene)>& onSuccess                           = nullptr,
+         const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
+         const std::function<void(Scene* scene, const std::string& message,
+                                  const std::string& exception)>& onError
+         = nullptr,
+         const std::string& pluginExtension = "");
 
 public:
   // Members

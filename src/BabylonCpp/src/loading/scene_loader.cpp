@@ -69,7 +69,7 @@ void SceneLoader::RegisterPlugins()
   SceneLoader::RegisterPlugin(std::make_shared<BabylonFileLoader>());
 }
 
-IRegisteredPlugin SceneLoader::_getDefaultPlugin()
+IRegisteredPlugin SceneLoader::GetDefaultPlugin()
 {
   // Add default plugin
   if (SceneLoader::_registeredPlugins.empty()) {
@@ -79,7 +79,7 @@ IRegisteredPlugin SceneLoader::_getDefaultPlugin()
   return SceneLoader::_registeredPlugins[".babylon"];
 }
 
-IRegisteredPlugin SceneLoader::_getPluginForExtension(const std::string& extension)
+IRegisteredPlugin SceneLoader::_GetPluginForExtension(const std::string& extension)
 {
   if (stl_util::contains(SceneLoader::_registeredPlugins, extension)) {
     return SceneLoader::_registeredPlugins[extension];
@@ -87,7 +87,7 @@ IRegisteredPlugin SceneLoader::_getPluginForExtension(const std::string& extensi
 
   if (extension == ".babylon" && SceneLoader::_registeredPlugins.empty()) {
     SceneLoader::RegisterPlugins();
-    return SceneLoader::_getDefaultPlugin();
+    return SceneLoader::GetDefaultPlugin();
   }
 
   BABYLON_LOGF_WARN("SceneLoader",
@@ -95,10 +95,10 @@ IRegisteredPlugin SceneLoader::_getPluginForExtension(const std::string& extensi
                     "plugin. To load from a specific filetype (eg. gltf) see: "
                     "http://doc.babylonjs.com/how_to/load_from_any_file_type",
                     extension.c_str())
-  return SceneLoader::_getDefaultPlugin();
+  return SceneLoader::GetDefaultPlugin();
 }
 
-IRegisteredPlugin SceneLoader::_getPluginForDirectLoad(const std::string& data)
+IRegisteredPlugin SceneLoader::_GetPluginForDirectLoad(const std::string& data)
 {
   for (const auto& pluginItem : SceneLoader::_registeredPlugins) {
     const auto& registeredPlugin = pluginItem.second;
@@ -123,10 +123,10 @@ IRegisteredPlugin SceneLoader::_getPluginForDirectLoad(const std::string& data)
     }
   }
 
-  return SceneLoader::_getDefaultPlugin();
+  return SceneLoader::GetDefaultPlugin();
 }
 
-IRegisteredPlugin SceneLoader::_getPluginForFilename(std::string sceneFilename)
+IRegisteredPlugin SceneLoader::_GetPluginForFilename(std::string sceneFilename)
 {
   auto queryStringPosition = sceneFilename.find("?", 0);
 
@@ -138,10 +138,10 @@ IRegisteredPlugin SceneLoader::_getPluginForFilename(std::string sceneFilename)
 
   auto extension
     = StringTools::toLowerCase(sceneFilename.substr(dotPosition, sceneFilename.size()));
-  return SceneLoader::_getPluginForExtension(extension);
+  return SceneLoader::_GetPluginForExtension(extension);
 }
 
-std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
+std::string SceneLoader::_GetDirectLoad(const std::string& sceneFilename)
 {
   if (StringTools::startsWith(sceneFilename, "data:")) {
     return sceneFilename.substr(5);
@@ -150,7 +150,7 @@ std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
   return "";
 }
 
-std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_loadData(
+std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_LoadData(
   const IFileInfo& fileInfo, Scene* scene,
   const std::function<
     void(const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
@@ -159,12 +159,12 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::function<void()>& /*onDispose*/, const std::string& pluginExtension)
 {
-  auto directLoad = SceneLoader::_getDirectLoad(fileInfo.name);
+  auto directLoad = SceneLoader::_GetDirectLoad(fileInfo.name);
   auto registeredPlugin
     = (!pluginExtension.empty()) ?
-        SceneLoader::_getPluginForExtension(pluginExtension) :
-        (!directLoad.empty() ? SceneLoader::_getPluginForDirectLoad(fileInfo.name) :
-                               SceneLoader::_getPluginForFilename(fileInfo.name));
+        SceneLoader::_GetPluginForExtension(pluginExtension) :
+        (!directLoad.empty() ? SceneLoader::_GetPluginForDirectLoad(fileInfo.name) :
+                               SceneLoader::_GetPluginForFilename(fileInfo.name));
 
   std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> plugin;
   ISceneLoaderPluginPtr syncedPlugin       = nullptr;
@@ -234,7 +234,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_lo
   return plugin;
 }
 
-std::shared_ptr<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
+std::shared_ptr<IFileInfo> SceneLoader::_GetFileInfo(std::string rootUrl,
                                                      const std::string& sceneFilename)
 {
   std::string url;
@@ -266,7 +266,7 @@ std::shared_ptr<IFileInfo> SceneLoader::_getFileInfo(std::string rootUrl,
 std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr, ISceneLoaderPluginFactoryPtr>
 SceneLoader::GetPluginForExtension(const std::string& extension)
 {
-  return SceneLoader::_getPluginForExtension(extension).plugin;
+  return SceneLoader::_GetPluginForExtension(extension).plugin;
 }
 
 bool SceneLoader::IsPluginForExtensionAvailable(const std::string& extension)
@@ -329,7 +329,7 @@ SceneLoader::ImportMesh(
     return std::nullopt;
   }
 
-  std::shared_ptr<IFileInfo> fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
+  std::shared_ptr<IFileInfo> fileInfo = SceneLoader::_GetFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
     return std::nullopt;
   }
@@ -379,7 +379,7 @@ SceneLoader::ImportMesh(
     }
   };
 
-  return SceneLoader::_loadData(
+  return SceneLoader::_LoadData(
     *fileInfo, scene,
     [=](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
         const std::string& data, const std::string& responseURL) -> void {
@@ -453,7 +453,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
     return std::nullopt;
   }
 
-  auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
+  auto fileInfo = SceneLoader::_GetFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
     return std::nullopt;
   }
@@ -501,7 +501,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
     }
   };
 
-  return SceneLoader::_loadData(
+  return SceneLoader::_LoadData(
     *fileInfo, scene,
     [=](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
         const std::string& data, const std::string & /*responseURL*/) -> void {
