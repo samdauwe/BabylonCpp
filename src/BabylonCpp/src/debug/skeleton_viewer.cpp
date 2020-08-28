@@ -3,20 +3,30 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/builders/lines_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 namespace Debug {
 
 SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshPtr& iMesh,
-                               Scene* iScene, bool iAutoUpdateBonesMatrices, int iRenderingGroupId)
+                               Scene* iScene, bool iAutoUpdateBonesMatrices, int iRenderingGroupId,
+                               const ISkeletonViewerOptions& iOptions)
     : color{Color3::White()}
-    , debugMesh{this, &SkeletonViewer::get_debugMesh}
+    , scene{this, &SkeletonViewer::get_scene}
+    , utilityLayer{this, &SkeletonViewer::get_utilityLayer}
+    , isReady{this, &SkeletonViewer::get_isReady}
+    , ready{this, &SkeletonViewer::set_ready}
+    , debugMesh{this, &SkeletonViewer::get_debugMesh, &SkeletonViewer::set_debugMesh}
+    , material{this, &SkeletonViewer::get_material, &SkeletonViewer::set_material}
+    , displayMode{this, &SkeletonViewer::get_displayMode, &SkeletonViewer::set_displayMode}
     , skeleton{iSkeleton}
     , mesh{iMesh}
     , autoUpdateBonesMatrices{iAutoUpdateBonesMatrices}
@@ -24,43 +34,153 @@ SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshP
     , isEnabled{this, &SkeletonViewer::get_isEnabled, &SkeletonViewer::set_isEnabled}
     , _debugMesh{nullptr}
     , _isEnabled{false}
+    , _obs{nullptr}
     , _utilityLayer{nullptr}
 {
   _scene = iScene;
+  _ready = false;
 
+  // Defaults
+  options.pauseAnimations        = iOptions.pauseAnimations.value_or(true);
+  options.returnToRest           = iOptions.returnToRest.value_or(true);
+  options.displayMode            = iOptions.displayMode.value_or(SkeletonViewer::DISPLAY_LINES);
+  options.displayOptions.midStep = iOptions.displayOptions.midStep.value_or(0.235f);
+  options.displayOptions.midStepFactor   = iOptions.displayOptions.midStepFactor.value_or(0.155f);
+  options.displayOptions.sphereBaseSize  = iOptions.displayOptions.sphereBaseSize.value_or(0.15f);
+  options.displayOptions.sphereScaleUnit = iOptions.displayOptions.sphereScaleUnit.value_or(2.f);
+  options.displayOptions.sphereFactor    = iOptions.displayOptions.sphereFactor.value_or(0.865f);
+  options.computeBonesUsingShaders       = iOptions.computeBonesUsingShaders.value_or(true);
+
+  const auto boneIndices = mesh->getVerticesData(VertexBuffer::MatricesIndicesKind);
+  const auto boneWeights = mesh->getVerticesData(VertexBuffer::MatricesWeightsKind);
+
+  if (!boneIndices.empty() && !boneWeights.empty()) {
+    for (size_t i = 0; i < boneIndices.size(); ++i) {
+      const auto index = boneIndices[i], weight = boneWeights[i];
+
+      if (weight != 0.f) {
+        _boneIndices.insert(static_cast<int>(index));
+      }
+    }
+  }
+
+  /* Create Utility Layer */
   _utilityLayer                        = UtilityLayerRenderer::New(_scene, false);
   _utilityLayer->pickUtilitySceneFirst = false;
   _utilityLayer->utilityLayerScene->autoClearDepthAndStencil = true;
 
+  auto iDisplayMode = options.displayMode.value_or(0u);
+  if (iDisplayMode > SkeletonViewer::DISPLAY_SPHERE_AND_SPURS) {
+    iDisplayMode = SkeletonViewer::DISPLAY_LINES;
+  }
+  displayMode = iDisplayMode;
+  // Prep the Systems
   update();
-
-  _renderFunction = [this](Scene*, EventState&) { update(); };
+  _bindObs();
 }
 
 SkeletonViewer::~SkeletonViewer() = default;
+
+Scene*& SkeletonViewer::get_scene()
+{
+  return _scene;
+}
+
+UtilityLayerRendererPtr& SkeletonViewer::get_utilityLayer()
+{
+  return _utilityLayer;
+}
+
+bool SkeletonViewer::get_isReady() const
+{
+  return _ready;
+}
+
+void SkeletonViewer::set_ready(bool value)
+{
+  _ready = value;
+}
 
 LinesMeshPtr& SkeletonViewer::get_debugMesh()
 {
   return _debugMesh;
 }
 
+void SkeletonViewer::set_debugMesh(const LinesMeshPtr& value)
+{
+  _debugMesh = value;
+}
+
+StandardMaterialPtr& SkeletonViewer::get_material()
+{
+  return material;
+}
+
+void SkeletonViewer::set_material(const StandardMaterialPtr& value)
+{
+  material = value;
+}
+
+unsigned int SkeletonViewer::get_displayMode() const
+{
+  return options.displayMode.value_or(SkeletonViewer::DISPLAY_LINES);
+}
+
+void SkeletonViewer::set_displayMode(unsigned int value)
+{
+  if (value > SkeletonViewer::DISPLAY_SPHERE_AND_SPURS) {
+    value = SkeletonViewer::DISPLAY_LINES;
+  }
+  options.displayMode = value;
+}
+
+void SkeletonViewer::_bindObs()
+{
+  switch (displayMode) {
+    case SkeletonViewer::DISPLAY_LINES: {
+      _obs = scene()->onBeforeRenderObservable.add(
+        [this](Scene* /*scene*/, EventState & /*es*/) -> void { _displayLinesUpdate(); });
+      break;
+    }
+  }
+}
+
+void SkeletonViewer::update()
+{
+  switch (displayMode) {
+    case SkeletonViewer::DISPLAY_LINES: {
+      _displayLinesUpdate();
+      break;
+    }
+    case SkeletonViewer::DISPLAY_SPHERES: {
+      _buildSpheresAndSpurs(true);
+      break;
+    }
+    case SkeletonViewer::DISPLAY_SPHERE_AND_SPURS: {
+      _buildSpheresAndSpurs(false);
+      break;
+    }
+  }
+}
+
 void SkeletonViewer::set_isEnabled(bool value)
 {
-  if (_isEnabled == value) {
+  if (isEnabled == value) {
     return;
   }
 
   _isEnabled = value;
 
-  if (_debugMesh) {
-    _debugMesh->setEnabled(value);
+  if (debugMesh()) {
+    debugMesh()->setEnabled(value);
   }
 
-  if (value) {
-    _scene->registerBeforeRender(_renderFunction);
+  if (value && !_obs) {
+    _bindObs();
   }
-  else {
-    _scene->unregisterBeforeRender(_renderFunction);
+  else if (!value && _obs) {
+    scene()->onBeforeRenderObservable.remove(_obs);
+    _obs = nullptr;
   }
 }
 
@@ -96,53 +216,6 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone, const
   position.z        = tmatM[14];
 }
 
-void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
-                                                 const Matrix& meshMat)
-{
-  _resizeDebugLines(bones.size());
-
-  auto _mesh   = mesh->_effectiveMesh();
-  auto meshPos = _mesh->position();
-  auto i       = 0u;
-  for (const auto& bone : bones) {
-    auto& points = _debugLines[i];
-    if (points.size() < 2) {
-      points = {Vector3::Zero(), Vector3::Zero()};
-    }
-    _getBonePosition(points[0], *bone, meshMat);
-    _getBonePosition(points[1], *bone, meshMat, 0.f, static_cast<float>(bones.size()), 0.f);
-    points[0].subtractInPlace(meshPos);
-    points[1].subtractInPlace(meshPos);
-    ++i;
-  }
-}
-
-void SkeletonViewer::_getLinesForBonesNoLength(const std::vector<BonePtr>& bones,
-                                               const Matrix& /*meshMat*/)
-{
-  _resizeDebugLines(bones.size());
-
-  auto _mesh   = mesh->_effectiveMesh();
-  auto meshPos = _mesh->position();
-  auto boneNum = 0u;
-  for (size_t i = bones.size(); i-- > 0;) {
-    auto& childBone = bones[i];
-    auto parentBone = childBone->getParent();
-    if (!parentBone) {
-      continue;
-    }
-    auto& points = _debugLines[i];
-    if (points.size() < 2) {
-      points = {Vector3::Zero(), Vector3::Zero()};
-    }
-    childBone->getAbsolutePositionToRef(_mesh, points[0]);
-    parentBone->getAbsolutePositionToRef(_mesh, points[1]);
-    points[0].subtractInPlace(meshPos);
-    points[1].subtractInPlace(meshPos);
-    ++boneNum;
-  }
-}
-
 void SkeletonViewer::_resizeDebugLines(size_t bonesSize)
 {
   if (bonesSize > _debugLines.size()) {
@@ -155,7 +228,191 @@ void SkeletonViewer::_resizeDebugLines(size_t bonesSize)
   }
 }
 
-void SkeletonViewer::update()
+void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
+                                                 const Matrix& meshMat)
+{
+  _resizeDebugLines(bones.size());
+
+  auto _mesh   = mesh->_effectiveMesh();
+  auto meshPos = _mesh->position();
+  auto idx     = 0u;
+  for (const auto& bone : bones) {
+    auto& points = _debugLines[idx];
+    if (bone->_index == -1 || !stl_util::contains(_boneIndices, bone->getIndex())) {
+      continue;
+    }
+    if (points.size() < 2) {
+      points           = {Vector3::Zero(), Vector3::Zero()};
+      _debugLines[idx] = points;
+    }
+    _getBonePosition(points[0], *bone, meshMat);
+    _getBonePosition(points[1], *bone, meshMat, 0.f, static_cast<float>(bones.size()), 0.f);
+    points[0].subtractInPlace(meshPos);
+    points[1].subtractInPlace(meshPos);
+    ++idx;
+  }
+}
+
+void SkeletonViewer::_getLinesForBonesNoLength(const std::vector<BonePtr>& bones)
+{
+  _resizeDebugLines(bones.size());
+
+  auto _mesh   = mesh->_effectiveMesh();
+  auto meshPos = _mesh->position();
+  auto boneNum = 0u;
+  for (size_t i = bones.size(); i-- > 0;) {
+    auto& childBone = bones[i];
+    auto parentBone = childBone->getParent();
+    if (!parentBone || !stl_util::contains(_boneIndices, childBone->getIndex())) {
+      continue;
+    }
+    auto& points = _debugLines[i];
+    if (points.size() < 2) {
+      points               = {Vector3::Zero(), Vector3::Zero()};
+      _debugLines[boneNum] = points;
+    }
+    childBone->getAbsolutePositionToRef(_mesh, points[0]);
+    parentBone->getAbsolutePositionToRef(_mesh, points[1]);
+    points[0].subtractInPlace(meshPos);
+    points[1].subtractInPlace(meshPos);
+    ++boneNum;
+  }
+}
+
+void SkeletonViewer::_revert(bool animationState)
+{
+  if (options.pauseAnimations) {
+    scene()->animationsEnabled = animationState;
+  }
+}
+
+void SkeletonViewer::_buildSpheresAndSpurs(bool /*spheresOnly*/)
+{
+  if (_debugMesh) {
+    _debugMesh->dispose();
+    _debugMesh = nullptr;
+    ready      = false;
+  }
+
+  struct MeshBone {
+    MeshPtr mesh = nullptr;
+    BonePtr bone = nullptr;
+  }; // end of struct MeshBone
+
+  _ready      = false;
+  auto iScene = scene();
+  auto bones  = skeleton->bones;
+  std::vector<MeshBone> spheres;
+  std::vector<MeshPtr> spurs;
+
+  const auto animationState = iScene->animationsEnabled;
+
+  try {
+    if (*options.pauseAnimations) {
+      iScene->animationsEnabled = false;
+    }
+
+    if (*options.returnToRest) {
+      skeleton->returnToRest();
+    }
+
+    if (autoUpdateBonesMatrices) {
+      skeleton->computeAbsoluteTransforms();
+    }
+
+    auto longestBoneLength = std::numeric_limits<float>::lowest();
+    std::function<void(Bone * bone, Matrix & matrix)> getAbsoluteRestPose = nullptr;
+    getAbsoluteRestPose = [&getAbsoluteRestPose](Bone* bone, Matrix& matrix) -> void {
+      if (bone == nullptr || bone->_index == -1) {
+        matrix.copyFrom(Matrix::Identity());
+        return;
+      }
+      getAbsoluteRestPose(bone->getParent(), matrix);
+      bone->getBindPose().multiplyToRef(matrix, matrix);
+      return;
+    };
+
+    const auto& displayOptions = options.displayOptions;
+
+    for (const auto& bone : bones) {
+      if (bone->_index == -1 || !stl_util::contains(_boneIndices, bone->getIndex())) {
+        continue;
+      }
+
+      Matrix boneAbsoluteRestTransform;
+      getAbsoluteRestPose(bone.get(), boneAbsoluteRestTransform);
+
+      std::optional<Vector3> scale       = std::nullopt;
+      std::optional<Quaternion> rotation = std::nullopt;
+      std::optional<Vector3> anchorPoint = Vector3();
+      boneAbsoluteRestTransform.decompose(scale, rotation, anchorPoint);
+
+      const auto sphereBaseSize = displayOptions.sphereBaseSize.value_or(0.2f);
+
+      SphereOptions sphereOptions;
+      sphereOptions.segments  = 6u;
+      sphereOptions.diameter  = sphereBaseSize;
+      sphereOptions.updatable = false;
+      auto sphere = SphereBuilder::CreateSphere(bone->name + ":sphere", sphereOptions, scene);
+
+      const auto numVertices = sphere->getTotalVertices();
+
+      Float32Array mwk;
+      Float32Array mik;
+
+      for (size_t i = 0; i < numVertices; i++) {
+        stl_util::concat(mwk, {1.f, 0.f, 0.f, 0.f});
+        stl_util::concat(mik, {static_cast<float>(bone->getIndex()), 0.f, 0.f, 0.f});
+      }
+
+      sphere->setVerticesData(VertexBuffer::MatricesWeightsKind, mwk, false);
+      sphere->setVerticesData(VertexBuffer::MatricesIndicesKind, mik, false);
+
+      sphere->position = *anchorPoint;
+      spheres.emplace_back(MeshBone{sphere, bone});
+    }
+
+    const auto sphereScaleUnit = displayOptions.sphereScaleUnit.value_or(2.f);
+    const auto sphereFactor    = displayOptions.sphereFactor.value_or(0.85f);
+
+    std::vector<MeshPtr> meshes;
+    for (const auto& meshBone : spheres) {
+      const auto& sphere = meshBone.mesh;
+      const auto& bone   = meshBone.bone;
+      auto scale         = 1.f / (sphereScaleUnit / longestBoneLength);
+
+      auto _stepsOut = 0;
+      auto _b        = bone.get();
+
+      while ((_b->getParent()) && _b->getParent()->getIndex() != -1) {
+        ++_stepsOut;
+        _b = _b->getParent();
+      }
+      sphere->scaling().scaleInPlace(scale * std::pow(sphereFactor, _stepsOut));
+      meshes.emplace_back(sphere);
+    }
+
+    // debugMesh = Mesh::MergeMeshes(stl_util::concat(meshes,spurs), true, true);
+    const auto& iDebugMesh = debugMesh();
+    if (iDebugMesh) {
+      iDebugMesh->renderingGroupId         = renderingGroupId;
+      iDebugMesh->skeleton                 = skeleton;
+      iDebugMesh->parent                   = mesh.get();
+      iDebugMesh->computeBonesUsingShaders = options.computeBonesUsingShaders.value_or(true);
+      iDebugMesh->alwaysSelectAsActiveMesh = true;
+    }
+
+    _revert(animationState);
+    ready = true;
+  }
+  catch (const std::exception& err) {
+    BABYLON_LOG_ERROR("SkeletonViewer", err.what());
+    _revert(animationState);
+    dispose();
+  }
+}
+
+void SkeletonViewer::_displayLinesUpdate()
 {
   if (!_utilityLayer) {
     return;
@@ -168,28 +425,78 @@ void SkeletonViewer::update()
   auto _mesh = mesh->_effectiveMesh();
 
   if (!skeleton->bones.empty() && stl_util::almost_equal(skeleton->bones[0]->length, -1.f)) {
-    _getLinesForBonesNoLength(skeleton->bones, _mesh->getWorldMatrix());
+    _getLinesForBonesNoLength(skeleton->bones);
   }
   else {
     _getLinesForBonesWithLength(skeleton->bones, _mesh->getWorldMatrix());
   }
+
   auto targetScene = _utilityLayer->utilityLayerScene.get();
 
-  LineSystemOptions options;
-  options.lines     = _debugLines;
-  options.updatable = true;
-  options.instance  = nullptr;
+  if (targetScene) {
+    LineSystemOptions options;
+    options.lines     = _debugLines;
+    options.updatable = true;
+    options.instance  = nullptr;
 
-  if (!_debugMesh) {
-    _debugMesh                   = LinesBuilder::CreateLineSystem("", options, targetScene);
-    _debugMesh->renderingGroupId = renderingGroupId;
+    if (!_debugMesh) {
+      _debugMesh                   = LinesBuilder::CreateLineSystem("", options, targetScene);
+      _debugMesh->renderingGroupId = renderingGroupId;
+    }
+    else {
+      options.instance = _debugMesh;
+      LinesBuilder::CreateLineSystem("", options, targetScene);
+    }
+    _debugMesh->position().copyFrom(mesh->position());
+    _debugMesh->color = color;
   }
-  else {
-    options.instance = _debugMesh;
-    LinesBuilder::CreateLineSystem("", options, targetScene);
+}
+
+void SkeletonViewer::changeDisplayMode(unsigned int mode)
+{
+  const auto wasEnabled = isEnabled() ? true : false;
+  if (displayMode != mode) {
+    isEnabled = false;
+    if (_debugMesh) {
+      _debugMesh->dispose();
+      _debugMesh = nullptr;
+      ready      = false;
+    }
+    displayMode = mode;
+
+    update();
+    _bindObs();
+    isEnabled = wasEnabled;
   }
-  _debugMesh->position().copyFrom(mesh->position());
-  _debugMesh->color = color;
+}
+
+void SkeletonViewer::changeDisplayOptions(const std::string& option, float value)
+{
+  const auto wasEnabled = isEnabled() ? true : false;
+  if (option == "midStep") {
+    options.displayOptions.midStep = value;
+  }
+  else if (option == "midStepFactor") {
+    options.displayOptions.midStepFactor = value;
+  }
+  else if (option == "sphereBaseSize") {
+    options.displayOptions.sphereBaseSize = value;
+  }
+  else if (option == "sphereScaleUnit") {
+    options.displayOptions.sphereScaleUnit = value;
+  }
+  else if (option == "sphereFactor") {
+    options.displayOptions.sphereFactor = value;
+  }
+  isEnabled = false;
+  if (_debugMesh) {
+    _debugMesh->dispose();
+    _debugMesh = nullptr;
+    ready      = false;
+  }
+  update();
+  _bindObs();
+  isEnabled = wasEnabled;
 }
 
 void SkeletonViewer::dispose()
@@ -197,7 +504,6 @@ void SkeletonViewer::dispose()
   isEnabled = false;
 
   if (_debugMesh) {
-    isEnabled = false;
     _debugMesh->dispose();
     _debugMesh = nullptr;
   }
@@ -206,6 +512,8 @@ void SkeletonViewer::dispose()
     _utilityLayer->dispose();
     _utilityLayer = nullptr;
   }
+
+  ready = false;
 }
 
 } // end of namespace Debug
