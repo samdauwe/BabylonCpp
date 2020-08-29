@@ -8,6 +8,7 @@
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/builders/lines_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/shape_builder.h>
 #include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -101,12 +102,12 @@ void SkeletonViewer::set_ready(bool value)
   _ready = value;
 }
 
-LinesMeshPtr& SkeletonViewer::get_debugMesh()
+AbstractMeshPtr& SkeletonViewer::get_debugMesh()
 {
   return _debugMesh;
 }
 
-void SkeletonViewer::set_debugMesh(const LinesMeshPtr& value)
+void SkeletonViewer::set_debugMesh(const AbstractMeshPtr& value)
 {
   _debugMesh = value;
 }
@@ -286,7 +287,7 @@ void SkeletonViewer::_revert(bool animationState)
   }
 }
 
-void SkeletonViewer::_buildSpheresAndSpurs(bool /*spheresOnly*/)
+void SkeletonViewer::_buildSpheresAndSpurs(bool spheresOnly)
 {
   if (_debugMesh) {
     _debugMesh->dispose();
@@ -347,6 +348,71 @@ void SkeletonViewer::_buildSpheresAndSpurs(bool /*spheresOnly*/)
       std::optional<Vector3> anchorPoint = Vector3();
       boneAbsoluteRestTransform.decompose(scale, rotation, anchorPoint);
 
+      for (const auto& bc : bone->children) {
+        Matrix childAbsoluteRestTransform;
+        bc->getRestPose()->multiplyToRef(boneAbsoluteRestTransform, childAbsoluteRestTransform);
+        std::optional<Vector3> bcScale       = std::nullopt;
+        std::optional<Quaternion> bcRotation = std::nullopt;
+        std::optional<Vector3> childPoint    = Vector3();
+        childAbsoluteRestTransform.decompose(bcScale, bcRotation, childPoint);
+
+        auto distanceFromParent = Vector3::Distance(*anchorPoint, *childPoint);
+
+        if (distanceFromParent > longestBoneLength) {
+          longestBoneLength = distanceFromParent;
+        }
+        if (spheresOnly) {
+          return;
+        }
+
+        auto dir = childPoint->copy().subtract(anchorPoint->copy());
+        auto h   = dir.length();
+        auto up  = dir.normalize().scale(h);
+
+        auto midStep       = displayOptions.midStep.value_or(0.165f);
+        auto midStepFactor = displayOptions.midStepFactor.value_or(0.215f);
+
+        auto up0 = up.scale(midStep);
+
+        ExtrudeShapeCustomOptions spurOptions;
+        spurOptions.shape = {
+          Vector3(1.f, -1.f, 0.f),  //
+          Vector3(1.f, 1.f, 0.f),   //
+          Vector3(-1.f, 1.f, 0.f),  //
+          Vector3(-1.f, -1.f, 0.f), //
+          Vector3(1.f, -1.f, 0.f)   //
+        };
+        spurOptions.path          = {Vector3::Zero(), up0, up};
+        spurOptions.scaleFunction = [h, midStepFactor](float i, float /*distance*/) -> float {
+          if (i == 0.f || i == 2.f) {
+            return 0.f;
+          }
+          else if (i == 1.f) {
+            return h * midStepFactor;
+          }
+          return 0.f;
+        };
+        spurOptions.sideOrientation = Mesh::DEFAULTSIDE;
+        spurOptions.updatable       = false;
+        auto spur = ShapeBuilder::ExtrudeShapeCustom(bc->name + ":spur", spurOptions, scene);
+
+        spur->convertToFlatShadedMesh();
+
+        auto numVertices = spur->getTotalVertices();
+        Float32Array mwk, mik;
+
+        for (size_t i = 0; i < numVertices; i++) {
+          stl_util::concat(mwk, {1.f, 0.f, 0.f, 0.f});
+          stl_util::concat(mik, {static_cast<float>(bone->getIndex()), 0.f, 0.f, 0.f});
+        }
+        spur->position = *anchorPoint;
+
+        spur->setVerticesData(VertexBuffer::MatricesWeightsKind, mwk, false);
+        spur->setVerticesData(VertexBuffer::MatricesIndicesKind, mik, false);
+
+        spurs.emplace_back(spur);
+      }
+
       const auto sphereBaseSize = displayOptions.sphereBaseSize.value_or(0.2f);
 
       SphereOptions sphereOptions;
@@ -392,7 +458,7 @@ void SkeletonViewer::_buildSpheresAndSpurs(bool /*spheresOnly*/)
       meshes.emplace_back(sphere);
     }
 
-    // debugMesh = Mesh::MergeMeshes(stl_util::concat(meshes,spurs), true, true);
+    debugMesh              = Mesh::MergeMeshes(stl_util::concat(meshes, spurs), true, true);
     const auto& iDebugMesh = debugMesh();
     if (iDebugMesh) {
       iDebugMesh->renderingGroupId         = renderingGroupId;
@@ -444,11 +510,15 @@ void SkeletonViewer::_displayLinesUpdate()
       _debugMesh->renderingGroupId = renderingGroupId;
     }
     else {
-      options.instance = _debugMesh;
+      auto debugLineMesh = std::static_pointer_cast<LinesMesh>(_debugMesh);
+      options.instance   = debugLineMesh;
       LinesBuilder::CreateLineSystem("", options, targetScene);
     }
-    _debugMesh->position().copyFrom(mesh->position());
-    _debugMesh->color = color;
+    auto debugLineMesh = std::static_pointer_cast<LinesMesh>(_debugMesh);
+    if (debugLineMesh) {
+      debugLineMesh->position().copyFrom(mesh->position());
+      debugLineMesh->color = color;
+    }
   }
 }
 

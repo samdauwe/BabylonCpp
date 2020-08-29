@@ -114,12 +114,12 @@ protected:
   /**
    * @brief Returns the mesh used to render the bones.
    */
-  LinesMeshPtr& get_debugMesh();
+  AbstractMeshPtr& get_debugMesh();
 
   /**
    * @brief Sets the debugMesh
    */
-  void set_debugMesh(const LinesMeshPtr& value);
+  void set_debugMesh(const AbstractMeshPtr& value);
 
   /**
    * @brief Gets the material
@@ -208,7 +208,7 @@ public:
    *
    * Returns the mesh used to render the bones
    */
-  Property<SkeletonViewer, LinesMeshPtr> debugMesh;
+  Property<SkeletonViewer, AbstractMeshPtr> debugMesh;
 
   /**
    * Gets the material */
@@ -264,7 +264,7 @@ private:
   /**
    * The SkeletonViewers Mesh.
    */
-  LinesMeshPtr _debugMesh;
+  AbstractMeshPtr _debugMesh;
 
   /**
    * If SkeletonViewer is enabled.
