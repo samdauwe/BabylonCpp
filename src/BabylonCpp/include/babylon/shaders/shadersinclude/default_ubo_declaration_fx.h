@@ -47,6 +47,9 @@ uniform Material
     vec3 vEmissiveColor;
     float visibility;
     vec4 vDiffuseColor;
+
+    vec4 vDetailInfos;
+    mat4 detailMatrix;
 };
 
 uniform Scene {

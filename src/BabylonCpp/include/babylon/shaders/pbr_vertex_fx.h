@@ -46,8 +46,16 @@ attribute vec4 color;
 // Uniforms
 #include<instancesDeclaration>
 
+#ifdef PREPASS
+varying vec3 vViewPos;
+#endif
+
 #if defined(ALBEDO) && ALBEDODIRECTUV == 0
 varying vec2 vAlbedoUV;
+#endif
+
+#if defined(DETAIL) && DETAILDIRECTUV == 0
+varying vec2 vDetailUV;
 #endif
 
 #if defined(AMBIENT) && AMBIENTDIRECTUV == 0
@@ -181,6 +189,9 @@ void main(void) {
 
     vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
     vPositionW = vec3(worldPos);
+#ifdef PREPASS
+    vViewPos = (view * worldPos).rgb;
+#endif
 
 #ifdef NORMAL
     mat3 normalWorld = mat3(finalWorld);
@@ -249,6 +260,17 @@ void main(void) {
     else
     {
         vAlbedoUV = vec2(albedoMatrix * vec4(uv2, 1.0, 0.0));
+    }
+#endif
+
+#if defined(DETAIL) && DETAILDIRECTUV == 0
+    if (vDetailInfos.x == 0.)
+    {
+        vDetailUV = vec2(detailMatrix * vec4(uvUpdated, 1.0, 0.0));
+    }
+    else
+    {
+        vDetailUV = vec2(detailMatrix * vec4(uv2, 1.0, 0.0));
     }
 #endif
 
@@ -342,6 +364,10 @@ void main(void) {
 
 #ifdef CLEARCOAT
     #if defined(CLEARCOAT_TEXTURE) && CLEARCOAT_TEXTUREDIRECTUV == 0
+
+)ShaderCode"
+R"ShaderCode(
+
         if (vClearCoatInfos.x == 0.)
         {
             vClearCoatUV = vec2(clearCoatMatrix * vec4(uvUpdated, 1.0, 0.0));
@@ -356,10 +382,6 @@ void main(void) {
         if (vClearCoatBumpInfos.x == 0.)
         {
             vClearCoatBumpUV = vec2(clearCoatBumpMatrix * vec4(uvUpdated, 1.0, 0.0));
-
-)ShaderCode"
-R"ShaderCode(
-
         }
         else
         {

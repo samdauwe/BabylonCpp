@@ -144,6 +144,10 @@ uniform mat4 view;
     uniform vec3 vDiffusionDistance;
     uniform vec4 vTintColor;
     uniform vec3 vSubSurfaceIntensity;
+
+    #ifdef SS_SCATTERING
+        uniform float scatteringDiffusionProfile;
+    #endif
 #endif
 
 )ShaderCode";

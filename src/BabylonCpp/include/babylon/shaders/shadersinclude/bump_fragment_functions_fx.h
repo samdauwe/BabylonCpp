@@ -24,6 +24,17 @@ const char* bumpFragmentFunctions
     }
 #endif
 
+#if defined(DETAIL)
+    #if DETAILDIRECTUV == 1
+        #define vDetailUV vMainUV1
+    #elif DETAILDIRECTUV == 2
+        #define vDetailUV vMainUV2
+    #else
+        varying vec2 vDetailUV;
+    #endif
+    uniform sampler2D detailSampler;
+#endif
+
 #if defined(BUMP)
     vec3 perturbNormal(mat3 cotangentFrame, vec3 color)
     {

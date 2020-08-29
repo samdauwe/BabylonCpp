@@ -122,9 +122,6 @@ struct subSurfaceOutParams
     #ifdef SS_TRANSLUCENCY
         float translucencyIntensity = vSubSurfaceIntensity.y;
     #endif
-    #ifdef SS_SCATTERING
-        float scatteringIntensity = vSubSurfaceIntensity.z;
-    #endif
 
     #ifdef SS_THICKNESSANDMASK_TEXTURE
         float thickness = thicknessMap.r * vThicknessParam.y + vThicknessParam.x;
@@ -139,9 +136,6 @@ struct subSurfaceOutParams
             #endif
             #ifdef SS_TRANSLUCENCY
                 translucencyIntensity *= thicknessMap.b;
-            #endif
-            #ifdef SS_SCATTERING
-                scatteringIntensity *= thicknessMap.a;
             #endif
         #endif
     #else
@@ -210,16 +204,16 @@ struct subSurfaceOutParams
                 // hardware LOD calculation with the alpha channel containing the LOD for each mipmap.
                 float automaticRefractionLOD = UNPACK_LOD(sampleRefraction(refractionSampler, refractionCoords).a);
                 float requestedRefractionLOD = max(automaticRefractionLOD, refractionLOD);
-
-)ShaderCode"
-R"ShaderCode(
-
             #else
                 float requestedRefractionLOD = refractionLOD;
             #endif
 
             #ifdef REALTIME_FILTERING
                 environmentRefraction = vec4(radiance(alphaG, refractionSampler, refractionCoords, vRefractionFilteringInfo), 1.0);
+
+)ShaderCode"
+R"ShaderCode(
+
             #else
                 environmentRefraction = sampleRefractionLod(refractionSampler, refractionCoords, requestedRefractionLOD);
             #endif
@@ -282,6 +276,11 @@ R"ShaderCode(
             // Compute tint from min distance only.
             vec3 volumeAlbedo = computeColorAtDistanceInMedia(vTintColor.rgb, vTintColor.w);
             refractionTransmittance *= cocaLambert(volumeAlbedo, vThicknessParam.y);
+        #endif
+
+        #ifdef SS_ALBEDOFORREFRACTIONTINT
+            // Tint the transmission with albedo.
+            environmentRefraction.rgb *= surfaceAlbedo.rgb;
         #endif
 
         // Decrease Albedo Contribution

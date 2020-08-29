@@ -44,6 +44,10 @@ void reflectivityBlock(
 #ifdef MICROSURFACEMAP
     const in vec4 microSurfaceTexel,
 #endif
+#ifdef DETAIL
+    const in vec4 detailColor,
+    const in vec4 vDetailInfos,
+#endif
     out reflectivityOutParams outParams
 )
 {
@@ -76,6 +80,13 @@ void reflectivityBlock(
                     metallicRoughness.g *= surfaceMetallicOrReflectivityColorMap.g;
                 #endif
             #endif
+        #endif
+
+        #ifdef DETAIL
+            float detailRoughness = mix(0.5, detailColor.b, vDetailInfos.w);
+            float loLerp = mix(0., metallicRoughness.g, detailRoughness * 2.);
+            float hiLerp = mix(metallicRoughness.g, 1., (detailRoughness - 0.5) * 2.);
+            metallicRoughness.g = mix(loLerp, hiLerp, step(detailRoughness, 0.5));
         #endif
 
         #ifdef MICROSURFACEMAP

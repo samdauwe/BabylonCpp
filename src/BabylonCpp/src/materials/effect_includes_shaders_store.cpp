@@ -21,6 +21,8 @@
 #include <babylon/shaders/shadersinclude/default_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/default_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/depth_pre_pass_fx.h>
+#include <babylon/shaders/shadersinclude/diffusion_profile_fx.h>
+#include <babylon/shaders/shadersinclude/fibonacci_fx.h>
 #include <babylon/shaders/shadersinclude/fog_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/fog_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/fog_vertex_fx.h>
@@ -62,6 +64,7 @@
 #include <babylon/shaders/shadersinclude/pbr_block_final_unlit_components_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_block_geometry_info_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_block_image_processing_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_block_lightmap_init_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_block_normal_final_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_block_normal_geometric_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_block_reflectance_fx.h>
@@ -83,6 +86,7 @@
 #include <babylon/shaders/shadersinclude/pbr_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pre_pass_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/reflection_function_fx.h>
 #include <babylon/shaders/shadersinclude/shadow_map_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/shadow_map_fragment_declaration_fx.h>
@@ -92,6 +96,7 @@
 #include <babylon/shaders/shadersinclude/shadow_map_vertex_normal_bias_fx.h>
 #include <babylon/shaders/shadersinclude/shadows_fragment_functions_fx.h>
 #include <babylon/shaders/shadersinclude/shadows_vertex_fx.h>
+#include <babylon/shaders/shadersinclude/sub_surface_scattering_functions_fx.h>
 
 namespace BABYLON {
 
@@ -134,6 +139,8 @@ std::unordered_map<std::string, std::string>
      {"defaultUboDeclaration", defaultUboDeclaration},
      {"defaultVertexDeclaration", defaultVertexDeclaration},
      {"depthPrePass", depthPrePass},
+     {"diffusionProfile", diffusionProfile},
+     {"fibonacci", fibonacci},
      {"fogFragment", fogFragment},
      {"fogFragmentDeclaration", fogFragmentDeclaration},
      {"fogVertex", fogVertex},
@@ -175,6 +182,7 @@ std::unordered_map<std::string, std::string>
      {"pbrBlockFinalUnlitComponents", pbrBlockFinalUnlitComponents},
      {"pbrBlockGeometryInfo", pbrBlockGeometryInfo},
      {"pbrBlockImageProcessing", pbrBlockImageProcessing},
+     {"pbrBlockLightmapInit", pbrBlockLightmapInit},
      {"pbrBlockNormalFinal", pbrBlockNormalFinal},
      {"pbrBlockNormalGeometric", pbrBlockNormalGeometric},
      {"pbrBlockReflectance", pbrBlockReflectance},
@@ -196,6 +204,7 @@ std::unordered_map<std::string, std::string>
      {"pbrVertexDeclaration", pbrVertexDeclaration},
      {"pointCloudVertex", pointCloudVertex},
      {"pointCloudVertexDeclaration", pointCloudVertexDeclaration},
+     {"prePassDeclaration", prePassDeclaration},
      {"reflectionFunction", reflectionFunction},
      {"shadowMapFragment", shadowMapFragment},
      {"shadowMapFragmentDeclaration", shadowMapFragmentDeclaration},
@@ -204,6 +213,7 @@ std::unordered_map<std::string, std::string>
      {"shadowMapVertexMetric", shadowMapVertexMetric},
      {"shadowMapVertexNormalBias", shadowMapVertexNormalBias},
      {"shadowsFragmentFunctions", shadowsFragmentFunctions},
-     {"shadowsVertex", shadowsVertex}};
+     {"shadowsVertex", shadowsVertex},
+     {"subSurfaceScatteringFunctions", subSurfaceScatteringFunctions}};
 
 } // end of namespace BABYLON

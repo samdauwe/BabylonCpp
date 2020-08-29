@@ -10,7 +10,8 @@ const char* spritesVertexShader
 
 // Attributes
 attribute vec4 position;
-attribute vec4 options;
+attribute vec2 options;
+attribute vec2 offsets;
 attribute vec2 inverts;
 attribute vec4 cellInfo;
 attribute vec4 color;
@@ -31,7 +32,7 @@ void main(void) {
 
     float angle = position.w;
     vec2 size = vec2(options.x, options.y);
-    vec2 offset = options.zw;
+    vec2 offset = offsets.xy;
 
     cornerPos = vec2(offset.x - 0.5, offset.y  - 0.5) * size;
 

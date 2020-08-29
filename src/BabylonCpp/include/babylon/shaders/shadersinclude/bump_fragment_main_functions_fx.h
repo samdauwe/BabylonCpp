@@ -8,7 +8,7 @@ extern const char* bumpFragmentMainFunctions;
 const char* bumpFragmentMainFunctions
   = R"ShaderCode(
 
-#if defined(BUMP) || defined(CLEARCOAT_BUMP) || defined(ANISOTROPIC)
+#if defined(BUMP) || defined(CLEARCOAT_BUMP) || defined(ANISOTROPIC) || defined(DETAIL)
     #if defined(TANGENT) && defined(NORMAL)
         varying mat3 vTBN;
     #endif
@@ -17,15 +17,18 @@ const char* bumpFragmentMainFunctions
         uniform mat4 normalMatrix;
     #endif
 
-    vec3 perturbNormal(mat3 cotangentFrame, vec3 textureSample, float scale)
+    vec3 perturbNormalBase(mat3 cotangentFrame, vec3 normal, float scale)
     {
-        textureSample = textureSample * 2.0 - 1.0;
-
         #ifdef NORMALXYSCALE
-            textureSample = normalize(textureSample * vec3(scale, scale, 1.0));
+            normal = normalize(normal * vec3(scale, scale, 1.0));
         #endif
 
-        return normalize(cotangentFrame * textureSample);
+        return normalize(cotangentFrame * normal);
+    }
+
+    vec3 perturbNormal(mat3 cotangentFrame, vec3 textureSample, float scale)
+    {
+        return perturbNormalBase(cotangentFrame, textureSample * 2.0 - 1.0, scale);
     }
 
     // Thanks to http://www.thetenthplanet.de/archives/1180

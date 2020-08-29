@@ -65,6 +65,7 @@
 #include <babylon/shaders/refraction_fragment_fx.h>
 #include <babylon/shaders/rgbd_decode_fragment_fx.h>
 #include <babylon/shaders/rgbd_encode_fragment_fx.h>
+#include <babylon/shaders/screen_space_curvature_fragment_fx.h>
 #include <babylon/shaders/screen_space_reflection_fragment_fx.h>
 #include <babylon/shaders/shadow_map_fragment_fx.h>
 #include <babylon/shaders/shadow_map_vertex_fx.h>
@@ -78,6 +79,7 @@
 #include <babylon/shaders/ssao_combine_fragment_fx.h>
 #include <babylon/shaders/standard_fragment_fx.h>
 #include <babylon/shaders/stereoscopic_interlace_fragment_fx.h>
+#include <babylon/shaders/sub_surface_scattering_fragment_fx.h>
 #include <babylon/shaders/tonemap_fragment_fx.h>
 #include <babylon/shaders/volumetric_light_scattering_fragment_fx.h>
 #include <babylon/shaders/volumetric_light_scattering_pass_fragment_fx.h>
@@ -168,6 +170,7 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
   {"refractionPixelShader", refractionPixelShader},
   {"rgbdDecodePixelShader", rgbdDecodePixelShader},
   {"rgbdEncodePixelShader", rgbdEncodePixelShader},
+  {"screenSpaceCurvaturePixelShader", screenSpaceCurvaturePixelShader},
   {"screenSpaceReflectionPixelShader", screenSpaceReflectionPixelShader},
   {"shadowMapPixelShader", shadowMapPixelShader},
   {"shadowMapVertexShader", shadowMapVertexShader},
@@ -181,6 +184,7 @@ std::unordered_map<std::string, std::string> EffectShadersStore::_shaders = {
   {"ssaoCombinePixelShader", ssaoCombinePixelShader},
   {"standardPixelShader", standardPixelShader},
   {"stereoscopicInterlacePixelShader", stereoscopicInterlacePixelShader},
+  {"subSurfaceScatteringPixelShader", subSurfaceScatteringPixelShader},
   {"tonemapPixelShader", tonemapPixelShader},
   {"volumetricLightScatteringPixelShader",
    volumetricLightScatteringPixelShader},
