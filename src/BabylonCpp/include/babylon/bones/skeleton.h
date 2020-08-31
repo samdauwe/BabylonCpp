@@ -331,6 +331,9 @@ public:
   /** Hidden */
   std::optional<bool> _hasWaitingData;
 
+  /** @hidden */
+  std::string _waitingOverrideMeshId;
+
   /**
    * Specifies if the skeleton should be serialized
    */

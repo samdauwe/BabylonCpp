@@ -564,8 +564,14 @@ SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
 
   skeleton->needInitialSkinMatrix = json_util::get_bool(parsedSkeleton, "needInitialSkinMatrix");
 
+  if (json_util::has_valid_key_value(parsedSkeleton, "overrideMeshId")) {
+    skeleton->_hasWaitingData        = true;
+    skeleton->_waitingOverrideMeshId = json_util::get_string(parsedSkeleton, "overrideMeshId");
+  }
+
   for (const auto& parsedBone : json_util::get_array<json>(parsedSkeleton, "bones")) {
-    BonePtr parentBone = nullptr;
+    const auto parsedBoneIndex = json_util::get_number<int>(parsedBone, "index");
+    BonePtr parentBone         = nullptr;
     if (json_util::get_number<int>(parsedBone, "parentBoneIndex", -1) > -1) {
       auto parentBoneIndex
         = static_cast<size_t>(json_util::get_number<int>(parsedBone, "parentBoneIndex", -1));
@@ -578,7 +584,8 @@ SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
 
     auto bone
       = Bone::New(json_util::get_string(parsedBone, "name"), skeleton.get(), parentBone.get(),
-                  Matrix::FromArray(json_util::get_array<float>(parsedBone, "matrix")), rest);
+                  Matrix::FromArray(json_util::get_array<float>(parsedBone, "matrix")), rest,
+                  std::nullopt, parsedBoneIndex);
 
     if (json_util::has_valid_key_value(parsedBone, "id")) {
       bone->id = json_util::get_string(parsedBone, "id");
