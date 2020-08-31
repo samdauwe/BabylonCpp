@@ -183,11 +183,11 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
 void PointerDragBehavior::releaseDrag()
 {
   if (dragging) {
+    dragging = false;
     DragStartOrEndEvent event;
     event.dragPlanePoint = lastDragPosition;
     event.pointerId      = currentDraggingPointerID;
     onDragEndObservable.notifyObservers(&event);
-    dragging = false;
   }
 
   currentDraggingPointerID = -1;
