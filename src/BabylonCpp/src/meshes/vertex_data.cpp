@@ -1563,13 +1563,16 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
       auto _totalYRotationSteps = static_cast<uint32_t>(totalYRotationSteps);
       for (uint32_t firstIndex = verticesCount - 2 * (_totalYRotationSteps + 1);
            (firstIndex + _totalYRotationSteps + 2) < verticesCount; ++firstIndex) {
-        indices.emplace_back((firstIndex));
-        indices.emplace_back((firstIndex + 1));
-        indices.emplace_back(firstIndex + _totalYRotationSteps + 1);
-
-        indices.emplace_back((firstIndex + _totalYRotationSteps + 1));
-        indices.emplace_back((firstIndex + 1));
-        indices.emplace_back((firstIndex + _totalYRotationSteps + 2));
+        if (zRotationStep > 1u) {
+          indices.emplace_back((firstIndex));
+          indices.emplace_back((firstIndex + 1));
+          indices.emplace_back(firstIndex + _totalYRotationSteps + 1);
+        }
+        if (zRotationStep < totalZRotationSteps || slice < 1.f) {
+          indices.emplace_back((firstIndex + _totalYRotationSteps + 1));
+          indices.emplace_back((firstIndex + 1));
+          indices.emplace_back((firstIndex + _totalYRotationSteps + 2));
+        }
       }
     }
   }
