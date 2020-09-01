@@ -885,13 +885,14 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       auto matricesIndices = json_util::get_array<float>(parsedGeometry, "matricesIndices");
       Float32Array floatIndices;
 
-      for (float matricesIndice : matricesIndices) {
+      for (auto matricesIndice : matricesIndices) {
         auto matricesIndex = static_cast<int>(matricesIndice);
 
         floatIndices.emplace_back(static_cast<float>(matricesIndex & 0x000000FF));
         floatIndices.emplace_back(static_cast<float>((matricesIndex & 0x0000FF00) >> 8));
         floatIndices.emplace_back(static_cast<float>((matricesIndex & 0x00FF0000) >> 16));
-        floatIndices.emplace_back(static_cast<float>(matricesIndex >> 24));
+        floatIndices.emplace_back(static_cast<float>(
+          (matricesIndex >> 24) & 0xFF)); // & 0xFF to convert to v + 256 if v < 0
       }
 
       mesh->setVerticesData(VertexBuffer::MatricesIndicesKind, floatIndices);
@@ -903,13 +904,14 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
         = json_util::get_array<float>(parsedGeometry, "matricesIndicesExtra");
       Float32Array floatIndices;
 
-      for (float i : matricesIndicesExtra) {
+      for (auto i : matricesIndicesExtra) {
         auto matricesIndexExtra = static_cast<int>(i);
 
         floatIndices.emplace_back(static_cast<float>(matricesIndexExtra & 0x000000FF));
         floatIndices.emplace_back(static_cast<float>((matricesIndexExtra & 0x0000FF00) >> 8));
         floatIndices.emplace_back(static_cast<float>((matricesIndexExtra & 0x00FF0000) >> 16));
-        floatIndices.emplace_back(static_cast<float>(matricesIndexExtra >> 24));
+        floatIndices.emplace_back(static_cast<float>(
+          (matricesIndexExtra >> 24) & 0xFF)); // & 0xFF to convert to v + 256 if v < 0
       }
 
       mesh->setVerticesData(VertexBuffer::MatricesIndicesExtraKind, floatIndices);
@@ -952,6 +954,7 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
   // Flat shading
   if (mesh->_shouldGenerateFlatShading) {
     mesh->convertToFlatShadedMesh();
+    mesh->_shouldGenerateFlatShading = false;
   }
 
   // Update
