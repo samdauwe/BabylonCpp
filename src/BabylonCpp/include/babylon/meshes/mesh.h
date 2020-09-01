@@ -1912,6 +1912,13 @@ protected:
   Mesh*& get_source();
 
   /**
+   * @brief Gets the list of clones of this mesh.
+   * The scene must have been constructed with useClonedMeshMap=true for this to work!
+   * Note that useClonedMeshMap=true is the default setting
+   */
+  std::unordered_map<std::string, Mesh*>& get_cloneMeshMap();
+
+  /**
    * @brief Gets a boolean indicating that this mesh does not use index buffer.
    */
   bool get_isUnIndexed() const;
@@ -2118,6 +2125,13 @@ public:
    * Gets the source mesh (the one used to clone this one from)
    */
   ReadOnlyProperty<Mesh, Mesh*> _source;
+
+  /**
+   * Gets the list of clones of this mesh
+   * The scene must have been constructed with useClonedMeshMap=true for this to work!
+   * Note that useClonedMeshMap=true is the default setting
+   */
+  ReadOnlyProperty<Mesh, std::unordered_map<std::string, Mesh*>> cloneMeshMap;
 
   /**
    * Gets or sets a boolean indicating that this mesh does not use index buffer

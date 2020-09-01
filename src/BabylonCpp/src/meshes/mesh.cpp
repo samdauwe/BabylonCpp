@@ -92,6 +92,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
     , overrideMaterialSideOrientation{std::nullopt}
     , _source{this, &Mesh::get_source}
+    , cloneMeshMap{this, &Mesh::get_cloneMeshMap}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
     , worldMatrixInstancedBuffer{this, &Mesh::get_worldMatrixInstancedBuffer}
     , manualUpdateOfWorldMatrixInstancedBuffer{this,
@@ -235,6 +236,11 @@ void Mesh::set_morphTargetManager(const MorphTargetManagerPtr& value)
 Mesh*& Mesh::get_source()
 {
   return _internalMeshDataInfo->_source;
+}
+
+std::unordered_map<std::string, Mesh*>& Mesh::get_cloneMeshMap()
+{
+  return _internalMeshDataInfo->meshMap;
 }
 
 bool Mesh::get_isUnIndexed() const
@@ -521,6 +527,15 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphe
   for (const auto& level : _LODLevels) {
     if (level->distance < distanceToCamera) {
       if (level->mesh) {
+        if (level->mesh->delayLoadState == Constants::DELAYLOADSTATE_NOTLOADED) {
+          level->mesh->_checkDelayState();
+          return this;
+        }
+
+        if (level->mesh->delayLoadState == Constants::DELAYLOADSTATE_LOADING) {
+          return this;
+        }
+
         level->mesh->_preActivate();
         level->mesh->_updateSubMeshesBoundingInfo(worldMatrixFromCache());
       }
@@ -1508,7 +1523,8 @@ void Mesh::thinInstanceRefreshBoundingInfo(bool forceRefreshParentInfo)
     }
   }
 
-  boundingInfo->reConstruct(TmpVectors::Vector3Array[0], TmpVectors::Vector3Array[1]);
+  boundingInfo->reConstruct(TmpVectors::Vector3Array[0], TmpVectors::Vector3Array[1],
+                            getWorldMatrix());
 }
 
 void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInstances)
@@ -3427,6 +3443,14 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
 
       if (json_util::has_valid_key_value(parsedInstance, "parentId")) {
         instance->_waitingParentId = json_util::get_string(parsedInstance, "parentId");
+      }
+
+      if (json_util::has_valid_key_value(parsedInstance, "isEnabled")) {
+        instance->setEnabled(json_util::get_bool(parsedInstance, "isEnabled"));
+      }
+
+      if (json_util::has_valid_key_value(parsedInstance, "isVisible")) {
+        instance->isVisible = json_util::get_bool(parsedInstance, "isVisible");
       }
 
       if (json_util::has_valid_key_value(parsedInstance, "isPickable")) {
