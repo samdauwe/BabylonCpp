@@ -32,7 +32,6 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha, float i
     , beta{0.f}
     , radius{0.f}
     , target{this, &ArcRotateCamera::get_target, &ArcRotateCamera::set_target}
-    , upVector{this, &ArcRotateCamera::get_upVector, &ArcRotateCamera::set_upVector}
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
     , inertialRadiusOffset{0.f}
@@ -65,7 +64,6 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha, float i
     , checkCollisions{false}
     , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _targetHost{nullptr}
-    , _upVector{Vector3::Up()}
     , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
     , _collisionVelocity{Vector3::Zero()}

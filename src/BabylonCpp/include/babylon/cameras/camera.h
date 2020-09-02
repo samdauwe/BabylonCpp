@@ -561,6 +561,18 @@ protected:
   void set_position(const Vector3& newPosition);
 
   /**
+   * @brief Sets the vector the camera should consider as up.
+   * (default is Vector3(0, 1, 0) aka Vector3.Up())
+   */
+  virtual Vector3& get_upVector();
+
+  /**
+   * @brief Gets the vector the camera should consider as up.
+   * (default is Vector3(0, 1, 0) aka Vector3.Up())
+   */
+  virtual void set_upVector(const Vector3& vec);
+
+  /**
    * @brief Gets the left camera of a rig setup in case of Rigged Camera.
    */
   bool get_isLeftCamera() const;
@@ -599,7 +611,7 @@ public:
    * The vector the camera should consider as up.
    * (default is Vector3(0, 1, 0) aka Vector3.Up())
    */
-  Vector3 upVector;
+  Property<Camera, Vector3> upVector;
 
   /**
    * Define the current limit on the left side for an orthographic camera
@@ -812,6 +824,7 @@ public:
   RenderTargetTexturePtr _multiviewTexture;
 
 protected:
+  Vector3 _upVector;
   Matrix _webvrViewMatrix;
   Vector3 _globalPosition;
 

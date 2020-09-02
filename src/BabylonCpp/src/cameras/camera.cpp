@@ -43,7 +43,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     : Node{iName, scene}
     , _position{Vector3::Zero()}
     , position{this, &Camera::get_position, &Camera::set_position}
-    , upVector{Vector3::Up()}
+    , upVector{this, &Camera::get_upVector, &Camera::set_upVector}
     , orthoLeft{0.f}
     , orthoRight{0.f}
     , orthoBottom{0.f}
@@ -72,6 +72,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , isRightCamera{this, &Camera::get_isRightCamera}
     , _useMultiviewToSingleView{false}
     , _multiviewTexture{nullptr}
+    , _upVector{Vector3::Up()}
     , _webvrViewMatrix{Matrix::Identity()}
     , _globalPosition{Vector3::Zero()}
     , _doNotComputeProjectionMatrix{false}
@@ -81,8 +82,6 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _setActiveOnSceneIfNoneActive{setActiveOnSceneIfNoneActive}
 {
   position = iPosition;
-  // _initCache(); // is done inside addToScene() (cannot call a virtual function in a constructor
-  // !)
 }
 
 Camera::~Camera() = default;
@@ -122,6 +121,16 @@ Vector3& Camera::get_position()
 void Camera::set_position(const Vector3& newPosition)
 {
   _position = newPosition;
+}
+
+Vector3& Camera::get_upVector()
+{
+  return _upVector;
+}
+
+void Camera::set_upVector(const Vector3& vec)
+{
+  _upVector = vec;
 }
 
 Camera& Camera::storeState()
@@ -871,7 +880,7 @@ void Camera::_updateRigCameras()
     rigCamera->minZ = minZ;
     rigCamera->maxZ = maxZ;
     rigCamera->fov  = fov;
-    rigCamera->upVector.copyFrom(upVector);
+    rigCamera->upVector().copyFrom(upVector());
   }
 
   // only update viewport when ANAGLYPH

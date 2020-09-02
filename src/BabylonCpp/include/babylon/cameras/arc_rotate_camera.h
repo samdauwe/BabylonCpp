@@ -211,8 +211,8 @@ protected:
    * rotation matrices to and from Y up. DO NOT set the up vector using copyFrom or copyFromFloats,
    * as this bypasses setting the above matrices.
    */
-  Vector3& get_upVector();
-  void set_upVector(const Vector3& vec);
+  Vector3& get_upVector() override;
+  void set_upVector(const Vector3& vec) override;
 
   /**
    * @brief Gets the bouncing behavior of the camera if it has been enabled.
@@ -276,14 +276,6 @@ public:
    * mesh.position
    */
   Property<ArcRotateCamera, Vector3> target;
-
-  /**
-   * The vector the camera should consider as up. (default is Vector3(0, 1, 0) as returned by
-   * Vector3.Up()) Setting this will copy the given vector to the camera's upVector, and set
-   * rotation matrices to and from Y up. DO NOT set the up vector using copyFrom or copyFromFloats,
-   * as this bypasses setting the above matrices.
-   */
-  Property<ArcRotateCamera, Vector3> upVector;
 
   /**
    * Current inertia value on the longitudinal axis.
@@ -484,7 +476,6 @@ public:
 protected:
   Vector3 _target;
   AbstractMeshPtr _targetHost;
-  Vector3 _upVector;
   Matrix _upToYMatrix;
   Matrix _YToUpMatrix;
   // Panning
