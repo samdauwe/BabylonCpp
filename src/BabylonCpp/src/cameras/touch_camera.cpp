@@ -10,11 +10,10 @@ bool TouchCamera::NodeConstructorAdded = false;
 
 void TouchCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "TouchCamera", [](const std::string& iName, Scene* scene,
-                      const std::optional<json>& /*options*/) {
-      return TouchCamera::New(iName, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("TouchCamera", [](const std::string& iName, Scene* scene,
+                                             const std::optional<json>& /*options*/) {
+    return TouchCamera::New(iName, Vector3::Zero(), scene);
+  });
   TouchCamera::NodeConstructorAdded = true;
 }
 
@@ -24,8 +23,7 @@ float TouchCamera::get_touchAngularSensibility() const
 {
   auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "touch") && inputsAttached["touch"]) {
-    auto touch
-      = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
+    auto touch = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
     if (touch) {
       return touch->touchAngularSensibility;
     }
@@ -38,8 +36,7 @@ void TouchCamera::set_touchAngularSensibility(float value)
 {
   auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "touch") && inputsAttached["touch"]) {
-    auto touch
-      = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
+    auto touch = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
     if (touch) {
       touch->touchAngularSensibility = value;
     }
@@ -50,8 +47,7 @@ float TouchCamera::get_touchMoveSensibility() const
 {
   auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "touch") && inputsAttached["touch"]) {
-    auto touch
-      = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
+    auto touch = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
     if (touch) {
       return touch->touchMoveSensibility;
     }
@@ -64,8 +60,7 @@ void TouchCamera::set_touchMoveSensibility(float value)
 {
   auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "touch") && inputsAttached["touch"]) {
-    auto touch
-      = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
+    auto touch = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
     if (touch) {
       touch->touchMoveSensibility = value;
     }
@@ -74,8 +69,8 @@ void TouchCamera::set_touchMoveSensibility(float value)
 
 //-- end properties for backward compatibility for inputs
 
-TouchCamera::TouchCamera::TouchCamera(const std::string& iName,
-                                      const Vector3& iPosition, Scene* scene)
+TouchCamera::TouchCamera::TouchCamera(const std::string& iName, const Vector3& iPosition,
+                                      Scene* scene)
     : FreeCamera{iName, iPosition, scene}
     , touchAngularSensibility{this, &TouchCamera::get_touchAngularSensibility,
                               &TouchCamera::set_touchAngularSensibility}
@@ -100,10 +95,17 @@ void TouchCamera::_setupInputs()
 {
   auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "mouse") && inputsAttached["mouse"]) {
-    auto mouse
-      = static_cast<FreeCameraMouseInput*>(inputsAttached["mouse"].get());
+    auto mouse = static_cast<FreeCameraMouseInput*>(inputsAttached["mouse"].get());
     if (mouse) {
       mouse->touchEnabled = false;
+    }
+  }
+  else {
+    if (stl_util::contains(inputsAttached, "touch") && inputsAttached["touch"]) {
+      auto touch = static_cast<FreeCameraTouchInput*>(inputsAttached["touch"].get());
+      if (touch) {
+        touch->allowMouse = false;
+      }
     }
   }
 }

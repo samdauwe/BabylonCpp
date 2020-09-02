@@ -246,13 +246,15 @@ void TargetCamera::set_rotation(const Vector3& newRotation)
 /** Target **/
 void TargetCamera::setTarget(const Vector3& target)
 {
-  upVector.normalize();
+  upVector().normalize();
 
   _initialFocalDistance = target.subtract(position).length();
 
   if (stl_util::almost_equal(position().z, target.z)) {
     position().z += Math::Epsilon;
   }
+
+  _referencePoint->normalize().scaleInPlace(_initialFocalDistance);
 
   Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
   _camMatrix.invert();
