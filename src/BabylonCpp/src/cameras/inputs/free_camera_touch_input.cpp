@@ -5,8 +5,9 @@
 
 namespace BABYLON {
 
-FreeCameraTouchInput::FreeCameraTouchInput()
-    : touchAngularSensibility{200000.f}
+FreeCameraTouchInput::FreeCameraTouchInput(bool iAllowMouse)
+    : allowMouse{iAllowMouse}
+    , touchAngularSensibility{200000.f}
     , touchMoveSensibility{250.f}
     , _offsetX{std::nullopt}
     , _offsetY{std::nullopt}
@@ -34,7 +35,7 @@ void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/, bool iNoPreventDef
     _pointerInput = [this](PointerInfo* p, EventState & /*es*/) -> void {
       auto& evt = p->pointerEvent;
 
-      if (evt.pointerType == PointerType::MOUSE) {
+      if (!allowMouse && evt.pointerType == PointerType::MOUSE) {
         return;
       }
 

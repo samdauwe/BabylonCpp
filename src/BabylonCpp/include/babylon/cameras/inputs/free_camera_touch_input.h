@@ -18,9 +18,11 @@ class BABYLON_SHARED_EXPORT FreeCameraTouchInput : public ICameraInput<FreeCamer
 
 public:
   /**
-   * @brief Instantiate the input.
+   * @brief Manage the touch inputs to control the movement of a free camera.
+   * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
+   * @param allowMouse Defines if mouse events can be treated as touch events
    */
-  FreeCameraTouchInput();
+  FreeCameraTouchInput(bool allowMouse = false);
   ~FreeCameraTouchInput() override; // = default
 
   /**
@@ -57,6 +59,11 @@ public:
   [[nodiscard]] std::string getSimpleName() const override;
 
 public:
+  /**
+   * Define if mouse events can be treated as touch events
+   */
+  bool allowMouse;
+
   /**
    * Defines the touch sensibility for rotation.
    * The higher the faster.
