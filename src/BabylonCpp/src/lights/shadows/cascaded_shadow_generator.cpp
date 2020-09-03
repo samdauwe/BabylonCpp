@@ -740,6 +740,9 @@ void CascadedShadowGenerator::_bindCustomEffectForRenderSubMeshForShadowMap(
 
   auto world = mesh->getWorldMatrix();
 
+  effect->setMatrix(stl_util::contains(matriceNames, "world") ? matriceNames.at("world") : "world",
+                    world);
+
   world.multiplyToRef(*getCascadeTransformMatrix(_currentLayer), tmpMatrix);
 
   effect->setMatrix(stl_util::contains(matriceNames, "worldViewProjection") ?
