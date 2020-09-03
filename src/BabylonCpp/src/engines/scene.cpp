@@ -4683,12 +4683,18 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
       continue;
     }
 
+    auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
+                   mesh->skeleton()->overrideMesh->getWorldMatrix() :
+                   mesh->getWorldMatrix();
+
     auto _mesh = std::static_pointer_cast<Mesh>(mesh);
     if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
+      auto& tmpMatrix   = TmpVectors::MatrixArray[0];
       auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
       for (size_t index = 0; index < thinMatrices.size(); ++index) {
-        auto world  = thinMatrices[index];
-        auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, iFastCheck,
+        auto& thinMatrix = thinMatrices[index];
+        thinMatrix.multiplyToRef(world, tmpMatrix);
+        auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, tmpMatrix, iFastCheck,
                                            onlyBoundingInfo, trianglePredicate);
 
         if (result) {
@@ -4702,10 +4708,6 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
       }
     }
     else {
-      auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
-                     mesh->skeleton()->overrideMesh->getWorldMatrix() :
-                     mesh->getWorldMatrix();
-
       const auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, iFastCheck,
                                                onlyBoundingInfo, trianglePredicate);
 
@@ -4739,12 +4741,18 @@ Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
       continue;
     }
 
+    auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
+                   mesh->skeleton()->overrideMesh->getWorldMatrix() :
+                   mesh->getWorldMatrix();
+
     auto _mesh = std::static_pointer_cast<Mesh>(mesh);
     if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
+      auto& tmpMatrix   = TmpVectors::MatrixArray[0];
       auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
       for (size_t index = 0; index < thinMatrices.size(); ++index) {
-        auto world  = thinMatrices[index];
-        auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, false, false,
+        auto& thinMatrix = thinMatrices[index];
+        thinMatrix.multiplyToRef(world, tmpMatrix);
+        auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, tmpMatrix, false, false,
                                            trianglePredicate);
 
         if (result) {
@@ -4754,10 +4762,6 @@ Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
       }
     }
     else {
-      auto world = mesh->skeleton() && mesh->skeleton()->overrideMesh ?
-                     mesh->skeleton()->overrideMesh->getWorldMatrix() :
-                     mesh->getWorldMatrix();
-
       auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, false, false,
                                          trianglePredicate);
 
