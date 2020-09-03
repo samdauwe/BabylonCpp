@@ -314,24 +314,13 @@ void SpotLight::transferToEffect(const EffectPtr& /*effect*/, const std::string&
     normalizeDirection = Vector3::Normalize(direction());
   }
 
-  if (getScene()->useRightHandedSystem()) {
-    _uniformBuffer->updateFloat4("vLightDirection",     // Name
-                                 -normalizeDirection.x, // X
-                                 -normalizeDirection.y, // Y
-                                 -normalizeDirection.z, // Z
-                                 _cosHalfAngle,         // Value
-                                 lightIndex             // Index
-    );
-  }
-  else {
-    _uniformBuffer->updateFloat4("vLightDirection",    // Name
-                                 normalizeDirection.x, // X
-                                 normalizeDirection.y, // Y
-                                 normalizeDirection.z, // Z
-                                 _cosHalfAngle,        // Value
-                                 lightIndex            // Index
-    );
-  }
+  _uniformBuffer->updateFloat4("vLightDirection",    // Name
+                               normalizeDirection.x, // X
+                               normalizeDirection.y, // Y
+                               normalizeDirection.z, // Z
+                               _cosHalfAngle,        // Value
+                               lightIndex            // Index
+  );
 
   _uniformBuffer->updateFloat4("vLightFalloff",      // Name
                                range,                // X
