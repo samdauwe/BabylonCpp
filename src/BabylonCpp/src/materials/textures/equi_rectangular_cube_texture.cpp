@@ -16,22 +16,20 @@ EquiRectangularCubeTexture::EquiRectangularCubeTexture(
   const std::string& iUrl, Scene* scene, size_t size, bool iNoMipmap, bool iGammaSpace,
   const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError)
-    : BaseTexture{scene}
-    , coordinatesMode{TextureConstants::CUBIC_MODE}
-    , _onLoad{nullptr}
-    , _onError{nullptr}
+    : BaseTexture{scene}, _onLoad{nullptr}, _onError{nullptr}
 {
   if (iUrl.empty()) {
     throw std::runtime_error("Image url is not set");
   }
 
-  name       = iUrl;
-  url        = iUrl;
-  _size      = size;
-  _noMipmap  = iNoMipmap;
-  gammaSpace = iGammaSpace;
-  _onLoad    = onLoad;
-  _onError   = onError;
+  _coordinatesMode = TextureConstants::CUBIC_MODE;
+  name             = iUrl;
+  url              = iUrl;
+  _size            = size;
+  _noMipmap        = iNoMipmap;
+  gammaSpace       = iGammaSpace;
+  _onLoad          = onLoad;
+  _onError         = onError;
 
   hasAlpha = false;
   isCube   = true;
@@ -151,10 +149,10 @@ EquiRectangularCubeTexturePtr EquiRectangularCubeTexture::clone() const
 
   // Base texture
   newTexture->level            = level;
-  newTexture->wrapU            = wrapU;
-  newTexture->wrapV            = wrapV;
+  newTexture->wrapU            = wrapU();
+  newTexture->wrapV            = wrapV();
   newTexture->coordinatesIndex = coordinatesIndex;
-  newTexture->coordinatesMode  = coordinatesMode;
+  newTexture->coordinatesMode  = coordinatesMode();
 
   return newTexture;
 }

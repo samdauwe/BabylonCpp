@@ -47,6 +47,7 @@ HDRCubeTexture::HDRCubeTexture(
     return;
   }
 
+  _coordinatesMode = TextureConstants::CUBIC_MODE;
   name             = iUrl;
   url              = iUrl;
   hasAlpha         = false;
@@ -56,7 +57,6 @@ HDRCubeTexture::HDRCubeTexture(
   _onLoad          = onLoad;
   _onError         = onError;
   gammaSpace       = iGammaSpace;
-  coordinatesMode  = TextureConstants::CUBIC_MODE;
 
   _noMipmap          = noMipmap;
   _size              = size;
@@ -237,8 +237,8 @@ HDRCubeTexturePtr HDRCubeTexture::clone() const
 
   // Base texture
   newTexture->level            = level;
-  newTexture->wrapU            = wrapU;
-  newTexture->wrapV            = wrapV;
+  newTexture->wrapU            = wrapU();
+  newTexture->wrapV            = wrapV();
   newTexture->coordinatesIndex = coordinatesIndex;
   newTexture->coordinatesMode  = coordinatesMode();
 

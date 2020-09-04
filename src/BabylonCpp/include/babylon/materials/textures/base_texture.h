@@ -228,6 +228,10 @@ protected:
   bool get_hasAlpha() const;
   void set_coordinatesMode(unsigned int value);
   unsigned int get_coordinatesMode() const;
+  unsigned int get_wrapU() const;
+  void set_wrapU(unsigned int value);
+  unsigned int get_wrapV() const;
+  void set_wrapV(unsigned int value);
   bool get_isCube() const;
   void set_isCube(bool value);
   bool get_is3D() const;
@@ -344,7 +348,7 @@ public:
    * | 1     | WRAP_ADDRESSMODE   |             |
    * | 2     | MIRROR_ADDRESSMODE |             |
    */
-  unsigned int wrapU;
+  Property<BaseTexture, unsigned int> wrapU;
 
   /**
    * | Value | Type               | Description |
@@ -353,7 +357,7 @@ public:
    * | 1     | WRAP_ADDRESSMODE   |             |
    * | 2     | MIRROR_ADDRESSMODE |             |
    */
-  unsigned int wrapV;
+  Property<BaseTexture, unsigned int> wrapV;
 
   /**
    * | Value | Type               | Description |
@@ -514,13 +518,15 @@ public:
   ReadOnlyProperty<BaseTexture, BaseTexturePtr> _lodTextureLow;
 
 protected:
+  unsigned int _coordinatesMode;
   Scene* _scene;
   ThinEngine* _engine;
 
 private:
   bool _hasAlpha;
-  unsigned int _coordinatesMode;
   bool _gammaSpace;
+  unsigned int _wrapU;
+  unsigned int _wrapV;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;

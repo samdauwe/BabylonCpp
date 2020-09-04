@@ -37,6 +37,7 @@ Texture::Texture(
     , wRotationCenter{0.5f}
     , samplingMode{this, &Texture::get_samplingMode}
     , invertY{this, &Texture::get_invertY}
+    , mimeType{this, &Texture::get_mimeType}
     , onLoadObservable{this, &Texture::get_onLoadObservable}
     , _isBlocking{true}
     , _rowGenerationMatrix{nullptr}
@@ -162,6 +163,11 @@ const char* Texture::getClassName() const
   return "Texture";
 }
 
+std::string Texture::get_mimeType() const
+{
+  return _mimeType;
+}
+
 void Texture::set_isBlocking(bool value)
 {
   _isBlocking = value;
@@ -234,7 +240,7 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
                                                  _delayedOnLoad, _delayedOnError, _buffer, nullptr,
                                                  _format, "", _mimeType);
     if (_deleteBuffer) {
-      // delete _buffer;
+      _buffer = std::nullopt;
     }
   }
   else {
@@ -407,8 +413,8 @@ TexturePtr Texture::clone() const
   // Base texture
   newTexture->hasAlpha         = hasAlpha();
   newTexture->level            = level;
-  newTexture->wrapU            = wrapU;
-  newTexture->wrapV            = wrapV;
+  newTexture->wrapU            = wrapU();
+  newTexture->wrapV            = wrapV();
   newTexture->coordinatesIndex = coordinatesIndex;
   newTexture->coordinatesMode  = coordinatesMode();
 

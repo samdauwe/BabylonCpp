@@ -22,8 +22,8 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , level{1.f}
     , coordinatesIndex{0}
     , coordinatesMode{this, &BaseTexture::get_coordinatesMode, &BaseTexture::set_coordinatesMode}
-    , wrapU{Constants::TEXTURE_WRAP_ADDRESSMODE}
-    , wrapV{Constants::TEXTURE_WRAP_ADDRESSMODE}
+    , wrapU{this, &BaseTexture::get_wrapU, &BaseTexture::set_wrapU}
+    , wrapV{this, &BaseTexture::get_wrapV, &BaseTexture::set_wrapV}
     , wrapR{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , anisotropicFilteringLevel{BaseTexture::DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
     , isCube{this, &BaseTexture::get_isCube, &BaseTexture::set_isCube}
@@ -57,11 +57,13 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _lodTextureHigh{this, &BaseTexture::get__lodTextureHigh}
     , _lodTextureMid{this, &BaseTexture::get__lodTextureMid}
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
+    , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _scene{nullptr}
     , _engine{nullptr}
     , _hasAlpha{false}
-    , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _gammaSpace{true}
+    , _wrapU{Constants::TEXTURE_WRAP_ADDRESSMODE}
+    , _wrapV{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
@@ -134,6 +136,26 @@ void BaseTexture::set_coordinatesMode(unsigned int value)
 unsigned int BaseTexture::get_coordinatesMode() const
 {
   return _coordinatesMode;
+}
+
+unsigned int BaseTexture::get_wrapU() const
+{
+  return _wrapU;
+}
+
+void BaseTexture::set_wrapU(unsigned int value)
+{
+  _wrapU = value;
+}
+
+unsigned int BaseTexture::get_wrapV() const
+{
+  return _wrapV;
+}
+
+void BaseTexture::set_wrapV(unsigned int value)
+{
+  _wrapV = value;
 }
 
 bool BaseTexture::get_isCube() const

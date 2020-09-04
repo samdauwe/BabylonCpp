@@ -69,11 +69,10 @@ RenderTargetTexture::RenderTargetTexture(const std::string& iName,
     return;
   }
 
-  name            = iName;
-  isRenderTarget  = true;
-  isCube          = iIsCube;
-  coordinatesMode = TextureConstants::PROJECTION_MODE;
-
+  _coordinatesMode      = TextureConstants::PROJECTION_MODE;
+  name                  = iName;
+  isRenderTarget        = true;
+  isCube                = iIsCube;
   _initialSizeParameter = size;
 
   _processSizeParameter(size);

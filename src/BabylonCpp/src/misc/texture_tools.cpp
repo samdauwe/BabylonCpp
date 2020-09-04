@@ -27,8 +27,8 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
                                       false                            //
   );
 
-  rtt->wrapU                     = texture->wrapU;
-  rtt->wrapV                     = texture->wrapV;
+  rtt->wrapU                     = texture->wrapU();
+  rtt->wrapV                     = texture->wrapV();
   rtt->uOffset                   = texture->uOffset;
   rtt->vOffset                   = texture->vOffset;
   rtt->uScale                    = texture->uScale;

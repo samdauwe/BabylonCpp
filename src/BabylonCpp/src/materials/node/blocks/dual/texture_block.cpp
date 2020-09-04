@@ -445,10 +445,10 @@ std::string TextureBlock::_dumpPropertiesCode()
 
   auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", nullptr);\r\n",
                                         _codeVariableName.c_str(), texture->name.c_str());
-  codeString
-    += StringTools::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(), texture->wrapU);
-  codeString
-    += StringTools::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(), texture->wrapV);
+  codeString += StringTools::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(),
+                                    texture->wrapU());
+  codeString += StringTools::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(),
+                                    texture->wrapV());
   codeString
     += StringTools::printf("%s.texture.uAng = %f;\r\n", _codeVariableName.c_str(), texture->uAng);
   codeString

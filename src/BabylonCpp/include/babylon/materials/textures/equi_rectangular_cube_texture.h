@@ -85,12 +85,6 @@ public:
    */
   std::string url;
 
-  /**
-   * The texture coordinates mode. As this texture is stored in a cube format, please modify
-   * carefully.
-   */
-  unsigned int coordinatesMode;
-
 private:
   /**
    * The six faces of the cube.

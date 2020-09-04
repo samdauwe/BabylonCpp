@@ -236,6 +236,14 @@ protected:
    */
   bool get_invertY() const;
 
+  /**
+   * @brief Returns the texture mime type if it was defined by a loader (undefined else).
+   */
+  std::string get_mimeType() const;
+
+  /**
+   * @brief Gets the observable triggered once the texture has been loaded.
+   */
   Observable<Texture>& get_onLoadObservable();
 
 private:
@@ -325,6 +333,11 @@ public:
    * Gets a boolean indicating if the texture needs to be inverted on the y axis during loading
    */
   ReadOnlyProperty<Texture, bool> invertY;
+
+  /**
+   * Returns the texture mime type if it was defined by a loader (undefined else).
+   */
+  ReadOnlyProperty<Texture, std::string> mimeType;
 
   /**
    * Observable triggered once the texture has been loaded.

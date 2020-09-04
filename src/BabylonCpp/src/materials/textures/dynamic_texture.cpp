@@ -157,8 +157,8 @@ DynamicTexturePtr DynamicTexture::clone()
   newTexture->level    = level;
 
   // Dynamic Texture
-  newTexture->wrapU = wrapU;
-  newTexture->wrapV = wrapV;
+  newTexture->wrapU = wrapU();
+  newTexture->wrapV = wrapV();
 
   return newTexture;
 }
