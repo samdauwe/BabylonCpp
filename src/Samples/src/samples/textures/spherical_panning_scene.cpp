@@ -1,7 +1,7 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/helpers/photo_dome.h>
-#include <babylon/helpers/photo_dome_options.h>
+#include <babylon/helpers/texture_dome_options.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/maths/matrix.h>
@@ -51,13 +51,12 @@ public:
 
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
-    PhotoDome::New("testdome", "./textures/GatonaParkWalkway1_Panorama_4Kx2K.jpg",
-                   PhotoDomeOptions{
-                     32u,         // resolution
-                     1000u,       // size
-                     std::nullopt // useDirectMapping
-                   },
-                   scene);
+    TextureDomeOptions options;
+    options.resolution       = 32u;
+    options.size             = 1000u;
+    options.useDirectMapping = std::nullopt;
+
+    PhotoDome::New("testdome", "./textures/GatonaParkWalkway1_Panorama_4Kx2K.jpg", options, scene);
 
     _addSphericalPanningCameraToScene(scene, canvas);
   }

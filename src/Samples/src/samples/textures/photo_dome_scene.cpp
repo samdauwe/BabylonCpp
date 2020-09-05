@@ -1,6 +1,6 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/helpers/photo_dome.h>
-#include <babylon/helpers/photo_dome_options.h>
+#include <babylon/helpers/texture_dome_options.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/samples/babylon_register_sample.h>
 
@@ -32,13 +32,12 @@ public:
     camera->attachControl(canvas, true);
     camera->inputs->attached["mousewheel"]->detachControl(canvas);
 
-    PhotoDome::New("testdome", "./textures/360photo.jpg",
-                   PhotoDomeOptions{
-                     32u,         // resolution
-                     1000u,       // size
-                     std::nullopt // useDirectMapping
-                   },
-                   scene);
+    TextureDomeOptions options;
+    options.resolution       = 32u;
+    options.size             = 1000u;
+    options.useDirectMapping = std::nullopt;
+
+    PhotoDome::New("testdome", "./textures/360photo.jpg", options, scene);
   }
 
 }; // end of class PhotoDomeScene

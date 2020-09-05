@@ -2,19 +2,12 @@
 #define BABYLON_HELPERS_PHOTO_DOME_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/meshes/transform_node.h>
+#include <babylon/helpers/texture_dome.h>
 
 namespace BABYLON {
 
-class BackgroundMaterial;
-class Mesh;
 class PhotoDome;
-struct PhotoDomeOptions;
-class Texture;
-using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
-using PhotoDomePtr          = std::shared_ptr<PhotoDome>;
-using MeshPtr               = std::shared_ptr<Mesh>;
-using TexturePtr            = std::shared_ptr<Texture>;
+using PhotoDomePtr = std::shared_ptr<PhotoDome>;
 
 /**
  * @brief Display a 360 degree photo on an approximately spherical surface, useful for VR
@@ -23,41 +16,40 @@ using TexturePtr            = std::shared_ptr<Texture>;
  * configured BackgroundMaterial on an inverted sphere. Potential additions to this helper include
  * zoom and and non-infinite distance rendering effects.
  */
-class BABYLON_SHARED_EXPORT PhotoDome : public TransformNode {
+class BABYLON_SHARED_EXPORT PhotoDome : public TextureDome {
 
 public:
   /**
    * Define the image as a Monoscopic panoramic 360 image.
    */
-  static constexpr unsigned int MODE_MONOSCOPIC = 0;
+  static constexpr unsigned int MODE_MONOSCOPIC = TextureDome::MODE_MONOSCOPIC;
+
   /**
    * Define the image as a Stereoscopic TopBottom/OverUnder panoramic 360 image.
    */
-  static constexpr unsigned int MODE_TOPBOTTOM = 1;
+  static constexpr unsigned int MODE_TOPBOTTOM = TextureDome::MODE_TOPBOTTOM;
+
   /**
    * Define the image as a Stereoscopic Side by Side panoramic 360 image.
    */
-  static constexpr unsigned int MODE_SIDEBYSIDE = 2;
+  static constexpr unsigned int MODE_SIDEBYSIDE = TextureDome::MODE_SIDEBYSIDE;
 
 public:
   template <typename... Ts>
-  static PhotoDomePtr New(Ts&&... args)
+  static PhotoDomePtr
+  New(const std::string& name, const std::string& textureUrlOrElement, TextureDomeOptions& options,
+      Scene* scene,
+      const std::function<void(const std::string& message, const std::string& exception)>& onError
+      = nullptr)
   {
-    auto photoDome = std::shared_ptr<PhotoDome>(new PhotoDome(std::forward<Ts>(args)...));
+    auto photoDome = std::shared_ptr<PhotoDome>(
+      new PhotoDome(name, textureUrlOrElement, options, scene, onError));
+    photoDome->initializeTextureDome(name, textureUrlOrElement, options, scene);
     photoDome->addToScene(photoDome);
 
     return photoDome;
   }
   ~PhotoDome() override; // = default
-
-  /**
-   * @brief Releases resources associated with this node.
-   * @param doNotRecurse Set to true to not recurse into each children (recurse into each children
-   * by default)
-   * @param disposeMaterialAndTextures Set to true to also dispose referenced materials and textures
-   * (false by default)
-   */
-  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -68,8 +60,10 @@ protected:
    * @param options defines an object containing optional or exposed sub element properties
    * @param onError defines a callback called when an error occured while loading the texture
    */
-  PhotoDome(std::string name, const std::string& urlOfPhoto, PhotoDomeOptions options, Scene* scene,
-            const std::function<void(const std::string& message)>& onError = nullptr);
+  PhotoDome(
+    std::string name, const std::string& urlOfPhoto, TextureDomeOptions& options, Scene* scene,
+    const std::function<void(const std::string& message, const std::string& exception)>& iOnError
+    = nullptr);
 
   /**
    * @brief Gets the texture being displayed on the sphere.
@@ -82,66 +76,37 @@ protected:
   void set_photoTexture(const TexturePtr& value);
 
   /**
-   * @brief Gets the mesh used for the skybox.
-   */
-  MeshPtr& get_mesh();
-
-  /**
-   * @brief Gets the current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0. Lower values
-   * "zoom in" and higher values "zoom out". Also see the options.resolution property.
-   */
-  float get_fovMultiplier() const;
-
-  /**
-   * @brief Sets the current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0. Lower values
-   * "zoom in" and higher values "zoom out". Also see the options.resolution property.
-   */
-  void set_fovMultiplier(float value);
-
-  /**
    * @brief Gets the current video mode for the video. It can be:
-   * * PhotoDome.MODE_MONOSCOPIC : Define the image as a Monoscopic panoramic 360 image.
-   * * PhotoDome.MODE_TOPBOTTOM  : Define the image as a Stereoscopic TopBottom/OverUnder panoramic
-   * 360 image.
-   * * PhotoDome.MODE_SIDEBYSIDE : Define the image as a Stereoscopic Side by Side panoramic 360
-   * image.
+   * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
+   * panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
+   * panoramic 360.
    */
   unsigned int get_imageMode() const;
 
   /**
    * @brief Sets the current video mode for the video. It can be:
-   * * PhotoDome.MODE_MONOSCOPIC : Define the image as a Monoscopic panoramic 360 image.
-   * * PhotoDome.MODE_TOPBOTTOM  : Define the image as a Stereoscopic TopBottom/OverUnder panoramic
-   * 360 image.
-   * * PhotoDome.MODE_SIDEBYSIDE : Define the image as a Stereoscopic Side by Side panoramic 360
-   * image.
+   * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
+   * panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
+   * panoramic 360.
    */
   void set_imageMode(unsigned int value);
 
-private:
-  void _changeImageMode(unsigned int value);
+protected:
+  /**
+   * @brief Hidden
+   */
+  TexturePtr _initTexture(const std::string& urlsOrElement, Scene* scene,
+                          const TextureDomeOptions& options) override;
 
 public:
   /**
    * Gets or sets the texture being displayed on the sphere
    */
   Property<PhotoDome, TexturePtr> photoTexture;
-
-  /**
-   * Observable raised when an error occured while loading the 360 image
-   */
-  Observable<std::string> onLoadErrorObservable;
-
-  /**
-   * Gets the mesh used for the skybox
-   */
-  ReadOnlyProperty<PhotoDome, MeshPtr> mesh;
-
-  /**
-   * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0.
-   * Lower values "zoom in" and higher values "zoom out". Also see the options.resolution property.
-   */
-  Property<PhotoDome, float> fovMultiplier;
 
   /**
    * Gets or sets the current video mode for the video. It can be:
@@ -152,27 +117,6 @@ public:
    * image.
    */
   Property<PhotoDome, unsigned int> imageMode;
-
-protected:
-  /**
-   * The texture being displayed on the sphere
-   */
-  TexturePtr _photoTexture;
-
-  /**
-   * The skybox material
-   */
-  BackgroundMaterialPtr _material;
-
-  /**
-   * The surface used for the skybox
-   */
-  MeshPtr _mesh;
-
-private:
-  bool _useDirectMapping;
-  unsigned int _imageMode;
-  Observer<Camera>::Ptr _onBeforeCameraRenderObserver;
 
 }; // end of class PhotoDome
 
