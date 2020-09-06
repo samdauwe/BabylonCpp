@@ -12,7 +12,8 @@ namespace Debug {
 AxesViewer::AxesViewer(Scene* iScene, float iScaleLines,
                        const std::optional<int>& iRenderingGroupId, TransformNodePtr iXAxis,
                        TransformNodePtr iYAxis, TransformNodePtr iZAxis)
-    : scaleLines{iScaleLines}
+    : scene{nullptr}
+    , scaleLines{iScaleLines}
     , xAxis{this, &AxesViewer::get_xAxis}
     , yAxis{this, &AxesViewer::get_yAxis}
     , zAxis{this, &AxesViewer::get_zAxis}
