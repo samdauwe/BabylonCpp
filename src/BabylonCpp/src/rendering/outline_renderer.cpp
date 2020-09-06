@@ -96,6 +96,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
                      useOverlay ? renderingMesh->overlayColor : renderingMesh->outlineColor,
                      useOverlay ? renderingMesh->overlayAlpha : material->alpha());
   _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  _effect->setMatrix("world", effectiveMesh->getWorldMatrix());
 
   // Bones
   if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()

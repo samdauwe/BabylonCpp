@@ -532,9 +532,13 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
     _effectLayerMapGenerationEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
-    _effectLayerMapGenerationEffect->setFloat4(
-      "glowColor", _emissiveTextureAndColor.color.r, _emissiveTextureAndColor.color.g,
-      _emissiveTextureAndColor.color.b, _emissiveTextureAndColor.color.a);
+    _effectLayerMapGenerationEffect->setMatrix("world", effectiveMesh->getWorldMatrix());
+
+    _effectLayerMapGenerationEffect->setFloat4("glowColor",                      //
+                                               _emissiveTextureAndColor.color.r, //
+                                               _emissiveTextureAndColor.color.g, //
+                                               _emissiveTextureAndColor.color.b, //
+                                               _emissiveTextureAndColor.color.a);
 
     const auto needAlphaTest = material->needAlphaTesting();
 
