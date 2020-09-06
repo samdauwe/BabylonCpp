@@ -104,7 +104,8 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene, bool iHandleEv
           if (!prePointerInfo->skipOnPointerObservable) {
             PointerInfo pointerInfo(prePointerInfo->type, prePointerInfo->pointerEvent,
                                     *utilityScenePick);
-            utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
+            utilityLayerScene->onPointerObservable.notifyObservers(
+              &pointerInfo, static_cast<int>(prePointerInfo->type));
           }
           if (prePointerInfo->type == PointerEventTypes::POINTERUP
               && stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
@@ -122,7 +123,8 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene, bool iHandleEv
             if (!prePointerInfo->skipOnPointerObservable) {
               PointerInfo pointerInfo(prePointerInfo->type, prePointerInfo->pointerEvent,
                                       *utilityScenePick);
-              utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
+              utilityLayerScene->onPointerObservable.notifyObservers(
+                &pointerInfo, static_cast<int>(prePointerInfo->type));
             }
             prePointerInfo->skipOnPointerObservable = true;
           }
@@ -266,7 +268,8 @@ void UtilityLayerRenderer::_notifyObservers(const PointerInfoPre& prePointerInfo
 {
   if (!prePointerInfo.skipOnPointerObservable) {
     PointerInfo pointerInfo(prePointerInfo.type, prePointerInfo.pointerEvent, pickInfo);
-    utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
+    utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo,
+                                                           static_cast<int>(prePointerInfo.type));
     _lastPointerEvents[pointerEvent.pointerId] = true;
   }
 }
