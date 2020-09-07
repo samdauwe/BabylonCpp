@@ -304,6 +304,11 @@ bool BabylonFileLoader::importMesh(
             }
           }
         }
+
+        if (!skeleton->_waitingOverrideMeshId.empty()) {
+          skeleton->overrideMesh           = scene->getMeshByID(skeleton->_waitingOverrideMeshId);
+          skeleton->_waitingOverrideMeshId = "";
+        }
         skeleton->_hasWaitingData = std::nullopt;
       }
     }
@@ -772,6 +777,11 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
               bone->_waitingTransformNodeId.clear();
             }
           }
+        }
+
+        if (!skeleton->_waitingOverrideMeshId.empty()) {
+          skeleton->overrideMesh           = scene->getMeshByID(skeleton->_waitingOverrideMeshId);
+          skeleton->_waitingOverrideMeshId = "";
         }
         skeleton->_hasWaitingData = std::nullopt;
       }
