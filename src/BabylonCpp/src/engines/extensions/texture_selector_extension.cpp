@@ -79,7 +79,7 @@ TextureSelectorExtension::setTextureFormatToUse(const std::vector<std::string>& 
   }
   // actively set format to nothing, to allow this to be called more than once
   // and possibly fail the 2nd time
-  _textureFormatInUse.clear();
+  _textureFormatInUse         = "";
   _this->_transformTextureUrl = nullptr;
   return "";
 }
