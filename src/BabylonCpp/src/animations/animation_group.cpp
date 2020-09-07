@@ -303,6 +303,9 @@ AnimationGroup& AnimationGroup::play(const std::optional<bool> loop)
 AnimationGroup& AnimationGroup::reset()
 {
   if (!_isStarted) {
+    play();
+    goToFrame(0.f);
+    stop();
     return *this;
   }
 
