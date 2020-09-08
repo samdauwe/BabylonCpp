@@ -108,6 +108,11 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
       }
       // Snapping logic
       if (snapDistance == 0.f) {
+        auto transformNode = std::static_pointer_cast<TransformNode>(attachedNode());
+        if (transformNode) { // Required for nodes like lights
+          transformNode->position().addInPlaceFromFloats(_localDelta.x, _localDelta.y,
+                                                         _localDelta.z);
+        }
         attachedNode()->getWorldMatrix().addTranslationFromFloats(_localDelta.x, _localDelta.y,
                                                                   _localDelta.z);
         attachedNode()->updateCache();
