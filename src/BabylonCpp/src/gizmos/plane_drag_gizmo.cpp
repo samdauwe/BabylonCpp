@@ -26,8 +26,6 @@ TransformNodePtr PlaneDragGizmo::_CreatePlane(Scene* scene, const StandardMateri
   dragPlane->material     = material;
   dragPlane->parent       = plane.get();
 
-  // Position plane pointing normal to dragPlane normal
-  dragPlane->material = material;
   return plane;
 }
 

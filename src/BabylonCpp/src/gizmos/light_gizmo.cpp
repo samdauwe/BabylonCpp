@@ -140,13 +140,6 @@ void LightGizmo::_update()
       _cachedForward.copyFrom(attachedMesh()->forward);
     }
   }
-  if (!_light->isEnabled()) {
-    _material->diffuseColor.set(0.f, 0.f, 0.f);
-  }
-  else {
-    _material->diffuseColor.set(_light->diffuse.r / 3.f, _light->diffuse.g / 3.f,
-                                _light->diffuse.b / 3.f);
-  }
 }
 
 MeshPtr LightGizmo::_CreateLightLines(float levels, Scene* scene)
