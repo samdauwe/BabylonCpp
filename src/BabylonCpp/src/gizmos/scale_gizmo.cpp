@@ -17,9 +17,7 @@ ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &ScaleGizmo::get_snapDistance, &ScaleGizmo::set_snapDistance}
     , sensitivity{this, &ScaleGizmo::get_sensitivity, &ScaleGizmo::set_sensitivity}
-    , _updateGizmoRotationToMatchAttachedMesh{false}
     , _snapDistance{0.f}
-    , _scaleRatio{1.f}
     , _uniformScalingMesh{nullptr}
     , _octahedron{nullptr}
     , _sensitivity{1.f}

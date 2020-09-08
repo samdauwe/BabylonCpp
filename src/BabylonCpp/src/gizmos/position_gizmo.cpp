@@ -17,9 +17,7 @@ PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer, float t
     , snapDistance{this, &PositionGizmo::get_snapDistance, &PositionGizmo::set_snapDistance}
     , _meshAttached{nullptr}
     , _nodeAttached{nullptr}
-    , _updateGizmoRotationToMatchAttachedMesh{false}
     , _snapDistance{0.f}
-    , _scaleRatio{1.f}
     , _planarGizmoEnabled{false}
 {
   xGizmo = std::make_unique<AxisDragGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),

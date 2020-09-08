@@ -88,9 +88,7 @@ public:
 private:
   AbstractMeshPtr _meshAttached;
   NodePtr _nodeAttached;
-  bool _updateGizmoRotationToMatchAttachedMesh;
   float _snapDistance;
-  float _scaleRatio;
   MeshPtr _uniformScalingMesh;
   MeshPtr _octahedron;
   float _sensitivity;

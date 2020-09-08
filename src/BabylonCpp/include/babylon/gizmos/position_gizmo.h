@@ -122,9 +122,7 @@ private:
    */
   AbstractMeshPtr _meshAttached;
   NodePtr _nodeAttached;
-  bool _updateGizmoRotationToMatchAttachedMesh;
   float _snapDistance;
-  float _scaleRatio;
 
   /**
    * If set to true, planar drag is enabled

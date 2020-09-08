@@ -162,15 +162,24 @@ public:
 
 protected:
   /**
+   * Ratio for the scale of the gizmo (Default: 1)
+   */
+  float _scaleRatio;
+
+  /**
    * If a custom mesh has been set (Default: false)
    */
   bool _customMeshSet;
 
+  /**
+   * If set the gizmo's rotation will be updated to match the attached mesh each frame (Default:
+   * true)
+   */
+  bool _updateGizmoRotationToMatchAttachedMesh;
+
   bool _interactionsEnabled;
 
 private:
-  float _scaleRatio;
-  bool _updateGizmoRotationToMatchAttachedMesh;
   AbstractMeshPtr _attachedMesh;
   NodePtr _attachedNode;
   Matrix _tmpMatrix;

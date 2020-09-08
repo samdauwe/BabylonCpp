@@ -19,10 +19,10 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
                                              &Gizmo::set_updateGizmoRotationToMatchAttachedMesh}
     , updateGizmoPositionToMatchAttachedMesh{true}
     , updateScale{true}
-    , _customMeshSet{false}
-    , _interactionsEnabled{true}
     , _scaleRatio{1.f}
+    , _customMeshSet{false}
     , _updateGizmoRotationToMatchAttachedMesh{true}
+    , _interactionsEnabled{true}
     , _attachedMesh{nullptr}
     , _attachedNode{nullptr}
     , _beforeRenderObserver{nullptr}
