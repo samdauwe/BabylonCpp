@@ -350,7 +350,9 @@ public:
   std::vector<SoundPtr> sounds;
 
   /**
-   * Environment texture for the scene
+   * Texture used in all pbr material as the reflection texture.
+   * As in the majority of the scene they are the same (exception for multi room and so on),
+   * this is easier to reference from here than from all the materials.
    */
   Property<AbstractScene, BaseTexturePtr> environmentTexture;
 
@@ -365,6 +367,10 @@ public:
    */
   std::vector<PostProcessPtr> postProcesses;
 
+protected:
+  /** Hidden */
+  BaseTexturePtr _environmentTexture;
+
 private:
   /**
    * Stores the list of available parsers in the application.
@@ -375,9 +381,6 @@ private:
    * Stores the list of available individual parsers in the application.
    */
   static std::unordered_map<std::string, IndividualBabylonFileParser> _IndividualBabylonFileParsers;
-
-  /** Hidden */
-  BaseTexturePtr _environmentTexture;
 
 }; // end of class AbstractScene
 
