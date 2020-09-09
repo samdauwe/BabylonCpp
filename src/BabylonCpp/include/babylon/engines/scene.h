@@ -1571,8 +1571,9 @@ public:
   /**
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
+   * @param pointerId optional pointer id when using more than one pointer
    */
-  void setPointerOverMesh(AbstractMesh* mesh);
+  void setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& pointerId = std::nullopt);
 
   /**
    * @brief Gets the mesh under the pointer.
@@ -1727,6 +1728,14 @@ public:
    * @returns an array of Material
    */
   std::vector<Material*> getMaterialByTags();
+
+  /**
+   * @brief Get a list of transform nodes by tags.
+   * @param tagsQuery defines the tags query to use
+   * @param forEach defines a predicate used to filter results
+   * @returns an array of TransformNode
+   */
+  std::vector<TransformNode*> getTransformNodesByTags();
 
   /**
    * @brief Overrides the default sort function applied in the renderging group
@@ -1901,18 +1910,16 @@ private:
 
 protected:
   /**
-   * @brief Returns the texture used in all pbr material as the reflection
-   * texture.
-   * As in the majority of the scene they are the same (exception for multi room
-   * and so on), this is easier to reference from here than from all the
-   * materials.
+   * @brief Returns the texture used in all pbr material as the reflection texture.
+   * As in the majority of the scene they are the same (exception for multi room and so on),
+   * this is easier to reference from here than from all the materials.
    */
   BaseTexturePtr& get_environmentTexture() override;
 
   /**
    * @brief Sets the texture used in all pbr material as the reflection texture.
-   * As in the majority of the scene they are the same (exception for multi room
-   * and so on), this is easier to set here than in all the materials.
+   * As in the majority of the scene they are the same (exception for multi room and so on),
+   * this is easier to set here than in all the materials.
    */
   void set_environmentTexture(const BaseTexturePtr& value) override;
 
@@ -3499,8 +3506,6 @@ public:
   std::unordered_map<std::string, DepthRendererPtr> _depthRenderer;
 
 protected:
-  /** Hidden */
-  BaseTexturePtr _environmentTexture;
   /** Hidden */
   float _environmentIntensity;
   /** Hidden */

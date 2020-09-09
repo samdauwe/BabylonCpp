@@ -208,7 +208,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _physicsEngine{nullptr}
     , _physicsTimeAccumulator{0.f}
     , _transformMatrixR{Matrix::Zero()}
-    , _environmentTexture{nullptr}
     , _environmentIntensity{1.f}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
@@ -5007,7 +5006,7 @@ AbstractMeshPtr& Scene::getPointerOverMesh()
   return _pointerOverMesh;
 }
 
-void Scene::setPointerOverMesh(AbstractMesh* mesh)
+void Scene::setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& /*pointerId*/)
 {
   if (_pointerOverMesh.get() == mesh) {
     return;
@@ -5300,6 +5299,11 @@ std::vector<Light*> Scene::getLightsByTags()
 std::vector<Material*> Scene::getMaterialByTags()
 {
   return std::vector<Material*>();
+}
+
+std::vector<TransformNode*> Scene::getTransformNodesByTags()
+{
+  return std::vector<TransformNode*>();
 }
 
 void Scene::setRenderingOrder(
