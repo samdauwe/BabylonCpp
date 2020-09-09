@@ -82,6 +82,16 @@ struct FramebufferDimensionsObject {
 }; // end of struct framebufferDimensionsObject
 
 /**
+ * @brief Information about the current host.
+ */
+struct HostInformation {
+  /**
+   * Defines if the current host is a mobile
+   */
+  bool isMobile = false;
+}; // end of struct HostInformation
+
+/**
  * @brief The base engine class (root of all engines).
  */
 class BABYLON_SHARED_EXPORT ThinEngine {
@@ -1938,6 +1948,11 @@ public:
 
   /** @hidden */
   std::function<std::string(const std::string& url)> _transformTextureUrl = nullptr;
+
+  /**
+   * Gets information about the current host
+   */
+  HostInformation hostInformation;
 
   /**
    * sets the object from which width and height will be taken from when getting render width and
