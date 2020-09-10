@@ -197,8 +197,8 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
     // calculate the world matrix with no rotation
     object->computeWorldMatrix();
     object->computeWorldMatrix(true);
-    auto& boundingInfo = *object->getBoundingInfo();
-    auto size          = boundingInfo.boundingBox.extendSizeWorld.scale(2.f);
+    const auto& boundingInfo = *object->getBoundingInfo();
+    const auto size          = boundingInfo.boundingBox.extendSizeWorld.scale(2.f);
 
     // bring back the rotation
     object->rotationQuaternion = *q;

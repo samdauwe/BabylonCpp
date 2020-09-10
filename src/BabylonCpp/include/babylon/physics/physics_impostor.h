@@ -25,8 +25,8 @@ using IPhysicsEnginePtr  = std::shared_ptr<IPhysicsEngine>;
 using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
 
 struct Joint {
-  std::shared_ptr<PhysicsJoint> joint;
-  PhysicsImpostorPtr otherImpostor;
+  std::shared_ptr<PhysicsJoint> joint = nullptr;
+  PhysicsImpostorPtr otherImpostor= nullptr;
 }; // end of class JointElement
 
 /**
