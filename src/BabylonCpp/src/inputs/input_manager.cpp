@@ -66,6 +66,11 @@ AbstractMeshPtr& InputManager::get_meshUnderPointer()
   return _pointerOverMesh;
 }
 
+AbstractMeshPtr InputManager::getMeshUnderPointerByPointerId(size_t pointerId)
+{
+  return pointerId < _meshUnderPointerId.size() ? _meshUnderPointerId[pointerId] : nullptr;
+}
+
 Vector2& InputManager::get_unTranslatedPointer()
 {
   _unTranslatedPointer = Vector2(_unTranslatedPointerX, _unTranslatedPointerY);
@@ -127,7 +132,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
 
   auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
-    scene.setPointerOverMesh(pickResult->pickedMesh.get());
+    scene.setPointerOverMesh(pickResult->pickedMesh.get(), evt.pointerId);
 
     if (_pointerOverMesh && _pointerOverMesh->actionManager
         && _pointerOverMesh->actionManager->hasPointerTriggers()) {
@@ -142,7 +147,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
     }
   }
   else {
-    scene.setPointerOverMesh(nullptr);
+    scene.setPointerOverMesh(nullptr, evt.pointerId);
   }
 
   for (const auto& step : scene._pointerMoveStage) {
@@ -709,9 +714,9 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
   };
 
   _onPointerUp = [this, elementToAttachTo](PointerEvent&& evt) {
-    if (_totalPointersPressed == 0) { // We are attaching the pointer up to
-                                      // windows because of a bug in FF
-      return;                         // So we need to test it the pointer down was pressed before.
+    if (_totalPointersPressed == 0) {
+      // We are attaching the pointer up to windows because of a bug in FF
+      return; // So we need to test it the pointer down was pressed before.
     }
 
     auto& scene = *_scene;
@@ -917,26 +922,42 @@ void InputManager::detachControl()
   _alreadyAttached = false;
 }
 
-void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh)
+void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh, int pointerId)
 {
-  if (_pointerOverMesh == mesh) {
+  // Sanity check
+  if (pointerId < 0) {
+    pointerId = 0;
+  }
+  if (static_cast<size_t>(pointerId) < _meshUnderPointerId.size()
+      && _meshUnderPointerId[pointerId] == mesh) {
     return;
   }
 
+  AbstractMeshPtr underPointerMesh = static_cast<size_t>(pointerId) < _meshUnderPointerId.size() ?
+                                       _meshUnderPointerId[pointerId] :
+                                       nullptr;
+
   AbstractActionManagerPtr actionManager = nullptr;
-  if (_pointerOverMesh) {
+  if (underPointerMesh) {
     actionManager
-      = _pointerOverMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOutTrigger);
+      = underPointerMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOutTrigger);
     if (actionManager) {
       actionManager->processTrigger(Constants::ACTION_OnPointerOutTrigger,
                                     ActionEvent::CreateNew(_pointerOverMesh));
     }
   }
 
-  _pointerOverMesh = mesh;
-  if (_pointerOverMesh) {
+  if (static_cast<size_t>(pointerId) > _meshUnderPointerId.size()) {
+    _meshUnderPointerId.resize(static_cast<size_t>(pointerId + 1));
+  }
+
+  _meshUnderPointerId[pointerId] = mesh;
+  _pointerOverMesh               = mesh;
+
+  underPointerMesh = _meshUnderPointerId[pointerId];
+  if (underPointerMesh) {
     actionManager
-      = _pointerOverMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOverTrigger);
+      = underPointerMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOverTrigger);
     if (actionManager) {
       actionManager->processTrigger(Constants::ACTION_OnPointerOverTrigger,
                                     ActionEvent::CreateNew(_pointerOverMesh));
