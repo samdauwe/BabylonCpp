@@ -616,6 +616,8 @@ void SpriteManager::render()
   if (_scene->useRightHandedSystem()) {
     engine->setState(culling, zOffset, false, true);
   }
+
+  engine->unbindInstanceAttributes();
 }
 
 void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)

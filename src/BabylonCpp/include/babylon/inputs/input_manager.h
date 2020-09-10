@@ -51,6 +51,14 @@ public:
   InputManager(Scene* scene);
   ~InputManager(); // = default
 
+  /**
+   * @brief When using more than one pointer (for example in XR) you can get the mesh under the
+   * specific pointer.
+   * @param pointerId the pointer id to use
+   * @returns The mesh under this pointer id or null if not found
+   */
+  AbstractMeshPtr getMeshUnderPointerByPointerId(size_t pointerId);
+
   /** Pointers handling **/
 
   /**
@@ -115,8 +123,9 @@ public:
   /**
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
+   * @param pointerId optional pointer id when using more than one pointer. Defaults to 0
    */
-  void setPointerOverMesh(const AbstractMeshPtr& mesh);
+  void setPointerOverMesh(const AbstractMeshPtr& mesh, int pointerId = 0);
 
   /**
    * @brief Gets the mesh under the pointer.
@@ -237,6 +246,8 @@ private:
   high_res_time_point_t _startingPointerTime;
   high_res_time_point_t _previousStartingPointerTime;
   std::unordered_map<int, bool> _pointerCaptures;
+
+  std::vector<AbstractMeshPtr> _meshUnderPointerId;
 
   // Keyboard
   std::function<void(KeyboardEvent&& evt)> _onKeyDown;
