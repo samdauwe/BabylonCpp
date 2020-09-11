@@ -729,6 +729,8 @@ public:
   /** Hidden */
   Matrix _localMatrix;
   /** Hidden */
+  bool _postMultiplyPivotMatrix;
+  /** Hidden */
   int _indexInSceneTransformNodesArray;
 
   /**
@@ -804,7 +806,6 @@ protected:
   // Properties
   Vector3 _scaling;
   bool _isDirty;
-  bool _postMultiplyPivotMatrix;
   // Cache
   bool _isWorldMatrixFrozen;
 

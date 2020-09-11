@@ -30,6 +30,7 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene, bool isPure
     , reIntegrateRotationIntoRotationQuaternion{false}
     , _poseMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _localMatrix{Matrix::Zero()}
+    , _postMultiplyPivotMatrix{false}
     , _indexInSceneTransformNodesArray{-1}
     , position{this, &TransformNode::get_position, &TransformNode::set_position}
     , rotation{this, &TransformNode::get_rotation, &TransformNode::set_rotation}
@@ -46,7 +47,6 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene, bool isPure
     , nonUniformScaling{this, &TransformNode::get_nonUniformScaling}
     , _scaling{Vector3::One()}
     , _isDirty{false}
-    , _postMultiplyPivotMatrix{false}
     , _isWorldMatrixFrozen{false}
     , _isPure{isPure}
     , _forward{Vector3{0.f, 0.f, 1.f}}
