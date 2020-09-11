@@ -62,6 +62,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   GL::any etc2; // WEBGL_compressed_texture_etc;
   /** Defines if astc texture compression is supported */
   GL::any astc; // WEBGL_compressed_texture_astc;
+  /** Defines if bptc texture compression is supported */
+  GL::any bptc; // EXT_texture_compression_bptc;
   /** Defines if float textures are supported */
   bool textureFloat;
   /** Defines if vertex array objects are supported */
