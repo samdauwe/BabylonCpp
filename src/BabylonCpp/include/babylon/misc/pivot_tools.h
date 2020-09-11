@@ -10,20 +10,19 @@ class AbstractMesh;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
- * @brief Class containing a set of static utilities functions for managing
- * Pivots
+ * @brief Class containing a set of static utilities functions for managing Pivots.
  * @hidden
  */
 class BABYLON_SHARED_EXPORT PivotTools {
 
 private:
   // Stores the state of the pivot cache (_oldPivotPoint, _pivotTranslation)
-  // store/remove pivot point should only be applied during their outermost
-  // calls
+  // store/remove pivot point should only be applied during their outermost calls
   static size_t _PivotCached;
   static Vector3 _OldPivotPoint;
   static Vector3 _PivotTranslation;
   static Vector3 _PivotTmpVector;
+  static bool _PivotPostMultiplyPivotMatrix;
 
 public:
   /**
