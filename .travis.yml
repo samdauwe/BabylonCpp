@@ -44,8 +44,14 @@ matrix:
       env: CC_VERSION=clang-5.0 CXX_VERSION=clang++-5.0
 
     # OSX
+    # - Xcode 10.2.1 (build version 10E1001)
     - os: osx
       osx_image: xcode10.2
+      env: OSX="On" CC_VERSION=clang CXX_VERSION=clang++
+
+    # - Xcode 12.0 (build version 12A8161k)
+    - os: osx
+      osx_image: xcode12u
       env: OSX="On" CC_VERSION=clang CXX_VERSION=clang++
 
 install:
@@ -67,7 +73,7 @@ install:
   ##########################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="https://cmake.org/files/v3.16/cmake-3.16.2-Linux-x86_64.tar.gz"
+      CMAKE_URL="https://cmake.org/files/v3.18/cmake-3.18.2-Linux-x86_64.tar.gz"
       mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     fi
