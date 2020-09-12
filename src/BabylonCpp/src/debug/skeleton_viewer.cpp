@@ -500,19 +500,19 @@ void SkeletonViewer::_displayLinesUpdate()
   auto targetScene = _utilityLayer->utilityLayerScene.get();
 
   if (targetScene) {
-    LineSystemOptions options;
-    options.lines     = _debugLines;
-    options.updatable = true;
-    options.instance  = nullptr;
+    LineSystemOptions debugMeshOptions;
+    debugMeshOptions.lines     = _debugLines;
+    debugMeshOptions.updatable = true;
+    debugMeshOptions.instance  = nullptr;
 
     if (!_debugMesh) {
-      _debugMesh                   = LinesBuilder::CreateLineSystem("", options, targetScene);
+      _debugMesh = LinesBuilder::CreateLineSystem("", debugMeshOptions, targetScene);
       _debugMesh->renderingGroupId = renderingGroupId;
     }
     else {
-      auto debugLineMesh = std::static_pointer_cast<LinesMesh>(_debugMesh);
-      options.instance   = debugLineMesh;
-      LinesBuilder::CreateLineSystem("", options, targetScene);
+      auto debugLineMesh        = std::static_pointer_cast<LinesMesh>(_debugMesh);
+      debugMeshOptions.instance = debugLineMesh;
+      LinesBuilder::CreateLineSystem("", debugMeshOptions, targetScene);
     }
     auto debugLineMesh = std::static_pointer_cast<LinesMesh>(_debugMesh);
     if (debugLineMesh) {

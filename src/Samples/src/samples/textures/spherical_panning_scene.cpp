@@ -53,7 +53,7 @@ public:
   {
     TextureDomeOptions options;
     options.resolution       = 32u;
-    options.size             = 1000u;
+    options.size             = 1000.f;
     options.useDirectMapping = std::nullopt;
 
     PhotoDome::New("testdome", "./textures/GatonaParkWalkway1_Panorama_4Kx2K.jpg", options, scene);

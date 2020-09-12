@@ -190,7 +190,8 @@ void GizmoManager::set_rotationGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.rotationGizmo) {
-      gizmos.rotationGizmo = std::make_unique<RotationGizmo>(_defaultUtilityLayer, _thickness);
+      gizmos.rotationGizmo
+        = std::make_unique<RotationGizmo>(_defaultUtilityLayer, 32, false, _thickness);
     }
     if (_attachedNode) {
       gizmos.rotationGizmo->attachedNode = _attachedNode;

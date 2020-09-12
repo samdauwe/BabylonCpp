@@ -42,11 +42,11 @@ void CameraGizmo::set_displayFrustum(bool value)
   _cameraLinesMesh->setEnabled(value);
 }
 
-void CameraGizmo::set_camera(const CameraPtr& camera)
+void CameraGizmo::set_camera(const CameraPtr& iCamera)
 {
-  _camera      = camera;
-  attachedNode = camera;
-  if (camera) {
+  _camera      = iCamera;
+  attachedNode = iCamera;
+  if (iCamera) {
     // Create the mesh for the given camera
     if (_cameraMesh) {
       _cameraMesh->dispose();
@@ -65,8 +65,8 @@ void CameraGizmo::set_camera(const CameraPtr& camera)
     _cameraLinesMesh->parent = _rootMesh.get();
 
     if (gizmoLayer->utilityLayerScene->activeCamera()
-        && gizmoLayer->utilityLayerScene->activeCamera()->maxZ < camera->maxZ * 1.5f) {
-      gizmoLayer->utilityLayerScene->activeCamera()->maxZ = camera->maxZ * 1.5f;
+        && gizmoLayer->utilityLayerScene->activeCamera()->maxZ < iCamera->maxZ * 1.5f) {
+      gizmoLayer->utilityLayerScene->activeCamera()->maxZ = iCamera->maxZ * 1.5f;
     }
 
     /*if (!attachedNode->reservedDataStore) {

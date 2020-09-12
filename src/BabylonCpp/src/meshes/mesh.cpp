@@ -1477,7 +1477,7 @@ std::vector<Matrix> Mesh::thinInstanceGetWorldMatrices()
   if (!_thinInstanceDataStorage->worldMatrices) {
     _thinInstanceDataStorage->worldMatrices = std::vector<Matrix>();
 
-    for (size_t i = 0; i < _thinInstanceDataStorage->instancesCount; ++i) {
+    for (unsigned int i = 0; i < _thinInstanceDataStorage->instancesCount; ++i) {
       _thinInstanceDataStorage->worldMatrices->emplace_back(Matrix::FromArray(matrixData, i * 16));
     }
   }
@@ -1850,12 +1850,12 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
 
   if (!_effectiveMaterial->backFaceCulling() && _effectiveMaterial->separateCullingPass) {
     engine->setState(true, _effectiveMaterial->zOffset, false, !reverse);
-    _processRendering(
-      this, subMesh, effect, static_cast<int>(fillMode), batch, hardwareInstancedRendering,
-      [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
-        _onBeforeDraw(isInstance, world, effectiveMaterial);
-      },
-      _effectiveMaterial.get());
+    _processRendering(this, subMesh, effect, static_cast<int>(fillMode), batch,
+                      hardwareInstancedRendering,
+                      [&](bool isInstance, Matrix world, Material* effectiveMaterial) {
+                        _onBeforeDraw(isInstance, world, effectiveMaterial);
+                      },
+                      _effectiveMaterial.get());
     engine->setState(true, _effectiveMaterial->zOffset, false, reverse);
   }
 
@@ -2129,26 +2129,26 @@ Mesh& Mesh::_queueLoad(Scene* scene)
 
   const auto getBinaryData = StringTools::contains(delayLoadingFile, ".babylonbinarymeshdata");
 
-  FileTools::LoadFile(
-    delayLoadingFile,
-    [this, &scene](const std::variant<std::string, ArrayBufferView>& data,
-                   const std::string & /*responseURL*/) -> void {
-      if (std::holds_alternative<ArrayBufferView>(data)) {
-        // _delayLoadingFunction(data, shared_from_base<Mesh>());
-      }
-      else {
-        _delayLoadingFunction(json::parse(std::get<std::string>(data)), shared_from_base<Mesh>());
-      }
+  FileTools::LoadFile(delayLoadingFile,
+                      [this, &scene](const std::variant<std::string, ArrayBufferView>& data,
+                                     const std::string & /*responseURL*/) -> void {
+                        if (std::holds_alternative<ArrayBufferView>(data)) {
+                          // _delayLoadingFunction(data, shared_from_base<Mesh>());
+                        }
+                        else {
+                          _delayLoadingFunction(json::parse(std::get<std::string>(data)),
+                                                shared_from_base<Mesh>());
+                        }
 
-      for (const auto& instance : instances) {
-        instance->refreshBoundingInfo();
-        instance->_syncSubMeshes();
-      }
+                        for (const auto& instance : instances) {
+                          instance->refreshBoundingInfo();
+                          instance->_syncSubMeshes();
+                        }
 
-      delayLoadState = Constants::DELAYLOADSTATE_LOADED;
-      scene->_removePendingData(this);
-    },
-    nullptr, /* scene->offlineProvider, */ getBinaryData);
+                        delayLoadState = Constants::DELAYLOADSTATE_LOADED;
+                        scene->_removePendingData(this);
+                      },
+                      nullptr, /* scene->offlineProvider, */ getBinaryData);
 
   return *this;
 }
@@ -2381,20 +2381,20 @@ Mesh& Mesh::applyDisplacementMap(const std::string& url, float minHeight, float 
                                  const std::optional<Vector2>& uvOffset,
                                  const std::optional<Vector2>& uvScale, bool forceUpdate)
 {
-  FileTools::LoadImageFromUrl(
-    url,
-    [&](const Image& img) {
-      auto heightMapWidth  = static_cast<unsigned>(img.width);
-      auto heightMapHeight = static_cast<unsigned>(img.height);
-      // Create VertexData from map data
-      applyDisplacementMapFromBuffer(img.data, heightMapWidth, heightMapHeight, minHeight,
-                                     maxHeight, uvOffset, uvScale, forceUpdate);
-      // execute success callback, if set
-      if (onSuccess) {
-        onSuccess(this);
-      }
-    },
-    nullptr, false);
+  FileTools::LoadImageFromUrl(url,
+                              [&](const Image& img) {
+                                auto heightMapWidth  = static_cast<unsigned>(img.width);
+                                auto heightMapHeight = static_cast<unsigned>(img.height);
+                                // Create VertexData from map data
+                                applyDisplacementMapFromBuffer(
+                                  img.data, heightMapWidth, heightMapHeight, minHeight, maxHeight,
+                                  uvOffset, uvScale, forceUpdate);
+                                // execute success callback, if set
+                                if (onSuccess) {
+                                  onSuccess(this);
+                                }
+                              },
+                              nullptr, false);
 
   return *this;
 }

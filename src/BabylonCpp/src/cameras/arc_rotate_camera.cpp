@@ -544,7 +544,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
   }
 
   if (radius == 0.f) {
-    radius = 0.0001; // Just to avoid division by zero
+    radius = 0.0001f; // Just to avoid division by zero
   }
 
   auto targetPostion = _getTargetPosition();

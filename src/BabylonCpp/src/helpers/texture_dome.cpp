@@ -47,8 +47,8 @@ void TextureDome::initializeTextureDome(const std::string& iName,
   options.clickToPlay = options.clickToPlay.value_or(false);
   options.autoPlay    = options.autoPlay.value_or(true);
   options.loop        = options.loop.value_or(true);
-  options.size        = options.size.value_or(
-    scene->activeCamera() ? static_cast<unsigned int>(scene->activeCamera()->maxZ * 0.48f) : 1000u);
+  options.size
+    = options.size.value_or(scene->activeCamera() ? scene->activeCamera()->maxZ * 0.48f : 1000.f);
 
   if (!options.useDirectMapping) {
     _useDirectMapping = true;

@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT TextureDomeOptions {
   std::optional<bool> clickToPlay        = std::nullopt;
   std::optional<bool> autoPlay           = std::nullopt;
   std::optional<bool> loop               = std::nullopt;
-  std::optional<unsigned int> size       = std::nullopt;
+  std::optional<float> size              = std::nullopt;
   std::optional<std::string> poster      = std::nullopt;
   std::optional<bool> faceForward        = std::nullopt;
   std::optional<bool> useDirectMapping   = std::nullopt;

@@ -63,23 +63,23 @@ Type TargetCamera::type() const
 AnimationValue TargetCamera::getProperty(const std::vector<std::string>& targetPropertyPath)
 {
   if (targetPropertyPath.size() == 1) {
-    const auto& target = targetPropertyPath[0];
-    if (target == "position") {
+    const auto& iTarget = targetPropertyPath[0];
+    if (iTarget == "position") {
       return position();
     }
-    if (target == "rotation") {
+    if (iTarget == "rotation") {
       return rotation();
     }
   }
   else if (targetPropertyPath.size() == 2) {
-    const auto& target = targetPropertyPath[0];
-    const auto& key    = targetPropertyPath[1];
+    const auto& iTarget = targetPropertyPath[0];
+    const auto& key     = targetPropertyPath[1];
     // Position
-    if (target == "position") {
+    if (iTarget == "position") {
       return IAnimatable::getProperty(key, position());
     }
     // Rotation
-    if (target == "rotation") {
+    if (iTarget == "rotation") {
       return IAnimatable::getProperty(key, rotation());
     }
   }
@@ -93,30 +93,30 @@ void TargetCamera::setProperty(const std::vector<std::string>& targetPropertyPat
   const auto animationType = value.animationType();
   if (animationType.has_value()) {
     if (targetPropertyPath.size() == 1) {
-      const auto& target = targetPropertyPath[0];
+      const auto& iTarget = targetPropertyPath[0];
       if (*animationType == Animation::ANIMATIONTYPE_VECTOR3) {
         auto vector3Value = value.get<Vector3>();
         // Position
-        if (target == "position") {
+        if (iTarget == "position") {
           position = vector3Value;
         }
         // Rotation
-        if (target == "rotation") {
+        if (iTarget == "rotation") {
           rotation = vector3Value;
         }
       }
     }
     if (targetPropertyPath.size() == 2) {
-      const auto& target = targetPropertyPath[0];
-      const auto& key    = targetPropertyPath[1];
+      const auto& iTarget = targetPropertyPath[0];
+      const auto& key     = targetPropertyPath[1];
       if (*animationType == Animation::ANIMATIONTYPE_FLOAT) {
         const auto& floatValue = value.get<float>();
         // Position
-        if (target == "position") {
+        if (iTarget == "position") {
           IAnimatable::setProperty(key, position(), floatValue);
         }
         // Rotation
-        if (target == "rotation") {
+        if (iTarget == "rotation") {
           IAnimatable::setProperty(key, rotation(), floatValue);
         }
       }
@@ -244,24 +244,24 @@ void TargetCamera::set_rotation(const Vector3& newRotation)
 }
 
 /** Target **/
-void TargetCamera::setTarget(const Vector3& target)
+void TargetCamera::setTarget(const Vector3& iTarget)
 {
   upVector().normalize();
 
-  _initialFocalDistance = target.subtract(position).length();
+  _initialFocalDistance = iTarget.subtract(position).length();
 
-  if (stl_util::almost_equal(position().z, target.z)) {
+  if (stl_util::almost_equal(position().z, iTarget.z)) {
     position().z += Math::Epsilon;
   }
 
   _referencePoint->normalize().scaleInPlace(_initialFocalDistance);
 
-  Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
+  Matrix::LookAtLHToRef(position, iTarget, _defaultUp, _camMatrix);
   _camMatrix.invert();
 
   _rotation->x = std::atan(_camMatrix.m()[6] / _camMatrix.m()[10]);
 
-  auto vDir = target.subtract(position);
+  auto vDir = iTarget.subtract(position);
 
   if (vDir.x >= 0.f) {
     _rotation->y = (-std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
@@ -456,20 +456,20 @@ Matrix TargetCamera::_getViewMatrix()
   return _viewMatrix;
 }
 
-void TargetCamera::_computeViewMatrix(const Vector3& iPosition, const Vector3& target,
+void TargetCamera::_computeViewMatrix(const Vector3& iPosition, const Vector3& iTarget,
                                       const Vector3& up)
 {
   if (ignoreParentScaling) {
     if (parent()) {
       auto parentWorldMatrix = parent()->getWorldMatrix();
       Vector3::TransformCoordinatesToRef(iPosition, parentWorldMatrix, _globalPosition);
-      Vector3::TransformCoordinatesToRef(target, parentWorldMatrix, _tmpUpVector);
+      Vector3::TransformCoordinatesToRef(iTarget, parentWorldMatrix, _tmpUpVector);
       Vector3::TransformNormalToRef(up, parentWorldMatrix, _tmpUpVector);
       _markSyncedWithParent();
     }
     else {
       _globalPosition.copyFrom(iPosition);
-      _tmpTargetVector.copyFrom(target);
+      _tmpTargetVector.copyFrom(iTarget);
       _tmpUpVector.copyFrom(up);
     }
 
@@ -483,10 +483,10 @@ void TargetCamera::_computeViewMatrix(const Vector3& iPosition, const Vector3& t
   }
 
   if (getScene()->useRightHandedSystem()) {
-    Matrix::LookAtRHToRef(position, target, up, _viewMatrix);
+    Matrix::LookAtRHToRef(position, iTarget, up, _viewMatrix);
   }
   else {
-    Matrix::LookAtLHToRef(position, target, up, _viewMatrix);
+    Matrix::LookAtLHToRef(position, iTarget, up, _viewMatrix);
   }
 
   if (parent()) {
@@ -564,8 +564,8 @@ void TargetCamera::_updateRigCameras()
 
 void TargetCamera::_getRigCamPositionAndTarget(float halfSpace, TargetCamera& rigCamera)
 {
-  const auto target = getTarget();
-  target.subtractToRef(position, TargetCamera::_TargetFocalPoint);
+  const auto iTarget = getTarget();
+  iTarget.subtractToRef(position, TargetCamera::_TargetFocalPoint);
 
   TargetCamera::_TargetFocalPoint.normalize().scaleInPlace(_initialFocalDistance);
   auto newFocalTarget = TargetCamera::_TargetFocalPoint.addInPlace(position);
