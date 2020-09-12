@@ -15,6 +15,10 @@ using PostProcessPtr = std::shared_ptr<PostProcess>;
  */
 struct BABYLON_SHARED_EXPORT PrePassEffectConfiguration {
   /**
+   * Destructor
+   */
+  virtual ~PrePassEffectConfiguration() = default;
+  /**
    * Post process to attach for this effect
    */
   PostProcessPtr postProcess = nullptr;

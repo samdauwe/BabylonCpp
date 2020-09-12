@@ -1,6 +1,7 @@
 #include <babylon/particles/model_shape.h>
 
 #include <babylon/maths/vector3.h>
+#include <babylon/particles/solid_particle_vertex.h>
 
 namespace BABYLON {
 

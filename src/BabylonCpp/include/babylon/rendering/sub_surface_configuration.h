@@ -26,7 +26,7 @@ public:
    * @param scene The scene
    */
   SubSurfaceConfiguration(Scene* scene);
-  ~SubSurfaceConfiguration() = default;
+  virtual ~SubSurfaceConfiguration() = default;
 
   /**
    * @brief Adds a new diffusion profile.

@@ -102,8 +102,8 @@ void ParticleTextureBlock::initialize(NodeMaterialBuildState& state)
 void ParticleTextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
-    auto uvInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
-      return b->isAttribute() && b->name() == "particle_uv";
+    auto uvInput = material->getInputBlockByPredicate([](const InputBlockPtr& inputBlock) -> bool {
+      return inputBlock->isAttribute() && inputBlock->name() == "particle_uv";
     });
 
     if (!uvInput) {
