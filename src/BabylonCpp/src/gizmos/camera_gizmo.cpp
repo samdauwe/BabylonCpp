@@ -23,11 +23,27 @@ CameraGizmo::CameraGizmo(const UtilityLayerRendererPtr& gizmoLayer)
     , material{this, &CameraGizmo::get_material}
     , _cameraMesh{nullptr}
     , _cameraLinesMesh{nullptr}
+    , _pointerObserver{nullptr}
     , _camera{nullptr}
 {
   _material = StandardMaterial::New("cameraGizmoMaterial", gizmoLayer->utilityLayerScene.get());
   _material->diffuseColor  = Color3(0.5f, 0.5f, 0.5f);
   _material->specularColor = Color3(0.1f, 0.1f, 0.1f);
+
+  _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
+    [this](PointerInfo* pointerInfo, EventState & /*es*/) -> void {
+      if (!_camera) {
+        return;
+      }
+
+      const auto childMeshes = _rootMesh->getChildMeshes();
+      const auto& isHovered
+        = (stl_util::index_of(childMeshes, pointerInfo->pickInfo.pickedMesh) != -1);
+      if (isHovered && pointerInfo->pointerEvent.button == MouseButtonType::LEFT) {
+        onClickedObservable.notifyObservers(_camera.get());
+      }
+    },
+    static_cast<int>(PointerEventTypes::POINTERDOWN));
 }
 
 CameraGizmo::~CameraGizmo() = default;
@@ -107,10 +123,19 @@ void CameraGizmo::_update()
   _cameraLinesMesh->scaling().x = 1.f / _rootMesh->scaling().x;
   _cameraLinesMesh->scaling().y = 1.f / _rootMesh->scaling().y;
   _cameraLinesMesh->scaling().z = 1.f / _rootMesh->scaling().z;
+
+  // take care of coordinate system in camera scene to properly display the mesh with the good Y
+  // axis orientation in this scene
+  _cameraMesh->parent = nullptr;
+  _cameraMesh->rotation().y
+    = Math::PI * 0.5f * (_camera->getScene()->useRightHandedSystem() ? 1.f : -1.f);
+  _cameraMesh->parent = _rootMesh.get();
 }
 
 void CameraGizmo::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
+  onClickedObservable.clear();
+  gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   if (_cameraMesh) {
     _cameraMesh->dispose();
   }
@@ -166,7 +191,6 @@ MeshPtr CameraGizmo::_CreateCameraMesh(Scene* scene)
   cyl3->rotation().z         = Math::PI * 0.5f;
 
   root->scaling().scaleInPlace(CameraGizmo::_Scale);
-  root->rotation().y = -Math::PI * 0.5f;
   mesh->position().x = -0.9f;
 
   return root;

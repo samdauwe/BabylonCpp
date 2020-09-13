@@ -70,6 +70,11 @@ protected:
 
 public:
   /**
+   * Event that fires each time the gizmo is clicked
+   */
+  Observable<Light> onClickedObservable;
+
+  /**
    * The light that the gizmo is attached to
    */
   Property<LightGizmo, LightPtr> light;
@@ -86,6 +91,7 @@ private:
   Vector3 _cachedPosition;
   Vector3 _cachedForward;
   TransformNodePtr _attachedMeshParent;
+  Observer<PointerInfo>::Ptr _pointerObserver;
   LightPtr _light;
 
 }; // end of class LightGizmo

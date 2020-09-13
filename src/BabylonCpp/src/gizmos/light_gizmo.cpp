@@ -1,6 +1,8 @@
 #include <babylon/gizmos/light_gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/engines/scene.h>
+#include <babylon/events/pointer_info.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadow_light.h>
@@ -22,6 +24,7 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     , _material{nullptr}
     , _cachedForward{Vector3(0.f, 0.f, 1.f)}
     , _attachedMeshParent{nullptr}
+    , _pointerObserver{nullptr}
     , _light{nullptr}
 {
   attachedMesh        = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
@@ -31,6 +34,21 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
   _material                = StandardMaterial::New("light", gizmoLayer->utilityLayerScene.get());
   _material->diffuseColor  = Color3(0.5f, 0.5f, 0.5f);
   _material->specularColor = Color3(0.1f, 0.1f, 0.1f);
+
+  _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
+    [this](PointerInfo* pointerInfo, EventState & /*es*/) -> void {
+      if (!_light) {
+        return;
+      }
+
+      const auto childMeshes = _rootMesh->getChildMeshes();
+      const auto& isHovered
+        = (stl_util::index_of(childMeshes, pointerInfo->pickInfo.pickedMesh) != -1);
+      if (isHovered && pointerInfo->pointerEvent.button == MouseButtonType::LEFT) {
+        onClickedObservable.notifyObservers(_light.get());
+      }
+    },
+    static_cast<int>(PointerEventTypes::POINTERDOWN));
 }
 
 LightGizmo::~LightGizmo() = default;
@@ -204,6 +222,8 @@ MeshPtr LightGizmo::_CreateLightLines(float levels, Scene* scene)
 
 void LightGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
+  onClickedObservable.clear();
+  gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   _material->dispose();
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
   _attachedMeshParent->dispose();

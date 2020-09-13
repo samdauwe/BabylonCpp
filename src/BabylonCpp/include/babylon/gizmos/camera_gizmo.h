@@ -68,6 +68,11 @@ private:
 
 public:
   /**
+   * Event that fires each time the gizmo is clicked
+   */
+  Observable<Camera> onClickedObservable;
+
+  /**
    * Gets or sets a boolean indicating if frustum lines must be rendered (true by default))
    */
   Property<CameraGizmo, bool> displayFrustum;
@@ -86,6 +91,7 @@ private:
   MeshPtr _cameraMesh;
   MeshPtr _cameraLinesMesh;
   StandardMaterialPtr _material;
+  Observer<PointerInfo>::Ptr _pointerObserver;
   CameraPtr _camera;
 
   // Static helper methods
