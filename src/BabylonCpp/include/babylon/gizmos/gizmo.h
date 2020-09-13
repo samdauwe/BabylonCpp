@@ -187,6 +187,9 @@ private:
   std::optional<Quaternion> _tempQuaternion;
   std::optional<Vector3> _tempVector;
   std::optional<Vector3> _tempVector2;
+  Matrix _tempMatrix1;
+  Matrix _tempMatrix2;
+  Matrix _rightHandtoLeftHandMatrix;
 
 }; // end of class Gizmo
 

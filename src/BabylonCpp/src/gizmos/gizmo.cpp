@@ -29,6 +29,7 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _tempQuaternion{Quaternion(0.f, 0.f, 0.f, 1.f)}
     , _tempVector{Vector3()}
     , _tempVector2{Vector3()}
+    , _rightHandtoLeftHandMatrix{Matrix::RotationY(Math::PI)}
 {
   _rootMesh                     = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _rootMesh->rotationQuaternion = Quaternion::Identity();
@@ -161,16 +162,30 @@ void Gizmo::_matrixChanged()
   auto camera = std::static_pointer_cast<Camera>(_attachedNode);
 
   if (camera && camera->_isCamera) {
+    Matrix worldMatrix;
+    Matrix worldMatrixUC;
     if (camera->parent()) {
-      Matrix parentInv;
-      Matrix localMat;
-      camera->parent()->getWorldMatrix().invertToRef(parentInv);
-      _attachedNode->getWorldMatrix().multiplyToRef(parentInv, localMat);
-      localMat.decompose(_tempVector2, _tempQuaternion, _tempVector);
+      auto& parentInv = _tempMatrix2;
+      camera->parent()->_worldMatrix.invertToRef(parentInv);
+      _attachedNode->_worldMatrix.multiplyToRef(parentInv, _tempMatrix1);
+      worldMatrix = _tempMatrix1;
     }
     else {
-      _attachedNode->getWorldMatrix().decompose(_tempVector2, _tempQuaternion, _tempVector);
+      worldMatrix = _attachedNode->_worldMatrix;
     }
+
+    if (camera->getScene()->useRightHandedSystem()) {
+      // avoid desync with RH matrix computation. Otherwise, rotation of PI around Y axis happens
+      // each frame resulting in axis flipped because worldMatrix is computed as inverse of
+      // viewMatrix.
+      _rightHandtoLeftHandMatrix.multiplyToRef(worldMatrix, _tempMatrix2);
+      worldMatrixUC = _tempMatrix2;
+    }
+    else {
+      worldMatrixUC = worldMatrix;
+    }
+
+    worldMatrixUC.decompose(_tempVector2, _tempQuaternion, _tempVector);
 
     const auto inheritsTargetCamera = _attachedNode->getClassName() == "FreeCamera"
                                       || _attachedNode->getClassName() == "FlyCamera"
@@ -192,14 +207,15 @@ void Gizmo::_matrixChanged()
   else if ((std::static_pointer_cast<Mesh>(_attachedNode)
             && std::static_pointer_cast<Mesh>(_attachedNode)->_isMesh())
            || _attachedNode->getClassName() == "AbstractMesh"
-           || _attachedNode->getClassName() == "TransformNode") {
+           || _attachedNode->getClassName() == "TransformNode"
+           || _attachedNode->getClassName() == "InstancedMesh") {
     auto transform = std::static_pointer_cast<TransformNode>(_attachedNode);
     Quaternion transformQuaternion(0.f, 0.f, 0.f, 1.f);
     if (transform->parent()) {
-      Matrix parentInv;
-      Matrix localMat;
+      auto& parentInv = _tempMatrix1;
+      auto& localMat  = _tempMatrix2;
       transform->parent()->getWorldMatrix().invertToRef(parentInv);
-      _attachedNode->_worldMatrix.multiplyToRef(parentInv, localMat);
+      _attachedNode->getWorldMatrix().multiplyToRef(parentInv, localMat);
       std::optional<Vector3> iScaling  = transform->scaling();
       std::optional<Vector3> iPosition = transform->position();
       localMat.decompose(iScaling, _tempQuaternion, iPosition);
@@ -226,8 +242,8 @@ void Gizmo::_matrixChanged()
     const auto parent = bone->getParent();
 
     if (parent) {
-      Matrix invParent;
-      Matrix boneLocalMatrix;
+      auto& invParent       = _tempMatrix1;
+      auto& boneLocalMatrix = _tempMatrix2;
       parent->getWorldMatrix().invertToRef(invParent);
       bone->getWorldMatrix().multiplyToRef(invParent, boneLocalMatrix);
       auto& lmat = bone->getLocalMatrix();
