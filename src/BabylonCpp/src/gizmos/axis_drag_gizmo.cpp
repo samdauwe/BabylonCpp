@@ -95,26 +95,24 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
   dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
   // _rootMesh->addBehavior(dragBehavior.get());
+
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
     if (attachedNode()) {
-      // Convert delta to local translation if it has a parent
-      if (attachedNode()->parent()) {
-        attachedNode()->parent()->getWorldMatrix().invertToRef(_tmpMatrix);
-        _tmpMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
-        Vector3::TransformCoordinatesToRef(event->delta, _tmpMatrix, _localDelta);
-      }
-      else {
-        _localDelta.copyFrom(event->delta);
-      }
+      // Keep world translation and use it to update world transform
+      // if the node has parent, the local transform properties (position, rotation, scale)
+      // will be recomputed in _matrixChanged function
+
       // Snapping logic
       if (snapDistance == 0.f) {
         auto transformNode = std::static_pointer_cast<TransformNode>(attachedNode());
         if (transformNode) { // Required for nodes like lights
-          transformNode->position().addInPlaceFromFloats(_localDelta.x, _localDelta.y,
-                                                         _localDelta.z);
+          transformNode->position().addInPlaceFromFloats(event->delta.x, event->delta.y,
+                                                         event->delta.z);
         }
-        attachedNode()->getWorldMatrix().addTranslationFromFloats(_localDelta.x, _localDelta.y,
-                                                                  _localDelta.z);
+        // use _worldMatrix to not force a matrix update when calling GetWorldMatrix especialy with
+        // Cameras
+        attachedNode()->_worldMatrix.addTranslationFromFloats(event->delta.x, event->delta.y,
+                                                              event->delta.z);
         attachedNode()->updateCache();
       }
       else {
@@ -122,10 +120,10 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
         if (std::abs(_currentSnapDragDistance) > snapDistance) {
           auto dragSteps           = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
           _currentSnapDragDistance = std::fmod(_currentSnapDragDistance, snapDistance);
-          _localDelta.normalizeToRef(_tmpVector);
+          event->delta.normalizeToRef(_tmpVector);
           _tmpVector.scaleInPlace(snapDistance * dragSteps);
-          attachedNode()->getWorldMatrix().addTranslationFromFloats(_tmpVector.x, _tmpVector.y,
-                                                                    _tmpVector.z);
+          attachedNode()->_worldMatrix.addTranslationFromFloats(_tmpVector.x, _tmpVector.y,
+                                                                _tmpVector.z);
           attachedNode()->updateCache();
           _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
           onSnapObservable.notifyObservers(&_tmpSnapEvent);

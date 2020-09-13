@@ -78,29 +78,21 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
 
   dragBehavior->onDragObservable.add([this](DragMoveEvent* event, EventState & /*es*/) -> void {
     if (attachedNode()) {
-      currentSnapDragDistance = 0.f;
-      Vector3 localDelta;
-      Matrix tmpMatrix;
-      // Convert delta to local translation if it has a parent
-      if (attachedNode()->parent()) {
-        attachedNode()->parent()->computeWorldMatrix().invertToRef(tmpMatrix);
-        tmpMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
-        Vector3::TransformCoordinatesToRef(event->delta, tmpMatrix, localDelta);
-      }
-      else {
-        localDelta.copyFrom(event->delta);
-      }
+      // Keep world translation and use it to update world transform
+      // if the node has parent, the local transform properties (position, rotation, scale)
+      // will be recomputed in _matrixChanged function
+
       // Snapping logic
       if (snapDistance == 0.f) {
-        attachedNode()->getWorldMatrix().addTranslationFromFloats(localDelta.x, localDelta.y,
-                                                                  localDelta.z);
+        attachedNode()->getWorldMatrix().addTranslationFromFloats(event->delta.x, event->delta.y,
+                                                                  event->delta.z);
       }
       else {
         currentSnapDragDistance += event->dragDistance;
         if (std::abs(currentSnapDragDistance) > snapDistance) {
           auto dragSteps          = std::floor(std::abs(currentSnapDragDistance) / snapDistance);
           currentSnapDragDistance = std::fmod(currentSnapDragDistance, snapDistance);
-          localDelta.normalizeToRef(tmpVector);
+          event->delta.normalizeToRef(tmpVector);
           tmpVector.scaleInPlace(snapDistance * dragSteps);
           attachedNode()->getWorldMatrix().addTranslationFromFloats(tmpVector.x, tmpVector.y,
                                                                     tmpVector.z);
