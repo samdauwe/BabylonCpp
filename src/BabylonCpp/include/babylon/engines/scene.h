@@ -2790,18 +2790,15 @@ public:
   // Pointers
 
   /**
-   * This observable event is triggered when any ponter event is triggered. It
-   * is registered during Scene.attachControl() and it is called BEFORE the 3D
-   * engine process anything (mesh/sprite picking for instance).
-   * You have the possibility to skip the process and the call to
-   * onPointerObservable by setting PointerInfoPre.skipOnPointerObservable to
-   * true
+   * This observable event is triggered when any ponter event is triggered. It is registered during
+   * Scene.attachControl() and it is called BEFORE the 3D engine process anything (mesh/sprite
+   * picking for instance). You have the possibility to skip the process and the call to
+   * onPointerObservable by setting PointerInfoPre.skipOnPointerObservable to true
    */
   Observable<PointerInfoPre> onPrePointerObservable;
 
   /**
-   * Observable event triggered each time an input event is received from the
-   * rendering canvas
+   * Observable event triggered each time an input event is received from the rendering canvas
    */
   Observable<PointerInfo> onPointerObservable;
 
