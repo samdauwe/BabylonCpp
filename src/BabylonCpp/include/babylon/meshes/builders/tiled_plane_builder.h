@@ -18,6 +18,7 @@ using MeshPtr = std::shared_ptr<Mesh>;
  */
 struct BABYLON_SHARED_EXPORT TiledPlaneBuilder {
 
+  // clang-format off
   /**
    * @brief Creates a tiled plane mesh.
    * * The parameter `pattern` will, depending on value, do nothing or
@@ -28,24 +29,18 @@ struct BABYLON_SHARED_EXPORT TiledPlaneBuilder {
    * * * flip and rotate alternate tiles across and up
    * * * flip and rotate every tile on alternate rows
    * * The parameter `tileSize` sets the size (float) of each tile side (default 1)
-   * * You can set some different tile dimensions by using the parameters `tileWidth` and
-   * `tileHeight` (both by default have the same value of `tileSize`)
-   * * If you create a double-sided mesh, you can choose what parts of the texture image to crop and
-   * stick respectively on the front and the back sides with the parameters `frontUVs` and `backUVs`
-   * (Vector4). Detail here :
-   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default), Mesh.BACKSIDE or
-   * Mesh.DOUBLESIDE
-   * * frontUvs only usable when you create a double-sided mesh, used to choose what parts of the
-   * texture image to crop and apply on the front side, optional, default vector4 (0, 0, 1, 1)
-   * * backUVs only usable when you create a double-sided mesh, used to choose what parts of the
-   * texture image to crop and apply on the back side, optional, default vector4 (0, 0, 1, 1)
+   * * You can set some different tile dimensions by using the parameters `tileWidth` and `tileHeight` (both by default have the same value of `tileSize`)
+   * * If you create a double-sided mesh, you can choose what parts of the texture image to crop and stick respectively on the front and the back sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here : https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default), Mesh.BACKSIDE or Mesh.DOUBLESIDE
+   * * frontUvs only usable when you create a double-sided mesh, used to choose what parts of the texture image to crop and apply on the front side, optional, default vector4 (0, 0, 1, 1)
+   * * backUVs only usable when you create a double-sided mesh, used to choose what parts of the texture image to crop and apply on the back side, optional, default vector4 (0, 0, 1, 1)
    * @see https://doc.babylonjs.com/how_to/set_shapes#box
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the box mesh
    */
+  // clang-format on
   static MeshPtr CreateTiledPlane(const std::string& name, TiledPlaneOptions& options,
                                   Scene* scene = nullptr);
 
