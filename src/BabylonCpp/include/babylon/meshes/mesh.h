@@ -786,6 +786,17 @@ public:
   void thinInstanceBufferUpdated(const std::string& kind);
 
   /**
+   * @brief Applies a partial update to a buffer directly on the GPU.
+   * Note that the buffer located on the CPU is NOT updated! It's up to you to update it (or not)
+   * with the same data you pass to this method
+   * @param kind name of the attribute to update. Use "matrix" to update the buffer of matrices
+   * @param data the data to set in the GPU buffer
+   * @param offset the offset in the GPU buffer where to update the data
+   */
+  void thinInstancePartialBufferUpdate(const std::string& kind, const Float32Array& data,
+                                       size_t offset);
+
+  /**
    * @brief Refreshes the bounding info, taking into account all the thin instances defined
    * @param forceRefreshParentInfo true to force recomputing the mesh bounding info and use it to
    * compute the aggregated bounding info.
