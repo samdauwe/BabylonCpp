@@ -137,20 +137,24 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
       else if (pointerInfo->type == PointerEventTypes::POINTERMOVE) {
         auto pointerId = pointerInfo->pointerEvent.pointerId;
 
-        // If drag was started with anyMouseID specified, set pointerID to the
-        // next mouse that moved
+        // If drag was started with anyMouseID specified, set pointerID to the next mouse that moved
         if (currentDraggingPointerID == PointerDragBehavior::_AnyMouseID
-            && pointerId != PointerDragBehavior::_AnyMouseID
-            && (pointerInfo->pointerEvent.pointerType == PointerType::MOUSE)) {
-          if (stl_util::contains(_lastPointerRay, currentDraggingPointerID)) {
-            _lastPointerRay[pointerId] = _lastPointerRay[currentDraggingPointerID];
-            _lastPointerRay.erase(currentDraggingPointerID);
+            && pointerId != PointerDragBehavior::_AnyMouseID) {
+          const auto& evt = pointerInfo->pointerEvent;
+          const auto isMouseEvent
+            = evt.pointerType == PointerType::MOUSE
+              || (!_scene->getEngine()->hostInformation.isMobile /* && evt instanceof MouseEvent*/);
+          if (isMouseEvent) {
+            if (stl_util::contains(_lastPointerRay, currentDraggingPointerID)) {
+              _lastPointerRay[pointerId] = _lastPointerRay[currentDraggingPointerID];
+              _lastPointerRay.erase(currentDraggingPointerID);
+            }
+            currentDraggingPointerID = pointerId;
           }
-          currentDraggingPointerID = pointerId;
         }
 
-        // Keep track of last pointer ray, this is used simulating the start of
-        // a drag in startDrag()
+        // Keep track of last pointer ray, this is used simulating the start of a drag in
+        // startDrag()
         if (!stl_util::contains(_lastPointerRay, pointerId)) {
           _lastPointerRay[pointerId] = Ray(Vector3(), Vector3());
         }
