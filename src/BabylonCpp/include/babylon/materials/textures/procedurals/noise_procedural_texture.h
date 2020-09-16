@@ -76,6 +76,11 @@ private:
 
 public:
   /**
+   * Gets or sets the start time (default is 0)
+   */
+  float time;
+
+  /**
    * Gets or sets a value between 0 and 1 indicating the overall brightness of
    * the texture (default is 0.2)
    */
@@ -95,9 +100,6 @@ public:
    * Gets or sets animation speed factor (default is 1)
    */
   float animationSpeedFactor;
-
-private:
-  float _time;
 
 }; // end of class CustomProceduralTexture
 
