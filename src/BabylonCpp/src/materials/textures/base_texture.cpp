@@ -61,9 +61,9 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _scene{nullptr}
     , _engine{nullptr}
     , _hasAlpha{false}
-    , _gammaSpace{true}
     , _wrapU{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , _wrapV{Constants::TEXTURE_WRAP_ADDRESSMODE}
+    , _gammaSpace{true}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
@@ -214,16 +214,34 @@ void BaseTexture::set_is2DArray(bool value)
 
 bool BaseTexture::get_gammaSpace() const
 {
-  return _gammaSpace;
-}
-
-void BaseTexture::set_gammaSpace(bool value)
-{
-  if (_gammaSpace == value) {
-    return;
+  if (!_texture) {
+    return _gammaSpace;
+  }
+  else {
+    if (!_texture->_gammaSpace.has_value()) {
+      _texture->_gammaSpace = _gammaSpace;
+    }
   }
 
-  _gammaSpace = value;
+  return *_texture->_gammaSpace;
+}
+
+void BaseTexture::set_gammaSpace(bool gamma)
+{
+  if (!_texture) {
+    if (_gammaSpace == gamma) {
+      return;
+    }
+
+    _gammaSpace = gamma;
+  }
+  else {
+    if (_texture->_gammaSpace.has_value() && *_texture->_gammaSpace == gamma) {
+      return;
+    }
+    _texture->_gammaSpace = gamma;
+  }
+
   _markAllSubMeshesAsTexturesDirty();
 }
 

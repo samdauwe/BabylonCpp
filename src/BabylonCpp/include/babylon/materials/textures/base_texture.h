@@ -239,7 +239,7 @@ protected:
   bool get_is2DArray() const;
   void set_is2DArray(bool value);
   bool get_gammaSpace() const;
-  void set_gammaSpace(bool value);
+  void set_gammaSpace(bool gamma);
   virtual bool get_noMipmap() const;
 
   /**
@@ -524,9 +524,9 @@ protected:
 
 private:
   bool _hasAlpha;
-  bool _gammaSpace;
   unsigned int _wrapU;
   unsigned int _wrapV;
+  bool _gammaSpace;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;
