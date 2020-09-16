@@ -328,6 +328,9 @@ public:
   WebGLTexturePtr _webGLTexture;
   int _references;
 
+  /** @hidden */
+  std::optional<bool> _gammaSpace;
+
 private:
   ThinEngine* _engine;
 
