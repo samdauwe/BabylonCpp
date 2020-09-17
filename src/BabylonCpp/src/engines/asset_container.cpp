@@ -219,7 +219,7 @@ void AssetContainer::dispose()
 
 MeshPtr AssetContainer::createRootMesh()
 {
-  auto rootMesh = Mesh::New("assetContainerRootMesh", scene);
+  const auto rootMesh = Mesh::New("assetContainerRootMesh", scene);
   for (const auto& m : meshes) {
     if (!m->parent) {
       rootMesh->addChild(*m);
