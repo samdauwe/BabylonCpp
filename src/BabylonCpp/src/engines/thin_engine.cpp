@@ -323,6 +323,9 @@ void ThinEngine::_initGLContext()
   _caps.astc          = _gl->getExtension("WEBGL_compressed_texture_astc") ?
                  _gl->getExtension("WEBGL_compressed_texture_astc") :
                  _gl->getExtension("WEBKIT_WEBGL_compressed_texture_astc");
+  _caps.bptc = _gl->getExtension("EXT_texture_compression_bptc") ?
+                 _gl->getExtension("EXT_texture_compression_bptc") :
+                 _gl->getExtension("WEBKIT_EXT_texture_compression_bptc");
   _caps.s3tc = (_gl->getExtension("WEBGL_compressed_texture_s3tc")
                 || _gl->getExtension("WEBKIT_WEBGL_compressed_texture_s3tc")) ?
                  std::nullopt :
@@ -1551,13 +1554,18 @@ EffectPtr ThinEngine::createEffect(
           _baseName["vertexElement"] :
           stl_util::contains(_baseName, "vertex") ?
           _baseName["vertex"] :
-          stl_util::contains(_baseName, "vertexToken") ? _baseName["vertexToken"] : "vertex";
-    auto fragment
-      = stl_util::contains(_baseName, "fragmentElement") ?
-          _baseName["fragmentElement"] :
-          stl_util::contains(_baseName, "fragment") ?
-          _baseName["fragment"] :
-          stl_util::contains(_baseName, "fragmentToken") ? _baseName["fragmentToken"] : "fragment";
+          stl_util::contains(_baseName, "vertexToken") ?
+          _baseName["vertexToken"] :
+          stl_util::contains(_baseName, "vertexSource") ? _baseName["vertexSource"] : "vertex";
+    auto fragment = stl_util::contains(_baseName, "fragmentElement") ?
+                      _baseName["fragmentElement"] :
+                      stl_util::contains(_baseName, "fragment") ?
+                      _baseName["fragment"] :
+                      stl_util::contains(_baseName, "fragmentToken") ?
+                      _baseName["fragmentToken"] :
+                      stl_util::contains(_baseName, "fragmentSource") ?
+                      _baseName["fragmentSource"] :
+                      "fragment";
     name = vertex + "+" + fragment + "@" + options.defines;
   }
 
