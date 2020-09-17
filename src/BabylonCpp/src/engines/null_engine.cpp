@@ -54,6 +54,7 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
   _caps.pvrtc                           = nullptr;
   _caps.etc1                            = nullptr;
   _caps.etc2                            = nullptr;
+  _caps.bptc                            = nullptr;
   _caps.maxAnisotropy                   = 0;
   _caps.uintIndices                     = false;
   _caps.fragmentDepthSupported          = false;
