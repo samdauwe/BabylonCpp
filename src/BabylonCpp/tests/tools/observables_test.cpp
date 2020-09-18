@@ -50,21 +50,18 @@ TEST(TestObservables, MouseClickObserver)
   // Add an Observer
   EXPECT_FALSE(obervable.hasObservers());
   auto leftClickObserver = obervable.add(
-    [&leftClickCounter](Mouse*, EventState&) { ++leftClickCounter; },
-    int(Mouse::ClickType::LEFT));
+    [&leftClickCounter](Mouse*, EventState&) { ++leftClickCounter; }, int(Mouse::ClickType::LEFT));
   EXPECT_TRUE(obervable.hasObservers());
   // Remove the previously registered Observer
   obervable.remove(leftClickObserver);
   EXPECT_FALSE(obervable.hasObservers());
   // Add the previously removed observer
   leftClickObserver = obervable.add(
-    [&leftClickCounter](Mouse*, EventState&) { ++leftClickCounter; },
-    int(Mouse::ClickType::LEFT));
+    [&leftClickCounter](Mouse*, EventState&) { ++leftClickCounter; }, int(Mouse::ClickType::LEFT));
   EXPECT_TRUE(obervable.hasObservers());
   // Add another observer
-  obervable.add(
-    [&rightClickCounter](Mouse*, EventState&) { ++rightClickCounter; },
-    int(Mouse::ClickType::RIGHT));
+  obervable.add([&rightClickCounter](Mouse*, EventState&) { ++rightClickCounter; },
+                int(Mouse::ClickType::RIGHT));
   EXPECT_TRUE(obervable.hasObservers());
   // Raise events
   for (size_t i = 0; i != 5; ++i) {
@@ -94,16 +91,15 @@ TEST(TestObservables, MouseObserver)
   auto& obervable = mouse.onMoveObservable;
   // Add an Observer
   EXPECT_FALSE(obervable.hasObservers());
-  auto observer = obervable.add([&mousePosition](
-    Vector2* position, EventState&) { mousePosition = *position; });
+  auto observer = obervable.add(
+    [&mousePosition](Vector2* position, EventState&) { mousePosition = *position; });
   EXPECT_TRUE(obervable.hasObservers());
   // Remove the previously registered Observer
   obervable.remove(observer);
   EXPECT_FALSE(obervable.hasObservers());
   // Add the previously removed observer
-  observer = obervable.add([&mousePosition](Vector2* position, EventState&) {
-    mousePosition = *position;
-  });
+  observer = obervable.add(
+    [&mousePosition](Vector2* position, EventState&) { mousePosition = *position; });
   EXPECT_TRUE(obervable.hasObservers());
   // Raise an event
   float x = 0.f, y = 0.f;
