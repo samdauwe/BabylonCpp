@@ -14,41 +14,26 @@ TEST(TestVertexData, CreateBox)
   options.size = size;
   auto box     = VertexData::CreateBox(options);
   // Set expected results
-  Uint32Array expectedIndices{0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,   //
-                              8,  9,  10, 8,  10, 11, 12, 13, 14, 12, 14, 15,  //
-                              16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23}; //
-  Float32Array expectedPositions{1.5f,  -1.5f, 1.5f,  -1.5f, -1.5f, 1.5f,      //
-                                 -1.5f, 1.5f,  1.5f,  1.5f,  1.5f,  1.5f,      //
-                                 1.5f,  1.5f,  -1.5f, -1.5f, 1.5f,  -1.5f,     //
-                                 -1.5f, -1.5f, -1.5f, 1.5f,  -1.5f, -1.5f,     //
-                                 1.5f,  1.5f,  -1.5f, 1.5f,  -1.5f, -1.5f,     //
-                                 1.5f,  -1.5f, 1.5f,  1.5f,  1.5f,  1.5f,      //
-                                 -1.5f, 1.5f,  1.5f,  -1.5f, -1.5f, 1.5f,      //
-                                 -1.5f, -1.5f, -1.5f, -1.5f, 1.5f,  -1.5f,     //
-                                 -1.5f, 1.5f,  1.5f,  -1.5f, 1.5f,  -1.5f,     //
-                                 1.5f,  1.5f,  -1.5f, 1.5f,  1.5f,  1.5f,      //
-                                 1.5f,  -1.5f, 1.5f,  1.5f,  -1.5f, -1.5f,     //
-                                 -1.5f, -1.5f, -1.5f, -1.5f, -1.5f, 1.5f};     //
-  Float32Array expectedNormals{0.f,  0.f,  1.f,  0.f,  0.f,  1.f,              //
-                               0.f,  0.f,  1.f,  0.f,  0.f,  1.f,              //
-                               0.f,  0.f,  -1.f, 0.f,  0.f,  -1.f,             //
-                               0.f,  0.f,  -1.f, 0.f,  0.f,  -1.f,             //
-                               1.f,  0.f,  0.f,  1.f,  0.f,  0.f,              //
-                               1.f,  0.f,  0.f,  1.f,  0.f,  0.f,              //
-                               -1.f, 0.f,  0.f,  -1.f, 0.f,  0.f,              //
-                               -1.f, 0.f,  0.f,  -1.f, 0.f,  0.f,              //
-                               0.f,  1.f,  0.f,  0.f,  1.f,  0.f,              //
-                               0.f,  1.f,  0.f,  0.f,  1.f,  0.f,              //
-                               0.f,  -1.f, 0.f,  0.f,  -1.f, 0.f,              //
-                               0.f,  -1.f, 0.f,  0.f,  -1.f, 0.f};             //
-  Float32Array expectedUVs{1.f, 1.f, 0.f, 1.f, 0.f, 0.f,                       //
-                           1.f, 0.f, 1.f, 1.f, 0.f, 1.f,                       //
-                           0.f, 0.f, 1.f, 0.f, 1.f, 1.f,                       //
-                           0.f, 1.f, 0.f, 0.f, 1.f, 0.f,                       //
-                           1.f, 1.f, 0.f, 1.f, 0.f, 0.f,                       //
-                           1.f, 0.f, 1.f, 1.f, 0.f, 1.f,                       //
-                           0.f, 0.f, 1.f, 0.f, 1.f, 1.f,                       //
-                           0.f, 1.f, 0.f, 0.f, 1.f, 0.f};                      //
+  Uint32Array expectedIndices{0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,
+                              8,  9,  10, 8,  10, 11, 12, 13, 14, 12, 14, 15,
+                              16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+  Float32Array expectedPositions{
+    1.5f,  -1.5f, 1.5f,  -1.5f, -1.5f, 1.5f,  -1.5f, 1.5f,  1.5f,  1.5f,  1.5f,  1.5f,
+    1.5f,  1.5f,  -1.5f, -1.5f, 1.5f,  -1.5f, -1.5f, -1.5f, -1.5f, 1.5f,  -1.5f, -1.5f,
+    1.5f,  1.5f,  -1.5f, 1.5f,  -1.5f, -1.5f, 1.5f,  -1.5f, 1.5f,  1.5f,  1.5f,  1.5f,
+    -1.5f, 1.5f,  1.5f,  -1.5f, -1.5f, 1.5f,  -1.5f, -1.5f, -1.5f, -1.5f, 1.5f,  -1.5f,
+    -1.5f, 1.5f,  1.5f,  -1.5f, 1.5f,  -1.5f, 1.5f,  1.5f,  -1.5f, 1.5f,  1.5f,  1.5f,
+    1.5f,  -1.5f, 1.5f,  1.5f,  -1.5f, -1.5f, -1.5f, -1.5f, -1.5f, -1.5f, -1.5f, 1.5f};
+  Float32Array expectedNormals{
+    0.f,  0.f,  1.f,  0.f, 0.f,  1.f,  0.f,  0.f,  1.f,  0.f,  0.f,  1.f, 0.f,  0.f, -1.f,
+    0.f,  0.f,  -1.f, 0.f, 0.f,  -1.f, 0.f,  0.f,  -1.f, 1.f,  0.f,  0.f, 1.f,  0.f, 0.f,
+    1.f,  0.f,  0.f,  1.f, 0.f,  0.f,  -1.f, 0.f,  0.f,  -1.f, 0.f,  0.f, -1.f, 0.f, 0.f,
+    -1.f, 0.f,  0.f,  0.f, 1.f,  0.f,  0.f,  1.f,  0.f,  0.f,  1.f,  0.f, 0.f,  1.f, 0.f,
+    0.f,  -1.f, 0.f,  0.f, -1.f, 0.f,  0.f,  -1.f, 0.f,  0.f,  -1.f, 0.f};
+  Float32Array expectedUVs{1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f,
+                           0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+                           1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f,
+                           0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f};
 
   // Perform comparison
   EXPECT_THAT(box->indices, ::testing::ContainerEq(expectedIndices));
@@ -70,21 +55,15 @@ TEST(TestVertexData, CreateGround)
   options.height       = height;
   auto ground          = VertexData::CreateGround(options);
   // Set expected results
-  Uint32Array expectedIndices{4, 1, 0, 3, 4, 0, 5, 2, 1, 4, 5, 1,      //
-                              7, 4, 3, 6, 7, 3, 8, 5, 4, 7, 8, 4};     //
-  Float32Array expectedPositions{-2.5f, 0.f, 2.5f,  0.f,   0.f, 2.5f,  //
-                                 2.5f,  0.f, 2.5f,  -2.5f, 0.f, 0.f,   //
-                                 0.f,   0.f, 0.f,   2.5f,  0.f, 0.f,   //
-                                 -2.5f, 0.f, -2.5f, 0.f,   0.f, -2.5f, //
-                                 2.5f,  0.f, -2.5f};                   //
-  Float32Array expectedNormals{0.f, 1.f, 0.f, 0.f, 1.f, 0.f,           //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f,           //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f,           //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f,           //
-                               0.f, 1.f, 0.f};                         //
-  Float32Array expectedUVs{0.f, 1.f,  0.5f, 1.f,  1.f, 1.f,            //
-                           0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f,           //
-                           0.f, 0.f,  0.5f, 0.f,  1.f, 0.f};           //
+  Uint32Array expectedIndices{4, 1, 0, 3, 4, 0, 5, 2, 1, 4, 5, 1,
+                              7, 4, 3, 6, 7, 3, 8, 5, 4, 7, 8, 4};
+  Float32Array expectedPositions{-2.5f, 0.f, 2.5f,  0.f, 0.f, 2.5f,  2.5f, 0.f, 2.5f,
+                                 -2.5f, 0.f, 0.f,   0.f, 0.f, 0.f,   2.5f, 0.f, 0.f,
+                                 -2.5f, 0.f, -2.5f, 0.f, 0.f, -2.5f, 2.5f, 0.f, -2.5f};
+  Float32Array expectedNormals{0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f,
+                               0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f};
+  Float32Array expectedUVs{0.f,  1.f, 0.5f, 1.f, 1.f, 1.f,  0.f, 0.5f, 0.5f,
+                           0.5f, 1.f, 0.5f, 0.f, 0.f, 0.5f, 0.f, 1.f,  0.f};
   // Perform comparison
   EXPECT_THAT(ground->indices, ::testing::ContainerEq(expectedIndices));
   EXPECT_THAT(ground->positions, ::testing::ContainerEq(expectedPositions));
@@ -218,53 +197,32 @@ TEST(TestVertexData, CreateTiledGround)
   // Create the Tiled Ground
   auto tiledGround = VertexData::CreateTiledGround(options);
   // Set expected results
-  Uint32Array expectedIndices{1,  4,  3,  0,  1,  3,  2,  5,  4,  1,  2,  4,                //
-                              4,  7,  6,  3,  4,  6,  5,  8,  7,  4,  5,  7,                //
-                              10, 13, 12, 9,  10, 12, 11, 14, 13, 10, 11, 13,               //
-                              13, 16, 15, 12, 13, 15, 14, 17, 16, 13, 14, 16,               //
-                              19, 22, 21, 18, 19, 21, 20, 23, 22, 19, 20, 22,               //
-                              22, 25, 24, 21, 22, 24, 23, 26, 25, 22, 23, 25,               //
-                              28, 31, 30, 27, 28, 30, 29, 32, 31, 28, 29, 31,               //
-                              31, 34, 33, 30, 31, 33, 32, 35, 34, 31, 32, 34};              //
-  Float32Array expectedPositions{-5.f,  0.f, -5.f,  -2.5f, 0.f, -5.f,                       //
-                                 0.f,   0.f, -5.f,  -5.f,  0.f, -2.5f,                      //
-                                 -2.5f, 0.f, -2.5f, 0.f,   0.f, -2.5f,                      //
-                                 -5.f,  0.f, 0.f,   -2.5f, 0.f, 0.f,                        //
-                                 0.f,   0.f, 0.f,   0.f,   0.f, -5.f,                       //
-                                 2.5f,  0.f, -5.f,  5.f,   0.f, -5.f,                       //
-                                 0.f,   0.f, -2.5f, 2.5f,  0.f, -2.5f,                      //
-                                 5.f,   0.f, -2.5f, 0.f,   0.f, 0.f,                        //
-                                 2.5f,  0.f, 0.f,   5.f,   0.f, 0.f,                        //
-                                 -5.f,  0.f, 0.f,   -2.5f, 0.f, 0.f,                        //
-                                 0.f,   0.f, 0.f,   -5.f,  0.f, 2.5f,                       //
-                                 -2.5f, 0.f, 2.5f,  0.f,   0.f, 2.5f,                       //
-                                 -5.f,  0.f, 5.f,   -2.5f, 0.f, 5.f,                        //
-                                 0.f,   0.f, 5.f,   0.f,   0.f, 0.f,                        //
-                                 2.5f,  0.f, 0.f,   5.f,   0.f, 0.f,                        //
-                                 0.f,   0.f, 2.5f,  2.5f,  0.f, 2.5f,                       //
-                                 5.f,   0.f, 2.5f,  0.f,   0.f, 5.f,                        //
-                                 2.5f,  0.f, 5.f,   5.f,   0.f, 5.f};                       //
-  Float32Array expectedNormals{0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,  //
-                               0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f}; //
-  Float32Array expectedUVs{0.f, 0.f,  0.5f, 0.f,  1.f, 0.f,                                 //
-                           0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f,                                //
-                           0.f, 1.f,  0.5f, 1.f,  1.f, 1.f,                                 //
-                           0.f, 0.f,  0.5f, 0.f,  1.f, 0.f,                                 //
-                           0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f,                                //
-                           0.f, 1.f,  0.5f, 1.f,  1.f, 1.f,                                 //
-                           0.f, 0.f,  0.5f, 0.f,  1.f, 0.f,                                 //
-                           0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f,                                //
-                           0.f, 1.f,  0.5f, 1.f,  1.f, 1.f,                                 //
-                           0.f, 0.f,  0.5f, 0.f,  1.f, 0.f,                                 //
-                           0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f,                                //
-                           0.f, 1.f,  0.5f, 1.f,  1.f, 1.f};                                //
+  Uint32Array expectedIndices{
+    1,  4,  3,  0,  1,  3,  2,  5,  4,  1,  2,  4,  4,  7,  6,  3,  4,  6,  5,  8,  7,  4,  5,  7,
+    10, 13, 12, 9,  10, 12, 11, 14, 13, 10, 11, 13, 13, 16, 15, 12, 13, 15, 14, 17, 16, 13, 14, 16,
+    19, 22, 21, 18, 19, 21, 20, 23, 22, 19, 20, 22, 22, 25, 24, 21, 22, 24, 23, 26, 25, 22, 23, 25,
+    28, 31, 30, 27, 28, 30, 29, 32, 31, 28, 29, 31, 31, 34, 33, 30, 31, 33, 32, 35, 34, 31, 32, 34};
+  Float32Array expectedPositions{
+    -5.f,  0.f,   -5.f,  -2.5f, 0.f,  -5.f,  0.f,  0.f,   -5.f, -5.f, 0.f,   -2.5f, -2.5f, 0.f,
+    -2.5f, 0.f,   0.f,   -2.5f, -5.f, 0.f,   0.f,  -2.5f, 0.f,  0.f,  0.f,   0.f,   0.f,   0.f,
+    0.f,   -5.f,  2.5f,  0.f,   -5.f, 5.f,   0.f,  -5.f,  0.f,  0.f,  -2.5f, 2.5f,  0.f,   -2.5f,
+    5.f,   0.f,   -2.5f, 0.f,   0.f,  0.f,   2.5f, 0.f,   0.f,  5.f,  0.f,   0.f,   -5.f,  0.f,
+    0.f,   -2.5f, 0.f,   0.f,   0.f,  0.f,   0.f,  -5.f,  0.f,  2.5f, -2.5f, 0.f,   2.5f,  0.f,
+    0.f,   2.5f,  -5.f,  0.f,   5.f,  -2.5f, 0.f,  5.f,   0.f,  0.f,  5.f,   0.f,   0.f,   0.f,
+    2.5f,  0.f,   0.f,   5.f,   0.f,  0.f,   0.f,  0.f,   2.5f, 2.5f, 0.f,   2.5f,  5.f,   0.f,
+    2.5f,  0.f,   0.f,   5.f,   2.5f, 0.f,   5.f,  5.f,   0.f,  5.f};
+  Float32Array expectedNormals{
+    0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+    0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+    0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+    0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+    0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f,
+    0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f};
+  Float32Array expectedUVs{
+    0.f, 0.f, 0.5f, 0.f, 1.f, 0.f, 0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f, 0.f, 1.f, 0.5f, 1.f, 1.f, 1.f,
+    0.f, 0.f, 0.5f, 0.f, 1.f, 0.f, 0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f, 0.f, 1.f, 0.5f, 1.f, 1.f, 1.f,
+    0.f, 0.f, 0.5f, 0.f, 1.f, 0.f, 0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f, 0.f, 1.f, 0.5f, 1.f, 1.f, 1.f,
+    0.f, 0.f, 0.5f, 0.f, 1.f, 0.f, 0.f, 0.5f, 0.5f, 0.5f, 1.f, 0.5f, 0.f, 1.f, 0.5f, 1.f, 1.f, 1.f};
   // Perform comparison
   EXPECT_THAT(tiledGround->indices, ::testing::ContainerEq(expectedIndices));
   EXPECT_THAT(tiledGround->positions, ::testing::ContainerEq(expectedPositions));
