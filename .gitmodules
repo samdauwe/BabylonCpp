@@ -25,6 +25,3 @@
 [submodule "external/backward-cpp"]
 	path = external/backward-cpp
 	url = https://github.com/bombela/backward-cpp.git
-[submodule "external/FunctionalPlus"]
-	path = external/FunctionalPlus
-	url = https://github.com/Dobiasd/FunctionalPlus.git
