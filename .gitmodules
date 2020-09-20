@@ -16,9 +16,6 @@
 [submodule "external/RuntimeCompiledCPlusPlus"]
 	path = external/RuntimeCompiledCPlusPlus
 	url = https://github.com/RuntimeCompiledCPlusPlus/RuntimeCompiledCPlusPlus.git
-[submodule "external/SDL"]
-	path = external/SDL
-	url = https://github.com/SDL-mirror/SDL.git
 [submodule "external/backward-cpp"]
 	path = external/backward-cpp
 	url = https://github.com/bombela/backward-cpp.git

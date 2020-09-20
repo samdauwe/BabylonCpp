@@ -1,6 +1,7 @@
 # imgui + backends (SDL, GLFW) compilation
 
 option(IMGUI_RUNNER_USE_SDL "Build babylon sdl version" ON)
+set(IMGUI_RUNNER_USE_SDL OFF) # No SDL support by default
 if (NOT EMSCRIPTEN)
     option(IMGUI_RUNNER_USE_GLFW "Build babylon glfw version" ON)
 else()

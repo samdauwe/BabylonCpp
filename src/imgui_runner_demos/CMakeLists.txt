@@ -6,6 +6,11 @@ if (EMSCRIPTEN)
 endif()
 
 #
+# No SDL support by default
+#
+set(IMGUI_RUNNER_USE_SDL OFF)
+
+#
 # imgui_runner_demos
 #
 if (IMGUI_RUNNER_USE_SDL)
