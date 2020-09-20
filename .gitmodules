@@ -28,6 +28,3 @@
 [submodule "external/FunctionalPlus"]
 	path = external/FunctionalPlus
 	url = https://github.com/Dobiasd/FunctionalPlus.git
-[submodule "external/fmt"]
-	path = external/fmt
-	url = https://github.com/fmtlib/fmt.git
