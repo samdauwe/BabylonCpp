@@ -20,8 +20,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
 
   static void render(const ArcRotateCameraPtr& camera)
   {
-    CommonCameraPropertyGridComponent::render(
-      std::static_pointer_cast<Camera>(camera));
+    CommonCameraPropertyGridComponent::render(std::static_pointer_cast<Camera>(camera));
     // --- TRANSFORMS ---
     static auto transformsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transformsContainerOpened, ImGuiCond_Always);
@@ -29,15 +28,12 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
       auto sliderChange = SliderLineComponent::render(
         "Alpha", camera->alpha,
         camera->lowerAlphaLimit.has_value() ? *camera->lowerAlphaLimit : 0.f,
-        camera->upperAlphaLimit.has_value() ? *camera->upperAlphaLimit :
-                                              Math::PI2,
-        0.01f, "%.3f");
+        camera->upperAlphaLimit.has_value() ? *camera->upperAlphaLimit : Math::PI2, 0.01f, "%.3f");
       if (sliderChange) {
         camera->alpha = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Beta", camera->beta, camera->lowerBetaLimit, camera->upperBetaLimit,
-        0.01f, "%.3f");
+      sliderChange = SliderLineComponent::render("Beta", camera->beta, camera->lowerBetaLimit,
+                                                 camera->upperBetaLimit, 0.01f, "%.3f");
       if (sliderChange) {
         camera->beta = sliderChange.value();
       }
@@ -51,7 +47,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
       transformsContainerOpened = false;
     }
     // --- CONTROLS ---
-    static auto controlsContainerOpened = true;
+    static auto controlsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(controlsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("CONTROLS")) {
       auto valueChange = FloatLineComponent::render("Speed", camera->speed);
@@ -64,51 +60,43 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
       controlsContainerOpened = false;
     }
     // --- COLLISIONS ---
-    static auto collisionsContainerOpened = true;
+    static auto collisionsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(collisionsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("COLLISIONS")) {
-      if (CheckBoxLineComponent::render("Check collisions",
-                                        camera->checkCollisions)) {
+      if (CheckBoxLineComponent::render("Check collisions", camera->checkCollisions)) {
         camera->checkCollisions = !camera->checkCollisions;
       }
-      Vector3LineComponent::render("Ellipsoid radius",
-                                   *camera->collisionRadius);
+      Vector3LineComponent::render("Collision radius", *camera->collisionRadius);
       collisionsContainerOpened = true;
     }
     else {
       collisionsContainerOpened = false;
     }
     // --- LIMITS ---
-    static auto limitsContainerOpened = true;
+    static auto limitsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(limitsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LIMITS")) {
-      auto valueChange = FloatLineComponent::render("Lower alpha limit",
-                                                    *camera->lowerAlphaLimit);
+      auto valueChange = FloatLineComponent::render("Lower alpha limit", *camera->lowerAlphaLimit);
       if (valueChange) {
         camera->lowerAlphaLimit = valueChange.value();
       }
-      valueChange = FloatLineComponent::render("Upper alpha limit",
-                                               *camera->upperAlphaLimit);
+      valueChange = FloatLineComponent::render("Upper alpha limit", *camera->upperAlphaLimit);
       if (valueChange) {
         camera->upperAlphaLimit = valueChange.value();
       }
-      valueChange = FloatLineComponent::render("Lower beta limit",
-                                               camera->lowerBetaLimit);
+      valueChange = FloatLineComponent::render("Lower beta limit", camera->lowerBetaLimit);
       if (valueChange) {
         camera->lowerBetaLimit = valueChange.value();
       }
-      valueChange = FloatLineComponent::render("Upper beta limit",
-                                               camera->upperBetaLimit);
+      valueChange = FloatLineComponent::render("Upper beta limit", camera->upperBetaLimit);
       if (valueChange) {
         camera->upperBetaLimit = valueChange.value();
       }
-      valueChange = FloatLineComponent::render("Lower radius limit",
-                                               *camera->lowerRadiusLimit);
+      valueChange = FloatLineComponent::render("Lower radius limit", *camera->lowerRadiusLimit);
       if (valueChange) {
         camera->lowerRadiusLimit = valueChange.value();
       }
-      valueChange = FloatLineComponent::render("Upper radius limit",
-                                               *camera->upperRadiusLimit);
+      valueChange = FloatLineComponent::render("Upper radius limit", *camera->upperRadiusLimit);
       if (valueChange) {
         camera->upperRadiusLimit = valueChange.value();
       }
@@ -121,16 +109,13 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
     static auto behaviorsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(behaviorsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("BEHAVIORS")) {
-      if (CheckBoxLineComponent::render("Auto rotation",
-                                        camera->useAutoRotationBehavior())) {
+      if (CheckBoxLineComponent::render("Auto rotation", camera->useAutoRotationBehavior())) {
         camera->useAutoRotationBehavior = !camera->useAutoRotationBehavior();
       }
-      if (CheckBoxLineComponent::render("Bouncing",
-                                        camera->useBouncingBehavior())) {
+      if (CheckBoxLineComponent::render("Bouncing", camera->useBouncingBehavior())) {
         camera->useBouncingBehavior = !camera->useBouncingBehavior;
       }
-      if (CheckBoxLineComponent::render("Framing",
-                                        camera->useFramingBehavior())) {
+      if (CheckBoxLineComponent::render("Framing", camera->useFramingBehavior())) {
         camera->useFramingBehavior = !camera->useFramingBehavior();
       }
       behaviorsContainerOpened = true;
