@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/inspector/components/actiontabs/lines/button_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/options_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
@@ -39,19 +40,17 @@ struct BABYLON_SHARED_EXPORT CommonCameraPropertyGridComponent {
       if (valueChange) {
         camera->maxZ = valueChange.value();
       }
-      auto sliderChange = SliderLineComponent::render(
-        "Inertia", camera->inertia, 0.f, 1.f, 0.01f, "%.3f");
+      auto sliderChange
+        = SliderLineComponent::render("Inertia", camera->inertia, 0.f, 1.f, 0.01f, "%.3f");
       if (sliderChange) {
         camera->inertia = sliderChange.value();
       }
-      auto optionChange
-        = OptionsLineComponent::render("Mode", camera->mode, modeOptions);
+      auto optionChange = OptionsLineComponent::render("Mode", camera->mode, modeOptions);
       if (optionChange) {
         camera->mode = optionChange.value();
       }
       if (camera->mode == Camera::PERSPECTIVE_CAMERA) {
-        SliderLineComponent::render("Field of view", camera->fov, 0.1f,
-                                    Math::PI, 0.1f, "%.2f");
+        SliderLineComponent::render("Field of view", camera->fov, 0.1f, Math::PI, 0.1f, "%.2f");
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
         valueChange = FloatLineComponent::render("Left", camera->orthoLeft);
@@ -76,6 +75,9 @@ struct BABYLON_SHARED_EXPORT CommonCameraPropertyGridComponent {
         if (valueChange) {
           camera->orthoBottom = valueChange.value();
         }
+      }
+      if (ButtonLineComponent::render("Dispose")) {
+        camera->dispose();
       }
       generalContainerOpened = true;
     }
