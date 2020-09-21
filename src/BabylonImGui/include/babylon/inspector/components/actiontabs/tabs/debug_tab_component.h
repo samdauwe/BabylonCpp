@@ -23,7 +23,6 @@ public:
   void render() override;
 
 private:
-  bool _skeletonViewersEnabled;
   bool _physicsViewersEnabled;
 
 }; // end of class StatisticsTabComponent
