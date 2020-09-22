@@ -1,5 +1,5 @@
-#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_LIGHTS_FREE_CAMERA_PROPERTY_GRID_COMPONENT_H
-#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_LIGHTS_FREE_CAMERA_PROPERTY_GRID_COMPONENT_H
+#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_CAMERAS_FREE_CAMERA_PROPERTY_GRID_COMPONENT_H
+#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_CAMERAS_FREE_CAMERA_PROPERTY_GRID_COMPONENT_H
 
 #include <memory>
 
@@ -19,24 +19,25 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
 
   static void render(const FreeCameraPtr& camera)
   {
-    CommonCameraPropertyGridComponent::render(
-      std::static_pointer_cast<Camera>(camera));
+    CommonCameraPropertyGridComponent::render(std::static_pointer_cast<Camera>(camera));
     // --- TRANSFORMS ---
     static auto transformsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transformsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSFORMS")) {
+      Vector3LineComponent::render("Target", camera->target());
       Vector3LineComponent::render("Position", camera->position());
+      Vector3LineComponent::render("Rotation", camera->rotation());
       transformsContainerOpened = true;
     }
     else {
       transformsContainerOpened = false;
     }
     // --- CONTROLS ---
-    static auto controlsContainerOpened = true;
+    static auto controlsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(controlsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("CONTROLS")) {
-      auto valueChange = FloatLineComponent::render(
-        "Angular sensitivity", camera->angularSensibility());
+      auto valueChange
+        = FloatLineComponent::render("Angular sensitivity", camera->angularSensibility());
       if (valueChange) {
         camera->angularSensibility = valueChange.value();
       }
@@ -50,15 +51,13 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
       controlsContainerOpened = false;
     }
     // --- COLLISIONS ---
-    static auto collisionsContainerOpened = true;
+    static auto collisionsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(collisionsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("COLLISIONS")) {
-      if (CheckBoxLineComponent::render("Check collisions",
-                                        camera->checkCollisions)) {
+      if (CheckBoxLineComponent::render("Check collisions", camera->checkCollisions)) {
         camera->checkCollisions = !camera->checkCollisions;
       }
-      if (CheckBoxLineComponent::render("Apply gravity",
-                                        camera->applyGravity)) {
+      if (CheckBoxLineComponent::render("Apply gravity", camera->applyGravity)) {
         camera->applyGravity = !camera->applyGravity;
       }
       Vector3LineComponent::render("Ellipsoid", camera->ellipsoid);
@@ -75,4 +74,4 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
 } // end of namespace BABYLON
 
 #endif // end of
-       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_LIGHTS_FREE_CAMERA_PROPERTY_GRID_COMPONENT_H
+       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_CAMERAS_FREE_CAMERA_PROPERTY_GRID_COMPONENT_H
