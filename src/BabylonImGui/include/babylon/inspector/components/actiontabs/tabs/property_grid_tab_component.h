@@ -18,6 +18,7 @@ class BackgroundMaterial;
 class BaseTexture;
 class Bone;
 class DirectionalLight;
+class FollowCamera;
 class FreeCamera;
 class HemisphericLight;
 class Material;
@@ -32,26 +33,25 @@ class Skeleton;
 class SpotLight;
 class StandardMaterial;
 class TransformNode;
-using ArcRotateCameraPtr    = std::shared_ptr<ArcRotateCamera>;
-using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
-using BaseTexturePtr        = std::shared_ptr<BaseTexture>;
-using BonePtr               = std::shared_ptr<Bone>;
-using DirectionalLightPtr   = std::shared_ptr<DirectionalLight>;
-using FreeCameraPtr         = std::shared_ptr<FreeCamera>;
-using HemisphericLightPtr   = std::shared_ptr<HemisphericLight>;
-using MaterialPtr           = std::shared_ptr<Material>;
-using MeshPtr               = std::shared_ptr<Mesh>;
-using MultiMaterialPtr      = std::shared_ptr<MultiMaterial>;
-using PBRMaterialPtr        = std::shared_ptr<PBRMaterial>;
-using PBRMetallicRoughnessMaterialPtr
-  = std::shared_ptr<PBRMetallicRoughnessMaterial>;
-using PBRSpecularGlossinessMaterialPtr
-  = std::shared_ptr<PBRSpecularGlossinessMaterial>;
-using PointLightPtr       = std::shared_ptr<PointLight>;
-using SkeletonPtr         = std::shared_ptr<Skeleton>;
-using SpotLightPtr        = std::shared_ptr<SpotLight>;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
-using TransformNodePtr    = std::shared_ptr<TransformNode>;
+using ArcRotateCameraPtr               = std::shared_ptr<ArcRotateCamera>;
+using BackgroundMaterialPtr            = std::shared_ptr<BackgroundMaterial>;
+using BaseTexturePtr                   = std::shared_ptr<BaseTexture>;
+using BonePtr                          = std::shared_ptr<Bone>;
+using DirectionalLightPtr              = std::shared_ptr<DirectionalLight>;
+using FollowCameraPtr                  = std::shared_ptr<FollowCamera>;
+using FreeCameraPtr                    = std::shared_ptr<FreeCamera>;
+using HemisphericLightPtr              = std::shared_ptr<HemisphericLight>;
+using MaterialPtr                      = std::shared_ptr<Material>;
+using MeshPtr                          = std::shared_ptr<Mesh>;
+using MultiMaterialPtr                 = std::shared_ptr<MultiMaterial>;
+using PBRMaterialPtr                   = std::shared_ptr<PBRMaterial>;
+using PBRMetallicRoughnessMaterialPtr  = std::shared_ptr<PBRMetallicRoughnessMaterial>;
+using PBRSpecularGlossinessMaterialPtr = std::shared_ptr<PBRSpecularGlossinessMaterial>;
+using PointLightPtr                    = std::shared_ptr<PointLight>;
+using SkeletonPtr                      = std::shared_ptr<Skeleton>;
+using SpotLightPtr                     = std::shared_ptr<SpotLight>;
+using StandardMaterialPtr              = std::shared_ptr<StandardMaterial>;
+using TransformNodePtr                 = std::shared_ptr<TransformNode>;
 
 struct EntityCache {
   // Bones
@@ -59,6 +59,7 @@ struct EntityCache {
   SkeletonPtr skeleton = nullptr;
   // Cameras
   ArcRotateCameraPtr arcRotateCamera = nullptr;
+  FollowCameraPtr followCamera       = nullptr;
   FreeCameraPtr freeCamera           = nullptr;
   // Lights
   DirectionalLightPtr directionalLight = nullptr;

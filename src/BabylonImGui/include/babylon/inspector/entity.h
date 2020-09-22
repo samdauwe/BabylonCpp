@@ -16,6 +16,7 @@ enum class EntityType {
   Skeleton,
   // Cameras
   ArcRotateCamera,
+  FollowCamera,
   FreeCamera,
   UniversalCamera,
   // Engine
