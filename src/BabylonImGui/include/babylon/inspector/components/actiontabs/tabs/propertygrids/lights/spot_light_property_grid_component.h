@@ -20,8 +20,7 @@ struct BABYLON_SHARED_EXPORT SpotLightPropertyGridComponent {
 
   static void render(const SpotLightPtr& light)
   {
-    CommonLightPropertyGridComponent::render(
-      std::static_pointer_cast<Light>(light));
+    CommonLightPropertyGridComponent::render(std::static_pointer_cast<Light>(light));
     // --- SETUP ---
     static auto setupContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(setupContainerOpened, ImGuiCond_Always);
@@ -33,6 +32,10 @@ struct BABYLON_SHARED_EXPORT SpotLightPropertyGridComponent {
       auto valueChange = FloatLineComponent::render("Angle", light->angle());
       if (valueChange) {
         light->angle = valueChange.value();
+      }
+      valueChange = FloatLineComponent::render("Inner angle", light->innerAngle());
+      if (valueChange) {
+        light->innerAngle = valueChange.value();
       }
       valueChange = FloatLineComponent::render("Exponent", light->exponent);
       if (valueChange) {
