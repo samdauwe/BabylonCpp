@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/inspector/components/actiontabs/lines/button_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
 #include <babylon/lights/light.h>
@@ -24,10 +25,12 @@ struct BABYLON_SHARED_EXPORT CommonLightPropertyGridComponent {
       TextLineComponent::render("ID", light->id);
       TextLineComponent::render("Unique ID", std::to_string(light->uniqueId));
       TextLineComponent::render("Class", light->getClassName());
-      auto valueChange
-        = FloatLineComponent::render("Intensity", light->intensity);
+      auto valueChange = FloatLineComponent::render("Intensity", light->intensity);
       if (valueChange) {
         light->intensity = valueChange.value();
+      }
+      if (ButtonLineComponent::render("Dispose")) {
+        light->dispose();
       }
       generalContainerOpened = true;
     }
