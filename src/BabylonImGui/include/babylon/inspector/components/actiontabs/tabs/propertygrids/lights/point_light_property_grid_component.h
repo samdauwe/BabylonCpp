@@ -19,8 +19,7 @@ struct BABYLON_SHARED_EXPORT PointLightPropertyGridComponent {
 
   static void render(const PointLightPtr& light)
   {
-    CommonLightPropertyGridComponent::render(
-      std::static_pointer_cast<Light>(light));
+    CommonLightPropertyGridComponent::render(std::static_pointer_cast<Light>(light));
     // --- SETUP ---
     static auto setupContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(setupContainerOpened, ImGuiCond_Always);
