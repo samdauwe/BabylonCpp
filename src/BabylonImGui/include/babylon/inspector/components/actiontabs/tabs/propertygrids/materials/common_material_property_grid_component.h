@@ -25,13 +25,12 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       {"Clockwise", Material::ClockWiseSideOrientation},
       {"Counterclockwise", Material::CounterClockWiseSideOrientation}};
 
-    static std::vector<std::pair<const char*, unsigned int>>
-      transparencyModeOptions{
-        {"Opaque", PBRMaterial::PBRMATERIAL_OPAQUE},
-        {"Alpha test", PBRMaterial::PBRMATERIAL_ALPHATEST},
-        {"Alpha blend", PBRMaterial::PBRMATERIAL_ALPHABLEND},
-        {"Alpha blend and test", PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND},
-      };
+    static std::vector<std::pair<const char*, unsigned int>> transparencyModeOptions{
+      {"Opaque", PBRMaterial::PBRMATERIAL_OPAQUE},
+      {"Alpha test", PBRMaterial::PBRMATERIAL_ALPHATEST},
+      {"Alpha blend", PBRMaterial::PBRMATERIAL_ALPHABLEND},
+      {"Alpha blend and test", PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND},
+    };
 
     static std::vector<std::pair<const char*, unsigned int>> alphaModeOptions{
       {"Combine", Constants::ALPHA_COMBINE},
@@ -48,41 +47,35 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(generalContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("GENERAL")) {
       TextLineComponent::render("ID", material->id);
-      TextLineComponent::render("Unique ID",
-                                std::to_string(material->uniqueId));
+      TextLineComponent::render("Unique ID", std::to_string(material->uniqueId));
       TextLineComponent::render("Class", material->getClassName());
-      if (CheckBoxLineComponent::render("Backface culling",
-                                        material->backFaceCulling())) {
+      if (CheckBoxLineComponent::render("Backface culling", material->backFaceCulling())) {
         material->backFaceCulling = !material->backFaceCulling();
       }
       auto optionChange = OptionsLineComponent::render(
-        "Orientation", static_cast<unsigned int>(material->sideOrientation),
-        orientationOptions);
+        "Orientation", static_cast<unsigned int>(material->sideOrientation), orientationOptions);
       if (optionChange) {
         material->sideOrientation = static_cast<int>(optionChange.value());
       }
-      if (CheckBoxLineComponent::render("Disable depth write",
-                                        material->disableDepthWrite)) {
+      if (CheckBoxLineComponent::render("Disable depth write", material->disableDepthWrite)) {
         material->disableDepthWrite = !material->disableDepthWrite;
       }
-      if (CheckBoxLineComponent::render("Need depth pre-pass",
-                                        material->needDepthPrePass())) {
+      if (CheckBoxLineComponent::render("Need depth pre-pass", material->needDepthPrePass())) {
         material->needDepthPrePass = !material->needDepthPrePass();
       }
       if (CheckBoxLineComponent::render("Wireframe", material->wireframe())) {
         material->wireframe = !material->wireframe();
       }
-      if (CheckBoxLineComponent::render("Point cloud",
-                                        material->pointsCloud())) {
+      if (CheckBoxLineComponent::render("Point cloud", material->pointsCloud())) {
         material->pointsCloud = !material->pointsCloud();
       }
-      auto sliderChange = SliderLineComponent::render(
-        "Point size", material->pointSize, 0.f, 100.f, 0.1f, "%.2f");
+      auto sliderChange
+        = SliderLineComponent::render("Point size", material->pointSize, 0.f, 100.f, 0.1f, "%.2f");
       if (sliderChange) {
         material->pointSize = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render("Z-offset", material->zOffset,
-                                                 -10.f, 10.f, 0.1f, "%.2f");
+      sliderChange
+        = SliderLineComponent::render("Z-offset", material->zOffset, -10.f, 10.f, 0.1f, "%.2f");
       if (sliderChange) {
         material->zOffset = sliderChange.value();
       }
@@ -95,28 +88,25 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
     static auto transparencyContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transparencyContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSPARENCY")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Alpha", material->alpha(), 0.f, 1.f, 0.01f, "%.2f");
+      auto sliderChange
+        = SliderLineComponent::render("Alpha", material->alpha(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->alpha = sliderChange.value();
       }
-      auto pbrBaseMaterial
-        = std::static_pointer_cast<PBRBaseMaterial>(material);
+      auto pbrBaseMaterial = std::static_pointer_cast<PBRBaseMaterial>(material);
       if (pbrBaseMaterial) {
         auto optionChange = OptionsLineComponent::render(
-          "Transparency mode", *pbrBaseMaterial->transparencyMode(),
-          transparencyModeOptions);
+          "Transparency mode", *pbrBaseMaterial->transparencyMode(), transparencyModeOptions);
         if (optionChange) {
           pbrBaseMaterial->transparencyMode = optionChange.value();
         }
       }
-      auto optionChange = OptionsLineComponent::render(
-        "Alpha mode", material->alphaMode(), alphaModeOptions);
+      auto optionChange
+        = OptionsLineComponent::render("Alpha mode", material->alphaMode(), alphaModeOptions);
       if (optionChange) {
         material->alphaMode = optionChange.value();
       }
-      if (CheckBoxLineComponent::render("Separate culling pass",
-                                        material->separateCullingPass)) {
+      if (CheckBoxLineComponent::render("Separate culling pass", material->separateCullingPass)) {
         material->separateCullingPass = !material->separateCullingPass;
       }
       transparencyContainerOpened = true;
