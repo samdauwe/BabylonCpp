@@ -24,14 +24,11 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
     static auto texturesContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(texturesContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TEXTURES")) {
-      TextureLinkLineComponent::render("Diffuse", material,
-                                       material->diffuseTexture());
-      TextureLinkLineComponent::render("Reflection", material,
-                                       material->reflectionTexture());
+      TextureLinkLineComponent::render("Diffuse", material, material->diffuseTexture());
+      TextureLinkLineComponent::render("Reflection", material, material->reflectionTexture());
       if (material->reflectionTexture()) {
         auto sliderChange = SliderLineComponent::render(
-          "Reflection blur", material->reflectionBlur(), 0.f, 1.f, 0.01f,
-          "%.2f");
+          "Reflection blur", material->reflectionBlur(), 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           material->reflectionBlur = sliderChange.value();
         }
@@ -48,21 +45,18 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
     CommonMaterialPropertyGridComponent::render(material);
     // --- LIGHTING & COLORS ---
     static auto lightingAndColorsContainerOpened = true;
-    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened,
-                               ImGuiCond_Always);
+    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LIGHTING & COLORS")) {
       Color3LineComponent::render(
         "Primary", material->primaryColor(),
         [&material](const Color3& color) { material->primaryColor = color; });
       auto sliderChange = SliderLineComponent::render(
-        "Shadow level", material->primaryColorShadowLevel(), 0.f, 1.f, 0.01f,
-        "%.2f");
+        "Shadow level", material->primaryColorShadowLevel(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->primaryColorShadowLevel = sliderChange.value();
       }
       sliderChange = SliderLineComponent::render(
-        "Highlight level", material->primaryColorHighlightLevel(), 0.f, 1.f,
-        0.01f, "%.2f");
+        "Highlight level", material->primaryColorHighlightLevel(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->primaryColorHighlightLevel = sliderChange.value();
       }
@@ -75,21 +69,17 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
     static auto renderingContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(renderingContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("RENDERING")) {
-      if (CheckBoxLineComponent::render("Enable noise",
-                                        material->enableNoise())) {
+      if (CheckBoxLineComponent::render("Enable noise", material->enableNoise())) {
         material->enableNoise = !material->enableNoise();
       }
-      if (CheckBoxLineComponent::render("Opacity fresnel",
-                                        material->opacityFresnel())) {
+      if (CheckBoxLineComponent::render("Opacity fresnel", material->opacityFresnel())) {
         material->opacityFresnel = !material->opacityFresnel();
       }
-      if (CheckBoxLineComponent::render("Reflection fresnel",
-                                        material->reflectionFresnel())) {
+      if (CheckBoxLineComponent::render("Reflection fresnel", material->reflectionFresnel())) {
         material->reflectionFresnel = !material->reflectionFresnel();
       }
       auto sliderChange = SliderLineComponent::render(
-        "Reflection amount", material->reflectionAmount(), 0.f, 1.f, 0.01f,
-        "%.2f");
+        "Reflection amount", material->reflectionAmount(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->reflectionAmount = sliderChange.value();
       }
