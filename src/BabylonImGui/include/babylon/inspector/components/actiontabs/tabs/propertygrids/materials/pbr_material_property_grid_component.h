@@ -34,26 +34,16 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto texturesContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(texturesContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TEXTURES")) {
-      TextureLinkLineComponent::render("Albedo", material,
-                                       material->albedoTexture());
-      TextureLinkLineComponent::render("Metallic", material,
-                                       material->metallicTexture());
-      TextureLinkLineComponent::render("Reflection", material,
-                                       material->reflectionTexture());
-      TextureLinkLineComponent::render("Refraction", material,
-                                       material->refractionTexture());
-      TextureLinkLineComponent::render("Micro-surface", material,
-                                       material->microSurfaceTexture());
-      TextureLinkLineComponent::render("Bump", material,
-                                       material->bumpTexture());
-      TextureLinkLineComponent::render("Emissive", material,
-                                       material->emissiveTexture());
-      TextureLinkLineComponent::render("Opacity", material,
-                                       material->opacityTexture());
-      TextureLinkLineComponent::render("Ambient", material,
-                                       material->ambientTexture());
-      TextureLinkLineComponent::render("Lightmap", material,
-                                       material->lightmapTexture());
+      TextureLinkLineComponent::render("Albedo", material, material->albedoTexture());
+      TextureLinkLineComponent::render("Metallic", material, material->metallicTexture());
+      TextureLinkLineComponent::render("Reflection", material, material->reflectionTexture());
+      TextureLinkLineComponent::render("Refraction", material, material->refractionTexture());
+      TextureLinkLineComponent::render("Micro-surface", material, material->microSurfaceTexture());
+      TextureLinkLineComponent::render("Bump", material, material->bumpTexture());
+      TextureLinkLineComponent::render("Emissive", material, material->emissiveTexture());
+      TextureLinkLineComponent::render("Opacity", material, material->opacityTexture());
+      TextureLinkLineComponent::render("Ambient", material, material->ambientTexture());
+      TextureLinkLineComponent::render("Lightmap", material, material->lightmapTexture());
       texturesContainerOpened = true;
     }
     else {
@@ -128,18 +118,16 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     renderTextures(material);
     // --- LIGHTING & COLORS ---
     static auto lightingAndColorsContainerOpened = true;
-    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened,
-                               ImGuiCond_Always);
+    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LIGHTING & COLORS")) {
       Color3LineComponent::render(
         "Albedo", material->albedoColor(),
         [&material](const Color3& color) { material->albedoColor = color; });
-      Color3LineComponent::render("Reflectivity", material->reflectivityColor(),
-                                  [&material](const Color3& color) {
-                                    material->reflectivityColor = color;
-                                  });
-      auto sliderChange = SliderLineComponent::render(
-        "Micro-surface", material->microSurface(), 0.f, 1.f, 0.01f, "%.2f");
+      Color3LineComponent::render(
+        "Reflectivity", material->reflectivityColor(),
+        [&material](const Color3& color) { material->reflectivityColor = color; });
+      auto sliderChange = SliderLineComponent::render("Micro-surface", material->microSurface(),
+                                                      0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->microSurface = sliderChange.value();
       }
@@ -151,8 +139,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
         [&material](const Color3& color) { material->ambientColor = color; });
       if (CheckBoxLineComponent::render("Use physical light falloff",
                                         material->usePhysicalLightFalloff())) {
-        material->usePhysicalLightFalloff
-          = !material->usePhysicalLightFalloff();
+        material->usePhysicalLightFalloff = !material->usePhysicalLightFalloff();
       }
       lightingAndColorsContainerOpened = true;
     }
@@ -164,14 +151,12 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(metallicWorkflowOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("METALLIC WORKFLOW")) {
       auto sliderChange = SliderLineComponent::render(
-        "Metallic", material->metallic().value_or(0.f), 0.f, 1.f, 0.01f,
-        "%.2f");
+        "Metallic", material->metallic().value_or(0.f), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->metallic = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Roughness", material->roughness().value_or(0.f), 0.f, 1.f, 0.01f,
-        "%.2f");
+      sliderChange = SliderLineComponent::render("Roughness", material->roughness().value_or(0.f),
+                                                 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->roughness = sliderChange.value();
       }
@@ -190,29 +175,26 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       }
       if (clearCoat->isEnabled()) {
         // Fragment
-        auto sliderChange = SliderLineComponent::render(
-          "Intensity", clearCoat->intensity, 0.f, 1.f, 0.01f, "%.2f");
+        auto sliderChange
+          = SliderLineComponent::render("Intensity", clearCoat->intensity, 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           clearCoat->intensity = sliderChange.value();
         }
-        sliderChange = SliderLineComponent::render(
-          "Roughness", clearCoat->roughness, 0.f, 1.f, 0.01f, "%.2f");
+        sliderChange
+          = SliderLineComponent::render("Roughness", clearCoat->roughness, 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           clearCoat->roughness = sliderChange.value();
         }
-        sliderChange = SliderLineComponent::render(
-          "IOR", clearCoat->indexOfRefraction(), 0.f, 1.f, 0.01f, "%.2f");
+        sliderChange = SliderLineComponent::render("IOR", clearCoat->indexOfRefraction(), 0.f, 1.f,
+                                                   0.01f, "%.2f");
         if (sliderChange) {
           clearCoat->indexOfRefraction = sliderChange.value();
         }
-        TextureLinkLineComponent::render("Texture", material,
-                                         clearCoat->texture());
-        TextureLinkLineComponent::render("Bump", material,
-                                         clearCoat->bumpTexture());
+        TextureLinkLineComponent::render("Texture", material, clearCoat->texture());
+        TextureLinkLineComponent::render("Bump", material, clearCoat->bumpTexture());
         if (clearCoat->bumpTexture()) {
           sliderChange = SliderLineComponent::render(
-            "Bump strength", clearCoat->bumpTexture()->level, 0.f, 2.f, 0.01f,
-            "%.2f");
+            "Bump strength", clearCoat->bumpTexture()->level, 0.f, 2.f, 0.01f, "%.2f");
           if (sliderChange) {
             clearCoat->bumpTexture()->level = sliderChange.value();
           }
@@ -222,20 +204,17 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
         }
         if (clearCoat->isTintEnabled()) {
           Color3LineComponent::render("Tint Color", clearCoat->tintColor);
-          sliderChange = SliderLineComponent::render(
-            "At Distance", clearCoat->tintColorAtDistance, 0.f, 20.f, 0.1f,
-            "%.1f");
+          sliderChange = SliderLineComponent::render("At Distance", clearCoat->tintColorAtDistance,
+                                                     0.f, 20.f, 0.1f, "%.1f");
           if (sliderChange) {
             clearCoat->tintColorAtDistance = sliderChange.value();
           }
-          sliderChange = SliderLineComponent::render("Tint Thickness",
-                                                     clearCoat->tintThickness,
+          sliderChange = SliderLineComponent::render("Tint Thickness", clearCoat->tintThickness,
                                                      0.f, 20.f, 0.1f, "%.1f");
           if (sliderChange) {
             clearCoat->tintThickness = sliderChange.value();
           }
-          TextureLinkLineComponent::render("Tint Texture", material,
-                                           clearCoat->tintTexture());
+          TextureLinkLineComponent::render("Tint Texture", material, clearCoat->tintTexture());
         }
       }
       clearCoatOpened = true;
@@ -253,14 +232,13 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       }
       if (anisotropy->isEnabled()) {
         // Fragment
-        auto sliderChange = SliderLineComponent::render(
-          "Intensity", anisotropy->intensity, 0.f, 1.f, 0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render("Intensity", anisotropy->intensity, 0.f,
+                                                        1.f, 0.01f, "%.2f");
         if (sliderChange) {
           anisotropy->intensity = sliderChange.value();
         }
         Vector2LineComponent::render("Direction", anisotropy->direction);
-        TextureLinkLineComponent::render("Texture", material,
-                                         anisotropy->texture());
+        TextureLinkLineComponent::render("Texture", material, anisotropy->texture());
       }
       anisotropicOpened = true;
     }
@@ -277,12 +255,11 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       }
       if (sheen->isEnabled()) {
         // Fragment
-        if (CheckBoxLineComponent::render("Link to Albedo",
-                                          sheen->linkSheenWithAlbedo())) {
+        if (CheckBoxLineComponent::render("Link to Albedo", sheen->linkSheenWithAlbedo())) {
           sheen->linkSheenWithAlbedo = !sheen->linkSheenWithAlbedo();
         }
-        auto sliderChange = SliderLineComponent::render(
-          "Intensity", sheen->intensity, 0.f, 1.f, 0.01f, "%.2f");
+        auto sliderChange
+          = SliderLineComponent::render("Intensity", sheen->intensity, 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           sheen->intensity = sliderChange.value();
         }
@@ -299,51 +276,44 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(subsurfaceOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("SUBSURFACE")) {
       auto& subSurface = material->subSurface;
-      TextureLinkLineComponent::render("Thickness", material,
-                                       subSurface->thicknessTexture());
-      auto sliderChange = SliderLineComponent::render(
-        "Min Thickness", subSurface->minimumThickness, 0.f, 10.f, 0.1f, "%.1f");
+      TextureLinkLineComponent::render("Thickness", material, subSurface->thicknessTexture());
+      auto sliderChange = SliderLineComponent::render("Min Thickness", subSurface->minimumThickness,
+                                                      0.f, 10.f, 0.1f, "%.1f");
       if (sliderChange) {
         subSurface->minimumThickness = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Max Thickness", subSurface->maximumThickness, 0.f, 10.f, 0.1f, "%.1f");
+      sliderChange = SliderLineComponent::render("Max Thickness", subSurface->maximumThickness, 0.f,
+                                                 10.f, 0.1f, "%.1f");
       if (sliderChange) {
         subSurface->maximumThickness = sliderChange.value();
       }
-      if (CheckBoxLineComponent::render(
-            "Mask From Thickness", subSurface->useMaskFromThicknessTexture())) {
-        subSurface->useMaskFromThicknessTexture
-          = !subSurface->useMaskFromThicknessTexture();
+      if (CheckBoxLineComponent::render("Mask From Thickness",
+                                        subSurface->useMaskFromThicknessTexture())) {
+        subSurface->useMaskFromThicknessTexture = !subSurface->useMaskFromThicknessTexture();
       }
       Color3LineComponent::render("Tint Color", subSurface->tintColor);
-      if (CheckBoxLineComponent::render("Refraction Enabled",
-                                        subSurface->isRefractionEnabled())) {
+      if (CheckBoxLineComponent::render("Refraction Enabled", subSurface->isRefractionEnabled())) {
         subSurface->isRefractionEnabled = !subSurface->isRefractionEnabled();
       }
       if (subSurface->isRefractionEnabled()) {
         // Fragment
-        sliderChange = SliderLineComponent::render(
-          "Intensity", subSurface->refractionIntensity, 0.f, 1.f, 0.01f,
-          "%.2f");
+        sliderChange = SliderLineComponent::render("Intensity", subSurface->refractionIntensity,
+                                                   0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           subSurface->refractionIntensity = sliderChange.value();
         }
         sliderChange = SliderLineComponent::render(
-          "Index of Refraction", subSurface->indexOfRefraction, 1.f, 2.f, 0.01f,
-          "%.2f");
+          "Index of Refraction", subSurface->indexOfRefraction, 1.f, 2.f, 0.01f, "%.2f");
         if (sliderChange) {
           subSurface->indexOfRefraction = sliderChange.value();
         }
         sliderChange = SliderLineComponent::render(
-          "Tint at Distance", subSurface->tintColorAtDistance, 1.f, 10.f, 0.1f,
-          "%.1f");
+          "Tint at Distance", subSurface->tintColorAtDistance, 1.f, 10.f, 0.1f, "%.1f");
         if (sliderChange) {
           subSurface->tintColorAtDistance = sliderChange.value();
         }
-        if (CheckBoxLineComponent::render(
-              "Link refraction with transparency",
-              subSurface->linkRefractionWithTransparency())) {
+        if (CheckBoxLineComponent::render("Link refraction with transparency",
+                                          subSurface->linkRefractionWithTransparency())) {
           subSurface->linkRefractionWithTransparency
             = !subSurface->linkRefractionWithTransparency();
         }
@@ -351,18 +321,15 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       Color3LineComponent::render("Tint Color", subSurface->tintColor);
       if (CheckBoxLineComponent::render("Transluency Enabled",
                                         subSurface->isTranslucencyEnabled())) {
-        subSurface->isTranslucencyEnabled
-          = !subSurface->isTranslucencyEnabled();
+        subSurface->isTranslucencyEnabled = !subSurface->isTranslucencyEnabled();
       }
       if (subSurface->isTranslucencyEnabled()) {
-        sliderChange = SliderLineComponent::render(
-          "Intensity", subSurface->translucencyIntensity, 0.f, 1.f, 0.01f,
-          "%.2f");
+        sliderChange = SliderLineComponent::render("Intensity", subSurface->translucencyIntensity,
+                                                   0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           subSurface->translucencyIntensity = sliderChange.value();
         }
-        Color3LineComponent::render("Diffusion Distance",
-                                    subSurface->diffusionDistance);
+        Color3LineComponent::render("Diffusion Distance", subSurface->diffusionDistance);
       }
       subsurfaceOpened = true;
     }
@@ -374,46 +341,42 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
       auto sliderChange = SliderLineComponent::render(
-        "Environment", material->environmentIntensity(), 0.f, 1.f, 0.01f,
-        "%.2f");
+        "Environment", material->environmentIntensity(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->environmentIntensity = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Specular", material->specularIntensity(), 0.f, 1.f, 0.01f, "%.2f");
+      sliderChange = SliderLineComponent::render("Specular", material->specularIntensity(), 0.f,
+                                                 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->specularIntensity = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Emissive", material->emissiveIntensity(), 0.f, 1.f, 0.01f, "%.2f");
+      sliderChange = SliderLineComponent::render("Emissive", material->emissiveIntensity(), 0.f,
+                                                 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->emissiveIntensity = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Direct", material->directIntensity(), 0.f, 1.f, 0.01f, "%.2f");
+      sliderChange = SliderLineComponent::render("Direct", material->directIntensity(), 0.f, 1.f,
+                                                 0.01f, "%.2f");
       if (sliderChange) {
         material->directIntensity = sliderChange.value();
       }
       if (material->bumpTexture()) {
-        sliderChange = SliderLineComponent::render(
-          "Bump strength", material->bumpTexture()->level, 0.f, 1.f, 0.01f,
-          "%.2f");
+        sliderChange = SliderLineComponent::render("Bump strength", material->bumpTexture()->level,
+                                                   0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           material->bumpTexture()->level = sliderChange.value();
         }
       }
       if (material->ambientTexture()) {
         sliderChange = SliderLineComponent::render(
-          "Ambient strength", material->ambientTexture()->level, 0.f, 1.f,
-          0.01f, "%.2f");
+          "Ambient strength", material->ambientTexture()->level, 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           material->ambientTexture()->level = sliderChange.value();
         }
       }
       if (material->reflectionTexture()) {
         sliderChange = SliderLineComponent::render(
-          "Reflection strength", material->reflectionTexture()->level, 0.f, 1.f,
-          0.01f, "%.2f");
+          "Reflection strength", material->reflectionTexture()->level, 0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           material->reflectionTexture()->level = sliderChange.value();
         }
@@ -427,33 +390,28 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto renderingContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(renderingContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("RENDERING")) {
-      if (CheckBoxLineComponent::render(
-            "Alpha from albedo", material->useAlphaFromAlbedoTexture())) {
-        material->useAlphaFromAlbedoTexture
-          = !material->useAlphaFromAlbedoTexture();
+      if (CheckBoxLineComponent::render("Alpha from albedo",
+                                        material->useAlphaFromAlbedoTexture())) {
+        material->useAlphaFromAlbedoTexture = !material->useAlphaFromAlbedoTexture();
       }
       if (CheckBoxLineComponent::render("Ambient in grayscale",
                                         material->useAmbientInGrayScale())) {
         material->useAmbientInGrayScale = !material->useAmbientInGrayScale();
       }
-      if (CheckBoxLineComponent::render("Radiance over alpha",
-                                        material->useRadianceOverAlpha())) {
+      if (CheckBoxLineComponent::render("Radiance over alpha", material->useRadianceOverAlpha())) {
         material->useRadianceOverAlpha = !material->useRadianceOverAlpha();
       }
-      if (CheckBoxLineComponent::render(
-            "Micro-surface from ref. map alpha",
-            material->useMicroSurfaceFromReflectivityMapAlpha())) {
+      if (CheckBoxLineComponent::render("Micro-surface from ref. map alpha",
+                                        material->useMicroSurfaceFromReflectivityMapAlpha())) {
         material->useMicroSurfaceFromReflectivityMapAlpha
           = !material->useMicroSurfaceFromReflectivityMapAlpha();
       }
-      if (CheckBoxLineComponent::render("Specular over alpha",
-                                        material->useSpecularOverAlpha())) {
+      if (CheckBoxLineComponent::render("Specular over alpha", material->useSpecularOverAlpha())) {
         material->useSpecularOverAlpha = !material->useSpecularOverAlpha();
       }
-      if (CheckBoxLineComponent::render(
-            "Specular anti-aliasing", material->enableSpecularAntiAliasing())) {
-        material->enableSpecularAntiAliasing
-          = !material->enableSpecularAntiAliasing();
+      if (CheckBoxLineComponent::render("Specular anti-aliasing",
+                                        material->enableSpecularAntiAliasing())) {
+        material->enableSpecularAntiAliasing = !material->enableSpecularAntiAliasing();
       }
       renderingContainerOpened = true;
     }
@@ -464,22 +422,18 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto advancedContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(advancedContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("ADVANCED")) {
-      if (CheckBoxLineComponent::render(
-            "Energy Conservation", material->brdf->useEnergyConservation())) {
-        material->brdf->useEnergyConservation
-          = !material->brdf->useEnergyConservation();
+      if (CheckBoxLineComponent::render("Energy Conservation",
+                                        material->brdf->useEnergyConservation())) {
+        material->brdf->useEnergyConservation = !material->brdf->useEnergyConservation();
       }
-      if (CheckBoxLineComponent::render(
-            "Spherical Harmonics", material->brdf->useSphericalHarmonics())) {
-        material->brdf->useSphericalHarmonics
-          = !material->brdf->useSphericalHarmonics();
+      if (CheckBoxLineComponent::render("Spherical Harmonics",
+                                        material->brdf->useSphericalHarmonics())) {
+        material->brdf->useSphericalHarmonics = !material->brdf->useSphericalHarmonics();
       }
-      if (CheckBoxLineComponent::render("Radiance occlusion",
-                                        material->useRadianceOcclusion())) {
+      if (CheckBoxLineComponent::render("Radiance occlusion", material->useRadianceOcclusion())) {
         material->useRadianceOcclusion = !material->useRadianceOcclusion();
       }
-      if (CheckBoxLineComponent::render("Horizon occlusion",
-                                        material->useHorizonOcclusion())) {
+      if (CheckBoxLineComponent::render("Horizon occlusion", material->useHorizonOcclusion())) {
         material->useHorizonOcclusion = !material->useHorizonOcclusion();
       }
       if (CheckBoxLineComponent::render("Unlit", material->unlit())) {
@@ -494,18 +448,18 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto debugOpened = false;
     ImGui::SetNextTreeNodeOpen(debugOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("DEBUG")) {
-      auto optionChange = OptionsLineComponent::render(
-        "Debug mode", material->debugMode(), debugMode);
+      auto optionChange
+        = OptionsLineComponent::render("Debug mode", material->debugMode(), debugMode);
       if (optionChange) {
         material->debugMode = optionChange.value();
       }
-      auto sliderChange = SliderLineComponent::render(
-        "Split position", material->debugLimit, -1.f, 1.f, 0.01f, "%.2f");
+      auto sliderChange = SliderLineComponent::render("Split position", material->debugLimit, -1.f,
+                                                      1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->debugLimit = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Output factor", material->debugFactor, 0.f, 5.f, 0.01f, "%.2f");
+      sliderChange = SliderLineComponent::render("Output factor", material->debugFactor, 0.f, 5.f,
+                                                 0.01f, "%.2f");
       if (sliderChange) {
         material->debugFactor = sliderChange.value();
       }
