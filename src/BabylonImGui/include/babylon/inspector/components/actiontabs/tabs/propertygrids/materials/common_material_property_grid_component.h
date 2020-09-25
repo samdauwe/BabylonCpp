@@ -4,6 +4,8 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/engines/engine.h>
+#include <babylon/inspector/components/actiontabs/lines/button_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/options_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
@@ -13,9 +15,6 @@
 #include <babylon/materials/pbr/pbr_material.h>
 
 namespace BABYLON {
-
-class Material;
-using MaterialPtr = std::shared_ptr<Material>;
 
 struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
 
@@ -42,11 +41,24 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       {"Pre-multiplied", Constants::ALPHA_PREMULTIPLIED},
     };
 
+    static std::vector<std::pair<const char*, unsigned int>> depthfunctionOptions{
+      {"<Engine Default>", 0},              //
+      {"Never", Engine::NEVER},             //
+      {"Always", Engine::ALWAYS},           //
+      {"Equal", Engine::EQUAL},             //
+      {"Less", Engine::LESS},               //
+      {"Less or equal", Engine::LEQUAL},    //
+      {"Greater", Engine::GREATER},         //
+      {"Greater or equal", Engine::GEQUAL}, //
+      {"Not equal", Engine::NOTEQUAL},      //
+    };
+
     // --- GENERAL ---
     static auto generalContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(generalContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("GENERAL")) {
       TextLineComponent::render("ID", material->id);
+      TextLineComponent::render("Name", material->name);
       TextLineComponent::render("Unique ID", std::to_string(material->uniqueId));
       TextLineComponent::render("Class", material->getClassName());
       if (CheckBoxLineComponent::render("Backface culling", material->backFaceCulling())) {
@@ -57,8 +69,16 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       if (optionChange) {
         material->sideOrientation = static_cast<int>(optionChange.value());
       }
+      if (CheckBoxLineComponent::render("Disable color write", material->disableColorWrite)) {
+        material->disableColorWrite = !material->disableColorWrite;
+      }
       if (CheckBoxLineComponent::render("Disable depth write", material->disableDepthWrite)) {
         material->disableDepthWrite = !material->disableDepthWrite;
+      }
+      optionChange = OptionsLineComponent::render(
+        "Depth function", static_cast<unsigned int>(material->depthFunction), depthfunctionOptions);
+      if (optionChange) {
+        material->depthFunction = static_cast<int>(optionChange.value());
       }
       if (CheckBoxLineComponent::render("Need depth pre-pass", material->needDepthPrePass())) {
         material->needDepthPrePass = !material->needDepthPrePass();
@@ -78,6 +98,9 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
         = SliderLineComponent::render("Z-offset", material->zOffset, -10.f, 10.f, 0.1f, "%.2f");
       if (sliderChange) {
         material->zOffset = sliderChange.value();
+      }
+      if (ButtonLineComponent::render("Dispose")) {
+        material->dispose();
       }
       generalContainerOpened = true;
     }
