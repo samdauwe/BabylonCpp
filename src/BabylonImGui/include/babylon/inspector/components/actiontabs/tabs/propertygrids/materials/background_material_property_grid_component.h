@@ -13,9 +13,6 @@
 
 namespace BABYLON {
 
-class BackgroundMaterial;
-using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
-
 struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
 
   static void renderTextures(const BackgroundMaterialPtr& material)

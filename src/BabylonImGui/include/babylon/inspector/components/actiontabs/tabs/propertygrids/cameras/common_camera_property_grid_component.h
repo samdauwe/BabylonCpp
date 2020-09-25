@@ -13,9 +13,6 @@
 
 namespace BABYLON {
 
-class Camera;
-using CameraPtr = std::shared_ptr<Camera>;
-
 struct BABYLON_SHARED_EXPORT CommonCameraPropertyGridComponent {
 
   static void render(const CameraPtr& camera)

@@ -9,9 +9,6 @@
 
 namespace BABYLON {
 
-class Material;
-using MaterialPtr = std::shared_ptr<Material>;
-
 struct BABYLON_SHARED_EXPORT MaterialPropertyGridComponent {
 
   static void render(const MaterialPtr& material)

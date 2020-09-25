@@ -11,9 +11,6 @@
 
 namespace BABYLON {
 
-class MultiMaterial;
-using MultiMaterialPtr = std::shared_ptr<MultiMaterial>;
-
 struct BABYLON_SHARED_EXPORT MultiMaterialPropertyGridComponent {
 
   static void renderChildMaterial(const MultiMaterialPtr& material)
@@ -22,7 +19,7 @@ struct BABYLON_SHARED_EXPORT MultiMaterialPropertyGridComponent {
     static auto childrenContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(childrenContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("CHILDREN")) {
-      int i = 0;
+      auto i = 0;
       for (const auto& mat : material->subMaterials()) {
         if (mat) {
           TextLineComponent::render(StringTools::printf("Material #%d", i).c_str(), mat->name);

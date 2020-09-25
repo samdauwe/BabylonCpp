@@ -13,9 +13,6 @@
 
 namespace BABYLON {
 
-class ArcRotateCamera;
-using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
-
 struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
 
   static void render(const ArcRotateCameraPtr& camera)

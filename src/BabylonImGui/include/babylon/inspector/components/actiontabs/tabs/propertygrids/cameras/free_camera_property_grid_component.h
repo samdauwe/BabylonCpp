@@ -12,9 +12,6 @@
 
 namespace BABYLON {
 
-class FreeCamera;
-using FreeCameraPtr = std::shared_ptr<FreeCamera>;
-
 struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
 
   static void render(const FreeCameraPtr& camera)
