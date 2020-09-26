@@ -19,9 +19,6 @@
 
 namespace BABYLON {
 
-class PBRMaterial;
-using PBRMaterialPtr = std::shared_ptr<PBRMaterial>;
-
 struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
 
   static void renderTextures(const PBRMaterialPtr& material)
