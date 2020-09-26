@@ -11,12 +11,7 @@
 
 namespace BABYLON {
 
-class PBRSpecularGlossinessMaterial;
-using PBRSpecularGlossinessMaterialPtr
-  = std::shared_ptr<PBRSpecularGlossinessMaterial>;
-
-struct BABYLON_SHARED_EXPORT
-  PBRSpecularGlossinessMaterialPropertyGridComponent {
+struct BABYLON_SHARED_EXPORT PBRSpecularGlossinessMaterialPropertyGridComponent {
 
   static void renderTextures(const PBRSpecularGlossinessMaterialPtr& material)
   {
@@ -28,18 +23,13 @@ struct BABYLON_SHARED_EXPORT
     static auto texturesContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(texturesContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TEXTURES")) {
-      TextureLinkLineComponent::render("Diffuse", material,
-                                       material->diffuseTexture());
+      TextureLinkLineComponent::render("Diffuse", material, material->diffuseTexture());
       TextureLinkLineComponent::render("Specular glossiness", material,
                                        material->specularGlossinessTexture());
-      TextureLinkLineComponent::render("Normal", material,
-                                       material->normalTexture());
-      TextureLinkLineComponent::render("Environment", material,
-                                       material->environmentTexture());
-      TextureLinkLineComponent::render("Emissive", material,
-                                       material->emissiveTexture());
-      TextureLinkLineComponent::render("Lightmap", material,
-                                       material->lightmapTexture());
+      TextureLinkLineComponent::render("Normal", material, material->normalTexture());
+      TextureLinkLineComponent::render("Environment", material, material->environmentTexture());
+      TextureLinkLineComponent::render("Emissive", material, material->emissiveTexture());
+      TextureLinkLineComponent::render("Lightmap", material, material->lightmapTexture());
       texturesContainerOpened = true;
     }
     else {
@@ -53,8 +43,7 @@ struct BABYLON_SHARED_EXPORT
     renderTextures(material);
     // --- LIGHTING & COLORS ---
     static auto lightingAndColorsContainerOpened = true;
-    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened,
-                               ImGuiCond_Always);
+    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LIGHTING & COLORS")) {
       Color3LineComponent::render("Diffuse", material->diffuseColor());
       Color3LineComponent::render("Specular", material->specularColor());
@@ -64,11 +53,11 @@ struct BABYLON_SHARED_EXPORT
       lightingAndColorsContainerOpened = false;
     }
     // --- LEVELS ---
-    static auto levelsContainerOpened = true;
+    static auto levelsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Glossiness", material->glossiness(), 0.f, 1.f, 0.01f, "%.2f");
+      auto sliderChange = SliderLineComponent::render("Glossiness", material->glossiness(), 0.f,
+                                                      1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->glossiness = sliderChange.value();
       }
@@ -76,6 +65,21 @@ struct BABYLON_SHARED_EXPORT
     }
     else {
       levelsContainerOpened = false;
+    }
+    // --- NORMAL MAP ---
+    static auto normalMapOpened = false;
+    ImGui::SetNextTreeNodeOpen(normalMapOpened, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("NORMAL MAP")) {
+      if (CheckBoxLineComponent::render("Invert X axis", material->invertNormalMapX())) {
+        material->invertNormalMapX = !material->invertNormalMapX();
+      }
+      if (CheckBoxLineComponent::render("Invert Y axis", material->invertNormalMapY())) {
+        material->invertNormalMapY = !material->invertNormalMapY();
+      }
+      normalMapOpened = true;
+    }
+    else {
+      normalMapOpened = false;
     }
   }
 

@@ -11,10 +11,6 @@
 
 namespace BABYLON {
 
-class PBRMetallicRoughnessMaterial;
-using PBRMetallicRoughnessMaterialPtr
-  = std::shared_ptr<PBRMetallicRoughnessMaterial>;
-
 struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
 
   static void renderTextures(const PBRMetallicRoughnessMaterialPtr& material)
@@ -27,17 +23,13 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     static auto texturesContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(texturesContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TEXTURES")) {
-      TextureLinkLineComponent::render("Base", material, material->baseTexture);
+      TextureLinkLineComponent::render("Base", material, material->baseTexture());
       TextureLinkLineComponent::render("Metallic roughness", material,
                                        material->metallicRoughnessTexture());
-      TextureLinkLineComponent::render("Normal", material,
-                                       material->normalTexture());
-      TextureLinkLineComponent::render("Environment", material,
-                                       material->environmentTexture());
-      TextureLinkLineComponent::render("Emissive", material,
-                                       material->emissiveTexture());
-      TextureLinkLineComponent::render("Lightmap", material,
-                                       material->lightmapTexture());
+      TextureLinkLineComponent::render("Normal", material, material->normalTexture());
+      TextureLinkLineComponent::render("Environment", material, material->environmentTexture());
+      TextureLinkLineComponent::render("Emissive", material, material->emissiveTexture());
+      TextureLinkLineComponent::render("Lightmap", material, material->lightmapTexture());
       texturesContainerOpened = true;
     }
     else {
@@ -51,29 +43,26 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     renderTextures(material);
     // --- LIGHTING & COLORS ---
     static auto lightingAndColorsContainerOpened = true;
-    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened,
-                               ImGuiCond_Always);
+    ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LIGHTING & COLORS")) {
       Color3LineComponent::render("Base", material->baseColor());
-      Color3LineComponent::render(
-        "Emissive", material->emissiveColor(),
-        [&material](const Color3& color) { material->emissiveColor = color; });
+      Color3LineComponent::render("Emissive", material->emissiveColor());
       lightingAndColorsContainerOpened = true;
     }
     else {
       lightingAndColorsContainerOpened = false;
     }
     // --- LEVELS ---
-    static auto levelsContainerOpened = true;
+    static auto levelsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Metallic", material->metallic(), 0.f, 1.f, 0.01f, "%.2f");
+      auto sliderChange
+        = SliderLineComponent::render("Metallic", material->metallic(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->metallic = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Roughness", material->roughness(), 0.f, 1.f, 0.01f, "%.2f");
+      sliderChange
+        = SliderLineComponent::render("Roughness", material->roughness(), 0.f, 1.f, 0.01f, "%.2f");
       if (sliderChange) {
         material->roughness = sliderChange.value();
       }
@@ -81,6 +70,21 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     }
     else {
       levelsContainerOpened = false;
+    }
+    // --- NORMAL MAP ---
+    static auto normalMapOpened = false;
+    ImGui::SetNextTreeNodeOpen(normalMapOpened, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("NORMAL MAP")) {
+      if (CheckBoxLineComponent::render("Invert X axis", material->invertNormalMapX())) {
+        material->invertNormalMapX = !material->invertNormalMapX();
+      }
+      if (CheckBoxLineComponent::render("Invert Y axis", material->invertNormalMapY())) {
+        material->invertNormalMapY = !material->invertNormalMapY();
+      }
+      normalMapOpened = true;
+    }
+    else {
+      normalMapOpened = false;
     }
   }
 
