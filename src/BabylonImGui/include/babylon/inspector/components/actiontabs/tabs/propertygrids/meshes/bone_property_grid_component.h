@@ -8,11 +8,9 @@
 #include <babylon/inspector/components/actiontabs/lines/quaternion_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/vector3_line_component.h>
+#include <babylon/meshes/transform_node.h>
 
 namespace BABYLON {
-
-class Bone;
-using BonePtr = std::shared_ptr<Bone>;
 
 struct BABYLON_SHARED_EXPORT BonePropertyGridComponent {
 
@@ -22,8 +20,19 @@ struct BABYLON_SHARED_EXPORT BonePropertyGridComponent {
     static auto generalContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(generalContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("GENERAL")) {
-      TextLineComponent::render("ID", bone->id);
+      TextLineComponent::render("Name", bone->name);
+      TextLineComponent::render("Index", std::to_string(bone->getIndex()));
       TextLineComponent::render("Unique ID", std::to_string(bone->uniqueId));
+      {
+        if (bone->getParent()) {
+          TextLineComponent::render("Parent", bone->getParent()->name);
+        }
+      }
+      {
+        if (bone->getTransformNode()) {
+          TextLineComponent::render("Linked node", bone->getTransformNode()->name);
+        }
+      }
       generalContainerOpened = true;
     }
     else {
@@ -31,16 +40,14 @@ struct BABYLON_SHARED_EXPORT BonePropertyGridComponent {
     }
     // --- TRANSFORMATIONS ---
     static auto transformationsContainerOpened = true;
-    ImGui::SetNextTreeNodeOpen(transformationsContainerOpened,
-                               ImGuiCond_Always);
+    ImGui::SetNextTreeNodeOpen(transformationsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSFORMATIONS")) {
       Vector3LineComponent::render("Position", bone->position());
       if (!bone->rotationQuaternion()) {
         Vector3LineComponent::render("Rotation", bone->rotation());
       }
       else if (bone->rotationQuaternion()) {
-        QuaternionLineComponent::render("Rotation",
-                                        *bone->rotationQuaternion());
+        QuaternionLineComponent::render("Rotation", *bone->rotationQuaternion());
       }
       Vector3LineComponent::render("Scaling", *bone->scaling());
       transformationsContainerOpened = true;
