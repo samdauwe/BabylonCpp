@@ -167,6 +167,12 @@ public:
   void linkTransformNode(const TransformNodePtr& transformNode);
 
   /**
+   * @brief Gets the node used to drive the bone's transformation.
+   * @returns a transform node or null
+   */
+  TransformNodePtr& getTransformNode();
+
+  /**
    * @brief Gets the absolute transform matrix (ie base matrix * parent world
    * matrix).
    * @returns a matrix
@@ -522,12 +528,6 @@ protected:
   void set__matrix(const Matrix& value);
 
   /** Properties (matches AbstractMesh properties) **/
-
-  /**
-   * @brief Gets the node used to drive the bone's transformation.
-   * @returns a transform node or null
-   */
-  TransformNodePtr& getTransformNode();
 
   /**
    * @brief Gets current position (in local space).
