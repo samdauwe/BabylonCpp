@@ -15,12 +15,15 @@ using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
 using MaterialPtr     = std::shared_ptr<Material>;
 
 struct BABYLON_SHARED_EXPORT MeshReservedDataStore {
+  bool hidden                  = false;
   bool displayNormals          = false;
   bool renderGridEnabled       = false;
-  bool renderNormalVectors     = false;
   bool renderWireframeOver     = false;
+  bool renderNormalVectors     = false;
   bool normalMaterialHidden    = true;
   bool isInspectorGrid         = false;
+  bool isVertexColorMaterial   = false;
+  bool displayVertexColors     = false;
   AbstractMeshPtr gridMesh     = nullptr;
   LinesMeshPtr normalLines     = nullptr;
   MaterialPtr originalMaterial = nullptr;
