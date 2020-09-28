@@ -13,9 +13,6 @@
 
 namespace BABYLON {
 
-class PostProcessRenderPipeline;
-using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
-
 struct BABYLON_SHARED_EXPORT CommonRenderingPipelinePropertyGridComponent {
 
   static void render(const PostProcessRenderPipelinePtr& renderPipeline)
@@ -24,17 +21,16 @@ struct BABYLON_SHARED_EXPORT CommonRenderingPipelinePropertyGridComponent {
     static auto generalContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(generalContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("GENERAL")) {
+      TextLineComponent::render("Name", renderPipeline->name());
       const auto className = renderPipeline->getClassName();
       TextLineComponent::render("Class", renderPipeline->getClassName());
       if (className == "DefaultRenderingPipeline") {
         auto defaultRenderingPipeline
           = std::static_pointer_cast<DefaultRenderingPipeline>(renderPipeline);
         auto sliderChange = SliderLineComponent::render(
-          "Samples", defaultRenderingPipeline->samples(), 1.f, 8.f, 1.f,
-          "%.0f");
+          "Samples", defaultRenderingPipeline->samples(), 1.f, 8.f, 1.f, "%.0f");
         if (sliderChange) {
-          defaultRenderingPipeline->samples
-            = static_cast<unsigned>(sliderChange.value());
+          defaultRenderingPipeline->samples = static_cast<unsigned>(sliderChange.value());
         }
       }
       else if (className == "SSAO2RenderingPipeline") {
@@ -43,19 +39,16 @@ struct BABYLON_SHARED_EXPORT CommonRenderingPipelinePropertyGridComponent {
         auto sliderChange = SliderLineComponent::render(
           "Samples", ssao2RenderingPipeline->samples(), 1.f, 8.f, 1.f, "%.0f");
         if (sliderChange) {
-          ssao2RenderingPipeline->samples
-            = static_cast<unsigned>(sliderChange.value());
+          ssao2RenderingPipeline->samples = static_cast<unsigned>(sliderChange.value());
         }
       }
       else if (className == "StandardRenderingPipeline") {
         auto standardRenderingPipeline
           = std::static_pointer_cast<StandardRenderingPipeline>(renderPipeline);
         auto sliderChange = SliderLineComponent::render(
-          "Samples", standardRenderingPipeline->samples(), 1.f, 8.f, 1.f,
-          "%.0f");
+          "Samples", standardRenderingPipeline->samples(), 1.f, 8.f, 1.f, "%.0f");
         if (sliderChange) {
-          standardRenderingPipeline->samples
-            = static_cast<unsigned>(sliderChange.value());
+          standardRenderingPipeline->samples = static_cast<unsigned>(sliderChange.value());
         }
       }
       generalContainerOpened = true;
