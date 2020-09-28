@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/inspector/components/actiontabs/lines/button_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
@@ -11,9 +12,6 @@
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
-
-class PostProcess;
-using PostProcessPtr = std::shared_ptr<PostProcess>;
 
 struct BABYLON_SHARED_EXPORT CommonPostProcessPropertyGridComponent {
 
@@ -32,20 +30,20 @@ struct BABYLON_SHARED_EXPORT CommonPostProcessPropertyGridComponent {
       if (postProcess->clearColor) {
         Color3LineComponent::render("Clear color", *postProcess->clearColor);
       }
-      if (CheckBoxLineComponent::render("Pixel perfect",
-                                        postProcess->enablePixelPerfectMode)) {
-        postProcess->enablePixelPerfectMode
-          = !postProcess->enablePixelPerfectMode;
+      if (CheckBoxLineComponent::render("Pixel perfect", postProcess->enablePixelPerfectMode)) {
+        postProcess->enablePixelPerfectMode = !postProcess->enablePixelPerfectMode;
       }
       if (CheckBoxLineComponent::render("Fullscreen viewport",
                                         postProcess->forceFullscreenViewport)) {
-        postProcess->forceFullscreenViewport
-          = !postProcess->forceFullscreenViewport;
+        postProcess->forceFullscreenViewport = !postProcess->forceFullscreenViewport;
       }
-      auto sliderChange = SliderLineComponent::render(
-        "Samples", postProcess->samples(), 1.f, 8.f, 1.f, "%.0f");
+      auto sliderChange
+        = SliderLineComponent::render("Samples", postProcess->samples(), 1.f, 8.f, 1.f, "%.0f");
       if (sliderChange) {
         postProcess->samples = static_cast<unsigned>(sliderChange.value());
+      }
+      if (ButtonLineComponent::render("Dispose")) {
+        postProcess->dispose();
       }
       generalContainerOpened = true;
     }
