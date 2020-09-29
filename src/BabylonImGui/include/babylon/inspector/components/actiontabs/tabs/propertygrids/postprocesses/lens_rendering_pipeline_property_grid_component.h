@@ -11,9 +11,6 @@
 
 namespace BABYLON {
 
-class LensRenderingPipeline;
-using LensRenderingPipelinePtr = std::shared_ptr<LensRenderingPipeline>;
-
 struct BABYLON_SHARED_EXPORT LensRenderingPipelinePropertyGridComponent {
 
   static void render(const LensRenderingPipelinePtr& renderPipeline)
@@ -24,36 +21,32 @@ struct BABYLON_SHARED_EXPORT LensRenderingPipelinePropertyGridComponent {
     static auto optionsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(optionsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("OPTIONS")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Edge blur", renderPipeline->edgeBlur(), 0.f, 5.f, 0.1f, "%.1f");
+      auto sliderChange = SliderLineComponent::render("Edge blur", renderPipeline->edgeBlur(), 0.f,
+                                                      5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->edgeBlur = sliderChange.value();
       }
       sliderChange = SliderLineComponent::render(
-        "Edge distortion", renderPipeline->edgeDistortion(), 0.f, 5.f, 0.1f,
-        "%.1f");
+        "Edge distortion", renderPipeline->edgeDistortion(), 0.f, 5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->edgeDistortion = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Grain amount", renderPipeline->grainAmount(), 0.f, 5.f, 0.1f, "%.1f");
+      sliderChange = SliderLineComponent::render("Grain amount", renderPipeline->grainAmount(), 0.f,
+                                                 5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->grainAmount = sliderChange.value();
       }
       sliderChange = SliderLineComponent::render(
-        "Chromatic aberration", renderPipeline->chromaticAberration(), 0.f, 5.f,
-        0.1f, "%.1f");
+        "Chromatic aberration", renderPipeline->chromaticAberration(), 0.f, 5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->chromaticAberration = sliderChange.value();
       }
       sliderChange = SliderLineComponent::render(
-        "Darken out of focus", renderPipeline->darkenOutOfFocus(), 0.f, 5.f,
-        0.1f, "%.1f");
+        "Darken out of focus", renderPipeline->darkenOutOfFocus(), 0.f, 5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->darkenOutOfFocus = sliderChange.value();
       }
-      if (CheckBoxLineComponent::render("Blur noise",
-                                        renderPipeline->blurNoise())) {
+      if (CheckBoxLineComponent::render("Blur noise", renderPipeline->blurNoise())) {
         renderPipeline->blurNoise = !renderPipeline->blurNoise();
       }
       optionsContainerOpened = true;
@@ -65,29 +58,26 @@ struct BABYLON_SHARED_EXPORT LensRenderingPipelinePropertyGridComponent {
     static auto depthOfFieldContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(depthOfFieldContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("DEPTH OF FIELD")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Aperture", renderPipeline->dofAperture(), 0.f, 10.f, 0.1f, "%.1f");
+      auto sliderChange = SliderLineComponent::render("Aperture", renderPipeline->dofAperture(),
+                                                      0.f, 10.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->dofAperture = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Distortion", renderPipeline->dofDistortion(), 0.f, 10.f, 0.1f, "%.1f");
+      sliderChange = SliderLineComponent::render("Distortion", renderPipeline->dofDistortion(), 0.f,
+                                                 10.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->dofDistortion = sliderChange.value();
       }
-      if (CheckBoxLineComponent::render("Pentagon bokeh",
-                                        renderPipeline->pentagonBokeh())) {
+      if (CheckBoxLineComponent::render("Pentagon bokeh", renderPipeline->pentagonBokeh())) {
         renderPipeline->pentagonBokeh = !renderPipeline->pentagonBokeh();
       }
-      sliderChange = SliderLineComponent::render(
-        "Highlight gain", renderPipeline->highlightsGain(), 0.f, 5.f, 0.1f,
-        "%.1f");
+      sliderChange = SliderLineComponent::render("Highlight gain", renderPipeline->highlightsGain(),
+                                                 0.f, 5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->highlightsGain = sliderChange.value();
       }
       sliderChange = SliderLineComponent::render(
-        "Highlight threshold", renderPipeline->highlightsThreshold(), 0.f, 5.f,
-        0.1f, "%.1f");
+        "Highlight threshold", renderPipeline->highlightsThreshold(), 0.f, 5.f, 0.1f, "%.1f");
       if (sliderChange) {
         renderPipeline->highlightsThreshold = sliderChange.value();
       }
