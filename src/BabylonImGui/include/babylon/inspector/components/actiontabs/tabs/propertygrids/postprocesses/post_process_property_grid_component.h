@@ -8,9 +8,6 @@
 
 namespace BABYLON {
 
-class PostProcess;
-using PostProcessPtr = std::shared_ptr<PostProcess>;
-
 struct BABYLON_SHARED_EXPORT PostProcessPropertyGridComponent {
 
   static void render(const PostProcessPtr& postProcess)

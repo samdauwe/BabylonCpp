@@ -8,9 +8,6 @@
 
 namespace BABYLON {
 
-class PostProcessRenderPipeline;
-using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
-
 struct BABYLON_SHARED_EXPORT RenderingPipelinePropertyGridComponent {
 
   static void render(const PostProcessRenderPipelinePtr& renderPipeline)
