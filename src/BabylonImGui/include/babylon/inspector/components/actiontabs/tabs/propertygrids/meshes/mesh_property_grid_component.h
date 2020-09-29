@@ -50,11 +50,13 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
 
     const auto color = Color3::White();
     const auto bbox  = mesh->getBoundingInfo();
-    const auto diag  = bbox->maximum().subtractToRef(bbox->minimum(), TmpVectors::Vector3Array[0]);
-    const auto size  = diag.length() * 0.05f;
+    // TODO FIXME
+    // const auto diag  = bbox->maximum().subtractToRef(bbox->minimum(),
+    // TmpVectors::Vector3Array[0]); const auto size  = diag.length() * 0.05f;
+    const auto size = 1.f;
 
     std::vector<std::vector<Vector3>> lines;
-    for (auto i = 0ull; i < normals.size(); i += 3) {
+    for (auto i = 0u; i < normals.size(); i += 3) {
       const auto v1             = Vector3::FromArray(positions, i);
       const auto v2             = v1.add(Vector3::FromArray(normals, i).scaleInPlace(size));
       std::vector<Vector3> v1v2 = {v1, v2};
