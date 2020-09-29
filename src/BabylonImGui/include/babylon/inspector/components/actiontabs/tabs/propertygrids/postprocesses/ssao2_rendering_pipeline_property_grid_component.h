@@ -12,14 +12,11 @@
 
 namespace BABYLON {
 
-class SSAO2RenderingPipeline;
-using SSAO2RenderingPipelinePtr = std::shared_ptr<SSAO2RenderingPipeline>;
-
 struct BABYLON_SHARED_EXPORT SSAO2RenderingPipelinePropertyGridComponent {
 
   static void render(const SSAO2RenderingPipelinePtr& renderPipeline)
   {
-    const auto& camera = renderPipeline->scene()->activeCamera;
+    const auto& camera = renderPipeline->scene()->activeCamera();
 
     // --- GENERAL ---
     CommonRenderingPipelinePropertyGridComponent::render(renderPipeline);
@@ -27,30 +24,30 @@ struct BABYLON_SHARED_EXPORT SSAO2RenderingPipelinePropertyGridComponent {
     static auto ssaoContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(ssaoContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("SSAO")) {
-      auto sliderChange = SliderLineComponent::render(
-        "Strength", renderPipeline->totalStrength, 0.f, 2.f, 0.05f, "%.2f");
+      auto sliderChange = SliderLineComponent::render("Strength", renderPipeline->totalStrength,
+                                                      0.f, 2.f, 0.05f, "%.2f");
       if (sliderChange) {
         renderPipeline->totalStrength = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render("Base", renderPipeline->base,
-                                                 0.f, 1.f, 0.05f, "%.2f");
+      sliderChange
+        = SliderLineComponent::render("Base", renderPipeline->base, 0.f, 1.f, 0.05f, "%.2f");
       if (sliderChange) {
         renderPipeline->base = sliderChange.value();
       }
       if (camera) {
-        sliderChange = SliderLineComponent::render(
-          "Max Z", renderPipeline->maxZ, 0.f, camera->maxZ, 1.f, "%.0f");
+        sliderChange = SliderLineComponent::render("Max Z", renderPipeline->maxZ, 0.f, camera->maxZ,
+                                                   1.f, "%.0f");
         if (sliderChange) {
           renderPipeline->maxZ = sliderChange.value();
         }
       }
-      sliderChange = SliderLineComponent::render(
-        "Min Z aspect", renderPipeline->minZAspect, 0.f, 0.5f, 0.01f, "%.2f");
+      sliderChange = SliderLineComponent::render("Min Z aspect", renderPipeline->minZAspect, 0.f,
+                                                 0.5f, 0.01f, "%.2f");
       if (sliderChange) {
         renderPipeline->minZAspect = sliderChange.value();
       }
-      sliderChange = SliderLineComponent::render(
-        "Radius", renderPipeline->radius, 0.f, 10.f, 0.05f, "%.2f");
+      sliderChange
+        = SliderLineComponent::render("Radius", renderPipeline->radius, 0.f, 10.f, 0.05f, "%.2f");
       if (sliderChange) {
         renderPipeline->radius = sliderChange.value();
       }
