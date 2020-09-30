@@ -34,6 +34,7 @@ public:
   void updateEnvironmentTexture(const std::string& fileLocation);
   void updateGravity(const Vector3& newValue);
   void updateTimeStep(float newValue);
+  void normalizeScene();
   void render();
 
 public:
