@@ -22,8 +22,7 @@ struct BABYLON_SHARED_EXPORT FogPropertyGridComponent {
 
     const auto& stateMode = scene->fogMode();
 
-    auto optionChange
-      = OptionsLineComponent::render("Fog mode", stateMode, fogModeOptions);
+    auto optionChange = OptionsLineComponent::render("Fog mode", stateMode, fogModeOptions);
     if (optionChange) {
       scene->fogMode = optionChange.value();
     }
@@ -31,15 +30,13 @@ struct BABYLON_SHARED_EXPORT FogPropertyGridComponent {
       Color3LineComponent::render("Fog color", scene->fogColor);
     }
     if (stateMode == Scene::FOGMODE_EXP || stateMode == Scene::FOGMODE_EXP2) {
-      auto valueChange
-        = FloatLineComponent::render("Fog density", scene->fogDensity);
+      auto valueChange = FloatLineComponent::render("Fog density", scene->fogDensity);
       if (valueChange) {
         scene->fogDensity = valueChange.value();
       }
     }
     if (stateMode == Scene::FOGMODE_LINEAR) {
-      auto valueChange
-        = FloatLineComponent::render("Fog start", scene->fogStart);
+      auto valueChange = FloatLineComponent::render("Fog start", scene->fogStart);
       if (valueChange) {
         scene->fogStart = valueChange.value();
       }
