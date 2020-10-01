@@ -21,8 +21,7 @@ struct BABYLON_SHARED_EXPORT CommonShadowLightPropertyGridComponent {
     static auto shadowsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(shadowsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("SHADOWS")) {
-      if (CheckBoxLineComponent::render("Shadows enabled",
-                                        light->shadowEnabled())) {
+      if (CheckBoxLineComponent::render("Shadows enabled", light->shadowEnabled())) {
         light->shadowEnabled = !light->shadowEnabled();
       }
       shadowsContainerOpened = true;
