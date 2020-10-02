@@ -4,13 +4,12 @@
 
 namespace BABYLON {
 
-ActionStore::ActionStore() =  default;
+ActionStore::ActionStore() = default;
 
 ActionStore::~ActionStore() = default;
 
 void ActionStore::addAction(const char* id, const char* icon, const char* label,
-                            const char* shortcut,
-                            const SA::delegate<void()>& callback)
+                            const char* shortcut, const SA::delegate<void()>& callback)
 {
   _actions[id] = InspectorAction(id, icon, label, shortcut, callback);
 }
