@@ -370,11 +370,13 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
         if (CheckBoxLineComponent::render("Render vertex normals",
                                           meshReservedDataStore.renderNormalVectors)) {
           renderNormalVectors(mesh, meshReservedDataStore);
+          meshReservedDataStore.renderNormalVectors = !meshReservedDataStore.renderNormalVectors;
         }
       }
       if (CheckBoxLineComponent::render("Render wireframe over mesh",
                                         meshReservedDataStore.renderWireframeOver)) {
         renderWireframeOver(mesh, meshReservedDataStore);
+        meshReservedDataStore.renderWireframeOver = !meshReservedDataStore.renderWireframeOver;
       }
       debugOpened = true;
     }
