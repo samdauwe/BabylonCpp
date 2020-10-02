@@ -17,26 +17,23 @@ using MeshPtr = std::shared_ptr<Mesh>;
 
 struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
 
-  static void addOrRemoveGrid(const MeshPtr& mesh,
-                              MeshReservedDataStore& meshReservedDataStore)
+  static void addOrRemoveGrid(const MeshPtr& mesh, MeshReservedDataStore& meshReservedDataStore)
   {
-    const auto& scene
-      = UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()->utilityLayerScene;
-    auto& _gridMesh = meshReservedDataStore.gridMesh;
+    const auto& scene = UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()->utilityLayerScene;
+    auto& _gridMesh   = meshReservedDataStore.gridMesh;
 
     if (!_gridMesh) {
       auto extend = mesh->getScene()->getWorldExtends();
       auto width  = (extend.max.x - extend.min.x) * 5.f;
       auto depth  = (extend.max.z - extend.min.z) * 5.f;
 
-      _gridMesh = Mesh::CreateGround("grid", 1.f, 1.f, 1, scene.get());
+      _gridMesh                             = Mesh::CreateGround("grid", 1.f, 1.f, 1, scene.get());
       _gridMesh->scaling().x                = std::max(width, depth);
       _gridMesh->scaling().z                = _gridMesh->scaling().x;
       meshReservedDataStore.isInspectorGrid = true;
       _gridMesh->isPickable                 = false;
 
-      auto groundMaterial
-        = MaterialsLibrary::GridMaterial::New("GridMaterial", scene);
+      auto groundMaterial = MaterialsLibrary::GridMaterial::New("GridMaterial", scene);
       groundMaterial->majorUnitFrequency  = 10.f;
       groundMaterial->minorUnitVisibility = 0.3f;
       groundMaterial->gridRatio           = 0.01f;
@@ -45,8 +42,7 @@ struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
       groundMaterial->lineColor           = Color3(1.f, 1.f, 1.f);
       groundMaterial->opacity             = 0.8f;
       groundMaterial->zOffset             = 1.f;
-      // groundMaterial->opacityTexture =
-      // Texture::New("textures/backgroundGround.png", scene);
+      groundMaterial->opacityTexture      = Texture::New("textures/backgroundGround.png", scene);
 
       _gridMesh->material = groundMaterial;
 
@@ -54,17 +50,14 @@ struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
       return;
     }
 
-    meshReservedDataStore.renderGridEnabled
-      = !meshReservedDataStore.renderGridEnabled;
+    meshReservedDataStore.renderGridEnabled = !meshReservedDataStore.renderGridEnabled;
     _gridMesh->dispose(true, true);
     _gridMesh = nullptr;
   }
 
-  static void render(const MeshPtr& mesh,
-                     MeshReservedDataStore& meshReservedDataStore)
+  static void render(const MeshPtr& mesh, MeshReservedDataStore& meshReservedDataStore)
   {
-    if (CheckBoxLineComponent::render(
-          "Render grid", meshReservedDataStore.renderGridEnabled)) {
+    if (CheckBoxLineComponent::render("Render grid", meshReservedDataStore.renderGridEnabled)) {
       addOrRemoveGrid(mesh, meshReservedDataStore);
     }
   }
