@@ -5,6 +5,9 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/effect.h>
+#include <babylon/materials/ishader_material_options.h>
+#include <babylon/materials/shader_material.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/builders/lines_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
@@ -12,10 +15,227 @@
 #include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 namespace Debug {
+
+ShaderMaterialPtr SkeletonViewer::CreateBoneWeightShader(const IBoneWeightShaderOptions& options,
+                                                         Scene* scene)
+{
+  const auto& skeleton       = options.skeleton;
+  const auto colorBase       = options.colorBase.value_or(Color3::Black());
+  const auto colorZero       = options.colorZero.value_or(Color3::Blue());
+  const auto colorQuarter    = options.colorQuarter.value_or(Color3::Green());
+  const auto colorHalf       = options.colorHalf.value_or(Color3::Yellow());
+  const auto colorFull       = options.colorFull.value_or(Color3::Red());
+  const auto targetBoneIndex = options.targetBoneIndex.value_or(0.f);
+
+  Effect::ShadersStore()["boneWeights:" + skeleton->name + "VertexShader"] = R"ShaderCode(
+      precision highp float;
+
+      attribute vec3 position;
+      attribute vec2 uv;
+
+      uniform mat4 view;
+      uniform mat4 projection;
+      uniform mat4 worldViewProjection;
+
+      #include<bonesDeclaration>
+      #include<instancesDeclaration>
+
+      varying vec3 vColor;
+
+      uniform vec3 colorBase;
+      uniform vec3 colorZero;
+      uniform vec3 colorQuarter;
+      uniform vec3 colorHalf;
+      uniform vec3 colorFull;
+
+      uniform float targetBoneIndex;
+
+      void main() {
+          vec3 positionUpdated = position;
+
+          #include<bonesVertex>
+          #include<instancesVertex>
+
+          vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
+
+          vec3 color = colorBase;
+          float totalWeight = 0.;
+          if(matricesIndices[0] == targetBoneIndex && matricesWeights[0] > 0.){
+              totalWeight += matricesWeights[0];
+          }
+          if(matricesIndices[1] == targetBoneIndex && matricesWeights[1] > 0.){
+              totalWeight += matricesWeights[1];
+          }
+          if(matricesIndices[2] == targetBoneIndex && matricesWeights[2] > 0.){
+              totalWeight += matricesWeights[2];
+          }
+          if(matricesIndices[3] == targetBoneIndex && matricesWeights[3] > 0.){
+              totalWeight += matricesWeights[3];
+          }
+
+          color = mix(color, colorZero, smoothstep(0., 0.25, totalWeight));
+          color = mix(color, colorQuarter, smoothstep(0.25, 0.5, totalWeight));
+          color = mix(color, colorHalf, smoothstep(0.5, 0.75, totalWeight));
+          color = mix(color, colorFull, smoothstep(0.75, 1.0, totalWeight));
+          vColor = color;
+
+      gl_Position = projection * view * worldPos;
+      }
+  )ShaderCode";
+
+  Effect::ShadersStore()["boneWeights:" + skeleton->name + "FragmentShader"] = R"ShaderCode(
+      precision highp float;
+      varying vec3 vPosition;
+
+      varying vec3 vColor;
+
+      void main() {
+          vec4 color = vec4(vColor, 1.0);
+          gl_FragColor = color;
+      }
+  )ShaderCode";
+
+  IShaderMaterialOptions shaderMaterialOptions;
+  shaderMaterialOptions.attributes = {"position", "normal"};
+  shaderMaterialOptions.uniforms   = {
+    "world",     "worldView", "worldViewProjection", "view",      "projection", "viewProjection",
+    "colorBase", "colorZero", "colorQuarter",        "colorHalf", "colorFull",  "targetBoneIndex"};
+
+  auto shader = ShaderMaterial::New("boneWeight:" + skeleton->name, scene,
+                                    "boneWeights:" + skeleton->name, shaderMaterialOptions);
+
+  shader->setColor3("colorBase", colorBase);
+  shader->setColor3("colorZero", colorZero);
+  shader->setColor3("colorQuarter", colorQuarter);
+  shader->setColor3("colorHalf", colorHalf);
+  shader->setColor3("colorFull", colorFull);
+  shader->setFloat("targetBoneIndex", targetBoneIndex);
+
+  shader->transparencyMode = Material::MATERIAL_OPAQUE;
+
+  return shader;
+}
+
+ShaderMaterialPtr SkeletonViewer::CreateSkeletonMapShader(const ISkeletonMapShaderOptions& options,
+                                                          Scene* scene)
+{
+  const auto& skeleton = options.skeleton;
+  const auto colorMap  = options.colorMap.value_or(
+    std::vector<ISkeletonMapShaderColorMapKnot>{{
+                                                  Color3(1.f, 0.38f, 0.18f), //
+                                                  0.f                        //
+                                                },
+                                                {
+                                                  Color3(0.59f, 0.18f, 1.00f), //
+                                                  0.2f                         //
+                                                },
+                                                {
+                                                  Color3(0.59f, 1.f, 0.18f), //
+                                                  0.4f                       //
+                                                },
+                                                {
+                                                  Color3(1.f, 0.87f, 0.17f), //
+                                                  0.6f                       //
+                                                },
+                                                {
+                                                  Color3(1.f, 0.17f, 0.42f), //
+                                                  0.8f                       //
+                                                },
+                                                {
+                                                  Color3(0.17f, 0.68f, 1.0f), //
+                                                  1.f                         //
+                                                }});
+
+  const auto bufferWidth = skeleton->bones.size() + 1;
+  Float32Array colorMapBuffer
+    = SkeletonViewer::_CreateBoneMapColorBuffer(bufferWidth, colorMap, scene);
+
+  Effect::ShadersStore()["_boneWeights:" + skeleton->name + "VertexShader"] = StringTools::printf(
+    R"ShaderCode(
+      precision highp float;
+
+      attribute vec3 position;
+      attribute vec2 uv;
+
+      uniform mat4 view;
+      uniform mat4 projection;
+      uniform mat4 worldViewProjection;
+      uniform float colorMap[%ull];
+
+      #include<bonesDeclaration>
+      #include<instancesDeclaration>
+
+      varying vec3 vColor;
+
+      void main() {
+          vec3 positionUpdated = position;
+
+          #include<bonesVertex>
+          #include<instancesVertex>
+
+          vec3 color = vec3(0.);
+          bool first = true;
+
+          for (int i = 0; i < 4; i++) {
+              int boneIdx = int(matricesIndices[i]);
+              float boneWgt = matricesWeights[i];
+
+              vec3 c = vec3(colorMap[boneIdx * 4 + 0], colorMap[boneIdx * 4 + 1], colorMap[boneIdx * 4 + 2]);
+
+              if (boneWgt > 0.) {
+                  if (first) {
+                      first = false;
+                      color = c;
+                  } else {
+                      color = mix(color, c, boneWgt);
+                  }
+              }
+          }
+
+          vColor = color;
+
+          vec4 worldPos = finalWorld * vec4(positionUpdated, 1.0);
+
+          gl_Position = projection * view * worldPos;
+      }
+    )ShaderCode",
+    ((skeleton->bones.size()) * 4));
+
+  Effect::ShadersStore()["_boneWeights:" + skeleton->name + "FragmentShader"] = R"ShaderCode(
+    precision highp float;
+    varying vec3 vColor;
+
+    void main() {
+       vec4 color = vec4( vColor, 1.0 );
+       gl_FragColor = color;
+    }
+  )ShaderCode";
+
+  IShaderMaterialOptions shaderMaterialOptions;
+  shaderMaterialOptions.attributes = {"position", "normal"};
+  shaderMaterialOptions.uniforms   = {"world', 'worldView", "worldViewProjectio", "view",
+                                    "projection",         "viewProjection",     "colorMap"};
+  auto shader                      = ShaderMaterial::New("boneWeight:" + skeleton->name, scene,
+                                    "_boneWeights:" + skeleton->name, shaderMaterialOptions);
+
+  shader->setFloats("colorMap", colorMapBuffer);
+
+  shader->transparencyMode = Material::MATERIAL_OPAQUE;
+
+  return shader;
+}
+
+Float32Array SkeletonViewer::_CreateBoneMapColorBuffer(
+  size_t /*size*/, const std::vector<ISkeletonMapShaderColorMapKnot>& /*colorMap*/,
+  Scene* /*scene*/)
+{
+  return {};
+}
 
 SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshPtr& iMesh,
                                Scene* iScene, bool iAutoUpdateBonesMatrices, int iRenderingGroupId,
@@ -51,16 +271,19 @@ SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshP
   options.displayOptions.sphereScaleUnit = iOptions.displayOptions.sphereScaleUnit.value_or(2.f);
   options.displayOptions.sphereFactor    = iOptions.displayOptions.sphereFactor.value_or(0.865f);
   options.computeBonesUsingShaders       = iOptions.computeBonesUsingShaders.value_or(true);
+  options.useAllBones                    = options.useAllBones.value_or(true);
 
-  const auto boneIndices = mesh->getVerticesData(VertexBuffer::MatricesIndicesKind);
-  const auto boneWeights = mesh->getVerticesData(VertexBuffer::MatricesWeightsKind);
+  const auto initialMeshBoneIndices = mesh->getVerticesData(VertexBuffer::MatricesIndicesKind);
+  const auto initialMeshBoneWeights = mesh->getVerticesData(VertexBuffer::MatricesWeightsKind);
 
-  if (!boneIndices.empty() && !boneWeights.empty()) {
-    for (size_t i = 0; i < boneIndices.size(); ++i) {
-      const auto index = boneIndices[i], weight = boneWeights[i];
+  if (!options.useAllBones.value_or(true)) {
+    if (!initialMeshBoneIndices.empty() && !initialMeshBoneWeights.empty()) {
+      for (size_t i = 0; i < initialMeshBoneIndices.size(); ++i) {
+        const auto index = initialMeshBoneIndices[i], weight = initialMeshBoneWeights[i];
 
-      if (weight != 0.f) {
-        _boneIndices.insert(static_cast<int>(index));
+        if (weight != 0.f) {
+          _boneIndices.insert(static_cast<int>(index));
+        }
       }
     }
   }
@@ -239,7 +462,9 @@ void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bon
   auto idx     = 0u;
   for (const auto& bone : bones) {
     auto& points = _debugLines[idx];
-    if (bone->_index == -1 || !stl_util::contains(_boneIndices, bone->getIndex())) {
+    if (bone->_index == -1
+        || (!stl_util::contains(_boneIndices, bone->getIndex())
+            && !options.useAllBones.value_or(true))) {
       continue;
     }
     if (points.size() < 2) {
@@ -264,7 +489,9 @@ void SkeletonViewer::_getLinesForBonesNoLength(const std::vector<BonePtr>& bones
   for (size_t i = bones.size(); i-- > 0;) {
     auto& childBone = bones[i];
     auto parentBone = childBone->getParent();
-    if (!parentBone || !stl_util::contains(_boneIndices, childBone->getIndex())) {
+    if (!parentBone
+        || (!stl_util::contains(_boneIndices, childBone->getIndex())
+            && !options.useAllBones.value_or(true))) {
       continue;
     }
     auto& points = _debugLines[i];
@@ -336,7 +563,9 @@ void SkeletonViewer::_buildSpheresAndSpurs(bool spheresOnly)
     const auto& displayOptions = options.displayOptions;
 
     for (const auto& bone : bones) {
-      if (bone->_index == -1 || !stl_util::contains(_boneIndices, bone->getIndex())) {
+      if (bone->_index == -1
+          || (!stl_util::contains(_boneIndices, bone->getIndex())
+              && !options.useAllBones.value_or(true))) {
         continue;
       }
 
@@ -394,7 +623,7 @@ void SkeletonViewer::_buildSpheresAndSpurs(bool spheresOnly)
         };
         spurOptions.sideOrientation = Mesh::DEFAULTSIDE;
         spurOptions.updatable       = false;
-        auto spur = ShapeBuilder::ExtrudeShapeCustom(bc->name + ":spur", spurOptions, scene);
+        auto spur = ShapeBuilder::ExtrudeShapeCustom("skeletonViewer", spurOptions, scene);
 
         spur->convertToFlatShadedMesh();
 
@@ -418,8 +647,8 @@ void SkeletonViewer::_buildSpheresAndSpurs(bool spheresOnly)
       SphereOptions sphereOptions;
       sphereOptions.segments  = 6u;
       sphereOptions.diameter  = sphereBaseSize;
-      sphereOptions.updatable = false;
-      auto sphere = SphereBuilder::CreateSphere(bone->name + ":sphere", sphereOptions, scene);
+      sphereOptions.updatable = true;
+      auto sphere             = SphereBuilder::CreateSphere("skeletonViewer", sphereOptions, scene);
 
       const auto numVertices = sphere->getTotalVertices();
 

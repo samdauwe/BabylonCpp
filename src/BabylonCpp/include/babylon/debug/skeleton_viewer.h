@@ -16,6 +16,7 @@ class Bone;
 class LinesMesh;
 class Matrix;
 class Scene;
+class ShaderMaterial;
 class Skeleton;
 class StandardMaterial;
 class Vector3;
@@ -23,6 +24,7 @@ class UtilityLayerRenderer;
 using BonePtr                 = std::shared_ptr<Bone>;
 using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
 using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
+using ShaderMaterialPtr       = std::shared_ptr<ShaderMaterial>;
 using SkeletonPtr             = std::shared_ptr<Skeleton>;
 using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
 using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
@@ -50,6 +52,26 @@ public:
    * public Display constants BABYLON.SkeletonViewer.DISPLAY_SPHERE_AND_SPURS
    */
   static constexpr unsigned int DISPLAY_SPHERE_AND_SPURS = 2;
+
+public:
+  /**
+   * @brief public static method to create a BoneWeight Shader
+   * @param options The constructor options
+   * @param scene The scene that the shader is scoped to
+   * @returns The created ShaderMaterial
+   * @see http://www.babylonjs-playground.com/#1BZJVJ#395
+   */
+  static ShaderMaterialPtr CreateBoneWeightShader(const IBoneWeightShaderOptions& options,
+                                                  Scene* scene);
+
+  /**
+   * @brief public static method to create a BoneWeight Shader.
+   * @param options The constructor options
+   * @param scene The scene that the shader is scoped to
+   * @returns The created ShaderMaterial
+   */
+  static ShaderMaterialPtr CreateSkeletonMapShader(const ISkeletonMapShaderOptions& options,
+                                                   Scene* scene);
 
 public:
   /**
@@ -249,6 +271,18 @@ public:
    * Gets or sets a boolean indicating if the viewer is enabled
    */
   Property<SkeletonViewer, bool> isEnabled;
+
+private:
+  /**
+   * @brief private static method to create a BoneWeight Shader.
+   * @param size The size of the buffer to create (usually the bone count)
+   * @param colorMap The gradient data to generate
+   * @param scene The scene that the shader is scoped to
+   * @returns an Array of floats from the color gradient values
+   */
+  static Float32Array _CreateBoneMapColorBuffer(size_t size,
+                                   const std::vector<ISkeletonMapShaderColorMapKnot>& colorMap,
+                                   Scene* scene);
 
 private:
   /**
