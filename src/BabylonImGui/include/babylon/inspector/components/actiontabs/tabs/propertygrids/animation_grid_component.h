@@ -16,18 +16,13 @@
 
 namespace BABYLON {
 
-class IAnimatable;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-
 struct BABYLON_SHARED_EXPORT AnimationGridComponent {
 
-  static void
-  componentDidMount(AnimationReservedDataStore& animationReservedDataStore)
+  static void componentDidMount(AnimationReservedDataStore& animationReservedDataStore)
   {
     animationReservedDataStore._onBeforeRenderObserver
       = animationReservedDataStore.scene->onBeforeRenderObservable.add(
-        [&animationReservedDataStore](Scene* /*scene*/,
-                                      EventState & /*es*/) -> void {
+        [&animationReservedDataStore](Scene* /*scene*/, EventState & /*es*/) -> void {
           if (!animationReservedDataStore._isPlaying
               || !animationReservedDataStore._runningAnimatable) {
             return;
@@ -37,8 +32,7 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
         });
   }
 
-  static void
-  componentWillUnmount(AnimationReservedDataStore& animationReservedDataStore)
+  static void componentWillUnmount(AnimationReservedDataStore& animationReservedDataStore)
   {
     if (animationReservedDataStore._onBeforeRenderObserver) {
       animationReservedDataStore.scene->onBeforeRenderObservable.remove(
@@ -47,9 +41,8 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
     }
   }
 
-  static void
-  initializeDatastore(const IAnimatablePtr& animatable,
-                      AnimationReservedDataStore& animationReservedDataStore)
+  static void initializeDatastore(const IAnimatablePtr& animatable,
+                                  AnimationReservedDataStore& animationReservedDataStore)
   {
     animationReservedDataStore.currentFrame = 0.f;
 
@@ -84,14 +77,11 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
     componentDidMount(animationReservedDataStore);
   }
 
-  static void
-  playOrPause(const IAnimatablePtr& animatable,
-              AnimationReservedDataStore& animationReservedDataStore)
+  static void playOrPause(const IAnimatablePtr& animatable,
+                          AnimationReservedDataStore& animationReservedDataStore)
   {
     animationReservedDataStore._isPlaying
-      = animationReservedDataStore.scene->getAllAnimatablesByTarget(animatable)
-          .size()
-        > 0;
+      = animationReservedDataStore.scene->getAllAnimatablesByTarget(animatable).size() > 0;
 
     if (animationReservedDataStore._isPlaying) {
       animationReservedDataStore.scene->stopAnimation(animatable);
@@ -106,9 +96,8 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
     }
   }
 
-  static void
-  onCurrentFrameChange(float value,
-                       AnimationReservedDataStore& animationReservedDataStore)
+  static void onCurrentFrameChange(float value,
+                                   AnimationReservedDataStore& animationReservedDataStore)
   {
     if (!animationReservedDataStore._runningAnimatable) {
       return;
@@ -149,11 +138,9 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
     if (_ranges.size() > 0 || _animations.size() > 0) {
       // --- ANIMATION OVERRIDE ---
       static auto animationOverrideContainerOpened = true;
-      ImGui::SetNextTreeNodeOpen(animationOverrideContainerOpened,
-                                 ImGuiCond_Always);
+      ImGui::SetNextTreeNodeOpen(animationOverrideContainerOpened, ImGuiCond_Always);
       if (ImGui::CollapsingHeader("ANIMATION OVERRIDE")) {
-        const auto enableOverride
-          = animatable->animationPropertiesOverride() != nullptr;
+        const auto enableOverride = animatable->animationPropertiesOverride() != nullptr;
         if (CheckBoxLineComponent::render("Enable override", enableOverride)) {
           if (!enableOverride) {
             animatable->animationPropertiesOverride
@@ -166,18 +153,15 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
         }
         if (animatable->animationPropertiesOverride() != nullptr) {
           if (CheckBoxLineComponent::render(
-                "Enable blending",
-                animatable->animationPropertiesOverride()->enableBlending)) {
+                "Enable blending", animatable->animationPropertiesOverride()->enableBlending)) {
             animatable->animationPropertiesOverride()->enableBlending
               = !animatable->animationPropertiesOverride()->enableBlending;
           }
           auto sliderChange = SliderLineComponent::render(
-            "Blending speed",
-            animatable->animationPropertiesOverride()->blendingSpeed, 0.f, 0.1f,
+            "Blending speed", animatable->animationPropertiesOverride()->blendingSpeed, 0.f, 0.1f,
             0.01f, "%.2f");
           if (sliderChange) {
-            animatable->animationPropertiesOverride()->blendingSpeed
-              = sliderChange.value();
+            animatable->animationPropertiesOverride()->blendingSpeed = sliderChange.value();
           }
         }
         animationOverrideContainerOpened = true;
@@ -190,14 +174,13 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
     if (_ranges.size() > 0) {
       // --- ANIMATION RANGES ---
       static auto animationRangesContainerOpened = true;
-      ImGui::SetNextTreeNodeOpen(animationRangesContainerOpened,
-                                 ImGuiCond_Always);
+      ImGui::SetNextTreeNodeOpen(animationRangesContainerOpened, ImGuiCond_Always);
       if (ImGui::CollapsingHeader("ANIMATION RANGES")) {
         for (const auto& range : _ranges) {
           if (ButtonLineComponent::render(range->name.c_str())) {
             _runningAnimatable = nullptr;
-            animationReservedDataStore.scene->beginAnimation(
-              animatable, range->from, range->to, true);
+            animationReservedDataStore.scene->beginAnimation(animatable, range->from, range->to,
+                                                             true);
           }
         }
         animationRangesContainerOpened = true;
@@ -223,12 +206,10 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
         }
         if (_isPlaying) {
           auto sliderChange = SliderLineComponent::render(
-            "Current frame", animationReservedDataStore.currentFrame,
-            _animationControl.from, _animationControl.to,
-            (_animationControl.to - _animationControl.from), "%.4f");
+            "Current frame", animationReservedDataStore.currentFrame, _animationControl.from,
+            _animationControl.to, (_animationControl.to - _animationControl.from), "%.4f");
           if (sliderChange) {
-            onCurrentFrameChange(sliderChange.value(),
-                                 animationReservedDataStore);
+            onCurrentFrameChange(sliderChange.value(), animationReservedDataStore);
           }
         }
         animationsContainerOpened = true;
