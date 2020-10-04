@@ -4,11 +4,14 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/texture_link_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/vector2_line_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/common_material_property_grid_component.h>
+#include <babylon/materials/detail_map_configuration.h>
 #include <babylon/materials/pbr/pbr_anisotropic_configuration.h>
 #include <babylon/materials/pbr/pbr_brdf_configuration.h>
 #include <babylon/materials/pbr/pbr_clear_coat_configuration.h>
@@ -16,6 +19,8 @@
 #include <babylon/materials/pbr/pbr_sheen_configuration.h>
 #include <babylon/materials/pbr/pbr_sub_surface_configuration.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
 
@@ -41,6 +46,14 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       TextureLinkLineComponent::render("Opacity", material, material->opacityTexture());
       TextureLinkLineComponent::render("Ambient", material, material->ambientTexture());
       TextureLinkLineComponent::render("Lightmap", material, material->lightmapTexture());
+      TextureLinkLineComponent::render("Detailmap", material, material->detailMap->texture());
+      if (CheckBoxLineComponent::render("Use lightmap as shadowmap",
+                                        material->useLightmapAsShadowmap())) {
+        material->useLightmapAsShadowmap = !material->useLightmapAsShadowmap();
+      }
+      if (CheckBoxLineComponent::render("Use detailmap", material->detailMap->isEnabled())) {
+        material->detailMap->isEnabled = !material->detailMap->isEnabled();
+      }
       texturesContainerOpened = true;
     }
     else {
@@ -92,23 +105,31 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       // Lighting Params
       {"Surface Albedo", 60},
       {"Reflectance 0", 61},
-      {"Roughness", 62},
-      {"AlphaG", 63},
-      {"NdotV", 64},
-      {"ClearCoat Color", 65},
-      {"ClearCoat Roughness", 66},
-      {"ClearCoat NdotV", 67},
-      {"Transmittance", 68},
-      {"Refraction Transmittance", 69},
+      {"Metallic", 62},
+      {"Metallic F0", 71},
+      {"Roughness", 63},
+      {"AlphaG", 64},
+      {"NdotV", 65},
+      {"ClearCoat Color", 66},
+      {"ClearCoat Roughness", 67},
+      {"ClearCoat NdotV", 68},
+      {"Transmittance", 69},
+      {"Refraction Transmittance", 70},
       // Misc
-      {"SEO", 70},
-      {"EHO", 71},
-      {"Energy Factor", 72},
-      {"Specular Reflectance", 73},
-      {"Clear Coat Reflectance", 74},
-      {"Sheen Reflectance", 75},
-      {"Luminance Over Alpha", 76},
-      {"Alpha", 77},
+      {"SEO", 80},
+      {"EHO", 81},
+      {"Energy Factor", 82},
+      {"Specular Reflectance", 83},
+      {"Clear Coat Reflectance", 84},
+      {"Sheen Reflectance", 85},
+      {"Luminance Over Alpha", 86},
+      {"Alpha", 87},
+    };
+
+    static std::vector<std::pair<const char*, unsigned int>> realTimeFilteringQualityOptions{
+      {"Low", Constants::TEXTURE_FILTERING_QUALITY_LOW},
+      {"Medium", Constants::TEXTURE_FILTERING_QUALITY_MEDIUM},
+      {"High", Constants::TEXTURE_FILTERING_QUALITY_HIGH},
     };
 
     CommonMaterialPropertyGridComponent::render(material);
@@ -157,6 +178,19 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       if (sliderChange) {
         material->roughness = sliderChange.value();
       }
+      sliderChange = SliderLineComponent::render(
+        "Index of Refraction", material->indexOfRefraction(), 1.f, 2.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->indexOfRefraction = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render("F0 Factor", material->metallicF0Factor(), 0.f,
+                                                 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->metallicF0Factor = sliderChange.value();
+      }
+      Color3LineComponent::render("Reflectance Color", material->metallicReflectanceColor());
+      TextureLinkLineComponent::render("Reflectance Texture", material,
+                                       material->metallicReflectanceTexture());
       metallicWorkflowOpened = true;
     }
     else {
@@ -187,7 +221,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
         if (sliderChange) {
           clearCoat->indexOfRefraction = sliderChange.value();
         }
-        TextureLinkLineComponent::render("Texture", material, clearCoat->texture());
+        TextureLinkLineComponent::render("Clear coat", material, clearCoat->texture());
         TextureLinkLineComponent::render("Bump", material, clearCoat->bumpTexture());
         if (clearCoat->bumpTexture()) {
           sliderChange = SliderLineComponent::render(
@@ -235,7 +269,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
           anisotropy->intensity = sliderChange.value();
         }
         Vector2LineComponent::render("Direction", anisotropy->direction);
-        TextureLinkLineComponent::render("Texture", material, anisotropy->texture());
+        TextureLinkLineComponent::render("Anisotropic", material, anisotropy->texture());
       }
       anisotropicOpened = true;
     }
@@ -261,7 +295,10 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
           sheen->intensity = sliderChange.value();
         }
         Color3LineComponent::render("Color", sheen->color);
-        TextureLinkLineComponent::render("Texture", material, sheen->texture());
+        TextureLinkLineComponent::render("Sheen", material, sheen->texture());
+        if (CheckBoxLineComponent::render("Albedo scaling", sheen->albedoScaling())) {
+          sheen->albedoScaling = !sheen->albedoScaling();
+        }
       }
       sheenOpened = true;
     }
@@ -289,16 +326,30 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
         subSurface->useMaskFromThicknessTexture = !subSurface->useMaskFromThicknessTexture();
       }
       Color3LineComponent::render("Tint Color", subSurface->tintColor);
+      if (CheckBoxLineComponent::render("Scattering Enabled", subSurface->isScatteringEnabled())) {
+        subSurface->isScatteringEnabled = !subSurface->isScatteringEnabled();
+      }
+      if (subSurface->isScatteringEnabled() && material->getScene()->prePassRenderer()) {
+        sliderChange = SliderLineComponent::render(
+          "Meters per unit",
+          material->getScene()->prePassRenderer()->subSurfaceConfiguration->metersPerUnit, 0.01f,
+          2.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->getScene()->prePassRenderer()->subSurfaceConfiguration->metersPerUnit
+            = sliderChange.value();
+        }
+      }
       if (CheckBoxLineComponent::render("Refraction Enabled", subSurface->isRefractionEnabled())) {
         subSurface->isRefractionEnabled = !subSurface->isRefractionEnabled();
       }
       if (subSurface->isRefractionEnabled()) {
-        // Fragment
+        // fragment
         sliderChange = SliderLineComponent::render("Intensity", subSurface->refractionIntensity,
                                                    0.f, 1.f, 0.01f, "%.2f");
         if (sliderChange) {
           subSurface->refractionIntensity = sliderChange.value();
         }
+        TextureLinkLineComponent::render("Refraction", material, subSurface->refractionTexture());
         sliderChange = SliderLineComponent::render(
           "Index of Refraction", subSurface->indexOfRefraction, 1.f, 2.f, 0.01f, "%.2f");
         if (sliderChange) {
@@ -313,6 +364,10 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
                                           subSurface->linkRefractionWithTransparency())) {
           subSurface->linkRefractionWithTransparency
             = !subSurface->linkRefractionWithTransparency();
+        }
+        if (CheckBoxLineComponent::render("Use albedo to tint surface transparency",
+                                          subSurface->useAlbedoToTintRefraction)) {
+          subSurface->useAlbedoToTintRefraction = !subSurface->useAlbedoToTintRefraction;
         }
       }
       Color3LineComponent::render("Tint Color", subSurface->tintColor);
