@@ -24,9 +24,8 @@ struct BABYLON_SHARED_EXPORT AxesViewerComponent {
 
   static void render(const TransformNodePtr& node)
   {
-    CheckBoxLineComponent::render(
-      "Display axes", displayAxis(node),
-      [&node](bool /*value*/) { displayAxes(node); });
+    if (CheckBoxLineComponent::render("Display axes", displayAxis(node))) {
+    }
   }
 
 }; // end of struct AxesViewerComponent
