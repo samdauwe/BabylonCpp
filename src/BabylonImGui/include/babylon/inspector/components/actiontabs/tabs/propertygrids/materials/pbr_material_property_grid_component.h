@@ -433,6 +433,65 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
           material->reflectionTexture()->level = sliderChange.value();
         }
       }
+      if (material->clearCoat->texture()) {
+        sliderChange = SliderLineComponent::render(
+          "Clear coat", material->clearCoat->texture()->level, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->clearCoat->texture()->level = sliderChange.value();
+        }
+      }
+      if (material->clearCoat->bumpTexture()) {
+        sliderChange = SliderLineComponent::render(
+          "Clear coat bump", material->clearCoat->bumpTexture()->level, 0.f, 2.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->clearCoat->bumpTexture()->level = sliderChange.value();
+        }
+      }
+      if (material->anisotropy->texture()) {
+        sliderChange = SliderLineComponent::render(
+          "Anisotropic", material->anisotropy->texture()->level, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->anisotropy->texture()->level = sliderChange.value();
+        }
+      }
+      if (material->sheen->texture()) {
+        sliderChange = SliderLineComponent::render("Sheen", material->sheen->texture()->level, 0.f,
+                                                   1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->sheen->texture()->level = sliderChange.value();
+        }
+      }
+      if (material->subSurface->thicknessTexture()) {
+        sliderChange = SliderLineComponent::render(
+          "Thickness", material->subSurface->thicknessTexture()->level, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->subSurface->thicknessTexture()->level = sliderChange.value();
+        }
+      }
+      if (material->subSurface->refractionTexture()) {
+        sliderChange = SliderLineComponent::render(
+          "Refraction", material->subSurface->refractionTexture()->level, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->subSurface->refractionTexture()->level = sliderChange.value();
+        }
+      }
+      if (material->detailMap->isEnabled()) {
+        sliderChange = SliderLineComponent::render(
+          "Detailmap diffuse", material->detailMap->diffuseBlendLevel, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->detailMap->diffuseBlendLevel = sliderChange.value();
+        }
+        sliderChange = SliderLineComponent::render("Detailmap bump", material->detailMap->bumpLevel,
+                                                   0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->detailMap->bumpLevel = sliderChange.value();
+        }
+        sliderChange = SliderLineComponent::render(
+          "Detailmap roughness", material->detailMap->roughnessBlendLevel, 0.f, 1.f, 0.01f, "%.2f");
+        if (sliderChange) {
+          material->detailMap->roughnessBlendLevel = sliderChange.value();
+        }
+      }
       levelsContainerOpened = true;
     }
     else {
@@ -465,10 +524,34 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
                                         material->enableSpecularAntiAliasing())) {
         material->enableSpecularAntiAliasing = !material->enableSpecularAntiAliasing();
       }
+      if (CheckBoxLineComponent::render("Realtime Filtering", material->realTimeFiltering())) {
+        material->realTimeFiltering = !material->realTimeFiltering();
+      }
+      auto optionChange = OptionsLineComponent::render("Realtime Filtering quality",
+                                                       material->realTimeFilteringQuality(),
+                                                       realTimeFilteringQualityOptions);
+      if (optionChange) {
+        material->realTimeFilteringQuality = optionChange.value();
+      }
       renderingContainerOpened = true;
     }
     else {
       renderingContainerOpened = false;
+    }
+    // --- NORMAL MAP ---
+    static auto normalMapContainerOpened = false;
+    ImGui::SetNextTreeNodeOpen(normalMapContainerOpened, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("NORMAL MAP")) {
+      if (CheckBoxLineComponent::render("Invert X axis", material->invertNormalMapX())) {
+        material->invertNormalMapX = !material->invertNormalMapX();
+      }
+      if (CheckBoxLineComponent::render("Invert Y axis", material->invertNormalMapY())) {
+        material->invertNormalMapY = !material->invertNormalMapY();
+      }
+      normalMapContainerOpened = true;
+    }
+    else {
+      normalMapContainerOpened = false;
     }
     // --- ADVANCED ---
     static auto advancedContainerOpened = false;
