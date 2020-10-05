@@ -10,8 +10,6 @@
 
 namespace BABYLON {
 
-using AnimationRangePtr = std::shared_ptr<AnimationRange>;
-
 struct BABYLON_SHARED_EXPORT AnimationControl {
   float from = 0.f;
   float to   = 0.f;

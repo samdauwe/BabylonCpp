@@ -19,14 +19,10 @@
 
 namespace BABYLON {
 
-class Skeleton;
-using SkeletonPtr = std::shared_ptr<Skeleton>;
-
 struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
 
-  static void
-  switchSkeletonViewers(const SkeletonPtr& skeleton,
-                        SkeletonReservedDataStore& skeletonReservedDataStore)
+  static void switchSkeletonViewers(const SkeletonPtr& skeleton,
+                                    SkeletonReservedDataStore& skeletonReservedDataStore)
   {
     skeletonReservedDataStore.skeletonViewersEnabled
       = !skeletonReservedDataStore.skeletonViewersEnabled;
@@ -36,8 +32,7 @@ struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
       for (const auto& mesh : scene->meshes) {
         if (mesh->skeleton() == skeleton) {
           auto found = false;
-          for (const auto& skeletonViewer :
-               skeletonReservedDataStore.skeletonViewers) {
+          for (const auto& skeletonViewer : skeletonReservedDataStore.skeletonViewers) {
             if (skeletonViewer->skeleton == mesh->skeleton()) {
               found = true;
               break;
@@ -46,8 +41,8 @@ struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
           if (found) {
             continue;
           }
-          auto viewer = std::make_shared<Debug::SkeletonViewer>(
-            mesh->skeleton(), mesh, scene, true, 0);
+          auto viewer
+            = std::make_shared<Debug::SkeletonViewer>(mesh->skeleton(), mesh, scene, true, 0);
           viewer->isEnabled = true;
           skeletonReservedDataStore.skeletonViewers.emplace_back(viewer);
           skeletonReservedDataStore.skeletonViewer = viewer;
@@ -55,8 +50,7 @@ struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
       }
     }
     else {
-      for (const auto& skeletonViewer :
-           skeletonReservedDataStore.skeletonViewers) {
+      for (const auto& skeletonViewer : skeletonReservedDataStore.skeletonViewers) {
         skeletonReservedDataStore.skeletonViewer = nullptr;
         skeletonViewer->dispose();
       }
@@ -73,16 +67,13 @@ struct BABYLON_SHARED_EXPORT SkeletonPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(generalContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("GENERAL")) {
       TextLineComponent::render("ID", skeleton->id);
-      TextLineComponent::render("Bone count",
-                                std::to_string(skeleton->bones.size()));
-      if (CheckBoxLineComponent::render(
-            "Use texture to store matrices",
-            skeleton->useTextureToStoreBoneMatrices())) {
-        skeleton->useTextureToStoreBoneMatrices
-          = !skeleton->useTextureToStoreBoneMatrices();
+      TextLineComponent::render("Bone count", std::to_string(skeleton->bones.size()));
+      if (CheckBoxLineComponent::render("Use texture to store matrices",
+                                        skeleton->useTextureToStoreBoneMatrices())) {
+        skeleton->useTextureToStoreBoneMatrices = !skeleton->useTextureToStoreBoneMatrices();
       }
-      if (CheckBoxLineComponent::render(
-            "Debug mode", skeletonReservedDataStore.skeletonViewersEnabled)) {
+      if (CheckBoxLineComponent::render("Debug mode",
+                                        skeletonReservedDataStore.skeletonViewersEnabled)) {
         switchSkeletonViewers(skeleton, skeletonReservedDataStore);
       }
       generalContainerOpened = true;

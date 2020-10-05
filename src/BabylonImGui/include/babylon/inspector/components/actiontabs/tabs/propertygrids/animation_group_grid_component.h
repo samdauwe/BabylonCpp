@@ -9,9 +9,6 @@
 
 namespace BABYLON {
 
-class AnimationGroup;
-using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
-
 struct BABYLON_SHARED_EXPORT AnimationGroupGridComponent {
 
   static void render(const AnimationGroupPtr& /*animationGroup*/)

@@ -12,9 +12,6 @@
 
 namespace BABYLON {
 
-class Mesh;
-using MeshPtr = std::shared_ptr<Mesh>;
-
 struct BABYLON_SHARED_EXPORT RenderGridPropertyGridComponent {
 
   static void addOrRemoveGrid(const MeshPtr& mesh, MeshReservedDataStore& meshReservedDataStore)
