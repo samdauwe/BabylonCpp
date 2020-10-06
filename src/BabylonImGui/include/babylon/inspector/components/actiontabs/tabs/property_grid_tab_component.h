@@ -13,45 +13,31 @@
 
 namespace BABYLON {
 
-class ArcRotateCamera;
-class BackgroundMaterial;
-class BaseTexture;
-class Bone;
-class DirectionalLight;
-class FollowCamera;
-class FreeCamera;
-class HemisphericLight;
-class Material;
-class Mesh;
-class MultiMaterial;
-class PBRMaterial;
-class PBRMetallicRoughnessMaterial;
-class PBRSpecularGlossinessMaterial;
-class PointLight;
-class ScenePropertyGridComponent;
-class Skeleton;
-class SpotLight;
-class StandardMaterial;
-class TransformNode;
-using ArcRotateCameraPtr               = std::shared_ptr<ArcRotateCamera>;
-using BackgroundMaterialPtr            = std::shared_ptr<BackgroundMaterial>;
-using BaseTexturePtr                   = std::shared_ptr<BaseTexture>;
-using BonePtr                          = std::shared_ptr<Bone>;
-using DirectionalLightPtr              = std::shared_ptr<DirectionalLight>;
-using FollowCameraPtr                  = std::shared_ptr<FollowCamera>;
-using FreeCameraPtr                    = std::shared_ptr<FreeCamera>;
-using HemisphericLightPtr              = std::shared_ptr<HemisphericLight>;
-using MaterialPtr                      = std::shared_ptr<Material>;
-using MeshPtr                          = std::shared_ptr<Mesh>;
-using MultiMaterialPtr                 = std::shared_ptr<MultiMaterial>;
-using PBRMaterialPtr                   = std::shared_ptr<PBRMaterial>;
-using PBRMetallicRoughnessMaterialPtr  = std::shared_ptr<PBRMetallicRoughnessMaterial>;
-using PBRSpecularGlossinessMaterialPtr = std::shared_ptr<PBRSpecularGlossinessMaterial>;
-using PointLightPtr                    = std::shared_ptr<PointLight>;
-using SkeletonPtr                      = std::shared_ptr<Skeleton>;
-using SpotLightPtr                     = std::shared_ptr<SpotLight>;
-using StandardMaterialPtr              = std::shared_ptr<StandardMaterial>;
-using TransformNodePtr                 = std::shared_ptr<TransformNode>;
+#define FWD_CLASS_SPTR(className)                                                                  \
+  class className;                                                                                 \
+  using className##Ptr = std::shared_ptr<className>;
+
+FWD_CLASS_SPTR(ArcRotateCamera)
+FWD_CLASS_SPTR(ArcRotateCamera)
+FWD_CLASS_SPTR(BackgroundMaterial)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Bone)
+FWD_CLASS_SPTR(DirectionalLight)
+FWD_CLASS_SPTR(FollowCamera)
+FWD_CLASS_SPTR(FreeCamera)
+FWD_CLASS_SPTR(HemisphericLight)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(MultiMaterial)
+FWD_CLASS_SPTR(PBRMaterial)
+FWD_CLASS_SPTR(PBRMetallicRoughnessMaterial)
+FWD_CLASS_SPTR(PBRSpecularGlossinessMaterial)
+FWD_CLASS_SPTR(PointLight)
+FWD_CLASS_SPTR(ScenePropertyGridComponent)
+FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(SpotLight)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(TransformNode)
 
 struct EntityCache {
   // Bones
