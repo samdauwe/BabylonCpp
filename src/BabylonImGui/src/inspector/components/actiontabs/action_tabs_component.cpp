@@ -1,13 +1,13 @@
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 
 #include <imgui.h>
-#include <babylon/misc/string_tools.h>
+#include <iostream>
+
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
 #include <babylon/inspector/components/global_state.h>
-
-#include <iostream>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -17,8 +17,7 @@ std::unordered_map<std::string, std::string> _ActionTabsComponent_Labels{
   {"Statistics", std::string(ICON_FA_CHART_BAR) + " Statistics"},
 };
 
-ActionTabsComponent::ActionTabsComponent(
-  const IActionTabsComponentProps& iProps)
+ActionTabsComponent::ActionTabsComponent(const IActionTabsComponentProps& iProps)
     : props{iProps}
     , _propertyGridTabComponent{nullptr}
     , _debugTabComponent{nullptr}
@@ -36,40 +35,34 @@ ActionTabsComponent::~ActionTabsComponent()
 void ActionTabsComponent::setScene(Scene* scene)
 {
   // Create tab widgets
-  props.scene      = scene;
-  _paneProps.scene = props.scene;
-  _propertyGridTabComponent
-    = std::make_unique<PropertyGridTabComponent>(_paneProps);
-  _debugTabComponent = std::make_unique<DebugTabComponent>(_paneProps);
-  _statisticsTabComponent
-    = std::make_unique<StatisticsTabComponent>(_paneProps);
+  props.scene               = scene;
+  _paneProps.scene          = props.scene;
+  _propertyGridTabComponent = std::make_unique<PropertyGridTabComponent>(_paneProps);
+  _debugTabComponent        = std::make_unique<DebugTabComponent>(_paneProps);
+  _statisticsTabComponent   = std::make_unique<StatisticsTabComponent>(_paneProps);
 }
 
 void ActionTabsComponent::componentWillMount()
 {
   // Create selection change observer
-  _onSelectionChangeObserver
-    = props.globalState->onSelectionChangedObservable.add(
-      [this](EntityInfo* entity, EventState & /*es*/) -> void {
-        if (entity && (entity->uniqueId.has_value() || !entity->name.empty())) {
-          _paneProps.selectedEntity
-            = {entity->type, *entity->uniqueId, entity->name};
-        }
-      });
+  _onSelectionChangeObserver = props.globalState->onSelectionChangedObservable.add(
+    [this](EntityInfo* entity, EventState & /*es*/) -> void {
+      if (entity && (entity->uniqueId.has_value() || !entity->name.empty())) {
+        _paneProps.selectedEntity = {entity->type, *entity->uniqueId, entity->name};
+      }
+    });
 }
 
 void ActionTabsComponent::componentWillUnmount()
 {
   if (_onSelectionChangeObserver) {
-    props.globalState->onSelectionChangedObservable.remove(
-      _onSelectionChangeObserver);
+    props.globalState->onSelectionChangedObservable.remove(_onSelectionChangeObserver);
   }
 }
 
 void ActionTabsComponent::render()
 {
-  if (ImGui::BeginTabBar("Actions Tabs"))
-  {
+  if (ImGui::BeginTabBar("Actions Tabs")) {
     // Properties
     if (_propertyGridTabComponent) {
       if (ImGui::BeginTabItem(_ActionTabsComponent_Labels.at("Properties").c_str())) {
