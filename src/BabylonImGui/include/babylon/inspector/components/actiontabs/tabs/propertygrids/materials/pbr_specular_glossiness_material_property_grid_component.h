@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_PBR_SPECULAR_GLOSSINESS_MATERIAL_PROPERTY_GRID_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_PBR_SPECULAR_GLOSSINESS_MATERIAL_PROPERTY_GRID_COMPONENT_H
 
-#include <memory>
-
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/texture_link_line_component.h>

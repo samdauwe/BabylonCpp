@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_POST_PROCESSES_POST_PROCESS_PROPERTY_GRID_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_POST_PROCESSES_POST_PROCESS_PROPERTY_GRID_COMPONENT_H
 
-#include <memory>
-
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/postprocesses/common_post_process_property_grid_component.h>
 

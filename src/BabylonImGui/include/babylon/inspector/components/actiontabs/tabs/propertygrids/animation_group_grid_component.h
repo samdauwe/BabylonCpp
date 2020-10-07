@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_GROUP_GRID_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_GROUP_GRID_COMPONENT_H
 
-#include <memory>
-
 #include <babylon/animations/animation_group.h>
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>

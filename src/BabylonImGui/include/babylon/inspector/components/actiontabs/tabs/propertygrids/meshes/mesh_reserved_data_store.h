@@ -4,15 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class LinesMesh;
-class Material;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
-using MaterialPtr     = std::shared_ptr<Material>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(LinesMesh)
+FWD_CLASS_SPTR(Material)
 
 struct BABYLON_SHARED_EXPORT MeshReservedDataStore {
   bool hidden                  = false;

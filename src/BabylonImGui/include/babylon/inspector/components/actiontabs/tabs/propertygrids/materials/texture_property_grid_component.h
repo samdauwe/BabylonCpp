@@ -1,9 +1,6 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_TEXTURE_PROPERTY_GRID_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_TEXTURE_PROPERTY_GRID_COMPONENT_H
 
-#include <memory>
-#include <vector>
-
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>

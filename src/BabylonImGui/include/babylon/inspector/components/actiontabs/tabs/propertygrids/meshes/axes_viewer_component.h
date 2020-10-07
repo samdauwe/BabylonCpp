@@ -4,12 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 
 namespace BABYLON {
 
-class TransformNode;
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(TransformNode)
 
 struct BABYLON_SHARED_EXPORT AxesViewerComponent {
 

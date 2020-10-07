@@ -4,13 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/inspector/entity.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-class GlobalState;
-using GlobalStatePtr = std::shared_ptr<GlobalState>;
+FWD_CLASS_SPTR(GlobalState)
 
 class BABYLON_SHARED_EXPORT GlobalState {
 
@@ -18,8 +18,7 @@ public:
   template <typename... Ts>
   static GlobalStatePtr New(Ts&&... args)
   {
-    return std::shared_ptr<GlobalState>(
-      new GlobalState(std::forward<Ts>(args)...));
+    return std::shared_ptr<GlobalState>(new GlobalState(std::forward<Ts>(args)...));
   }
   ~GlobalState() = default;
 

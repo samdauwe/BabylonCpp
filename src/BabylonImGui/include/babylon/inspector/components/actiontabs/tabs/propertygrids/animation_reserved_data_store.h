@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_RESERVED_DATA_STORAGE_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_RESERVED_DATA_STORAGE_H
 
-#include <memory>
-
 #include <babylon/animations/animation_range.h>
 #include <babylon/babylon_api.h>
 #include <babylon/engines/scene.h>

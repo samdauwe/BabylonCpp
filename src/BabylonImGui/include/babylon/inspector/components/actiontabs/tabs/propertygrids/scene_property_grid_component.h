@@ -6,13 +6,13 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-class Scene;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Scene)
 
 struct IScenePropertyGridComponentProps {
   Scene* scene = nullptr;

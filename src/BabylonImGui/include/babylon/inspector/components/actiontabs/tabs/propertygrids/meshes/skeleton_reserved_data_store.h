@@ -5,11 +5,11 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 namespace Debug {
-class SkeletonViewer;
-using SkeletonViewerPtr = std::shared_ptr<SkeletonViewer>;
+FWD_CLASS_SPTR(SkeletonViewer)
 } // end of namespace Debug
 
 struct BABYLON_SHARED_EXPORT SkeletonReservedDataStore {

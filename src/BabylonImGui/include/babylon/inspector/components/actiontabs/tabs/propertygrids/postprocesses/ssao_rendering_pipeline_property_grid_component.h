@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_POST_PROCESSES_SSAO_RENDERING_PIPELINE_PROPERTY_GRID_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_POST_PROCESSES_SSAO_RENDERING_PIPELINE_PROPERTY_GRID_COMPONENT_H
 
-#include <memory>
-
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/postprocesses/common_rendering_pipeline_property_grid_component.h>
 #include <babylon/postprocesses/renderpipeline/pipelines/ssao_rendering_pipeline.h>
