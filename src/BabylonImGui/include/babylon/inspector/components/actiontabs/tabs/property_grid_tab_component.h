@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/inspector/components/actiontabs/pane_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_reserved_data_store.h>
@@ -12,10 +13,6 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/skeleton_reserved_data_store.h>
 
 namespace BABYLON {
-
-#define FWD_CLASS_SPTR(className)                                                                  \
-  class className;                                                                                 \
-  using className##Ptr = std::shared_ptr<className>;
 
 FWD_CLASS_SPTR(ArcRotateCamera)
 FWD_CLASS_SPTR(ArcRotateCamera)
