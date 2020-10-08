@@ -1,5 +1,5 @@
-#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_GRID_COMPONENT_H
-#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_GRID_COMPONENT_H
+#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATIONS_ANIMATION_PROPERTY_GRID_COMPONENT_H
+#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATIONS_ANIMATION_PROPERTY_GRID_COMPONENT_H
 
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation_properties_override.h>
@@ -12,7 +12,7 @@
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
-#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_reserved_data_store.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animations/animation_reserved_data_store.h>
 
 namespace BABYLON {
 
@@ -225,4 +225,4 @@ struct BABYLON_SHARED_EXPORT AnimationGridComponent {
 } // end of namespace BABYLON
 
 #endif // end of
-       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATION_GRID_COMPONENT_H
+       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_ANIMATIONS_ANIMATION_PROPERTY_GRID_COMPONENT_H

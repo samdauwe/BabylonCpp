@@ -7,7 +7,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/inspector/components/actiontabs/pane_component.h>
-#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animation_reserved_data_store.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/animations/animation_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/skeleton_reserved_data_store.h>
