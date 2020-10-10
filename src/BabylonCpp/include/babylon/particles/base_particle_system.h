@@ -415,17 +415,6 @@ public:
   std::function<void()> onAnimationEnd;
 
   /**
-   * Forces the particle to write their depth information to the depth buffer.
-   * This can help preventing other draw calls to override the particles.
-   */
-  bool forceDepthWrite;
-
-  /**
-   * Gets or sets a world offset applied to all particles
-   */
-  Vector3 worldOffset;
-
-  /**
    * An optional mask to filter some colors out of the texture, or filter a part of the alpha
    * channel
    */

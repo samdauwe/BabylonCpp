@@ -20,8 +20,6 @@ namespace BABYLON {
 BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     : manualEmitCount{-1}
     , onAnimationEnd{nullptr}
-    , forceDepthWrite{false}
-    , worldOffset{Vector3(0.f, 0.f, 0.f)}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
     , direction1{this, &BaseParticleSystem::get_direction1, &BaseParticleSystem::set_direction1}
     , direction2{this, &BaseParticleSystem::get_direction2, &BaseParticleSystem::set_direction2}
@@ -46,6 +44,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     updateSpeed           = 0.01f;
     targetStopDuration    = 0;
     disposeOnStop         = false;
+    forceDepthWrite       = false;
     particleTexture       = nullptr;
     blendMode             = BaseParticleSystem::BLENDMODE_ONEONE;
     minLifeTime           = 1.f;
@@ -61,6 +60,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     colorDead             = Color4{0.f, 0.f, 0.f, 0.f};
     emitRate              = 100;
     gravity               = Vector3::Zero();
+    worldOffset           = Vector3(0.f, 0.f, 0.f);
     minEmitPower          = 1.f;
     maxEmitPower          = 1.f;
     minAngularSpeed       = 0.f;
