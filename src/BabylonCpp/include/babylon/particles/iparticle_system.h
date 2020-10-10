@@ -183,6 +183,11 @@ public:
   int emitRate;
 
   /**
+   * Gets or sets a world offset applied to all particles
+   */
+  Vector3 worldOffset;
+
+  /**
    * You can use gravity if you want to give an orientation to your particles.
    */
   Vector3 gravity;
@@ -330,6 +335,12 @@ public:
    * animation.
    */
   bool disposeOnStop;
+
+  /**
+   * Forces the particle to write their depth information to the depth buffer.
+   * This can help preventing other draw calls to override the particles.
+   */
+  bool forceDepthWrite;
 
   /**
    * Specifies if the particles are updated in emitter local space or world space
