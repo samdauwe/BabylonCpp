@@ -4,6 +4,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/vector3.h>
@@ -12,14 +13,11 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
 struct ISize;
-class ReflectionProbe;
-class RenderTargetTexture;
 class Scene;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(ReflectionProbe)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Class used to generate realtime reflection / refraction cube textures.
