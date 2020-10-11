@@ -3,6 +3,10 @@
 
 namespace BABYLON {
 
+#define FWD_STRUCT_SPTR(className)                                                                 \
+  struct className;                                                                                \
+  using className##Ptr = std::shared_ptr<className>;
+
 #define FWD_CLASS_SPTR(className)                                                                  \
   class className;                                                                                 \
   using className##Ptr = std::shared_ptr<className>;
