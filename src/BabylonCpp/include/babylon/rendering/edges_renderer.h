@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 #include <babylon/rendering/iedges_renderer.h>
@@ -11,16 +12,12 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Node;
 class Scene;
-class ShaderMaterial;
-class VertexBuffer;
-class WebGLDataBuffer;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using ShaderMaterialPtr  = std::shared_ptr<ShaderMaterial>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(ShaderMaterial)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief This class is used to generate edges of the mesh that could then easily be rendered in a

@@ -6,24 +6,19 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Effect;
 class Engine;
-class Mesh;
-class SubMesh;
-class MultiRenderTarget;
 class Scene;
-class SubMesh;
-using AbstractMeshPtr      = std::shared_ptr<AbstractMesh>;
-using EffectPtr            = std::shared_ptr<Effect>;
-using MeshPtr              = std::shared_ptr<Mesh>;
-using SubMeshPtr           = std::shared_ptr<SubMesh>;
-using MultiRenderTargetPtr = std::shared_ptr<MultiRenderTarget>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(SubMesh)
+FWD_CLASS_SPTR(MultiRenderTarget)
 
 struct ISavedTransformationMatrix {
   Matrix world;

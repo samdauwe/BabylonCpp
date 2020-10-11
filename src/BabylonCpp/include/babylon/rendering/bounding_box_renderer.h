@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/maths/color3.h>
@@ -13,15 +14,11 @@ namespace BABYLON {
 
 class AbstractMesh;
 class BoundingBox;
-class BoundingBoxRenderer;
-class ShaderMaterial;
 class SubMesh;
-class VertexBuffer;
-class WebGLDataBuffer;
-using BoundingBoxRendererPtr = std::shared_ptr<BoundingBoxRenderer>;
-using ShaderMaterialPtr      = std::shared_ptr<ShaderMaterial>;
-using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(BoundingBoxRenderer)
+FWD_CLASS_SPTR(ShaderMaterial)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Component responsible of rendering the bounding box of the meshes in a

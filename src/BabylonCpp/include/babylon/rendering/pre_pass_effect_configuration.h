@@ -4,11 +4,11 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class PostProcess;
-using PostProcessPtr = std::shared_ptr<PostProcess>;
+FWD_CLASS_SPTR(PostProcess)
 
 /**
  * @brief Interface for defining prepass effects in the prepass post-process pipeline.

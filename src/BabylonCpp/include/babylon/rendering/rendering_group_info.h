@@ -4,12 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Camera;
 class Scene;
-using CameraPtr = std::shared_ptr<Camera>;
+FWD_CLASS_SPTR(Camera)
 
 /**
  * @brief This class is used by the onRenderingGroupObservable.

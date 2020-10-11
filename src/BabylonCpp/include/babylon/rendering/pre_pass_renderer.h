@@ -5,21 +5,18 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color4.h>
 
 namespace BABYLON {
 
 class Effect;
 class Engine;
-class ImageProcessingPostProcess;
-class MultiRenderTarget;
-class PostProcess;
 class Scene;
-class SubSurfaceConfiguration;
-using ImageProcessingPostProcessPtr = std::shared_ptr<ImageProcessingPostProcess>;
-using MultiRenderTargetPtr          = std::shared_ptr<MultiRenderTarget>;
-using PostProcessPtr                = std::shared_ptr<PostProcess>;
-using SubSurfaceConfigurationPtr    = std::unique_ptr<SubSurfaceConfiguration>;
+FWD_CLASS_SPTR(ImageProcessingPostProcess)
+FWD_CLASS_SPTR(MultiRenderTarget)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(SubSurfaceConfiguration)
 
 /**
  * @brief Renders a pre pass of the scene.

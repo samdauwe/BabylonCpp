@@ -6,24 +6,20 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Camera;
 class EdgesRenderer;
-struct IEdgesRenderer;
 class IParticleSystem;
 class ISpriteManager;
-class Material;
 class Scene;
-class SubMesh;
-using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
-using CameraPtr         = std::shared_ptr<Camera>;
-using IEdgesRendererPtr = std::shared_ptr<IEdgesRenderer>;
-using MaterialPtr       = std::shared_ptr<Material>;
-using SubMeshPtr        = std::shared_ptr<SubMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Camera)
+FWD_STRUCT_SPTR(IEdgesRenderer)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(SubMesh)
 
 /**
  * @brief This represents the object necessary to create a rendering group.

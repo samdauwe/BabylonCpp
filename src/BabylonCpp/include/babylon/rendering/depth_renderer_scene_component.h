@@ -4,15 +4,14 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class DepthRendererSceneComponent;
-class RenderTargetTexture;
-using DepthRendererSceneComponentPtr = std::shared_ptr<DepthRendererSceneComponent>;
-using RenderTargetTexturePtr         = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(DepthRendererSceneComponent)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Defines the Depth Renderer scene component responsible to manage a

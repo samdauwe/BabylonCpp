@@ -4,21 +4,19 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-struct _InstancesBatch;
-class OutlineRenderer;
-class Effect;
 class Engine;
 class Mesh;
 class Scene;
 class SubMesh;
-using _InstancesBatchPtr = std::shared_ptr<_InstancesBatch>;
-using EffectPtr          = std::shared_ptr<Effect>;
-using OutlineRendererPtr = std::shared_ptr<OutlineRenderer>;
+FWD_STRUCT_SPTR(_InstancesBatch)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(OutlineRenderer)
 
 /**
  * @brief This class is responsible to draw bothe outline/overlay of meshes.

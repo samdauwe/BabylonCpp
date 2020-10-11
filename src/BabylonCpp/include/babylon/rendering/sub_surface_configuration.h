@@ -5,14 +5,14 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/rendering/pre_pass_effect_configuration.h>
 
 namespace BABYLON {
 
 class Scene;
-class SubSurfaceScatteringPostProcess;
-using SubSurfaceScatteringPostProcessPtr = std::shared_ptr<SubSurfaceScatteringPostProcess>;
+FWD_CLASS_SPTR(SubSurfaceScatteringPostProcess)
 
 /**
  * @brief Contains all parameters needed for the prepass to perform screen space subsurface

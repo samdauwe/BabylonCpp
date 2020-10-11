@@ -2,6 +2,7 @@
 #define BABYLON_RENDERING_PRE_PASS_RENDERER_SCENE_COMPONENT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/iscene_serializable_component.h>
 #include <babylon/engines/scene_component_constants.h>
@@ -11,8 +12,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class AbstractScene;
-class PrePassRendererSceneComponent;
-using PrePassRendererSceneComponentPtr = std::shared_ptr<PrePassRendererSceneComponent>;
+FWD_CLASS_SPTR(PrePassRendererSceneComponent)
 
 /**
  * @brief Defines the Geometry Buffer scene component responsible to manage a G-Buffer useful

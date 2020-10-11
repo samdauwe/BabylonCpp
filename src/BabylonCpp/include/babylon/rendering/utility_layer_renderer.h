@@ -2,6 +2,7 @@
 #define BABYLON_RENDERING_UTILITY_LAYER_RENDER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observable.h>
@@ -9,16 +10,13 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Camera;
-class HemisphericLight;
 class PickingInfo;
 class PointerInfo;
 class PointerInfoPre;
 class Scene;
-using AbstractMeshPtr     = std::shared_ptr<AbstractMesh>;
-using CameraPtr           = std::shared_ptr<Camera>;
-using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(HemisphericLight)
 
 /**
  * @brief Renders a layer on top of an existing scene.

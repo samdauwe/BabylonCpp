@@ -4,16 +4,14 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class GeometryBufferRendererSceneComponent;
-class RenderTargetTexture;
-using GeometryBufferRendererSceneComponentPtr
-  = std::shared_ptr<GeometryBufferRendererSceneComponent>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(GeometryBufferRendererSceneComponent)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Defines the Geometry Buffer scene component responsible to manage a

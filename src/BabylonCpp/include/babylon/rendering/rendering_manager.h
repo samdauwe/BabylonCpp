@@ -4,23 +4,21 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color4.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class IParticleSystem;
 struct IRenderingManagerAutoClearSetup;
 class ISpriteManager;
-class Material;
 class RenderingGroup;
 struct RenderingGroupInfo;
 class Scene;
 class SpriteManager;
-class SubMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using MaterialPtr     = std::shared_ptr<Material>;
-using SubMeshPtr      = std::shared_ptr<SubMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(SubMesh)
 
 /**
  * @brief This is the manager responsible of all the rendering for meshes
@@ -59,15 +57,14 @@ public:
    * different rennder targets.
    * Hidden
    */
-  void
-  render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                            const std::vector<SubMesh*>& alphaTestSubMeshes,
-                            const std::vector<SubMesh*>& transparentSubMeshes,
-                            const std::vector<SubMesh*>& depthOnlySubMeshes,
-                            const std::function<void()>& beforeTransparents)>
-           customRenderFunction,
-         const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
-         bool renderSprites);
+  void render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                                 const std::vector<SubMesh*>& alphaTestSubMeshes,
+                                 const std::vector<SubMesh*>& transparentSubMeshes,
+                                 const std::vector<SubMesh*>& depthOnlySubMeshes,
+                                 const std::function<void()>& beforeTransparents)>
+                customRenderFunction,
+              const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
+              bool renderSprites);
 
   /**
    * @brief Resets the different information of the group to prepare a new frame
@@ -128,14 +125,9 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      opaqueSortCompareFn
-    = nullptr,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      alphaTestSortCompareFn
-    = nullptr,
-    const std::function<int(const SubMesh* a, const SubMesh* b)>&
-      transparentSortCompareFn
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& opaqueSortCompareFn    = nullptr,
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& alphaTestSortCompareFn = nullptr,
+    const std::function<int(const SubMesh* a, const SubMesh* b)>& transparentSortCompareFn
     = nullptr);
 
   /**
@@ -150,10 +142,8 @@ public:
    * @param stencil Automatically clears stencil between groups if true and
    * autoClear is true.
    */
-  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
-                                         bool autoClearDepthStencil,
-                                         bool depth   = true,
-                                         bool stencil = true);
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId, bool autoClearDepthStencil,
+                                         bool depth = true, bool stencil = true);
 
   /**
    * @brief Gets the current auto clear configuration for one rendering group of
@@ -161,8 +151,7 @@ public:
    * @param index the rendering group index to get the information for
    * @returns The auto clear setup for the requested rendering group
    */
-  std::optional<IRenderingManagerAutoClearSetup>
-  getAutoClearDepthStencilSetup(size_t index);
+  std::optional<IRenderingManagerAutoClearSetup> getAutoClearDepthStencilSetup(size_t index);
 
 private:
   void _clearDepthStencilBuffer(bool depth = true, bool stencil = true);
@@ -180,10 +169,8 @@ private:
   bool _depthStencilBufferAlreadyCleaned;
 
   std::vector<IRenderingManagerAutoClearSetup> _autoClearDepthStencil;
-  std::vector<std::function<int(const SubMesh* a, const SubMesh* b)>>
-    _customOpaqueSortCompareFn;
-  std::vector<std::function<int(const SubMesh* a, const SubMesh* b)>>
-    _customAlphaTestSortCompareFn;
+  std::vector<std::function<int(const SubMesh* a, const SubMesh* b)>> _customOpaqueSortCompareFn;
+  std::vector<std::function<int(const SubMesh* a, const SubMesh* b)>> _customAlphaTestSortCompareFn;
   std::vector<std::function<int(const SubMesh* a, const SubMesh* b)>>
     _customTransparentSortCompareFn;
   std::unique_ptr<RenderingGroupInfo> _renderingGroupInfo;
