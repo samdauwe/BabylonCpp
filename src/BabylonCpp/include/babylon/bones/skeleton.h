@@ -245,6 +245,11 @@ public:
    */
   void sortBones();
 
+  /**
+   * @brief Set the current local matrix as the restPose for all bones in the skeleton.
+   */
+  void setCurrentPoseAsRest();
+
 protected:
   /**
    * @brief Creates a new skeleton.

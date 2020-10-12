@@ -145,23 +145,21 @@ public:
 
   /**
    * @brief Gets the inverse of the absolute transform matrix.
-   * This matrix will be multiplied by local matrix to get the difference matrix
-   * (ie. the difference between original state and current state)
+   * This matrix will be multiplied by local matrix to get the difference matrix (ie. the difference
+   * between original state and current state)
    * @returns a matrix
    */
   Matrix& getInvertedAbsoluteTransform();
 
   /**
-   * @brief Gets the absolute transform matrix (ie base matrix * parent world
-   * matrix).
+   * @brief Gets the absolute transform matrix (ie base matrix * parent world matrix).
    * @returns a matrix
    */
   Matrix& getAbsoluteTransform();
 
   /**
    * @brief Links with the given transform node.
-   * The local matrix of this bone is copied from the transform node every
-   * frame.
+   * The local matrix of this bone is copied from the transform node every frame.
    * @param transformNode defines the transform node to link to
    */
   void linkTransformNode(const TransformNodePtr& transformNode);
@@ -173,8 +171,7 @@ public:
   TransformNodePtr& getTransformNode();
 
   /**
-   * @brief Gets the absolute transform matrix (ie base matrix * parent world
-   * matrix).
+   * @brief Gets the absolute transform matrix (ie base matrix * parent world matrix).
    * @returns a matrix
    */
   const Matrix& getAbsoluteTransform() const;
@@ -187,8 +184,7 @@ public:
   /**
    * @brief Update the base and local matrices.
    * @param matrix defines the new base or local matrix
-   * @param updateDifferenceMatrix defines if the difference matrix must be
-   * updated
+   * @param updateDifferenceMatrix defines if the difference matrix must be updated
    * @param updateLocalMatrix defines if the local matrix should be updated
    */
   void updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix = true,
@@ -227,8 +223,7 @@ public:
    * @brief Translate the bone in local or world space.
    * @param vec The amount to translate the bone
    * @param space The space that the translation is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    */
   void translate(const Vector3& vec, Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
@@ -236,8 +231,7 @@ public:
    * @brief Set the postion of the bone in local or world space.
    * @param position The position to set the bone
    * @param space The space that the position is in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    */
   void setPosition(const Vector3& position, Space space = Space::LOCAL,
                    AbstractMesh* mesh = nullptr);
@@ -254,8 +248,8 @@ public:
    * @param x The amount to scale the bone on the x axis
    * @param y The amount to scale the bone on the y axis
    * @param z The amount to scale the bone on the z axis
-   * @param scaleChildren sets this to true if children of the bone should be
-   * scaled as well (false by default)
+   * @param scaleChildren sets this to true if children of the bone should be scaled as well (false
+   * by default)
    */
   void scale(float x, float y, float z, bool scaleChildren = false);
 
@@ -272,8 +266,7 @@ public:
   std::optional<Vector3>& getScale();
 
   /**
-   * @brief Gets the current scaling in local space and stores it in a target
-   * vector.
+   * @brief Gets the current scaling in local space and stores it in a target vector.
    * @param result defines the target vector
    */
   void getScaleToRef(Vector3& result);
@@ -284,8 +277,7 @@ public:
    * @param pitch The rotation of the bone on the x axis
    * @param roll The rotation of the bone on the z axis
    * @param space The space that the axes of rotation are in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    */
   void setYawPitchRoll(float yaw, float pitch, float roll, Space space = Space::LOCAL,
                        AbstractMesh* mesh = nullptr);
@@ -295,50 +287,44 @@ public:
    * @param axis The axis to rotate the bone on
    * @param amount The amount to rotate the bone
    * @param space The space that the axis is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    */
   void rotate(Vector3& axis, float amount, Space space = Space::LOCAL,
               AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Set the rotation of the bone to a particular axis angle in local or
-   * world space.
+   * @brief Set the rotation of the bone to a particular axis angle in local or world space.
    * @param axis The axis to rotate the bone on
    * @param angle The angle that the bone should be rotated to
    * @param space The space that the axis is in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    */
   void setAxisAngle(Vector3& axis, float angle, Space space = Space::LOCAL,
                     AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Set the euler rotation of the bone in local of world space.
+   * @brief Set the euler rotation of the bone in local or world space.
    * @param rotation The euler rotation that the bone should be set to
    * @param space The space that the rotation is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    */
   void setRotation(const Vector3& rotation, Space space = Space::LOCAL,
                    AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Set the quaternion rotation of the bone in local of world space.
+   * @brief Set the quaternion rotation of the bone in local or world space.
    * @param quat The quaternion rotation that the bone should be set to
    * @param space The space that the rotation is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    */
   void setRotationQuaternion(const Quaternion& quat, Space space = Space::LOCAL,
                              AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Set the rotation matrix of the bone in local of world space.
+   * @brief Set the rotation matrix of the bone in local or world space.
    * @param rotMat The rotation matrix that the bone should be set to
    * @param space The space that the rotation is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    */
   void setRotationMatrix(const Matrix& rotMat, Space space = Space::LOCAL,
                          AbstractMesh* mesh = nullptr);
@@ -346,8 +332,7 @@ public:
   /**
    * @brief Get the position of the bone in local or world space.
    * @param space The space that the returned position is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    * @returns The position of the bone
    */
   Vector3 getPosition(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr) const;
@@ -355,8 +340,7 @@ public:
   /**
    * @brief Copy the position of the bone to a vector3 in local or world space.
    * @param space The space that the returned position is in
-   * @param mesh The mesh that this bone is attached to. This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to. This is only used in world space
    * @param result The vector3 to copy the position to
    */
   void getPositionToRef(Vector3& result, Space space = Space::LOCAL,
@@ -370,8 +354,7 @@ public:
   Vector3 getAbsolutePosition(AbstractMesh* mesh) const;
 
   /**
-   * @brief Copy the absolute position of the bone (world space) to the result
-   * param.
+   * @brief Copy the absolute position of the bone (world space) to the result param.
    * @param mesh The mesh that this bone is attached to
    * @param result The vector3 to copy the absolute position to
    */
@@ -383,20 +366,17 @@ public:
   void computeAbsoluteTransforms();
 
   /**
-   * @brief Get the world direction from an axis that is in the local space of
-   * the bone.
-   * @param localAxis The local direction that is used to compute the world
-   * direction
+   * @brief Get the world direction from an axis that is in the local space of the bone.
+   * @param localAxis The local direction that is used to compute the world direction
    * @param mesh The mesh that this bone is attached to
    * @returns The world direction
    */
   Vector3 getDirection(const Vector3& localAxis, AbstractMesh* mesh = nullptr) const;
 
   /**
-   * @brief Copy the world direction to a vector3 from an axis that is in the
-   * local space of the bone.
-   * @param localAxis The local direction that is used to compute the world
-   * direction
+   * @brief Copy the world direction to a vector3 from an axis that is in the local space of the
+   * bone.
+   * @param localAxis The local direction that is used to compute the world direction
    * @param mesh The mesh that this bone is attached to
    * @param result The vector3 that the world direction will be copied to
    */
@@ -406,38 +386,33 @@ public:
   /**
    * @brief Get the euler rotation of the bone in local or world space.
    * @param space The space that the rotation should be in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    * @returns The euler rotation
    */
   Vector3& getRotation(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Copy the euler rotation of the bone to a vector3.  The rotation can
-   * be in either local or world space.
+   * @brief Copy the euler rotation of the bone to a vector3.  The rotation can be in either local
+   * or world space.
    * @param space The space that the rotation should be in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    * @param result The vector3 that the rotation should be copied to
    */
   void getRotationToRef(Vector3& result, Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Get the quaternion rotation of the bone in either local or world
-   * space.
+   * @brief Get the quaternion rotation of the bone in either local or world space.
    * @param space The space that the rotation should be in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    * @returns The quaternion rotation
    */
   Quaternion getRotationQuaternion(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Copy the quaternion rotation of the bone to a quaternion.  The
-   * rotation can be in either local or world space.
+   * @brief Copy the quaternion rotation of the bone to a quaternion. The rotation can be in either
+   * local or world space.
    * @param space The space that the rotation should be in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    * @param result The quaternion that the rotation should be copied to
    */
   void getRotationQuaternionToRef(Quaternion& result, const Space& space = Space::LOCAL,
@@ -446,26 +421,23 @@ public:
   /**
    * @brief Get the rotation matrix of the bone in local or world space.
    * @param space The space that the rotation should be in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    * @returns The rotation matrix
    */
   Matrix getRotationMatrix(Space space = Space::LOCAL, AbstractMesh* mesh = nullptr) const;
 
   /**
-   * @brief Copy the rotation matrix of the bone to a matrix.  The rotation can
-   * be in either local or world space.
+   * @brief Copy the rotation matrix of the bone to a matrix.  The rotation can be in either local
+   * or world space.
    * @param space The space that the rotation should be in
-   * @param mesh The mesh that this bone is attached to.  This is only used in
-   * world space
+   * @param mesh The mesh that this bone is attached to.  This is only used in world space
    * @param result The quaternion that the rotation should be copied to
    */
   void getRotationMatrixToRef(Matrix& result, Space space = Space::LOCAL,
                               AbstractMesh* mesh = nullptr) const;
 
   /**
-   * @brief Get the world position of a point that is in the local space of the
-   * bone.
+   * @brief Get the world position of a point that is in the local space of the bone.
    * @param position The local position
    * @param mesh The mesh that this bone is attached to
    * @returns The world position
@@ -473,8 +445,8 @@ public:
   Vector3 getAbsolutePositionFromLocal(const Vector3& position, AbstractMesh* mesh) const;
 
   /**
-   * @brief Get the world position of a point that is in the local space of the
-   * bone and copy it to the result param.
+   * @brief Get the world position of a point that is in the local space of the bone and copy it to
+   * the result param.
    * @param position The local position
    * @param mesh The mesh that this bone is attached to
    * @param result The vector3 that the world position should be copied to
@@ -491,14 +463,19 @@ public:
   Vector3 getLocalPositionFromAbsolute(const Vector3& position, AbstractMesh* mesh = nullptr) const;
 
   /**
-   * @brief Get the local position of a point that is in world space and copy it
-   * to the result param.
+   * @brief Get the local position of a point that is in world space and copy it to the result
+   * param.
    * @param position The world position
    * @param mesh The mesh that this bone is attached to
    * @param result The vector3 that the local position should be copied to
    */
   void getLocalPositionFromAbsoluteToRef(const Vector3& position, AbstractMesh* mesh,
                                          Vector3& result) const;
+
+  /**
+   * @brief Set the current local matrix as the restPose for this bone.
+   */
+  void setCurrentPoseAsRest();
 
 protected:
   /**
@@ -595,9 +572,8 @@ public:
 
   /**
    * Hidden Internal only
-   * Set this value to map this bone to a different index in the transform
-   * matrices Set this value to -1 to exclude the bone from the transform
-   * matrices
+   * Set this value to map this bone to a different index in the transform matrices Set this value
+   * to -1 to exclude the bone from the transform matrices
    */
   std::optional<int> _index;
 

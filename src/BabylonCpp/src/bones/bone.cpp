@@ -197,7 +197,7 @@ void Bone::returnToRest()
     updateMatrix(_restPose.value_or(Matrix::Identity()), false, false);
   }
   else {
-    updateMatrix(_restPose.value_or(Matrix::Identity()));
+    updateMatrix(_restPose.value_or(Matrix::Identity()), false, true);
   }
 }
 
@@ -331,6 +331,7 @@ void Bone::updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix, bool 
   }
 
   if (updateLocalMatrix) {
+    _needToCompose = false; // in case there was a pending compose
     _localMatrix.copyFrom(matrix);
     _markAsDirtyAndDecompose();
   }
@@ -1048,6 +1049,11 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& iPosition, AbstractM
   tmat.invert();
 
   Vector3::TransformCoordinatesToRef(iPosition, tmat, result);
+}
+
+void Bone::setCurrentPoseAsRest()
+{
+  setRestPose(getLocalMatrix());
 }
 
 } // end of namespace BABYLON

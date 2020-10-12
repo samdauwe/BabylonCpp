@@ -118,13 +118,25 @@ enum class Space {
 }; // end of enum class Space
 
 /**
+ * @brief Defines cartesian components.
+ */
+enum class Coordinate {
+  /** X axis */
+  X,
+  /** Y axis */
+  Y,
+  /** Z axis */
+  Z
+}; // end of enum class Coordinate
+
+/**
  * @brief Defines potential orientation for back face culling.
  */
 enum class Orientation {
   /** Clockwise */
   CW = 0,
   /** Counter clockwise */
-  CCW = 1
+  CCW = 1,
 }; // end of enum class Orientation
 
 /** Mesh Enums **/

@@ -316,7 +316,7 @@ Animatable* Skeleton::beginAnimation(const std::string& iName, bool /*loop*/, fl
 SkeletonPtr Skeleton::MakeAnimationAdditive(const SkeletonPtr& skeleton, int referenceFrame,
                                             const std::string& range)
 {
-  auto rangeValue = skeleton->getAnimationRange(/*name*/ range);
+  auto rangeValue = skeleton->getAnimationRange(range);
 
   // We can't make a range additive if it doesn't exist
   if (!rangeValue) {
@@ -684,6 +684,13 @@ void Skeleton::_sortBones(unsigned int index, std::vector<BonePtr>& iBones,
   }
 
   iBones.emplace_back(bone);
+}
+
+void Skeleton::setCurrentPoseAsRest()
+{
+  for (const auto& b : bones) {
+    b->setCurrentPoseAsRest();
+  }
 }
 
 } // end of namespace BABYLON
