@@ -55,7 +55,7 @@ bool operator!=(const Angle& lhs, const Angle& rhs)
 
 float Angle::degrees() const
 {
-  return _radians * 180.f / Math::PI;
+  return (_radians * 180.f) / Math::PI;
 }
 
 float Angle::radians() const
@@ -77,7 +77,7 @@ Angle Angle::FromRadians(float radians)
 
 Angle Angle::FromDegrees(float degrees)
 {
-  return Angle(degrees * Math::PI / 180.f);
+  return Angle((degrees * Math::PI) / 180.f);
 }
 
 } // end of namespace BABYLON

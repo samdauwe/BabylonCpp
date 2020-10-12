@@ -902,6 +902,18 @@ public:
                          const Viewport& viewport);
 
   /**
+   * @brief Project a Vector3 onto screen space to reference.
+   * @param vector defines the Vector3 to project
+   * @param world defines the world matrix to use
+   * @param transform defines the transform (view x projection) matrix to use
+   * @param viewport defines the screen viewport to use
+   * @param result the vector in which the screen space will be stored
+   * @returns the new Vector3
+   */
+  static Vector3& ProjectToRef(const Vector3& vector, Matrix& world, Matrix& transform,
+                               const Viewport& viewport, Vector3& result);
+
+  /**
    * @brief Hidden
    */
   static void _UnprojectFromInvertedMatrixToRef(const Vector3& source, const Matrix& matrix,

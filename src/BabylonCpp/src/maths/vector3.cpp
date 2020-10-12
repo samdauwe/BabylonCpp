@@ -883,6 +883,14 @@ void Vector3::NormalizeToRef(const Vector3& vector, Vector3& result)
 Vector3 Vector3::Project(const Vector3& vector, Matrix& world, Matrix& transform,
                          const Viewport& viewport)
 {
+  Vector3 result;
+  Vector3::ProjectToRef(vector, world, transform, viewport, result);
+  return result;
+}
+
+Vector3& Vector3::ProjectToRef(const Vector3& vector, Matrix& world, Matrix& transform,
+                               const Viewport& viewport, Vector3& result)
+{
   const auto cw = static_cast<float>(viewport.width);
   const auto ch = static_cast<float>(viewport.height);
   const auto cx = static_cast<float>(viewport.x);
@@ -899,7 +907,8 @@ Vector3 Vector3::Project(const Vector3& vector, Matrix& world, Matrix& transform
   world.multiplyToRef(transform, matrix);
   matrix.multiplyToRef(viewportMatrix, matrix);
 
-  return Vector3::TransformCoordinates(vector, matrix);
+  Vector3::TransformCoordinatesToRef(vector, matrix, result);
+  return result;
 }
 
 void Vector3::_UnprojectFromInvertedMatrixToRef(const Vector3& source, const Matrix& matrix,

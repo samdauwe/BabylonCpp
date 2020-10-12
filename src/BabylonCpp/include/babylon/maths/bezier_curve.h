@@ -11,8 +11,8 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT BezierCurve {
 
   /**
-   * @brief Returns the cubic Bezier interpolated value (float) at "t" (float)
-   * from the given x1, y1, x2, y2 floats.
+   * @brief Returns the cubic Bezier interpolated value (float) at "t" (float) from the given x1,
+   * y1, x2, y2 floats.
    * @param t defines the time
    * @param x1 defines the left coordinate on X axis
    * @param y1 defines the left coordinate on Y axis

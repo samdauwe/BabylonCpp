@@ -94,7 +94,7 @@ Path2& Path2::addArcTo(float midX, float midY, float endX, float endY,
 
   float increment = arc.angle.radians() / static_cast<float>(numberOfSegments);
   if (arc.orientation == Orientation::CW) {
-    increment *= -1;
+    increment *= -1.f;
   }
   float currentAngle = arc.startAngle.radians() + increment;
 
@@ -121,7 +121,7 @@ float Path2::length() const
   if (closed) {
     const auto lastPoint  = _points[_points.size() - 1];
     const auto firstPoint = _points[0];
-    result += (firstPoint.subtract(lastPoint).length());
+    result += firstPoint.subtract(lastPoint).length();
   }
 
   return result;
@@ -153,7 +153,7 @@ Vector2 Path2::getPointAtLengthPosition(float normalizedLengthPosition) const
     const Vector2 b = _points[j];
     Vector2 bToA    = b.subtract(a);
 
-    const float nextOffset = (bToA.length() + previousOffset);
+    const float nextOffset = bToA.length() + previousOffset;
     if (lengthPosition >= previousOffset && lengthPosition <= nextOffset) {
       const Vector2 dir       = bToA.normalize();
       const float localOffset = lengthPosition - previousOffset;

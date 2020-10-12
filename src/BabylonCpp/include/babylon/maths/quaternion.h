@@ -226,18 +226,16 @@ public:
   Quaternion& normalize();
 
   /**
-   * @brief Returns a new Vector3 set with the Euler angles translated from the
-   * current quaternion.
-   * @param order is a reserved parameter and is ignore for now
+   * @brief Returns a new Vector3 set with the Euler angles translated from the current quaternion.
+   * @param order is a reserved parameter and is ignored for now
    * @returns a new Vector3 containing the Euler angles
    */
   [[nodiscard]] Vector3 toEulerAngles(const std::string& order = "YZX") const;
 
   /**
-   * @brief Sets the given vector3 "result" with the Euler angles translated
-   * from the current quaternion.
+   * @brief Sets the given vector3 "result" with the Euler angles translated from the current
+   * quaternion.
    * @param result defines the vector which will be filled with the Euler angles
-   * @param order is a reserved parameter and is ignore for now
    * @returns the current unchanged quaternion
    */
   const Quaternion& toEulerAnglesToRef(Vector3& result, const std::string& order = "YZX") const;

@@ -169,8 +169,9 @@ float Path3D::getClosestPositionTo(const Vector3& target)
     const auto tangent   = _curve[i + 1].subtract(point).normalize();
     const auto subLength = _distances[i + 1] - _distances[i + 0];
     const auto subPosition
-      = std::min(std::max(Vector3::Dot(tangent, target.subtract(point).normalize()), 0.f)
-                   * Vector3::Distance(point, target) / subLength,
+      = std::min((std::max(Vector3::Dot(tangent, target.subtract(point).normalize()), 0.f)
+                  * Vector3::Distance(point, target))
+                   / subLength,
                  1.f);
     const auto distance
       = Vector3::Distance(point.add(tangent.scale(subPosition * subLength)), target);
@@ -238,6 +239,10 @@ Path3D& Path3D::update(const std::vector<Vector3>& iPath, const std::optional<Ve
 void Path3D::_compute(const std::optional<Vector3>& firstNormal, bool alignTangentsWithPath)
 {
   const auto l = _curve.size();
+
+  if (l < 2) {
+    return;
+  }
 
   _binormals.resize(l);
   _distances.resize(l);
@@ -340,8 +345,8 @@ Vector3 Path3D::_normalVector(const Vector3& vt, const std::optional<Vector3>& v
 
   if (va == std::nullopt) {
     Vector3 point;
-    if (!Scalar::WithinEpsilon(std::abs(vt.y) / tgl, 1.f,
-                               Math::Epsilon)) { // search for a point in the plane
+    if (!Scalar::WithinEpsilon(std::abs(vt.y) / tgl, 1.f, Math::Epsilon)) {
+      // search for a point in the plane
       point = Vector3(0.f, -1.f, 0.f);
     }
     else if (!Scalar::WithinEpsilon(std::abs(vt.x) / tgl, 1.f, Math::Epsilon)) {
