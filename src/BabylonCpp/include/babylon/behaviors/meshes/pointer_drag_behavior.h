@@ -78,6 +78,10 @@ public:
   void detach() override;
 
 protected:
+  void _startDrag(int pointerId = 1, const std::optional<Ray>& fromRay = std::nullopt,
+                  const std::optional<Vector3>& startPickedPoint = std::nullopt);
+  void _moveDrag(const Ray& ray);
+
   /**
    * @brief Gets the options used by the behavior.
    */
@@ -89,9 +93,6 @@ protected:
   void set_options(const PointerDragBehaviorOptions& options);
 
 private:
-  void _startDrag(int pointerId = 1, const std::optional<Ray>& fromRay = std::nullopt,
-                  const std::optional<Vector3>& startPickedPoint = std::nullopt);
-  void _moveDrag(const Ray& ray);
   std::optional<Vector3> _pickWithRayOnDragPlane(const std::optional<Ray>& ray);
 
   /**
