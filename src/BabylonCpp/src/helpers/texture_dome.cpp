@@ -21,6 +21,8 @@ TextureDome::TextureDome(
     , fovMultiplier{this, &TextureDome::get_fovMultiplier, &TextureDome::set_fovMultiplier}
     , textureMode{this, &TextureDome::get_textureMode, &TextureDome::set_textureMode}
     , halfDome{this, &TextureDome::get_halfDome, &TextureDome::set_halfDome}
+    , crossEye{this, &TextureDome::get_crossEye, &TextureDome::set_crossEye}
+    , material{this, &TextureDome::get_material}
     , _useDirectMapping{false}
     , _texture{nullptr}
     , _material{nullptr}
@@ -28,6 +30,7 @@ TextureDome::TextureDome(
     , _textureMode{TextureDome::MODE_MONOSCOPIC}
     , onError{iOnError}
     , _halfDome{false}
+    , _crossEye{false}
     , _halfDomeMask{nullptr}
     , _onBeforeCameraRenderObserver{nullptr}
 {
@@ -88,9 +91,10 @@ void TextureDome::initializeTextureDome(const std::string& iName,
   // set the parent, so it will always be positioned correctly AND will be disposed when the main
   // sphere is disposed
   _halfDomeMask->parent = _mesh.get();
-  _halfDome             = !!options.halfDomeMode;
+  _halfDome             = options.halfDomeMode.value_or(false);
   // enable or disable according to the settings
   _halfDomeMask->setEnabled(_halfDome);
+  _crossEye = options.crossEyeMode.value_or(false);
 
   // create
   _texture->anisotropicFilteringLevel = 1;
@@ -175,6 +179,21 @@ void TextureDome::set_halfDome(bool enabled)
   _halfDomeMask->setEnabled(enabled);
 }
 
+void TextureDome::set_crossEye(bool enabled)
+{
+  _crossEye = enabled;
+}
+
+bool TextureDome::get_crossEye() const
+{
+  return _crossEye;
+}
+
+BackgroundMaterialPtr& TextureDome::get_material()
+{
+  return _material;
+}
+
 TexturePtr TextureDome::_initTexture(const std::string& /*urlsOrElement*/, Scene* /*scene*/,
                                      const TextureDomeOptions& /*options*/)
 {
@@ -191,6 +210,7 @@ void TextureDome::_changeTextureMode(unsigned int value)
   _texture->vScale  = 1.f;
   _texture->uOffset = 0.f;
   _texture->vOffset = 0.f;
+  _texture->vAng    = 0.f;
 
   switch (value) {
     case TextureDome::MODE_MONOSCOPIC: {
@@ -206,8 +226,17 @@ void TextureDome::_changeTextureMode(unsigned int value)
       _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
         [this](Camera* camera, EventState & /*es*/) -> void {
           const auto rightOffset = _halfDome ? 0.f : 0.5f;
-          const auto leftOffset  = _halfDome ? 0.5f : 0.f;
-          _texture->uOffset      = camera->isRightCamera() ? rightOffset : leftOffset;
+          const auto leftOffset  = _halfDome ? -0.5f : 0.f;
+          auto isRightCamera     = camera->isRightCamera();
+          if (_crossEye) {
+            isRightCamera = !isRightCamera;
+          }
+          if (isRightCamera) {
+            _texture->uOffset = rightOffset;
+          }
+          else {
+            _texture->uOffset = leftOffset;
+          }
         });
     } break;
     case TextureDome::MODE_TOPBOTTOM: {
@@ -216,6 +245,11 @@ void TextureDome::_changeTextureMode(unsigned int value)
       _texture->vScale              = _halfDome ? 0.99999f : 0.5f;
       _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
         [this](Camera* camera, EventState & /*es*/) -> void {
+          auto isRightCamera = camera->isRightCamera();
+          // allow "cross-eye" if left and right were switched in this mode
+          if (_crossEye) {
+            isRightCamera = !isRightCamera;
+          }
           _texture->vOffset = camera->isRightCamera() ? 0.5f : 0.f;
         });
     } break;

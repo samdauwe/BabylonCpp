@@ -1,5 +1,6 @@
 #include <babylon/helpers/photo_dome.h>
 
+#include <babylon/helpers/texture_dome_options.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
@@ -36,10 +37,10 @@ void PhotoDome::set_imageMode(unsigned int value)
 }
 
 TexturePtr PhotoDome::_initTexture(const std::string& urlsOrElement, Scene* scene,
-                                   const TextureDomeOptions& /*options*/)
+                                   const TextureDomeOptions& options)
 {
-  return Texture::New(urlsOrElement, scene, true, !_useDirectMapping,
-                      TextureConstants::TRILINEAR_SAMPLINGMODE, nullptr,
+  return Texture::New(urlsOrElement, scene, !options.generateMipMaps.value_or(false),
+                      !_useDirectMapping, TextureConstants::TRILINEAR_SAMPLINGMODE, nullptr,
                       [this](const std::string& message, const std::string& exception) -> void {
                         auto iMessage = !message.empty() ? message : "Unknown error occured";
                         onLoadErrorObservable.notifyObservers(&iMessage);

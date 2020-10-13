@@ -75,24 +75,24 @@ protected:
    */
   void set_photoTexture(const TexturePtr& value);
 
+  // clang-format off
   /**
    * @brief Gets the current video mode for the video. It can be:
    * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
-   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
-   * panoramic 360.
-   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
-   * panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side panoramic 360.
    */
+  // clang-format on
   unsigned int get_imageMode() const;
 
+  // clang-format off
   /**
    * @brief Sets the current video mode for the video. It can be:
    * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
-   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
-   * panoramic 360.
-   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
-   * panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side panoramic 360.
    */
+  // clang-format on
   void set_imageMode(unsigned int value);
 
 protected:
@@ -108,14 +108,14 @@ public:
    */
   Property<PhotoDome, TexturePtr> photoTexture;
 
+  // clang-format off
   /**
-   * Gets or sets the current video mode for the video. It can be:
-   * * PhotoDome.MODE_MONOSCOPIC : Define the image as a Monoscopic panoramic 360 image.
-   * * PhotoDome.MODE_TOPBOTTOM  : Define the image as a Stereoscopic TopBottom/OverUnder panoramic
-   * 360 image.
-   * * PhotoDome.MODE_SIDEBYSIDE : Define the image as a Stereoscopic Side by Side panoramic 360
-   * image.
+   * @brief Gets or sets the current video mode for the video. It can be:
+   * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side panoramic 360.
    */
+  // clang-format on
   Property<PhotoDome, unsigned int> imageMode;
 
 }; // end of class PhotoDome

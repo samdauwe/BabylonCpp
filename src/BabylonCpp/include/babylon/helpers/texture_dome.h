@@ -2,17 +2,15 @@
 #define BABYLON_HELPERS_TEXTURE_DOME_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/meshes/transform_node.h>
 
 namespace BABYLON {
 
-class BackgroundMaterial;
-class Mesh;
-class Texture;
 struct TextureDomeOptions;
-using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
-using MeshPtr               = std::shared_ptr<Mesh>;
-using TexturePtr            = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(BackgroundMaterial)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Display a 360/180 degree texture on an approximately spherical surface, useful for VR
@@ -95,24 +93,24 @@ protected:
    */
   void set_fovMultiplier(float value);
 
+  // clang-format off
   /**
    * @brief Gets the current texture mode for the texture. It can be:
    * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
-   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
-   * panoramic 360.
-   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
-   * panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side panoramic 360.
    */
+  // clang-format on
   unsigned int get_textureMode() const;
 
+  // clang-format off
   /**
    * @brief Sets the current texture mode for the texture. It can be:
    * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
-   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
-   * panoramic 360.
-   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
-   * panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side panoramic 360.
    */
+  // clang-format on
   void set_textureMode(unsigned int value);
 
   /**
@@ -125,6 +123,22 @@ protected:
    * back will be blacked out.
    */
   void set_halfDome(bool enabled);
+
+  /**
+   * @brief Set the cross-eye mode. If set, images that can be seen when crossing eyes will render
+   * correctly.
+   */
+  bool get_crossEye() const;
+
+  /**
+   * @brief Is it a cross-eye texture?
+   */
+  void set_crossEye(bool enabled);
+
+  /**
+   * @brief Gets the background material of this dome.
+   */
+  BackgroundMaterialPtr& get_material();
 
   /**
    * @brief Hidden
@@ -152,20 +166,31 @@ public:
    */
   Property<TextureDome, float> fovMultiplier;
 
+  // clang-format off
   /**
-   * Gets or set the current texture mode for the texture. It can be:
+   * Sets the current texture mode for the texture. It can be:
    * * TextureDome.MODE_MONOSCOPIC : Define the texture source as a Monoscopic panoramic 360.
-   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder
-   * panoramic 360.
-   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side
-   * panoramic 360.
+   * * TextureDome.MODE_TOPBOTTOM  : Define the texture source as a Stereoscopic TopBottom/OverUnder panoramic 360.
+   * * TextureDome.MODE_SIDEBYSIDE : Define the texture source as a Stereoscopic Side by Side panoramic 360.
    */
+  // clang-format on
   Property<TextureDome, unsigned int> textureMode;
 
   /**
    * Is it a 180 degrees dome (half dome) or 360 texture (full dome)
    */
   Property<TextureDome, bool> halfDome;
+
+  /**
+   * Gets or sets the cross-eye mode. If set, images that can be seen when crossing eyes will render
+   * correctly
+   */
+  Property<TextureDome, bool> crossEye;
+
+  /**
+   * The background material of this dome
+   */
+  ReadOnlyProperty<TextureDome, BackgroundMaterialPtr> material;
 
 protected:
   /**
@@ -210,6 +235,7 @@ protected:
 
 private:
   bool _halfDome;
+  bool _crossEye;
 
   /**
    * A mesh that will be used to mask the back of the dome in case it is a 180 degree movie.

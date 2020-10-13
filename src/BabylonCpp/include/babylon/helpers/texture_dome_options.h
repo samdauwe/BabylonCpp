@@ -18,6 +18,8 @@ struct BABYLON_SHARED_EXPORT TextureDomeOptions {
   std::optional<bool> faceForward        = std::nullopt;
   std::optional<bool> useDirectMapping   = std::nullopt;
   std::optional<bool> halfDomeMode       = std::nullopt;
+  std::optional<bool> crossEyeMode       = std::nullopt;
+  std::optional<bool> generateMipMaps    = std::nullopt;
 }; // end of struct TextureDomeOptions
 
 } // end of namespace BABYLON
