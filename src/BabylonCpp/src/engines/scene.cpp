@@ -1339,7 +1339,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
+              static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1347,7 +1347,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1707,14 +1707,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -4859,6 +4859,10 @@ std::optional<PickingInfo> Scene::pickSprite(int x, int y,
                                              const std::function<bool(Sprite* sprite)>& predicate,
                                              bool fastCheck, const CameraPtr& camera)
 {
+  if (!_tempSpritePickingRay) {
+    return std::nullopt;
+  }
+
   createPickingRayInCameraSpaceToRef(x, y, *_tempPickingRay, camera);
 
   return _internalPickSprites(*_tempPickingRay, predicate, fastCheck, camera);
