@@ -191,14 +191,23 @@ void PhysicsImpostor::resetUpdateFlags()
 Vector3 PhysicsImpostor::getObjectExtendSize()
 {
   if (object->hasBoundingInfo()) {
-    auto& q = object->rotationQuaternion();
+    auto& q      = object->rotationQuaternion();
+    auto scaling = object->scaling();
     // reset rotation
     object->rotationQuaternion = PhysicsImpostor::IDENTITY_QUATERNION;
     // calculate the world matrix with no rotation
-    object->computeWorldMatrix();
-    object->computeWorldMatrix(true);
+    auto worldMatrix = object->computeWorldMatrix();
+    worldMatrix      = object->computeWorldMatrix(true);
+    {
+      std::optional<Vector3> scale       = scaling;
+      std::optional<Quaternion> rotation = std::nullopt;
+      std::optional<Vector3> translation = std::nullopt;
+      worldMatrix.decompose(scale, rotation, translation);
+      scaling = *scale;
+    }
     const auto& boundingInfo = *object->getBoundingInfo();
-    const auto size          = boundingInfo.boundingBox.extendSizeWorld.scale(2.f);
+    // get the global scaling of the object
+    const auto size = boundingInfo.boundingBox.extendSizeWorld.scale(2.f).multiplyInPlace(scaling);
 
     // bring back the rotation
     object->rotationQuaternion = *q;
