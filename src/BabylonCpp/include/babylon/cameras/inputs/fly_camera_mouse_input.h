@@ -116,7 +116,6 @@ public:
   float angularSensibility;
 
 private:
-  std::function<void(MouseEvent& e)> _mousemoveCallback;
   Observer<PointerInfo>::Ptr _observer;
   Observer<Scene>::Ptr _rollObserver;
   std::optional<PositionCoord> previousPosition;

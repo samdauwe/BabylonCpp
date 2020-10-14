@@ -58,6 +58,11 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
           evt.preventDefault();
           _canvas->focus();
         }
+
+        // This is required to move while pointer button is down
+        if (_engine->isPointerLock && _onMouseMove) {
+          // _onMouseMove(p->pointerEvent);
+        }
       }
       else if (p->type == PointerEventTypes::POINTERUP && srcElement) {
         srcElement->releasePointerCapture(evt.pointerId);
@@ -69,7 +74,11 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
       }
 
       else if (p->type == PointerEventTypes::POINTERMOVE) {
-        if (!previousPosition.has_value() && !_engine->isPointerLock) {
+        if (!previousPosition.has_value()) {
+          if (_engine->isPointerLock && _onMouseMove) {
+            // _onMouseMove(p->pointerEvent);
+          }
+
           return;
         }
 

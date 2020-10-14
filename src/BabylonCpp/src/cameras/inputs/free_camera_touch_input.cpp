@@ -129,21 +129,26 @@ void FreeCameraTouchInput::detachControl(ICanvas* canvas)
 
 void FreeCameraTouchInput::checkInputs()
 {
-  if (_offsetX.has_value() && _offsetY.has_value()) {
-    camera->cameraRotation->y += _offsetX.value() / touchAngularSensibility;
+  if (!_offsetX.has_value() || !_offsetY.has_value()) {
+    return;
+  }
+  if (*_offsetX == 0.f && *_offsetY == 0.f) {
+    return;
+  }
 
-    if (_pointerPressed.size() > 1) {
-      camera->cameraRotation->x += -_offsetY.value() / touchAngularSensibility;
-    }
-    else {
-      auto speed = camera->_computeLocalCameraSpeed();
-      Vector3 direction(0.f, 0.f, speed * _offsetY.value() / touchMoveSensibility);
+  camera->cameraRotation->y = _offsetX.value() / touchAngularSensibility;
 
-      Matrix::RotationYawPitchRollToRef(camera->rotation().y, camera->rotation().x, 0.f,
-                                        camera->_cameraRotationMatrix);
-      camera->cameraDirection->addInPlace(
-        Vector3::TransformCoordinates(direction, camera->_cameraRotationMatrix));
-    }
+  if (_pointerPressed.size() > 1) {
+    camera->cameraRotation->x = -_offsetY.value() / touchAngularSensibility;
+  }
+  else {
+    auto speed = camera->_computeLocalCameraSpeed();
+    Vector3 direction(0.f, 0.f, speed * _offsetY.value() / touchMoveSensibility);
+
+    Matrix::RotationYawPitchRollToRef(camera->rotation().y, camera->rotation().x, 0.f,
+                                      camera->_cameraRotationMatrix);
+    camera->cameraDirection->addInPlace(
+      Vector3::TransformCoordinates(direction, camera->_cameraRotationMatrix));
   }
 }
 

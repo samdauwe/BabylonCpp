@@ -15,7 +15,6 @@ FlyCameraMouseInput::FlyCameraMouseInput(bool iTouchEnabled)
     , buttonsRoll{2}
     , activeButton{-1}
     , angularSensibility{1000.f}
-    , _mousemoveCallback{nullptr}
     , _observer{nullptr}
     , _rollObserver{nullptr}
     , previousPosition{std::nullopt}
@@ -44,10 +43,6 @@ void FlyCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
         camera->restoreRoll(camera->rollCorrect);
       }
     });
-
-  // Helper function to keep 'this'.
-  _mousemoveCallback = [this](MouseEvent& e) -> void { _onMouseMove(e); };
-  // canvas->addEventListener("mousemove", _mousemoveCallback, false);
 }
 
 void FlyCameraMouseInput::detachControl(ICanvas* canvas)
@@ -56,10 +51,6 @@ void FlyCameraMouseInput::detachControl(ICanvas* canvas)
     camera->getScene()->onPointerObservable.remove(_observer);
 
     camera->getScene()->onBeforeRenderObservable.remove(_rollObserver);
-
-    if (_mousemoveCallback) {
-      // canvas->removeEventListener("mousemove", _mousemoveCallback);
-    }
 
     _observer         = nullptr;
     _rollObserver     = nullptr;
@@ -115,6 +106,11 @@ void FlyCameraMouseInput::_pointerInput(PointerInfo* p, EventState& /*s*/)
       e.preventDefault();
       _canvas->focus();
     }
+
+    // This is required to move while pointer button is down
+    if (engine->isPointerLock) {
+      // _onMouseMove(p->pointerEvent);
+    }
   }
   else {
     // Mouse up.
@@ -131,7 +127,11 @@ void FlyCameraMouseInput::_pointerInput(PointerInfo* p, EventState& /*s*/)
     else {
       // Mouse move.
       if (p->type == PointerEventTypes::POINTERMOVE) {
-        if (!previousPosition.has_value() && !engine->isPointerLock) {
+        if (!previousPosition.has_value()) {
+          if (engine->isPointerLock) {
+            // _onMouseMove(p->pointerEvent);
+          }
+
           return;
         }
 

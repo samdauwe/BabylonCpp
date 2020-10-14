@@ -54,7 +54,12 @@ void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPrevent
       }
     });
 
+  // check if there are already other controllers connected
   gamepad = manager->getGamepadByType(Gamepad::XBOX);
+  // if no xbox controller was found, but there are gamepad controllers, take the first one
+  if (!gamepad && !manager->gamepads().empty()) {
+    gamepad = manager->gamepads()[0].get();
+  }
 }
 
 void FreeCameraGamepadInput::detachControl(ICanvas* /*canvas*/)
