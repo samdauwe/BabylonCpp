@@ -2,13 +2,14 @@
 #define BABYLON_CAMERAS_FREE_CAMERA_INPUTS_MANAGER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/camera_inputs_manager.h>
 
 namespace BABYLON {
 
 class FreeCamera;
-class FreeCameraMouseInput;
-using FreeCameraMouseInputPtr = std::shared_ptr<FreeCameraMouseInput>;
+FWD_CLASS_SPTR(FreeCameraMouseInput)
+FWD_CLASS_SPTR(FreeCameraMouseWheelInput)
 
 /**
  * @brief Default Inputs manager for the FreeCamera.
@@ -44,7 +45,19 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager : public CameraInputsManage
   FreeCameraInputsManager& removeMouse();
 
   /**
--   * @brief Add orientation input support to the input manager.
+   * @brief Add mouse wheel input support to the input manager.
+   * @returns the current input manager
+   */
+  FreeCameraInputsManager& addMouseWheel();
+
+  /**
+   * @brief Removes the mouse wheel input support from the manager.
+   * @returns the current input manager
+   */
+  FreeCameraInputsManager& removeMouseWheel();
+
+  /**
+   * @brief Add orientation input support to the input manager.
    * @returns the current input manager
    */
   FreeCameraInputsManager& addDeviceOrientation();
@@ -73,9 +86,14 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager : public CameraInputsManage
   void clear();
 
   /**
-   * Hidden
+   * @hidden
    */
   FreeCameraMouseInputPtr _mouseInput;
+
+  /**
+   * @hidden
+   */
+  FreeCameraMouseWheelInputPtr _mouseWheelInput;
 
 }; // end of struct FreeCameraInputsManager
 

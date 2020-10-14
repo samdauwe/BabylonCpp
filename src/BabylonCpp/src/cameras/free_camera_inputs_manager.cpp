@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 FreeCameraInputsManager::FreeCameraInputsManager(FreeCamera* iCamera)
-    : CameraInputsManager{iCamera}, _mouseInput{nullptr}
+    : CameraInputsManager{iCamera}, _mouseInput{nullptr}, _mouseWheelInput{nullptr}
 {
 }
 
@@ -34,6 +34,23 @@ FreeCameraInputsManager& FreeCameraInputsManager::removeMouse()
 {
   if (_mouseInput) {
     remove(_mouseInput.get());
+  }
+  return *this;
+}
+
+FreeCameraInputsManager& FreeCameraInputsManager::addMouseWheel()
+{
+  if (!_mouseWheelInput) {
+    // _mouseWheelInput = std::make_shared<FreeCameraMouseWheelInput>();
+    // add(_mouseWheelInput);
+  }
+  return *this;
+}
+
+FreeCameraInputsManager& FreeCameraInputsManager::removeMouseWheel()
+{
+  if (_mouseWheelInput) {
+    // remove(_mouseWheelInput);
   }
   return *this;
 }
