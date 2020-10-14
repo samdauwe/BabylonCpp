@@ -28,6 +28,7 @@
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/stereoscopic_interlace_post_process_i.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 
 namespace BABYLON {
 
@@ -387,6 +388,12 @@ int Camera::attachPostProcess(const PostProcessPtr& postProcess, int insertAt)
     stl_util::splice(_postProcesses, insertAt, 0, {postProcess});
   }
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
+
+  // Update prePass
+  if (_scene->prePassRenderer()) {
+    _scene->prePassRenderer()->markAsDirty();
+  }
+
   return stl_util::index_of(_postProcesses, postProcess);
 }
 
@@ -396,6 +403,12 @@ void Camera::detachPostProcess(const PostProcessPtr& postProcess)
   if (idx != -1) {
     _postProcesses[static_cast<size_t>(idx)] = nullptr;
   }
+
+  // Update prePass
+  if (_scene->prePassRenderer()) {
+    _scene->prePassRenderer()->markAsDirty();
+  }
+
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
 }
 
