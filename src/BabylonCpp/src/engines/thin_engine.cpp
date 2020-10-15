@@ -2483,6 +2483,7 @@ InternalTexturePtr ThinEngine::createPrefilteredCubeTexture(
       glTextureFromLod->isCube = true;
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, glTextureFromLod, true);
 
+      glTextureFromLod->samplingMode = Constants::TEXTURE_LINEAR_LINEAR;
       gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
       gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, GL::LINEAR);
       gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
