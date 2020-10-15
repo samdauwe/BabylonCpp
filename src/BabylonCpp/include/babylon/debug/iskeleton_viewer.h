@@ -29,6 +29,15 @@ struct BABYLON_SHARED_EXPORT ISkeletonViewerDisplayOptions {
 
   /** Ratio for the Sphere Size */
   std::optional<float> sphereFactor = std::nullopt;
+
+  /** Whether a spur should attach its far end to the child bone position */
+  std::optional<bool> spurFollowsChild = std::nullopt;
+
+  /** Whether to show local axes or not  */
+  std::optional<bool> showLocalAxes = std::nullopt;
+
+  /** Length of each local axis */
+  std::optional<float> localAxesSize = std::nullopt;
 }; // end of struct ISkeletonViewerDisplayOptions
 
 /**
