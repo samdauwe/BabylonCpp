@@ -7,19 +7,15 @@
 namespace BABYLON {
 
 /**
- * @brief The Observable class is a simple implementation of the Observable
- * pattern.
- * There's one slight particularity though: a given Observable can notify
- * its observer using a particular mask value, only the Observers registered
- * with this mask value will be notified.
- * This enable a more fine grained execution without having to rely on
- * multiple different Observable objects.
- * For instance you may have a given Observable that have four different
- * types of notifications: Move (mask = 0x01), Stop (mask = 0x02), Turn Right
- * (mask = 0X04), Turn Left (mask = 0X08).
- * A given observer can register itself with only Move and Stop (mask =
- * 0x03), then it will only be notified when one of these two occurs and will
- * never be for Turn Left/Right.
+ * @brief The Observable class is a simple implementation of the Observable pattern.
+ *
+ * There's one slight particularity though: a given Observable can notify its observer using a
+ * particular mask value, only the Observers registered with this mask value will be notified. This
+ * enable a more fine grained execution without having to rely on multiple different Observable
+ * objects. For instance you may have a given Observable that have four different types of
+ * notifications: Move (mask = 0x01), Stop (mask = 0x02), Turn Right (mask = 0X04), Turn Left (mask
+ * = 0X08). A given observer can register itself with only Move and Stop (mask = 0x03), then it will
+ * only be notified when one of these two occurs and will never be for Turn Left/Right.
  */
 template <class T>
 class Observable {
@@ -38,8 +34,7 @@ public:
 
   /**
    * @brief Creates a new observable.
-   * @param onObserverAdded defines a callback to call when a new observer is
-   * added
+   * @param onObserverAdded defines a callback to call when a new observer is added
    */
   Observable(const std::function<void(typename Observer<T>::Ptr& observer)>& onObserverAdded)
       : _eventState{0}, _onObserverAdded{onObserverAdded}
@@ -70,13 +65,12 @@ public:
    * @brief Create a new Observer with the specified callback.
    * @param callback the callback that will be executed for that Observer
    * @param mask the mask used to filter observers
-   * @param insertFirst if true the callback will be inserted at the first
-   * position, hence executed before the others ones. If false (default
-   * behavior) the callback will be inserted at the last position, executed
-   * after all the others already present.
+   * @param insertFirst if true the callback will be inserted at the first position, hence executed
+   * before the others ones. If false (default behavior) the callback will be inserted at the last
+   * position, executed after all the others already present.
    * @param scope optional scope for the callback to be called from
-   * @param unregisterOnFirstCall defines if the observer as to be unregistered
-   * after the next notification
+   * @param unregisterOnFirstCall defines if the observer as to be unregistered after the next
+   * notification
    * @returns the new observer created for the callback
    */
   typename Observer<T>::Ptr add(const CallbackFunc& callback, int mask = -1,
@@ -108,13 +102,12 @@ public:
    * @brief Create a new Observer with the specified callback.
    * @param callback the callback that will be executed for that Observer
    * @param mask the mask used to filter observers
-   * @param insertFirst if true the callback will be inserted at the first
-   * position, hence executed before the others ones. If false (default
-   * behavior) the callback will be inserted at the last position, executed
-   * after all the others already present.
+   * @param insertFirst if true the callback will be inserted at the first position, hence executed
+   * before the others ones. If false (default behavior) the callback will be inserted at the last
+   * position, executed after all the others already present.
    * @param scope optional scope for the callback to be called from
-   * @param unregisterOnFirstCall defines if the observer as to be unregistered
-   * after the next notification
+   * @param unregisterOnFirstCall defines if the observer as to be unregistered after the next
+   * notification
    * @returns the new observer created for the callback
    */
   typename Observer<T>::Ptr add(CallbackFunc&& callback, int mask = -1, bool insertFirst = false,
@@ -142,8 +135,8 @@ public:
   }
 
   /**
-   * @brief Create a new Observer with the specified callback and unregisters
-   * after the next notification.
+   * @brief Create a new Observer with the specified callback and unregisters after the next
+   * notification.
    * @param callback the callback that will be executed for that Observer
    * @returns the new observer created for the callback
    */
@@ -177,8 +170,7 @@ public:
   /**
    * @brief Remove a callback from the Observable object.
    * @param callback the callback to remove
-   * @param scope optional scope. If used only the callbacks with this scope
-   * will be removed
+   * @param scope optional scope. If used only the callbacks with this scope will be removed
    * @returns false if it doesn't belong to this Observable
    */
   bool removeCallback(const CallbackFunc& callback)
@@ -225,8 +217,8 @@ private:
 
 public:
   /**
-   * @brief Moves the observable to the top of the observer list making it get
-   * called first when notified.
+   * @brief Moves the observable to the top of the observer list making it get called first when
+   * notified.
    * @param observer the observer to move
    */
   void makeObserverTopPriority(typename Observer<T>::Ptr& observer)
@@ -236,8 +228,8 @@ public:
   }
 
   /**
-   * @brief Moves the observable to the bottom of the observer list making it
-   * get called last when notified.
+   * @brief Moves the observable to the bottom of the observer list making it get called last when
+   * notified.
    * @param observer the observer to move
    */
   void makeObserverBottomPriority(typename Observer<T>::Ptr& observer)
@@ -247,20 +239,20 @@ public:
   }
 
   /**
-   * @brief Notify all Observers by calling their respective callback with the
-   * given data. Will return true if all observers were executed, false if an
-   * observer set skipNextObservers to true, then prevent the subsequent ones to
-   * execute
+   * @brief Notify all Observers by calling their respective callback with the given data
+   * Will return true if all observers were executed, false if an observer set skipNextObservers to
+   * true, then prevent the subsequent ones to execute
    * @param eventData defines the data to send to all observers
-   * @param mask defines the mask of the current notification (observers with
-   * incompatible mask (ie mask & observer.mask === 0) will not be notified)
+   * @param mask defines the mask of the current notification (observers with incompatible mask (ie
+   * mask & observer.mask === 0) will not be notified)
    * @param target defines the original target of the state
    * @param currentTarget defines the current target of the state
-   * @returns false if the complete observer chain was not processed (because
-   * one observer set the skipNextObservers to true)
+   * @param userInfo defines any user info to send to observers
+   * @returns false if the complete observer chain was not processed (because one observer set the
+   * skipNextObservers to true)
    */
   bool notifyObservers(T* eventData = nullptr, int mask = -1, any* target = nullptr,
-                       any* currentTarget = nullptr)
+                       any* currentTarget = nullptr, any userInfo = nullptr)
   {
     if (_observers.empty()) {
       return true;
@@ -272,6 +264,7 @@ public:
     state.currentTarget     = currentTarget;
     state.skipNextObservers = false;
     state.lastReturnValue   = eventData;
+    state.userInfo          = userInfo;
 
     for (auto& obs : _observers) {
       if (obs->_willBeUnregistered) {
@@ -308,8 +301,7 @@ public:
   }
 
   /**
-   * @brief Gets a boolean indicating if the observable has at least one
-   * observer.
+   * @brief Gets a boolean indicating if the observable has at least one observer.
    * @returns true is the Observable has at least one Observer registered
    */
   [[nodiscard]] bool hasObservers() const
@@ -342,8 +334,7 @@ public:
   /**
    * @brief Does this observable handles observer registered with a given mask.
    * @param mask defines the mask to be tested
-   * @return whether or not one observer registered with the given mask is
-   *handeled
+   * @return whether or not one observer registered with the given mask is handeled
    **/
   bool hasSpecificMask(int mask = -1)
   {

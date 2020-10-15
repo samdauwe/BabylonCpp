@@ -25,6 +25,7 @@ EventState& EventState::initalize(int iMmask, bool iSkipNextObservers, any* iTar
   target            = iTarget;
   currentTarget     = iCurrentTarget;
   lastReturnValue   = nullptr;
+  userInfo          = nullptr;
   return *this;
 }
 

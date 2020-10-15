@@ -72,6 +72,11 @@ public:
    */
   any lastReturnValue;
 
+  /**
+   * User defined information that will be sent to observers
+   */
+  any userInfo;
+
 }; // end of class Tools
 
 } // end of namespace BABYLON
