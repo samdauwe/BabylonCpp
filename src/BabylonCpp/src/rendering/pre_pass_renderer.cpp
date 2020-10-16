@@ -19,8 +19,39 @@
 
 namespace BABYLON {
 
+std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats
+  = {{
+       Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_HALF_FLOAT,          //
+     },
+     {
+       Constants::PREPASS_POSITION_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_HALF_FLOAT,        //
+     },
+     {
+       Constants::PREPASS_VELOCITY_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_HALF_FLOAT,        //
+     },
+     {
+       Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_UNSIGNED_INT,          //
+     },
+     {
+       Constants::PREPASS_COLOR_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_HALF_FLOAT,     //
+     },
+     {
+       Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_HALF_FLOAT,           //
+     },
+     {
+       Constants::PREPASS_ALBEDO_TEXTURE_TYPE, //
+       Constants::TEXTURETYPE_UNSIGNED_INT,    //
+     }};
+
 PrePassRenderer::PrePassRenderer(Scene* scene)
-    : prePassRT{nullptr}
+    : mrtCount{0}
+    , prePassRT{nullptr}
     , imageProcessingPostProcess{nullptr}
     , subSurfaceConfiguration{nullptr}
     , materialsShouldRenderGeometry{false}
@@ -29,12 +60,6 @@ PrePassRenderer::PrePassRenderer(Scene* scene)
     , samples{this, &PrePassRenderer::get_samples, &PrePassRenderer::set_samples}
     , isSupported{this, &PrePassRenderer::get_isSupported}
     , _isDirty{false}
-    , _mrtTypes{
-          Constants::TEXTURETYPE_HALF_FLOAT, // Original color
-          Constants::TEXTURETYPE_HALF_FLOAT, // Irradiance
-          Constants::TEXTURETYPE_HALF_FLOAT, // Depth (world units)
-          Constants::TEXTURETYPE_UNSIGNED_INT // Albedo
-    }
     , _clearColor{Color4(0.f, 0.f, 0.f, 0.f)}
     , _enabled{false}
 {
@@ -96,7 +121,6 @@ void PrePassRenderer::_createCompositionEffect()
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
   options.defaultType          = Constants::TEXTURETYPE_UNSIGNED_INT;
-  options.types                = _mrtTypes;
   prePassRT                    = std::make_shared<MultiRenderTarget>("sceneprePassRT",
                                                   RenderTargetSize{
                                                     _engine->getRenderWidth(), // width
@@ -194,6 +218,11 @@ void PrePassRenderer::clear()
     _engine->clear(_clearColor, true, false, false);
     _engine->bindAttachments(_multiRenderAttachments);
   }
+}
+
+unsigned int PrePassRenderer::getIndex(unsigned int type)
+{
+  return _textureIndices[type];
 }
 
 void PrePassRenderer::_setState(bool iEnabled)

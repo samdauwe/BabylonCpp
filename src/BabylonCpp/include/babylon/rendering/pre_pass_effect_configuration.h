@@ -29,11 +29,16 @@ struct BABYLON_SHARED_EXPORT PrePassEffectConfiguration {
   /**
    * @brief Disposes the effect configuration.
    */
-  virtual void dispose() = 0;
+  virtual void dispose()
+  {
+  }
   /**
    * @brief Creates the post-process.
    */
-  virtual PostProcessPtr createPostProcess() = 0;
+  virtual PostProcessPtr createPostProcess()
+  {
+    return nullptr;
+  };
 }; // end of struct PrePassEffectConfiguration
 
 } // end of namespace BABYLON

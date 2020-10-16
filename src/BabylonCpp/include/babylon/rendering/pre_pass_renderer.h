@@ -13,10 +13,17 @@ namespace BABYLON {
 class Effect;
 class Engine;
 class Scene;
+FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(ImageProcessingPostProcess)
+FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiRenderTarget)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(SubSurfaceConfiguration)
+
+struct TextureFormatMapping {
+  unsigned int type   = 0;
+  unsigned int format = 0;
+}; // end of struct TextureFormatMapping
 
 /**
  * @brief Renders a pre pass of the scene.
@@ -25,12 +32,6 @@ FWD_CLASS_SPTR(SubSurfaceConfiguration)
  * It is necessary for effects like subsurface scattering or deferred shading
  */
 class BABYLON_SHARED_EXPORT PrePassRenderer : public std::enable_shared_from_this<PrePassRenderer> {
-
-public:
-  /**
-   * Number of textures in the multi render target texture where the scene is directly rendered
-   */
-  static constexpr size_t mrtCount = 4;
 
 public:
   /**
@@ -62,6 +63,13 @@ public:
    * value).
    */
   void clear();
+
+  /**
+   * @brief Returns the index of a texture in the multi render target texture array.
+   * @param type Texture type
+   * @return The index
+   */
+  unsigned int getIndex(unsigned int type);
 
   /**
    * @brief Marks the prepass renderer as dirty, triggering a check if the prepass is necessary for
@@ -109,6 +117,23 @@ private:
 
 public:
   /**
+   * To save performance, we can excluded skinned meshes from the prepass
+   */
+  std::vector<AbstractMeshPtr> excludedSkinnedMesh;
+
+  /**
+   * Force material to be excluded from the prepass
+   * Can be useful when `useGeometryBufferFallback` is set to `true`
+   * and you don't want a material to show in the effect.
+   */
+  std::vector<MaterialPtr> excludedMaterials;
+
+  /**
+   * Number of textures in the multi render target texture where the scene is directly rendered
+   */
+  size_t mrtCount;
+
+  /**
    * The render target where the scene is directly rendered
    */
   MultiRenderTargetPtr prePassRT;
@@ -149,10 +174,11 @@ public:
   ReadOnlyProperty<PrePassRenderer, bool> isSupported;
 
 private:
+  static std::vector<TextureFormatMapping> _textureFormats;
+  IndicesArray _textureIndices;
   Scene* _scene;
   Engine* _engine;
   bool _isDirty;
-  Uint32Array _mrtTypes;
   Uint32Array _multiRenderAttachments;
   Uint32Array _defaultAttachments;
   Uint32Array _clearAttachments;
