@@ -45,6 +45,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     , aspectRatio{this, &PostProcess::get_aspectRatio}
     , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
+    , _prePassEffectConfiguration{nullptr}
     , _scene{nullptr}
     , _samples{1}
     , _camera{nullptr}

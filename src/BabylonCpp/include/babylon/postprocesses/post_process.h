@@ -6,6 +6,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
@@ -19,18 +20,14 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class Animation;
-class Camera;
-class Effect;
 class Engine;
-class NodeMaterial;
-class PostProcess;
 class Scene;
-class InternalTexture;
-using CameraPtr          = std::shared_ptr<Camera>;
-using EffectPtr          = std::shared_ptr<Effect>;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
-using PostProcessPtr     = std::shared_ptr<PostProcess>;
-using NodeMaterialPtr    = std::shared_ptr<NodeMaterial>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(NodeMaterial)
+FWD_CLASS_SPTR(PostProcess)
+FWD_STRUCT_SPTR(PrePassEffectConfiguration)
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has been rendered
@@ -485,6 +482,12 @@ public:
    * Hidden
    */
   unsigned int _currentRenderTextureInd;
+
+  /**
+   * Prepass configuration in case this post process needs a texture from prepass
+   * @hidden
+   */
+  PrePassEffectConfigurationPtr _prePassEffectConfiguration;
 
   // Events
 
