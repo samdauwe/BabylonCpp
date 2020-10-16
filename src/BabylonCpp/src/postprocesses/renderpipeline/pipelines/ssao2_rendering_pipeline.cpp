@@ -24,6 +24,7 @@
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
 #include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/ssao2_configuration.h>
 #include <babylon/rendering/sub_surface_configuration.h>
 
 namespace BABYLON {
@@ -85,7 +86,6 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
   }
   else {
     _prePassRenderer = scene->enablePrePassRenderer();
-    _prePassRenderer->markAsDirty();
   }
 
   _createRandomTexture();
@@ -247,7 +247,8 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     else {
       effect->setTexture(
         "depthNormalSampler",
-        _prePassRenderer->prePassRT->textures()[Constants::PREPASS_DEPTHNORMAL_INDEX]);
+        _prePassRenderer->prePassRT
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -273,7 +274,8 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     else {
       effect->setTexture(
         "depthNormalSampler",
-        _prePassRenderer->prePassRT->textures()[Constants::PREPASS_DEPTHNORMAL_INDEX]);
+        _prePassRenderer->prePassRT
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -398,7 +400,8 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     else {
       effect->setTexture(
         "depthNormalSampler",
-        _prePassRenderer->prePassRT->textures()[Constants::PREPASS_DEPTHNORMAL_INDEX]);
+        _prePassRenderer->prePassRT
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
   };
@@ -420,6 +423,10 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     effect->setTextureFromPostProcess("originalColor", _originalColorPostProcess);
   };
   _ssaoCombinePostProcess->samples = textureSamples;
+
+  if (!_forceGeometryBuffer) {
+    _ssaoCombinePostProcess->_prePassEffectConfiguration = std::make_shared<SSAO2Configuration>();
+  }
 }
 
 void SSAO2RenderingPipeline::_createRandomTexture()
@@ -472,13 +479,6 @@ std::unique_ptr<SSAO2RenderingPipeline>
 SSAO2RenderingPipeline::Parse(const json& /*source*/, Scene* /*scene*/, const std::string& /*url*/)
 {
   return nullptr;
-}
-
-bool SSAO2RenderingPipeline::setPrePassRenderer(const PrePassRendererPtr& prePassRenderer)
-{
-  prePassRenderer->materialsShouldRenderGeometry
-    = prePassRenderer->materialsShouldRenderGeometry || true;
-  return true;
 }
 
 } // end of namespace BABYLON

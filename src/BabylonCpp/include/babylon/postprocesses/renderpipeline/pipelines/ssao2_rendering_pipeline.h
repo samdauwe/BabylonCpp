@@ -115,13 +115,6 @@ public:
   static std::unique_ptr<SSAO2RenderingPipeline> Parse(const json& source, Scene* scene,
                                                        const std::string& url);
 
-  /**
-   * @brief Sets the required values to the prepass renderer.
-   * @param prePassRenderer defines the prepass renderer to setup
-   * @returns true if the pre pass is needed.
-   */
-  bool setPrePassRenderer(const PrePassRendererPtr& prePassRenderer) override;
-
 protected:
   /**
    * @brief Constructor
