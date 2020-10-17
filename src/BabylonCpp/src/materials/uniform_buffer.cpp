@@ -303,6 +303,8 @@ void UniformBuffer::updateUniform(const std::string& uniformName, const Float32A
     bool changed = false;
 
     for (size_t i = 0; i < size; ++i) {
+      // We are checking the matrix cache before calling updateUniform so we do not need to check it
+      // here Hence the test for size === 16 to simply commit the matrix values
       if (size == 16 || !stl_util::almost_equal(_bufferData[location + i], data[i])) {
         changed                   = true;
         _bufferData[location + i] = data[i];
