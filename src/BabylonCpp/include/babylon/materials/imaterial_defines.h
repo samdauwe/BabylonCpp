@@ -21,6 +21,7 @@ struct BABYLON_SHARED_EXPORT IMaterialDefines {
   virtual void markAsTexturesDirty()                                     = 0;
   virtual void markAsFresnelDirty()                                      = 0;
   virtual void markAsMiscDirty()                                         = 0;
+  virtual void markAsPrePassDirty()                                      = 0;
   virtual void rebuild()                                                 = 0;
   [[nodiscard]] virtual bool isEqual(const MaterialDefines& other) const = 0;
   virtual void cloneTo(MaterialDefines& other)                           = 0;

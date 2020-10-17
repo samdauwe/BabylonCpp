@@ -159,6 +159,11 @@ public:
   static constexpr unsigned int MiscDirtyFlag = Constants::MATERIAL_MiscDirtyFlag;
 
   /**
+   * The dirty prepass flag value
+   */
+  static constexpr unsigned int PrePassDirtyFlag = Constants::MATERIAL_PrePassDirtyFlag;
+
+  /**
    * The all dirty flag value
    */
   static constexpr unsigned int AllDirtyFlag = Constants::MATERIAL_AllDirtyFlag;
@@ -699,6 +704,11 @@ protected:
   void _markAllSubMeshesAsMiscDirty();
 
   /**
+   * @brief Indicates that prepass needs to be re-calculated for all submeshes.
+   */
+  void _markAllSubMeshesAsPrePassDirty();
+
+  /**
    * @brief Indicates that textures and misc need to be re-calculated for all
    * submeshes.
    */
@@ -1048,6 +1058,7 @@ private:
   static const MaterialDefinesCallback _TextureDirtyCallBack;
   static const MaterialDefinesCallback _FresnelDirtyCallBack;
   static const MaterialDefinesCallback _MiscDirtyCallBack;
+  static const MaterialDefinesCallback _PrePassDirtyCallBack;
   static const MaterialDefinesCallback _LightsDirtyCallBack;
   static const MaterialDefinesCallback _AttributeDirtyCallBack;
   static const MaterialDefinesCallback _FresnelAndMiscDirtyCallBack;

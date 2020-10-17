@@ -79,6 +79,11 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   void markAsMiscDirty() override;
 
   /**
+   * @brief Marks the prepass state as changed.
+   */
+  void markAsPrePassDirty() override;
+
+  /**
    * @brief Rebuilds the material defines.
    */
   void rebuild() override;
@@ -130,6 +135,8 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   bool _areFresnelDirty;
   /** Hidden */
   bool _areMiscDirty;
+  /** @hidden */
+  bool _arePrePassDirty;
   /** Hidden */
   bool _areImageProcessingDirty;
 

@@ -30,6 +30,8 @@ const Material::MaterialDefinesCallback Material::_FresnelDirtyCallBack
   = [](MaterialDefines& defines) -> void { defines.markAsFresnelDirty(); };
 const Material::MaterialDefinesCallback Material::_MiscDirtyCallBack
   = [](MaterialDefines& defines) -> void { defines.markAsMiscDirty(); };
+const Material::MaterialDefinesCallback Material::_PrePassDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAsPrePassDirty(); };
 const Material::MaterialDefinesCallback Material::_LightsDirtyCallBack
   = [](MaterialDefines& defines) -> void { defines.markAsLightDirty(); };
 const Material::MaterialDefinesCallback Material::_AttributeDirtyCallBack
@@ -731,6 +733,10 @@ void Material::markAsDirty(unsigned int flag)
     Material::_DirtyCallbackArray.emplace_back(Material::_MiscDirtyCallBack);
   }
 
+  if (flag & Material::PrePassDirtyFlag) {
+    Material::_DirtyCallbackArray.emplace_back(Material::_PrePassDirtyCallBack);
+  }
+
   if (!Material::_DirtyCallbackArray.empty()) {
     _markAllSubMeshesAsDirty(Material::_RunDirtyCallBacks);
   }
@@ -811,6 +817,11 @@ void Material::_markAllSubMeshesAsAttributesDirty()
 }
 
 void Material::_markAllSubMeshesAsMiscDirty()
+{
+  _markAllSubMeshesAsDirty(Material::_MiscDirtyCallBack);
+}
+
+void Material::_markAllSubMeshesAsPrePassDirty()
 {
   _markAllSubMeshesAsDirty(Material::_MiscDirtyCallBack);
 }

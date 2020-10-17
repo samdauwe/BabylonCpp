@@ -13,6 +13,7 @@ MaterialDefines::MaterialDefines()
     , _areTexturesDirty{true}
     , _areFresnelDirty{true}
     , _areMiscDirty{true}
+    , _arePrePassDirty{true}
     , _areImageProcessingDirty{true}
     , _normals{false}
     , _uvs{false}
@@ -34,6 +35,7 @@ MaterialDefines::MaterialDefines(const MaterialDefines& other)
     , _areTexturesDirty{other._areTexturesDirty}
     , _areFresnelDirty{other._areFresnelDirty}
     , _areMiscDirty{other._areMiscDirty}
+    , _arePrePassDirty{other._arePrePassDirty}
     , _areImageProcessingDirty{other._areImageProcessingDirty}
     , _normals{other._normals}
     , _uvs{other._uvs}
@@ -55,6 +57,7 @@ MaterialDefines::MaterialDefines(MaterialDefines&& other)
     , _areTexturesDirty{std::move(other._areTexturesDirty)}
     , _areFresnelDirty{std::move(other._areFresnelDirty)}
     , _areMiscDirty{std::move(other._areMiscDirty)}
+    , _arePrePassDirty{std::move(other._arePrePassDirty)}
     , _areImageProcessingDirty{std::move(other._areImageProcessingDirty)}
     , _normals{std::move(other._normals)}
     , _uvs{std::move(other._uvs)}
@@ -78,6 +81,7 @@ MaterialDefines& MaterialDefines::operator=(const MaterialDefines& other)
     _areTexturesDirty        = other._areTexturesDirty;
     _areFresnelDirty         = other._areFresnelDirty;
     _areMiscDirty            = other._areMiscDirty;
+    _arePrePassDirty         = other._arePrePassDirty;
     _areImageProcessingDirty = other._areImageProcessingDirty;
     _normals                 = other._normals;
     _uvs                     = other._uvs;
@@ -103,6 +107,7 @@ MaterialDefines& MaterialDefines::operator=(MaterialDefines&& other)
     _areTexturesDirty        = std::move(other._areTexturesDirty);
     _areFresnelDirty         = std::move(other._areFresnelDirty);
     _areMiscDirty            = std::move(other._areMiscDirty);
+    _arePrePassDirty         = std::move(other._arePrePassDirty);
     _areImageProcessingDirty = std::move(other._areImageProcessingDirty);
     _normals                 = std::move(other._normals);
     _uvs                     = std::move(other._uvs);
@@ -130,8 +135,7 @@ bool MaterialDefines::operator!=(const MaterialDefines& rhs) const
   return !(operator==(rhs));
 }
 
-std::ostream& operator<<(std::ostream& os,
-                         const MaterialDefines& materialDefines)
+std::ostream& operator<<(std::ostream& os, const MaterialDefines& materialDefines)
 {
   for (const auto& item : materialDefines.boolDef) {
     if (item.second) {
@@ -168,6 +172,7 @@ void MaterialDefines::markAsProcessed()
   _areLightsDirty          = false;
   _areLightsDisposed       = false;
   _areMiscDirty            = false;
+  _arePrePassDirty         = false;
   _areImageProcessingDirty = false;
 }
 
@@ -224,14 +229,19 @@ void MaterialDefines::markAsMiscDirty()
   _isDirty      = true;
 }
 
+void MaterialDefines::markAsPrePassDirty()
+{
+  _arePrePassDirty = true;
+  _isDirty         = true;
+}
+
 void MaterialDefines::rebuild()
 {
 }
 
 bool MaterialDefines::isEqual(const MaterialDefines& other) const
 {
-  if ((boolDef.size() != other.boolDef.size())
-      || (intDef.size() != other.intDef.size())
+  if ((boolDef.size() != other.boolDef.size()) || (intDef.size() != other.intDef.size())
       || (floatDef.size() != other.floatDef.size())
       || (stringDef.size() != other.stringDef.size())) {
     return false;
@@ -242,16 +252,16 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (_areLightsDisposed != other._areLightsDisposed)
       || (_areAttributesDirty != other._areAttributesDirty)
       || (_areTexturesDirty != other._areTexturesDirty)
-      || (_areFresnelDirty != other._areFresnelDirty)
-      || (_areMiscDirty != other._areMiscDirty)
+      || (_areFresnelDirty != other._areFresnelDirty) || (_areMiscDirty != other._areMiscDirty)
+      || (_arePrePassDirty != other._arePrePassDirty)
       || (_areImageProcessingDirty != other._areImageProcessingDirty)
       || (_normals != other._normals) || (_uvs != other._uvs)
       || (_needNormals != other._needNormals) || (_needUVs != other._needUVs)) {
     return false;
   }
 
-  if ((boolDef != other.boolDef) || (intDef != other.intDef)
-      || (floatDef != other.floatDef) || (stringDef != other.stringDef)) {
+  if ((boolDef != other.boolDef) || (intDef != other.intDef) || (floatDef != other.floatDef)
+      || (stringDef != other.stringDef)) {
     return false;
   }
 
@@ -268,6 +278,7 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other._areTexturesDirty        = _areTexturesDirty;
   other._areFresnelDirty         = _areFresnelDirty;
   other._areMiscDirty            = _areMiscDirty;
+  other._arePrePassDirty         = _arePrePassDirty;
   other._areImageProcessingDirty = _areImageProcessingDirty;
   other._normals                 = _normals;
   other._uvs                     = _uvs;
@@ -290,6 +301,7 @@ void MaterialDefines::reset()
   _areTexturesDirty   = true;
   _areFresnelDirty    = true;
   _areMiscDirty       = true;
+  _arePrePassDirty    = true;
   _normals            = false;
   _uvs                = false;
   _needNormals        = false;
