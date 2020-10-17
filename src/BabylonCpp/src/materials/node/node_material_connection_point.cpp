@@ -23,6 +23,7 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , type{this, &NodeMaterialConnectionPoint::get_type, &NodeMaterialConnectionPoint::set_type}
     , isOptional{false}
     , isExposedOnFrame{false}
+    , exposedPortPosition{-1}
     , _prioritizeVertex{false}
     , target{this, &NodeMaterialConnectionPoint::get_target,
              &NodeMaterialConnectionPoint::set_target}

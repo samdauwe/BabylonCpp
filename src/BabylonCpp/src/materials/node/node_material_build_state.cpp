@@ -129,8 +129,10 @@ void NodeMaterialBuildState::_excludeVariableName(const std::string& name)
 
 void NodeMaterialBuildState::_emit2DSampler(const std::string& name)
 {
-  _samplerDeclaration += StringTools::printf("uniform sampler2D %s;\r\n", name.c_str());
-  samplers.emplace_back(name);
+  if (stl_util::index_of(samplers, name) < 0) {
+    _samplerDeclaration += StringTools::printf("uniform sampler2D %s;\r\n", name.c_str());
+    samplers.emplace_back(name);
+  }
 }
 
 std::string NodeMaterialBuildState::_getGLType(NodeMaterialBlockConnectionPointTypes type) const

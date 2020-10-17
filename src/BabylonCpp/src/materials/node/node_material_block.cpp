@@ -15,6 +15,7 @@ namespace BABYLON {
 NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlockTargets target,
                                      bool isFinalMerger, bool isInput)
     : inputsAreExclusive{false}
+    , visibleInInspector{false}
     , name{this, &NodeMaterialBlock::get_name, &NodeMaterialBlock::set_name}
     , isUnique{this, &NodeMaterialBlock::get_isUnique}
     , isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
@@ -502,7 +503,9 @@ std::string NodeMaterialBlock::_outputRename(const std::string& iName)
 
 std::string NodeMaterialBlock::_dumpPropertiesCode()
 {
-  return "";
+  const auto& variableName = _codeVariableName;
+  return StringTools::printf("%s.visibleInInspector = %s", variableName.c_str(),
+                             visibleInInspector ? "true" : "false");
 }
 
 std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,

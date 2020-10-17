@@ -15,6 +15,8 @@ enum class BABYLON_SHARED_EXPORT NodeMaterialModes : unsigned int {
   PostProcess = 1,
   /** For particle system */
   Particle = 2,
+  /** For procedural texture */
+  ProceduralTexture = 3,
 }; // end of enum class NodeMaterialModes
 
 } // end of namespace BABYLON

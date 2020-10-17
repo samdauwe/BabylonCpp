@@ -7,6 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/enums/node_material_block_connection_point_types.h>
 #include <babylon/materials/node/enums/node_material_block_targets.h>
 #include <babylon/misc/observable.h>
@@ -15,12 +16,9 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class InputBlock;
-class NodeMaterialBlock;
-class NodeMaterialConnectionPoint;
-using InputBlockPtr                  = std::shared_ptr<InputBlock>;
-using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
+FWD_CLASS_SPTR(InputBlock)
+FWD_CLASS_SPTR(NodeMaterialBlock)
+FWD_CLASS_SPTR(NodeMaterialConnectionPoint)
 
 /**
  * @brief  Enum used to define the compatibility state between two connection points.
@@ -300,6 +298,11 @@ public:
    * Gets or sets a boolean indicating that this connection point is exposed on a frame
    */
   bool isExposedOnFrame;
+
+  /**
+   * Gets or sets number indicating the position that the port is exposed to on a frame
+   */
+  int exposedPortPosition;
 
   /**
    * Gets or sets a string indicating that this uniform must be defined under a #ifdef

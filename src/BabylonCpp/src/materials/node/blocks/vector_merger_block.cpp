@@ -97,7 +97,25 @@ VectorMergerBlock& VectorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
   const auto& v3Output = _outputs[1];
   const auto& v2Output = _outputs[2];
 
-  if (xyInput->isConnected()) {
+  if (xyzInput->isConnected()) {
+    if (v4Output->hasEndpoints()) {
+      state.compilationString
+        += _declareOutput(v4Output, state)
+           + StringTools::printf(" = vec4(%s, %s);\r\n", xyzInput->associatedVariableName().c_str(),
+                                 wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
+    }
+    else if (v3Output->hasEndpoints()) {
+      state.compilationString
+        += _declareOutput(v3Output, state)
+           + StringTools::printf(" = %s;\r\n", xyzInput->associatedVariableName().c_str());
+    }
+    else if (v2Output->hasEndpoints()) {
+      state.compilationString
+        += _declareOutput(v2Output, state)
+           + StringTools::printf(" = %s.xy;\r\n", xyzInput->associatedVariableName().c_str());
+    }
+  }
+  else if (xyInput->isConnected()) {
     if (v4Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(v4Output, state)
@@ -116,24 +134,6 @@ VectorMergerBlock& VectorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
       state.compilationString
         += _declareOutput(v2Output, state)
            + StringTools::printf(" = %s;\r\n", xyInput->associatedVariableName().c_str());
-    }
-  }
-  else if (xyzInput->isConnected()) {
-    if (v4Output->hasEndpoints()) {
-      state.compilationString
-        += _declareOutput(v4Output, state)
-           + StringTools::printf(" = vec4(%s, %s);\r\n", xyzInput->associatedVariableName().c_str(),
-                                 wInput->isConnected() ? _writeVariable(wInput).c_str() : "0.0");
-    }
-    else if (v3Output->hasEndpoints()) {
-      state.compilationString
-        += _declareOutput(v3Output, state)
-           + StringTools::printf(" = %s;\r\n", xyzInput->associatedVariableName().c_str());
-    }
-    else if (v2Output->hasEndpoints()) {
-      state.compilationString
-        += _declareOutput(v2Output, state)
-           + StringTools::printf(" = %s.xy;\r\n", xyzInput->associatedVariableName().c_str());
     }
   }
   else {

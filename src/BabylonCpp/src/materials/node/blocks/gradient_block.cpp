@@ -7,6 +7,44 @@
 
 namespace BABYLON {
 
+GradientBlockColorStep::GradientBlockColorStep(float iStep, const Color3& iColor)
+    : step{this, &GradientBlockColorStep::get_step, &GradientBlockColorStep::set_step}
+    , color{this, &GradientBlockColorStep::get_color, &GradientBlockColorStep::set_color}
+    , _step{iStep}
+    , _color{iColor}
+{
+}
+
+GradientBlockColorStep::GradientBlockColorStep(const GradientBlockColorStep& other)
+    : step{this, &GradientBlockColorStep::get_step, &GradientBlockColorStep::set_step}
+    , color{this, &GradientBlockColorStep::get_color, &GradientBlockColorStep::set_color}
+    , _step{other.step}
+    , _color{other.color}
+{
+}
+
+float GradientBlockColorStep::get_step() const
+{
+  return _step;
+}
+
+void GradientBlockColorStep::set_step(float val)
+{
+  _step = val;
+}
+
+Color3& GradientBlockColorStep::get_color()
+{
+  return _color;
+}
+
+void GradientBlockColorStep::set_color(const Color3& val)
+{
+  _color = val;
+}
+
+//************************************************************************************************//
+
 GradientBlock::GradientBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Neutral}
     , colorSteps{GradientBlockColorStep(0.f, Color3::Black()),
@@ -33,6 +71,11 @@ GradientBlock::~GradientBlock()
 {
 }
 
+void GradientBlock::colorStepsUpdated()
+{
+  onValueChangedObservable.notifyObservers(this);
+}
+
 std::string GradientBlock::getClassName() const
 {
   return "GradientBlock";
@@ -51,7 +94,7 @@ NodeMaterialConnectionPointPtr& GradientBlock::get_output()
 std::string GradientBlock::_writeColorConstant(unsigned int index)
 {
   const auto& step = colorSteps[index];
-  return StringTools::printf("vec3(%f, %f, %f)", step.color.r, step.color.g, step.color.b);
+  return StringTools::printf("vec3(%f, %f, %f)", step.color().r, step.color().g, step.color().b);
 }
 
 GradientBlock& GradientBlock::_buildBlock(NodeMaterialBuildState& state)
@@ -114,8 +157,8 @@ std::string GradientBlock::_dumpPropertiesCode()
   for (const auto& colorStep : colorSteps) {
     codeString += StringTools::printf(
       "%s.colorSteps.emplace_back(GradientBlockColorStep(%s, Color3(%f, %f, %f)));\r\n",
-      _codeVariableName.c_str(), colorStep.step, colorStep.color.r, colorStep.color.g,
-      colorStep.color.b);
+      _codeVariableName.c_str(), colorStep.step(), colorStep.color().r, colorStep.color().g,
+      colorStep.color().b);
   }
 
   return codeString;

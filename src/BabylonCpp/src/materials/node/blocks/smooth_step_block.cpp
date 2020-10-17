@@ -13,10 +13,12 @@ SmoothStepBlock::SmoothStepBlock(const std::string& iName)
     , edge1{this, &SmoothStepBlock::get_edge1}
     , output{this, &SmoothStepBlock::get_output}
 {
-  registerInput("value", NodeMaterialBlockConnectionPointTypes::Float);
+  registerInput("value", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("edge0", NodeMaterialBlockConnectionPointTypes::Float);
   registerInput("edge1", NodeMaterialBlockConnectionPointTypes::Float);
-  registerOutput("output", NodeMaterialBlockConnectionPointTypes::Float);
+  registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
+
+  _outputs[0]->_typeConnectionSource = _inputs[0];
 }
 
 SmoothStepBlock::~SmoothStepBlock() = default;

@@ -370,6 +370,12 @@ public:
   /** Hidden */
   std::vector<NodeMaterialConnectionPointPtr> _outputs;
 
+  /**
+   * Gets or sets a boolean indicating that this input can be edited in the Inspector
+   * (false by default)
+   */
+  bool visibleInInspector;
+
   /** Hidden */
   size_t _preparationId;
 

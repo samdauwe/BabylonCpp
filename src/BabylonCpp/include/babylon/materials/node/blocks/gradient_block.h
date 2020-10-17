@@ -2,37 +2,72 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_GRADIENT_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 #include <babylon/maths/color3.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-class GradientBlock;
-using GradientBlockPtr = std::shared_ptr<GradientBlock>;
+FWD_CLASS_SPTR(GradientBlock)
 
 /**
  * @brief Class used to store a color step for the GradientBlock.
  */
-struct BABYLON_SHARED_EXPORT GradientBlockColorStep {
+class BABYLON_SHARED_EXPORT GradientBlockColorStep {
+
+public:
   /**
    * @brief Creates a new GradientBlockColorStep.
    * @param step defines a value indicating which step this color is associated with (between 0 and
    * 1)
    * @param color defines the color associated with this step
    */
-  GradientBlockColorStep(float iStep, const Color3& iColor) : step{iStep}, color{iColor}
-  {
-  }
+  GradientBlockColorStep(float iStep, const Color3& iColor);
+  GradientBlockColorStep(const GradientBlockColorStep& other);
   ~GradientBlockColorStep() = default;
 
+protected:
   /**
-   * Gets or sets a value indicating which step this color is associated with (between 0 and 1)
+   * @brief Gets value indicating which step this color is associated with (between 0 and 1).
    */
-  float step;
+  float get_step() const;
+
+  /**
+   * @brief Sets a value indicating which step this color is associated with (between 0 and 1).
+   */
+  void set_step(float val);
+
+  /**
+   * @brief Gets the color associated with this step.
+   */
+  Color3& get_color();
+
+  /**
+   * @brief Sets the color associated with this step.
+   */
+  void set_color(const Color3& val);
+
+public:
+  /**
+   * Gets or sets the value indicating which step this color is associated with (between 0 and 1)
+   */
+  Property<GradientBlockColorStep, float> step;
+
   /**
    * Gets or sets the color associated with this step
    */
-  Color3 color;
+  Property<GradientBlockColorStep, Color3> color;
+
+private:
+  /**
+   * Gets or sets a value indicating which step this color is associated with (between 0 and 1)
+   */
+  float _step;
+  /**
+   * Gets or sets the color associated with this step
+   */
+  Color3 _color;
 }; // end of structGradientBlockColorStep
 
 /**
@@ -47,6 +82,11 @@ public:
     return std::shared_ptr<GradientBlock>(new GradientBlock(std::forward<Ts>(args)...));
   }
   ~GradientBlock() override;
+
+  /**
+   * @brief Calls observable when the value is changed
+   */
+  void colorStepsUpdated();
 
   /**
    * @brief Gets the current class name.
@@ -101,6 +141,11 @@ public:
    * Gets or sets the list of color steps
    */
   std::vector<GradientBlockColorStep> colorSteps;
+
+  /**
+   * Gets an observable raised when the value is changed
+   */
+  Observable<GradientBlock> onValueChangedObservable;
 
   /**
    * Gets the gradient input component

@@ -29,6 +29,7 @@ NodeMaterialBuildStateSharedData::NodeMaterialBuildStateSharedData()
   variableNames["specularBase"]         = 0;
   variableNames["worldPos"]             = 0;
   variableNames["shadow"]               = 0;
+  variableNames["view"]                 = 0;
 
   // Exclude known varyings
   variableNames["vTBN"] = 0;
