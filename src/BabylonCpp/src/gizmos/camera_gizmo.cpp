@@ -37,9 +37,8 @@ CameraGizmo::CameraGizmo(const UtilityLayerRendererPtr& gizmoLayer)
       }
 
       const auto childMeshes = _rootMesh->getChildMeshes();
-      const auto& isHovered
-        = (stl_util::index_of(childMeshes, pointerInfo->pickInfo.pickedMesh) != -1);
-      if (isHovered && pointerInfo->pointerEvent.button == MouseButtonType::LEFT) {
+      _isHovered = (stl_util::index_of(childMeshes, pointerInfo->pickInfo.pickedMesh) != -1);
+      if (_isHovered && pointerInfo->pointerEvent.button == MouseButtonType::LEFT) {
         onClickedObservable.notifyObservers(_camera.get());
       }
     },

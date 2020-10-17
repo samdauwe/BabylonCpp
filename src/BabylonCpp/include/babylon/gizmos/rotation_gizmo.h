@@ -47,6 +47,13 @@ protected:
   void set_attachedMesh(const AbstractMeshPtr& mesh) override;
   NodePtr& get_attachedNode() override;
   void set_attachedNode(const NodePtr& node) override;
+  void _checkBillboardTransform();
+
+  /**
+   * @brief Returns True when the mouse pointer is hovered a gizmo mesh.
+   */
+  bool get_isHovered() const override;
+
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
   [[nodiscard]] bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);

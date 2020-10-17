@@ -81,6 +81,11 @@ protected:
   UtilityLayerRendererPtr& get_utilityLayer();
 
   /**
+   * @brief Returns True when the mouse pointer is hovering a gizmo mesh.
+   */
+  bool get_isHovered() const;
+
+  /**
    * @brief Sets if the position gizmo is enabled.
    */
   void set_positionGizmoEnabled(bool value);
@@ -175,6 +180,11 @@ public:
    * Utility layer that all gizmos besides bounding box belong to
    */
   ReadOnlyProperty<GizmoManager, UtilityLayerRendererPtr> utilityLayer;
+
+  /**
+   * True when the mouse pointer is hovering a gizmo mesh
+   */
+  ReadOnlyProperty<GizmoManager, bool> isHovered;
 
   /**
    * If the position gizmo is enabled

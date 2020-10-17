@@ -58,6 +58,11 @@ protected:
   [[nodiscard]] virtual float get_scaleRatio() const;
 
   /**
+   * @brief Returns True when the mouse pointer is hovered a gizmo mesh.
+   */
+  virtual bool get_isHovered() const;
+
+  /**
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
    * will be dragged).
    */
@@ -125,6 +130,11 @@ public:
   Property<Gizmo, float> scaleRatio;
 
   /**
+   * True when the mouse pointer is hovered a gizmo mesh
+   */
+  ReadOnlyProperty<Gizmo, bool> isHovered;
+
+  /**
    * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that will be dragged)
    * * When set, interactions will be enabled
    */
@@ -165,6 +175,11 @@ protected:
    * Ratio for the scale of the gizmo (Default: 1)
    */
   float _scaleRatio;
+
+  /**
+   * boolean updated by pointermove when a gizmo mesh is hovered
+   */
+  bool _isHovered;
 
   /**
    * If a custom mesh has been set (Default: false)

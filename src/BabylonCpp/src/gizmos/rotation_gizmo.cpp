@@ -71,6 +71,7 @@ void RotationGizmo::set_attachedNode(const NodePtr& node)
 {
   _meshAttached = nullptr;
   _nodeAttached = node;
+  _checkBillboardTransform();
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
     if (gizmo->isEnabled()) {
       gizmo->attachedNode = node;
@@ -79,6 +80,23 @@ void RotationGizmo::set_attachedNode(const NodePtr& node)
       gizmo->attachedNode = nullptr;
     }
   };
+}
+
+void RotationGizmo::_checkBillboardTransform()
+{
+  if (_nodeAttached && std::static_pointer_cast<TransformNode>(_nodeAttached)
+      && std::static_pointer_cast<TransformNode>(_nodeAttached)->billboardMode()) {
+    BABYLON_LOG_ERROR("Rotation Gizmo will not work with transforms in billboard mode.");
+  }
+}
+
+bool RotationGizmo::get_isHovered() const
+{
+  auto hovered = false;
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    hovered = hovered || gizmo->isHovered();
+  };
+  return hovered;
 }
 
 void RotationGizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)

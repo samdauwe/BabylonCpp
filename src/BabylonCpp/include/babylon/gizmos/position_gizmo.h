@@ -47,6 +47,11 @@ protected:
   void set_attachedNode(const NodePtr& node) override;
 
   /**
+   * @brief Returns True when the mouse pointer is hovered a gizmo mesh.
+   */
+  bool get_isHovered() const override;
+
+  /**
    * @brief Gets if the planar drag gizmo is enabled.
    */
   [[nodiscard]] bool get_planarGizmoEnabled() const;

@@ -115,6 +115,18 @@ void PositionGizmo::set_attachedNode(const NodePtr& node)
   }
 }
 
+bool PositionGizmo::get_isHovered() const
+{
+  bool hovered = false;
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    hovered = hovered || gizmo->isHovered();
+  }
+  for (const auto& gizmo : {xPlaneGizmo.get(), yPlaneGizmo.get(), zPlaneGizmo.get()}) {
+    hovered = hovered || gizmo->isHovered();
+  }
+  return hovered;
+}
+
 void PositionGizmo::set_planarGizmoEnabled(bool value)
 {
   _planarGizmoEnabled = value;

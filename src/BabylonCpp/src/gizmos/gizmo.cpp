@@ -11,6 +11,7 @@ namespace BABYLON {
 
 Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : scaleRatio{this, &Gizmo::get_scaleRatio, &Gizmo::set_scaleRatio}
+    , isHovered{this, &Gizmo::get_isHovered}
     , attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
     , attachedNode{this, &Gizmo::get_attachedNode, &Gizmo::set_attachedNode}
     , gizmoLayer{iGizmoLayer}
@@ -20,6 +21,7 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , updateGizmoPositionToMatchAttachedMesh{true}
     , updateScale{true}
     , _scaleRatio{1.f}
+    , _isHovered{false}
     , _customMeshSet{false}
     , _updateGizmoRotationToMatchAttachedMesh{true}
     , _interactionsEnabled{true}
@@ -48,6 +50,11 @@ void Gizmo::set_scaleRatio(float value)
 float Gizmo::get_scaleRatio() const
 {
   return _scaleRatio;
+}
+
+bool Gizmo::get_isHovered() const
+{
+  return _isHovered;
 }
 
 AbstractMeshPtr& Gizmo::get_attachedMesh()
@@ -230,11 +237,13 @@ void Gizmo::_matrixChanged()
       transform->position = *iPosition;
     }
 
-    if (transform->rotationQuaternion()) {
-      transform->rotationQuaternion()->copyFrom(*_tempQuaternion);
-    }
-    else {
-      transform->rotation = _tempQuaternion->toEulerAngles();
+    if (!transform->billboardMode()) {
+      if (transform->rotationQuaternion()) {
+        transform->rotationQuaternion()->copyFrom(*_tempQuaternion);
+      }
+      else {
+        transform->rotation = _tempQuaternion->toEulerAngles();
+      }
     }
   }
   else if (_attachedNode->getClassName() == "Bone") {

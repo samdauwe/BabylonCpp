@@ -170,9 +170,9 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       if (_customMeshSet) {
         return;
       }
-      auto isHovered
+      _isHovered
         = stl_util::contains(_rootMesh->getChildMeshes(), pointerInfo->pickInfo.pickedMesh);
-      auto material = isHovered ? hoverMaterial : coloredMaterial;
+      auto material = _isHovered ? hoverMaterial : coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material = material;
         // if ((static_cast<LinesMesh*>(m))->color)

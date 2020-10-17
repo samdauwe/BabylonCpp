@@ -104,6 +104,15 @@ void ScaleGizmo::set_attachedNode(const NodePtr& node)
   }
 }
 
+bool ScaleGizmo::get_isHovered() const
+{
+  auto hovered = false;
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    hovered = hovered || gizmo->isHovered();
+  }
+  return hovered;
+}
+
 void ScaleGizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)
 {
   if (!value) {

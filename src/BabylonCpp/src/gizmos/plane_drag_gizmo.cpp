@@ -109,9 +109,9 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
       if (_customMeshSet) {
         return;
       }
-      const auto isHovered
+      _isHovered
         = stl_util::contains(_rootMesh->getChildMeshes(), pointerInfo->pickInfo.pickedMesh);
-      const auto material = isHovered ? _hoverMaterial : _coloredMaterial;
+      const auto material = _isHovered ? _hoverMaterial : _coloredMaterial;
       for (const auto& m : _rootMesh->getChildMeshes()) {
         m->material = material;
       }

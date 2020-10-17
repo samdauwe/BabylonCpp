@@ -144,9 +144,9 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       auto pickedMesh = pointerInfo->pickInfo.pickedMesh;
       auto it = std::find(_rootMesh->getChildMeshes().begin(), _rootMesh->getChildMeshes().end(),
                           pickedMesh);
-      auto isHovered = (it != _rootMesh->getChildMeshes().end());
 
-      auto material = isHovered ? _hoverMaterial : _coloredMaterial;
+      _isHovered    = (it != _rootMesh->getChildMeshes().end());
+      auto material = _isHovered ? _hoverMaterial : _coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
         auto linesMesh = std::static_pointer_cast<LinesMesh>(m);

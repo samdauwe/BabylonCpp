@@ -20,6 +20,7 @@ GizmoManager::GizmoManager(Scene* iScene, float thickness)
     , usePointerToAttachGizmos{true}
     , keepDepthUtilityLayer{this, &GizmoManager::get_keepDepthUtilityLayer}
     , utilityLayer{this, &GizmoManager::get_utilityLayer}
+    , isHovered{this, &GizmoManager::get_isHovered}
     , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
                            &GizmoManager::set_positionGizmoEnabled}
     , rotationGizmoEnabled{this, &GizmoManager::get_rotationGizmoEnabled,
@@ -160,6 +161,26 @@ UtilityLayerRendererPtr& GizmoManager::get_keepDepthUtilityLayer()
 UtilityLayerRendererPtr& GizmoManager::get_utilityLayer()
 {
   return _defaultUtilityLayer;
+}
+
+bool GizmoManager::get_isHovered() const
+{
+  bool hovered = false;
+  {
+    if (gizmos.positionGizmo && gizmos.positionGizmo->isHovered()) {
+      hovered = true;
+    }
+    if (gizmos.rotationGizmo && gizmos.rotationGizmo->isHovered()) {
+      hovered = true;
+    }
+    if (gizmos.scaleGizmo && gizmos.scaleGizmo->isHovered()) {
+      hovered = true;
+    }
+    if (gizmos.boundingBoxGizmo && gizmos.boundingBoxGizmo->isHovered()) {
+      hovered = true;
+    }
+  }
+  return hovered;
 }
 
 void GizmoManager::set_positionGizmoEnabled(bool value)
