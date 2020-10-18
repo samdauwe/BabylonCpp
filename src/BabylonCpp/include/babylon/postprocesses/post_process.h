@@ -28,6 +28,7 @@ FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
+FWD_STRUCT_SPTR(PrePassRenderer)
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has been rendered
@@ -184,6 +185,13 @@ public:
   void _disposeTextures();
 
   /**
+   * @brief Sets the required values to the prepass renderer.
+   * @param prePassRenderer defines the prepass renderer to setup.
+   * @returns true if the pre pass is needed.
+   */
+  bool setPrePassRenderer(const PrePassRendererPtr& prePassRenderer);
+
+  /**
    * @brief Disposes the post process.
    * @param camera The camera to dispose the post process on.
    */
@@ -206,31 +214,26 @@ public:
                               const std::string& rootUrl);
 
 protected:
+  // clang-format off
   /**
    * @brief Creates a new instance PostProcess.
    * @param name The name of the PostProcess.
    * @param fragmentUrl The url of the fragment shader to be used.
-   * @param parameters Array of the names of uniform non-sampler2D variables that will be passed
-   * to the shader.
-   * @param samplers Array of the names of uniform sampler2D variables that will be passed to
-   * the shader.
-   * @param options The required width/height ratio to downsize to before computing the render
-   * pass. (Use 1.0 for full size)
+   * @param parameters Array of the names of uniform non-sampler2D variables that will be passed to the shader.
+   * @param samplers Array of the names of uniform sampler2D variables that will be passed to the shader.
+   * @param options The required width/height ratio to downsize to before computing the render pass. (Use 1.0 for full size)
    * @param camera The camera to apply the render pass to.
    * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)
    * @param engine The engine which the post process will be applied. (default: current engine)
    * @param reusable If the post process can be reused on the same frame. (default: false)
-   * @param defines String of defines that will be set when running the fragment shader.
-   * (default: null)
+   * @param defines String of defines that will be set when running the fragment shader. (default: null)
    * @param textureType Type of textures used when performing the post process. (default: 0)
    * @param vertexUrl The url of the vertex shader to be used. (default: "postprocess")
-   * @param indexParameters The index parameters to be used for babylons include syntax
-   * "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage
-   * in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
-   * @param blockCompilation If the shader should not be compiled imediatly. (default: false)
-   * @param textureFormat Format of textures used when performing the post process. (default:
-   * TEXTUREFORMAT_RGBA)
+   * @param indexParameters The index parameters to be used for babylons include syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default: undefined) See usage in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
+   * @param blockCompilation If the shader should not be compiled immediatly. (default: false)
+   * @param textureFormat Format of textures used when performing the post process. (default: TEXTUREFORMAT_RGBA)
    */
+  // clang-format on
   PostProcess(const std::string& name, const std::string& fragmentUrl,
               const std::vector<std::string>& parameters, const std::vector<std::string>& samplers,
               const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,

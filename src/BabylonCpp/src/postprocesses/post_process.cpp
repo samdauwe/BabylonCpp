@@ -11,6 +11,8 @@
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/rendering/pre_pass_effect_configuration.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 
 namespace BABYLON {
 
@@ -497,6 +499,18 @@ void PostProcess::_disposeTextures()
   }
 
   _textures.clear();
+}
+
+bool PostProcess::setPrePassRenderer(const PrePassRendererPtr& prePassRenderer)
+{
+  if (_prePassEffectConfiguration) {
+    _prePassEffectConfiguration
+      = prePassRenderer->addEffectConfiguration(_prePassEffectConfiguration);
+    _prePassEffectConfiguration->enabled = true;
+    return true;
+  }
+
+  return false;
 }
 
 void PostProcess::dispose(Camera* camera)
