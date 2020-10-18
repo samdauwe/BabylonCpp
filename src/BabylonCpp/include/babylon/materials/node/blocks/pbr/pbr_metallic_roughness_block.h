@@ -152,7 +152,7 @@ protected:
   /**
    * @brief Gets the ambient occlusion object parameters.
    */
-  NodeMaterialConnectionPointPtr& get_ambientOcclusion();
+  NodeMaterialConnectionPointPtr& get_ambientOcc();
 
   /**
    * @brief Gets the reflection object parameters.
@@ -178,6 +178,11 @@ protected:
    * @brief Gets the anisotropy object parameters.
    */
   NodeMaterialConnectionPointPtr& get_anisotropy();
+
+  /**
+   * @brief Gets the view matrix parameter.
+   */
+  NodeMaterialConnectionPointPtr& get_view();
 
   /**
    * @brief Gets the ambient output component.
@@ -527,7 +532,7 @@ public:
   /**
    * Gets the ambient occlusion object parameters
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambientOcclusion;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambientOcc;
 
   /**
    * Gets the reflection object parameters
@@ -553,6 +558,11 @@ public:
    * Gets the anisotropy object parameters
    */
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> anisotropy;
+
+  /**
+   * Gets the view matrix parameter
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> view;
 
   /**
    * Gets the ambient output component

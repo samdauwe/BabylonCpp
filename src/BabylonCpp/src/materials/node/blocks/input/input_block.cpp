@@ -42,7 +42,6 @@ InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarge
     , isBoolean{false}
     , matrixMode{0}
     , _systemValue{std::nullopt}
-    , visibleInInspector{false}
     , isConstant{false}
     , type{this, &InputBlock::get_type}
     , output{this, &InputBlock::get_output}
@@ -691,11 +690,8 @@ std::string InputBlock::_dumpPropertiesCode()
     }
 
     // Common Property "Type"
-    stl_util::concat(codes,
-                     {StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
-                                          isConstant ? "true" : "false"),
-                      StringTools::printf("%s.visibleInInspector = %s;\r\n", variableName.c_str(),
-                                          visibleInInspector ? "true" : "false")});
+    stl_util::concat(codes, {StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
+                                                 isConstant ? "true" : "false")});
 
     return StringTools::join(codes, ";\r\n");
   }

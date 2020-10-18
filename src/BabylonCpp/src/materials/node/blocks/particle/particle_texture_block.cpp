@@ -28,7 +28,7 @@ ParticleTextureBlock::ParticleTextureBlock(const std::string& iName)
     , a{this, &ParticleTextureBlock::get_a}
     , _samplerName{"diffuseSampler"}
 {
-  _isUnique = true;
+  _isUnique = false;
 
   registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2, false,
                 NodeMaterialBlockTargets::VertexAndFragment);

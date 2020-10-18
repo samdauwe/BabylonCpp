@@ -150,6 +150,7 @@ void ClearCoatBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& n
 
   defines.setValue("CLEARCOAT", true);
   defines.setValue("CLEARCOAT_TEXTURE", texture()->isConnected(), true);
+  defines.setValue("CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE", true, true);
   defines.setValue("CLEARCOAT_TINT",
                    tintColor()->isConnected() || tintThickness()->isConnected()
                      || tintAtDistance()->isConnected(),

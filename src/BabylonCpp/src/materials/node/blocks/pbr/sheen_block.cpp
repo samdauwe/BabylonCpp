@@ -82,6 +82,7 @@ void SheenBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeM
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 
   defines.setValue("SHEEN", true);
+  defines.setValue("SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE", true, true);
   defines.setValue("SHEEN_LINKWITHALBEDO", linkSheenWithAlbedo, true);
   defines.setValue("SHEEN_ROUGHNESS", roughness()->isConnected(), true);
   defines.setValue("SHEEN_ALBEDOSCALING", albedoScaling, true);

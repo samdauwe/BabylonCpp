@@ -25,6 +25,7 @@ LightBlock::LightBlock(const std::string& iName)
     , glossPower{this, &LightBlock::get_glossPower}
     , diffuseColor{this, &LightBlock::get_diffuseColor}
     , specularColor{this, &LightBlock::get_specularColor}
+    , view{this, &LightBlock::get_view}
     , diffuseOutput{this, &LightBlock::get_diffuseOutput}
     , specularOutput{this, &LightBlock::get_specularOutput}
     , shadow{this, &LightBlock::get_shadow}
@@ -45,6 +46,7 @@ LightBlock::LightBlock(const std::string& iName)
                 NodeMaterialBlockTargets::Fragment);
   registerInput("specularColor", NodeMaterialBlockConnectionPointTypes::Color3, true,
                 NodeMaterialBlockTargets::Fragment);
+  registerInput("view", NodeMaterialBlockConnectionPointTypes::Matrix, true);
 
   registerOutput("diffuseOutput", NodeMaterialBlockConnectionPointTypes::Color3,
                  NodeMaterialBlockTargets::Fragment);
@@ -94,6 +96,11 @@ NodeMaterialConnectionPointPtr& LightBlock::get_diffuseColor()
 NodeMaterialConnectionPointPtr& LightBlock::get_specularColor()
 {
   return _inputs[6];
+}
+
+NodeMaterialConnectionPointPtr& LightBlock::get_view()
+{
+  return _inputs[7];
 }
 
 NodeMaterialConnectionPointPtr& LightBlock::get_diffuseOutput()
@@ -248,6 +255,10 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
   else {
     state.compilationString
       += StringTools::printf("vec4 worldPos = %s;\r\n", worldPos->associatedVariableName().c_str());
+    if (view()->isConnected()) {
+      state.compilationString
+        += StringTools::printf("mat4 view = %s;\r\n", view()->associatedVariableName().c_str());
+    }
     EmitCodeFromIncludeOptions options;
     options.repeatKey = "maxSimultaneousLights";
     state.compilationString += state._emitCodeFromInclude("shadowsVertex", iComments, options);

@@ -285,12 +285,6 @@ public:
   std::optional<NodeMaterialSystemValues> _systemValue;
 
   /**
-   * Gets or sets a boolean indicating that this input can be edited in the
-   * Inspector (false by default)
-   */
-  bool visibleInInspector;
-
-  /**
    * Gets or sets a boolean indicating that the value of this input will not change after a build
    */
   bool isConstant;

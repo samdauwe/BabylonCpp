@@ -96,12 +96,13 @@ PBRMetallicRoughnessBlock::PBRMetallicRoughnessBlock(const std::string& iName)
     , opacityTexture{this, &PBRMetallicRoughnessBlock::get_opacityTexture}
     , ambientColor{this, &PBRMetallicRoughnessBlock::get_ambientColor}
     , reflectivity{this, &PBRMetallicRoughnessBlock::get_reflectivity}
-    , ambientOcclusion{this, &PBRMetallicRoughnessBlock::get_ambientOcclusion}
+    , ambientOcc{this, &PBRMetallicRoughnessBlock::get_ambientOcc}
     , reflection{this, &PBRMetallicRoughnessBlock::get_reflection}
     , sheen{this, &PBRMetallicRoughnessBlock::get_sheen}
     , clearcoat{this, &PBRMetallicRoughnessBlock::get_clearcoat}
     , subsurface{this, &PBRMetallicRoughnessBlock::get_subsurface}
     , anisotropy{this, &PBRMetallicRoughnessBlock::get_anisotropy}
+    , view{this, &PBRMetallicRoughnessBlock::get_view}
     , ambient{this, &PBRMetallicRoughnessBlock::get_ambient}
     , diffuse{this, &PBRMetallicRoughnessBlock::get_diffuse}
     , specular{this, &PBRMetallicRoughnessBlock::get_specular}
@@ -158,10 +159,10 @@ void PBRMetallicRoughnessBlock::RegisterConnections(
       },
       "ReflectivityBlock"));
   pbrMetallicRoughnessBlock->registerInput(
-    "ambientOcclusion", NodeMaterialBlockConnectionPointTypes::Object, true,
+    "ambientOcc", NodeMaterialBlockConnectionPointTypes::Object, true,
     NodeMaterialBlockTargets::Fragment,
     NodeMaterialConnectionPointCustomObject::New(
-      "ambientOcclusion", pbrMetallicRoughnessBlock, NodeMaterialConnectionPointDirection::Input,
+      "ambientOcc", pbrMetallicRoughnessBlock, NodeMaterialConnectionPointDirection::Input,
       [](const std::string& iName) -> AmbientOcclusionBlockPtr {
         return AmbientOcclusionBlock::New(iName);
       },
@@ -201,6 +202,8 @@ void PBRMetallicRoughnessBlock::RegisterConnections(
       "anisotropy", pbrMetallicRoughnessBlock, NodeMaterialConnectionPointDirection::Input,
       [](const std::string& iName) -> AnisotropyBlockPtr { return AnisotropyBlock::New(iName); },
       "AnisotropyBlock"));
+  pbrMetallicRoughnessBlock->registerInput("view", NodeMaterialBlockConnectionPointTypes::Matrix,
+                                           true);
 
   pbrMetallicRoughnessBlock->registerOutput(
     "ambient", NodeMaterialBlockConnectionPointTypes::Color3, NodeMaterialBlockTargets::Fragment);
@@ -321,7 +324,7 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_reflectivity()
   return _inputs[7];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambientOcclusion()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambientOcc()
 {
   return _inputs[8];
 }
@@ -349,6 +352,11 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_subsurface()
 NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_anisotropy()
 {
   return _inputs[13];
+}
+
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_view()
+{
+  return _inputs[14];
 }
 
 NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambient()
@@ -644,6 +652,10 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
   else {
     state.compilationString
       += StringTools::printf("vec4 worldPos = %s;\r\n", worldPos->associatedVariableName().c_str());
+    if (view()->isConnected()) {
+      state.compilationString
+        += StringTools::printf("mat4 view = %s;\r\n", view()->associatedVariableName().c_str());
+    }
     EmitCodeFromIncludeOptions options;
     options.repeatKey = "maxSimultaneousLights";
     state.compilationString += state._emitCodeFromInclude("shadowsVertex", iComments, options);
@@ -819,9 +831,9 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state.compilationString += state._emitCodeFromInclude("depthPrePass", iComments);
 
   // _____________________________ AO  _______________________________
-  const auto aoBlock = ambientOcclusion()->connectedPoint() ?
+  const auto aoBlock = ambientOcc()->connectedPoint() ?
                          std::static_pointer_cast<AmbientOcclusionBlock>(
-                           ambientOcclusion()->connectedPoint()->ownerBlock()) :
+                           ambientOcc()->connectedPoint()->ownerBlock()) :
                          nullptr;
 
   state.compilationString += AmbientOcclusionBlock::GetCode(aoBlock);

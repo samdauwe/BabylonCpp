@@ -122,6 +122,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_specularColor();
 
   /**
+   * @brief Gets the view matrix component.
+   */
+  NodeMaterialConnectionPointPtr& get_view();
+
+  /**
    * @brief Gets the diffuse output component.
    */
   NodeMaterialConnectionPointPtr& get_diffuseOutput();
@@ -184,6 +189,11 @@ public:
    * Gets the specular color component
    */
   ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> specularColor;
+
+  /**
+   * Gets the view matrix component
+   */
+  ReadOnlyProperty<LightBlock, NodeMaterialConnectionPointPtr> view;
 
   /**
    * Gets the diffuse output component

@@ -99,7 +99,7 @@ protected:
   /**
    * @brief Gets the ambient occlusion object output component.
    */
-  NodeMaterialConnectionPointPtr& get_ambientOcclusion();
+  NodeMaterialConnectionPointPtr& get_ambientOcc();
 
   /**
    * @brief Hidden
@@ -130,7 +130,7 @@ public:
   /**
    * Gets the ambient occlusion object output component
    */
-  ReadOnlyProperty<AmbientOcclusionBlock, NodeMaterialConnectionPointPtr> ambientOcclusion;
+  ReadOnlyProperty<AmbientOcclusionBlock, NodeMaterialConnectionPointPtr> ambientOcc;
 
   /**
    * Specifies if the ambient texture contains the ambient occlusion information in its red channel

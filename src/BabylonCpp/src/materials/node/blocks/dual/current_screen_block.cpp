@@ -1,5 +1,6 @@
 #include <babylon/materials/node/blocks/dual/current_screen_block.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -25,7 +26,7 @@ CurrentScreenBlock::CurrentScreenBlock(const std::string& iName)
     , a{this, &CurrentScreenBlock::get_a}
     , _samplerName{"textureSampler"}
 {
-  _isUnique = true;
+  _isUnique = false;
 
   registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2, false,
                 NodeMaterialBlockTargets::VertexAndFragment);
@@ -48,7 +49,7 @@ CurrentScreenBlock::CurrentScreenBlock(const std::string& iName)
   _inputs[0]->acceptedConnectionPointTypes.emplace_back(
     NodeMaterialBlockConnectionPointTypes::Vector4);
 
-  _inputs[0]->_prioritizeVertex = true;
+  _inputs[0]->_prioritizeVertex = false;
 }
 
 CurrentScreenBlock::~CurrentScreenBlock() = default;
@@ -100,8 +101,6 @@ void CurrentScreenBlock::initialize(NodeMaterialBuildState& state)
 
 NodeMaterialBlockTargets& CurrentScreenBlock::get_target()
 {
-  // TextureBlock has a special optimizations for uvs that come from the vertex shaders as they can
-  // be packed into a single varyings. But we need to detect uvs coming from fragment then
   if (!uv()->isConnected()) {
     _currentTarget = NodeMaterialBlockTargets::VertexAndFragment;
     return _currentTarget;
@@ -112,34 +111,7 @@ NodeMaterialBlockTargets& CurrentScreenBlock::get_target()
     return _currentTarget;
   }
 
-  auto parent = uv()->connectedPoint();
-
-  while (parent) {
-    if (parent->target() == NodeMaterialBlockTargets::Fragment) {
-      _currentTarget = NodeMaterialBlockTargets::Fragment;
-      return _currentTarget;
-    }
-
-    if (parent->target() == NodeMaterialBlockTargets::Vertex) {
-      _currentTarget = NodeMaterialBlockTargets::VertexAndFragment;
-      return _currentTarget;
-    }
-
-    if (parent->target() == NodeMaterialBlockTargets::Neutral
-        || parent->target() == NodeMaterialBlockTargets::VertexAndFragment) {
-      auto parentBlock = parent->ownerBlock();
-
-      parent = nullptr;
-      for (const auto& input : parentBlock->inputs()) {
-        if (input->connectedPoint()) {
-          parent = input->connectedPoint();
-          break;
-        }
-      }
-    }
-  }
-
-  _currentTarget = NodeMaterialBlockTargets::VertexAndFragment;
+  _currentTarget = NodeMaterialBlockTargets::Fragment;
   return _currentTarget;
 }
 
@@ -268,19 +240,34 @@ CurrentScreenBlock& CurrentScreenBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  if (state.target == NodeMaterialBlockTargets::Vertex) {
-    _tempTextureRead = state._getFreeVariableName("tempTextureRead");
+  _tempTextureRead = state._getFreeVariableName("tempTextureRead");
 
-    state._emit2DSampler(_samplerName);
-
+  if (stl_util::index_of(state.sharedData->blockingBlocks,
+                         std::static_pointer_cast<NodeMaterialBlock>(shared_from_this()))
+      < 0) {
     state.sharedData->blockingBlocks.emplace_back(shared_from_this());
-    state.sharedData->textureBlocks.emplace_back(
-      std::static_pointer_cast<CurrentScreenBlock>(shared_from_this()));
+  }
+  const auto thisAsCurrentScreenBlock
+    = std::static_pointer_cast<CurrentScreenBlock>(shared_from_this());
+  auto hasCurrentScreenBlock = false;
+  for (const auto& textureBlock : state.sharedData->textureBlocks) {
+    if (std::holds_alternative<CurrentScreenBlockPtr>(textureBlock)
+        && std::get<CurrentScreenBlockPtr>(textureBlock) == thisAsCurrentScreenBlock) {
+      hasCurrentScreenBlock = true;
+    }
+  }
+  if (!hasCurrentScreenBlock) {
+    state.sharedData->textureBlocks.emplace_back(thisAsCurrentScreenBlock);
+  }
+  if (stl_util::index_of(state.sharedData->blocksWithDefines,
+                         std::static_pointer_cast<NodeMaterialBlock>(shared_from_this()))
+      < 0) {
     state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
   }
 
   if (state.target != NodeMaterialBlockTargets::Fragment) {
     // Vertex
+    state._emit2DSampler(_samplerName);
     _injectVertexCode(state);
     return *this;
   }

@@ -15,7 +15,7 @@ AmbientOcclusionBlock::AmbientOcclusionBlock(const std::string& iName)
     , texture{this, &AmbientOcclusionBlock::get_texture}
     , intensity{this, &AmbientOcclusionBlock::get_intensity}
     , directLightIntensity{this, &AmbientOcclusionBlock::get_directLightIntensity}
-    , ambientOcclusion{this, &AmbientOcclusionBlock::get_ambientOcclusion}
+    , ambientOcc{this, &AmbientOcclusionBlock::get_ambientOcc}
     , useAmbientInGrayScale{false}
 {
   _isUnique = true;
@@ -35,10 +35,9 @@ void AmbientOcclusionBlock::RegisterConnections(
                                        NodeMaterialBlockTargets::Fragment);
 
   ambientOcclusionBlock->registerOutput(
-    "ambientOcclusion", NodeMaterialBlockConnectionPointTypes::Object,
-    NodeMaterialBlockTargets::Fragment,
+    "ambientOcc", NodeMaterialBlockConnectionPointTypes::Object, NodeMaterialBlockTargets::Fragment,
     NodeMaterialConnectionPointCustomObject::New(
-      "ambientOcclusion", ambientOcclusionBlock, NodeMaterialConnectionPointDirection::Output,
+      "ambientOcc", ambientOcclusionBlock, NodeMaterialConnectionPointDirection::Output,
       [](const std::string& iName) -> AmbientOcclusionBlockPtr {
         return AmbientOcclusionBlock::New(iName);
       },
@@ -70,7 +69,7 @@ NodeMaterialConnectionPointPtr& AmbientOcclusionBlock::get_directLightIntensity(
   return _inputs[2];
 }
 
-NodeMaterialConnectionPointPtr& AmbientOcclusionBlock::get_ambientOcclusion()
+NodeMaterialConnectionPointPtr& AmbientOcclusionBlock::get_ambientOcc()
 {
   return _outputs[0];
 }
