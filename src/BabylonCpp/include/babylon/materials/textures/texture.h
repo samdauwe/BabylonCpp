@@ -4,6 +4,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/matrix.h>
@@ -12,10 +13,9 @@
 
 namespace BABYLON {
 
-class MirrorTexture;
-class Texture;
-using MirrorTexturePtr = std::shared_ptr<MirrorTexture>;
-using TexturePtr       = std::shared_ptr<Texture>;
+FWD_STRUCT_SPTR(LoaderOptions)
+FWD_CLASS_SPTR(MirrorTexture)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief This represents a texture in babylon. It can be easily loaded from a network, base64 or
@@ -79,6 +79,13 @@ public:
    * @hidden
    */
   void delayLoad(const std::string& forcedExtension = "") override;
+
+  /**
+   * @brief Checks if the texture has the same transform matrix than another texture.
+   * @param texture texture to check against
+   * @returns true if the transforms are the same, else false
+   */
+  bool checkTransformsAreIdentical(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Get the current texture matrix which includes the requested offsetting, tiling and
@@ -182,6 +189,7 @@ public:
     unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
 protected:
+  //  clang-format off
   /**
    * @brief Instantiates a new texture.
    * This represents a texture in babylon. It can be easily loaded from a network, base64 or html
@@ -202,7 +210,9 @@ protected:
    * @param format defines the format of the texture we are trying to load
    * (Engine.TEXTUREFORMAT_RGBA...)
    * @param mimeType defines an optional mime type information
+   * @param loaderOptions options to be passed to the loader
    */
+  //  clang-format on
   Texture(
     const std::string& url, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
     bool noMipmap = false, bool invertY = true,
@@ -213,7 +223,7 @@ protected:
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
     bool deleteBuffer = false, const std::optional<unsigned int>& format = std::nullopt,
-    const std::string& mimeType = "");
+    const std::string& mimeType = "", const LoaderOptionsPtr& loaderOptions = nullptr);
 
   bool get_noMipmap() const override;
 
@@ -314,6 +324,12 @@ public:
   float wRotationCenter;
 
   /**
+   * Sets this property to true to avoid deformations when rotating the texture with non-uniform
+   * scaling
+   */
+  bool homogeneousRotationInUVTransform;
+
+  /**
    * @brief List of inspectable custom properties (used by the Inspector).
    * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
    */
@@ -371,12 +387,17 @@ private:
   float _cachedVAng;
   float _cachedWAng;
   int _cachedProjectionMatrixId;
+  int _cachedURotationCenter;
+  int _cachedVRotationCenter;
+  int _cachedWRotationCenter;
+  bool _cachedHomogeneousRotationInUVTransform;
   int _cachedCoordinatesMode;
   std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>> _buffer;
   bool _deleteBuffer;
   std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   std::function<void(const std::string& message, const std::string& exception)> _delayedOnError;
   std::string _mimeType;
+  LoaderOptionsPtr _loaderOptions;
 
   std::function<void()> _onLoad;
   std::function<void(InternalTexture*, EventState&)> _load;

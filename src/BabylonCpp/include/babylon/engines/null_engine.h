@@ -399,7 +399,8 @@ public:
     = std::nullopt,
     const InternalTexturePtr& fallBack        = nullptr,
     const std::optional<unsigned int>& format = std::nullopt,
-    const std::string& forcedExtension = "", const std::string& mimeType = "") override;
+    const std::string& forcedExtension = "", const std::string& mimeType = "",
+    const LoaderOptionsPtr& loaderOptions = nullptr) override;
 
   /**
    * @brief Creates a new render target texture

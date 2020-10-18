@@ -14,6 +14,7 @@
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
 #include <babylon/postprocesses/sub_surface_scattering_post_process.h>
+#include <babylon/rendering/pre_pass_effect_configuration.h>
 #include <babylon/rendering/pre_pass_renderer_scene_component.h>
 #include <babylon/rendering/sub_surface_configuration.h>
 
@@ -218,6 +219,21 @@ void PrePassRenderer::clear()
     _engine->clear(_clearColor, true, false, false);
     _engine->bindAttachments(_multiRenderAttachments);
   }
+}
+
+PrePassEffectConfigurationPtr
+PrePassRenderer::addEffectConfiguration(const PrePassEffectConfigurationPtr& cfg)
+{
+  // Do not add twice
+  auto it = std::find_if(
+    _effectConfigurations.begin(), _effectConfigurations.end(),
+    [&cfg](const PrePassEffectConfigurationPtr& config) { return config->name() == cfg->name(); });
+  if (it != _effectConfigurations.end()) {
+    return *it;
+  }
+
+  _effectConfigurations.emplace_back(cfg);
+  return cfg;
 }
 
 unsigned int PrePassRenderer::getIndex(unsigned int type)

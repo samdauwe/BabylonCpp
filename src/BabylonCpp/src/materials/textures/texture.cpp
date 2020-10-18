@@ -8,6 +8,7 @@
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/mirror_texture.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/string_tools.h>
@@ -23,7 +24,8 @@ Texture::Texture(
   bool iNoMipmap, bool invertY, unsigned int samplingMode, const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
-  bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType)
+  bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType,
+  const LoaderOptionsPtr& loaderOptions)
     : BaseTexture{sceneOrEngine}
     , uOffset{0.f}
     , vOffset{0.f}
@@ -35,6 +37,7 @@ Texture::Texture(
     , uRotationCenter{0.5f}
     , vRotationCenter{0.5f}
     , wRotationCenter{0.5f}
+    , homogeneousRotationInUVTransform{false}
     , samplingMode{this, &Texture::get_samplingMode}
     , invertY{this, &Texture::get_invertY}
     , mimeType{this, &Texture::get_mimeType}
@@ -54,6 +57,10 @@ Texture::Texture(
     , _cachedVAng{-1.f}
     , _cachedWAng{-1.f}
     , _cachedProjectionMatrixId{-1}
+    , _cachedURotationCenter{-1}
+    , _cachedVRotationCenter{-1}
+    , _cachedWRotationCenter{-1}
+    , _cachedHomogeneousRotationInUVTransform{false}
     , _cachedCoordinatesMode{-1}
     , _buffer{buffer}
     , _delayedOnLoad{nullptr}
@@ -68,6 +75,7 @@ Texture::Texture(
   _buffer              = buffer;
   _deleteBuffer        = deleteBuffer;
   _mimeType            = mimeType;
+  _loaderOptions       = loaderOptions;
   if (format) {
     _format = format;
   }
@@ -126,7 +134,7 @@ Texture::Texture(
   if (!_texture) {
     if (!scene || !scene->useDelayedTextureLoading) {
       _texture = engine->createTexture(url, noMipmap, invertY, scene, samplingMode, _load, onError,
-                                       _buffer, nullptr, _format, "", mimeType);
+                                       _buffer, nullptr, _format, "", mimeType, loaderOptions);
       if (deleteBuffer) {
         _buffer = std::nullopt;
       }
@@ -238,7 +246,7 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
   if (!_texture) {
     _texture = scene->getEngine()->createTexture(url, _noMipmap, _invertY, getScene(), samplingMode,
                                                  _delayedOnLoad, _delayedOnError, _buffer, nullptr,
-                                                 _format, "", _mimeType);
+                                                 _format, "", _mimeType, _loaderOptions);
     if (_deleteBuffer) {
       _buffer = std::nullopt;
     }
@@ -277,23 +285,44 @@ void Texture::_prepareRowForTextureGeneration(float x, float y, float z, Vector3
   t.z += wRotationCenter;
 }
 
+bool Texture::checkTransformsAreIdentical(const BaseTexturePtr& iTexture) const
+{
+  const auto texture = std::static_pointer_cast<Texture>(iTexture);
+
+  return texture != nullptr             //
+         && uOffset == texture->uOffset //
+         && vOffset == texture->vOffset //
+         && uScale == texture->uScale   //
+         && vScale == texture->vScale   //
+         && uAng == texture->uAng       //
+         && vAng == texture->vAng       //
+         && wAng == texture->wAng;
+}
+
 Matrix* Texture::getTextureMatrix(int uBase)
 {
   if (stl_util::almost_equal(uOffset, _cachedUOffset)
       && stl_util::almost_equal(vOffset, _cachedVOffset)
       && stl_util::almost_equal(uScale * uBase, _cachedUScale)
       && stl_util::almost_equal(vScale, _cachedVScale) && stl_util::almost_equal(uAng, _cachedUAng)
-      && stl_util::almost_equal(vAng, _cachedVAng) && stl_util::almost_equal(wAng, _cachedWAng)) {
+      && stl_util::almost_equal(vAng, _cachedVAng) && stl_util::almost_equal(wAng, _cachedWAng)
+      && uRotationCenter == _cachedURotationCenter && vRotationCenter == _cachedVRotationCenter
+      && wRotationCenter == _cachedWRotationCenter
+      && homogeneousRotationInUVTransform == _cachedHomogeneousRotationInUVTransform) {
     return _cachedTextureMatrix.get();
   }
 
-  _cachedUOffset = uOffset;
-  _cachedVOffset = vOffset;
-  _cachedUScale  = uScale * uBase;
-  _cachedVScale  = vScale;
-  _cachedUAng    = uAng;
-  _cachedVAng    = vAng;
-  _cachedWAng    = wAng;
+  _cachedUOffset                          = uOffset;
+  _cachedVOffset                          = vOffset;
+  _cachedUScale                           = uScale * uBase;
+  _cachedVScale                           = vScale;
+  _cachedUAng                             = uAng;
+  _cachedVAng                             = vAng;
+  _cachedWAng                             = wAng;
+  _cachedURotationCenter                  = uRotationCenter;
+  _cachedVRotationCenter                  = vRotationCenter;
+  _cachedWRotationCenter                  = wRotationCenter;
+  _cachedHomogeneousRotationInUVTransform = homogeneousRotationInUVTransform;
 
   if (!_cachedTextureMatrix) {
     _cachedTextureMatrix = std::make_unique<Matrix>(Matrix::Zero());
@@ -305,18 +334,40 @@ Matrix* Texture::getTextureMatrix(int uBase)
 
   Matrix::RotationYawPitchRollToRef(vAng, uAng, wAng, *_rowGenerationMatrix);
 
-  _prepareRowForTextureGeneration(0.f, 0.f, 0.f, *_t0);
-  _prepareRowForTextureGeneration(1.f, 0.f, 0.f, *_t1);
-  _prepareRowForTextureGeneration(0.f, 1.f, 0.f, *_t2);
+  if (homogeneousRotationInUVTransform) {
+    Matrix::TranslationToRef(-_cachedURotationCenter, -_cachedVRotationCenter,
+                             -_cachedWRotationCenter, TmpVectors::MatrixArray[0]);
+    Matrix::TranslationToRef(_cachedURotationCenter, _cachedVRotationCenter, _cachedWRotationCenter,
+                             TmpVectors::MatrixArray[1]);
+    Matrix::ScalingToRef(_cachedUScale, _cachedVScale, 0, TmpVectors::MatrixArray[2]);
+    Matrix::TranslationToRef(_cachedUOffset, _cachedVOffset, 0, TmpVectors::MatrixArray[3]);
 
-  _t1->subtractInPlace(*_t0);
-  _t2->subtractInPlace(*_t0);
+    TmpVectors::MatrixArray[0].multiplyToRef(
+      _rowGenerationMatrix ? *_rowGenerationMatrix : Matrix(), *_cachedTextureMatrix);
+    _cachedTextureMatrix->multiplyToRef(TmpVectors::MatrixArray[1], *_cachedTextureMatrix);
+    _cachedTextureMatrix->multiplyToRef(TmpVectors::MatrixArray[2], *_cachedTextureMatrix);
+    _cachedTextureMatrix->multiplyToRef(TmpVectors::MatrixArray[3], *_cachedTextureMatrix);
 
-  Matrix::FromValuesToRef(_t1->x, _t1->y, _t1->z, 0.f, //
-                          _t2->x, _t2->y, _t2->z, 0.f, //
-                          _t0->x, _t0->y, _t0->z, 0.f, //
-                          0.f, 0.f, 0.f, 1.f,          //
-                          *_cachedTextureMatrix);
+    // copy the translation row to the 3rd row of the matrix so that we don't need to update the
+    // shaders (which expects the translation to be on the 3rd row)
+    _cachedTextureMatrix->setRowFromFloats(2, _cachedTextureMatrix->m()[12],
+                                           _cachedTextureMatrix->m()[13],
+                                           _cachedTextureMatrix->m()[14], 1);
+  }
+  else {
+    _prepareRowForTextureGeneration(0.f, 0.f, 0.f, *_t0);
+    _prepareRowForTextureGeneration(1.f, 0.f, 0.f, *_t1);
+    _prepareRowForTextureGeneration(0.f, 1.f, 0.f, *_t2);
+
+    _t1->subtractInPlace(*_t0);
+    _t2->subtractInPlace(*_t0);
+
+    Matrix::FromValuesToRef(_t1->x, _t1->y, _t1->z, 0.f, //
+                            _t2->x, _t2->y, _t2->z, 0.f, //
+                            _t0->x, _t0->y, _t0->z, 0.f, //
+                            0.f, 0.f, 0.f, 1.f,          //
+                            *_cachedTextureMatrix);
+  }
 
   auto scene = getScene();
 

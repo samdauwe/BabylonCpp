@@ -337,7 +337,8 @@ InternalTexturePtr NullEngine::createTexture(
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
   const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format,
-  const std::string& /*forcedExtension*/, const std::string& /*mimeType*/)
+  const std::string& /*forcedExtension*/, const std::string& /*mimeType*/,
+  const LoaderOptionsPtr& /*loaderOptions*/)
 {
   auto texture = InternalTexture::New(this, InternalTextureSource::Url);
 

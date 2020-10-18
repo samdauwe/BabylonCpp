@@ -368,6 +368,11 @@ ThinEngine* BaseTexture::_getEngine() const
   return _engine;
 }
 
+bool BaseTexture::checkTransformsAreIdentical(const BaseTexturePtr& texture) const
+{
+  return texture != nullptr;
+}
+
 Matrix* BaseTexture::getTextureMatrix(int /*uBase*/)
 {
   return &_textureMatrix;

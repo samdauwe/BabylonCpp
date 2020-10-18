@@ -42,6 +42,7 @@ struct RenderTargetCreationOptions;
 struct IRenderTargetOptions;
 struct IShaderProcessor;
 struct ISize;
+struct LoaderOptions;
 class MultiRenderExtension;
 class ProgressEvent;
 class RawTextureExtension;
@@ -63,6 +64,7 @@ using IInternalTextureLoaderPtr = std::shared_ptr<IInternalTextureLoader>;
 using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
 using IPipelineContextPtr       = std::shared_ptr<IPipelineContext>;
 using IShaderProcessorPtr       = std::shared_ptr<IShaderProcessor>;
+using LoaderOptionsPtr          = std::shared_ptr<LoaderOptions>;
 using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
 using WebGLBufferPtr            = std::shared_ptr<GL::IGLBuffer>;
 using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
@@ -842,7 +844,8 @@ public:
     = std::nullopt,
     const InternalTexturePtr& fallBack        = nullptr,
     const std::optional<unsigned int>& format = std::nullopt,
-    const std::string& forcedExtension = "", const std::string& mimeType = "");
+    const std::string& forcedExtension = "", const std::string& mimeType = "",
+    const LoaderOptionsPtr& loaderOptions = nullptr);
 
   /**
    * @brief Create a cube texture from prefiltered data (ie. the mipmaps contain ready to use data

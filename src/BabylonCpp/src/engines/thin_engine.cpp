@@ -2214,7 +2214,8 @@ InternalTexturePtr ThinEngine::createTexture(
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format,
-  const std::string& forcedExtension, const std::string& mimeType)
+  const std::string& forcedExtension, const std::string& mimeType,
+  const LoaderOptionsPtr& /*loaderOptions*/)
 {
   // assign a new string, so that the original is still available in case of fallback
   const auto fromData = url.substr(0, 5) == "data:";

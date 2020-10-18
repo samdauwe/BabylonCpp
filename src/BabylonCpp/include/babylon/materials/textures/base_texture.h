@@ -73,6 +73,13 @@ public:
   Scene* getScene() const;
 
   /**
+   * @brief Checks if the texture has the same transform matrix than another texture.
+   * @param texture texture to check against
+   * @returns true if the transforms are the same, else false
+   */
+  virtual bool checkTransformsAreIdentical(const BaseTexturePtr& texture) const;
+
+  /**
    * @brief Get the texture transform matrix used to offset tile the texture for istance.
    * @returns the transformation matrix
    */
