@@ -18,9 +18,12 @@ struct BABYLON_SHARED_EXPORT MotionBlurConfiguration : public PrePassEffectConfi
   bool enabled = false;
 
   /**
-   * Name of the configuration
+   * @brief Returns the name of the configuration.
    */
-  static constexpr const char* name = "motionBlur";
+  std::string name() const override
+  {
+    return "motionBlur";
+  }
 
   /**
    * Textures that should be present in the MRT for this effect to work

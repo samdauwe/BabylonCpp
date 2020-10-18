@@ -18,6 +18,7 @@ FWD_CLASS_SPTR(ImageProcessingPostProcess)
 FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiRenderTarget)
 FWD_CLASS_SPTR(PostProcess)
+FWD_STRUCT_SPTR(PrePassEffectConfiguration)
 FWD_CLASS_SPTR(SubSurfaceConfiguration)
 
 struct TextureFormatMapping {
@@ -65,6 +66,15 @@ public:
   void clear();
 
   /**
+   * @brief Adds an effect configuration to the prepass.
+   * If an effect has already been added, it won't add it twice and will return the configuration
+   * already present.
+   * @param cfg the effect configuration
+   * @return the effect configuration now used by the prepass
+   */
+  PrePassEffectConfigurationPtr addEffectConfiguration(const PrePassEffectConfigurationPtr& cfg);
+
+  /**
    * @brief Returns the index of a texture in the multi render target texture array.
    * @param type Texture type
    * @return The index
@@ -83,6 +93,11 @@ public:
   void dispose();
 
 protected:
+  /**
+   * Configuration for prepass effects
+   */
+  std::vector<PrePassEffectConfigurationPtr> _effectConfigurations;
+
   /**
    * @brief Indicates if the prepass is enabled.
    */

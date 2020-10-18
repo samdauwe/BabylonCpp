@@ -19,9 +19,12 @@ struct BABYLON_SHARED_EXPORT SSAO2Configuration : public PrePassEffectConfigurat
   bool enabled = false;
 
   /**
-   * Name of the configuration
+   * @brief Returns the name of the configuration.
    */
-  static constexpr const char* name = "ssao2";
+  std::string name() const override
+  {
+    return "ssao2";
+  }
 
   /**
    * Textures that should be present in the MRT for this effect to work

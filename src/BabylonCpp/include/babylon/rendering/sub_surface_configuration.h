@@ -29,6 +29,14 @@ public:
   virtual ~SubSurfaceConfiguration() = default;
 
   /**
+   * @brief Returns the name of the configuration.
+   */
+  std::string name() const override
+  {
+    return "subSurface";
+  }
+
+  /**
    * @brief Adds a new diffusion profile.
    * Useful for more realistic subsurface scattering on diverse materials.
    * @param color The color of the diffusion profile. Should be the average color of the material.

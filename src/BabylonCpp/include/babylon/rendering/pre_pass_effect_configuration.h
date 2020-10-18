@@ -2,6 +2,7 @@
 #define BABYLON_RENDERING_PRE_PASS_EFFECT_CONFIGURATION_H
 
 #include <memory>
+#include <string>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
@@ -26,6 +27,13 @@ struct BABYLON_SHARED_EXPORT PrePassEffectConfiguration {
    * Is the effect enabled
    */
   bool enabled = false;
+  /**
+   * @brief Returns the name of the configuration.
+   */
+  virtual std::string name() const
+  {
+    return "";
+  }
   /**
    * @brief Disposes the effect configuration.
    */
