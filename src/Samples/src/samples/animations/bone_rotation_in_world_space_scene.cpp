@@ -19,8 +19,8 @@ using SkeletonPtr     = std::shared_ptr<Skeleton>;
 namespace Samples {
 
 /**
- * @brief Bone Rotation In World Space Scene. Example demonstrating how to
- * rotate a bone around an axis, using the rotate function in world space.
+ * @brief Bone Rotation In World Space Scene. Example demonstrating how to rotate a bone around an
+ * axis, using the rotate function in world space.
  * @see https://www.babylonjs-playground.com/#D4ZZ8#2
  * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
  */
