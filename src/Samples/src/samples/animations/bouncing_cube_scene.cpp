@@ -28,20 +28,17 @@ namespace Samples {
  * - some random platforms inside it, built with instances
  * - a Mario player, the tiny red box
  *
- * Mario is given an initial random velocity and applied a constant gravity. You
- * can tweak the energy loss against the box walls with the variable restitution
- * (here : 100% = 1.0)
+ * Mario is given an initial random velocity and applied a constant gravity. You can tweak the
+ * energy loss against the box walls with the variable restitution (here : 100% = 1.0)
  *
- * When Mario hits a platform coming downward (he's above the platform), he
- * bounces back with some energy loss (variable platformBounceRestitution), when
- * he hits the platform under it, he's just rejected. This is a very simple and
- * naive physics engine because I don't even test if Mario hits the platform
- * borders here. But it is fast. ﻿
+ * When Mario hits a platform coming downward (he's above the platform), he bounces back with some
+ * energy loss (variable platformBounceRestitution), when he hits the platform under it, he's just
+ * rejected. This is a very simple and naive physics engine because I don't even test if Mario hits
+ * the platform borders here. But it is fast. ﻿
  *
- * Note that I also test all the platforms what is not performant at all (well,
- * they aren't very numerous). The use of an octree or any preselection (we know
- * where all the obstacles are in the space before the scene starts !) would be
- * better. ﻿
+ * Note that I also test all the platforms what is not performant at all (well, they aren't very
+ * numerous). The use of an octree or any preselection (we know where all the obstacles are in the
+ * space before the scene starts !) would be better. ﻿
  *
  * @see http://www.babylonjs-playground.com/#PBVEM#17
  */
