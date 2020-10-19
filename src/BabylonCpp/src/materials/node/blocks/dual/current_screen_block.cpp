@@ -238,6 +238,10 @@ void CurrentScreenBlock::_writeOutput(NodeMaterialBuildState& state,
 
 CurrentScreenBlock& CurrentScreenBlock::_buildBlock(NodeMaterialBuildState& state)
 {
+  using TextureInputBlockType
+    = std::variant<TextureBlockPtr, ReflectionTextureBlockPtr, RefractionBlockPtr,
+                   CurrentScreenBlockPtr, ParticleTextureBlockPtr>;
+
   NodeMaterialBlock::_buildBlock(state);
 
   _tempTextureRead = state._getFreeVariableName("tempTextureRead");
@@ -249,14 +253,13 @@ CurrentScreenBlock& CurrentScreenBlock::_buildBlock(NodeMaterialBuildState& stat
   }
   const auto thisAsCurrentScreenBlock
     = std::static_pointer_cast<CurrentScreenBlock>(shared_from_this());
-  auto hasCurrentScreenBlock = false;
-  for (const auto& textureBlock : state.sharedData->textureBlocks) {
-    if (std::holds_alternative<CurrentScreenBlockPtr>(textureBlock)
-        && std::get<CurrentScreenBlockPtr>(textureBlock) == thisAsCurrentScreenBlock) {
-      hasCurrentScreenBlock = true;
-    }
-  }
-  if (!hasCurrentScreenBlock) {
+  auto it = std::find_if(
+    state.sharedData->textureBlocks.begin(), state.sharedData->textureBlocks.end(),
+    [&thisAsCurrentScreenBlock](const TextureInputBlockType& textureBlock) {
+      return (std::holds_alternative<CurrentScreenBlockPtr>(textureBlock)
+              && std::get<CurrentScreenBlockPtr>(textureBlock) == thisAsCurrentScreenBlock);
+    });
+  if (it == state.sharedData->textureBlocks.end()) {
     state.sharedData->textureBlocks.emplace_back(thisAsCurrentScreenBlock);
   }
   if (stl_util::index_of(state.sharedData->blocksWithDefines,
