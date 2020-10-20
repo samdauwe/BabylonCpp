@@ -301,6 +301,12 @@ public:
   Property<EffectLayer, int> renderingGroupId;
 
   /**
+   * Specifies if the bounding boxes should be rendered normally or if they should undergo the
+   * effect of the layer
+   */
+  bool disableBoundingBoxesFromEffectLayer;
+
+  /**
    * An event triggered when the effect layer has been disposed.
    */
   Observable<EffectLayer> onDisposeObservable;

@@ -21,6 +21,7 @@
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/post_process.h>
+#include <babylon/rendering/bounding_box_renderer.h>
 
 namespace BABYLON {
 
@@ -29,6 +30,7 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
     , isEnabled{true}
     , camera{this, &EffectLayer::get_camera}
     , renderingGroupId{this, &EffectLayer::get_renderingGroupId, &EffectLayer::set_renderingGroupId}
+    , disableBoundingBoxesFromEffectLayer{false}
     , _mainTexture{nullptr}
     , _maxSize{0}
     , _mainTextureDesiredSize{ISize{0, 0}}
@@ -193,6 +195,17 @@ void EffectLayer::_createMainTexture()
 
   _mainTexture->onClearObservable.add(
     [this](Engine* engine, EventState& /*es*/) { engine->clear(neutralColor, true, true, true); });
+
+  _mainTexture->onBeforeBindObservable.add(
+    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
+      _scene->getBoundingBoxRenderer()->enabled
+        = !disableBoundingBoxesFromEffectLayer && _scene->getBoundingBoxRenderer()->enabled;
+    });
+
+  _mainTexture->onAfterUnbindObservable.add(
+    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
+      _scene->getBoundingBoxRenderer()->enabled = _scene->getBoundingBoxRenderer()->enabled;
+    });
 }
 
 void EffectLayer::_addCustomEffectDefines(std::vector<std::string>& /*defines*/)
