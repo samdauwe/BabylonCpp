@@ -17,6 +17,7 @@ BoundingBoxRenderer::BoundingBoxRenderer(Scene* iScene)
     : frontColor{Color3(1.f, 1.f, 1.f)}
     , backColor{Color3(0.1f, 0.1f, 0.1f)}
     , showBackLines{true}
+    , enabled{true}
     , _colorShader{nullptr}
     , _indexBuffer{nullptr}
     , _fillIndexBuffer{nullptr}

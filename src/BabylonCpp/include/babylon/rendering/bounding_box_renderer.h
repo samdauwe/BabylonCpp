@@ -122,6 +122,16 @@ public:
   Observable<BoundingBox> onAfterBoxRenderingObservable;
 
   /**
+   * Observable raised after ressources are created
+   */
+  Observable<BoundingBoxRenderer> onResourcesReadyObservable;
+
+  /**
+   * When false, no bounding boxes will be rendered
+   */
+  bool enabled;
+
+  /**
    * Hidden
    */
   std::vector<BoundingBox> renderList;
