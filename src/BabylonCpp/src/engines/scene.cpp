@@ -4647,11 +4647,12 @@ std::optional<PickingInfo> Scene::_internalPickForMesh(
   const std::optional<PickingInfo>& pickingInfo,
   const std::function<Ray(Matrix& world)>& rayFunction, const AbstractMeshPtr& mesh, Matrix& world,
   const std::optional<bool>& fastCheck, const std::optional<bool>& onlyBoundingInfo,
-  const TrianglePickingPredicate& trianglePredicate)
+  const TrianglePickingPredicate& trianglePredicate, const std::optional<bool>& skipBoundingInfo)
 {
   auto ray = rayFunction(world);
 
-  auto result = mesh->intersects(ray, fastCheck, trianglePredicate, onlyBoundingInfo, world);
+  auto result = mesh->intersects(ray, fastCheck, trianglePredicate, onlyBoundingInfo, world,
+                                 skipBoundingInfo.value_or(false));
   if (/*!result || */ !result.hit) {
     return std::nullopt;
   }
@@ -4687,21 +4688,31 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
                    mesh->getWorldMatrix();
 
     auto _mesh = std::static_pointer_cast<Mesh>(mesh);
+
     if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
-      auto& tmpMatrix   = TmpVectors::MatrixArray[0];
-      auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
-      for (size_t index = 0; index < thinMatrices.size(); ++index) {
-        auto& thinMatrix = thinMatrices[index];
-        thinMatrix.multiplyToRef(world, tmpMatrix);
-        auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, tmpMatrix, iFastCheck,
-                                           onlyBoundingInfo, trianglePredicate);
+      // first check if the ray intersects the whole bounding box/sphere of the mesh
+      auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, iFastCheck, true,
+                                         trianglePredicate);
+      if (result) {
+        if (onlyBoundingInfo.value_or(false)) {
+          // the user only asked for a bounding info check so we can return
+          return pickingInfo;
+        }
+        auto& tmpMatrix   = TmpVectors::MatrixArray[1];
+        auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
+        for (size_t index = 0; index < thinMatrices.size(); ++index) {
+          auto& thinMatrix = thinMatrices[index];
+          thinMatrix.multiplyToRef(world, tmpMatrix);
+          auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, tmpMatrix, iFastCheck,
+                                             onlyBoundingInfo, trianglePredicate, true);
 
-        if (result) {
-          pickingInfo                    = result;
-          pickingInfo->thinInstanceIndex = static_cast<int>(index);
+          if (result) {
+            pickingInfo                    = result;
+            pickingInfo->thinInstanceIndex = static_cast<int>(index);
 
-          if (iFastCheck.value_or(false)) {
-            return pickingInfo;
+            if (iFastCheck.value_or(false)) {
+              return pickingInfo;
+            }
           }
         }
       }
@@ -4746,17 +4757,21 @@ Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
 
     auto _mesh = std::static_pointer_cast<Mesh>(mesh);
     if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
-      auto& tmpMatrix   = TmpVectors::MatrixArray[0];
-      auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
-      for (size_t index = 0; index < thinMatrices.size(); ++index) {
-        auto& thinMatrix = thinMatrices[index];
-        thinMatrix.multiplyToRef(world, tmpMatrix);
-        auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, tmpMatrix, false, false,
-                                           trianglePredicate);
+      auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, false, true,
+                                         trianglePredicate);
+      if (result) {
+        auto& tmpMatrix   = TmpVectors::MatrixArray[1];
+        auto thinMatrices = _mesh->thinInstanceGetWorldMatrices();
+        for (size_t index = 0; index < thinMatrices.size(); ++index) {
+          auto& thinMatrix = thinMatrices[index];
+          thinMatrix.multiplyToRef(world, tmpMatrix);
+          auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, tmpMatrix, false,
+                                             false, trianglePredicate, true);
 
-        if (result) {
-          result->thinInstanceIndex = static_cast<int>(index);
-          pickingInfos.emplace_back(result);
+          if (result) {
+            result->thinInstanceIndex = static_cast<int>(index);
+            pickingInfos.emplace_back(result);
+          }
         }
       }
     }

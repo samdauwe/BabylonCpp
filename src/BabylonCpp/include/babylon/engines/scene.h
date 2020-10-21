@@ -1896,7 +1896,8 @@ private:
                        const AbstractMeshPtr& mesh, Matrix& world,
                        const std::optional<bool>& fastCheck              = std::nullopt,
                        const std::optional<bool>& onlyBoundingInfo       = std::nullopt,
-                       const TrianglePickingPredicate& trianglePredicate = nullptr);
+                       const TrianglePickingPredicate& trianglePredicate = nullptr,
+                       const std::optional<bool>& skipBoundingInfo       = std::nullopt);
 
   /**
    * @brief hidden
