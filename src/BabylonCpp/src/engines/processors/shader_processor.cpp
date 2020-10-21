@@ -18,11 +18,13 @@
 namespace BABYLON {
 
 void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
-                              const std::function<void(const std::string& migratedCode)>& callback)
+                              const std::function<void(const std::string& migratedCode)>& callback,
+                              ThinEngine* engine)
 {
   _ProcessIncludes(sourceCode, options,
-                   [&options, callback](const std::string& codeWithIncludes) -> void {
-                     const auto migratedCode = _ProcessShaderConversion(codeWithIncludes, options);
+                   [&options, callback, &engine](const std::string& codeWithIncludes) -> void {
+                     const auto migratedCode
+                       = _ProcessShaderConversion(codeWithIncludes, options, engine);
                      callback(migratedCode);
                    });
 }
@@ -355,7 +357,8 @@ ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options)
 }
 
 std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceCode,
-                                                      ProcessingOptions& options)
+                                                      ProcessingOptions& options,
+                                                      ThinEngine* engine)
 {
   auto preparedSourceCode = _ProcessPrecision(sourceCode, options);
 
@@ -383,7 +386,7 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
   // Post processing
   /* if (options.processor->postProcessor) */ {
     preparedSourceCode
-      = options.processor->postProcessor(preparedSourceCode, defines, options.isFragment);
+      = options.processor->postProcessor(preparedSourceCode, defines, options.isFragment, engine);
   }
 
   return preparedSourceCode;

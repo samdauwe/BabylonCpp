@@ -19,7 +19,7 @@ std::string WebGL2ShaderProcessor::varyingProcessor(const std::string& varying, 
 
 std::string WebGL2ShaderProcessor::postProcessor(std::string code,
                                                  const std::vector<std::string>& defines,
-                                                 bool isFragment)
+                                                 bool isFragment, ThinEngine* /*engine*/)
 {
   const auto hasDrawBuffersExtension
     = StringTools::contains(code, "#extension.+GL_EXT_draw_buffers.+require");

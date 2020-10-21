@@ -45,7 +45,7 @@ std::string IShaderProcessor::preProcessor(const std::string& code,
 
 std::string IShaderProcessor::postProcessor(std::string code,
                                             const std::vector<std::string>& /*defines*/,
-                                            bool /*isFragment*/)
+                                            bool /*isFragment*/, ThinEngine* /*engine*/)
 {
   return code;
 }

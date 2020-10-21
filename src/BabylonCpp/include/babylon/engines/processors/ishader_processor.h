@@ -8,6 +8,8 @@
 
 namespace BABYLON {
 
+class ThinEngine;
+
 /**
  * @brief Hidden
  */
@@ -22,8 +24,8 @@ struct BABYLON_SHARED_EXPORT IShaderProcessor {
   virtual std::string lineProcessor(const std::string& line, bool isFragment);
   virtual std::string preProcessor(const std::string& code, const std::vector<std::string>& defines,
                                    bool isFragment);
-  virtual std::string postProcessor(std::string, const std::vector<std::string>& defines,
-                                    bool isFragment);
+  virtual std::string postProcessor(std::string code, const std::vector<std::string>& defines,
+                                    bool isFragment, ThinEngine* engine);
 }; // end of struct IShaderProcessor
 
 } // end of namespace BABYLON

@@ -154,8 +154,10 @@ Effect::Effect(
                                 = processFinalCode("fragment", migratedFragmentCode);
                             }
                             _useFinalCode(migratedVertexCode, migratedFragmentCode, baseName);
-                          });
-                      });
+                          },
+                          _engine);
+                      },
+                      _engine);
                   });
               });
 } // namespace BABYLON

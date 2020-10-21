@@ -8,6 +8,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 
@@ -16,17 +17,13 @@ namespace BABYLON {
 class ArrayBufferView;
 struct ProcessingOptions;
 class ProgressEvent;
-struct ShaderCodeConditionNode;
 class ShaderCodeCursor;
-struct ShaderCodeNode;
-struct ShaderCodeTestNode;
-class ShaderDefineArithmeticOperator;
-class ShaderDefineExpression;
-using ShaderCodeConditionNodePtr        = std::shared_ptr<ShaderCodeConditionNode>;
-using ShaderCodeNodePtr                 = std::shared_ptr<ShaderCodeNode>;
-using ShaderCodeTestNodePtr             = std::shared_ptr<ShaderCodeTestNode>;
-using ShaderDefineArithmeticOperatorPtr = std::shared_ptr<ShaderDefineArithmeticOperator>;
-using ShaderDefineExpressionPtr         = std::shared_ptr<ShaderDefineExpression>;
+class ThinEngine;
+FWD_STRUCT_SPTR(ShaderCodeConditionNode)
+FWD_STRUCT_SPTR(ShaderCodeNode)
+FWD_STRUCT_SPTR(ShaderCodeTestNode)
+FWD_CLASS_SPTR(ShaderDefineArithmeticOperator)
+FWD_CLASS_SPTR(ShaderDefineExpression)
 
 /**
  * @brief Hidden
@@ -39,7 +36,8 @@ public:
 
 public:
   static void Process(const std::string& sourceCode, ProcessingOptions& options,
-                      const std::function<void(const std::string& migratedCode)>& callback);
+                      const std::function<void(const std::string& migratedCode)>& callback,
+                      ThinEngine* engine);
 
   /**
    * @brief Loads a file from a url.
@@ -79,7 +77,7 @@ private:
   static std::unordered_map<std::string, std::string>
   _PreparePreProcessors(const ProcessingOptions& options);
   static std::string _ProcessShaderConversion(const std::string& sourceCode,
-                                              ProcessingOptions& options);
+                                              ProcessingOptions& options, ThinEngine* engine);
   static void _ProcessIncludes(const std::string& sourceCode, ProcessingOptions& options,
                                const std::function<void(const std::string& data)>& callback);
 
