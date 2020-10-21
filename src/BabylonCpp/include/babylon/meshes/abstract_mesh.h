@@ -697,13 +697,15 @@ public:
    * bounding info (false by default)
    * @param worldToUse defines the world matrix to use to get the world coordinate of the
    * intersection point
+   * @param skipBoundingInfo a boolean indicating if we should skip the bounding info check
    * @returns the picking info
    * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
   virtual PickingInfo intersects(Ray& ray, const std::optional<bool>& fastCheck = std::nullopt,
                                  const TrianglePickingPredicate& trianglePredicate = nullptr,
                                  const std::optional<bool>& onlyBoundingInfo       = std::nullopt,
-                                 const std::optional<Matrix>& worldToUse           = std::nullopt);
+                                 const std::optional<Matrix>& worldToUse           = std::nullopt,
+                                 bool skipBoundingInfo                             = false);
 
   /**
    * @brief Clones the current mesh.

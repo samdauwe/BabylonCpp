@@ -1416,7 +1416,8 @@ bool AbstractMesh::_generatePointsArray()
 PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastCheck,
                                      const TrianglePickingPredicate& trianglePredicate,
                                      const std::optional<bool>& onlyBoundingInfo,
-                                     const std::optional<Matrix>& worldToUse)
+                                     const std::optional<Matrix>& worldToUse,
+                                     bool /*skipBoundingInfo*/)
 {
   const auto fastCheck = iFastCheck.value_or(true);
   PickingInfo pickingInfo;
