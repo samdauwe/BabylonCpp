@@ -289,12 +289,12 @@ SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigest
     }
 
     // create a model shape for each single particle
-    auto idx             = nbParticles;
-    auto shape           = _posToShape(facetPos);
-    auto shapeUV         = _uvsToShapeUV(facetUV);
-    const auto& shapeInd = facetInd;
-    const auto& shapeCol = facetCol;
-    const auto& shapeNor = facetNor;
+    auto idx            = nbParticles;
+    auto shape          = _posToShape(facetPos);
+    auto shapeUV        = _uvsToShapeUV(facetUV);
+    const auto shapeInd = facetInd;
+    const auto shapeCol = facetCol;
+    const auto shapeNor = facetNor;
 
     // compute the barycenter of the shape
     barycenter.copyFromFloats(0.f, 0.f, 0.f);
@@ -586,16 +586,16 @@ int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
 int SolidParticleSystem::addShape(const MeshPtr& iMesh, size_t nb,
                                   std::optional<SolidParticleSystemMeshBuilderOptions>& options)
 {
-  const auto meshPos       = iMesh->getVerticesData(VertexBuffer::PositionKind);
-  const auto meshInd       = iMesh->getIndices();
-  const auto meshUV        = iMesh->getVerticesData(VertexBuffer::UVKind);
-  const auto meshCol       = iMesh->getVerticesData(VertexBuffer::ColorKind);
-  const auto meshNor       = iMesh->getVerticesData(VertexBuffer::NormalKind);
-  recomputeNormals         = !meshNor.empty() ? false : true;
-  const auto& indices      = meshInd;
-  const auto& shapeNormals = meshNor;
-  const auto& shapeColors  = meshCol;
-  BoundingInfoPtr bbInfo   = nullptr;
+  const auto meshPos      = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  const auto meshInd      = iMesh->getIndices();
+  const auto meshUV       = iMesh->getVerticesData(VertexBuffer::UVKind);
+  const auto meshCol      = iMesh->getVerticesData(VertexBuffer::ColorKind);
+  const auto meshNor      = iMesh->getVerticesData(VertexBuffer::NormalKind);
+  recomputeNormals        = !meshNor.empty() ? false : true;
+  const auto indices      = meshInd;
+  const auto shapeNormals = meshNor;
+  const auto shapeColors  = meshCol;
+  BoundingInfoPtr bbInfo  = nullptr;
   if (_particlesIntersect) {
     bbInfo = mesh->getBoundingInfo();
   }

@@ -409,6 +409,11 @@ public:
   Observable<IParticleSystem> onDisposeObservable;
 
   /**
+   * An event triggered when the system is stopped
+   */
+  Observable<IParticleSystem> onStoppedObservable;
+
+  /**
    * @brief Clones the particle system.
    * @param name The name of the cloned object
    * @param newEmitter The new emitter to use

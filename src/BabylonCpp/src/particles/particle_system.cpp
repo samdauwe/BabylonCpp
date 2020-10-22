@@ -59,6 +59,7 @@ ParticleSystem::ParticleSystem(
     , _scaledGravity{Vector3::Zero()}
     , _currentRenderId{-1}
     , _useInstancing{false}
+    , _vertexArrayObject{nullptr}
     , _started{false}
     , _stopped{false}
     , _actualFrame{0}
@@ -86,6 +87,10 @@ ParticleSystem::ParticleSystem(
   else {
     _engine                 = std::get<ThinEngine*>(*sceneOrEngine);
     defaultProjectionMatrix = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f);
+  }
+
+  if (_engine->getCaps().vertexArrayObject) {
+    _vertexArrayObject = nullptr;
   }
 
   // Setup the default processing configuration to the scene.
@@ -732,6 +737,11 @@ void ParticleSystem::_resetEffect()
     _spriteBuffer = nullptr;
   }
 
+  if (_vertexArrayObject) {
+    _engine->releaseVertexArrayObject(_vertexArrayObject);
+    _vertexArrayObject = nullptr;
+  }
+
   _createVertexBuffers();
 }
 
@@ -913,6 +923,12 @@ void ParticleSystem::stop()
 
 void ParticleSystem::stop(bool stopSubEmitters)
 {
+  if (_stopped) {
+    return;
+  }
+
+  onStoppedObservable.notifyObservers(this);
+
   _stopped = true;
 
   if (stopSubEmitters) {
@@ -1659,7 +1675,7 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
     auto baseSize = particleTexture->getBaseSize();
     effect->setFloat3("particlesInfos", spriteCellWidth / static_cast<float>(baseSize.width),
                       spriteCellHeight / static_cast<float>(baseSize.height),
-                      static_cast<float>(baseSize.width) / spriteCellWidth);
+                      static_cast<float>(spriteCellWidth) / baseSize.width);
   }
 
   effect->setVector2("translationPivot", translationPivot);
@@ -1694,7 +1710,16 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
+  if (_engine->getCaps().vertexArrayObject) {
+    if (!_vertexArrayObject) {
+      _vertexArrayObject = _engine->recordVertexArrayObject(_vertexBuffers, _indexBuffer, effect);
+    }
+
+    _engine->bindVertexArrayObject(_vertexArrayObject, _indexBuffer);
+  }
+  else {
+    engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
+  }
 
   // image processing
   if (_imageProcessingConfiguration && !_imageProcessingConfiguration->applyByPostProcess) {
@@ -1780,6 +1805,11 @@ void ParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextu
     _indexBuffer = nullptr;
   }
 
+  if (_vertexArrayObject) {
+    _engine->releaseVertexArrayObject(_vertexArrayObject);
+    _vertexArrayObject = nullptr;
+  }
+
   if (disposeTexture && particleTexture) {
     particleTexture->dispose();
     particleTexture = nullptr;
@@ -1828,6 +1858,7 @@ void ParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTextu
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
+  onStoppedObservable.clear();
 
   reset();
 }

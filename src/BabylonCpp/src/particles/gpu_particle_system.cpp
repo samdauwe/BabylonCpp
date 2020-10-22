@@ -267,6 +267,9 @@ void GPUParticleSystem::start(size_t delay)
 
 void GPUParticleSystem::stop()
 {
+  if (_stopped) {
+    return;
+  }
   _stopped = true;
 }
 
@@ -1624,6 +1627,7 @@ void GPUParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTe
   }
 
   // Callback
+  onStoppedObservable.clear();
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
 }

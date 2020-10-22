@@ -12,6 +12,10 @@
 
 namespace BABYLON {
 
+namespace GL {
+class IGLVertexArrayObject;
+}
+
 class Buffer;
 class Effect;
 class Mesh;
@@ -20,9 +24,10 @@ class Scene;
 class ThinEngine;
 class VertexBuffer;
 class WebGLDataBuffer;
-using EffectPtr          = std::shared_ptr<Effect>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+using EffectPtr                 = std::shared_ptr<Effect>;
+using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
+using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
+using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**
  * @brief This represents a particle system in Babylon.
@@ -673,6 +678,7 @@ private:
   int _currentRenderId;
   bool _alive;
   bool _useInstancing;
+  WebGLVertexArrayObjectPtr _vertexArrayObject;
 
   bool _started;
   bool _stopped;
