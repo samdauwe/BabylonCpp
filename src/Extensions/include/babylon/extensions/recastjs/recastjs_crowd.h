@@ -68,6 +68,34 @@ public:
   void getAgentVelocityToRef(int index, Vector3& result) override;
 
   /**
+   * @brief Returns the agent next target point on the path
+   * @param index agent index returned by addAgent
+   * @returns world space position
+   */
+  Vector3 getAgentNextTargetPath(int index) override;
+
+  /**
+   * @brief Returns the agent next target point on the path
+   * @param index agent index returned by addAgent
+   * @param result output world space position
+   */
+  void getAgentNextTargetPathToRef(int index, Vector3& result) override;
+
+  /**
+   * @brief Gets the agent state
+   * @param index agent index returned by addAgent
+   * @returns agent state
+   */
+  int getAgentState(int index) override;
+
+  /**
+   * @brief Returns true if the agent in over an off mesh link connection
+   * @param index agent index returned by addAgent
+   * @returns true if over an off mesh link connection
+   */
+  bool overOffmeshConnection(int index) override;
+
+  /**
    * @brief Asks a particular agent to go to a destination. That destination is constrained by the
    * navigation mesh.
    * @param index agent index returned by addAgent

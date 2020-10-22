@@ -65,6 +65,34 @@ struct ICrowd {
   virtual void getAgentVelocityToRef(int index, Vector3& result) = 0;
 
   /**
+   * @brief Returns the agent next target point on the path
+   * @param index agent index returned by addAgent
+   * @returns world space position
+   */
+  virtual Vector3 getAgentNextTargetPath(int index) = 0;
+
+  /**
+   * @brief Gets the agent state
+   * @param index agent index returned by addAgent
+   * @returns agent state
+   */
+  virtual int getAgentState(int index) = 0;
+
+  /**
+   * @brief Returns true if the agent in over an off mesh link connection
+   * @param index agent index returned by addAgent
+   * @returns true if over an off mesh link connection
+   */
+  virtual bool overOffmeshConnection(int index) = 0;
+
+  /**
+   * @brief Returns the agent next target point on the path
+   * @param index agent index returned by addAgent
+   * @param result output world space position
+   */
+  virtual void getAgentNextTargetPathToRef(int index, Vector3& result) = 0;
+
+  /**
    * @brief remove a particular agent previously created.
    * @param index agent index returned by addAgent
    */

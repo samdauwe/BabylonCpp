@@ -78,6 +78,28 @@ void RecastJSCrowd::getAgentVelocityToRef(int index, Vector3& result)
   result.set(agentVel.x, agentVel.y, agentVel.z);
 }
 
+Vector3 RecastJSCrowd::getAgentNextTargetPath(int index)
+{
+  const auto pathTargetPos = recastCrowd->getAgentNextTargetPath(index);
+  return Vector3(pathTargetPos.x, pathTargetPos.y, pathTargetPos.z);
+}
+
+void RecastJSCrowd::getAgentNextTargetPathToRef(int index, Vector3& result)
+{
+  const auto pathTargetPos = recastCrowd->getAgentNextTargetPath(index);
+  result.set(pathTargetPos.x, pathTargetPos.y, pathTargetPos.z);
+}
+
+int RecastJSCrowd::getAgentState(int index)
+{
+  return recastCrowd->getAgentState(index);
+}
+
+bool RecastJSCrowd::overOffmeshConnection(int index)
+{
+  return recastCrowd->overOffmeshConnection(index);
+}
+
 void RecastJSCrowd::agentGoto(int index, const Vector3& destination)
 {
   recastCrowd->agentGoto(index, Vec3(destination.x, destination.y, destination.z));
