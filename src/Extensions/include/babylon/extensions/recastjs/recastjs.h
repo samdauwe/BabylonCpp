@@ -152,6 +152,7 @@ public:
   void update(const float dt);
   Vec3 getAgentPosition(int idx);
   Vec3 getAgentVelocity(int idx);
+  Vec3 getAgentNextTargetPath(int idx);
   void agentGoto(int idx, const Vec3& destination);
   void agentTeleport(int idx, const Vec3& destination);
   dtCrowdAgentParams getAgentParameters(const int idx);

@@ -742,6 +742,12 @@ Vec3 Crowd::getAgentVelocity(int idx)
   return Vec3(agent->vel[0], agent->vel[1], agent->vel[2]);
 }
 
+Vec3 Crowd::getAgentNextTargetPath(int idx)
+{
+  const dtCrowdAgent* agent = m_crowd->getAgent(idx);
+  return Vec3(agent->cornerVerts[0], agent->cornerVerts[1], agent->cornerVerts[2]);
+}
+
 void Crowd::agentGoto(int idx, const Vec3& destination)
 {
   dtQueryFilter filter;
