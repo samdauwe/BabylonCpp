@@ -748,6 +748,29 @@ Vec3 Crowd::getAgentNextTargetPath(int idx)
   return Vec3(agent->cornerVerts[0], agent->cornerVerts[1], agent->cornerVerts[2]);
 }
 
+int Crowd::getAgentState(int idx)
+{
+  const dtCrowdAgent* agent = m_crowd->getAgent(idx);
+  return agent->state;
+}
+
+bool Crowd::overOffmeshConnection(int idx)
+{
+  const dtCrowdAgent* agent = m_crowd->getAgent(idx);
+  const float triggerRadius = agent->params.radius * 2.25f;
+  if (!agent->ncorners)
+    return false;
+  const bool offMeshConnection
+    = (agent->cornerFlags[agent->ncorners - 1] & DT_STRAIGHTPATH_OFFMESH_CONNECTION) ? true : false;
+  if (offMeshConnection) {
+    const float distSq = dtVdist2DSqr(agent->npos, &agent->cornerVerts[(agent->ncorners - 1) * 3]);
+    if (distSq < triggerRadius * triggerRadius) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void Crowd::agentGoto(int idx, const Vec3& destination)
 {
   dtQueryFilter filter;

@@ -59,7 +59,7 @@ void RecastJSPlugin::createNavMesh(const std::vector<MeshPtr>& meshes,
         continue;
       }
 
-      const auto wm = mesh->computeWorldMatrix(false);
+      const auto wm = mesh->computeWorldMatrix(true);
 
       for (size_t tri = 0; tri < meshIndices.size(); ++tri) {
         indices.emplace_back(static_cast<int>(meshIndices[tri]) + offset);
