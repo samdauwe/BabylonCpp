@@ -4,6 +4,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/maths/plane.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
@@ -13,8 +14,7 @@ Collider::Collider()
     , _radius{Vector3::One()}
     , _retry{0}
     , _basePointWorld{Vector3::Zero()}
-    , collisionMask{this, &Collider::get_collisionMask,
-                    &Collider::set_collisionMask}
+    , collisionMask{this, &Collider::get_collisionMask, &Collider::set_collisionMask}
     , _collisionPoint{Vector3::Zero()}
     , _planeIntersectionPoint{Vector3::Zero()}
     , _tempVector{Vector3::Zero()}
@@ -34,10 +34,8 @@ Collider::Collider()
 
 Collider::~Collider() = default;
 
-bool Collider::IntersectBoxAASphere(const Vector3& boxMin,
-                                    const Vector3& boxMax,
-                                    const Vector3& sphereCenter,
-                                    float sphereRadius)
+bool Collider::IntersectBoxAASphere(const Vector3& boxMin, const Vector3& boxMax,
+                                    const Vector3& sphereCenter, float sphereRadius)
 {
   if (boxMin.x > sphereCenter.x + sphereRadius) {
     return false;
@@ -127,9 +125,8 @@ void Collider::_initialize(Vector3& source, Vector3& dir, float e)
   collisionFound = false;
 }
 
-bool Collider::_checkPointInTriangle(const Vector3& point, const Vector3& pa,
-                                     const Vector3& pb, const Vector3& pc,
-                                     const Vector3& n)
+bool Collider::_checkPointInTriangle(const Vector3& point, const Vector3& pa, const Vector3& pb,
+                                     const Vector3& pc, const Vector3& n)
 {
   pa.subtractToRef(point, _tempVector);
   pb.subtractToRef(point, _tempVector2);
@@ -153,8 +150,7 @@ bool Collider::_checkPointInTriangle(const Vector3& point, const Vector3& pa,
 }
 
 bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
-                               const Vector3& vecMin,
-                               const Vector3& vecMax) const
+                               const Vector3& vecMin, const Vector3& vecMax) const
 {
   auto distance = Vector3::Distance(_basePointWorld, sphereCenter);
 
@@ -164,19 +160,16 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
     return false;
   }
 
-  if (!IntersectBoxAASphere(vecMin, vecMax, _basePointWorld,
-                            _velocityWorldLength + max)) {
+  if (!IntersectBoxAASphere(vecMin, vecMax, _basePointWorld, _velocityWorldLength + max)) {
     return false;
   }
 
   return true;
 }
 
-void Collider::_testTriangle(size_t faceIndex,
-                             std::vector<Plane>& trianglePlaneArray,
-                             const Vector3& p1, const Vector3& p2,
-                             const Vector3& p3, bool hasMaterial,
-                             const AbstractMeshPtr& hostMesh)
+void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlaneArray,
+                             const Vector3& p1, const Vector3& p2, const Vector3& p3,
+                             bool hasMaterial, const AbstractMeshPtr& hostMesh)
 {
   auto f = 0.f, t0 = 0.f;
   auto embeddedInPlane = false;
@@ -190,13 +183,12 @@ void Collider::_testTriangle(size_t faceIndex,
 
   auto& trianglePlane = trianglePlaneArray[faceIndex];
 
-  if ((!hasMaterial)
-      && !trianglePlane.isFrontFacingTo(_normalizedVelocity, 0)) {
+  if ((!hasMaterial) && !trianglePlane.isFrontFacingTo(_normalizedVelocity, 0)) {
     return;
   }
 
   auto signedDistToTrianglePlane = trianglePlane.signedDistanceTo(_basePoint);
-  auto normalDotVelocity = Vector3::Dot(trianglePlane.normal, _velocity);
+  auto normalDotVelocity         = Vector3::Dot(trianglePlane.normal, _velocity);
 
   if (stl_util::almost_equal(normalDotVelocity, 0.f)) {
     if (std::abs(signedDistToTrianglePlane) >= 1.f) {
@@ -235,8 +227,7 @@ void Collider::_testTriangle(size_t faceIndex,
     _velocity.scaleToRef(t0, _tempVector);
     _planeIntersectionPoint.addInPlace(_tempVector);
 
-    if (_checkPointInTriangle(_planeIntersectionPoint, p1, p2, p3,
-                              trianglePlane.normal)) {
+    if (_checkPointInTriangle(_planeIntersectionPoint, p1, p2, p3, trianglePlane.normal)) {
       found = true;
       t     = t0;
       _collisionPoint.copyFrom(_planeIntersectionPoint);
@@ -287,8 +278,7 @@ void Collider::_testTriangle(size_t faceIndex,
     auto edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
     auto edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
-    a = edgeSquaredLength * (-velocitySquaredLength)
-        + edgeDotVelocity * edgeDotVelocity;
+    a = edgeSquaredLength * (-velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
     b = edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
         - 2.f * edgeDotVelocity * edgeDotBaseToVertex;
     c = edgeSquaredLength * (1.f - _baseToVertex.lengthSquared())
@@ -296,8 +286,7 @@ void Collider::_testTriangle(size_t faceIndex,
 
     lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
-      auto _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
-                / edgeSquaredLength;
+      auto _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex) / edgeSquaredLength;
 
       if (_f >= 0.f && _f <= 1.f) {
         t     = lowestRoot.root;
@@ -313,16 +302,14 @@ void Collider::_testTriangle(size_t faceIndex,
     edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
     edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
-    a = edgeSquaredLength * (-velocitySquaredLength)
-        + edgeDotVelocity * edgeDotVelocity;
+    a = edgeSquaredLength * (-velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
     b = edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
         - 2.f * edgeDotVelocity * edgeDotBaseToVertex;
     c = edgeSquaredLength * (1.f - _baseToVertex.lengthSquared())
         + edgeDotBaseToVertex * edgeDotBaseToVertex;
     lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
-      auto _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
-                / edgeSquaredLength;
+      auto _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex) / edgeSquaredLength;
 
       if (_f >= 0.f && _f <= 1.f) {
         t     = lowestRoot.root;
@@ -338,8 +325,7 @@ void Collider::_testTriangle(size_t faceIndex,
     edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
     edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
-    a = edgeSquaredLength * (-velocitySquaredLength)
-        + edgeDotVelocity * edgeDotVelocity;
+    a = edgeSquaredLength * (-velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
     b = edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
         - 2.f * edgeDotVelocity * edgeDotBaseToVertex;
     c = edgeSquaredLength * (1.f - _baseToVertex.lengthSquared())
@@ -347,8 +333,7 @@ void Collider::_testTriangle(size_t faceIndex,
 
     lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
-      f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
-          / edgeSquaredLength;
+      f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex) / edgeSquaredLength;
 
       if (f >= 0.f && f <= 1.f) {
         t     = lowestRoot.root;
@@ -363,25 +348,28 @@ void Collider::_testTriangle(size_t faceIndex,
     auto distToCollision = t * _velocity.length();
 
     if (!collisionFound || distToCollision < _nearestDistance) {
-      if (!intersectionPointSet) {
-        intersectionPoint    = _collisionPoint;
-        intersectionPointSet = true;
+      // if collisionResponse is false, collision is not found but the collidedMesh is set anyway.
+      // onCollide observable are triggered if collideMesh is set
+      // this allow trigger volumes to be created.
+      if (hostMesh->collisionResponse()) {
+        if (!intersectionPointSet) {
+          intersectionPoint    = _collisionPoint;
+          intersectionPointSet = true;
+        }
+        else {
+          intersectionPoint.copyFrom(_collisionPoint);
+        }
+        _nearestDistance = distToCollision;
+        collisionFound   = true;
       }
-      else {
-        intersectionPoint.copyFrom(_collisionPoint);
-      }
-      _nearestDistance = distToCollision;
-      collisionFound   = true;
-      collidedMesh     = hostMesh;
+      collidedMesh = hostMesh;
     }
   }
 }
 
-void Collider::_collide(std::vector<Plane>& trianglePlaneArray,
-                        const std::vector<Vector3>& pts,
-                        const IndicesArray& indices, size_t indexStart,
-                        size_t indexEnd, unsigned int decal, bool hasMaterial,
-                        const AbstractMeshPtr& hostMesh)
+void Collider::_collide(std::vector<Plane>& trianglePlaneArray, const std::vector<Vector3>& pts,
+                        const IndicesArray& indices, size_t indexStart, size_t indexEnd,
+                        unsigned int decal, bool hasMaterial, const AbstractMeshPtr& hostMesh)
 {
   for (size_t i = indexStart; i < indexEnd; i += 3) {
     const auto& p1 = pts[indices[i] - decal];
@@ -405,9 +393,8 @@ void Collider::_getResponse(Vector3& pos, Vector3& vel)
   pos.addInPlace(_displacementVector);
   intersectionPoint.addInPlace(_displacementVector);
 
-  _slidePlaneNormal.scaleInPlace(
-    Plane::SignedDistanceToPlaneFromPositionAndNormal(
-      intersectionPoint, _slidePlaneNormal, _destinationPoint));
+  _slidePlaneNormal.scaleInPlace(Plane::SignedDistanceToPlaneFromPositionAndNormal(
+    intersectionPoint, _slidePlaneNormal, _destinationPoint));
   _destinationPoint.subtractInPlace(_slidePlaneNormal);
 
   _destinationPoint.subtractToRef(intersectionPoint, vel);

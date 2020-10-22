@@ -11,6 +11,7 @@ _MeshCollisionData::_MeshCollisionData()
     , _diffPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
+    , _collisionResponse{true}
 {
 }
 
@@ -18,7 +19,7 @@ _MeshCollisionData::_MeshCollisionData(const _MeshCollisionData& other) = defaul
 
 _MeshCollisionData::_MeshCollisionData(_MeshCollisionData&& other) = default;
 
-_MeshCollisionData& _MeshCollisionData::operator=(const _MeshCollisionData& other)  = default;
+_MeshCollisionData& _MeshCollisionData::operator=(const _MeshCollisionData& other) = default;
 
 _MeshCollisionData& _MeshCollisionData::operator=(_MeshCollisionData&& other) = default;
 

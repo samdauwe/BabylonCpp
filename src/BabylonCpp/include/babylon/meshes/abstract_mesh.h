@@ -1230,6 +1230,22 @@ protected:
   void set_collisionMask(int mask);
 
   /**
+   * @brief Gets collision response flag (default is true).
+   * when collisionResponse is false, events are still triggered but colliding entity has no
+   * response This helps creating trigger volume when user wants collision feedback events but not
+   * position/velocity to respond to the collision.
+   */
+  bool get_collisionResponse() const;
+
+  /**
+   * @brief Sets a collision response flag (default is true).
+   * when collisionResponse is false, events are still triggered but colliding entity has no
+   * response This helps creating trigger volume when user wants collision feedback events but not
+   * position/velocity to respond to the collision.
+   */
+  void set_collisionResponse(bool response);
+
+  /**
    * @brief Gets the current collision group mask (-1 by default). A collision between A and B will
    * happen if A.collisionGroup & b.collisionMask !== 0
    */
@@ -1753,6 +1769,14 @@ public:
    * between A and B will happen if A.collisionGroup & b.collisionMask !== 0
    */
   Property<AbstractMesh, int> collisionMask;
+
+  /**
+   * Gets or sets a collision response flag (default is true).
+   * when collisionResponse is false, events are still triggered but colliding entity has no
+   * response This helps creating trigger volume when user wants collision feedback events but not
+   * position/velocity to respond to the collision.
+   */
+  Property<AbstractMesh, bool> collisionResponse;
 
   /**
    * the current collision group mask (-1 by default). A collision between A and

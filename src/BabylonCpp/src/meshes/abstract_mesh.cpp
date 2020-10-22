@@ -105,6 +105,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , ellipsoidOffset{Vector3(0, 0, 0)}
     , collisionMask{this, &AbstractMesh::get_collisionMask, &AbstractMesh::set_collisionMask}
+    , collisionResponse{this, &AbstractMesh::get_collisionResponse,
+                        &AbstractMesh::set_collisionResponse}
     , collisionGroup{this, &AbstractMesh::get_collisionGroup, &AbstractMesh::set_collisionGroup}
     , surroundingMeshes{this, &AbstractMesh::get_surroundingMeshes,
                         &AbstractMesh::set_surroundingMeshes}
@@ -491,6 +493,16 @@ int AbstractMesh::get_collisionMask() const
 void AbstractMesh::set_collisionMask(int mask)
 {
   _meshCollisionData._collisionMask = !isNan(mask) ? mask : -1;
+}
+
+bool AbstractMesh::get_collisionResponse() const
+{
+  return _meshCollisionData._collisionResponse;
+}
+
+void AbstractMesh::set_collisionResponse(bool response)
+{
+  _meshCollisionData._collisionResponse = response;
 }
 
 int AbstractMesh::get_collisionGroup() const

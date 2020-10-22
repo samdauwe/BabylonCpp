@@ -38,6 +38,7 @@ public:
   Vector3 _diffPositionForCollisions;
   Observer<AbstractMesh>::Ptr _onCollideObserver;
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
+  bool _collisionResponse;
 
 }; // end of class _MeshCollisionData
 
