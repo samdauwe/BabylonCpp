@@ -16,6 +16,7 @@ class DashedLinesOptions;
 class DiscOptions;
 class GroundFromHeightMapOptions;
 class GroundOptions;
+class ICreateCapsuleOptions;
 class LineSystemOptions;
 class PlaneOptions;
 class RibbonOptions;
@@ -425,6 +426,16 @@ public:
    */
   // clang-format on
   static std::unique_ptr<VertexData> CreatePolyhedron(PolyhedronOptions& options);
+
+  /**
+   * @brief Creates the VertexData for a Capsule, inspired from
+   * https://github.com/maximeq/three-js-capsule-geometry/blob/master/src/CapsuleBufferGeometry.js
+   * @param options an object used to set the following optional parameters for the capsule,
+   * required but can be empty
+   * @returns the VertexData of the Capsule
+   * @see https://doc.babylonjs.com/how_to/capsule_shape
+   */
+  static std::unique_ptr<VertexData> CreateCapsule(const ICreateCapsuleOptions& options);
 
   // clang-format off
   // based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473

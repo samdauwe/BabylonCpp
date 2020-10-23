@@ -22,6 +22,7 @@ class Geometry;
 class GroundMesh;
 class IAnimatable;
 class IcoSphereOptions;
+class ICreateCapsuleOptions;
 class InstancedMesh;
 class IParticleSystem;
 class LinesMesh;
@@ -1710,7 +1711,19 @@ public:
    * @param scene defines the hosting scene
    * @returns a new Mesh
    */
-  static MeshPtr CreatePolyhedron(const std::string& name, PolyhedronOptions& options, Scene*);
+  static MeshPtr CreatePolyhedron(const std::string& name, PolyhedronOptions& options,
+                                  Scene* scene);
+
+  /**
+   * @brief Creates a capsule or a pill mesh
+   * @param name defines the name of the mesh.
+   * @param options the constructors options used to shape the mesh.
+   * @param scene defines the scene the mesh is scoped to.
+   * @returns the capsule mesh
+   * @see https://doc.babylonjs.com/how_to/capsule_shape
+   */
+  static MeshPtr CreateCapsule(const std::string& name, ICreateCapsuleOptions& options,
+                               Scene* scene);
 
   /**
    * @brief Creates a sphere based upon an icosahedron with 20 triangular faces

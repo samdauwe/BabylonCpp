@@ -33,6 +33,7 @@
 #include <babylon/meshes/_visible_instances.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/builders/box_builder.h>
+#include <babylon/meshes/builders/capsule_builder.h>
 #include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/decal_builder.h>
 #include <babylon/meshes/builders/disc_builder.h>
@@ -3859,6 +3860,11 @@ MeshPtr Mesh::CreateTube(const std::string& iName, const std::vector<Vector3>& p
 MeshPtr Mesh::CreatePolyhedron(const std::string& iName, PolyhedronOptions& options, Scene* scene)
 {
   return PolyhedronBuilder::CreatePolyhedron(iName, options, scene);
+}
+
+MeshPtr Mesh::CreateCapsule(const std::string& name, ICreateCapsuleOptions& options, Scene* scene)
+{
+  return CapsuleBuilder::CreateCapsule(name, options, scene);
 }
 
 MeshPtr Mesh::CreateIcoSphere(const std::string& iName, IcoSphereOptions& options, Scene* scene)

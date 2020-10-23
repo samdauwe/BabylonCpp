@@ -243,9 +243,8 @@ VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry, bool update
 
 VertexData& VertexData::transform(const Matrix& matrix)
 {
-  const auto& matrixM = matrix.m();
-  bool flip           = matrixM[0] * matrixM[5] * matrixM[10] < 0.f;
-  auto transformed    = Vector3::Zero();
+  const auto flip  = matrix.determinant() < 0.f;
+  auto transformed = Vector3::Zero();
   if (!positions.empty()) {
     auto position = Vector3::Zero();
 
@@ -1523,7 +1522,8 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
                      1.f;
   const auto slice
     = options.slice.has_value() ? ((*options.slice <= 0.f) ? 1.f : *options.slice) : 1.f;
-  const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto sideOrientation       = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto dedupTopBottomIndices = options.dedupTopBottomIndices.value_or(false);
 
   Vector3 radius(diameterX / 2.f, diameterY / 2.f, diameterZ / 2.f);
 
@@ -1558,20 +1558,31 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
       stl_util::concat(uvs, {normalizedY, normalizedZ});
     }
 
-    if (zRotationStep > 0) {
+    if (zRotationStep > 0u) {
       auto verticesCount        = static_cast<uint32_t>(positions.size() / 3);
       auto _totalYRotationSteps = static_cast<uint32_t>(totalYRotationSteps);
       for (uint32_t firstIndex = verticesCount - 2 * (_totalYRotationSteps + 1);
            (firstIndex + _totalYRotationSteps + 2) < verticesCount; ++firstIndex) {
-        if (zRotationStep > 1u) {
-          indices.emplace_back((firstIndex));
-          indices.emplace_back((firstIndex + 1));
-          indices.emplace_back(firstIndex + _totalYRotationSteps + 1);
+        if (dedupTopBottomIndices) {
+          if (zRotationStep > 1u) {
+            indices.emplace_back((firstIndex));
+            indices.emplace_back((firstIndex + 1));
+            indices.emplace_back(firstIndex + _totalYRotationSteps + 1);
+          }
+          if (zRotationStep < totalZRotationSteps || slice < 1.f) {
+            indices.emplace_back((firstIndex + _totalYRotationSteps + 1));
+            indices.emplace_back((firstIndex + 1));
+            indices.emplace_back((firstIndex + _totalYRotationSteps + 2));
+          }
         }
-        if (zRotationStep < totalZRotationSteps || slice < 1.f) {
-          indices.emplace_back((firstIndex + _totalYRotationSteps + 1));
-          indices.emplace_back((firstIndex + 1));
-          indices.emplace_back((firstIndex + _totalYRotationSteps + 2));
+        else {
+          indices.emplace_back(firstIndex);
+          indices.emplace_back(firstIndex + 1);
+          indices.emplace_back(firstIndex + totalYRotationSteps + 1);
+
+          indices.emplace_back(firstIndex + totalYRotationSteps + 1);
+          indices.emplace_back(firstIndex + 1);
+          indices.emplace_back(firstIndex + totalYRotationSteps + 2);
         }
       }
     }
@@ -3204,6 +3215,203 @@ std::unique_ptr<VertexData> VertexData::CreatePolyhedron(PolyhedronOptions& opti
     vertexData->colors = std::move(colors);
   }
   return vertexData;
+}
+
+std::unique_ptr<VertexData> VertexData::CreateCapsule(const ICreateCapsuleOptions& options)
+{
+  const auto subdivisions = std::max(options.subdivisions.value_or(2u), 1u);
+  const auto tessellation = std::max(options.tessellation.value_or(16u), 3u);
+  const auto height       = std::max(options.height.value_or(1.f), 0.f);
+  const auto radius       = std::max(options.radius.value_or(0.25f), 0.f);
+  const auto capDetail    = std::max(options.capSubdivisions.value_or(6u), 1u);
+
+  const auto radialSegments = tessellation;
+  const auto heightSegments = subdivisions;
+
+  const auto radiusTop    = std::max(options.radiusTop.value_or(radius), 0.f);
+  const auto radiusBottom = std::max(options.radiusBottom.value_or(radius), 0.f);
+
+  const auto heightMinusCaps = height - (radiusTop + radiusBottom);
+
+  const auto thetaStart  = 0.f;
+  const auto thetaLength = Math::PI2;
+
+  const auto capsTopSegments    = std::max(options.topCapSubdivisions.value_or(capDetail), 1u);
+  const auto capsBottomSegments = std::max(options.bottomCapSubdivisions.value_or(capDetail), 1u);
+
+  const auto alpha = std::acos((radiusBottom - radiusTop) / height);
+
+  IndicesArray indices;
+  Float32Array vertices;
+  Float32Array normals;
+  Float32Array uvs;
+
+  auto index = 0u;
+  std::vector<IndicesArray> indexArray;
+  auto halfHeight = heightMinusCaps * 0.5f;
+  const auto pi2  = Math::PI_2;
+
+  auto x = 0u, y = 0u;
+  auto normal = Vector3::Zero();
+  auto vertex = Vector3::Zero();
+
+  const auto cosAlpha = std::cos(alpha);
+  const auto sinAlpha = std::sin(alpha);
+
+  const auto cone_length
+    = Vector2(radiusTop * sinAlpha, halfHeight + radiusTop * cosAlpha)
+        .subtract(Vector2(radiusBottom * sinAlpha, -halfHeight + radiusBottom * cosAlpha))
+        .length();
+
+  // Total length for v texture coord
+  const auto vl = radiusTop * alpha + cone_length + radiusBottom * (pi2 - alpha);
+
+  auto v = 0.f;
+  for (y = 0; y <= capsTopSegments; y++) {
+
+    IndicesArray indexRow;
+
+    const auto a = pi2 - alpha * (y / capsTopSegments);
+
+    v += radiusTop * alpha / capsTopSegments;
+
+    const auto cosA = std::cos(a);
+    const auto sinA = std::sin(a);
+
+    // calculate the radius of the current row
+    const auto _radius = cosA * radiusTop;
+
+    for (x = 0; x <= radialSegments; x++) {
+      const auto u        = x / static_cast<float>(radialSegments);
+      const auto theta    = u * thetaLength + thetaStart;
+      const auto sinTheta = std::sin(theta);
+      const auto cosTheta = std::cos(theta);
+      // vertex
+      vertex.x = _radius * sinTheta;
+      vertex.y = halfHeight + sinA * radiusTop;
+      vertex.z = _radius * cosTheta;
+      stl_util::concat(vertices, {vertex.x, vertex.y, vertex.z});
+      // normal
+      normal.set(cosA * sinTheta, sinA, cosA * cosTheta);
+      stl_util::concat(normals, {normal.x, normal.y, normal.z});
+      // uv
+      stl_util::concat(uvs, {u, 1.f - v / vl});
+      // save index of vertex in respective row
+      indexRow.emplace_back(index);
+      // increase index
+      ++index;
+    }
+    // now save vertices of the row in our index array
+    indexArray.emplace_back(indexRow);
+  }
+
+  const auto cone_height
+    = (height - radiusTop - radiusBottom) + cosAlpha * radiusTop - cosAlpha * radiusBottom;
+  const auto slope = sinAlpha * (radiusBottom - radiusTop) / cone_height;
+
+  for (y = 1; y <= heightSegments; y++) {
+    IndicesArray indexRow;
+    v += cone_length / heightSegments;
+    // calculate the radius of the current row
+    const auto _radius = sinAlpha * (y * (radiusBottom - radiusTop) / heightSegments + radiusTop);
+    for (x = 0; x <= radialSegments; x++) {
+      const auto u        = x / static_cast<float>(radialSegments);
+      const auto theta    = u * thetaLength + thetaStart;
+      const auto sinTheta = std::sin(theta);
+      const auto cosTheta = std::cos(theta);
+      // vertex
+      vertex.x = _radius * sinTheta;
+      vertex.y = halfHeight + cosAlpha * radiusTop - y * cone_height / heightSegments;
+      vertex.z = _radius * cosTheta;
+      stl_util::concat(vertices, {vertex.x, vertex.y, vertex.z});
+      // normal
+      normal.set(sinTheta, slope, cosTheta).normalize();
+      stl_util::concat(normals, {normal.x, normal.y, normal.z});
+      // uv
+      stl_util::concat(uvs, {u, 1.f - v / vl});
+      // save index of vertex in respective row
+      indexRow.emplace_back(index);
+      // increase index
+      ++index;
+    }
+    // now save vertices of the row in our index array
+    indexArray.emplace_back(indexRow);
+  }
+
+  for (y = 1; y <= capsBottomSegments; y++) {
+    IndicesArray indexRow;
+    const auto a = (pi2 - alpha) - (Math::PI - alpha) * (y / capsBottomSegments);
+    v += radiusBottom * alpha / capsBottomSegments;
+    const auto cosA = std::cos(a);
+    const auto sinA = std::sin(a);
+    // calculate the radius of the current row
+    const auto _radius = cosA * radiusBottom;
+    for (x = 0; x <= radialSegments; x++) {
+      const auto u        = x / static_cast<float>(radialSegments);
+      const auto theta    = u * thetaLength + thetaStart;
+      const auto sinTheta = std::sin(theta);
+      const auto cosTheta = std::cos(theta);
+      // vertex
+      vertex.x = _radius * sinTheta;
+      vertex.y = -halfHeight + sinA * radiusBottom;
+      vertex.z = _radius * cosTheta;
+      stl_util::concat(vertices, {vertex.x, vertex.y, vertex.z});
+      // normal
+      normal.set(cosA * sinTheta, sinA, cosA * cosTheta);
+      stl_util::concat(normals, {normal.x, normal.y, normal.z});
+      // uv
+      stl_util::concat(uvs, {u, 1.f - v / vl});
+      // save index of vertex in respective row
+      indexRow.emplace_back(index);
+      // increase index
+      ++index;
+    }
+    // now save vertices of the row in our index array
+    indexArray.emplace_back(indexRow);
+  }
+  // generate indices
+  for (x = 0; x < radialSegments; x++) {
+    for (y = 0; y < capsTopSegments + heightSegments + capsBottomSegments; y++) {
+      // we use the index array to access the correct indices
+      const auto i1 = indexArray[y][x];
+      const auto i2 = indexArray[y + 1][x];
+      const auto i3 = indexArray[y + 1][x + 1];
+      const auto i4 = indexArray[y][x + 1];
+      // face one
+      indices.emplace_back(i1);
+      indices.emplace_back(i2);
+      indices.emplace_back(i4);
+      // face two
+      indices.emplace_back(i2);
+      indices.emplace_back(i3);
+      indices.emplace_back(i4);
+    }
+  }
+
+  std::reverse(indices.begin(), indices.end());
+
+  if (options.orientation && !options.orientation->equals(Vector3::Up())) {
+    Matrix m;
+    (options.orientation->copy().scale(Math::PI_2).cross(Vector3::Up()).toQuaternion())
+      .toRotationMatrix(m);
+    auto v = Vector3::Zero();
+    for (auto i = 0ull; i < vertices.size(); i += 3) {
+      v.set(vertices[i], vertices[i + 1], vertices[i + 2]);
+      Vector3::TransformCoordinatesToRef(v.copy(), m, v);
+      vertices[i]     = v.x;
+      vertices[i + 1] = v.y;
+      vertices[i + 2] = v.z;
+    }
+  }
+
+  // Result
+  auto vDat       = std::make_unique<VertexData>();
+  vDat->positions = std::move(vertices);
+  vDat->normals   = std::move(normals);
+  vDat->uvs       = std::move(uvs);
+  vDat->indices   = std::move(indices);
+
+  return vDat;
 }
 
 std::unique_ptr<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
