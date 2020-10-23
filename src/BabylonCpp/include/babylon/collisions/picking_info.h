@@ -97,7 +97,7 @@ public:
   /**
    * Id of the the submesh that was picked
    */
-  unsigned int subMeshId;
+  int subMeshId;
 
   /**
    * If a sprite was picked, this will be the sprite the pick collided with
