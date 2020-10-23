@@ -99,7 +99,7 @@ bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
   scene.clipPlane5 ? _addClipPlaneDefine("CLIPPLANE5") : _removeClipPlaneDefine("CLIPPLANE5");
   scene.clipPlane6 ? _addClipPlaneDefine("CLIPPLANE6") : _removeClipPlaneDefine("CLIPPLANE6");
 
-  if (!_colorShader->isReady()) {
+  if (!_colorShader->isReady(this)) {
     return false;
   }
 

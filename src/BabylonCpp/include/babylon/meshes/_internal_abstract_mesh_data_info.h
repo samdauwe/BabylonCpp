@@ -4,12 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/meshes/_facet_data_storage.h>
 
 namespace BABYLON {
 
-class Skeleton;
-using SkeletonPtr = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Skeleton)
 
 /**
  * @brief Hidden
@@ -30,6 +31,7 @@ struct BABYLON_SHARED_EXPORT _InternalAbstractMeshDataInfo {
   bool _isActiveIntermediate         = false;
   bool _onlyForInstancesIntermediate = false;
   bool _actAsRegularMesh             = false;
+  AbstractMeshPtr _currentLOD        = nullptr;
 }; // end of struct _InternalAbstractMeshDataInfo
 
 } // end of namespace BABYLON

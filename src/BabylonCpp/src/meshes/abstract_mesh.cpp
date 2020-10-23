@@ -1428,28 +1428,31 @@ bool AbstractMesh::_generatePointsArray()
 PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastCheck,
                                      const TrianglePickingPredicate& trianglePredicate,
                                      const std::optional<bool>& onlyBoundingInfo,
-                                     const std::optional<Matrix>& worldToUse,
-                                     bool /*skipBoundingInfo*/)
+                                     const std::optional<Matrix>& worldToUse, bool skipBoundingInfo)
 {
   const auto fastCheck = iFastCheck.value_or(true);
   PickingInfo pickingInfo;
-
   auto intersectionThreshold
     = getClassName() == "InstancedLinesMesh" || getClassName() == "LinesMesh" ?
         static_cast<LinesMesh*>(this)->intersectionThreshold :
         0.f;
   const auto& boundingInfo = _boundingInfo;
-  if (subMeshes.empty() || !boundingInfo
-      || !ray.intersectsSphere(boundingInfo->boundingSphere, intersectionThreshold)
-      || !ray.intersectsBox(boundingInfo->boundingBox, intersectionThreshold)) {
+
+  if (subMeshes.empty() || !boundingInfo) {
+    return pickingInfo;
+  }
+  if (!skipBoundingInfo
+      && (!ray.intersectsSphere(boundingInfo->boundingSphere, intersectionThreshold)
+          || !ray.intersectsBox(boundingInfo->boundingBox, intersectionThreshold))) {
     return pickingInfo;
   }
 
   if (onlyBoundingInfo && *onlyBoundingInfo) {
-    pickingInfo.hit        = true;
-    pickingInfo.pickedMesh = shared_from_base<AbstractMesh>();
-    pickingInfo.distance   = Vector3::Distance(ray.origin, boundingInfo->boundingSphere.center);
-    pickingInfo.subMeshId  = 0;
+    pickingInfo.hit        = skipBoundingInfo ? false : true;
+    pickingInfo.pickedMesh = skipBoundingInfo ? nullptr : shared_from_base<AbstractMesh>();
+    pickingInfo.distance
+      = skipBoundingInfo ? 0.f : Vector3::Distance(ray.origin, boundingInfo->boundingSphere.center);
+    pickingInfo.subMeshId = 0;
     return pickingInfo;
   }
 
@@ -1459,11 +1462,40 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
 
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
-  // Octrees
-  auto _subMeshes = _scene->getIntersectingSubMeshCandidates(this, ray);
-  auto len        = _subMeshes.size();
+  const auto _subMeshes = _scene->getIntersectingSubMeshCandidates(this, ray);
+  const auto len        = _subMeshes.size();
+
+  // Check if all submeshes are using a material that don't allow picking (point/lines rendering)
+  // if no submesh can be picked that way, then fallback to BBox picking
+  auto anySubmeshSupportIntersect = false;
   for (size_t index = 0; index < len; ++index) {
-    auto& subMesh = _subMeshes[index];
+    const auto& subMesh  = _subMeshes[index];
+    const auto& material = subMesh->getMaterial();
+    if (!material) {
+      continue;
+    }
+    if (!getIndices().empty()
+        && (material->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
+            || material->fillMode() == Constants::MATERIAL_TriangleFillMode
+            || material->fillMode() == Constants::MATERIAL_WireFrameFillMode
+            || material->fillMode() == Constants::MATERIAL_PointFillMode)) {
+      anySubmeshSupportIntersect = true;
+      break;
+    }
+  }
+
+  // no sub mesh support intersection, fallback to BBox that has already be done
+  if (!anySubmeshSupportIntersect) {
+    pickingInfo.hit        = true;
+    pickingInfo.pickedMesh = shared_from_base<AbstractMesh>();
+    pickingInfo.distance   = Vector3::Distance(ray.origin, boundingInfo->boundingSphere.center);
+    pickingInfo.subMeshId  = -1;
+    return pickingInfo;
+  }
+
+  // at least 1 submesh supports intersection, keep going
+  for (size_t index = 0; index < len; ++index) {
+    const auto& subMesh = _subMeshes[index];
 
     // Bounding test
     if (len > 1 && !subMesh->canIntersects(ray)) {

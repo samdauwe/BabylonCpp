@@ -2,15 +2,14 @@
 #define BABYLON_MESHES_LINE_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
-class InstancedLinesMesh;
-class ShaderMaterial;
-using ShaderMaterialPtr     = std::shared_ptr<ShaderMaterial>;
-using InstancedLinesMeshPtr = std::shared_ptr<InstancedLinesMesh>;
+FWD_CLASS_SPTR(InstancedLinesMesh)
+FWD_CLASS_SPTR(ShaderMaterial)
 
 /**
  * @brief Line mesh
