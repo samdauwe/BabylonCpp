@@ -76,6 +76,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , darkness{this, &ShadowGenerator::get_darkness, &ShadowGenerator::set_darkness}
     , transparencyShadow{this, &ShadowGenerator::get_transparencyShadow,
                          &ShadowGenerator::set_transparencyShadow}
+    , mapSize{this, &ShadowGenerator::get_mapSize, &ShadowGenerator::set_mapSize}
     , enableSoftTransparentShadow{false}
     , frustumEdgeFalloff{0.f}
     , forceBackFacesOnly{false}
@@ -464,6 +465,18 @@ void ShadowGenerator::set_transparencyShadow(bool value)
   setTransparencyShadow(value);
 }
 
+RenderTargetSize& ShadowGenerator::get_mapSize()
+{
+  return _mapSize;
+}
+
+void ShadowGenerator::set_mapSize(const RenderTargetSize& size)
+{
+  _mapSize = size;
+  _light->_markMeshesAsLightDirty();
+  recreateShadowMap();
+}
+
 ShadowGenerator& ShadowGenerator::setDarkness(float iDarkness)
 {
   if (iDarkness >= 1.f) {
@@ -807,7 +820,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
 
   effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
-  if (!material || subMesh->verticesCount == 0) {
+  if (!material || subMesh->verticesCount == 0 || subMesh->_renderId == scene->getRenderId()) {
     return;
   }
 
@@ -825,7 +838,18 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     = (engine->getCaps().instancedArrays)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty() || renderingMesh->hasThinInstances());
+  if (effectiveMesh->_internalAbstractMeshDataInfo._currentLOD != effectiveMesh) {
+    if (hardwareInstancedRendering) {
+      batch->renderSelf.erase(subMesh->_id);
+    }
+    else {
+      return;
+    }
+  }
+
   if (isReady(subMesh, hardwareInstancedRendering, isTransparent)) {
+    subMesh->_renderId = scene->getRenderId();
+
     const auto shadowDepthWrapper
       = renderingMesh->material() ? renderingMesh->material()->shadowDepthWrapper : nullptr;
 

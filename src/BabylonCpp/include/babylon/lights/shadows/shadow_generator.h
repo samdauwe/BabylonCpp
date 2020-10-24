@@ -513,6 +513,16 @@ protected:
   void set_transparencyShadow(bool value);
 
   /**
+   * @brief Gets the size of the texture what stores the shadows.
+   */
+  RenderTargetSize& get_mapSize();
+
+  /**
+   * @brief Sets the size of the texture what stores the shadows.
+   */
+  void set_mapSize(const RenderTargetSize& size);
+
+  /**
    * @brief Hiddden
    */
   virtual void _initializeGenerator();
@@ -678,6 +688,11 @@ public:
    * Gets or sets the ability to have transparent shadow
    */
   Property<ShadowGenerator, bool> transparencyShadow;
+
+  /**
+   * Gets or sets the size of the texture what stores the shadows
+   */
+  Property<ShadowGenerator, RenderTargetSize> mapSize;
 
   /**
    * Enables or disables shadows with varying strength based on the transparency
