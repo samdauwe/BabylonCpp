@@ -215,7 +215,7 @@ protected:
   //  clang-format on
   Texture(
     const std::string& url, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
-    bool noMipmap = false, bool invertY = true,
+    bool noMipmap = false, const std::optional<bool>& invertY = true,
     unsigned int samplingMode           = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError

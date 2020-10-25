@@ -116,11 +116,13 @@ protected:
    * @param samplingMode defines the sampling mode to use (default is
    * Texture.TRILINEAR_SAMPLINGMODE)
    * @param format defines the texture format to use (default is Engine.TEXTUREFORMAT_RGBA)
+   * @param invertY defines if the texture needs to be inverted on the y axis during loading
    */
   DynamicTexture(const std::string& name, const DynamicTextureOptions& options, Scene* scene,
                  bool generateMipMaps,
-                 unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
-                 unsigned int format       = Constants::TEXTUREFORMAT_RGBA);
+                 unsigned int samplingMode          = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                 unsigned int format                = Constants::TEXTUREFORMAT_RGBA,
+                 const std::optional<bool>& invertY = std::nullopt);
 
   /**
    * @brief Gets the current state of canRescale.

@@ -12,9 +12,9 @@ namespace BABYLON {
 
 DynamicTexture::DynamicTexture(const std::string& iName, const DynamicTextureOptions& options,
                                Scene* scene, bool generateMipMaps, unsigned int iSamplingMode,
-                               unsigned int format)
-    : Texture{nullptr, scene,   !generateMipMaps, true,  iSamplingMode,
-              nullptr, nullptr, std::nullopt,     false, format}
+                               unsigned int format, const std::optional<bool>& invertY)
+    : Texture{nullptr, scene,   !generateMipMaps, invertY, iSamplingMode,
+              nullptr, nullptr, std::nullopt,     false,   format}
     , canRescale{this, &DynamicTexture::get_canRescale}
     , _generateMipMaps{generateMipMaps}
 {

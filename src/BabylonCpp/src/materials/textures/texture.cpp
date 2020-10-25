@@ -21,7 +21,8 @@ bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
   const std::string& iUrl, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
-  bool iNoMipmap, bool invertY, unsigned int samplingMode, const std::function<void()>& onLoad,
+  bool iNoMipmap, const std::optional<bool>& invertY, unsigned int samplingMode,
+  const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType,
@@ -70,7 +71,7 @@ Texture::Texture(
   name                 = iUrl;
   url                  = iUrl;
   _noMipmap            = iNoMipmap;
-  _invertY             = invertY;
+  _invertY             = invertY.value_or(true);
   _initialSamplingMode = samplingMode;
   _buffer              = buffer;
   _deleteBuffer        = deleteBuffer;
@@ -133,7 +134,7 @@ Texture::Texture(
 
   if (!_texture) {
     if (!scene || !scene->useDelayedTextureLoading) {
-      _texture = engine->createTexture(url, noMipmap, invertY, scene, samplingMode, _load, onError,
+      _texture = engine->createTexture(url, noMipmap, _invertY, scene, samplingMode, _load, onError,
                                        _buffer, nullptr, _format, "", mimeType, loaderOptions);
       if (deleteBuffer) {
         _buffer = std::nullopt;
