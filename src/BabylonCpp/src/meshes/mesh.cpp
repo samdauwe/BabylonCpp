@@ -4235,7 +4235,7 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource
   return meshSubclass;
 }
 
-void Mesh::addInstance(InstancedMesh* instance)
+void Mesh::addInstance(const InstancedMeshPtr& instance)
 {
   instance->_indexInSourceMeshInstanceArray = static_cast<int>(instances.size());
   instances.emplace_back(instance);

@@ -1842,7 +1842,7 @@ public:
   /**
    * @brief Hidden
    */
-  void addInstance(InstancedMesh* instance);
+  void addInstance(const InstancedMeshPtr& instance);
 
   /**
    * @brief Hidden
@@ -2081,7 +2081,7 @@ public:
    * change.
    * @see https://doc.babylonjs.com/how_to/how_to_use_instances
    */
-  std::vector<InstancedMesh*> instances;
+  std::vector<InstancedMeshPtr> instances;
 
   /**
    * true to use the edge renderer for all instances of this mesh

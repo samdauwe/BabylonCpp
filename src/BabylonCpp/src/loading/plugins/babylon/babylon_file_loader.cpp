@@ -21,6 +21,7 @@
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/hdr_cube_texture.h>
 #include <babylon/meshes/geometry.h>
+#include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
@@ -691,6 +692,11 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     for (const auto& parsedMesh : json_util::get_array<json>(parsedData, "meshes")) {
       auto mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
       container->meshes.emplace_back(mesh);
+      if (mesh->hasInstances()) {
+        for (const auto& instance : mesh->instances) {
+          container->meshes.emplace_back(instance);
+        }
+      }
       log << (index == 0 ? "\n\tMeshes:" : "");
       log << "\n\t\t" << mesh->toString(fullDetails);
       ++index;

@@ -19,8 +19,6 @@ InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
     , sourceMesh{this, &InstancedMesh::get_sourceMesh}
     , _currentLOD{nullptr}
 {
-  source->addInstance(this);
-
   _sourceMesh = source;
 
   _unIndexed = source->_unIndexed;
@@ -48,6 +46,13 @@ InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
 }
 
 InstancedMesh::~InstancedMesh() = default;
+
+void InstancedMesh::addInstanceToSourceMesh(const InstancedMeshPtr& instancedMesh)
+{
+  if (_sourceMesh && instancedMesh) {
+    _sourceMesh->addInstance(instancedMesh);
+  }
+}
 
 void InstancedMesh::syncSubMeshes(const InstancedMeshPtr& instancedMesh)
 {

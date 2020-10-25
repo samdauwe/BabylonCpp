@@ -21,6 +21,7 @@ public:
   static InstancedMeshPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<InstancedMesh>(new InstancedMesh(std::forward<Ts>(args)...));
+    mesh->addInstanceToSourceMesh(mesh);
     mesh->addToScene(mesh);
     mesh->syncSubMeshes(mesh);
 
@@ -28,6 +29,7 @@ public:
   }
   ~InstancedMesh() override; // = default
 
+  void addInstanceToSourceMesh(const InstancedMeshPtr& instancedMesh);
   void syncSubMeshes(const InstancedMeshPtr& instancedMesh);
 
   /**
