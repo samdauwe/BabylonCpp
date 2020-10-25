@@ -52,7 +52,7 @@ void _DDSTextureLoader::loadCubeData(
     }
   }
 
-  engine->_setCubeMapTextureParams(loadMipmap);
+  engine->_setCubeMapTextureParams(texture, loadMipmap);
   texture->isReady = true;
 
   if (onLoad) {
@@ -101,7 +101,7 @@ void _DDSTextureLoader::loadCubeData(
     }
   }
 
-  engine->_setCubeMapTextureParams(loadMipmap);
+  engine->_setCubeMapTextureParams(texture, loadMipmap);
   texture->isReady = true;
   texture->onLoadedObservable.notifyObservers(texture.get());
   texture->onLoadedObservable.clear();

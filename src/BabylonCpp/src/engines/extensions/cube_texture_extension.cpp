@@ -69,7 +69,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension, bool createPolynomials, float lodScale,
-  float lodOffset, const InternalTexturePtr& fallback)
+  float lodOffset, const InternalTexturePtr& fallback, const LoaderOptionsPtr& loaderOptions)
 {
   auto texture    = fallback ? fallback : InternalTexture::New(_this, InternalTextureSource::Cube);
   texture->isCube = true;
@@ -116,7 +116,8 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
       BABYLON_LOGF_WARN("CubeTextureExtension", "Failed to load %s, falling back to the %s",
                         rootUrl.c_str(), originalRootUrl.c_str())
       createCubeTexture(originalRootUrl, scene, files, noMipmap, onLoad, onError, format,
-                        forcedExtension, createPolynomials, lodScale, lodOffset, texture);
+                        forcedExtension, createPolynomials, lodScale, lodOffset, texture,
+                        loaderOptions);
     }
   };
 
@@ -179,7 +180,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
           _this->_gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
         }
 
-        _setCubeMapTextureParams(!noMipmap);
+        _setCubeMapTextureParams(texture, !noMipmap);
 
         texture->width   = width;
         texture->height  = height;
@@ -225,7 +226,8 @@ void CubeTextureExtension::_cascadeLoadImgs(
   }
 }
 
-void CubeTextureExtension::_setCubeMapTextureParams(bool loadMipmap)
+void CubeTextureExtension::_setCubeMapTextureParams(const InternalTexturePtr& texture,
+                                                    bool loadMipmap)
 {
   auto& gl = *_this->_gl;
   gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
@@ -233,6 +235,8 @@ void CubeTextureExtension::_setCubeMapTextureParams(bool loadMipmap)
                    loadMipmap ? GL::LINEAR_MIPMAP_LINEAR : GL::LINEAR);
   gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
   gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+  texture->samplingMode
+    = loadMipmap ? Constants::TEXTURE_TRILINEAR_SAMPLINGMODE : Constants::TEXTURE_LINEAR_LINEAR;
 
   _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 }

@@ -2,14 +2,15 @@
 #define BABYLON_MATERIALS_TEXTURES_CUBE_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
 
-class CubeTexture;
 struct CubeTextureData;
-using CubeTexturePtr = std::shared_ptr<CubeTexture>;
+FWD_CLASS_SPTR(CubeTexture)
+FWD_STRUCT_SPTR(LoaderOptions)
 
 /**
  * @brief Class for creating a cube texture.
@@ -126,6 +127,7 @@ protected:
    * level used for IBL according to the roughness
    * @param lodOffset defines the offset applied to environment texture. This manages first LOD
    * level used for IBL according to the roughness
+   * @param loaderOptions options to be passed to the loader
    * @return the cube texture
    */
   CubeTexture(
@@ -137,7 +139,7 @@ protected:
     = nullptr,
     unsigned int format = Constants::TEXTUREFORMAT_RGBA, bool prefiltered = false,
     const std::string& forcedExtension = "", bool createPolynomials = false, float lodScale = 0.8f,
-    float lodOffset = 0.f);
+    float lodOffset = 0.f, const LoaderOptionsPtr& loaderOptions = nullptr);
 
   /**
    * @brief Gets or sets the size of the bounding box associated with the cube
@@ -213,6 +215,7 @@ private:
   std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _format;
   bool _createPolynomials;
+  LoaderOptionsPtr _loaderOptions;
   float _lodScale;
   float _lodOffset;
 

@@ -3816,11 +3816,11 @@ InternalTexturePtr ThinEngine::createCubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension, bool createPolynomials, float lodScale,
-  float lodOffset, const InternalTexturePtr& fallback)
+  float lodOffset, const InternalTexturePtr& fallback, const LoaderOptionsPtr& loaderOptions)
 {
   return _cubeTextureExtension->createCubeTexture(rootUrl, scene, files, noMipmap, onLoad, onError,
                                                   format, forcedExtension, createPolynomials,
-                                                  lodScale, lodOffset, fallback);
+                                                  lodScale, lodOffset, fallback, loaderOptions);
 }
 
 void ThinEngine::_cascadeLoadImgs(
@@ -3832,9 +3832,9 @@ void ThinEngine::_cascadeLoadImgs(
   _cubeTextureExtension->_cascadeLoadImgs(rootUrl, scene, onfinish, files, onError);
 }
 
-void ThinEngine::_setCubeMapTextureParams(bool loadMipmap)
+void ThinEngine::_setCubeMapTextureParams(const InternalTexturePtr& texture, bool loadMipmap)
 {
-  _cubeTextureExtension->_setCubeMapTextureParams(loadMipmap);
+  _cubeTextureExtension->_setCubeMapTextureParams(texture, loadMipmap);
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -50,7 +50,7 @@ void _KTXTextureLoader::loadCubeData(
   texture->width  = static_cast<int>(ktx.pixelWidth);
   texture->height = static_cast<int>(ktx.pixelHeight);
 
-  engine->_setCubeMapTextureParams(loadMipmap);
+  engine->_setCubeMapTextureParams(texture, loadMipmap);
   texture->isReady = true;
   texture->onLoadedObservable.notifyObservers(texture.get());
   texture->onLoadedObservable.clear();

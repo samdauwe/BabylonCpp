@@ -50,7 +50,7 @@ CubeTexture::CubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, bool prefiltered, const std::string& forcedExtension, bool createPolynomials,
-  float lodScale, float lodOffset)
+  float lodScale, float lodOffset, const LoaderOptionsPtr& loaderOptions)
     : BaseTexture{sceneOrEngine}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
@@ -73,6 +73,7 @@ CubeTexture::CubeTexture(
   _extensions        = extensions;
   _files             = iFiles;
   _forcedExtension   = forcedExtension;
+  _loaderOptions     = loaderOptions;
 
   if (rootUrl.empty() && iFiles.empty()) {
     return;
@@ -137,9 +138,9 @@ CubeTexture::CubeTexture(
                                                               forcedExtension, _createPolynomials);
       }
       else {
-        _texture
-          = _getEngine()->createCubeTexture(rootUrl, scene, _files, noMipmap, onLoad, onError,
-                                            _format, forcedExtension, false, lodScale, lodOffset);
+        _texture = _getEngine()->createCubeTexture(rootUrl, scene, _files, noMipmap, onLoad,
+                                                   onError, _format, forcedExtension, false,
+                                                   lodScale, lodOffset, nullptr, loaderOptions);
       }
       _texture->onLoadedObservable.add(
         [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
@@ -248,7 +249,8 @@ void CubeTexture::delayLoad(const std::string& forcedExtension)
     }
     else {
       _texture = _getEngine()->createCubeTexture(url, scene, _files, _noMipmap, _delayedOnLoad,
-                                                 nullptr, _format, forcedExtension);
+                                                 nullptr, _format, forcedExtension, false, 0, 0,
+                                                 nullptr, _loaderOptions);
     }
     _texture->onLoadedObservable.add(
       [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {

@@ -1235,6 +1235,7 @@ public:
    * level used for IBL according to the roughness
    * @param fallback defines texture to use while falling back when (compressed) texture file not
    * found.
+   * @param loaderOptions options to be passed to the loader
    * @returns the cube texture as an InternalTexture
    */
   InternalTexturePtr createCubeTexture(
@@ -1244,7 +1245,7 @@ public:
     = nullptr,
     unsigned int format = 0, const std::string& forcedExtension = "",
     bool createPolynomials = false, float lodScale = 0.f, float lodOffset = 0.f,
-    const InternalTexturePtr& fallback = nullptr);
+    const InternalTexturePtr& fallback = nullptr, const LoaderOptionsPtr& loaderOptions = nullptr);
 
   /**
    * @brief Hidden
@@ -1259,7 +1260,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _setCubeMapTextureParams(bool loadMipmap);
+  void _setCubeMapTextureParams(const InternalTexturePtr& texture, bool loadMipmap);
 
   //------------------------------------------------------------------------------------------------
   //                              Dynamic Buffer Extension
