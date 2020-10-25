@@ -79,7 +79,7 @@ public:
    * @param type Texture type
    * @return The index
    */
-  unsigned int getIndex(unsigned int type);
+  int getIndex(unsigned int type);
 
   /**
    * @brief Marks the prepass renderer as dirty, triggering a check if the prepass is necessary for

@@ -1330,7 +1330,7 @@ std::optional<PickedParticle> SolidParticleSystem::pickedParticle(const PickingI
     const auto faceId  = pickingInfo.faceId != -1 ? static_cast<size_t>(pickingInfo.faceId) :
                                                    pickedBySubMesh[subMesh].size();
     const auto& picked = pickedBySubMesh;
-    if (subMesh < picked.size() && faceId < picked[subMesh].size()) {
+    if (subMesh < static_cast<int>(picked.size()) && faceId < picked[subMesh].size()) {
       return picked[subMesh][faceId];
     }
   }

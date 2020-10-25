@@ -1,5 +1,6 @@
 #include <babylon/postprocesses/motion_blur_post_process.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -7,15 +8,15 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
+#include <babylon/rendering/motion_blur_configuration.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 
 namespace BABYLON {
 
-MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* scene,
-                                             const std::variant<float, PostProcessOptions>& options,
-                                             const CameraPtr& camera,
-                                             const std::optional<unsigned int>& samplingMode,
-                                             Engine* engine, bool reusable,
-                                             unsigned int textureType, bool blockCompilation)
+MotionBlurPostProcess::MotionBlurPostProcess(
+  const std::string& iName, Scene* scene, const std::variant<float, PostProcessOptions>& options,
+  const CameraPtr& camera, const std::optional<unsigned int>& samplingMode, Engine* engine,
+  bool reusable, unsigned int textureType, bool blockCompilation, bool forceGeometryBuffer)
     : PostProcess{iName,
                   "motionBlur",
                   {"motionStrength", "motionScale", "screenSize"},
@@ -34,21 +35,33 @@ MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* sc
     , motionBlurSamples{this, &MotionBlurPostProcess::get_motionBlurSamples,
                         &MotionBlurPostProcess::set_motionBlurSamples}
     , _motionBlurSamples{32}
+    , _forceGeometryBuffer{false}
     , _geometryBufferRenderer{nullptr}
+    , _prePassRenderer{nullptr}
 {
-  _geometryBufferRenderer = scene->enableGeometryBufferRenderer();
+  _forceGeometryBuffer = forceGeometryBuffer;
 
-  if (!_geometryBufferRenderer) {
-    // Geometry buffer renderer is not supported. So, work as a passthrough.
+  // Set up assets
+  if (_forceGeometryBuffer) {
+    _geometryBufferRenderer = scene->enableGeometryBufferRenderer();
+    if (_geometryBufferRenderer) {
+      _geometryBufferRenderer->enableVelocity = true;
+    }
+  }
+  else {
+    _prePassRenderer = scene->enablePrePassRenderer();
+    _prePassRenderer->markAsDirty();
+    _prePassEffectConfiguration = std::make_shared<MotionBlurConfiguration>();
+  }
+
+  if (!_geometryBufferRenderer && !_prePassRenderer) {
+    // We can't get a velocity texture. So, work as a passthrough.
     BABYLON_LOG_WARN("MotionBlurPostProcess",
                      "Multiple Render Target support needed to compute object "
                      "based motion blur")
     updateEffect();
   }
   else {
-    // Geometry buffer renderer is supported.
-    _geometryBufferRenderer->enableVelocity = true;
-
     onApply = [this, scene](Effect* effect, EventState & /*es*/) -> void {
       effect->setVector2("screenSize",
                          Vector2(static_cast<float>(width), static_cast<float>(height)));
@@ -66,6 +79,15 @@ MotionBlurPostProcess::MotionBlurPostProcess(const std::string& iName, Scene* sc
             const auto& texture = textures.at(_velocityIndex);
             effect->setTexture("velocitySampler", texture);
           }
+        }
+      }
+      else {
+        const auto velocityIndex
+          = _geometryBufferRenderer->getTextureIndex(Constants::PREPASS_VELOCITY_TEXTURE_TYPE);
+        if (velocityIndex > 0) {
+          const auto _velocityIndex = static_cast<unsigned>(velocityIndex);
+          effect->setTexture("velocitySampler",
+                             _prePassRenderer->prePassRT->textures()[_velocityIndex]);
         }
       }
     };
@@ -95,18 +117,39 @@ void MotionBlurPostProcess::set_motionBlurSamples(unsigned int iSamples)
 
 void MotionBlurPostProcess::excludeSkinnedMesh(const AbstractMeshPtr& skinnedMesh)
 {
-  if (_geometryBufferRenderer && skinnedMesh->skeleton()) {
-    _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.emplace_back(skinnedMesh);
+  if (skinnedMesh->skeleton()) {
+    std::vector<AbstractMeshPtr>* list = nullptr;
+    if (_geometryBufferRenderer) {
+      list = &_geometryBufferRenderer->excludedSkinnedMeshesFromVelocity;
+    }
+    else if (_prePassRenderer) {
+      list = &_prePassRenderer->excludedSkinnedMesh;
+    }
+    else {
+      return;
+    }
+    list->emplace_back(skinnedMesh);
   }
 }
 
 void MotionBlurPostProcess::removeExcludedSkinnedMesh(const AbstractMeshPtr& skinnedMesh)
 {
-  if (_geometryBufferRenderer && skinnedMesh->skeleton()) {
-    _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.erase(
-      std::remove(_geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.begin(),
-                  _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.end(), skinnedMesh),
-      _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.end());
+  if (skinnedMesh->skeleton()) {
+    std::vector<AbstractMeshPtr>* list = nullptr;
+    if (_geometryBufferRenderer) {
+      list = &_geometryBufferRenderer->excludedSkinnedMeshesFromVelocity;
+    }
+    else if (_prePassRenderer) {
+      list = &_prePassRenderer->excludedSkinnedMesh;
+    }
+    else {
+      return;
+    }
+
+    const auto index = stl_util::index_of(*list, skinnedMesh);
+    if (index != -1) {
+      stl_util::splice(*list, index, 1);
+    }
   }
 }
 

@@ -2,30 +2,30 @@
 #define BABYLON_POSTPROCESSES_MOTION_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class GeometryBufferRenderer;
-class MotionBlurPostProcess;
-using AbstractMeshPtr           = std::shared_ptr<AbstractMesh>;
-using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
-using MotionBlurPostProcessPtr  = std::shared_ptr<MotionBlurPostProcess>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(GeometryBufferRenderer)
+FWD_CLASS_SPTR(MotionBlurPostProcess)
 
+// clang-format off
 /**
  * @brief The Motion Blur Post Process which blurs an image based on the objects velocity in scene.
- * Velocity can be affected by each object's rotation, position and scale depending on the
- * transformation speed. As an example, all you have to do is to create the post-process: var mb =
- * new BABYLON.MotionBlurPostProcess( 'mb', // The name of the effect. scene, // The scene
- * containing the objects to blur according to their velocity. 1.0, // The required width/height
- * ratio to downsize to before computing the render pass. camera // The camera to apply the render
- * pass to.
+ * Velocity can be affected by each object's rotation, position and scale depending on the transformation speed.
+ * As an example, all you have to do is to create the post-process:
+ *  var mb = new BABYLON.MotionBlurPostProcess(
+ *      'mb', // The name of the effect.
+ *      scene, // The scene containing the objects to blur according to their velocity.
+ *      1.0, // The required width/height ratio to downsize to before computing the render pass.
+ *      camera // The camera to apply the render pass to.
  * );
- * Then, all objects moving, rotating and/or scaling will be blurred depending on the transformation
- * speed.
+ * Then, all objects moving, rotating and/or scaling will be blurred depending on the transformation speed.
  */
+// clang-format on
 class BABYLON_SHARED_EXPORT MotionBlurPostProcess : public PostProcess {
 
 public:
@@ -88,6 +88,8 @@ protected:
    * @param textureType Type of textures used when performing the post process. (default: 0)
    * @param blockCompilation If compilation of the shader should not be done in the constructor. The
    * updateEffect method can be used to compile the shader at a later time. (default: false)
+   * @param forceGeometryBuffer If this post process should use geometry buffer instead of prepass
+   * (default: false)
    */
   MotionBlurPostProcess(const std::string& name, Scene* scene,
                         const std::variant<float, PostProcessOptions>& options,
@@ -95,7 +97,7 @@ protected:
                         const std::optional<unsigned int>& samplingMode = std::nullopt,
                         Engine* engine = nullptr, bool reusable = false,
                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                        bool blockCompilation    = false);
+                        bool blockCompilation = false, bool forceGeometryBuffer = false);
   /**
    * @brief Gets the number of iterations are used for motion blur quality.
    * Default value is equal to 32.
@@ -120,7 +122,9 @@ public:
 
 private:
   unsigned int _motionBlurSamples;
+  bool _forceGeometryBuffer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
+  PrePassRendererPtr _prePassRenderer;
 
 }; // end of class VRDistortionCorrectionPostProcess
 

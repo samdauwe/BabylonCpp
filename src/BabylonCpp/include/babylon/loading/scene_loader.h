@@ -159,9 +159,13 @@ public:
    * @param sceneFilename a string that defines the name of the scene file or starts with "data:"
    * following by the stringified version of the scene or a File object (default: empty string)
    * @param scene the instance of BABYLON.Scene to append to
+   * @param onSuccess a callback with a list of imported meshes, particleSystems, skeletons, and
+   * animationGroups when import succeeds
    * @param onProgress a callback with a progress event for each file being loaded
+   * @param onError a callback with the scene, a message, and possibly an exception when import
+   * fails
    * @param pluginExtension the extension used to determine the plugin
-   * @returns The loaded list of imported meshes, particle systems, skeletons, and animation groups
+   * @returns The loaded plugin
    */
   static std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> ImportMesh(
     const std::vector<std::string>& meshNames, std::string rootUrl, std::string sceneFilename,

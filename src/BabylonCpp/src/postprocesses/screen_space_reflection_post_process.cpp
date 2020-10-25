@@ -6,13 +6,15 @@
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
+#include <babylon/rendering/pre_pass_renderer.h>
+#include <babylon/rendering/screen_space_reflections_configuration.h>
 
 namespace BABYLON {
 
 ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
   const std::string& iName, Scene* scene, float options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable, unsigned int textureType,
-  bool blockCompilation)
+  bool blockCompilation, bool forceGeometryBuffer)
     : PostProcess{iName,
                   "screenSpaceReflection",
                   {"projection", "view", "threshold", "reflectionSpecularFalloffExponent",
@@ -39,40 +41,70 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
                         &ScreenSpaceReflectionPostProcess::set_reflectionSamples}
     , smoothSteps{this, &ScreenSpaceReflectionPostProcess::get_smoothSteps,
                   &ScreenSpaceReflectionPostProcess::set_smoothSteps}
+    , _forceGeometryBuffer{false}
     , _geometryBufferRenderer{nullptr}
+    , _prePassRenderer{nullptr}
     , _enableSmoothReflections{false}
     , _reflectionSamples{64}
     , _smoothSteps{5}
 {
-  // Get geometry buffer renderer and update effect
-  auto geometryBufferRenderer = scene->enableGeometryBufferRenderer();
-  if (geometryBufferRenderer) {
-    if (geometryBufferRenderer->isSupported()) {
-      geometryBufferRenderer->enablePosition     = true;
-      geometryBufferRenderer->enableReflectivity = true;
-      _geometryBufferRenderer                    = geometryBufferRenderer;
+  _forceGeometryBuffer = forceGeometryBuffer;
+
+  if (_forceGeometryBuffer) {
+    // Get geometry buffer renderer and update effect
+    auto geometryBufferRenderer = scene->enableGeometryBufferRenderer();
+    if (geometryBufferRenderer) {
+      if (geometryBufferRenderer->isSupported()) {
+        geometryBufferRenderer->enablePosition     = true;
+        geometryBufferRenderer->enableReflectivity = true;
+        _geometryBufferRenderer                    = geometryBufferRenderer;
+      }
     }
+  }
+  else {
+    _prePassRenderer = scene->enablePrePassRenderer();
+    _prePassRenderer->markAsDirty();
+    _prePassEffectConfiguration = std::make_shared<ScreenSpaceReflectionsConfiguration>();
   }
 
   _updateEffectDefines();
 
   // On apply, send uniforms
-  onApply = [this, geometryBufferRenderer, scene](Effect* effect, EventState&) -> void {
-    if (!geometryBufferRenderer) {
+  onApply = [this, scene](Effect* effect, EventState&) -> void {
+    const auto& geometryBufferRenderer = _geometryBufferRenderer;
+    const auto& prePassRenderer        = _prePassRenderer;
+
+    if (!prePassRenderer && !geometryBufferRenderer) {
       return;
     }
 
-    // Samplers
-    const auto positionIndex = static_cast<size_t>(
-      geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::POSITION_TEXTURE_TYPE));
-    const auto roughnessIndex = static_cast<size_t>(
-      geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE));
+    if (geometryBufferRenderer) {
+      // Samplers
+      const auto positionIndex = static_cast<size_t>(
+        geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::POSITION_TEXTURE_TYPE));
+      const auto roughnessIndex = static_cast<size_t>(
+        geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE));
 
-    effect->setTexture("normalSampler", geometryBufferRenderer->getGBuffer()->textures()[1]);
-    effect->setTexture("positionSampler",
-                       geometryBufferRenderer->getGBuffer()->textures()[positionIndex]);
-    effect->setTexture("reflectivitySampler",
-                       geometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
+      effect->setTexture("normalSampler", geometryBufferRenderer->getGBuffer()->textures()[1]);
+      effect->setTexture("positionSampler",
+                         geometryBufferRenderer->getGBuffer()->textures()[positionIndex]);
+      effect->setTexture("reflectivitySampler",
+                         geometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
+    }
+    else {
+      // Samplers
+      const auto positionIndex
+        = prePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
+      const auto roughnessIndex
+        = prePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
+      const auto normalIndex
+        = prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE);
+
+      effect->setTexture("normalSampler", prePassRenderer->prePassRT->textures()[normalIndex]);
+      effect->setTexture("positionSampler", prePassRenderer->prePassRT->textures()[positionIndex]);
+      effect->setTexture("reflectivitySampler",
+                         prePassRenderer->prePassRT->textures()[roughnessIndex]);
+    }
 
     // Uniforms
     auto camera = scene->activeCamera();
@@ -80,8 +112,8 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
       return;
     }
 
-    const auto viewMatrix       = camera->getViewMatrix();
-    const auto projectionMatrix = camera->getProjectionMatrix();
+    const auto& viewMatrix       = camera->getViewMatrix();
+    const auto& projectionMatrix = camera->getProjectionMatrix();
 
     effect->setMatrix("projection", projectionMatrix);
     effect->setMatrix("view", viewMatrix);
@@ -148,8 +180,11 @@ void ScreenSpaceReflectionPostProcess::set_smoothSteps(unsigned int steps)
 void ScreenSpaceReflectionPostProcess::_updateEffectDefines()
 {
   std::vector<std::string> defines;
-  if (_geometryBufferRenderer) {
+  if (_geometryBufferRenderer || _prePassRenderer) {
     defines.emplace_back("#define SSR_SUPPORTED");
+    if (_prePassRenderer) {
+      defines.emplace_back("#define PREPASS_LAYOUT");
+    }
   }
   if (_enableSmoothReflections) {
     defines.emplace_back("#define ENABLE_SMOOTH_REFLECTIONS");

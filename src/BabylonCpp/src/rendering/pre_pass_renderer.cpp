@@ -1,5 +1,6 @@
 #include <babylon/rendering/pre_pass_renderer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -236,9 +237,9 @@ PrePassRenderer::addEffectConfiguration(const PrePassEffectConfigurationPtr& cfg
   return cfg;
 }
 
-unsigned int PrePassRenderer::getIndex(unsigned int type)
+int PrePassRenderer::getIndex(unsigned int type)
 {
-  return _textureIndices[type];
+  return stl_util::contains(_textureIndices, type) ? _textureIndices[type] : -1;
 }
 
 void PrePassRenderer::_setState(bool iEnabled)

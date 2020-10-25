@@ -2,14 +2,13 @@
 #define BABYLON_POSTPROCESSES_SCREEN_SPACE_REFLECTION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class GeometryBufferRenderer;
-class ScreenSpaceReflectionPostProcess;
-using GeometryBufferRendererPtr           = std::shared_ptr<GeometryBufferRenderer>;
-using ScreenSpaceReflectionPostProcessPtr = std::shared_ptr<ScreenSpaceReflectionPostProcess>;
+FWD_CLASS_SPTR(GeometryBufferRenderer)
+FWD_CLASS_SPTR(ScreenSpaceReflectionPostProcess)
 
 /**
  * @brief The ScreenSpaceReflectionPostProcess performs realtime reflections using only and only the
@@ -56,12 +55,14 @@ protected:
    * @param textureType Type of textures used when performing the post process. (default: 0)
    * @param blockCompilation If compilation of the shader should not be done in the constructor. The
    * updateEffect method can be used to compile the shader at a later time. (default: false)
+   * @param forceGeometryBuffer If this post process should use geometry buffer instead of prepass
+   * (default: false)
    */
   ScreenSpaceReflectionPostProcess(const std::string& name, Scene* scene, float options,
                                    const CameraPtr& camera, unsigned int samplingMode = 0,
                                    Engine* engine = nullptr, bool reusable = false,
                                    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                                   bool blockCompilation    = false);
+                                   bool blockCompilation = false, bool forceGeometryBuffer = false);
 
   /**
    * @brief Gets wether or not smoothing reflections is enabled.
@@ -156,7 +157,9 @@ public:
   Property<ScreenSpaceReflectionPostProcess, unsigned int> smoothSteps;
 
 private:
+  bool _forceGeometryBuffer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
+  PrePassRendererPtr _prePassRenderer;
   bool _enableSmoothReflections;
   unsigned int _reflectionSamples;
   unsigned int _smoothSteps;
