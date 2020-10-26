@@ -3,13 +3,13 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/node.h>
 
 namespace BABYLON {
 
-class Bone;
 class Skeleton;
-using BonePtr = std::shared_ptr<Bone>;
+FWD_CLASS_SPTR(Bone)
 
 /**
  * @brief Class used to store bone information.
