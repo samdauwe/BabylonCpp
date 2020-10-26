@@ -7,6 +7,7 @@
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/misc/iinspectable.h>
@@ -16,20 +17,14 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Animatable;
 struct AnimationPropertiesOverride;
-class Bone;
-class IAnimatable;
-class RawTexture;
 class Scene;
-class Skeleton;
-using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
-using AnimationRangePtr = std::shared_ptr<AnimationRange>;
-using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
-using BonePtr           = std::shared_ptr<Bone>;
-using RawTexturePtr     = std::shared_ptr<RawTexture>;
-using SkeletonPtr       = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Bone)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(RawTexture)
+FWD_CLASS_SPTR(Skeleton)
 
 /**
  * @brief Class used to handle skinning animations.
