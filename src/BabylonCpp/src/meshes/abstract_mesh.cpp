@@ -1469,16 +1469,16 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
   // if no submesh can be picked that way, then fallback to BBox picking
   auto anySubmeshSupportIntersect = false;
   for (size_t index = 0; index < len; ++index) {
-    const auto& subMesh  = _subMeshes[index];
-    const auto& material = subMesh->getMaterial();
-    if (!material) {
+    const auto& subMesh   = _subMeshes[index];
+    const auto& iMaterial = subMesh->getMaterial();
+    if (!iMaterial) {
       continue;
     }
     if (!getIndices().empty()
-        && (material->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
-            || material->fillMode() == Constants::MATERIAL_TriangleFillMode
-            || material->fillMode() == Constants::MATERIAL_WireFrameFillMode
-            || material->fillMode() == Constants::MATERIAL_PointFillMode)) {
+        && (iMaterial->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
+            || iMaterial->fillMode() == Constants::MATERIAL_TriangleFillMode
+            || iMaterial->fillMode() == Constants::MATERIAL_WireFrameFillMode
+            || iMaterial->fillMode() == Constants::MATERIAL_PointFillMode)) {
       anySubmeshSupportIntersect = true;
       break;
     }

@@ -3394,13 +3394,13 @@ std::unique_ptr<VertexData> VertexData::CreateCapsule(const ICreateCapsuleOption
     Matrix m;
     (options.orientation->copy().scale(Math::PI_2).cross(Vector3::Up()).toQuaternion())
       .toRotationMatrix(m);
-    auto v = Vector3::Zero();
+    auto vector = Vector3::Zero();
     for (auto i = 0ull; i < vertices.size(); i += 3) {
-      v.set(vertices[i], vertices[i + 1], vertices[i + 2]);
-      Vector3::TransformCoordinatesToRef(v.copy(), m, v);
-      vertices[i]     = v.x;
-      vertices[i + 1] = v.y;
-      vertices[i + 2] = v.z;
+      vector.set(vertices[i], vertices[i + 1], vertices[i + 2]);
+      Vector3::TransformCoordinatesToRef(vector.copy(), m, vector);
+      vertices[i]     = vector.x;
+      vertices[i + 1] = vector.y;
+      vertices[i + 2] = vector.z;
     }
   }
 

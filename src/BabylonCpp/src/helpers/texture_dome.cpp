@@ -68,16 +68,16 @@ void TextureDome::initializeTextureDome(const std::string& iName,
   _mesh = Mesh::CreateSphere(name + "_mesh", *options.resolution, *options.size, scene, false,
                              Mesh::BACKSIDE);
   // configure material
-  auto material = (_material = BackgroundMaterial::New(name + "_material", scene));
-  material->useEquirectangularFOV = true;
-  material->fovMultiplier         = 1.f;
-  material->opacityFresnel        = false;
+  auto backgroundMaterial = (_material = BackgroundMaterial::New(name + "_material", scene));
+  backgroundMaterial->useEquirectangularFOV = true;
+  backgroundMaterial->fovMultiplier         = 1.f;
+  backgroundMaterial->opacityFresnel        = false;
 
   const auto iTexture = _initTexture(textureUrlOrElement, scene, options);
   texture             = iTexture;
 
   // configure mesh
-  _mesh->material = material;
+  _mesh->material = backgroundMaterial;
   _mesh->parent   = this;
 
   // create a (disabled until needed) mask to cover unneeded segments of 180 texture.

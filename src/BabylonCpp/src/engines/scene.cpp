@@ -1339,7 +1339,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1347,7 +1347,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1707,14 +1707,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -4703,11 +4703,11 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
         for (size_t index = 0; index < thinMatrices.size(); ++index) {
           auto& thinMatrix = thinMatrices[index];
           thinMatrix.multiplyToRef(world, tmpMatrix);
-          auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, tmpMatrix, iFastCheck,
-                                             onlyBoundingInfo, trianglePredicate, true);
+          auto iResult = _internalPickForMesh(pickingInfo, rayFunction, mesh, tmpMatrix, iFastCheck,
+                                              onlyBoundingInfo, trianglePredicate, true);
 
-          if (result) {
-            pickingInfo                    = result;
+          if (iResult) {
+            pickingInfo                    = iResult;
             pickingInfo->thinInstanceIndex = static_cast<int>(index);
 
             if (iFastCheck.value_or(false)) {
@@ -4765,12 +4765,12 @@ Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
         for (size_t index = 0; index < thinMatrices.size(); ++index) {
           auto& thinMatrix = thinMatrices[index];
           thinMatrix.multiplyToRef(world, tmpMatrix);
-          auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, tmpMatrix, false,
-                                             false, trianglePredicate, true);
+          auto iResult = _internalPickForMesh(std::nullopt, rayFunction, mesh, tmpMatrix, false,
+                                              false, trianglePredicate, true);
 
-          if (result) {
-            result->thinInstanceIndex = static_cast<int>(index);
-            pickingInfos.emplace_back(result);
+          if (iResult) {
+            iResult->thinInstanceIndex = static_cast<int>(index);
+            pickingInfos.emplace_back(iResult);
           }
         }
       }

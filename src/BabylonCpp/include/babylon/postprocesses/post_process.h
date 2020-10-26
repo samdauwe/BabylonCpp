@@ -28,7 +28,7 @@ FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
-FWD_STRUCT_SPTR(PrePassRenderer)
+FWD_CLASS_SPTR(PrePassRenderer)
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has been rendered

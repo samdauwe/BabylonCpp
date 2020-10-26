@@ -79,7 +79,7 @@ public:
     player2->position.y = -0.3f;
     player2->position.x = 1.f;
     player2->size       = 0.3f;
-    player2->invertU    = -1; // Change orientation
+    player2->invertU    = 1; // Change orientation
     player2->isPickable = true;
 
     // Picking
