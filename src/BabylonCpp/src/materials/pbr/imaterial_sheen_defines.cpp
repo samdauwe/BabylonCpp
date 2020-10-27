@@ -7,12 +7,19 @@ namespace BABYLON {
 IMaterialSheenDefines::IMaterialSheenDefines()
 {
   boolDef = {
-    {"SHEEN", false},                 //
-    {"SHEEN_TEXTURE", false},         //
-    {"SHEEN_TEXTUREDIRECTUV", false}, //
-    {"SHEEN_LINKWITHALBEDO", false},  //
-    {"SHEEN_ROUGHNESS", false},       //
-    {"SHEEN_ALBEDOSCALING", false},   //
+    {"SHEEN", false},                                //
+    {"SHEEN_TEXTURE", false},                        //
+    {"SHEEN_TEXTURE_ROUGHNESS", false},              //
+    {"SHEEN_LINKWITHALBEDO", false},                 //
+    {"SHEEN_ROUGHNESS", false},                      //
+    {"SHEEN_ALBEDOSCALING", false},                  //
+    {"SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE", false}, //
+    {"SHEEN_TEXTURE_ROUGHNESS_IDENTICAL", false},    //
+  };
+
+  intDef = {
+    {"SHEEN_TEXTUREDIRECTUV", 0},           //
+    {"SHEEN_TEXTURE_ROUGHNESSDIRECTUV", 0}, //
   };
 }
 
