@@ -40,9 +40,11 @@ void BoundingBoxRenderer::_register()
     SceneComponentConstants::STEP_BEFOREEVALUATEACTIVEMESH_BOUNDINGBOXRENDERER, this,
     [this]() { reset(); });
 
-  scene->_activeMeshStage.registerStep(
+#if 0
+  scene->_preAactiveMeshStage.registerStep(
     SceneComponentConstants::STEP_ACTIVEMESH_BOUNDINGBOXRENDERER, this,
     [this](AbstractMesh* sourceMesh, AbstractMesh* mesh) { _activeMesh(sourceMesh, mesh); });
+#endif
 
   scene->_evaluateSubMeshStage.registerStep(
     SceneComponentConstants::STEP_EVALUATESUBMESH_BOUNDINGBOXRENDERER, this,
