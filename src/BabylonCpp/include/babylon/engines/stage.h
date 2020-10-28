@@ -32,9 +32,9 @@ using MeshStageAction = std::function<bool(AbstractMesh* mesh, bool hardwareInst
 using EvaluateSubMeshStageAction = std::function<void(AbstractMesh* mesh, SubMesh* subMesh)>;
 
 /**
- * Strong typing of a Active Mesh related stage step action
+ * Strong typing of a pre active Mesh related stage step action
  */
-using ActiveMeshStageAction = std::function<void(AbstractMesh* sourceMesh, AbstractMesh* mesh)>;
+using PreActiveMeshStageAction = std::function<void(AbstractMesh* mesh)>;
 
 /**
  * Strong typing of a Camera related stage step action

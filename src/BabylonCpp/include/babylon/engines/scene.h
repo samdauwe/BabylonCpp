@@ -3358,7 +3358,7 @@ public:
    * Defines the actions happening during the active mesh stage
    * Hidden
    */
-  Stage<ActiveMeshStageAction> _activeMeshStage;
+  Stage<PreActiveMeshStageAction> _preActiveMeshStage;
 
   /**
    * Defines the actions happening during the per camera render target step

@@ -1339,7 +1339,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
+              static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1347,7 +1347,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1707,14 +1707,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -3641,8 +3641,8 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
     }
   }
 
-  for (const auto& step : _activeMeshStage) {
-    step.action(sourceMesh, mesh);
+  for (const auto& step : _preActiveMeshStage) {
+    step.action(mesh);
   }
 
   if (mesh && !mesh->subMeshes.empty()) {
@@ -4267,7 +4267,7 @@ void Scene::dispose()
   _isReadyForMeshStage.clear();
   _beforeEvaluateActiveMeshStage.clear();
   _evaluateSubMeshStage.clear();
-  _activeMeshStage.clear();
+  _preActiveMeshStage.clear();
   _cameraDrawRenderTargetStage.clear();
   _beforeCameraDrawStage.clear();
   _beforeRenderingGroupDrawStage.clear();
