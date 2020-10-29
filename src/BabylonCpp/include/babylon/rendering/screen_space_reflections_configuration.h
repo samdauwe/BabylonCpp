@@ -28,9 +28,9 @@ struct BABYLON_SHARED_EXPORT ScreenSpaceReflectionsConfiguration
   }
 
   /**
-   * Textures that should be present in the MRT for this effect to work
+   * @brief Textures that should be present in the MRT for this effect to work
    */
-  std::vector<uint32_t> texturesRequired()
+  std::vector<uint32_t> texturesRequired() const override
   {
     return {
       Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE,
