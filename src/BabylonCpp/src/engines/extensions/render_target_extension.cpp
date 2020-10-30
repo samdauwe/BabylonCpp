@@ -95,6 +95,8 @@ InternalTexturePtr RenderTargetExtension::createRenderTargetTexture(
 
   _this->_bindTextureDirectly(target, nullptr);
 
+  const auto currentFrameBuffer = _this->_currentFramebuffer;
+
   // Create the framebuffer
   auto framebuffer = gl.createFramebuffer();
   _this->_bindUnboundFramebuffer(framebuffer);
@@ -108,7 +110,7 @@ InternalTexturePtr RenderTargetExtension::createRenderTargetTexture(
                             texture->_webGLTexture.get(), 0);
   }
 
-  _this->_bindUnboundFramebuffer(nullptr);
+  _this->_bindUnboundFramebuffer(currentFrameBuffer);
   texture->_framebuffer           = std::move(framebuffer);
   texture->baseWidth              = width;
   texture->baseHeight             = height;
@@ -130,12 +132,15 @@ InternalTexturePtr RenderTargetExtension::createRenderTargetTexture(
 }
 
 InternalTexturePtr
-RenderTargetExtension::createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
+RenderTargetExtension::createDepthStencilTexture(const RenderTargetTextureSize& size,
                                                  const DepthTextureCreationOptions& options)
 {
   if (options.isCube.value_or(false)) {
-    auto width = std::holds_alternative<int>(size) ? std::get<int>(size) :
-                                                     std::get<RenderTargetSize>(size).width;
+    auto width = std::holds_alternative<int>(size) ?
+                   std::get<int>(size) :
+                   std::holds_alternative<RenderTargetSize>(size) ?
+                   std::get<RenderTargetSize>(size).width :
+                   static_cast<int>(std::holds_alternative<float>(size));
     return _this->_createDepthStencilCubeTexture(width, options);
   }
   else {
@@ -144,7 +149,7 @@ RenderTargetExtension::createDepthStencilTexture(const std::variant<int, RenderT
 }
 
 InternalTexturePtr
-RenderTargetExtension::_createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
+RenderTargetExtension::_createDepthStencilTexture(const RenderTargetTextureSize& size,
                                                   const DepthTextureCreationOptions& options)
 {
   auto& gl          = *_this->_gl;

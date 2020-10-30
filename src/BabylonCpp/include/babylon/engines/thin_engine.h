@@ -99,6 +99,13 @@ struct HostInformation {
 class BABYLON_SHARED_EXPORT ThinEngine {
 
 public:
+  /**
+   * Type used to define a render target texture size (either with a number or with a rect width and
+   * height)
+   */
+  using RenderTargetTextureSize = std::variant<int, RenderTargetSize, float>;
+
+public:
   static std::vector<IInternalTextureLoaderPtr> _TextureLoaders;
 
   /**
@@ -949,7 +956,7 @@ public:
    * @brief Hidden
    */
   void _setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
-                                 const std::variant<int, RenderTargetSize>& size,
+                                 const RenderTargetTextureSize& size,
                                  bool generateStencil, bool bilinearFiltering,
                                  int comparisonFunction);
 
@@ -1549,9 +1556,8 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  virtual InternalTexturePtr
-  createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
-                            const IRenderTargetOptions& options);
+  virtual InternalTexturePtr createRenderTargetTexture(const RenderTargetTextureSize& size,
+                                                       const IRenderTargetOptions& options);
 
   /**
    * @brief Creates a depth stencil texture.
@@ -1560,13 +1566,13 @@ public:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  InternalTexturePtr createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
+  InternalTexturePtr createDepthStencilTexture(const RenderTargetTextureSize& size,
                                                const DepthTextureCreationOptions& options);
 
   /**
    * @brief Hidden
    */
-  InternalTexturePtr _createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
+  InternalTexturePtr _createDepthStencilTexture(const RenderTargetTextureSize& size,
                                                 const DepthTextureCreationOptions& options);
 
   //------------------------------------------------------------------------------------------------
