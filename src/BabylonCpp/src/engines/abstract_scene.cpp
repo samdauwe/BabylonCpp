@@ -34,7 +34,10 @@ std::unordered_map<std::string, IndividualBabylonFileParser>
 AbstractScene::AbstractScene()
     : environmentTexture{this, &AbstractScene::get_environmentTexture,
                          &AbstractScene::set_environmentTexture}
+    , subSurfaceConfiguration{this, &AbstractScene::get_subSurfaceConfiguration,
+                              &AbstractScene::set_subSurfaceConfiguration}
     , _environmentTexture{nullptr}
+    , _subSurfaceConfiguration{nullptr}
 {
   _addIndividualParsers();
   _addParsers();
@@ -173,6 +176,24 @@ void AbstractScene::_addParsers()
           for (const auto& color :
                json_util::get_array<json>(parsedData, "ssDiffusionProfileColors")) {
             scene->prePassRenderer()->subSurfaceConfiguration->addDiffusionProfile(Color3(
+              json_util::get_number<float>(color, "r"), json_util::get_number<float>(color, "g"),
+              json_util::get_number<float>(color, "b")));
+          }
+        }
+      }
+    });
+  // Adds the parser to the scene parsers.
+  AbstractScene::AddParser(
+    SceneComponentConstants::NAME_SUBSURFACE,
+    [](const json& parsedData, Scene* scene, AssetContainer& /*container*/,
+       const std::string& /*rootUrl*/) {
+      // Diffusion profiles
+      if (json_util::has_valid_key_value(parsedData, "ssDiffusionProfileColors")) {
+        scene->enableSubSurfaceForPrePass();
+        if (scene->subSurfaceConfiguration()) {
+          for (const auto& color :
+               json_util::get_array<json>(parsedData, "ssDiffusionProfileColors")) {
+            scene->subSurfaceConfiguration()->addDiffusionProfile(Color3(
               json_util::get_number<float>(color, "r"), json_util::get_number<float>(color, "g"),
               json_util::get_number<float>(color, "b")));
           }
@@ -319,6 +340,15 @@ void AbstractScene::set_environmentTexture(const BaseTexturePtr& value)
   _environmentTexture = value;
 }
 
+SubSurfaceConfigurationPtr& AbstractScene::get_subSurfaceConfiguration()
+{
+  return _subSurfaceConfiguration;
+}
+
+void AbstractScene::set_subSurfaceConfiguration(const SubSurfaceConfigurationPtr& /*value*/)
+{
+}
+
 std::vector<NodePtr> AbstractScene::getNodes() const
 {
   std::vector<NodePtr> nodes;
@@ -340,6 +370,15 @@ std::vector<NodePtr> AbstractScene::getNodes() const
     }
   }
   return nodes;
+}
+
+SubSurfaceConfigurationPtr AbstractScene::enableSubSurfaceForPrePass()
+{
+  return nullptr;
+}
+
+void AbstractScene::disableSubSurfaceForPrePass()
+{
 }
 
 } // end of namespace BABYLON

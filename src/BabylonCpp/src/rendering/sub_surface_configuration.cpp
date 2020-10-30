@@ -5,7 +5,9 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/postprocesses/sub_surface_scattering_post_process.h>
+#include <babylon/rendering/sub_surface_scene_component.h>
 
 namespace BABYLON {
 
@@ -21,6 +23,13 @@ SubSurfaceConfiguration::SubSurfaceConfiguration(Scene* scene)
   // Adding default diffusion profile
   addDiffusionProfile(Color3(1.f, 1.f, 1.f));
   _scene = scene;
+
+  // Register the G Buffer component to the scene.
+  auto component = scene->_getComponent(SceneComponentConstants::NAME_SUBSURFACE);
+  if (!component) {
+    component = SubSurfaceSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
 }
 
 Float32Array& SubSurfaceConfiguration::get_ssDiffusionS()

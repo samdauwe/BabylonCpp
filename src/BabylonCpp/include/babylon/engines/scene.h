@@ -1820,6 +1820,17 @@ public:
    */
   void _renderMultiviewToSingleView(const CameraPtr& camera);
 
+  /**
+   * @brief Enables the subsurface effect for prepass.
+   * @returns the SubSurfaceConfiguration
+   */
+  SubSurfaceConfigurationPtr enableSubSurfaceForPrePass() override;
+
+  /**
+   * @brief Disables the subsurface effect for prepass
+   */
+  void disableSubSurfaceForPrePass() override;
+
 protected:
   /**
    * @brief Creates a new Scene.
@@ -2324,6 +2335,16 @@ protected:
    * (ie. the materials won't be updated if they are out of sync)
    */
   void set_blockMaterialDirtyMechanism(bool value);
+
+  /**
+   * @brief Gets the current prepass renderer associated to the scene.
+   */
+  SubSurfaceConfigurationPtr& get_subSurfaceConfiguration() override;
+
+  /**
+   * @brief Sets the current prepass renderer associated to the scene.
+   */
+  void set_subSurfaceConfiguration(const SubSurfaceConfigurationPtr& value) override;
 
 public:
   // Members

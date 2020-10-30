@@ -4465,6 +4465,20 @@ void Scene::set_blockMaterialDirtyMechanism(bool value)
   }
 }
 
+SubSurfaceConfigurationPtr& Scene::get_subSurfaceConfiguration()
+{
+  return _subSurfaceConfiguration;
+}
+
+void Scene::set_subSurfaceConfiguration(const SubSurfaceConfigurationPtr& value)
+{
+  if (value) {
+    if (enablePrePassRenderer()) {
+      _subSurfaceConfiguration = value;
+    }
+  }
+}
+
 void Scene::clearCachedVertexData()
 {
   for (const auto& abstractmesh : meshes) {
@@ -5440,6 +5454,32 @@ void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
       postProcessManager->_finalizeFrame(_activeCamera->isIntermediate);
     }
   }
+}
+
+SubSurfaceConfigurationPtr Scene::enableSubSurfaceForPrePass()
+{
+  if (_subSurfaceConfiguration) {
+    return _subSurfaceConfiguration;
+  }
+
+  const auto prePassRenderer = enablePrePassRenderer();
+  if (prePassRenderer) {
+    _subSurfaceConfiguration = std::make_shared<SubSurfaceConfiguration>(this);
+    prePassRenderer->addEffectConfiguration(_subSurfaceConfiguration);
+    return _subSurfaceConfiguration;
+  }
+
+  return nullptr;
+}
+
+void Scene::disableSubSurfaceForPrePass()
+{
+  if (!_subSurfaceConfiguration) {
+    return;
+  }
+
+  _subSurfaceConfiguration->dispose();
+  _subSurfaceConfiguration = nullptr;
 }
 
 } // end of namespace BABYLON

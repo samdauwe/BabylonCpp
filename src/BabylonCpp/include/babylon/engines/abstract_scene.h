@@ -1,4 +1,4 @@
-#ifndef BABYLON_ENGINES_ABSTRACT_SCENE_H
+﻿#ifndef BABYLON_ENGINES_ABSTRACT_SCENE_H
 #define BABYLON_ENGINES_ABSTRACT_SCENE_H
 
 #include <functional>
@@ -9,62 +9,39 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractActionManager;
-class AbstractMesh;
-class Animation;
-class AnimationGroup;
-class AssetContainer;
-class BaseTexture;
-class Camera;
-class EffectLayer;
-class Geometry;
-class GlowLayer;
-class HighlightLayer;
-class IParticleSystem;
-class Layer;
-class LensFlareSystem;
-class Light;
-class Material;
-class MorphTargetManager;
-class MultiMaterial;
-class Node;
-class PostProcess;
-class ProceduralTexture;
-class ReflectionProbe;
 class Scene;
-class Skeleton;
-class Sound;
-class TransformNode;
-using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
-using AbstractMeshPtr          = std::shared_ptr<AbstractMesh>;
-using AnimationPtr             = std::shared_ptr<Animation>;
-using AnimationGroupPtr        = std::shared_ptr<AnimationGroup>;
-using AssetContainerPtr        = std::shared_ptr<AssetContainer>;
-using BaseTexturePtr           = std::shared_ptr<BaseTexture>;
-using CameraPtr                = std::shared_ptr<Camera>;
-using EffectLayerPtr           = std::shared_ptr<EffectLayer>;
-using GeometryPtr              = std::shared_ptr<Geometry>;
-using GlowLayerPtr             = std::shared_ptr<GlowLayer>;
-using HighlightLayerPtr        = std::shared_ptr<HighlightLayer>;
-using IParticleSystemPtr       = std::shared_ptr<IParticleSystem>;
-using LayerPtr                 = std::shared_ptr<Layer>;
-using LensFlareSystemPtr       = std::shared_ptr<LensFlareSystem>;
-using LightPtr                 = std::shared_ptr<Light>;
-using MaterialPtr              = std::shared_ptr<Material>;
-using MorphTargetManagerPtr    = std::shared_ptr<MorphTargetManager>;
-using MultiMaterialPtr         = std::shared_ptr<MultiMaterial>;
-using NodePtr                  = std::shared_ptr<Node>;
-using PostProcessPtr           = std::shared_ptr<PostProcess>;
-using ProceduralTexturePtr     = std::shared_ptr<ProceduralTexture>;
-using ReflectionProbePtr       = std::shared_ptr<ReflectionProbe>;
-using SkeletonPtr              = std::shared_ptr<Skeleton>;
-using SoundPtr                 = std::shared_ptr<Sound>;
-using TransformNodePtr         = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(AbstractActionManager)
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Animation)
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(AssetContainer)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(EffectLayer)
+FWD_CLASS_SPTR(Geometry)
+FWD_CLASS_SPTR(GlowLayer)
+FWD_CLASS_SPTR(HighlightLayer)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(Layer)
+FWD_CLASS_SPTR(LensFlareSystem)
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(MorphTargetManager)
+FWD_CLASS_SPTR(MultiMaterial)
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(ProceduralTexture)
+FWD_CLASS_SPTR(ReflectionProbe)
+FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(Sound)
+FWD_CLASS_SPTR(SubSurfaceConfiguration)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * Defines how the parser contract is defined.
@@ -206,6 +183,17 @@ public:
    */
   std::vector<NodePtr> getNodes() const;
 
+  /**
+   * @brief Enables the subsurface effect for prepass.
+   * @returns the SubSurfaceConfiguration
+   */
+  virtual SubSurfaceConfigurationPtr enableSubSurfaceForPrePass();
+
+  /**
+   * @brief Disables the subsurface effect for prepass
+   */
+  virtual void disableSubSurfaceForPrePass();
+
 protected:
   /**
    * @brief Returns the environment texture for the scene.
@@ -216,6 +204,16 @@ protected:
    * @brief Sets the environment texture for the scene.
    */
   virtual void set_environmentTexture(const BaseTexturePtr& value);
+
+  /**
+   * @brief Gets the current prepass renderer associated to the scene.
+   */
+  virtual SubSurfaceConfigurationPtr& get_subSurfaceConfiguration();
+
+  /**
+   * @brief Sets the current prepass renderer associated to the scene.
+   */
+  virtual void set_subSurfaceConfiguration(const SubSurfaceConfigurationPtr& value);
 
 private:
   /**
@@ -367,9 +365,17 @@ public:
    */
   std::vector<PostProcessPtr> postProcesses;
 
+  /**
+   * Gets or Sets the current prepass renderer associated to the scene.
+   */
+  Property<AbstractScene, SubSurfaceConfigurationPtr> subSurfaceConfiguration;
+
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
+
+  /** @hidden (Backing field) */
+  SubSurfaceConfigurationPtr _subSurfaceConfiguration;
 
 private:
   /**
