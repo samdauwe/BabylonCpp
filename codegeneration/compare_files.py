@@ -143,8 +143,8 @@ def main():
         "precisionDate.ts", "promise.ts", "retryStrategy.ts",
         "sceneRecorder.ts", "sceneSerializer.ts", "screenshotTools.ts",
         "smartArray.ts", "stringDictionary.ts", "tags.ts", "timer.ts",
-        "typeStore.ts", "videoRecorder.ts", "virtualJoystick.ts",
-        "webRequest.ts", "workerPool.ts",
+        "trajectoryClassifier.ts", "typeStore.ts", "videoRecorder.ts",
+        "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
         # Physics / Plugins
