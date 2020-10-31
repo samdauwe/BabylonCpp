@@ -31,10 +31,12 @@ public:
   /**
    * @brief Returns the name of the configuration.
    */
-  std::string name() const override
-  {
-    return "subSurface";
-  }
+  std::string name() const override;
+
+  /**
+   * @brief Textures that should be present in the MRT for this effect to work.
+   */
+  std::vector<uint32_t> texturesRequired() const override;
 
   /**
    * @brief Adds a new diffusion profile.

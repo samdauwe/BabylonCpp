@@ -32,6 +32,21 @@ SubSurfaceConfiguration::SubSurfaceConfiguration(Scene* scene)
   }
 }
 
+std::string SubSurfaceConfiguration::name() const
+{
+  return SceneComponentConstants::NAME_SUBSURFACE;
+}
+
+std::vector<uint32_t> SubSurfaceConfiguration::texturesRequired() const
+{
+  return {
+    Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE, //
+    Constants::PREPASS_ALBEDO_TEXTURE_TYPE,      //
+    Constants::PREPASS_COLOR_TEXTURE_TYPE,       //
+    Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE,  //
+  };
+}
+
 Float32Array& SubSurfaceConfiguration::get_ssDiffusionS()
 {
   return _ssDiffusionS;
