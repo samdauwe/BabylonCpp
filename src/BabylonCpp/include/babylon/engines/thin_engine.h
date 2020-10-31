@@ -956,9 +956,8 @@ public:
    * @brief Hidden
    */
   void _setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
-                                 const RenderTargetTextureSize& size,
-                                 bool generateStencil, bool bilinearFiltering,
-                                 int comparisonFunction);
+                                 const RenderTargetTextureSize& size, bool generateStencil,
+                                 bool bilinearFiltering, int comparisonFunction);
 
   /**
    * @brief Hidden
@@ -1366,6 +1365,18 @@ public:
    * @param attachments gl attachments
    */
   void bindAttachments(const std::vector<unsigned int>& attachments);
+
+  /**
+   * @brief Creates a layout object to draw/clear on specific textures in a MRT.
+   * @param textureStatus textureStatus[i] indicates if the i-th is active
+   * @returns A layout to be fed to the engine, calling `bindAttachments`.
+   */
+  std::vector<unsigned int> buildTextureLayout(const std::vector<bool>& textureStatus) const;
+
+  /**
+   * @brief Restores the webgl state to only draw on the main color attachment.
+   */
+  void restoreSingleAttachment();
 
   //------------------------------------------------------------------------------------------------
   //                              Raw Texture Extension

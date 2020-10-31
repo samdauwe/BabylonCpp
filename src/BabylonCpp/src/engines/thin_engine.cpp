@@ -3907,6 +3907,17 @@ void ThinEngine::bindAttachments(const std::vector<unsigned int>& attachments)
   return _multiRenderExtension->bindAttachments(attachments);
 }
 
+std::vector<unsigned int>
+ThinEngine::buildTextureLayout(const std::vector<bool>& textureStatus) const
+{
+  return _multiRenderExtension->buildTextureLayout(textureStatus);
+}
+
+void ThinEngine::restoreSingleAttachment()
+{
+  return _multiRenderExtension->restoreSingleAttachment();
+}
+
 //--------------------------------------------------------------------------------------------------
 //                              Raw Texture Extension
 //--------------------------------------------------------------------------------------------------
