@@ -4,10 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
-#include <babylon/engines/iscene_serializable_component.h>
 #include <babylon/engines/scene_component_constants.h>
-
-using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -18,7 +15,7 @@ FWD_CLASS_SPTR(PrePassRendererSceneComponent)
  * @brief Defines the Geometry Buffer scene component responsible to manage a G-Buffer useful
  * in several rendering techniques.
  */
-class BABYLON_SHARED_EXPORT PrePassRendererSceneComponent : public ISceneSerializableComponent {
+class BABYLON_SHARED_EXPORT PrePassRendererSceneComponent : public ISceneComponent {
 
 public:
   /**
@@ -44,25 +41,6 @@ public:
    * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
-
-  /**
-   * @brief Serializes the component data to the specified json object.
-   * @param serializationObject The object to serialize to
-   */
-  void serialize(json& serializationObject) override;
-
-  /**
-   * @brief Adds all the elements from the container to the scene.
-   * @param container the container holding the elements
-   */
-  void addFromContainer(AbstractScene& container) override;
-
-  /**
-   * @brief Removes all the elements in the container from the scene.
-   * @param container contains the elements to remove
-   * @param dispose if the removed element should be disposed (default: false)
-   */
-  void removeFromContainer(AbstractScene& container, bool dispose = false) override;
 
   /**
    * @brief Disposes the component and the associated resources.

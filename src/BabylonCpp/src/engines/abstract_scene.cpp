@@ -164,24 +164,6 @@ void AbstractScene::_addParsers()
 
       loadedSounds.clear();
     });
-  // Pre-pass renderer parsers
-  AbstractScene::AddParser(
-    SceneComponentConstants::NAME_PREPASSRENDERER,
-    [](const json& parsedData, Scene* scene, AssetContainer& /*container*/,
-       const std::string& /*rootUrl*/) {
-      // Diffusion profiles
-      if (json_util::has_valid_key_value(parsedData, "ssDiffusionProfileColors")) {
-        scene->enablePrePassRenderer();
-        if (scene->prePassRenderer()) {
-          for (const auto& color :
-               json_util::get_array<json>(parsedData, "ssDiffusionProfileColors")) {
-            scene->prePassRenderer()->subSurfaceConfiguration->addDiffusionProfile(Color3(
-              json_util::get_number<float>(color, "r"), json_util::get_number<float>(color, "g"),
-              json_util::get_number<float>(color, "b")));
-          }
-        }
-      }
-    });
   // Adds the parser to the scene parsers.
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_SUBSURFACE,
