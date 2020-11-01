@@ -4154,18 +4154,20 @@ void Scene::set_headphone(const std::optional<bool>& value)
   }
 }
 
-DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera, bool storeNonLinearDepth)
+DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera, bool storeNonLinearDepth,
+                                            bool force32bitsFloat)
 {
   auto _camera = camera ? camera : _activeCamera;
   if (!_camera) {
     throw std::runtime_error("No camera available to enable depth renderer");
   }
   if (!stl_util::contains(_depthRenderer, _camera->id) || !_depthRenderer[_camera->id]) {
-    auto textureType = 0u;
-    if (_engine->getCaps().textureHalfFloatRender) {
+    const auto supportFullfloat = getEngine()->getCaps().textureFloatRender;
+    auto textureType            = 0u;
+    if (_engine->getCaps().textureHalfFloatRender && (!force32bitsFloat || !supportFullfloat)) {
       textureType = Constants::TEXTURETYPE_HALF_FLOAT;
     }
-    else if (_engine->getCaps().textureFloatRender) {
+    else if (supportFullfloat) {
       textureType = Constants::TEXTURETYPE_FLOAT;
     }
     else {

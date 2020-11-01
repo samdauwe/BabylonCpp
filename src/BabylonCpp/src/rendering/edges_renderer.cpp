@@ -328,8 +328,8 @@ void EdgesRenderer::_tessellateTriangle(
 
 void EdgesRenderer::_generateEdgesLinesAlternate()
 {
-  auto positions = _source->getVerticesData(VertexBuffer::PositionKind);
-  auto indices   = _source->getIndices();
+  const auto positions = _source->getVerticesData(VertexBuffer::PositionKind);
+  auto indices         = _source->getIndices();
 
   if (indices.empty() || positions.empty()) {
     return;
