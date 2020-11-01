@@ -21,12 +21,14 @@
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/rendering/geometry_buffer_renderer_scene_component.h>
+#include <babylon/rendering/pre_pass_renderer.h>
 
 namespace BABYLON {
 
 GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     : renderTransparentMeshes{true}
-    , renderList{this, &GeometryBufferRenderer::set_renderList}
+    , renderList{this, &GeometryBufferRenderer::get_renderList,
+                 &GeometryBufferRenderer::set_renderList}
     , isSupported{this, &GeometryBufferRenderer::get_isSupported}
     , enablePosition{this, &GeometryBufferRenderer::get_enablePosition,
                      &GeometryBufferRenderer::set_enablePosition}
@@ -47,6 +49,9 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _positionIndex{-1}
     , _velocityIndex{-1}
     , _reflectivityIndex{-1}
+    , _depthNormalIndex{-1}
+    , _linkedWithPrePass{false}
+    , _prePassRenderer{nullptr}
 {
   _scene = scene;
   _ratio = ratio;
@@ -65,6 +70,78 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
 
 GeometryBufferRenderer::~GeometryBufferRenderer() = default;
 
+void GeometryBufferRenderer::_linkPrePassRenderer(const PrePassRendererPtr& prePassRenderer)
+{
+  _linkedWithPrePass = true;
+  _prePassRenderer   = prePassRenderer;
+
+  if (_multiRenderTarget) {
+    // prevents clearing of the RT since it's done by prepass
+    _multiRenderTarget->onClearObservable.clear();
+    _multiRenderTarget->onClearObservable.add([](Engine* /*engine*/, EventState & /*es*/) -> void {
+      // pass
+    });
+  }
+}
+
+void GeometryBufferRenderer::_unlinkPrePassRenderer()
+{
+  _linkedWithPrePass = false;
+  _createRenderTargets();
+}
+
+void GeometryBufferRenderer::_resetLayout()
+{
+  _enablePosition     = false;
+  _enableReflectivity = false;
+  _enableVelocity     = false;
+  _attachments        = {};
+}
+
+void GeometryBufferRenderer::_forceTextureType(unsigned int geometryBufferType, int index)
+{
+  if (geometryBufferType == GeometryBufferRenderer::POSITION_TEXTURE_TYPE) {
+    _positionIndex  = index;
+    _enablePosition = true;
+  }
+  else if (geometryBufferType == GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE) {
+    _velocityIndex  = index;
+    _enableVelocity = true;
+  }
+  else if (geometryBufferType == GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE) {
+    _reflectivityIndex  = index;
+    _enableReflectivity = true;
+  }
+  else if (geometryBufferType == GeometryBufferRenderer::DEPTHNORMAL_TEXTURE_TYPE) {
+    _depthNormalIndex = index;
+  }
+}
+
+void GeometryBufferRenderer::_setAttachments(const std::vector<unsigned int>& attachments)
+{
+  _attachments = attachments;
+}
+
+void GeometryBufferRenderer::_linkInternalTexture(const InternalTexturePtr& internalTexture)
+{
+  _multiRenderTarget->_texture = internalTexture;
+}
+
+std::vector<AbstractMesh*>& GeometryBufferRenderer::get_renderList()
+{
+  return _multiRenderTarget->renderList();
+}
+
+void GeometryBufferRenderer::set_renderList(const std::vector<AbstractMesh*>& meshes)
+{
+  _multiRenderTarget->renderList = meshes;
+}
+
+bool GeometryBufferRenderer::get_isSupported() const
+{
+  return _multiRenderTarget->isSupported();
+}
+
 int GeometryBufferRenderer::getTextureIndex(unsigned int textureType)
 {
   switch (textureType) {
@@ -79,20 +156,6 @@ int GeometryBufferRenderer::getTextureIndex(unsigned int textureType)
   }
 }
 
-void GeometryBufferRenderer::set_renderList(const std::vector<MeshPtr>& meshes)
-{
-  _multiRenderTarget->renderList().clear();
-  _multiRenderTarget->renderList().reserve(meshes.size());
-  for (const auto& mesh : meshes) {
-    _multiRenderTarget->renderList().emplace_back(mesh.get());
-  }
-}
-
-bool GeometryBufferRenderer::get_isSupported() const
-{
-  return _multiRenderTarget->isSupported();
-}
-
 bool GeometryBufferRenderer::get_enablePosition() const
 {
   return _enablePosition;
@@ -101,8 +164,12 @@ bool GeometryBufferRenderer::get_enablePosition() const
 void GeometryBufferRenderer::set_enablePosition(bool enable)
 {
   _enablePosition = enable;
-  dispose();
-  _createRenderTargets();
+
+  // PrePass handles index and texture links
+  if (!_linkedWithPrePass) {
+    dispose();
+    _createRenderTargets();
+  }
 }
 
 bool GeometryBufferRenderer::get_enableVelocity() const
@@ -118,8 +185,10 @@ void GeometryBufferRenderer::set_enableVelocity(bool enable)
     _previousTransformationMatrices = {};
   }
 
-  dispose();
-  _createRenderTargets();
+  if (!_linkedWithPrePass) {
+    dispose();
+    _createRenderTargets();
+  }
 }
 
 bool GeometryBufferRenderer::get_enableReflectivity() const
@@ -130,8 +199,11 @@ bool GeometryBufferRenderer::get_enableReflectivity() const
 void GeometryBufferRenderer::set_enableReflectivity(bool enable)
 {
   _enableReflectivity = enable;
-  dispose();
-  _createRenderTargets();
+
+  if (!_linkedWithPrePass) {
+    dispose();
+    _createRenderTargets();
+  }
 }
 
 Scene*& GeometryBufferRenderer::get_scene()
@@ -201,6 +273,15 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     }
   }
 
+  // PrePass
+  if (_linkedWithPrePass) {
+    defines.emplace_back("#define PREPASS");
+    if (_depthNormalIndex != -1) {
+      defines.emplace_back("#define DEPTHNORMAL_INDEX " + std::to_string(_depthNormalIndex));
+      defines.emplace_back("#define PREPASS_DEPTHNORMAL");
+    }
+  }
+
   // Buffers
   if (_enablePosition) {
     defines.emplace_back("#define POSITION");
@@ -263,8 +344,13 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Setup textures count
-  defines.emplace_back("#define RENDER_TARGET_COUNT "
-                       + std::to_string(_multiRenderTarget->textures().size()));
+  if (_linkedWithPrePass) {
+    defines.emplace_back("#define RENDER_TARGET_COUNT " + std::to_string(_attachments.size()));
+  }
+  else {
+    defines.emplace_back("#define RENDER_TARGET_COUNT "
+                         + std::to_string(_multiRenderTarget->textures().size()));
+  }
 
   // Get correct effect
   auto join = StringTools::join(defines, '\n');
@@ -327,10 +413,8 @@ void GeometryBufferRenderer::dispose()
   getGBuffer()->dispose();
 }
 
-void GeometryBufferRenderer::_createRenderTargets()
+int GeometryBufferRenderer::_assignRenderTargetIndices()
 {
-  auto engine = _scene->getEngine();
-
   auto count = 2;
 
   if (_enablePosition) {
@@ -347,6 +431,14 @@ void GeometryBufferRenderer::_createRenderTargets()
     _reflectivityIndex = count;
     ++count;
   }
+
+  return count;
+}
+
+void GeometryBufferRenderer::_createRenderTargets()
+{
+  const auto engine = _scene->getEngine();
+  const auto count  = _assignRenderTargetIndices();
 
   // Render target
   IMultiRenderTargetOptions options;
@@ -390,6 +482,13 @@ void GeometryBufferRenderer::_createRenderTargets()
                      const std::vector<SubMesh*>& transparentSubMeshes,
                      const std::vector<SubMesh*>& depthOnlySubMeshes,
                      const std::function<void()>& /*beforeTransparents*/) {
+        if (_linkedWithPrePass) {
+          if (!_prePassRenderer->enabled()) {
+            return;
+          }
+          _scene->getEngine()->bindAttachments(_attachments);
+        }
+
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
