@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/layers/ieffect_layer_options.h>
 #include <babylon/maths/color4.h>
@@ -15,30 +16,20 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class BaseTexture;
-class Effect;
-class EffectLayer;
 class Engine;
-class Material;
-class Mesh;
-class PostProcess;
-class RenderTargetTexture;
 class Scene;
 class SubMesh;
-class VertexBuffer;
-class WebGLDataBuffer;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using EffectPtr              = std::shared_ptr<Effect>;
-using EffectLayerPtr         = std::shared_ptr<EffectLayer>;
-using MaterialPtr            = std::shared_ptr<Material>;
-using MeshPtr                = std::shared_ptr<Mesh>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using SubMeshPtr             = std::shared_ptr<SubMesh>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(EffectLayer)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(SubMesh)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 struct EmissiveTextureAndColor {
   BaseTexturePtr texture = nullptr;
