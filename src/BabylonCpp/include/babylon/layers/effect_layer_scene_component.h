@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
@@ -16,9 +17,8 @@ namespace BABYLON {
 class AbstractMesh;
 class AbstractScene;
 class Camera;
-class EffectLayerSceneComponent;
 class Engine;
-using EffectLayerSceneComponentPtr = std::shared_ptr<EffectLayerSceneComponent>;
+FWD_CLASS_SPTR(EffectLayerSceneComponent)
 
 /**
  * @brief Defines the layer scene component responsible to manage any effect layers in a given
