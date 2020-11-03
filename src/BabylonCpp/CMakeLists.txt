@@ -38,6 +38,10 @@ configure_file(options.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 #                       Create library                                         #
 # ============================================================================ #
 
+if (IOS)
+    set(BUILD_SHARED_LIBS OFF)
+endif()
+
 # Build library
 babylon_add_library_glob(${TARGET})
 
@@ -63,6 +67,10 @@ target_include_directories(${TARGET}
 )
 
 target_compile_definitions(${TARGET} PUBLIC BABYLON_REPO_FOLDER="${CMAKE_SOURCE_DIR}")
+
+if (IOS)
+    target_compile_definitions(${TARGET} PRIVATE GLES_SILENCE_DEPRECATION GLES3=1)
+endif()
 
 # ============================================================================ #
 #                        Include What You Use                                  #
