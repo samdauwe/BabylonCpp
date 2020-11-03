@@ -1,19 +1,27 @@
 option(BUILD_OGL43 "Build OpenGL 4.3 examples" OFF)
 mark_as_advanced(BUILD_OGL43)
 
-# OpenGL dependency
-set(OpenGL_GL_PREFERENCE GLVND)
-if (NOT EMSCRIPTEN)
-    find_package(OpenGL REQUIRED)
-endif()
-include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
-
 # Configure build environment
 include(../cmake/BuildEnvironment.cmake)
 
+if (IOS)
+  set(BUILD_SHARED_LIBS OFF)
+endif()
+
+# OpenGL dependency
+if (NOT IOS)
+    set(OpenGL_GL_PREFERENCE GLVND)
+    if (NOT EMSCRIPTEN)
+        find_package(OpenGL REQUIRED)
+    endif()
+    include_directories(SYSTEM ${OPENGL_INCLUDE_DIRS})
+endif()
+
 
 # imgui + backends (SDL, GLFW) compilation
-include("CMakeLists_imgui.cmake")
+if (NOT IOS)
+    include("CMakeLists_imgui.cmake")
+endif()
 
 
 # Build gtest and gmock + macro "babylon_add_test"
@@ -47,29 +55,31 @@ target_include_directories(json_hpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/json.h
 
 # glad as a standalone library
 # (in the case of emscripten, fake library that includes GlES)
-if (NOT EMSCRIPTEN)
-    set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
-    set(GLAD_FILES
-        ${GLAD_DIR}/src/glad.c
-        ${GLAD_DIR}/include/glad/glad.h
-        ${GLAD_DIR}/include/KHR/khrplatform.h)
-    source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
-    add_library(glad ${GLAD_FILES})
-    target_include_directories(glad PUBLIC SYSTEM ${GLAD_DIR}/include)
-    if(WIN32)
-        target_link_libraries(glad PUBLIC opengl32.lib)
+if (NOT IOS)
+    if (NOT EMSCRIPTEN)
+        set(GLAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/glad CACHE INTERNAL "Directory of glad")
+        set(GLAD_FILES
+            ${GLAD_DIR}/src/glad.c
+            ${GLAD_DIR}/include/glad/glad.h
+            ${GLAD_DIR}/include/KHR/khrplatform.h)
+        source_group_by_path_all(${GLAD_DIR} ${GLAD_FILES})
+        add_library(glad ${GLAD_FILES})
+        target_include_directories(glad PUBLIC SYSTEM ${GLAD_DIR}/include)
+        if(WIN32)
+            target_link_libraries(glad PUBLIC opengl32.lib)
+        else()
+            target_link_libraries(glad PUBLIC ${OPENGL_LIBRARIES})
+        endif()
+        get_target_property(library_type glad TYPE)
+        if (library_type STREQUAL SHARED_LIBRARY)
+            # If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
+            target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
+            target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
+        endif()
     else()
-        target_link_libraries(glad PUBLIC ${OPENGL_LIBRARIES})
+        add_library(glad INTERFACE)
+        target_include_directories(glad INTERFACE ${CMAKE_CURRENT_LIST_DIR}/glad_wasm_dummy/include)
     endif()
-    get_target_property(library_type glad TYPE)
-    if (library_type STREQUAL SHARED_LIBRARY)
-        # If glad is a shared lobrary, define the macro GLAD_API_EXPORT on the command line.
-        target_compile_definitions(glad PRIVATE GLAD_GLAPI_EXPORT)
-        target_compile_definitions(glad PUBLIC GLAD_GLAPI_EXPORT PRIVATE GLAD_GLAPI_EXPORT_BUILD)
-    endif()
-else()
-    add_library(glad INTERFACE)
-    target_include_directories(glad INTERFACE ${CMAKE_CURRENT_LIST_DIR}/glad_wasm_dummy/include)
 endif()
 
 

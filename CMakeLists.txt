@@ -20,7 +20,7 @@ else()
     set(OPTION_BUILD_TESTS_DEFAULT ON)
 endif()
 
-if (NOT BABYLON_WASM)
+if (NOT BABYLON_WASM OR NOT IOS)
     option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
 endif()
 

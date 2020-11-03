@@ -211,7 +211,12 @@ endif()
 
 # Performance
 if(NOT WIN32)
-  set(EXTRA_FLAGS "${EXTRA_FLAGS} -march=native -mpopcnt")
+  # Check for the Apple iOS platform
+  if (APPLE AND PLATFORM STREQUAL "OS64COMBINED")
+    set(EXTRA_FLAGS "${EXTRA_FLAGS} -mpopcnt")
+  else()
+    set(EXTRA_FLAGS "${EXTRA_FLAGS} -march=native -mpopcnt")
+  endif()
 endif()
 
 # Performance

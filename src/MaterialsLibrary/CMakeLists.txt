@@ -11,6 +11,10 @@ set(TARGET MaterialsLibrary)
 # Print status message
 message(STATUS "Lib ${TARGET}")
 
+if (IOS)
+  set(BUILD_SHARED_LIBS OFF)
+endif()
+
 # ============================================================================ #
 #                       Project description and (meta) information             #
 # ============================================================================ #
