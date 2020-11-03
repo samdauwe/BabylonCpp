@@ -46,7 +46,7 @@ public:
                                                        const std::string& rootUrl);
 
 protected:
-  CloudProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+  CloudProceduralTexture(const std::string& name, const RenderTargetTextureSize& size, Scene* scene,
                          Texture* fallbackTexture = nullptr, bool generateMipMaps = true);
 
   Color4& get_skyColor();

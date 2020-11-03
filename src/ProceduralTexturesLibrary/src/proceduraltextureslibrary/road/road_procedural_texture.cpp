@@ -9,22 +9,15 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 RoadProceduralTexture::RoadProceduralTexture(const std::string& iName,
-                                             const Size& size, Scene* scene,
-                                             Texture* fallbackTexture,
-                                             bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "roadProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
-    , roadColor{this, &RoadProceduralTexture::get_roadColor,
-                &RoadProceduralTexture::set_roadColor}
+                                             const RenderTargetTextureSize& size, Scene* scene,
+                                             Texture* fallbackTexture, bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "roadProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
+    , roadColor{this, &RoadProceduralTexture::get_roadColor, &RoadProceduralTexture::set_roadColor}
     , _roadColor{Color3(0.53f, 0.53f, 0.53f)}
 {
   // Fragment shader
-  Effect::ShadersStore()["roadProceduralTexturePixelShader"]
-    = roadProceduralTexturePixelShader;
+  Effect::ShadersStore()["roadProceduralTexturePixelShader"] = roadProceduralTexturePixelShader;
 
   updateShaderUniforms();
 }
@@ -52,9 +45,9 @@ json RoadProceduralTexture::serialize() const
   return nullptr;
 }
 
-std::unique_ptr<RoadProceduralTexture>
-RoadProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
-                             const std::string& /*rootUrl*/)
+std::unique_ptr<RoadProceduralTexture> RoadProceduralTexture::Parse(const json& /*parsedTexture*/,
+                                                                    Scene* /*scene*/,
+                                                                    const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

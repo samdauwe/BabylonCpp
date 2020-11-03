@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engines/engine.h>
+#include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/materials/effect.h>
@@ -16,10 +17,10 @@
 
 namespace BABYLON {
 
-ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
+ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTargetTextureSize& size,
                                      const std::unordered_map<std::string, std::string>& fragment,
                                      Scene* scene, Texture* fallbackTexture, bool generateMipMaps,
-                                     bool iIsCube)
+                                     bool iIsCube, unsigned int textureType)
     : Texture("", scene, !generateMipMaps)
     , isEnabled{true}
     , autoClear{true}
@@ -36,7 +37,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     , _cachedDefines{""}
     , _contentUpdateId{-1}
 {
-  scene = getScene();
+  scene = getScene() ? getScene() : EngineStore::LastCreatedScene();
 
   auto component = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
   if (!component) {
@@ -53,17 +54,29 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
 
   _fallbackTexture = fallbackTexture;
 
+  const auto width = std::holds_alternative<int>(size) ?
+                       std::get<int>(size) :
+                       std::holds_alternative<RenderTargetSize>(size) ?
+                       std::get<RenderTargetSize>(size).width :
+                       static_cast<int>(std::holds_alternative<float>(size));
+  const auto height = std::holds_alternative<int>(size) ?
+                        std::get<int>(size) :
+                        std::holds_alternative<RenderTargetSize>(size) ?
+                        std::get<RenderTargetSize>(size).height :
+                        static_cast<int>(std::holds_alternative<float>(size));
+
   if (iIsCube) {
     IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
-    _texture                = _fullEngine->createRenderTargetCubeTexture(size, options);
+    options.type            = textureType;
+    _texture = _fullEngine->createRenderTargetCubeTexture(ISize{width, height}, options);
     setFloat("face", 0);
   }
   else {
     IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
-    _texture
-      = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
+    options.type            = textureType;
+    _texture                = _fullEngine->createRenderTargetTexture(width, options);
   }
 
   // VBO
@@ -81,9 +94,10 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
   _indexBuffer = _fullEngine->createIndexBuffer(indices);
 }
 
-ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
+ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTargetTextureSize& size,
                                      const std::string& fragment, Scene* scene,
-                                     Texture* fallbackTexture, bool generateMipMaps, bool iIsCube)
+                                     Texture* fallbackTexture, bool generateMipMaps, bool iIsCube,
+                                     unsigned int textureType)
     : Texture("", scene, !generateMipMaps)
     , isEnabled{true}
     , autoClear{true}
@@ -96,7 +110,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     , _cachedDefines{""}
     , _contentUpdateId{-1}
 {
-  scene          = getScene();
+  scene          = getScene() ? getScene() : EngineStore::LastCreatedScene();
   auto component = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
   if (!component) {
     component = ProceduralTextureSceneComponent::New(scene);
@@ -113,12 +127,24 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
 
   _fallbackTexture = fallbackTexture;
 
+  const auto width = std::holds_alternative<int>(size) ?
+                       std::get<int>(size) :
+                       std::holds_alternative<RenderTargetSize>(size) ?
+                       std::get<RenderTargetSize>(size).width :
+                       static_cast<int>(std::holds_alternative<float>(size));
+  const auto height = std::holds_alternative<int>(size) ?
+                        std::get<int>(size) :
+                        std::holds_alternative<RenderTargetSize>(size) ?
+                        std::get<RenderTargetSize>(size).height :
+                        static_cast<int>(std::holds_alternative<float>(size));
+
   if (iIsCube) {
     IRenderTargetOptions options;
     options.generateMipMaps       = generateMipMaps;
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
-    _texture                      = _fullEngine->createRenderTargetCubeTexture(size, options);
+    options.type                  = textureType;
+    _texture = _fullEngine->createRenderTargetCubeTexture(ISize{width, height}, options);
     setFloat("face", 0);
   }
   else {
@@ -126,8 +152,8 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
     options.generateMipMaps       = generateMipMaps;
     options.generateDepthBuffer   = false;
     options.generateStencilBuffer = false;
-    _texture
-      = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
+    options.type                  = textureType;
+    _texture                      = _fullEngine->createRenderTargetTexture(width, options);
   }
 
   // VBO
@@ -216,6 +242,10 @@ bool ProceduralTexture::isReady()
 {
   auto engine = _fullEngine;
   std::unordered_map<std::string, std::string> shaders;
+
+  if (nodeMaterialSource) {
+    return _effect->isReady();
+  }
 
   if (_fragment.empty()) {
     return false;
@@ -319,12 +349,12 @@ bool ProceduralTexture::_shouldRender()
   return false;
 }
 
-Size& ProceduralTexture::getRenderSize()
+ProceduralTexture::RenderTargetTextureSize& ProceduralTexture::getRenderSize()
 {
   return _size;
 }
 
-const Size& ProceduralTexture::getRenderSize() const
+const ProceduralTexture::RenderTargetTextureSize& ProceduralTexture::getRenderSize() const
 {
   return _size;
 }
@@ -342,7 +372,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
     = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
 
   // Update properties
-  _size            = size;
+  _size            = RenderTargetSize{size.width, size.height};
   _generateMipMaps = generateMipMaps;
 }
 
@@ -442,52 +472,55 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
   // Render
   engine->enableEffect(_effect);
+  onBeforeGenerationObservable.notifyObservers(this);
   engine->setState(false);
 
-  // Texture
-  for (auto& item : _textures) {
-    _effect->setTexture(item.first, item.second);
-  }
+  if (!nodeMaterialSource) {
+    // Texture
+    for (auto& item : _textures) {
+      _effect->setTexture(item.first, item.second);
+    }
 
-  // Int
-  for (auto& item : _ints) {
-    _effect->setInt(item.first, item.second);
-  }
+    // Int
+    for (auto& item : _ints) {
+      _effect->setInt(item.first, item.second);
+    }
 
-  // Float
-  for (auto& item : _floats) {
-    _effect->setFloat(item.first, item.second);
-  }
+    // Float
+    for (auto& item : _floats) {
+      _effect->setFloat(item.first, item.second);
+    }
 
-  // Floats
-  for (auto& item : _floatsArrays) {
-    _effect->setArray(item.first, item.second);
-  }
+    // Floats
+    for (auto& item : _floatsArrays) {
+      _effect->setArray(item.first, item.second);
+    }
 
-  // Color3
-  for (auto& item : _colors3) {
-    _effect->setColor3(item.first, item.second);
-  }
+    // Color3
+    for (auto& item : _colors3) {
+      _effect->setColor3(item.first, item.second);
+    }
 
-  // Color4
-  for (auto& item : _colors4) {
-    const auto& color = item.second;
-    _effect->setFloat4(item.first, color.r, color.g, color.b, color.a);
-  }
+    // Color4
+    for (auto& item : _colors4) {
+      const auto& color = item.second;
+      _effect->setFloat4(item.first, color.r, color.g, color.b, color.a);
+    }
 
-  // Vector2
-  for (auto& item : _vectors2) {
-    _effect->setVector2(item.first, item.second);
-  }
+    // Vector2
+    for (auto& item : _vectors2) {
+      _effect->setVector2(item.first, item.second);
+    }
 
-  // Vector3
-  for (auto& item : _vectors3) {
-    _effect->setVector3(item.first, item.second);
-  }
+    // Vector3
+    for (auto& item : _vectors3) {
+      _effect->setVector3(item.first, item.second);
+    }
 
-  // Matrix
-  for (auto& item : _matrices) {
-    _effect->setMatrix(item.first, item.second);
+    // Matrix
+    for (auto& item : _matrices) {
+      _effect->setMatrix(item.first, item.second);
+    }
   }
 
   if (!_texture) {
@@ -578,6 +611,9 @@ void ProceduralTexture::dispose()
   if (_indexBuffer && _fullEngine->_releaseBuffer(_indexBuffer)) {
     _indexBuffer = nullptr;
   }
+
+  onGeneratedObservable.clear();
+  onBeforeGenerationObservable.clear();
 
   Texture::dispose();
 }

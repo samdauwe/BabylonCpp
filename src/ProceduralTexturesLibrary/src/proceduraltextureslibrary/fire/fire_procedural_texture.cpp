@@ -10,23 +10,16 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 FireProceduralTexture::FireProceduralTexture(const std::string& iName,
-                                             const Size& size, Scene* scene,
-                                             Texture* fallbackTexture,
-                                             bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "fireProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
+                                             const RenderTargetTextureSize& size, Scene* scene,
+                                             Texture* fallbackTexture, bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "fireProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
     , autoGenerateTime{this, &FireProceduralTexture::get_autoGenerateTime,
                        &FireProceduralTexture::set_autoGenerateTime}
     , fireColors{this, &FireProceduralTexture::get_fireColors,
                  &FireProceduralTexture::set_fireColors}
-    , time{this, &FireProceduralTexture::get_time,
-           &FireProceduralTexture::set_time}
-    , speed{this, &FireProceduralTexture::get_speed,
-            &FireProceduralTexture::set_speed}
+    , time{this, &FireProceduralTexture::get_time, &FireProceduralTexture::set_time}
+    , speed{this, &FireProceduralTexture::get_speed, &FireProceduralTexture::set_speed}
     , alphaThreshold{this, &FireProceduralTexture::get_alphaThreshold,
                      &FireProceduralTexture::set_alphaThreshold}
     , _time{0.f}
@@ -35,8 +28,7 @@ FireProceduralTexture::FireProceduralTexture(const std::string& iName,
     , _alphaThreshold{0.5f}
 {
   // Fragment shader
-  Effect::ShadersStore()["fireProceduralTexturePixelShader"]
-    = fireProceduralTexturePixelShader;
+  Effect::ShadersStore()["fireProceduralTexturePixelShader"] = fireProceduralTexturePixelShader;
 
   _fireColors = FireProceduralTexture::RedFireColors();
   updateShaderUniforms();
@@ -166,9 +158,9 @@ json FireProceduralTexture::serialize() const
   return nullptr;
 }
 
-std::unique_ptr<FireProceduralTexture>
-FireProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
-                             const std::string& /*rootUrl*/)
+std::unique_ptr<FireProceduralTexture> FireProceduralTexture::Parse(const json& /*parsedTexture*/,
+                                                                    Scene* /*scene*/,
+                                                                    const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

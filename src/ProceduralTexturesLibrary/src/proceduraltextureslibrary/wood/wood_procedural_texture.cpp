@@ -9,25 +9,17 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 WoodProceduralTexture::WoodProceduralTexture(const std::string& iName,
-                                             const Size& size, Scene* scene,
-                                             Texture* fallbackTexture,
-                                             bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "woodProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
-    , ampScale{this, &WoodProceduralTexture::get_ampScale,
-               &WoodProceduralTexture::set_ampScale}
-    , woodColor{this, &WoodProceduralTexture::get_woodColor,
-                &WoodProceduralTexture::set_woodColor}
+                                             const RenderTargetTextureSize& size, Scene* scene,
+                                             Texture* fallbackTexture, bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "woodProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
+    , ampScale{this, &WoodProceduralTexture::get_ampScale, &WoodProceduralTexture::set_ampScale}
+    , woodColor{this, &WoodProceduralTexture::get_woodColor, &WoodProceduralTexture::set_woodColor}
     , _ampScale{100.f}
     , _woodColor{Color3(0.32f, 0.17f, 0.09f)}
 {
   // Fragment shader
-  Effect::ShadersStore()["woodProceduralTexturePixelShader"]
-    = woodProceduralTexturePixelShader;
+  Effect::ShadersStore()["woodProceduralTexturePixelShader"] = woodProceduralTexturePixelShader;
 
   updateShaderUniforms();
 }
@@ -67,9 +59,9 @@ json WoodProceduralTexture::serialize() const
   return nullptr;
 }
 
-std::unique_ptr<WoodProceduralTexture>
-WoodProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
-                             const std::string& /*rootUrl*/)
+std::unique_ptr<WoodProceduralTexture> WoodProceduralTexture::Parse(const json& /*parsedTexture*/,
+                                                                    Scene* /*scene*/,
+                                                                    const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

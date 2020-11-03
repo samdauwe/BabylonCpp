@@ -9,25 +9,18 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 CloudProceduralTexture::CloudProceduralTexture(const std::string& iName,
-                                               const Size& size, Scene* scene,
-                                               Texture* fallbackTexture,
-                                               bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "cloudProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
-    , skyColor{this, &CloudProceduralTexture::get_skyColor,
-               &CloudProceduralTexture::set_skyColor}
+                                               const RenderTargetTextureSize& size, Scene* scene,
+                                               Texture* fallbackTexture, bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "cloudProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
+    , skyColor{this, &CloudProceduralTexture::get_skyColor, &CloudProceduralTexture::set_skyColor}
     , cloudColor{this, &CloudProceduralTexture::get_cloudColor,
                  &CloudProceduralTexture::set_cloudColor}
     , _skyColor{Color4(0.15f, 0.68f, 1.f, 1.f)}
     , _cloudColor{Color4(1.f, 1.f, 1.f, 1.f)}
 {
   // Fragment shader
-  Effect::ShadersStore()["cloudProceduralTexturePixelShader"]
-    = cloudProceduralTexturePixelShader;
+  Effect::ShadersStore()["cloudProceduralTexturePixelShader"] = cloudProceduralTexturePixelShader;
 
   updateShaderUniforms();
 }

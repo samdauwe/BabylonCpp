@@ -46,7 +46,7 @@ public:
                                                       const std::string& rootUrl);
 
 protected:
-  WoodProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+  WoodProceduralTexture(const std::string& name, const RenderTargetTextureSize& size, Scene* scene,
                         Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   float get_ampScale() const;

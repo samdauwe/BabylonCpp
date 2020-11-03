@@ -46,7 +46,7 @@ public:
                                                       const std::string& rootUrl);
 
 protected:
-  RoadProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+  RoadProceduralTexture(const std::string& name, const RenderTargetTextureSize& size, Scene* scene,
                         Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   Color3& get_roadColor();

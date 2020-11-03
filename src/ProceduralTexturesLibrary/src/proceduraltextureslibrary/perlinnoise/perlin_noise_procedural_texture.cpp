@@ -10,15 +10,12 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-PerlinNoiseProceduralTexture::PerlinNoiseProceduralTexture(
-  const std::string& iName, const Size& size, Scene* scene,
-  Texture* fallbackTexture, bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "perlinNoiseProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
+PerlinNoiseProceduralTexture::PerlinNoiseProceduralTexture(const std::string& iName,
+                                                           const RenderTargetTextureSize& size,
+                                                           Scene* scene, Texture* fallbackTexture,
+                                                           bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "perlinNoiseProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
     , time{0.f}
     , timeScale{1.f}
     , translationSpeed{1.f}
@@ -35,7 +32,9 @@ PerlinNoiseProceduralTexture::~PerlinNoiseProceduralTexture() = default;
 
 void PerlinNoiseProceduralTexture::updateShaderUniforms()
 {
-  setFloat("size", static_cast<float>(getRenderSize().width));
+  setFloat("size", std::holds_alternative<int>(getRenderSize()) ?
+                     static_cast<float>(std::get<int>(getRenderSize())) :
+                     std::get<float>(getRenderSize()));
 
   auto scene = getScene();
 
@@ -58,8 +57,7 @@ void PerlinNoiseProceduralTexture::render(bool useCameraPostProcess)
   ProceduralTexture::render(useCameraPostProcess);
 }
 
-void PerlinNoiseProceduralTexture::resize(const Size& size,
-                                          bool generateMipMaps)
+void PerlinNoiseProceduralTexture::resize(const Size& size, bool generateMipMaps)
 {
   ProceduralTexture::resize(size, generateMipMaps);
 }
@@ -70,8 +68,7 @@ json PerlinNoiseProceduralTexture::serialize() const
 }
 
 std::unique_ptr<PerlinNoiseProceduralTexture>
-PerlinNoiseProceduralTexture::Parse(const json& /*parsedTexture*/,
-                                    Scene* /*scene*/,
+PerlinNoiseProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
                                     const std::string& /*rootUrl*/)
 {
   return nullptr;

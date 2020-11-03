@@ -46,7 +46,7 @@ public:
                                                        const std::string& rootUrl);
 
 protected:
-  BrickProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+  BrickProceduralTexture(const std::string& name, const RenderTargetTextureSize& size, Scene* scene,
                          Texture* fallbackTexture = nullptr, bool generateMipMaps = true);
 
   float get_numberOfBricksHeight() const;

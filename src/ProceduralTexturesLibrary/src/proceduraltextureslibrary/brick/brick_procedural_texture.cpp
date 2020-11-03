@@ -9,20 +9,13 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 BrickProceduralTexture::BrickProceduralTexture(const std::string& iName,
-                                               const Size& size, Scene* scene,
-                                               Texture* fallbackTexture,
-                                               bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "brickProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
-    , numberOfBricksHeight{this,
-                           &BrickProceduralTexture::get_numberOfBricksHeight,
+                                               const RenderTargetTextureSize& size, Scene* scene,
+                                               Texture* fallbackTexture, bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "brickProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
+    , numberOfBricksHeight{this, &BrickProceduralTexture::get_numberOfBricksHeight,
                            &BrickProceduralTexture::set_numberOfBricksHeight}
-    , numberOfBricksWidth{this,
-                          &BrickProceduralTexture::get_numberOfBricksWidth,
+    , numberOfBricksWidth{this, &BrickProceduralTexture::get_numberOfBricksWidth,
                           &BrickProceduralTexture::set_numberOfBricksWidth}
     , jointColor{this, &BrickProceduralTexture::get_jointColor,
                  &BrickProceduralTexture::set_jointColor}
@@ -34,8 +27,7 @@ BrickProceduralTexture::BrickProceduralTexture(const std::string& iName,
     , _brickColor{Color3(0.77f, 0.47f, 0.40f)}
 {
   // Fragment shader
-  Effect::ShadersStore()["brickProceduralTexturePixelShader"]
-    = brickProceduralTexturePixelShader;
+  Effect::ShadersStore()["brickProceduralTexturePixelShader"] = brickProceduralTexturePixelShader;
 
   updateShaderUniforms();
 }
@@ -88,8 +80,7 @@ Color3& BrickProceduralTexture::get_brickColor()
   return _brickColor;
 }
 
-void BrickProceduralTexture::BrickProceduralTexture::set_brickColor(
-  const Color3& value)
+void BrickProceduralTexture::BrickProceduralTexture::set_brickColor(const Color3& value)
 {
   _brickColor = value;
   updateShaderUniforms();

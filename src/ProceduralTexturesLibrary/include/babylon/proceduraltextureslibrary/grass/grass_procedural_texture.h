@@ -46,7 +46,7 @@ public:
                                                        const std::string& rootUrl);
 
 protected:
-  GrassProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+  GrassProceduralTexture(const std::string& name, const RenderTargetTextureSize& size, Scene* scene,
                          Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   std::vector<Color3>& get_grassColors();

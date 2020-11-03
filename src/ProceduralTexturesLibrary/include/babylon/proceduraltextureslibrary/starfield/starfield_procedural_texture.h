@@ -46,8 +46,9 @@ public:
                                                            const std::string& rootUrl);
 
 protected:
-  StarfieldProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                             Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
+  StarfieldProceduralTexture(const std::string& name, const RenderTargetTextureSize& size,
+                             Scene* scene, Texture* fallbackTexture = nullptr,
+                             bool generateMipMaps = false);
 
   float get_time() const;
   void set_time(float value);

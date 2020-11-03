@@ -9,16 +9,11 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 GrassProceduralTexture::GrassProceduralTexture(const std::string& iName,
-                                               const Size& size, Scene* scene,
-                                               Texture* fallbackTexture,
-                                               bool generateMipMaps)
+                                               const RenderTargetTextureSize& size, Scene* scene,
+                                               Texture* fallbackTexture, bool generateMipMaps)
 
-    : ProceduralTexture{iName,
-                        size,
-                        "grassProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
+    : ProceduralTexture{iName,           size,           "grassProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
     , grassColors{this, &GrassProceduralTexture::get_grassColors,
                   &GrassProceduralTexture::set_grassColors}
     , groundColor{this, &GrassProceduralTexture::get_groundColor,
@@ -26,8 +21,7 @@ GrassProceduralTexture::GrassProceduralTexture(const std::string& iName,
     , _groundColor{Color3(1.f, 1.f, 1.f)}
 {
   // Fragment shader
-  Effect::ShadersStore()["grassProceduralTexturePixelShader"]
-    = grassProceduralTexturePixelShader;
+  Effect::ShadersStore()["grassProceduralTexturePixelShader"] = grassProceduralTexturePixelShader;
 
   _grassColors = {
     Color3(0.29f, 0.38f, 0.02f), //

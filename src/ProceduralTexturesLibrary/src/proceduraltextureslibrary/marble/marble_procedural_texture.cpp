@@ -9,17 +9,11 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 MarbleProceduralTexture::MarbleProceduralTexture(const std::string& iName,
-                                                 const Size& size, Scene* scene,
-                                                 Texture* fallbackTexture,
-                                                 bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "marbleProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
-    , numberOfTilesHeight{this,
-                          &MarbleProceduralTexture::get_numberOfTilesHeight,
+                                                 const RenderTargetTextureSize& size, Scene* scene,
+                                                 Texture* fallbackTexture, bool generateMipMaps)
+    : ProceduralTexture{iName,           size,           "marbleProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
+    , numberOfTilesHeight{this, &MarbleProceduralTexture::get_numberOfTilesHeight,
                           &MarbleProceduralTexture::set_numberOfTilesHeight}
     , numberOfTilesWidth{this, &MarbleProceduralTexture::get_numberOfTilesWidth,
                          &MarbleProceduralTexture::set_numberOfTilesWidth}
@@ -33,8 +27,7 @@ MarbleProceduralTexture::MarbleProceduralTexture(const std::string& iName,
     , _jointColor{Color3(0.72f, 0.72f, 0.72f)}
 {
   // Fragment shader
-  Effect::ShadersStore()["marbleProceduralTexturePixelShader"]
-    = marbleProceduralTexturePixelShader;
+  Effect::ShadersStore()["marbleProceduralTexturePixelShader"] = marbleProceduralTexturePixelShader;
 
   updateShaderUniforms();
 }

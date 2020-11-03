@@ -53,7 +53,7 @@ public:
                                                       const std::string& rootUrl);
 
 protected:
-  FireProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+  FireProceduralTexture(const std::string& name, const RenderTargetTextureSize& size, Scene* scene,
                         Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
 
   bool get_autoGenerateTime() const;

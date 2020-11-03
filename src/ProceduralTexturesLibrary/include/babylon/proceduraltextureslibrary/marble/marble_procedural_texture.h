@@ -46,8 +46,9 @@ public:
                                                         const std::string& rootUrl);
 
 protected:
-  MarbleProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                          Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
+  MarbleProceduralTexture(const std::string& name, const RenderTargetTextureSize& size,
+                          Scene* scene, Texture* fallbackTexture = nullptr,
+                          bool generateMipMaps = false);
 
   float get_numberOfTilesHeight() const;
   void set_numberOfTilesHeight(float value);

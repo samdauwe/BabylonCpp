@@ -9,16 +9,11 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 NormalMapProceduralTexture::NormalMapProceduralTexture(const std::string& iName,
-                                                       const Size& size,
-                                                       Scene* scene,
-                                                       Texture* fallbackTexture,
+                                                       const RenderTargetTextureSize& size,
+                                                       Scene* scene, Texture* fallbackTexture,
                                                        bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "normalMapProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
+    : ProceduralTexture{iName,           size,           "normalMapProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
     , baseTexture{this, &NormalMapProceduralTexture::get_baseTexture,
                   &NormalMapProceduralTexture::set_baseTexture}
     , _baseTexture{nullptr}
@@ -35,7 +30,9 @@ NormalMapProceduralTexture::~NormalMapProceduralTexture() = default;
 void NormalMapProceduralTexture::updateShaderUniforms()
 {
   setTexture("baseSampler", _baseTexture);
-  setFloat("size", static_cast<float>(getRenderSize().width));
+  setFloat("size", std::holds_alternative<int>(getRenderSize()) ?
+                     static_cast<float>(std::get<int>(getRenderSize())) :
+                     std::get<float>(getRenderSize()));
 }
 
 void NormalMapProceduralTexture::render(bool useCameraPostProcess)
@@ -68,8 +65,7 @@ json NormalMapProceduralTexture::serialize() const
 }
 
 std::unique_ptr<NormalMapProceduralTexture>
-NormalMapProceduralTexture::Parse(const json& /*parsedTexture*/,
-                                  Scene* /*scene*/,
+NormalMapProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

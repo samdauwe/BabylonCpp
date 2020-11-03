@@ -2,19 +2,17 @@
 #define BABYLON_MATERIALS_TEXTURES_PROCEDURALS_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
 
-class Effect;
 class Engine;
-class ProceduralTexture;
-class VertexBuffer;
-class WebGLDataBuffer;
-using EffectPtr            = std::shared_ptr<Effect>;
-using ProceduralTexturePtr = std::shared_ptr<ProceduralTexture>;
-using VertexBufferPtr      = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr   = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(NodeMaterial)
+FWD_CLASS_SPTR(ProceduralTexture)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Procedural texturing is a way to programmatically create a texture. There are 2 types of
@@ -26,6 +24,13 @@ using WebGLDataBufferPtr   = std::shared_ptr<WebGLDataBuffer>;
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
 
   friend class CustomProceduralTexture;
+
+public:
+  /**
+   * Type used to define a render target texture size (either with a number or with a rect width and
+   * height)
+   */
+  using RenderTargetTextureSize = std::variant<int, RenderTargetSize, float>;
 
 public:
   template <typename... Ts>
@@ -97,15 +102,15 @@ public:
 
   /**
    * @brief Get the size the texture is rendering at.
-   * @returns the size (texture is always squared)
+   * @returns the size (on cube texture it is always squared)
    */
-  Size& getRenderSize();
+  RenderTargetTextureSize& getRenderSize();
 
   /**
    * @brief Get the size the texture is rendering at.
-   * @returns the size (texture is always squared)
+   * @returns the size (on cube texture it is always squared)
    */
-  const Size& getRenderSize() const;
+  const RenderTargetTextureSize& getRenderSize() const;
 
   /**
    * @brief Resize the texture to new value.
@@ -222,14 +227,17 @@ protected:
    * @param generateMipMaps Define if the texture should creates mip maps or not
    * @param isCube Define if the texture is a cube texture or not (this will render each faces of
    * the cube)
+   * @param textureType The FBO internal texture type
    */
-  ProceduralTexture(const std::string& name, const Size& size,
+  ProceduralTexture(const std::string& name, const RenderTargetTextureSize& size,
                     const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
                     Texture* fallbackTexture = nullptr, bool generateMipMaps = true,
-                    bool isCube = false);
-  ProceduralTexture(const std::string& name, const Size& size, const std::string& fragment,
-                    Scene* scene, Texture* fallbackTexture = nullptr, bool generateMipMaps = true,
-                    bool isCube = false);
+                    bool isCube              = false,
+                    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+  ProceduralTexture(const std::string& name, const RenderTargetTextureSize& size,
+                    const std::string& fragment, Scene* scene, Texture* fallbackTexture = nullptr,
+                    bool generateMipMaps = true, bool isCube = false,
+                    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Define the refresh rate of the texture or the rendering frequency.
@@ -273,6 +281,17 @@ public:
   Observable<ProceduralTexture> onGeneratedObservable;
 
   /**
+   * Event raised before the texture is generated
+   */
+  Observable<ProceduralTexture> onBeforeGenerationObservable;
+
+  /**
+   * Gets or sets the node material used to create this texture (null if the texture was manually
+   * created)
+   */
+  NodeMaterialPtr nodeMaterialSource;
+
+  /**
    * Hidden
    */
   bool _generateMipMaps;
@@ -306,7 +325,7 @@ protected:
   Texture* _fallbackTexture;
 
 private:
-  Size _size;
+  RenderTargetTextureSize _size;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _frameId;

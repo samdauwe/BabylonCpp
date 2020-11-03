@@ -9,30 +9,20 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 StarfieldProceduralTexture::StarfieldProceduralTexture(const std::string& iName,
-                                                       const Size& size,
-                                                       Scene* scene,
-                                                       Texture* fallbackTexture,
+                                                       const RenderTargetTextureSize& size,
+                                                       Scene* scene, Texture* fallbackTexture,
                                                        bool generateMipMaps)
-    : ProceduralTexture{iName,
-                        size,
-                        "starfieldProceduralTexture",
-                        scene,
-                        fallbackTexture,
-                        generateMipMaps}
-    , time{this, &StarfieldProceduralTexture::get_time,
-           &StarfieldProceduralTexture::set_time}
-    , alpha{this, &StarfieldProceduralTexture::get_alpha,
-            &StarfieldProceduralTexture::set_alpha}
-    , beta{this, &StarfieldProceduralTexture::get_beta,
-           &StarfieldProceduralTexture::set_beta}
-    , zoom{this, &StarfieldProceduralTexture::get_zoom,
-           &StarfieldProceduralTexture::set_zoom}
+    : ProceduralTexture{iName,           size,           "starfieldProceduralTexture", scene,
+                        fallbackTexture, generateMipMaps}
+    , time{this, &StarfieldProceduralTexture::get_time, &StarfieldProceduralTexture::set_time}
+    , alpha{this, &StarfieldProceduralTexture::get_alpha, &StarfieldProceduralTexture::set_alpha}
+    , beta{this, &StarfieldProceduralTexture::get_beta, &StarfieldProceduralTexture::set_beta}
+    , zoom{this, &StarfieldProceduralTexture::get_zoom, &StarfieldProceduralTexture::set_zoom}
     , formuparam{this, &StarfieldProceduralTexture::get_formuparam,
                  &StarfieldProceduralTexture::set_formuparam}
     , stepsize{this, &StarfieldProceduralTexture::get_stepsize,
                &StarfieldProceduralTexture::set_stepsize}
-    , tile{this, &StarfieldProceduralTexture::get_tile,
-           &StarfieldProceduralTexture::set_tile}
+    , tile{this, &StarfieldProceduralTexture::get_tile, &StarfieldProceduralTexture::set_tile}
     , brightness{this, &StarfieldProceduralTexture::get_brightness,
                  &StarfieldProceduralTexture::set_brightness}
     , darkmatter{this, &StarfieldProceduralTexture::get_darkmatter,
@@ -204,8 +194,7 @@ json StarfieldProceduralTexture::serialize() const
 }
 
 std::unique_ptr<StarfieldProceduralTexture>
-StarfieldProceduralTexture::Parse(const json& /*parsedTexture*/,
-                                  Scene* /*scene*/,
+StarfieldProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

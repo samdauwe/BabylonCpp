@@ -46,8 +46,9 @@ public:
   static std::unique_ptr<PerlinNoiseProceduralTexture>
   Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
-  PerlinNoiseProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                               Texture* fallbackTexture = nullptr, bool generateMipMaps = false);
+  PerlinNoiseProceduralTexture(const std::string& name, const RenderTargetTextureSize& size,
+                               Scene* scene, Texture* fallbackTexture = nullptr,
+                               bool generateMipMaps = false);
 
 public:
   float time;
