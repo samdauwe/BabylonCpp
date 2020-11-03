@@ -51,7 +51,7 @@ void openBrowser(const std::string& url)
   std::string jsCode = "window.open('url','_blank');";
   jsCode             = StringTools::replace(jsCode, "url", url);
   emscripten_run_script(jsCode.c_str());
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) && defined(__x86_64__)
   std::string cmd = std::string("open ") + url;
   int result      = system(cmd.c_str());
   if (result != 0)
@@ -66,14 +66,14 @@ void openBrowser(const std::string& url)
 
 void openFile(const std::string& filename)
 {
-#ifndef _WIN32
+#if defined(_WIN32)
+  std::string canonical_path = BABYLON::Filesystem::absolutePath(filename);
+  ShellExecute(0, 0, canonical_path.c_str(), 0, 0, SW_SHOW);
+#elif defined(__EMSCRIPTEN__) || defined(__APPLE__) && defined(__x86_64__) || defined(__linux__)
   std::string cmd = std::string("open ") + BABYLON::Filesystem::absolutePath(filename);
   int result      = system(cmd.c_str());
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str())
-#else
-  std::string canonical_path = BABYLON::Filesystem::absolutePath(filename);
-  ShellExecute(0, 0, canonical_path.c_str(), 0, 0, SW_SHOW);
 #endif
 }
 
