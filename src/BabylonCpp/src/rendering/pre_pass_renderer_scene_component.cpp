@@ -49,24 +49,6 @@ void PrePassRendererSceneComponent::_beforeClearStage()
   }
 }
 
-void PrePassRendererSceneComponent::serialize(json& /*serializationObject*/)
-{
-}
-
-void PrePassRendererSceneComponent::addFromContainer(AbstractScene& /*container*/)
-{
-  // Nothing to do
-}
-
-void PrePassRendererSceneComponent::removeFromContainer(AbstractScene& /*container*/,
-                                                        bool /*dispose*/)
-{
-  // Make sure nothing will be serialized
-  if (scene->prePassRenderer()) {
-    scene->prePassRenderer()->subSurfaceConfiguration->clearAllDiffusionProfiles();
-  }
-}
-
 void PrePassRendererSceneComponent::rebuild()
 {
   // Nothing to do for this component

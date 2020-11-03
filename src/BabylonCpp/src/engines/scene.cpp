@@ -1339,7 +1339,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
+              static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1347,7 +1347,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1707,14 +1707,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -3641,8 +3641,8 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
     }
   }
 
-  for (const auto& step : _activeMeshStage) {
-    step.action(sourceMesh, mesh);
+  for (const auto& step : _preActiveMeshStage) {
+    step.action(mesh);
   }
 
   if (mesh && !mesh->subMeshes.empty()) {
@@ -4154,18 +4154,20 @@ void Scene::set_headphone(const std::optional<bool>& value)
   }
 }
 
-DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera, bool storeNonLinearDepth)
+DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera, bool storeNonLinearDepth,
+                                            bool force32bitsFloat)
 {
   auto _camera = camera ? camera : _activeCamera;
   if (!_camera) {
     throw std::runtime_error("No camera available to enable depth renderer");
   }
   if (!stl_util::contains(_depthRenderer, _camera->id) || !_depthRenderer[_camera->id]) {
-    auto textureType = 0u;
-    if (_engine->getCaps().textureHalfFloatRender) {
+    const auto supportFullfloat = getEngine()->getCaps().textureFloatRender;
+    auto textureType            = 0u;
+    if (_engine->getCaps().textureHalfFloatRender && (!force32bitsFloat || !supportFullfloat)) {
       textureType = Constants::TEXTURETYPE_HALF_FLOAT;
     }
-    else if (_engine->getCaps().textureFloatRender) {
+    else if (supportFullfloat) {
       textureType = Constants::TEXTURETYPE_FLOAT;
     }
     else {
@@ -4267,7 +4269,7 @@ void Scene::dispose()
   _isReadyForMeshStage.clear();
   _beforeEvaluateActiveMeshStage.clear();
   _evaluateSubMeshStage.clear();
-  _activeMeshStage.clear();
+  _preActiveMeshStage.clear();
   _cameraDrawRenderTargetStage.clear();
   _beforeCameraDrawStage.clear();
   _beforeRenderingGroupDrawStage.clear();
@@ -4462,6 +4464,20 @@ void Scene::set_blockMaterialDirtyMechanism(bool value)
 
   if (!value) { // Do a complete update
     markAllMaterialsAsDirty(Material::AllDirtyFlag);
+  }
+}
+
+SubSurfaceConfigurationPtr& Scene::get_subSurfaceConfiguration()
+{
+  return _subSurfaceConfiguration;
+}
+
+void Scene::set_subSurfaceConfiguration(const SubSurfaceConfigurationPtr& value)
+{
+  if (value) {
+    if (enablePrePassRenderer()) {
+      _subSurfaceConfiguration = value;
+    }
   }
 }
 
@@ -5440,6 +5456,32 @@ void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
       postProcessManager->_finalizeFrame(_activeCamera->isIntermediate);
     }
   }
+}
+
+SubSurfaceConfigurationPtr Scene::enableSubSurfaceForPrePass()
+{
+  if (_subSurfaceConfiguration) {
+    return _subSurfaceConfiguration;
+  }
+
+  const auto prePassRenderer = enablePrePassRenderer();
+  if (prePassRenderer) {
+    _subSurfaceConfiguration = std::make_shared<SubSurfaceConfiguration>(this);
+    prePassRenderer->addEffectConfiguration(_subSurfaceConfiguration);
+    return _subSurfaceConfiguration;
+  }
+
+  return nullptr;
+}
+
+void Scene::disableSubSurfaceForPrePass()
+{
+  if (!_subSurfaceConfiguration) {
+    return;
+  }
+
+  _subSurfaceConfiguration->dispose();
+  _subSurfaceConfiguration = nullptr;
 }
 
 } // end of namespace BABYLON

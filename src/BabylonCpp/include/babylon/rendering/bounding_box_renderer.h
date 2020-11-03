@@ -91,7 +91,7 @@ protected:
 
 private:
   void _evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh);
-  void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
+  void _preActiveMesh(AbstractMesh* mesh);
   void _prepareResources();
   void _createIndexBuffer();
 
@@ -122,7 +122,7 @@ public:
   Observable<BoundingBox> onAfterBoxRenderingObservable;
 
   /**
-   * Observable raised after ressources are created
+   * Observable raised after resources are created
    */
   Observable<BoundingBoxRenderer> onResourcesReadyObservable;
 

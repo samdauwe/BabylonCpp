@@ -16,7 +16,9 @@ class Engine;
 class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(PrePassRenderer)
 FWD_CLASS_SPTR(SubMesh)
 FWD_CLASS_SPTR(MultiRenderTarget)
 
@@ -32,6 +34,11 @@ struct ISavedTransformationMatrix {
 class BABYLON_SHARED_EXPORT GeometryBufferRenderer {
 
 public:
+  /**
+   * Constant used to retrieve the depth + normal texture index in the G-Buffer textures array
+   * using getIndex(GeometryBufferRenderer.DEPTHNORMAL_TEXTURE_INDEX)
+   */
+  static constexpr unsigned int DEPTHNORMAL_TEXTURE_TYPE = 0;
   /**
    * Constant used to retrieve the position texture index in the G-Buffer
    * textures array using
@@ -58,6 +65,47 @@ public:
    */
   GeometryBufferRenderer(Scene* scene, float ratio = 1.f);
   virtual ~GeometryBufferRenderer(); // = default
+
+  /**
+   * @hidden
+   * @brief Sets up internal structures to share outputs with PrePassRenderer.
+   * This method should only be called by the PrePassRenderer itself
+   */
+  void _linkPrePassRenderer(const PrePassRendererPtr& prePassRenderer);
+
+  /**
+   * @hidden
+   * @brief Separates internal structures from PrePassRenderer so the geometry buffer can now
+   * operate by itself. This method should only be called by the PrePassRenderer itself
+   */
+  void _unlinkPrePassRenderer();
+
+  /**
+   * @hidden
+   * @brief Resets the geometry buffer layout.
+   */
+  void _resetLayout();
+
+  /**
+   * @hidden
+   * @brief Replaces a texture in the geometry buffer renderer.
+   * Useful when linking textures of the prepass renderer
+   */
+  void _forceTextureType(unsigned int geometryBufferType, int index);
+
+  /**
+   * @hidden
+   * @brief Sets texture attachments.
+   * Useful when linking textures of the prepass renderer
+   */
+  void _setAttachments(const std::vector<unsigned int>& attachments);
+
+  /**
+   * @hidden
+   * @brief Replaces the first texture which is hard coded as a depth texture in the geometry
+   * buffer. Useful when linking textures of the prepass renderer
+   */
+  void _linkInternalTexture(const InternalTexturePtr& internalTexture);
 
   /**
    * @brief Returns the index of the given texture type in the G-Buffer textures
@@ -90,9 +138,14 @@ public:
 
 protected:
   /**
+   * @brief Gets the render list (meshes to be rendered) used in the G buffer.
+   */
+  std::vector<AbstractMesh*>& get_renderList();
+
+  /**
    * @brief Set the render list (meshes to be rendered) used in the G buffer.
    */
-  void set_renderList(const std::vector<MeshPtr>& meshes);
+  void set_renderList(const std::vector<AbstractMesh*>& meshes);
 
   /**
    * @brief Gets wether or not G buffer are supported by the running hardware.
@@ -155,6 +208,9 @@ protected:
    */
   void set_samples(unsigned int value);
 
+  /**
+   * @brief Hidden
+   */
   void _createRenderTargets();
 
 private:
@@ -163,6 +219,11 @@ private:
    * @param subMesh
    */
   void renderSubMesh(SubMesh* subMesh);
+
+  /**
+   * @brief Hidden
+   */
+  int _assignRenderTargetIndices();
 
   /**
    * @brief _Copies the bones transformation matrices into the target array and
@@ -204,7 +265,7 @@ public:
   /**
    * The render list (meshes to be rendered) used in the G buffer.
    */
-  WriteOnlyProperty<GeometryBufferRenderer, std::vector<MeshPtr>> renderList;
+  Property<GeometryBufferRenderer, std::vector<AbstractMesh*>> renderList;
 
   /**
    * Wether or not G buffer are supported by the running hardware.
@@ -259,6 +320,11 @@ private:
   int _positionIndex;
   int _velocityIndex;
   int _reflectivityIndex;
+  int _depthNormalIndex;
+
+  bool _linkedWithPrePass;
+  PrePassRendererPtr _prePassRenderer;
+  std::vector<unsigned int> _attachments;
 
 }; // end of class GeometryBufferRenderer
 

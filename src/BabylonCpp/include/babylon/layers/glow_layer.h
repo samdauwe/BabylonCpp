@@ -2,25 +2,19 @@
 #define BABYLON_LAYERS_GLOW_LAYER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/layers/effect_layer.h>
 #include <babylon/layers/iglow_layer_options.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class BlurPostProcess;
-class GlowLayer;
-class Material;
-class Mesh;
-class SubMesh;
-class Texture;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
-using GlowLayerPtr       = std::shared_ptr<GlowLayer>;
-using MaterialPtr        = std::shared_ptr<Material>;
-using MeshPtr            = std::shared_ptr<Mesh>;
-using SubMeshPtr         = std::shared_ptr<SubMesh>;
-using TexturePtr         = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(BlurPostProcess)
+FWD_CLASS_SPTR(GlowLayer)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(SubMesh)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief The glow layer Helps adding a glow effect around the emissive parts of a mesh.

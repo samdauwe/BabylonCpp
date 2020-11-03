@@ -2625,14 +2625,20 @@ void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
 }
 
 void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
-                                           const std::variant<int, RenderTargetSize>& size,
+                                           const RenderTargetTextureSize& size,
                                            bool generateStencil, bool bilinearFiltering,
                                            int comparisonFunction)
 {
-  auto width = std::holds_alternative<int>(size) ? std::get<int>(size) :
-                                                   std::get<RenderTargetSize>(size).width;
-  auto height = std::holds_alternative<int>(size) ? std::get<int>(size) :
-                                                    std::get<RenderTargetSize>(size).height;
+  auto width = std::holds_alternative<int>(size) ?
+                 std::get<int>(size) :
+                 std::holds_alternative<RenderTargetSize>(size) ?
+                 std::get<RenderTargetSize>(size).width :
+                 static_cast<int>(std::holds_alternative<float>(size));
+  auto height = std::holds_alternative<int>(size) ?
+                  std::get<int>(size) :
+                  std::holds_alternative<RenderTargetSize>(size) ?
+                  std::get<RenderTargetSize>(size).height :
+                  static_cast<int>(std::holds_alternative<float>(size));
   internalTexture->baseWidth              = width;
   internalTexture->baseHeight             = height;
   internalTexture->width                  = width;
@@ -3901,6 +3907,17 @@ void ThinEngine::bindAttachments(const std::vector<unsigned int>& attachments)
   return _multiRenderExtension->bindAttachments(attachments);
 }
 
+std::vector<unsigned int>
+ThinEngine::buildTextureLayout(const std::vector<bool>& textureStatus) const
+{
+  return _multiRenderExtension->buildTextureLayout(textureStatus);
+}
+
+void ThinEngine::restoreSingleAttachment()
+{
+  return _multiRenderExtension->restoreSingleAttachment();
+}
+
 //--------------------------------------------------------------------------------------------------
 //                              Raw Texture Extension
 //--------------------------------------------------------------------------------------------------
@@ -4012,22 +4029,20 @@ ArrayBufferView ThinEngine::_readTexturePixels(const InternalTexturePtr& texture
 //                              Render Target Extension
 //--------------------------------------------------------------------------------------------------
 
-InternalTexturePtr
-ThinEngine::createRenderTargetTexture(const std::variant<int, RenderTargetSize, float>& size,
-                                      const IRenderTargetOptions& options)
+InternalTexturePtr ThinEngine::createRenderTargetTexture(const RenderTargetTextureSize& size,
+                                                         const IRenderTargetOptions& options)
 {
   return _renderTargetExtension->createRenderTargetTexture(size, options);
 }
 
-InternalTexturePtr
-ThinEngine::createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
-                                      const DepthTextureCreationOptions& options)
+InternalTexturePtr ThinEngine::createDepthStencilTexture(const RenderTargetTextureSize& size,
+                                                         const DepthTextureCreationOptions& options)
 {
   return _renderTargetExtension->createDepthStencilTexture(size, options);
 }
 
 InternalTexturePtr
-ThinEngine::_createDepthStencilTexture(const std::variant<int, RenderTargetSize>& size,
+ThinEngine::_createDepthStencilTexture(const RenderTargetTextureSize& size,
                                        const DepthTextureCreationOptions& options)
 {
   return _renderTargetExtension->_createDepthStencilTexture(size, options);

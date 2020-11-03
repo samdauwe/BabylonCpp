@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
@@ -20,20 +21,27 @@ struct BABYLON_SHARED_EXPORT PrePassEffectConfiguration {
    */
   virtual ~PrePassEffectConfiguration() = default;
   /**
-   * Post process to attach for this effect
-   */
-  PostProcessPtr postProcess = nullptr;
-  /**
-   * Is the effect enabled
-   */
-  bool enabled = false;
-  /**
    * @brief Returns the name of the configuration.
    */
   virtual std::string name() const
   {
     return "";
   }
+  /**
+   * Post process to attach for this effect
+   */
+  PostProcessPtr postProcess = nullptr;
+  /**
+   * @brief Textures required in the MRT.
+   */
+  virtual std::vector<uint32_t> texturesRequired() const
+  {
+    return {};
+  }
+  /**
+   * Is the effect enabled
+   */
+  bool enabled = false;
   /**
    * @brief Disposes the effect configuration.
    */

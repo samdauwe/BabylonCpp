@@ -326,4 +326,28 @@ void MultiRenderExtension::bindAttachments(const std::vector<unsigned int>& atta
   gl.drawBuffers(attachments);
 }
 
+void MultiRenderExtension::restoreSingleAttachment()
+{
+  bindAttachments({GL::BACK});
+}
+
+std::vector<unsigned int>
+MultiRenderExtension::buildTextureLayout(const std::vector<bool>& textureStatus) const
+{
+  auto& gl = *_this->_gl;
+
+  std::vector<unsigned int> result;
+
+  for (auto i = 0ull; i < textureStatus.size(); ++i) {
+    if (textureStatus[i]) {
+      result.emplace_back(gl["COLOR_ATTACHMENT" + std::to_string(i)]);
+    }
+    else {
+      result.emplace_back(GL::NONE);
+    }
+  }
+
+  return result;
+}
+
 } // end of namespace BABYLON

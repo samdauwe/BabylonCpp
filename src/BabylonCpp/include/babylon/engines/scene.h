@@ -7,6 +7,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 #include <babylon/culling/octrees/octree.h>
@@ -30,68 +31,47 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class Animatable;
 struct AnimationPropertiesOverride;
-class Bone;
-class BoundingBoxRenderer;
 class ClickInfo;
 class Collider;
 class DebugLayer;
-class DepthRenderer;
-class Effect;
 class Engine;
 class EnvironmentHelper;
 class GamepadManager;
-class GeometryBufferRenderer;
 struct IActiveMeshCandidateProvider;
-class IAnimatable;
 struct ICollisionCoordinator;
-class ImageProcessingConfiguration;
-class InternalTexture;
-struct IPhysicsEngine;
 struct IPhysicsEnginePlugin;
 struct IRenderingManagerAutoClearSetup;
-struct ISceneComponent;
-struct ISceneSerializableComponent;
-class ISpriteManager;
 class KeyboardInfo;
 class KeyboardInfoPre;
-class Mesh;
-class MorphTarget;
-class Node;
-class OutlineRenderer;
 class PostProcessManager;
 class PostProcessRenderPipelineManager;
-class PrePassRenderer;
 struct RenderingGroupInfo;
 class RenderingManager;
 class RuntimeAnimation;
-class ShaderMaterial;
-class SimplificationQueue;
-class SoundTrack;
 class UniformBuffer;
-using AnimatablePtr                   = std::shared_ptr<Animatable>;
-using BoundingBoxRendererPtr          = std::shared_ptr<BoundingBoxRenderer>;
-using BonePtr                         = std::shared_ptr<Bone>;
-using EffectPtr                       = std::shared_ptr<Effect>;
-using DepthRendererPtr                = std::shared_ptr<DepthRenderer>;
-using GeometryBufferRendererPtr       = std::shared_ptr<GeometryBufferRenderer>;
-using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
-using IPhysicsEnginePtr               = std::shared_ptr<IPhysicsEngine>;
-using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
-using InternalTexturePtr              = std::shared_ptr<InternalTexture>;
-using ISceneComponentPtr              = std::shared_ptr<ISceneComponent>;
-using ISceneSerializableComponentPtr  = std::shared_ptr<ISceneSerializableComponent>;
-using ISpriteManagerPtr               = std::shared_ptr<ISpriteManager>;
-using NodePtr                         = std::shared_ptr<Node>;
-using MeshPtr                         = std::shared_ptr<Mesh>;
-using MorphTargetPtr                  = std::shared_ptr<MorphTarget>;
-using OutlineRendererPtr              = std::shared_ptr<OutlineRenderer>;
-using PrePassRendererPtr              = std::shared_ptr<PrePassRenderer>;
-using ShaderMaterialPtr               = std::shared_ptr<ShaderMaterial>;
-using SimplificationQueuePtr          = std::shared_ptr<SimplificationQueue>;
-using SoundTrackPtr                   = std::shared_ptr<SoundTrack>;
-using SubMeshPtr                      = std::shared_ptr<SubMesh>;
+FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(Bone)
+FWD_CLASS_SPTR(BoundingBoxRenderer)
+FWD_CLASS_SPTR(DepthRenderer)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(GeometryBufferRenderer)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_STRUCT_SPTR(IPhysicsEngine)
+FWD_CLASS_SPTR(ImageProcessingConfiguration)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_STRUCT_SPTR(ISceneComponent)
+FWD_STRUCT_SPTR(ISceneSerializableComponent)
+FWD_CLASS_SPTR(ISpriteManager)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(MorphTarget)
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(OutlineRenderer)
+FWD_CLASS_SPTR(PrePassRenderer)
+FWD_CLASS_SPTR(ShaderMaterial)
+FWD_CLASS_SPTR(SimplificationQueue)
+FWD_CLASS_SPTR(SoundTrack)
+FWD_CLASS_SPTR(SubMesh)
 
 /**
  * @brief Represents a scene to be rendered by the engine.
@@ -1310,10 +1290,13 @@ public:
    * @param camera The camera to create the depth renderer on (default: scene's active camera)
    * @param storeNonLinearDepth Defines whether the depth is stored linearly like in Babylon Shadows
    * or directly like glFragCoord.z
+   * @param force32bitsFloat Forces 32 bits float when supported (else 16 bits float is prioritized
+   * over 32 bits float if supported)
    * @returns the created depth renderer
    */
   DepthRendererPtr enableDepthRenderer(const CameraPtr& camera  = nullptr,
-                                       bool storeNonLinearDepth = false);
+                                       bool storeNonLinearDepth = false,
+                                       bool force32bitsFloat    = false);
 
   /**
    * @brief Disables a depth renderer for a given camera.
@@ -1820,6 +1803,17 @@ public:
    */
   void _renderMultiviewToSingleView(const CameraPtr& camera);
 
+  /**
+   * @brief Enables the subsurface effect for prepass.
+   * @returns the SubSurfaceConfiguration
+   */
+  SubSurfaceConfigurationPtr enableSubSurfaceForPrePass() override;
+
+  /**
+   * @brief Disables the subsurface effect for prepass
+   */
+  void disableSubSurfaceForPrePass() override;
+
 protected:
   /**
    * @brief Creates a new Scene.
@@ -2324,6 +2318,16 @@ protected:
    * (ie. the materials won't be updated if they are out of sync)
    */
   void set_blockMaterialDirtyMechanism(bool value);
+
+  /**
+   * @brief Gets the current prepass renderer associated to the scene.
+   */
+  SubSurfaceConfigurationPtr& get_subSurfaceConfiguration() override;
+
+  /**
+   * @brief Sets the current prepass renderer associated to the scene.
+   */
+  void set_subSurfaceConfiguration(const SubSurfaceConfigurationPtr& value) override;
 
 public:
   // Members
@@ -3358,7 +3362,7 @@ public:
    * Defines the actions happening during the active mesh stage
    * Hidden
    */
-  Stage<ActiveMeshStageAction> _activeMeshStage;
+  Stage<PreActiveMeshStageAction> _preActiveMeshStage;
 
   /**
    * Defines the actions happening during the per camera render target step

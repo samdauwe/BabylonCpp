@@ -23,6 +23,7 @@ struct BABYLON_SHARED_EXPORT SceneComponentConstants {
   static constexpr const char* NAME_POSTPROCESSRENDERPIPELINEMANAGER
     = "PostProcessRenderPipelineManager";
   static constexpr const char* NAME_SPRITE            = "Sprite";
+  static constexpr const char* NAME_SUBSURFACE        = "SubSurface";
   static constexpr const char* NAME_OUTLINERENDERER   = "Outline";
   static constexpr const char* NAME_PROCEDURALTEXTURE = "ProceduralTexture";
   static constexpr const char* NAME_SHADOWGENERATOR   = "ShadowGenerator";
@@ -36,7 +37,7 @@ struct BABYLON_SHARED_EXPORT SceneComponentConstants {
 
   static constexpr unsigned int STEP_EVALUATESUBMESH_BOUNDINGBOXRENDERER = 0;
 
-  static constexpr unsigned int STEP_ACTIVEMESH_BOUNDINGBOXRENDERER = 0;
+  static constexpr unsigned int STEP_PREACTIVEMESH_BOUNDINGBOXRENDERER = 0;
 
   static constexpr unsigned int STEP_CAMERADRAWRENDERTARGET_EFFECTLAYER = 1;
 

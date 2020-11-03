@@ -38,19 +38,19 @@ void BoundingBoxRenderer::_register()
 {
   scene->_beforeEvaluateActiveMeshStage.registerStep(
     SceneComponentConstants::STEP_BEFOREEVALUATEACTIVEMESH_BOUNDINGBOXRENDERER, this,
-    [this]() { reset(); });
+    [this]() -> void { reset(); });
 
-  scene->_activeMeshStage.registerStep(
-    SceneComponentConstants::STEP_ACTIVEMESH_BOUNDINGBOXRENDERER, this,
-    [this](AbstractMesh* sourceMesh, AbstractMesh* mesh) { _activeMesh(sourceMesh, mesh); });
+  scene->_preActiveMeshStage.registerStep(
+    SceneComponentConstants::STEP_PREACTIVEMESH_BOUNDINGBOXRENDERER, this,
+    [this](AbstractMesh* mesh) -> void { _preActiveMesh(mesh); });
 
   scene->_evaluateSubMeshStage.registerStep(
     SceneComponentConstants::STEP_EVALUATESUBMESH_BOUNDINGBOXRENDERER, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh) { _evaluateSubMesh(mesh, subMesh); });
+    [this](AbstractMesh* mesh, SubMesh* subMesh) -> void { _evaluateSubMesh(mesh, subMesh); });
 
   scene->_afterRenderingGroupDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER, this,
-    [this](int renderingGroupId) { render(renderingGroupId); });
+    [this](int renderingGroupId) -> void { render(renderingGroupId); });
 }
 
 void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
@@ -62,10 +62,10 @@ void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
   }
 }
 
-void BoundingBoxRenderer::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
+void BoundingBoxRenderer::_preActiveMesh(AbstractMesh* mesh)
 {
-  if (sourceMesh->showBoundingBox || scene->forceShowBoundingBoxes) {
-    auto& boundingInfo            = *sourceMesh->getBoundingInfo();
+  if (mesh->showBoundingBox || scene->forceShowBoundingBoxes) {
+    auto& boundingInfo            = *mesh->getBoundingInfo();
     boundingInfo.boundingBox._tag = mesh->renderingGroupId;
     renderList.emplace_back(boundingInfo.boundingBox);
   }
@@ -91,6 +91,7 @@ void BoundingBoxRenderer::_prepareResources()
     = std::make_shared<VertexBuffer>(engine, boxdata->positions, VertexBuffer::PositionKind, false);
   _createIndexBuffer();
   _fillIndexData = boxdata->indices;
+  onResourcesReadyObservable.notifyObservers(this);
 }
 
 void BoundingBoxRenderer::_createIndexBuffer()
@@ -118,7 +119,7 @@ void BoundingBoxRenderer::reset()
 
 void BoundingBoxRenderer::render(int renderingGroupId)
 {
-  if (renderList.empty()) {
+  if (renderList.empty() || !enabled) {
     return;
   }
 
@@ -131,6 +132,7 @@ void BoundingBoxRenderer::render(int renderingGroupId)
   auto engine = scene->getEngine();
   engine->setDepthWrite(false);
   _colorShader->_preBind();
+
   for (auto& boundingBox : renderList) {
     if (boundingBox._tag != renderingGroupId) {
       continue;
@@ -226,6 +228,7 @@ void BoundingBoxRenderer::dispose()
 
   onBeforeBoxRenderingObservable.clear();
   onAfterBoxRenderingObservable.clear();
+  onResourcesReadyObservable.clear();
 
   renderList.clear();
 
