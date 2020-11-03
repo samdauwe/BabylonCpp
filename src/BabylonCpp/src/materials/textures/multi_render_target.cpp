@@ -38,23 +38,7 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
 
   Uint32Array types;
   Uint32Array samplingModes;
-
-  for (std::size_t i = 0; i < count; ++i) {
-    if (options && i < (*options).types.size()) {
-      types.emplace_back((*options).types[i]);
-    }
-    else {
-      types.emplace_back(options && (*options).defaultType ? *(*options).defaultType :
-                                                             Constants::TEXTURETYPE_UNSIGNED_INT);
-    }
-
-    if (options && i < (*options).samplingModes.size()) {
-      samplingModes.emplace_back((*options).samplingModes[i]);
-    }
-    else {
-      samplingModes.emplace_back(TextureConstants::BILINEAR_SAMPLINGMODE);
-    }
-  }
+  _initTypes(count, types, samplingModes, options);
 
   const auto generateDepthBuffer = !options || (*options).generateDepthBuffer == std::nullopt ?
                                      true :
@@ -121,14 +105,40 @@ void MultiRenderTarget::set_wrapV(unsigned int wrap)
   }
 }
 
-void MultiRenderTarget::_rebuild()
+void MultiRenderTarget::_initTypes(size_t count, std::vector<unsigned int>& types,
+                                   std::vector<unsigned int>& samplingModes,
+                                   const std::optional<IMultiRenderTargetOptions>& options)
+{
+  for (auto i = 0ull; i < count; ++i) {
+    if (options && i < (*options).types.size()) {
+      types.emplace_back((*options).types[i]);
+    }
+    else {
+      types.emplace_back(options && (*options).defaultType ? *(*options).defaultType :
+                                                             Constants::TEXTURETYPE_UNSIGNED_INT);
+    }
+
+    if (options && i < (*options).samplingModes.size()) {
+      samplingModes.emplace_back((*options).samplingModes[i]);
+    }
+    else {
+      samplingModes.emplace_back(TextureConstants::BILINEAR_SAMPLINGMODE);
+    }
+  }
+}
+
+void MultiRenderTarget::_rebuild(bool forceFullRebuild)
 {
   releaseInternalTextures();
   _createInternalTextures();
 
-  for (std::size_t i = 0; i < _internalTextures.size(); ++i) {
-    auto& texture     = _textures[i];
-    texture->_texture = _internalTextures[i];
+  if (forceFullRebuild) {
+    _createTextures();
+  }
+
+  for (auto i = 0ull; i < _internalTextures.size(); ++i) {
+    const auto& texture = _textures[i];
+    texture->_texture   = _internalTextures[i];
   }
 
   // Keeps references to frame buffer and stencil/depth buffer
@@ -159,6 +169,17 @@ void MultiRenderTarget::_createTextures()
   _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
 }
 
+void MultiRenderTarget::replaceTexture(const TexturePtr& texture, unsigned int index)
+{
+  if (texture->_texture) {
+    if (index >= _textures.size()) {
+      _textures.resize(index + 1);
+    }
+    _textures[index]         = texture;
+    _internalTextures[index] = texture->_texture;
+  }
+}
+
 unsigned int MultiRenderTarget::get_samples() const
 {
   return _samples;
@@ -177,6 +198,21 @@ void MultiRenderTarget::resize(Size size)
 {
   _size = RenderTargetSize{size.width, size.height};
   _rebuild();
+}
+
+void MultiRenderTarget::updateCount(size_t count,
+                                    const std::optional<IMultiRenderTargetOptions>& options)
+{
+  _multiRenderTargetOptions.textureCount = count;
+  _count                                 = count;
+
+  std::vector<unsigned int> types;
+  std::vector<unsigned int> samplingModes;
+
+  _initTypes(count, types, samplingModes, options);
+  _multiRenderTargetOptions.types         = types;
+  _multiRenderTargetOptions.samplingModes = samplingModes;
+  _rebuild(true);
 }
 
 void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex)

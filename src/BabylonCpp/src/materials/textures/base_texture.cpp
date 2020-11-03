@@ -487,7 +487,7 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
   return nullptr;
 }
 
-void BaseTexture::_rebuild()
+void BaseTexture::_rebuild(bool /*forceFullRebuild*/)
 {
 }
 

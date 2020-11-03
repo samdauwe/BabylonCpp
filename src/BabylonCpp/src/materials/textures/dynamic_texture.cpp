@@ -168,7 +168,7 @@ json DynamicTexture::serialize() const
   return nullptr;
 }
 
-void DynamicTexture::_rebuild()
+void DynamicTexture::_rebuild(bool /*forceFullRebuild*/)
 {
   update();
 }

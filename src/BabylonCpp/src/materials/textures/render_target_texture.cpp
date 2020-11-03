@@ -861,7 +861,7 @@ void RenderTargetTexture::dispose()
   Texture::dispose();
 }
 
-void RenderTargetTexture::_rebuild()
+void RenderTargetTexture::_rebuild(bool /*forceFullRebuild*/)
 {
   if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
     refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE;

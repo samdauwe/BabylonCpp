@@ -182,7 +182,7 @@ void ProceduralTexture::_createIndexBuffer()
   _indexBuffer = _fullEngine->createIndexBuffer(indices);
 }
 
-void ProceduralTexture::_rebuild()
+void ProceduralTexture::_rebuild(bool /*forceFullRebuild*/)
 {
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
     auto& vb = _vertexBuffers[VertexBuffer::PositionKind];

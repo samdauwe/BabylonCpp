@@ -56,7 +56,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild() override;
+  void _rebuild(bool forceFullRebuild = false) override;
 
   /**
    * @brief Resets the texture in order to recreate its associated resources.

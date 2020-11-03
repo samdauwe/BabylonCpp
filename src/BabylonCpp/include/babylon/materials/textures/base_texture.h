@@ -170,7 +170,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _rebuild();
+  virtual void _rebuild(bool forceFullRebuild = false);
 
   /**
    * @brief Triggers the load sequence in delayed load mode.

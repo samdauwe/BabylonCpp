@@ -228,7 +228,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild() override;
+  void _rebuild(bool forceFullRebuild = false) override;
 
   /**
    * @brief Clear the info related to rendering groups preventing retention point in material
