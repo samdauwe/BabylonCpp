@@ -109,18 +109,20 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
   - cmake --version
   - |
-    if [ "$(uname)" == "Darwin" ]; then
+    if [ $TRAVIS_OS_NAME = 'osx' ]; then
       # Mac OS X platform
-      mkdir build && cd build && cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE=../external/ios-cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=0 -DDEPLOYMENT_TARGET=12 ..
-    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+      echo "Running build on Mac OS X platform"
+      mkdir build && cd build && cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE=../external/ios-cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=0 -DDEPLOYMENT_TARGET=12 ../
+    else
       # GNU/Linux platform
+      echo "Running build on GNU/Linux platform"
       mkdir build && cd build && cmake ../
     fi
 #  -
 #  - Setup virtual X server in order to run the examples:
 #  - See https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-xvfb-to-run-tests-that-require-a-gui
   - |
-    if [[ $(uname) == "Linux" ]]; then
+    if [[ $TRAVIS_OS_NAME = 'linux' ]]; then
       export DISPLAY=:99.0
       sh -e /etc/init.d/xvfb start
       sleep 3
