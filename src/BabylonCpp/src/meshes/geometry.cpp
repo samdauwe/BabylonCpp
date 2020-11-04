@@ -444,7 +444,8 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
     _indexBuffer = _engine->createIndexBuffer(_indices, updatable);
   }
 
-  if (totalVertices != 0) { // including null and undefined
+  if (totalVertices != 0) {
+    // including null and undefined
     _totalVertices = static_cast<size_t>(totalVertices);
   }
 
@@ -686,11 +687,25 @@ bool Geometry::_generatePointsArray()
     return false;
   }
 
-  _positions.clear();
-
-  for (unsigned int index = 0; index < data.size(); index += 3) {
-    _positions.emplace_back(Vector3::FromArray(data, index));
+  for (auto index = _positionsCache.size() * 3, arrayIdx = _positionsCache.size();
+       index < data.size(); index += 3, ++arrayIdx) {
+    if (arrayIdx >= _positionsCache.size()) {
+      _positionsCache.resize(_positionsCache.size() * 3);
+    }
+    _positionsCache[arrayIdx] = Vector3::FromArray(data, index);
   }
+
+  for (auto index = 0ull, arrayIdx = 0ull; index < data.size(); index += 3, ++arrayIdx) {
+    if (index >= _positionsCache.size()) {
+      _positionsCache.resize(_positionsCache.size() * 3);
+    }
+    _positionsCache[arrayIdx].set(data[0 + index], data[1 + index], data[2 + index]);
+  }
+
+  // just in case the number of positions was reduced, splice the array
+  _positionsCache.resize(data.size() / 3);
+
+  _positions = _positionsCache;
 
   return true;
 }
@@ -888,11 +903,11 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       for (auto matricesIndice : matricesIndices) {
         auto matricesIndex = static_cast<int>(matricesIndice);
 
-        floatIndices.emplace_back(static_cast<float>(matricesIndex & 0x000000FF));
-        floatIndices.emplace_back(static_cast<float>((matricesIndex & 0x0000FF00) >> 8));
-        floatIndices.emplace_back(static_cast<float>((matricesIndex & 0x00FF0000) >> 16));
+        floatIndices.emplace_back(static_cast<float>(matricesIndex & 0x000000ff));
+        floatIndices.emplace_back(static_cast<float>((matricesIndex & 0x0000ff00) >> 8));
+        floatIndices.emplace_back(static_cast<float>((matricesIndex & 0x00ff0000) >> 16));
         floatIndices.emplace_back(static_cast<float>(
-          (matricesIndex >> 24) & 0xFF)); // & 0xFF to convert to v + 256 if v < 0
+          (matricesIndex >> 24) & 0xff)); // & 0xFF to convert to v + 256 if v < 0
       }
 
       mesh->setVerticesData(VertexBuffer::MatricesIndicesKind, floatIndices);
@@ -907,11 +922,11 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       for (auto i : matricesIndicesExtra) {
         auto matricesIndexExtra = static_cast<int>(i);
 
-        floatIndices.emplace_back(static_cast<float>(matricesIndexExtra & 0x000000FF));
-        floatIndices.emplace_back(static_cast<float>((matricesIndexExtra & 0x0000FF00) >> 8));
-        floatIndices.emplace_back(static_cast<float>((matricesIndexExtra & 0x00FF0000) >> 16));
+        floatIndices.emplace_back(static_cast<float>(matricesIndexExtra & 0x000000ff));
+        floatIndices.emplace_back(static_cast<float>((matricesIndexExtra & 0x0000ff00) >> 8));
+        floatIndices.emplace_back(static_cast<float>((matricesIndexExtra & 0x00ff0000) >> 16));
         floatIndices.emplace_back(static_cast<float>(
-          (matricesIndexExtra >> 24) & 0xFF)); // & 0xFF to convert to v + 256 if v < 0
+          (matricesIndexExtra >> 24) & 0xff)); // & 0xFF to convert to v + 256 if v < 0
       }
 
       mesh->setVerticesData(VertexBuffer::MatricesIndicesExtraKind, floatIndices);
@@ -943,7 +958,7 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       && parsedGeometry["subMeshes"].is_array()) {
     mesh->subMeshes.clear();
     for (const auto& parsedSubMesh : json_util::get_array<json>(parsedGeometry, "subMeshes")) {
-      SubMesh::AddToMesh(json_util::get_number(parsedSubMesh, "materialIndex", 0u),
+      SubMesh::AddToMesh(json_util::get_number(parsedSubMesh, "", 0u),
                          json_util::get_number(parsedSubMesh, "verticesStart", 0u),
                          json_util::get_number(parsedSubMesh, "verticesCount", 0ul),
                          json_util::get_number(parsedSubMesh, "indexStart", 0u),

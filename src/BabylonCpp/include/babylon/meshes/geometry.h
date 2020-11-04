@@ -492,6 +492,7 @@ private:
   std::optional<Vector2> _boundingBias;
   WebGLDataBufferPtr _indexBuffer;
   bool _indexBufferIsUpdatable;
+  std::vector<Vector3> _positionsCache;
 
 }; // end of class Geometry
 
