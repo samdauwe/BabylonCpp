@@ -14,6 +14,7 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_defines.h>
+#include <babylon/materials/pre_pass_configuration.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/thin_material_helper.h>
@@ -186,6 +187,17 @@ void MaterialHelper::PrepareDefinesForBones(AbstractMesh* mesh, MaterialDefines&
       else {
         defines.boolDef.erase("BONETEXTURE");
       }
+
+      const auto prePassRenderer = mesh->getScene()->prePassRenderer();
+      if (prePassRenderer && prePassRenderer->enabled()) {
+        const auto nonExcluded = std::find_if(prePassRenderer->excludedSkinnedMesh.begin(),
+                                              prePassRenderer->excludedSkinnedMesh.end(),
+                                              [&mesh](const AbstractMeshPtr& abstractMesh) -> bool {
+                                                return abstractMesh.get() == mesh;
+                                              })
+                                 == prePassRenderer->excludedSkinnedMesh.end();
+        defines.boolDef["BONES_VELOCITY_ENABLED"] = nonExcluded;
+      }
     }
   }
   else {
@@ -277,12 +289,68 @@ void MaterialHelper::PrepareDefinesForPrePass(Scene* scene, MaterialDefines& def
 {
   const auto previousPrePass = defines["PREPASS"];
 
-  if (scene->prePassRenderer() && canRenderToMRT) {
+  if (!defines._arePrePassDirty) {
+    return;
+  }
+
+  struct TexturesListItem {
+    unsigned int type;
+    std::string define;
+    std::string index;
+  }; // end of struct texturesListItem
+
+  static const std::vector<TexturesListItem> texturesList
+    = {{
+         Constants::PREPASS_POSITION_TEXTURE_TYPE, // type
+         "PREPASS_POSITION",                       // define
+         "PREPASS_POSITION_INDEX",                 // index
+       },
+       {
+         Constants::PREPASS_VELOCITY_TEXTURE_TYPE, // type
+         "PREPASS_VELOCITY",                       // define
+         "PREPASS_VELOCITY_INDEX",                 // index
+       },
+       {
+         Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE, // type
+         "PREPASS_REFLECTIVITY",                       // define
+         "PREPASS_REFLECTIVITY_INDEX",                 // index
+       },
+       {
+         Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, // type
+         "PREPASS_IRRADIANCE",                       // define
+         "PREPASS_IRRADIANCE_INDEX",                 // index
+       },
+       {
+         Constants::PREPASS_ALBEDO_TEXTURE_TYPE, // type
+         "PREPASS_ALBEDO",                       // define
+         "PREPASS_ALBEDO_INDEX",                 // index
+       },
+       {
+         Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE, // type
+         "PREPASS_DEPTHNORMAL",                       // define
+         "PREPASS_DEPTHNORMAL_INDEX",                 // index
+       }};
+
+  if (scene->prePassRenderer() && scene->prePassRenderer()->enabled() && canRenderToMRT) {
     defines.boolDef["PREPASS"]        = true;
     defines.intDef["SCENE_MRT_COUNT"] = static_cast<int>(scene->prePassRenderer()->mrtCount);
+
+    for (const auto& texturesListItem : texturesList) {
+      const auto index = scene->prePassRenderer()->getIndex(texturesListItem.type);
+      if (index != -1) {
+        defines.boolDef[texturesListItem.define] = true;
+        defines.intDef[texturesListItem.index]   = static_cast<unsigned int>(index);
+      }
+      else {
+        defines.boolDef[texturesListItem.define] = false;
+      }
+    }
   }
   else {
     defines.boolDef["PREPASS"] = false;
+    for (const auto& texturesListItem : texturesList) {
+      defines.boolDef[texturesListItem.define] = false;
+    }
   }
 
   if (defines["PREPASS"] != previousPrePass) {
@@ -347,6 +415,7 @@ void MaterialHelper::PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh, co
   defines.boolDef["SHADOWPCSS" + lightIndexStr]             = false;
   defines.boolDef["SHADOWPOISSON" + lightIndexStr]          = false;
   defines.boolDef["SHADOWESM" + lightIndexStr]              = false;
+  defines.boolDef["SHADOWCLOSEESM" + lightIndexStr]         = false;
   defines.boolDef["SHADOWCUBE" + lightIndexStr]             = false;
   defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]       = false;
   defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr]    = false;
@@ -429,6 +498,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
       defines.boolDef["SHADOWPCSS" + indexStr]             = false;
       defines.boolDef["SHADOWPOISSON" + indexStr]          = false;
       defines.boolDef["SHADOWESM" + indexStr]              = false;
+      defines.boolDef["SHADOWCLOSEESM" + indexStr]         = false;
       defines.boolDef["SHADOWCUBE" + indexStr]             = false;
       defines.boolDef["SHADOWLOWQUALITY" + indexStr]       = false;
       defines.boolDef["SHADOWMEDIUMQUALITY" + indexStr]    = false;
@@ -592,6 +662,10 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(MaterialDefines& defines,
       if (defines["SHADOWESM" + lightIndexStr]) {
         fallbacks.addFallback(rank, "SHADOWESM" + lightIndexStr);
       }
+
+      if (defines["SHADOWCLOSEESM" + lightIndexStr]) {
+        fallbacks.addFallback(rank, "SHADOWCLOSEESM" + lightIndexStr);
+      }
     }
   }
 
@@ -730,7 +804,8 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh, const E
   }
 }
 
-void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect)
+void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect,
+                                         const PrePassConfigurationPtr& prePassConfiguration)
 {
   if (!effect || !mesh) {
     return;
@@ -752,9 +827,34 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, const EffectPtr& ef
 
       if (!matrices.empty()) {
         effect->setMatrices("mBones", matrices);
+        if (prePassConfiguration && mesh->getScene()->prePassRenderer()
+            && mesh->getScene()->prePassRenderer()->getIndex(
+              Constants::PREPASS_VELOCITY_TEXTURE_TYPE)) {
+          if (mesh->uniqueId < prePassConfiguration->previousBones.size()
+              && !prePassConfiguration->previousBones[mesh->uniqueId].empty()) {
+            effect->setMatrices("mPreviousBones",
+                                prePassConfiguration->previousBones[mesh->uniqueId]);
+          }
+
+          if (mesh->uniqueId >= prePassConfiguration->previousBones.size()) {
+            prePassConfiguration->previousBones.reserve(mesh->uniqueId + 1);
+          }
+
+          MaterialHelper::_CopyBonesTransformationMatrices(
+            matrices, prePassConfiguration->previousBones[mesh->uniqueId]);
+        }
       }
     }
   }
+}
+
+Float32Array& MaterialHelper::_CopyBonesTransformationMatrices(const Float32Array& source,
+                                                               Float32Array& target)
+{
+  target.clear();
+  std::copy(source.begin(), source.end(), std::back_inserter(target));
+
+  return target;
 }
 
 void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh, const EffectPtr& effect)

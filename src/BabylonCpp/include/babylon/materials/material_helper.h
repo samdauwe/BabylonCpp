@@ -20,11 +20,13 @@ class EffectFallbacks;
 class Engine;
 class Light;
 struct MaterialDefines;
+struct PrePassConfiguration;
 class Scene;
 class UniformBuffer;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
-using EffectPtr      = std::shared_ptr<Effect>;
-using LightPtr       = std::shared_ptr<Light>;
+using BaseTexturePtr          = std::shared_ptr<BaseTexture>;
+using EffectPtr               = std::shared_ptr<Effect>;
+using LightPtr                = std::shared_ptr<Light>;
+using PrePassConfigurationPtr = std::shared_ptr<PrePassConfiguration>;
 
 struct BABYLON_SHARED_EXPORT PrepareDefinesForLightsState {
   bool needNormals     = false;
@@ -356,8 +358,17 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @brief Binds the bones information from the mesh to the effect.
    * @param mesh The mesh we are binding the information to render
    * @param effect The effect we are binding the data to
+   * @param prePassConfiguration Configuration for the prepass, in case prepass is activated
    */
-  static void BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect);
+  static void BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect,
+                                  const PrePassConfigurationPtr& prePassConfiguration = nullptr);
+
+  /**
+   * @brief Copies the bones transformation matrices into the target array and returns the target's
+   * reference.
+   */
+  static Float32Array& _CopyBonesTransformationMatrices(const Float32Array& source,
+                                                        Float32Array& target);
 
   /**
    * @brief Binds the morph targets information from the mesh to the effect.
