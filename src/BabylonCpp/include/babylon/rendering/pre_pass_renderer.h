@@ -13,6 +13,7 @@ namespace BABYLON {
 class Effect;
 class Engine;
 class Scene;
+class SubMesh;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(ImageProcessingPostProcess)
 FWD_CLASS_SPTR(Material)
@@ -47,7 +48,7 @@ public:
    * @param effect The effect that is drawn. It can be or not be compatible with drawing to several
    * output textures.
    */
-  void bindAttachmentsForEffect(Effect& effect);
+  void bindAttachmentsForEffect(Effect& effect, SubMesh* subMesh);
 
   /**
    * @brief Hidden

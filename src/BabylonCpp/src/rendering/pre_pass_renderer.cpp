@@ -143,7 +143,7 @@ bool PrePassRenderer::get_isSupported() const
   return _engine->webGLVersion() > 1.f;
 }
 
-void PrePassRenderer::bindAttachmentsForEffect(Effect& effect)
+void PrePassRenderer::bindAttachmentsForEffect(Effect& effect, SubMesh* /*subMesh*/)
 {
   if (enabled()) {
     if (effect._multiTarget) {

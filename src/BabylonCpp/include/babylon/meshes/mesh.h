@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/isize.h>
 #include <babylon/maths/path3d.h>
 #include <babylon/meshes/abstract_mesh.h>
@@ -10,41 +11,28 @@
 
 namespace BABYLON {
 
-struct _CreationDataStorage;
-struct _InstancesBatch;
 struct _InstanceDataStorage;
 struct _InternalMeshDataInfo;
 struct _ThinInstanceDataStorage;
 struct _VisibleInstances;
-class Buffer;
-class Effect;
 class Geometry;
-class GroundMesh;
-class IAnimatable;
 class IcoSphereOptions;
 class ICreateCapsuleOptions;
-class InstancedMesh;
-class IParticleSystem;
-class LinesMesh;
-class Mesh;
-class MeshLODLevel;
-class MorphTargetManager;
 class PolyhedronOptions;
-class VertexBuffer;
-using _CreationDataStoragePtr = std::shared_ptr<_CreationDataStorage>;
-using _InstancesBatchPtr      = std::shared_ptr<_InstancesBatch>;
-using BufferPtr               = std::shared_ptr<Buffer>;
-using EffectPtr               = std::shared_ptr<Effect>;
-using GroundMeshPtr           = std::shared_ptr<GroundMesh>;
-using IAnimatablePtr          = std::shared_ptr<IAnimatable>;
-using InstancedMeshPtr        = std::shared_ptr<InstancedMesh>;
-using IParticleSystemPtr      = std::shared_ptr<IParticleSystem>;
-using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
-using MeshLODLevelPtr         = std::shared_ptr<MeshLODLevel>;
-using MeshPtr                 = std::shared_ptr<Mesh>;
-using MorphTargetManagerPtr   = std::shared_ptr<MorphTargetManager>;
-using SubMeshPtr              = std::shared_ptr<SubMesh>;
-using VertexBufferPtr         = std::shared_ptr<VertexBuffer>;
+FWD_STRUCT_SPTR(_CreationDataStorage)
+FWD_STRUCT_SPTR(_InstancesBatch)
+FWD_CLASS_SPTR(Buffer)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(GroundMesh)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(InstancedMesh)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(LinesMesh)
+FWD_CLASS_SPTR(MeshLODLevel)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(MorphTargetManager)
+FWD_CLASS_SPTR(SubMesh)
+FWD_CLASS_SPTR(VertexBuffer)
 
 /**
  * @brief Represents a custom thin buffer that will be instanced.
@@ -1715,7 +1703,7 @@ public:
                                   Scene* scene);
 
   /**
-   * @brief Creates a capsule or a pill mesh
+   * @brief Creates a Capsule Mesh.
    * @param name defines the name of the mesh.
    * @param options the constructors options used to shape the mesh.
    * @param scene defines the scene the mesh is scoped to.

@@ -332,12 +332,13 @@ void Mesh::set_computeBonesUsingShaders(bool value)
     return;
   }
 
-  if (value && !_internalMeshDataInfo->_sourcePositions.empty()
-      && !_internalMeshDataInfo->_sourceNormals.empty()) {
+  if (value && !_internalMeshDataInfo->_sourcePositions.empty()) {
     // switch from software to GPU computation: we need to reset the vertex and normal buffers that
     // have been updated by the software process
     setVerticesData(VertexBuffer::PositionKind, _internalMeshDataInfo->_sourcePositions, true);
-    setVerticesData(VertexBuffer::NormalKind, _internalMeshDataInfo->_sourceNormals, true);
+    if (!_internalMeshDataInfo->_sourceNormals.empty()) {
+      setVerticesData(VertexBuffer::NormalKind, _internalMeshDataInfo->_sourceNormals, true);
+    }
   }
 
   _internalAbstractMeshDataInfo._computeBonesUsingShaders = value;
@@ -798,6 +799,12 @@ Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 
   if (_instanceDataStorage->visibleInstances->meshes.find(renderId)
       == _instanceDataStorage->visibleInstances->meshes.end()) {
+    if (_instanceDataStorage->previousRenderId.has_value() && _instanceDataStorage->isFrozen
+        && *_instanceDataStorage->previousRenderId
+             < _instanceDataStorage->visibleInstances->meshes.size()) {
+      _instanceDataStorage->visibleInstances->meshes[*_instanceDataStorage->previousRenderId] = {};
+    }
+    _instanceDataStorage->previousRenderId                   = static_cast<unsigned int>(renderId);
     _instanceDataStorage->visibleInstances->meshes[renderId] = std::vector<InstancedMesh*>();
   }
 
@@ -1809,7 +1816,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
 
   // Render to MRT
   if (scene.prePassRenderer()) {
-    scene.prePassRenderer()->bindAttachmentsForEffect(*effect);
+    scene.prePassRenderer()->bindAttachmentsForEffect(*effect, subMesh);
   }
 
   auto& effectiveMesh = effectiveMeshReplacement ? *effectiveMeshReplacement : *_effectiveMesh();
@@ -2097,11 +2104,11 @@ SkinningValidationResult Mesh::validateSkinning()
   auto matricesIndices      = getVerticesData(VertexBuffer::MatricesIndicesKind);
   auto matricesIndicesExtra = getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
   auto numBadBoneIndices    = 0u;
-  for (size_t a = 0; a < numWeights; a++) {
+  for (size_t a = 0; a < numWeights; a += 4) {
     for (size_t b = 0; b < numInfluences; b++) {
-      auto index = b < 4 ? matricesIndices[b] : matricesIndicesExtra[b - 4];
+      auto index = b < 4 ? matricesIndices[a + b] : matricesIndicesExtra[a + b - 4];
       if (index >= numBones || index < 0) {
-        numBadBoneIndices++;
+        ++numBadBoneIndices;
       }
     }
   }
@@ -3936,15 +3943,14 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)) {
     return this;
   }
-  if (!isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    return this;
-  }
   if (!isVerticesDataPresent(VertexBuffer::MatricesIndicesKind)) {
     return this;
   }
   if (!isVerticesDataPresent(VertexBuffer::MatricesWeightsKind)) {
     return this;
   }
+
+  const auto hasNormals = isVerticesDataPresent(VertexBuffer::NormalKind);
 
   auto& internalDataInfo = *_internalMeshDataInfo;
 
@@ -3954,7 +3960,7 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
     subMeshes = std::move(_submeshes);
   }
 
-  if (internalDataInfo._sourceNormals.empty()) {
+  if (hasNormals && internalDataInfo._sourceNormals.empty()) {
     setNormalsForCPUSkinning();
   }
 
@@ -3969,8 +3975,10 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
   // normalsData checks for not being Float32Array will only pass at most once
   auto normalsData = getVerticesData(VertexBuffer::NormalKind);
 
-  if (normalsData.empty()) {
-    return this;
+  if (hasNormals) {
+    if (normalsData.empty()) {
+      return this;
+    }
   }
 
   auto matricesIndicesData = getVerticesData(VertexBuffer::MatricesIndicesKind);
@@ -4024,16 +4032,20 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
       internalDataInfo._sourcePositions[index + 2], finalMatrix, tempVector3);
     tempVector3.toArray(positionsData, index);
 
-    Vector3::TransformNormalFromFloatsToRef(
-      internalDataInfo._sourceNormals[index], internalDataInfo._sourceNormals[index + 1],
-      internalDataInfo._sourceNormals[index + 2], finalMatrix, tempVector3);
-    tempVector3.toArray(normalsData, index);
+    if (hasNormals) {
+      Vector3::TransformNormalFromFloatsToRef(
+        internalDataInfo._sourceNormals[index], internalDataInfo._sourceNormals[index + 1],
+        internalDataInfo._sourceNormals[index + 2], finalMatrix, tempVector3);
+      tempVector3.toArray(normalsData, index);
+    }
 
     finalMatrix.reset();
   }
 
   updateVerticesData(VertexBuffer::PositionKind, positionsData);
-  updateVerticesData(VertexBuffer::NormalKind, normalsData);
+  if (hasNormals) {
+    updateVerticesData(VertexBuffer::NormalKind, normalsData);
+  }
 
   return this;
 }
