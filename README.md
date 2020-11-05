@@ -46,7 +46,7 @@ python cmake_build.py all --mode=debug
 
 Use the provided CMakeLists.txt with [CMake](https://cmake.org) to generate a build configuration for your favorite IDE or compiler.
 
-## <img src="./assets/images/OS_X_El_Capitan_logo.png" alt="" height="32px"> iOS
+## <img src="./assets/images/iOS_logo.png" alt="" height="32px"> iOS
 
 Xcode project targeting iOS 12.0
 
