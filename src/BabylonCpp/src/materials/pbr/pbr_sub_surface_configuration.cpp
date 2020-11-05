@@ -59,6 +59,7 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
     , _isScatteringEnabled{false}
     , _scatteringDiffusionProfileIndex{0ull}
     , _nullColor{std::nullopt}
+    , _ssDiffusionProfileColor{std::nullopt}
     , _thicknessTexture{nullptr}
     , _refractionTexture{nullptr}
     , _indexOfRefraction{1.5f}
@@ -121,25 +122,30 @@ void PBRSubSurfaceConfiguration::set_isScatteringEnabled(bool value)
 
 std::optional<Color3>& PBRSubSurfaceConfiguration::get_scatteringDiffusionProfile()
 {
-  if (!_scene->prePassRenderer()) {
+  if (!_scene->subSurfaceConfiguration()) {
     return _nullColor;
   }
 
-  _scatteringDiffusionProfile
-    = _scene->prePassRenderer()
-        ->subSurfaceConfiguration->ssDiffusionProfileColors[_scatteringDiffusionProfileIndex];
-  return _scatteringDiffusionProfile;
+  if (_scatteringDiffusionProfileIndex
+      >= _scene->subSurfaceConfiguration()->ssDiffusionProfileColors.size()) {
+    return _nullColor;
+  }
+
+  _ssDiffusionProfileColor
+    = _scene->subSurfaceConfiguration()->ssDiffusionProfileColors[_scatteringDiffusionProfileIndex];
+
+  return _ssDiffusionProfileColor;
 }
 
 void PBRSubSurfaceConfiguration::set_scatteringDiffusionProfile(const std::optional<Color3>& c)
 {
-  if (!_scene->enablePrePassRenderer()) {
+  if (!_scene->enableSubSurfaceForPrePass()) {
     // Not supported
     return;
   }
 
   // addDiffusionProfile automatically checks for doubles
-  if (c) {
+  if (c && _scene->prePassRenderer()->subSurfaceConfiguration) {
     _scatteringDiffusionProfileIndex
       = _scene->prePassRenderer()->subSurfaceConfiguration->addDiffusionProfile(*c);
   }
@@ -266,6 +272,7 @@ void PBRSubSurfaceConfiguration::_markAllSubMeshesAsTexturesDirty()
 
 void PBRSubSurfaceConfiguration::_markScenePrePassDirty()
 {
+  _internalMarkAllSubMeshesAsTexturesDirty();
   _internalMarkScenePrePassDirty();
 }
 

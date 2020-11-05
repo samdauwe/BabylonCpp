@@ -6,24 +6,22 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class IAnimatable;
-class BaseTexture;
 class Effect;
 class EffectFallbacks;
 class Engine;
 struct MaterialDefines;
-class RenderTargetTexture;
 class Scene;
 class UniformBuffer;
-using IAnimatablePtr         = std::shared_ptr<IAnimatable>;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Define the code related to the sub surface parameters of the pbr material.
@@ -343,7 +341,7 @@ private:
   bool _isTranslucencyEnabled;
   bool _isScatteringEnabled;
   size_t _scatteringDiffusionProfileIndex;
-  std::optional<Color3> _nullColor, _scatteringDiffusionProfile;
+  std::optional<Color3> _nullColor, _ssDiffusionProfileColor, _scatteringDiffusionProfile;
   BaseTexturePtr _thicknessTexture;
   BaseTexturePtr _refractionTexture;
   float _indexOfRefraction;
