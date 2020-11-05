@@ -9,6 +9,7 @@
 #include <babylon/materials/pbr/imaterial_sheen_defines.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/uniform_buffer.h>
+#include <babylon/meshes/sub_mesh.h>
 
 namespace BABYLON {
 
@@ -20,13 +21,19 @@ PBRSheenConfiguration::PBRSheenConfiguration(
     , intensity{1.f}
     , color{Color3::White()}
     , texture{this, &PBRSheenConfiguration::get_texture, &PBRSheenConfiguration::set_texture}
+    , useRoughnessFromMainTexture{this, &PBRSheenConfiguration::get_useRoughnessFromMainTexture,
+                                  &PBRSheenConfiguration::set_useRoughnessFromMainTexture}
     , roughness{this, &PBRSheenConfiguration::get_roughness, &PBRSheenConfiguration::set_roughness}
+    , textureRoughness{this, &PBRSheenConfiguration::get_textureRoughness,
+                       &PBRSheenConfiguration::set_textureRoughness}
     , albedoScaling{this, &PBRSheenConfiguration::get_albedoScaling,
                     &PBRSheenConfiguration::set_albedoScaling}
     , _isEnabled{false}
     , _linkSheenWithAlbedo{false}
     , _texture{nullptr}
+    , _useRoughnessFromMainTexture{true}
     , _roughness{std::nullopt}
+    , _textureRoughness{nullptr}
     , _albedoScaling{false}
     , _internalMarkAllSubMeshesAsTexturesDirty{markAllSubMeshesAsTexturesDirty}
 {
@@ -80,6 +87,21 @@ void PBRSheenConfiguration::set_texture(const BaseTexturePtr& value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
+bool PBRSheenConfiguration::get_useRoughnessFromMainTexture() const
+{
+  return _useRoughnessFromMainTexture;
+}
+
+void PBRSheenConfiguration::set_useRoughnessFromMainTexture(bool value)
+{
+  if (_useRoughnessFromMainTexture == value) {
+    return;
+  }
+
+  _useRoughnessFromMainTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
 std::optional<float>& PBRSheenConfiguration::get_roughness()
 {
   return _roughness;
@@ -92,6 +114,21 @@ void PBRSheenConfiguration::set_roughness(const std::optional<float>& value)
   }
 
   _roughness = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+BaseTexturePtr& PBRSheenConfiguration::get_textureRoughness()
+{
+  return _textureRoughness;
+}
+
+void PBRSheenConfiguration::set_textureRoughness(const BaseTexturePtr& value)
+{
+  if (_textureRoughness == value) {
+    return;
+  }
+
+  _textureRoughness = value;
   _markAllSubMeshesAsTexturesDirty();
 }
 
@@ -124,6 +161,12 @@ bool PBRSheenConfiguration::isReadyForSubMesh(const MaterialDefines& defines, Sc
           return false;
         }
       }
+
+      if (_textureRoughness && MaterialFlags::SheenTextureEnabled()) {
+        if (!_textureRoughness->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
     }
   }
 
@@ -133,10 +176,15 @@ bool PBRSheenConfiguration::isReadyForSubMesh(const MaterialDefines& defines, Sc
 void PBRSheenConfiguration::prepareDefines(MaterialDefines& defines, Scene* scene)
 {
   if (_isEnabled) {
-    defines.boolDef["SHEEN"]                = _isEnabled;
-    defines.boolDef["SHEEN_LINKWITHALBEDO"] = _linkSheenWithAlbedo;
-    defines.boolDef["SHEEN_ROUGHNESS"]      = _roughness.has_value();
-    defines.boolDef["SHEEN_ALBEDOSCALING"]  = _albedoScaling;
+    defines.boolDef["SHEEN"]                                = _isEnabled;
+    defines.boolDef["SHEEN_LINKWITHALBEDO"]                 = _linkSheenWithAlbedo;
+    defines.boolDef["SHEEN_ROUGHNESS"]                      = _roughness.has_value();
+    defines.boolDef["SHEEN_ALBEDOSCALING"]                  = _albedoScaling;
+    defines.boolDef["SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE"] = _useRoughnessFromMainTexture;
+    defines.boolDef["SHEEN_TEXTURE_ROUGHNESS_IDENTICAL"]
+      = _texture != nullptr && _textureRoughness != nullptr
+        && _texture->_texture == _textureRoughness->_texture
+        && _texture->checkTransformsAreIdentical(_textureRoughness);
 
     if (defines._areTexturesDirty) {
       if (scene->texturesEnabled()) {
@@ -146,26 +194,55 @@ void PBRSheenConfiguration::prepareDefines(MaterialDefines& defines, Scene* scen
         else {
           defines.boolDef["SHEEN_TEXTURE"] = false;
         }
+
+        if (_textureRoughness && MaterialFlags::SheenTextureEnabled()) {
+          MaterialHelper::PrepareDefinesForMergedUV(_textureRoughness, defines,
+                                                    "SHEEN_TEXTURE_ROUGHNESS");
+        }
+        else {
+          defines.boolDef["SHEEN_TEXTURE_ROUGHNESS"] = false;
+        }
       }
     }
   }
   else {
-    defines.boolDef["SHEEN"]                = false;
-    defines.boolDef["SHEEN_TEXTURE"]        = false;
-    defines.boolDef["SHEEN_LINKWITHALBEDO"] = false;
-    defines.boolDef["SHEEN_ROUGHNESS"]      = false;
-    defines.boolDef["SHEEN_ALBEDOSCALING"]  = false;
+    defines.boolDef["SHEEN"]                                = false;
+    defines.boolDef["SHEEN_TEXTURE"]                        = false;
+    defines.boolDef["SHEEN_TEXTURE_ROUGHNESS"]              = false;
+    defines.boolDef["SHEEN_LINKWITHALBEDO"]                 = false;
+    defines.boolDef["SHEEN_ROUGHNESS"]                      = false;
+    defines.boolDef["SHEEN_ALBEDOSCALING"]                  = false;
+    defines.boolDef["SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE"] = false;
+    defines.boolDef["SHEEN_TEXTURE_ROUGHNESS_IDENTICAL"]    = false;
   }
 }
 
 void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
-                                           bool isFrozen)
+                                           bool isFrozen, SubMesh* subMesh)
 {
+  std::shared_ptr<IMaterialSheenDefines> defines = nullptr;
+  auto identicalTextures                         = false;
+  if (subMesh) {
+    defines           = std::static_pointer_cast<IMaterialSheenDefines>(subMesh->_materialDefines);
+    identicalTextures = defines->boolDef["SHEEN_TEXTURE_ROUGHNESS_IDENTICAL"];
+  }
+
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
-    if (_texture && MaterialFlags::SheenTextureEnabled()) {
-      uniformBuffer.updateFloat2("vSheenInfos", static_cast<float>(_texture->coordinatesIndex),
-                                 _texture->level, "");
+    if (identicalTextures && MaterialFlags::SheenTextureEnabled() && _texture) {
+      uniformBuffer.updateFloat4("vSheenInfos", static_cast<float>(_texture->coordinatesIndex),
+                                 _texture->level, -1.f, -1.f, "");
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "sheen");
+    }
+    else if ((_texture || _textureRoughness) && MaterialFlags::SheenTextureEnabled()) {
+      uniformBuffer.updateFloat4("vSheenInfos", _texture->coordinatesIndex, _texture->level,
+                                 _textureRoughness->coordinatesIndex, _textureRoughness->level, "");
+      if (_texture) {
+        MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "sheen");
+      }
+      if (_textureRoughness && !identicalTextures
+          && !(*defines)["SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE"]) {
+        MaterialHelper::BindTextureMatrix(*_textureRoughness, uniformBuffer, "sheenRoughness");
+      }
     }
 
     // Sheen
@@ -181,18 +258,36 @@ void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Scene* 
     if (_texture && MaterialFlags::SheenTextureEnabled()) {
       uniformBuffer.setTexture("sheenSampler", _texture);
     }
+
+    if (_textureRoughness && !identicalTextures
+        && !(*defines)["SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE"]
+        && MaterialFlags::SheenTextureEnabled()) {
+      uniformBuffer.setTexture("sheenRoughnessSampler", _textureRoughness);
+    }
   }
 }
 
 bool PBRSheenConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
-  return _texture == iTexture;
+  if (_texture == iTexture) {
+    return true;
+  }
+
+  if (_textureRoughness == iTexture) {
+    return true;
+  }
+
+  return false;
 }
 
 void PBRSheenConfiguration::getActiveTextures(std::vector<BaseTexturePtr>& activeTextures)
 {
   if (_texture) {
     activeTextures.emplace_back(_texture);
+  }
+
+  if (_textureRoughness) {
+    activeTextures.emplace_back(_textureRoughness);
   }
 }
 
@@ -201,6 +296,10 @@ void PBRSheenConfiguration::getAnimatables(std::vector<IAnimatablePtr>& animatab
   if (_texture && !_texture->animations.empty()) {
     animatables.emplace_back(_texture);
   }
+
+  if (_textureRoughness && !_textureRoughness->animations.empty()) {
+    animatables.emplace_back(_textureRoughness);
+  }
 }
 
 void PBRSheenConfiguration::dispose(bool forceDisposeTextures)
@@ -208,6 +307,9 @@ void PBRSheenConfiguration::dispose(bool forceDisposeTextures)
   if (forceDisposeTextures) {
     if (_texture) {
       _texture->dispose();
+    }
+    if (_textureRoughness) {
+      _textureRoughness->dispose();
     }
   }
 }
@@ -229,20 +331,23 @@ unsigned int PBRSheenConfiguration::AddFallbacks(const MaterialDefines& defines,
 
 void PBRSheenConfiguration::AddUniforms(std::vector<std::string>& uniforms)
 {
-  stl_util::concat(uniforms, {"vSheenColor", "vSheenRoughness", "vSheenInfos", "sheenMatrix"});
+  stl_util::concat(uniforms, {"vSheenColor", "vSheenRoughness", "vSheenInfos", "sheenMatrix",
+                              "sheenRoughnessMatrix"});
 }
 
 void PBRSheenConfiguration::PrepareUniformBuffer(UniformBuffer& uniformBuffer)
 {
   uniformBuffer.addUniform("vSheenColor", 4);
   uniformBuffer.addUniform("vSheenRoughness", 1);
-  uniformBuffer.addUniform("vSheenInfos", 2);
+  uniformBuffer.addUniform("vSheenInfos", 4);
   uniformBuffer.addUniform("sheenMatrix", 16);
+  uniformBuffer.addUniform("sheenRoughnessMatrix", 16);
 }
 
 void PBRSheenConfiguration::AddSamplers(std::vector<std::string>& samplers)
 {
   samplers.emplace_back("sheenSampler");
+  samplers.emplace_back("sheenRoughnessSampler");
 }
 
 void PBRSheenConfiguration::copyTo(PBRSheenConfiguration& /*anisotropicConfiguration*/)

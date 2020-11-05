@@ -7,6 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 
 using json = nlohmann::json;
@@ -18,9 +19,10 @@ class EffectFallbacks;
 class IAnimatable;
 struct MaterialDefines;
 class Scene;
+class SubMesh;
 class UniformBuffer;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(IAnimatable)
 
 /**
  * @brief Define the code related to the BRDF parameters of the pbr material.
@@ -60,15 +62,17 @@ public:
    * @param uniformBuffer defines the Uniform buffer to fill in.
    * @param scene defines the scene the material belongs to.
    * @param isFrozen defines wether the material is frozen or not.
+   * @param subMesh the submesh to bind data for
    */
-  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, bool isFrozen);
+  void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, bool isFrozen,
+                      SubMesh* subMesh = nullptr);
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
+  bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -92,7 +96,7 @@ public:
    * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRSheenConfiguration"
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.
@@ -132,7 +136,7 @@ public:
    * @brief Serializes this BRDF configuration.
    * @returns - An object with the serialized config.
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses a sheen Configuration from a serialized object.
@@ -143,14 +147,18 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  [[nodiscard]] bool get_isEnabled() const;
+  bool get_isEnabled() const;
   void set_isEnabled(bool value);
-  [[nodiscard]] bool get_linkSheenWithAlbedo() const;
+  bool get_linkSheenWithAlbedo() const;
   void set_linkSheenWithAlbedo(bool value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);
+  bool get_useRoughnessFromMainTexture() const;
+  void set_useRoughnessFromMainTexture(bool value);
   std::optional<float>& get_roughness();
   void set_roughness(const std::optional<float>& value);
+  BaseTexturePtr& get_textureRoughness();
+  void set_textureRoughness(const BaseTexturePtr& value);
   bool get_albedoScaling() const;
   void set_albedoScaling(bool value);
 
@@ -178,9 +186,18 @@ public:
   /**
    * Stores the sheen tint values in a texture.
    * rgb is tint
-   * a is a intensity or roughness if roughness has been defined
+   * a is a intensity or roughness if the roughness property has been defined and
+   * useRoughnessFromTexture is true (in that case, textureRoughness won't be used) If the roughness
+   * property has been defined and useRoughnessFromTexture is false then the alpha channel is not
+   * used to modulate roughness
    */
   Property<PBRSheenConfiguration, BaseTexturePtr> texture;
+
+  /**
+   * Indicates that the alpha channel of the texture property will be used for roughness.
+   * Has no effect if the roughness (and texture!) property is not defined
+   */
+  Property<PBRSheenConfiguration, bool> useRoughnessFromMainTexture;
 
   /**
    * Defines the sheen roughness.
@@ -188,6 +205,13 @@ public:
    * To stay backward compatible, material roughness is used instead if sheen roughness = null
    */
   Property<PBRSheenConfiguration, std::optional<float>> roughness;
+
+  /**
+   * Stores the sheen roughness in a texture.
+   * alpha channel is the roughness. This texture won't be used if the texture property is not empty
+   * and useRoughnessFromTexture is true
+   */
+  Property<PBRSheenConfiguration, BaseTexturePtr> textureRoughness;
 
   /**
    * If true, the sheen effect is layered above the base BRDF with the albedo-scaling technique.
@@ -200,7 +224,9 @@ private:
   bool _isEnabled;
   bool _linkSheenWithAlbedo;
   BaseTexturePtr _texture;
+  bool _useRoughnessFromMainTexture;
   std::optional<float> _roughness;
+  BaseTexturePtr _textureRoughness;
   bool _albedoScaling;
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;
 
