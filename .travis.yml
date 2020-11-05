@@ -112,7 +112,7 @@ before_script:
     if [ $TRAVIS_OS_NAME = 'osx' ]; then
       # Mac OS X platform
       echo "Running build on Mac OS X platform"
-      mkdir build && cd build && cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE=../external/ios-cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=0 -DDEPLOYMENT_TARGET=12 ../
+      mkdir build && cd build && cmake -G Xcode ../
     else
       # GNU/Linux platform
       echo "Running build on GNU/Linux platform"
