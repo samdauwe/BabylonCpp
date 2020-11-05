@@ -10,6 +10,7 @@
 #include <babylon/materials/pbr/imaterial_clear_coat_defines.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/uniform_buffer.h>
+#include <babylon/meshes/sub_mesh.h>
 
 namespace BABYLON {
 
@@ -23,6 +24,12 @@ PBRClearCoatConfiguration::PBRClearCoatConfiguration(
                         &PBRClearCoatConfiguration::set_indexOfRefraction}
     , texture{this, &PBRClearCoatConfiguration::get_texture,
               &PBRClearCoatConfiguration::set_texture}
+    , useRoughnessFromMainTexture{this, &PBRClearCoatConfiguration::get_useRoughnessFromMainTexture,
+                                  &PBRClearCoatConfiguration::set_useRoughnessFromMainTexture}
+    , textureRoughness{this, &PBRClearCoatConfiguration::get_textureRoughness,
+                       &PBRClearCoatConfiguration::set_textureRoughness}
+    , remapF0OnInterfaceChange{this, &PBRClearCoatConfiguration::get_remapF0OnInterfaceChange,
+                               &PBRClearCoatConfiguration::set_remapF0OnInterfaceChange}
     , bumpTexture{this, &PBRClearCoatConfiguration::get_bumpTexture,
                   &PBRClearCoatConfiguration::set_bumpTexture}
     , isTintEnabled{this, &PBRClearCoatConfiguration::get_isTintEnabled,
@@ -35,6 +42,9 @@ PBRClearCoatConfiguration::PBRClearCoatConfiguration(
     , _isEnabled{false}
     , _indexOfRefraction{PBRClearCoatConfiguration::_DefaultIndexOfRefraction}
     , _texture{nullptr}
+    , _useRoughnessFromMainTexture{true}
+    , _textureRoughness{nullptr}
+    , _remapF0OnInterfaceChange{true}
     , _bumpTexture{nullptr}
     , _isTintEnabled{false}
     , _tintTexture{nullptr}
@@ -89,6 +99,51 @@ void PBRClearCoatConfiguration::set_texture(const BaseTexturePtr& value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
+bool PBRClearCoatConfiguration::get_useRoughnessFromMainTexture() const
+{
+  return _useRoughnessFromMainTexture;
+}
+
+void PBRClearCoatConfiguration::set_useRoughnessFromMainTexture(bool value)
+{
+  if (_useRoughnessFromMainTexture == value) {
+    return;
+  }
+
+  _useRoughnessFromMainTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+BaseTexturePtr& PBRClearCoatConfiguration::get_textureRoughness()
+{
+  return _textureRoughness;
+}
+
+void PBRClearCoatConfiguration::set_textureRoughness(const BaseTexturePtr& value)
+{
+  if (_textureRoughness == value) {
+    return;
+  }
+
+  _textureRoughness = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+bool PBRClearCoatConfiguration::get_remapF0OnInterfaceChange() const
+{
+  return _remapF0OnInterfaceChange;
+}
+
+void PBRClearCoatConfiguration::set_remapF0OnInterfaceChange(bool value)
+{
+  if (_remapF0OnInterfaceChange == value) {
+    return;
+  }
+
+  _remapF0OnInterfaceChange = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
 BaseTexturePtr& PBRClearCoatConfiguration::get_bumpTexture()
 {
   return _bumpTexture;
@@ -139,14 +194,19 @@ void PBRClearCoatConfiguration::_markAllSubMeshesAsTexturesDirty()
   _internalMarkAllSubMeshesAsTexturesDirty();
 }
 
-bool PBRClearCoatConfiguration::isReadyForSubMesh(
-  const MaterialDefines& defines, Scene* scene, Engine* engine,
-  bool disableBumpMap) const
+bool PBRClearCoatConfiguration::isReadyForSubMesh(const MaterialDefines& defines, Scene* scene,
+                                                  Engine* engine, bool disableBumpMap) const
 {
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
       if (_texture && MaterialFlags::ClearCoatTextureEnabled()) {
         if (!_texture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (_textureRoughness && MaterialFlags::ClearCoatTextureEnabled()) {
+        if (!_textureRoughness->isReadyOrNotBlocking()) {
           return false;
         }
       }
@@ -159,8 +219,7 @@ bool PBRClearCoatConfiguration::isReadyForSubMesh(
         }
       }
 
-      if (_isTintEnabled && _tintTexture
-          && MaterialFlags::ClearCoatTintTextureEnabled()) {
+      if (_isTintEnabled && _tintTexture && MaterialFlags::ClearCoatTintTextureEnabled()) {
         if (!_tintTexture->isReadyOrNotBlocking()) {
           return false;
         }
@@ -171,33 +230,43 @@ bool PBRClearCoatConfiguration::isReadyForSubMesh(
   return true;
 }
 
-void PBRClearCoatConfiguration::prepareDefines(MaterialDefines& defines,
-                                               Scene* scene)
+void PBRClearCoatConfiguration::prepareDefines(MaterialDefines& defines, Scene* scene)
 {
   if (_isEnabled) {
-    defines.boolDef["CLEARCOAT"] = true;
+    defines.boolDef["CLEARCOAT"]                                = true;
+    defines.boolDef["CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE"] = _useRoughnessFromMainTexture;
+    defines.boolDef["CLEARCOAT_TEXTURE_ROUGHNESS_IDENTICAL"]
+      = _texture != nullptr && _textureRoughness != nullptr
+        && _texture->_texture == _textureRoughness->_texture
+        && _texture->checkTransformsAreIdentical(_textureRoughness);
+    defines.boolDef["CLEARCOAT_REMAP_F0"] = _remapF0OnInterfaceChange;
 
     if (defines._areTexturesDirty) {
       if (scene->texturesEnabled()) {
         if (_texture && MaterialFlags::ClearCoatTextureEnabled()) {
-          MaterialHelper::PrepareDefinesForMergedUV(_texture, defines,
-                                                    "CLEARCOAT_TEXTURE");
+          MaterialHelper::PrepareDefinesForMergedUV(_texture, defines, "CLEARCOAT_TEXTURE");
         }
         else {
           defines.boolDef["CLEARCOAT_TEXTURE"] = false;
         }
 
+        if (_textureRoughness && MaterialFlags::ClearCoatTextureEnabled()) {
+          MaterialHelper::PrepareDefinesForMergedUV(_textureRoughness, defines,
+                                                    "CLEARCOAT_TEXTURE_ROUGHNESS");
+        }
+        else {
+          defines.boolDef["CLEARCOAT_TEXTURE_ROUGHNESS"] = false;
+        }
+
         if (_bumpTexture && MaterialFlags::ClearCoatBumpTextureEnabled()) {
-          MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines,
-                                                    "CLEARCOAT_BUMP");
+          MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines, "CLEARCOAT_BUMP");
         }
         else {
           defines.boolDef["CLEARCOAT_BUMP"] = false;
         }
 
         defines.boolDef["CLEARCOAT_DEFAULTIOR"] = stl_util::almost_equal(
-          _indexOfRefraction,
-          PBRClearCoatConfiguration::_DefaultIndexOfRefraction);
+          _indexOfRefraction, PBRClearCoatConfiguration::_DefaultIndexOfRefraction);
 
         if (_isTintEnabled) {
           defines.boolDef["CLEARCOAT_TINT"] = true;
@@ -217,57 +286,69 @@ void PBRClearCoatConfiguration::prepareDefines(MaterialDefines& defines,
     }
   }
   else {
-    defines.boolDef["CLEARCOAT"]              = false;
-    defines.boolDef["CLEARCOAT_TEXTURE"]      = false;
-    defines.boolDef["CLEARCOAT_BUMP"]         = false;
-    defines.boolDef["CLEARCOAT_TINT"]         = false;
-    defines.boolDef["CLEARCOAT_TINT_TEXTURE"] = false;
+    defines.boolDef["CLEARCOAT"]                                = false;
+    defines.boolDef["CLEARCOAT_TEXTURE"]                        = false;
+    defines.boolDef["CLEARCOAT_TEXTURE_ROUGHNESS"]              = false;
+    defines.boolDef["CLEARCOAT_BUMP"]                           = false;
+    defines.boolDef["CLEARCOAT_TINT"]                           = false;
+    defines.boolDef["CLEARCOAT_TINT_TEXTURE"]                   = false;
+    defines.boolDef["CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE"] = false;
+    defines.boolDef["CLEARCOAT_TEXTURE_ROUGHNESS_IDENTICAL"]    = false;
   }
 }
 
-void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
-                                               Scene* scene, Engine* engine,
-                                               bool disableBumpMap,
-                                               bool isFrozen,
-                                               bool invertNormalMapX,
-                                               bool invertNormalMapY)
+void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene,
+                                               Engine* engine, bool disableBumpMap, bool isFrozen,
+                                               bool invertNormalMapX, bool invertNormalMapY,
+                                               SubMesh* subMesh)
 {
+  std::shared_ptr<IMaterialClearCoatDefines> defines = nullptr;
+  auto identicalTextures                             = false;
+  if (subMesh) {
+    defines = std::static_pointer_cast<IMaterialClearCoatDefines>(subMesh->_materialDefines);
+    identicalTextures = defines->boolDef["CLEARCOAT_TEXTURE_ROUGHNESS_IDENTICAL"];
+  }
+
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
-    if (_texture && MaterialFlags::ClearCoatTextureEnabled()) {
-      uniformBuffer.updateFloat2("vClearCoatInfos",
-                                 static_cast<float>(_texture->coordinatesIndex),
-                                 _texture->level, "");
+    if (identicalTextures && MaterialFlags::ClearCoatTextureEnabled() && _texture) {
+      uniformBuffer.updateFloat4("vClearCoatInfos", static_cast<float>(_texture->coordinatesIndex),
+                                 _texture->level, -1.f, -1.f, "");
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "clearCoat");
+    }
+    else if ((_texture || _textureRoughness) && MaterialFlags::ClearCoatTextureEnabled()) {
+      uniformBuffer.updateFloat4("vClearCoatInfos", _texture->coordinatesIndex, _texture->level,
+                                 _textureRoughness->coordinatesIndex, _textureRoughness->level, "");
+      if (_texture) {
+        MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "clearCoat");
+      }
+      if (_textureRoughness && !identicalTextures
+          && !(*defines)["CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE"]) {
+        MaterialHelper::BindTextureMatrix(*_textureRoughness, uniformBuffer, "clearCoatRoughness");
+      }
     }
 
     if (_bumpTexture && engine->getCaps().standardDerivatives
         && MaterialFlags::ClearCoatTextureEnabled() && !disableBumpMap) {
-      uniformBuffer.updateFloat2(
-        "vClearCoatBumpInfos",
-        static_cast<float>(_bumpTexture->coordinatesIndex), _bumpTexture->level,
-        "");
-      MaterialHelper::BindTextureMatrix(*_bumpTexture, uniformBuffer,
-                                        "clearCoatBump");
+      uniformBuffer.updateFloat2("vClearCoatBumpInfos",
+                                 static_cast<float>(_bumpTexture->coordinatesIndex),
+                                 _bumpTexture->level, "");
+      MaterialHelper::BindTextureMatrix(*_bumpTexture, uniformBuffer, "clearCoatBump");
 
       if (scene->_mirroredCameraPosition) {
-        uniformBuffer.updateFloat2("vClearCoatTangentSpaceParams",
-                                   invertNormalMapX ? 1.f : -1.f,
+        uniformBuffer.updateFloat2("vClearCoatTangentSpaceParams", invertNormalMapX ? 1.f : -1.f,
                                    invertNormalMapY ? 1.f : -1.f, "");
       }
       else {
-        uniformBuffer.updateFloat2("vClearCoatTangentSpaceParams",
-                                   invertNormalMapX ? -1.f : 1.f,
+        uniformBuffer.updateFloat2("vClearCoatTangentSpaceParams", invertNormalMapX ? -1.f : 1.f,
                                    invertNormalMapY ? -1.f : 1.f, "");
       }
     }
 
     if (_tintTexture && MaterialFlags::ClearCoatTintTextureEnabled()) {
-      uniformBuffer.updateFloat2(
-        "vClearCoatTintInfos",
-        static_cast<float>(_tintTexture->coordinatesIndex), _tintTexture->level,
-        "");
-      MaterialHelper::BindTextureMatrix(*_tintTexture, uniformBuffer,
-                                        "clearCoatTint");
+      uniformBuffer.updateFloat2("vClearCoatTintInfos",
+                                 static_cast<float>(_tintTexture->coordinatesIndex),
+                                 _tintTexture->level, "");
+      MaterialHelper::BindTextureMatrix(*_tintTexture, uniformBuffer, "clearCoatTint");
     }
 
     // Clear Coat General params
@@ -283,8 +364,7 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
     uniformBuffer.updateFloat4("vClearCoatRefractionParams", f0, eta, a, b, "");
 
     if (_isTintEnabled) {
-      uniformBuffer.updateFloat4("vClearCoatTintParams", tintColor.r,
-                                 tintColor.g, tintColor.b,
+      uniformBuffer.updateFloat4("vClearCoatTintParams", tintColor.r, tintColor.g, tintColor.b,
                                  std::max(0.00001f, tintThickness), "");
       uniformBuffer.updateFloat("clearCoatColorAtDistance",
                                 std::max(0.00001f, tintColorAtDistance));
@@ -297,13 +377,18 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
       uniformBuffer.setTexture("clearCoatSampler", _texture);
     }
 
+    if (_textureRoughness && !identicalTextures
+        && !(*defines)["CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE"]
+        && MaterialFlags::ClearCoatTextureEnabled()) {
+      uniformBuffer.setTexture("clearCoatRoughnessSampler", _textureRoughness);
+    }
+
     if (_bumpTexture && engine->getCaps().standardDerivatives
         && MaterialFlags::ClearCoatBumpTextureEnabled() && !disableBumpMap) {
       uniformBuffer.setTexture("clearCoatBumpSampler", _bumpTexture);
     }
 
-    if (_isTintEnabled && _tintTexture
-        && MaterialFlags::ClearCoatTintTextureEnabled()) {
+    if (_isTintEnabled && _tintTexture && MaterialFlags::ClearCoatTintTextureEnabled()) {
       uniformBuffer.setTexture("clearCoatTintSampler", _tintTexture);
     }
   }
@@ -312,6 +397,10 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 bool PBRClearCoatConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
   if (_texture == iTexture) {
+    return true;
+  }
+
+  if (_textureRoughness == iTexture) {
     return true;
   }
 
@@ -326,11 +415,14 @@ bool PBRClearCoatConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
   return false;
 }
 
-void PBRClearCoatConfiguration::getActiveTextures(
-  std::vector<BaseTexturePtr>& activeTextures)
+void PBRClearCoatConfiguration::getActiveTextures(std::vector<BaseTexturePtr>& activeTextures)
 {
   if (_texture) {
     activeTextures.emplace_back(_texture);
+  }
+
+  if (_textureRoughness) {
+    activeTextures.emplace_back(_textureRoughness);
   }
 
   if (_bumpTexture) {
@@ -342,11 +434,14 @@ void PBRClearCoatConfiguration::getActiveTextures(
   }
 }
 
-void PBRClearCoatConfiguration::getAnimatables(
-  std::vector<IAnimatablePtr>& animatables)
+void PBRClearCoatConfiguration::getAnimatables(std::vector<IAnimatablePtr>& animatables)
 {
   if (_texture && !_texture->animations.empty()) {
     animatables.emplace_back(_texture);
+  }
+
+  if (_textureRoughness && !_textureRoughness->animations.empty()) {
+    animatables.emplace_back(_textureRoughness);
   }
 
   if (_bumpTexture && !_bumpTexture->animations.empty()) {
@@ -365,6 +460,10 @@ void PBRClearCoatConfiguration::dispose(bool forceDisposeTextures)
       _texture->dispose();
     }
 
+    if (_textureRoughness) {
+      _textureRoughness->dispose();
+    }
+
     if (_bumpTexture) {
       _bumpTexture->dispose();
     }
@@ -380,9 +479,9 @@ std::string PBRClearCoatConfiguration::getClassName() const
   return "PBRClearCoatConfiguration";
 }
 
-unsigned int PBRClearCoatConfiguration::AddFallbacks(
-  const IMaterialClearCoatDefines& defines, EffectFallbacks& fallbacks,
-  unsigned int currentRank)
+unsigned int PBRClearCoatConfiguration::AddFallbacks(const IMaterialClearCoatDefines& defines,
+                                                     EffectFallbacks& fallbacks,
+                                                     unsigned int currentRank)
 {
   if (defines["CLEARCOAT_BUMP"]) {
     fallbacks.addFallback(currentRank++, "CLEARCOAT_BUMP");
@@ -399,26 +498,25 @@ unsigned int PBRClearCoatConfiguration::AddFallbacks(
 void PBRClearCoatConfiguration::AddUniforms(std::vector<std::string>& uniforms)
 {
   stl_util::concat(
-    uniforms, {"vClearCoatTangentSpaceParams", "vClearCoatParams",
-               "vClearCoatRefractionParams", "vClearCoatTintParams",
-               "clearCoatColorAtDistance", "clearCoatMatrix",
-               "clearCoatBumpMatrix", "clearCoatTintMatrix", "vClearCoatInfos",
-               "vClearCoatBumpInfos", "vClearCoatTintInfos"});
+    uniforms, {"vClearCoatTangentSpaceParams", "vClearCoatParams", "vClearCoatRefractionParams",
+               "vClearCoatTintParams", "clearCoatColorAtDistance", "clearCoatMatrix",
+               "clearCoatRoughnessMatrix", "clearCoatBumpMatrix", "clearCoatTintMatrix",
+               "vClearCoatInfos", "vClearCoatBumpInfos", "vClearCoatTintInfos"});
 }
 
 void PBRClearCoatConfiguration::AddSamplers(std::vector<std::string>& samplers)
 {
-  stl_util::concat(samplers, {"clearCoatSampler", "clearCoatBumpSampler",
-                              "clearCoatTintSampler"});
+  stl_util::concat(samplers, {"clearCoatSampler", "clearCoatRoughnessSampler",
+                              "clearCoatBumpSampler", "clearCoatTintSampler"});
 }
 
-void PBRClearCoatConfiguration::PrepareUniformBuffer(
-  UniformBuffer& uniformBuffer)
+void PBRClearCoatConfiguration::PrepareUniformBuffer(UniformBuffer& uniformBuffer)
 {
   uniformBuffer.addUniform("vClearCoatParams", 2);
   uniformBuffer.addUniform("vClearCoatRefractionParams", 4);
-  uniformBuffer.addUniform("vClearCoatInfos", 2);
+  uniformBuffer.addUniform("vClearCoatInfos", 4);
   uniformBuffer.addUniform("clearCoatMatrix", 16);
+  uniformBuffer.addUniform("clearCoatRoughnessMatrix", 16);
   uniformBuffer.addUniform("vClearCoatBumpInfos", 2);
   uniformBuffer.addUniform("vClearCoatTangentSpaceParams", 2);
   uniformBuffer.addUniform("clearCoatBumpMatrix", 16);
@@ -428,8 +526,7 @@ void PBRClearCoatConfiguration::PrepareUniformBuffer(
   uniformBuffer.addUniform("clearCoatTintMatrix", 16);
 }
 
-void PBRClearCoatConfiguration::copyTo(
-  PBRClearCoatConfiguration& /*clearCoatConfiguration*/)
+void PBRClearCoatConfiguration::copyTo(PBRClearCoatConfiguration& /*clearCoatConfiguration*/)
 {
 }
 

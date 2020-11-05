@@ -6,25 +6,24 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class IAnimatable;
-class BaseTexture;
 class Effect;
 class EffectFallbacks;
 class Engine;
 struct IMaterialClearCoatDefines;
 struct MaterialDefines;
-class RenderTargetTexture;
 class Scene;
+class SubMesh;
 class UniformBuffer;
-using IAnimatablePtr         = std::shared_ptr<IAnimatable>;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Define the code related to the clear coat parameters of the pbr material.
@@ -73,17 +72,18 @@ public:
    * = 1.0 - x).
    * @param invertNormalMapY If sets to true, y component of normal map value will be inverted (y
    * = 1.0 - y).
+   * @param subMesh the submesh to bind data for
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine,
                       bool disableBumpMap, bool isFrozen, bool invertNormalMapX,
-                      bool invertNormalMapY);
+                      bool invertNormalMapY, SubMesh* subMesh = nullptr);
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const;
+  bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief Returns an array of the actively used textures.
@@ -107,7 +107,7 @@ public:
    * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "PBRClearCoatConfiguration"
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Add fallbacks to the effect fallbacks list.
@@ -147,7 +147,7 @@ public:
    * @brief Serializes this clear coat configuration.
    * @returns - An object with the serialized config.
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses a Clear Coat Configuration from a serialized object.
@@ -158,15 +158,21 @@ public:
   void parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  [[nodiscard]] bool get_isEnabled() const;
+  bool get_isEnabled() const;
   void set_isEnabled(bool value);
-  [[nodiscard]] float get_indexOfRefraction() const;
+  float get_indexOfRefraction() const;
   void set_indexOfRefraction(float value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);
+  bool get_useRoughnessFromMainTexture() const;
+  void set_useRoughnessFromMainTexture(bool value);
+  BaseTexturePtr& get_textureRoughness();
+  void set_textureRoughness(const BaseTexturePtr& value);
+  bool get_remapF0OnInterfaceChange() const;
+  void set_remapF0OnInterfaceChange(bool value);
   BaseTexturePtr& get_bumpTexture();
   void set_bumpTexture(const BaseTexturePtr& value);
-  [[nodiscard]] bool get_isTintEnabled() const;
+  bool get_isTintEnabled() const;
   void set_isTintEnabled(bool value);
   BaseTexturePtr& get_tintTexture();
   void set_tintTexture(const BaseTexturePtr& value);
@@ -196,9 +202,29 @@ public:
   Property<PBRClearCoatConfiguration, float> indexOfRefraction;
 
   /**
-   * Stores the clear coat values in a texture.
+   * Stores the clear coat values in a texture (red channel is intensity and green channel is
+   * roughness) If useRoughnessFromMainTexture is false, the green channel of texture is not used
+   * and the green channel of textureRoughness is used instead if textureRoughness is not empty,
+   * else no texture roughness is used
    */
   Property<PBRClearCoatConfiguration, BaseTexturePtr> texture;
+
+  /**
+   * Indicates that the green channel of the texture property will be used for roughness (default:
+   * true) If false, the green channel from textureRoughness is used for roughness
+   */
+  Property<PBRClearCoatConfiguration, bool> useRoughnessFromMainTexture;
+
+  /**
+   * Stores the clear coat roughness in a texture (green channel)
+   * Not used if useRoughnessFromMainTexture is true
+   */
+  Property<PBRClearCoatConfiguration, BaseTexturePtr> textureRoughness;
+
+  /**
+   * Defines if the F0 value should be remapped to account for the interface change in the material.
+   */
+  Property<PBRClearCoatConfiguration, bool> remapF0OnInterfaceChange;
 
   /**
    * Define the clear coat specific bump texture.
@@ -241,6 +267,9 @@ private:
   bool _isEnabled;
   float _indexOfRefraction;
   BaseTexturePtr _texture;
+  bool _useRoughnessFromMainTexture;
+  BaseTexturePtr _textureRoughness;
+  bool _remapF0OnInterfaceChange;
   BaseTexturePtr _bumpTexture;
   bool _isTintEnabled;
   BaseTexturePtr _tintTexture;
