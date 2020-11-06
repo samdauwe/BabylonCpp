@@ -690,14 +690,14 @@ bool Geometry::_generatePointsArray()
   for (auto index = _positionsCache.size() * 3, arrayIdx = _positionsCache.size();
        index < data.size(); index += 3, ++arrayIdx) {
     if (arrayIdx >= _positionsCache.size()) {
-      _positionsCache.resize(_positionsCache.size() * 3);
+      _positionsCache.resize((_positionsCache.size() + 1) * 3);
     }
     _positionsCache[arrayIdx] = Vector3::FromArray(data, index);
   }
 
   for (auto index = 0ull, arrayIdx = 0ull; index < data.size(); index += 3, ++arrayIdx) {
     if (index >= _positionsCache.size()) {
-      _positionsCache.resize(_positionsCache.size() * 3);
+      _positionsCache.resize((_positionsCache.size() + 1) * 3);
     }
     _positionsCache[arrayIdx].set(data[0 + index], data[1 + index], data[2 + index]);
   }
