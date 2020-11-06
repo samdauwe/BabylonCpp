@@ -108,16 +108,7 @@ before_script:
   ####################################################################
   - cd "${TRAVIS_BUILD_DIR}"
   - cmake --version
-  - |
-    if [ $TRAVIS_OS_NAME = 'osx' ]; then
-      # Mac OS X platform
-      echo "Running build on Mac OS X platform"
-      mkdir build && cd build && cmake -G Xcode ../
-    else
-      # GNU/Linux platform
-      echo "Running build on GNU/Linux platform"
-      mkdir build && cd build && cmake ../
-    fi
+  - mkdir build && cd build && cmake ../
 #  -
 #  - Setup virtual X server in order to run the examples:
 #  - See https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-xvfb-to-run-tests-that-require-a-gui
