@@ -1858,149 +1858,171 @@ void ThinEngine::enableEffect(const EffectPtr& effect)
   effect->onBindObservable().notifyObservers(effect.get());
 }
 
-void ThinEngine::setInt(const WebGLUniformLocationPtr& uniform, int value)
+bool ThinEngine::setInt(const WebGLUniformLocationPtr& uniform, int value)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform1i(uniform.get(), value);
+
+  return true;
 }
 
-void ThinEngine::setIntArray(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
+bool ThinEngine::setIntArray(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform1iv(uniform.get(), array);
+
+  return true;
 }
 
-void ThinEngine::setIntArray2(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
+bool ThinEngine::setIntArray2(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform || array.size() % 2 != 0) {
-    return;
+    return false;
   }
 
   _gl->uniform2iv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setIntArray3(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
+bool ThinEngine::setIntArray3(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform || array.size() % 3 != 0) {
-    return;
+    return false;
   }
 
   _gl->uniform3iv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setIntArray4(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
+bool ThinEngine::setIntArray4(const WebGLUniformLocationPtr& uniform, const Int32Array& array)
 {
   if (!uniform || array.size() % 4 != 0) {
-    return;
+    return false;
   }
 
   _gl->uniform4iv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
+bool ThinEngine::setArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform1fv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
+bool ThinEngine::setArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform || array.size() % 2 != 0) {
-    return;
+    return false;
   }
 
   _gl->uniform2fv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
+bool ThinEngine::setArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform || array.size() % 3 != 0) {
-    return;
+    return false;
   }
 
   _gl->uniform3fv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
+bool ThinEngine::setArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array)
 {
   if (!uniform || array.size() % 4 != 0) {
-    return;
+    return false;
   }
 
   _gl->uniform4fv(uniform.get(), array);
+  return true;
 }
 
-void ThinEngine::setMatrices(const WebGLUniformLocationPtr& uniform, const Float32Array& matrices)
+bool ThinEngine::setMatrices(const WebGLUniformLocationPtr& uniform, const Float32Array& matrices)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniformMatrix4fv(uniform.get(), false, matrices);
+  return true;
 }
 
-void ThinEngine::setMatrix3x3(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix)
+bool ThinEngine::setMatrix3x3(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniformMatrix3fv(uniform.get(), false, matrix);
+  return true;
 }
 
-void ThinEngine::setMatrix2x2(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix)
+bool ThinEngine::setMatrix2x2(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniformMatrix2fv(uniform.get(), false, matrix);
+  return true;
 }
 
-void ThinEngine::setFloat(const WebGLUniformLocationPtr& uniform, float value)
+bool ThinEngine::setFloat(const WebGLUniformLocationPtr& uniform, float value)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform1f(uniform.get(), value);
+
+  return true;
 }
 
-void ThinEngine::setFloat2(const WebGLUniformLocationPtr& uniform, float x, float y)
+bool ThinEngine::setFloat2(const WebGLUniformLocationPtr& uniform, float x, float y)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform2f(uniform.get(), x, y);
+
+  return true;
 }
 
-void ThinEngine::setFloat3(const WebGLUniformLocationPtr& uniform, float x, float y, float z)
+bool ThinEngine::setFloat3(const WebGLUniformLocationPtr& uniform, float x, float y, float z)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform3f(uniform.get(), x, y, z);
+
+  return true;
 }
 
-void ThinEngine::setFloat4(const WebGLUniformLocationPtr& uniform, float x, float y, float z,
+bool ThinEngine::setFloat4(const WebGLUniformLocationPtr& uniform, float x, float y, float z,
                            float w)
 {
   if (!uniform) {
-    return;
+    return false;
   }
 
   _gl->uniform4f(uniform.get(), x, y, z, w);
+
+  return true;
 }
 
 void ThinEngine::applyStates()

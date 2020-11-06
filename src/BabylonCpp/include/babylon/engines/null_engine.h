@@ -152,29 +152,33 @@ public:
    * @brief Set the value of an uniform to an array of int32.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
+   * @returns true if the value was set
    */
-  void setIntArray(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
+  bool setIntArray(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
+   * @returns true if the value was set
    */
-  void setIntArray2(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
+  bool setIntArray2(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
+   * @returns true if the value was set
    */
-  void setIntArray3(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
+  bool setIntArray3(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of int32 (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of int32 to store
+   * @returns true if the value was set
    */
-  void setIntArray4(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
+  bool setIntArray4(const WebGLUniformLocationPtr& uniform, const Int32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of float32.
@@ -208,65 +212,74 @@ public:
    * @brief Set the value of an uniform to an array of number.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
+   * @returns true if the value was set
    */
-  void setArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
+  bool setArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
+   * @returns true if the value was set
    */
-  void setArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
+  bool setArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
 
   /**
-   *@brief  Set the value of an uniform to an array of number (stored as vec3).
+   * @brief Set the value of an uniform to an array of number (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
+   * @returns true if the value was set
    */
-  void setArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
+  bool setArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of number (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of number to store
+   * @returns true if the value was set
    */
-  void setArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
+  bool setArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array) override;
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as matrices).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrices defines the array of float32 to store
+   * @returns true if the value was set
    */
-  void setMatrices(const WebGLUniformLocationPtr& uniform, const Float32Array& matrices) override;
+  bool setMatrices(const WebGLUniformLocationPtr& uniform, const Float32Array& matrices) override;
 
   /**
    * @brief Set the value of an uniform to a matrix (3x3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 3x3 matrix to store
+   * @returns true if the value was set
    */
-  void setMatrix3x3(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix) override;
+  bool setMatrix3x3(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix) override;
 
   /**
    * @brief Set the value of an uniform to a matrix (2x2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param matrix defines the Float32Array representing the 2x2 matrix to store
+   * @returns true if the value was set
    */
-  void setMatrix2x2(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix) override;
+  bool setMatrix2x2(const WebGLUniformLocationPtr& uniform, const Float32Array& matrix) override;
 
   /**
    * @brief Set the value of an uniform to a number (float).
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the float number to store
+   * @returns true if the value was transfered
    */
-  void setFloat(const WebGLUniformLocationPtr& uniform, float value) override;
+  bool setFloat(const WebGLUniformLocationPtr& uniform, float value) override;
 
   /**
    * @brief Set the value of an uniform to a vec2.
    * @param uniform defines the webGL uniform location where to store the value
    * @param x defines the 1st component of the value
    * @param y defines the 2nd component of the value
+   * @returns true if the value was set
    */
-  void setFloat2(const WebGLUniformLocationPtr& uniform, float x, float y) override;
+  bool setFloat2(const WebGLUniformLocationPtr& uniform, float x, float y) override;
 
   /**
    * @brief Set the value of an uniform to a vec3.
@@ -274,8 +287,9 @@ public:
    * @param x defines the 1st component of the value
    * @param y defines the 2nd component of the value
    * @param z defines the 3rd component of the value
+   * @returns true if the value was set
    */
-  void setFloat3(const WebGLUniformLocationPtr& uniform, float x, float y, float z) override;
+  bool setFloat3(const WebGLUniformLocationPtr& uniform, float x, float y, float z) override;
 
   /**
    * @brief Set the value of an uniform to a boolean.
@@ -291,8 +305,9 @@ public:
    * @param y defines the 2nd component of the value
    * @param z defines the 3rd component of the value
    * @param w defines the 4th component of the value
+   * @returns true if the value was set
    */
-  void setFloat4(const WebGLUniformLocationPtr& uniform, float x, float y, float z,
+  bool setFloat4(const WebGLUniformLocationPtr& uniform, float x, float y, float z,
                  float w) override;
 
   /**
