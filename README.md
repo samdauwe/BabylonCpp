@@ -46,6 +46,14 @@ python cmake_build.py all --mode=debug
 
 Use the provided CMakeLists.txt with [CMake](https://cmake.org) to generate a build configuration for your favorite IDE or compiler.
 
+## <img src="./assets/images/iOS_logo.png" alt="" height="32px"> iOS
+
+Xcode project targeting iOS 12.0
+
+```
+cmake -G Xcode -DCMAKE_TOOLCHAIN_FILE=../external/ios-cmake/ios.toolchain.cmake -DPLATFORM=OS64COMBINED -DENABLE_ARC=0 -DDEPLOYMENT_TARGET=12 ..
+```
+
 ## <img src="./assets/images/windowslogo.png" alt="" height="32px"> Windows
 
 [![Build status](https://ci.appveyor.com/api/projects/status/81b7scxkykn5qq1y?svg=true)](https://ci.appveyor.com/project/samdauwe/babyloncpp)
@@ -125,6 +133,7 @@ A summary of the development roadmap can be found on [this page](https://github.
 * [ImGuiColorTextEdit](https://github.com/BalazsJako/ImGuiColorTextEdit):Syntax highlighting text editor for ImGui.
 * [JSON for Modern C++](https://github.com/nlohmann/json)
 * [Runtime Compiled C++](https://github.com/RuntimeCompiledCPlusPlus/RuntimeCompiledCPlusPlus.git): Library that enables to reliably make major changes to your C++ code at runtime and see the results immediately.
+* [ios-cmake](https://github.com/leetal/ios-cmake): A CMake toolchain file for iOS, watchOS and tvOS C/C++/Obj-C++ development.
 
 ## Supported Compilers ##
 The compiler should implement all the features of the [ISO C++ 2017 standard](https://www.iso.org/standard/68564.html):
@@ -137,6 +146,7 @@ The compiler should implement all the features of the [ISO C++ 2017 standard](ht
 * Linux
 * MacOSX
 * Windows >= 7
+* iOS >= 12.0
 
 Graphics APIs:
 *  <img src="./assets/images/OpenGLLogo.png" alt="" height="28px"> 2.1 through 4.6, core profile functionality and modern extensions
