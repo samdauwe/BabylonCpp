@@ -81,6 +81,7 @@ else()
     add_subdirectory(BabylonRunStandalone)
     add_subdirectory(imgui_runner_demos)
     if (APPLE)
-        add_subdirectory(Standalone_OSX)
+        # Disabled: Does not build on Travis CI
+        # add_subdirectory(Standalone_OSX)
     endif()
 endif()
