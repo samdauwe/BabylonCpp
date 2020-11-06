@@ -6,36 +6,30 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-class BaseTexture;
 class Color3;
 class Color4;
-class Effect;
 struct IEffectCreationOptions;
 class EffectFallbacks;
 struct IEffectFallbacks;
-class InternalTexture;
-class IPipelineContext;
 class Matrix;
-class PostProcess;
-class RenderTargetTexture;
 class ThinEngine;
 class Vector2;
 class Vector3;
 class Vector4;
-class WebGLDataBuffer;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using EffectPtr              = std::shared_ptr<Effect>;
-using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
-using IPipelineContextPtr    = std::shared_ptr<IPipelineContext>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(IPipelineContext)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 namespace GL {
 class IGLProgram;
@@ -49,7 +43,6 @@ using WebGLUniformLocationPtr = std::shared_ptr<GL::IGLUniformLocation>;
  * @brief Effect containing vertex and fragment shader that can be executed on an object.
  */
 class BABYLON_SHARED_EXPORT Effect : public IDisposable {
-
   friend class Engine;
 
 public:

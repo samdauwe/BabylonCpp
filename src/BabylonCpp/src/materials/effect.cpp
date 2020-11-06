@@ -816,9 +816,9 @@ Effect& Effect::setInt(const std::string& uniformName, int value)
     return *this;
   }
 
-  _valueCache[uniformName] = _value;
-
-  _engine->setInt(getUniform(uniformName), value);
+  if (_engine->setInt(getUniform(uniformName), value)) {
+    _valueCache[uniformName] = _value;
+  }
 
   return *this;
 }
@@ -934,7 +934,9 @@ Effect& Effect::setMatrices(const std::string& uniformName, Float32Array matrice
 Effect& Effect::setMatrix(const std::string& uniformName, const Matrix& matrix)
 {
   if (_cacheMatrix(uniformName, matrix)) {
-    _engine->setMatrices(getUniform(uniformName), matrix.toArray());
+    if (!_engine->setMatrices(getUniform(uniformName), matrix.toArray())) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -963,9 +965,9 @@ Effect& Effect::setFloat(const std::string& uniformName, float value)
     return *this;
   }
 
-  _valueCache[uniformName] = {value};
-
-  _engine->setFloat(getUniform(uniformName), value);
+  if (_engine->setFloat(getUniform(uniformName), value)) {
+    _valueCache[uniformName] = {value};
+  }
 
   return *this;
 }
@@ -977,9 +979,9 @@ Effect& Effect::setBool(const std::string& uniformName, bool _bool)
     return *this;
   }
 
-  _valueCache[uniformName] = {_bool ? 1.f : 0.f};
-
-  _engine->setInt(getUniform(uniformName), _bool ? 1 : 0);
+  if (_engine->setInt(getUniform(uniformName), _bool ? 1 : 0)) {
+    _valueCache[uniformName] = {_bool ? 1.f : 0.f};
+  }
 
   return *this;
 }
@@ -987,7 +989,9 @@ Effect& Effect::setBool(const std::string& uniformName, bool _bool)
 Effect& Effect::setVector2(const std::string& uniformName, const Vector2& vector2)
 {
   if (_cacheFloat2(uniformName, vector2.x, vector2.y)) {
-    _engine->setFloat2(getUniform(uniformName), vector2.x, vector2.y);
+    if (!_engine->setFloat2(getUniform(uniformName), vector2.x, vector2.y)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -996,7 +1000,9 @@ Effect& Effect::setVector2(const std::string& uniformName, const Vector2& vector
 Effect& Effect::setFloat2(const std::string& uniformName, float x, float y)
 {
   if (_cacheFloat2(uniformName, x, y)) {
-    _engine->setFloat2(getUniform(uniformName), x, y);
+    if (!_engine->setFloat2(getUniform(uniformName), x, y)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1005,7 +1011,9 @@ Effect& Effect::setFloat2(const std::string& uniformName, float x, float y)
 Effect& Effect::setVector3(const std::string& uniformName, const Vector3& vector3)
 {
   if (_cacheFloat3(uniformName, vector3.x, vector3.y, vector3.z)) {
-    _engine->setFloat3(getUniform(uniformName), vector3.x, vector3.y, vector3.z);
+    if (!_engine->setFloat3(getUniform(uniformName), vector3.x, vector3.y, vector3.z)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1014,7 +1022,9 @@ Effect& Effect::setVector3(const std::string& uniformName, const Vector3& vector
 Effect& Effect::setFloat3(const std::string& uniformName, float x, float y, float z)
 {
   if (_cacheFloat3(uniformName, x, y, z)) {
-    _engine->setFloat3(getUniform(uniformName), x, y, z);
+    if (!_engine->setFloat3(getUniform(uniformName), x, y, z)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1023,7 +1033,9 @@ Effect& Effect::setFloat3(const std::string& uniformName, float x, float y, floa
 Effect& Effect::setVector4(const std::string& uniformName, const Vector4& vector4)
 {
   if (_cacheFloat4(uniformName, vector4.x, vector4.y, vector4.z, vector4.w)) {
-    _engine->setFloat4(getUniform(uniformName), vector4.x, vector4.y, vector4.z, vector4.w);
+    if (!_engine->setFloat4(getUniform(uniformName), vector4.x, vector4.y, vector4.z, vector4.w)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1032,7 +1044,9 @@ Effect& Effect::setVector4(const std::string& uniformName, const Vector4& vector
 Effect& Effect::setFloat4(const std::string& uniformName, float x, float y, float z, float w)
 {
   if (_cacheFloat4(uniformName, x, y, z, w)) {
-    _engine->setFloat4(getUniform(uniformName), x, y, z, w);
+    if (!_engine->setFloat4(getUniform(uniformName), x, y, z, w)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1041,7 +1055,9 @@ Effect& Effect::setFloat4(const std::string& uniformName, float x, float y, floa
 Effect& Effect::setColor3(const std::string& uniformName, const Color3& color3)
 {
   if (_cacheFloat3(uniformName, color3.r, color3.g, color3.b)) {
-    _engine->setFloat3(getUniform(uniformName), color3.r, color3.g, color3.b);
+    if (!_engine->setFloat3(getUniform(uniformName), color3.r, color3.g, color3.b)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1050,7 +1066,9 @@ Effect& Effect::setColor3(const std::string& uniformName, const Color3& color3)
 Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3, float alpha)
 {
   if (_cacheFloat4(uniformName, color3.r, color3.g, color3.b, alpha)) {
-    _engine->setFloat4(getUniform(uniformName), color3.r, color3.g, color3.b, alpha);
+    if (!_engine->setFloat4(getUniform(uniformName), color3.r, color3.g, color3.b, alpha)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
@@ -1059,7 +1077,9 @@ Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3, 
 Effect& Effect::setDirectColor4(const std::string& uniformName, const Color4& color4)
 {
   if (_cacheFloat4(uniformName, color4.r, color4.g, color4.b, color4.a)) {
-    _engine->setFloat4(getUniform(uniformName), color4.r, color4.g, color4.b, color4.a);
+    if (!_engine->setFloat4(getUniform(uniformName), color4.r, color4.g, color4.b, color4.a)) {
+      _valueCache.erase(uniformName);
+    }
   }
 
   return *this;
