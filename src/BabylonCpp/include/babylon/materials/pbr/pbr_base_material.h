@@ -2,29 +2,23 @@
 #define BABYLON_MATERIALS_PBR_PBR_BASE_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/maths/vector4.h>
 
 namespace BABYLON {
 
-class DetailMapConfiguration;
-class IAnimatable;
-class ImageProcessingConfiguration;
-class PBRAnisotropicConfiguration;
-class PBRBRDFConfiguration;
-class PBRClearCoatConfiguration;
 struct PBRMaterialDefines;
-class PBRSheenConfiguration;
-class PBRSubSurfaceConfiguration;
-using DetailMapConfigurationPtr       = std::shared_ptr<DetailMapConfiguration>;
-using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
-using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
-using PBRAnisotropicConfigurationPtr  = std::shared_ptr<PBRAnisotropicConfiguration>;
-using PBRBRDFConfigurationPtr         = std::shared_ptr<PBRBRDFConfiguration>;
-using PBRClearCoatConfigurationPtr    = std::shared_ptr<PBRClearCoatConfiguration>;
-using PBRSheenConfigurationPtr        = std::shared_ptr<PBRSheenConfiguration>;
-using PBRSubSurfaceConfigurationPtr   = std::shared_ptr<PBRSubSurfaceConfiguration>;
+FWD_CLASS_SPTR(DetailMapConfiguration)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(ImageProcessingConfiguration)
+FWD_CLASS_SPTR(PBRAnisotropicConfiguration)
+FWD_CLASS_SPTR(PBRBRDFConfiguration)
+FWD_CLASS_SPTR(PBRClearCoatConfiguration)
+FWD_CLASS_SPTR(PBRSheenConfiguration)
+FWD_CLASS_SPTR(PBRSubSurfaceConfiguration)
+FWD_STRUCT_SPTR(PrePassConfiguration)
 
 /**
  * @brief The Physically based material base class of BJS.
@@ -101,24 +95,24 @@ public:
   /**
    * @brief Gets the name of the material class.
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Returns true if alpha blending should be disabled.
    */
-  [[nodiscard]] bool _disableAlphaBlending() const;
+  bool _disableAlphaBlending() const;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * blend mode.
    */
-  [[nodiscard]] bool needAlphaBlending() const override;
+  bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * test mode.
    */
-  [[nodiscard]] bool needAlphaTesting() const override;
+  bool needAlphaTesting() const override;
 
   /**
    * @brief Gets the texture used for the alpha test.
@@ -139,7 +133,7 @@ public:
    * @returns boolean specifiying if the material uses metallic roughness
    * workflow.
    */
-  [[nodiscard]] bool isMetallicWorkflow() const;
+  bool isMetallicWorkflow() const;
 
   /**
    * @brief Force shader compilation
@@ -175,14 +169,14 @@ public:
    * @brief Returns an array of the actively used textures.
    * @returns - Array of BaseTextures
    */
-  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Sets the required values to the prepass renderer.
@@ -205,7 +199,16 @@ protected:
    */
   void _attachImageProcessingConfiguration(const ImageProcessingConfigurationPtr& configuration);
 
-  [[nodiscard]] bool _shouldUseAlphaFromAlbedoTexture() const;
+  /**
+   * Specifies whether or not the alpha value of the albedo texture should be used for alpha
+   * blending.
+   */
+  bool _shouldUseAlphaFromAlbedoTexture() const;
+
+  /**
+   * Specifies whether or not there is a usable alpha channel for transparency.
+   */
+  bool _hasAlphaChannel() const;
 
   /**
    * @brief Enables realtime filtering on the texture.
@@ -228,13 +231,13 @@ protected:
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
+  bool get_hasRenderTargetTextures() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
    * depth buffers.
    */
-  [[nodiscard]] bool get_useLogarithmicDepth() const override;
+  bool get_useLogarithmicDepth() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
@@ -248,7 +251,7 @@ protected:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  [[nodiscard]] unsigned int get_debugMode() const;
+  unsigned int get_debugMode() const;
   void set_debugMode(unsigned int value);
 
 private:
@@ -269,7 +272,7 @@ private:
    * @returns - Reflection texture if present.  Otherwise, returns the
    * environment texture.
    */
-  [[nodiscard]] BaseTexturePtr _getReflectionTexture() const;
+  BaseTexturePtr _getReflectionTexture() const;
 
 public:
   /**
@@ -319,6 +322,11 @@ public:
    * Defines the SubSurface parameters for the material.
    */
   PBRSubSurfaceConfigurationPtr subSurface;
+
+  /**
+   * Defines additionnal PrePass parameters for the material.
+   */
+  PrePassConfigurationPtr prePassConfiguration;
 
   /**
    * Defines the detail map parameters for the material.

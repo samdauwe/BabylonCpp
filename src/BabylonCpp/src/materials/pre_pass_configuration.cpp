@@ -26,9 +26,8 @@ void PrePassConfiguration::AddSamplers(std::vector<std::string>& /*samplers*/)
   // pass
 }
 
-void PrePassConfiguration::bindForSubMesh(const EffectPtr& effect, Scene* scene,
-                                          const MeshPtr& mesh, const Matrix& world,
-                                          bool /*isFrozen*/)
+void PrePassConfiguration::bindForSubMesh(const EffectPtr& effect, Scene* scene, Mesh* mesh,
+                                          const Matrix& world, bool /*isFrozen*/)
 {
   if (scene->prePassRenderer() && scene->prePassRenderer()->enabled()) {
     if (scene->prePassRenderer()->getIndex(Constants::PREPASS_VELOCITY_TEXTURE_TYPE) != -1) {

@@ -23,6 +23,7 @@
 #include <babylon/materials/pbr/pbr_material_defines.h>
 #include <babylon/materials/pbr/pbr_sheen_configuration.h>
 #include <babylon/materials/pbr/pbr_sub_surface_configuration.h>
+#include <babylon/materials/pre_pass_configuration.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/cube_texture.h>
@@ -59,6 +60,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
         [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
     , sheen{std::make_shared<PBRSheenConfiguration>(
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , prePassConfiguration{nullptr}
     , detailMap{std::make_shared<DetailMapConfiguration>(
         [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _directIntensity{1.f}
@@ -155,6 +157,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
   subSurface              = std::make_shared<PBRSubSurfaceConfiguration>(
     [this]() -> void { _markAllSubMeshesAsTexturesDirty(); },
     [this]() -> void { _markScenePrePassDirty(); }, scene);
+  prePassConfiguration = std::make_shared<PrePassConfiguration>();
 }
 
 PBRBaseMaterial::~PBRBaseMaterial() = default;
@@ -280,7 +283,7 @@ bool PBRBaseMaterial::needAlphaTesting() const
     return false;
   }
 
-  return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
+  return _hasAlphaChannel() && _albedoTexture->hasAlpha()
          && (!_transparencyMode.has_value()
              || *_transparencyMode == PBRBaseMaterial::PBRMATERIAL_ALPHATEST);
 }
@@ -289,6 +292,11 @@ bool PBRBaseMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha() && _useAlphaFromAlbedoTexture
          && *_transparencyMode != PBRBaseMaterial::PBRMATERIAL_OPAQUE;
+}
+
+bool PBRBaseMaterial::_hasAlphaChannel() const
+{
+  return (_albedoTexture != nullptr && _albedoTexture->hasAlpha()) || _opacityTexture != nullptr;
 }
 
 BaseTexturePtr PBRBaseMaterial::getAlphaTestTexture()
@@ -699,6 +707,9 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
 
   PBRSheenConfiguration::AddUniforms(uniforms);
   PBRSheenConfiguration::AddSamplers(samplers);
+
+  PrePassConfiguration::AddUniforms(uniforms);
+  PrePassConfiguration::AddSamplers(uniforms);
 
   // if (ImageProcessingConfiguration)
   {
@@ -1194,6 +1205,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     bindOnlyWorldMatrix(world);
   }
 
+  // PrePass
+  prePassConfiguration->bindForSubMesh(_activeEffect, scene, mesh, world, isFrozen());
+
   // Normal Matrix
   if (defines["OBJECTSPACE_NORMALMAP"]) {
     world.toNormalMatrix(_normalMatrix);
@@ -1203,7 +1217,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect, prePassConfiguration);
 
   BaseTexturePtr reflectionTexture = nullptr;
   auto& ubo                        = *_uniformBuffer;
@@ -1486,9 +1500,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(), defines["LODBASEDMICROSFURACE"],
                                _realTimeFiltering);
     clearCoat->bindForSubMesh(ubo, scene, engine, _disableBumpMap, isFrozen(), _invertNormalMapX,
-                              _invertNormalMapY);
+                              _invertNormalMapY, subMesh);
     anisotropy->bindForSubMesh(ubo, scene, isFrozen());
-    sheen->bindForSubMesh(ubo, scene, isFrozen());
+    sheen->bindForSubMesh(ubo, scene, isFrozen(), subMesh);
 
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
@@ -1707,14 +1721,18 @@ bool PBRBaseMaterial::hasTexture(const BaseTexturePtr& texture) const
          || anisotropy->hasTexture(texture);
 }
 
-bool PBRBaseMaterial::setPrePassRenderer(const PrePassRendererPtr& prePassRenderer)
+bool PBRBaseMaterial::setPrePassRenderer(const PrePassRendererPtr& /*prePassRenderer*/)
 {
   if (subSurface->isScatteringEnabled()) {
-    prePassRenderer->subSurfaceConfiguration->enabled = true;
-    prePassRenderer->materialsShouldRenderIrradiance  = true;
+    const auto subSurfaceConfiguration = getScene()->enableSubSurfaceForPrePass();
+    if (subSurfaceConfiguration) {
+      subSurfaceConfiguration->enabled = true;
+    }
+
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 void PBRBaseMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,

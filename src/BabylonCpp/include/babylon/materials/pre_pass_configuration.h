@@ -59,8 +59,8 @@ struct BABYLON_SHARED_EXPORT PrePassConfiguration {
    * @param world World matrix of this mesh
    * @param isFrozen Is the material frozen
    */
-  void bindForSubMesh(const EffectPtr& effect, Scene* scene, const MeshPtr& mesh,
-                      const Matrix& world, bool isFrozen);
+  void bindForSubMesh(const EffectPtr& effect, Scene* scene, Mesh* mesh, const Matrix& world,
+                      bool isFrozen);
 
 }; // end of struct PrePassConfiguration
 
