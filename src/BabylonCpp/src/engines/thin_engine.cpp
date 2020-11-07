@@ -18,6 +18,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl2_shader_processor.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
+#include <babylon/engines/webgl/webgl_shader_processor.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -156,6 +157,9 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
   // Shader processor
   if (webGLVersion() > 1.f) {
     _shaderProcessor = std::make_shared<WebGL2ShaderProcessor>();
+  }
+  else {
+    _shaderProcessor = std::make_shared<WebGLShaderProcessor>();
   }
 
   // Detect if we are running on a faulty buggy OS.
