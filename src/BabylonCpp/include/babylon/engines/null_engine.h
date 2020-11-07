@@ -184,29 +184,33 @@ public:
    * @brief Set the value of an uniform to an array of float32.
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
+   * @returns true if value was set
    */
-  void setFloatArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
+  bool setFloatArray(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
-   * @brief Set the value of an uniform to an array of float32 (stored as vec2).
+   * @brief  Set the value of an uniform to an array of float32 (stored as vec2).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
+   * @returns true if value was set
    */
-  void setFloatArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
+  bool setFloatArray2(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as vec3).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
+   * @returns true if value was set
    */
-  void setFloatArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
+  bool setFloatArray3(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of float32 (stored as vec4).
    * @param uniform defines the webGL uniform location where to store the value
    * @param array defines the array of float32 to store
+   * @returns true if value was set
    */
-  void setFloatArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
+  bool setFloatArray4(const WebGLUniformLocationPtr& uniform, const Float32Array& array);
 
   /**
    * @brief Set the value of an uniform to an array of number.
@@ -295,8 +299,9 @@ public:
    * @brief Set the value of an uniform to a boolean.
    * @param uniform defines the webGL uniform location where to store the value
    * @param bool defines the boolean to store
+   * @returns true if value was set
    */
-  void setBool(const WebGLUniformLocationPtr& uniform, int value);
+  bool setBool(const WebGLUniformLocationPtr& uniform, int value);
 
   /**
    * @brief Set the value of an uniform to a vec4.

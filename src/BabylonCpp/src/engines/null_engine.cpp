@@ -195,24 +195,28 @@ bool NullEngine::setIntArray4(const WebGLUniformLocationPtr& /*uniform*/,
   return true;
 }
 
-void NullEngine::setFloatArray(const WebGLUniformLocationPtr& /*uniform*/,
+bool NullEngine::setFloatArray(const WebGLUniformLocationPtr& /*uniform*/,
                                const Float32Array& /*array*/)
 {
+  return true;
 }
 
-void NullEngine::setFloatArray2(const WebGLUniformLocationPtr& /*uniform*/,
+bool NullEngine::setFloatArray2(const WebGLUniformLocationPtr& /*uniform*/,
                                 const Float32Array& /*array*/)
 {
+  return true;
 }
 
-void NullEngine::setFloatArray3(const WebGLUniformLocationPtr& /*uniform*/,
+bool NullEngine::setFloatArray3(const WebGLUniformLocationPtr& /*uniform*/,
                                 const Float32Array& /*array*/)
 {
+  return true;
 }
 
-void NullEngine::setFloatArray4(const WebGLUniformLocationPtr& /*uniform*/,
+bool NullEngine::setFloatArray4(const WebGLUniformLocationPtr& /*uniform*/,
                                 const Float32Array& /*array*/)
 {
+  return true;
 }
 
 bool NullEngine::setArray(const WebGLUniformLocationPtr& /*uniform*/, const Float32Array& /*array*/)
@@ -272,8 +276,9 @@ bool NullEngine::setFloat3(const WebGLUniformLocationPtr& /*uniform*/, float /*x
   return true;
 }
 
-void NullEngine::setBool(const WebGLUniformLocationPtr& /*uniform*/, int /*value*/)
+bool NullEngine::setBool(const WebGLUniformLocationPtr& /*uniform*/, int /*value*/)
 {
+  return true;
 }
 
 bool NullEngine::setFloat4(const WebGLUniformLocationPtr& /*uniform*/, float /*x*/, float /*y*/,
