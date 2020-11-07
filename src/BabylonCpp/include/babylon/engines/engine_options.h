@@ -82,6 +82,12 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    * Make the matrix computations to be performed in 64 bits instead of 32 bits. False by default
    */
   bool useHighPrecisionMatrix = false;
+
+  /**
+   * Will prevent the system from falling back to software implementation if a hardware device
+   * cannot be created
+   */
+  bool failIfMajorPerformanceCaveat = false;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON
