@@ -3491,9 +3491,14 @@ IActiveMeshCandidateProvider* Scene::getActiveMeshCandidateProvider() const
   return _activeMeshCandidateProvider;
 }
 
-Scene& Scene::freezeActiveMeshes(bool skipEvaluateActiveMeshes)
+Scene& Scene::freezeActiveMeshes(bool skipEvaluateActiveMeshes,
+                                 const std::function<void()>& onSuccess,
+                                 const std::function<void(const std::string& message)> onError)
 {
   if (!_activeCamera) {
+    if (onError) {
+      onError("No active camera found");
+    }
     return *this;
   }
 
@@ -3504,11 +3509,29 @@ Scene& Scene::freezeActiveMeshes(bool skipEvaluateActiveMeshes)
   _evaluateActiveMeshes();
   _activeMeshesFrozen                 = true;
   _skipEvaluateActiveMeshesCompletely = skipEvaluateActiveMeshes;
+
+  for (const auto& activeMesh : _activeMeshes) {
+    activeMesh->_freeze();
+  }
+  if (onSuccess) {
+    onSuccess();
+  }
+
   return *this;
 }
 
 Scene& Scene::unfreezeActiveMeshes()
 {
+  for (const auto& mesh : meshes) {
+    /* if (mesh->_internalAbstractMeshDataInfo) */ {
+      mesh->_internalAbstractMeshDataInfo._isActive = false;
+    }
+  }
+
+  for (const auto& activeMesh : _activeMeshes) {
+    activeMesh->_unFreeze();
+  }
+
   _activeMeshesFrozen = false;
   return *this;
 }
@@ -3597,6 +3620,10 @@ void Scene::_evaluateActiveMeshes()
         meshLOD->_activate(_renderId, false);
       }
 
+      for (const auto& step : _preActiveMeshStage) {
+        step.action(mesh);
+      }
+
       _activeMesh(mesh, meshLOD);
     }
   }
@@ -3639,10 +3666,6 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
         }
       }
     }
-  }
-
-  for (const auto& step : _preActiveMeshStage) {
-    step.action(mesh);
   }
 
   if (mesh && !mesh->subMeshes.empty()) {
@@ -3817,6 +3840,11 @@ void Scene::_renderForCamera(const CameraPtr& camera, const CameraPtr& rigParent
   // Finalize frame
   if (postProcessManager && !camera->_multiviewTexture) {
     postProcessManager->_finalizeFrame(camera->isIntermediate);
+
+    // if the camera has an output render target, render the post process to the render target
+    const auto texture
+      = camera->outputRenderTarget ? camera->outputRenderTarget->getInternalTexture() : nullptr;
+    postProcessManager->_finalizeFrame(camera->isIntermediate, texture);
   }
 
   // Reset some special arrays

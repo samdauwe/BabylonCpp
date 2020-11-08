@@ -1245,9 +1245,14 @@ public:
    * between frames.
    * @param skipEvaluateActiveMeshes defines an optional boolean indicating that the evaluate active
    * meshes step must be completely skipped
+   * @param onSuccess optional success callback
+   * @param onError optional error callback
    * @returns the current scene
    */
-  Scene& freezeActiveMeshes(bool skipEvaluateActiveMeshes);
+  Scene& freezeActiveMeshes(bool skipEvaluateActiveMeshes          = false,
+                            const std::function<void()>& onSuccess = nullptr,
+                            const std::function<void(const std::string& message)> onError
+                            = nullptr);
 
   /**
    * @brief Use this function to restart evaluating active meshes on every frame.
