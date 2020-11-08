@@ -46,6 +46,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"VERTEXCOLOR", false},                                 //
     {"VERTEXALPHA", false},                                 //
     {"BONETEXTURE", false},                                 //
+    {"BONES_VELOCITY_ENABLED", false},                      //
     {"INSTANCES", false},                                   //
     {"THIN_INSTANCES", false},                              //
     {"GLOSSINESS", false},                                  //
@@ -83,7 +84,13 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"ALPHATEST_AFTERALLALPHACOMPUTATIONS", false}, //
     {"ALPHABLEND", true},                           //
 
-    {"PREPASS", false}, //
+    {"PREPASS", false},              //
+    {"PREPASS_IRRADIANCE", false},   //
+    {"PREPASS_ALBEDO", false},       //
+    {"PREPASS_DEPTHNORMAL", false},  //
+    {"PREPASS_POSITION", false},     //
+    {"PREPASS_VELOCITY", false},     //
+    {"PREPASS_REFLECTIVITY", false}, //
 
     {"RGBDLIGHTMAP", false},   //
     {"RGBDREFLECTION", false}, //
@@ -117,19 +124,25 @@ StandardMaterialDefines::StandardMaterialDefines()
   };
 
   intDef = {
-    {"DIFFUSEDIRECTUV", 0},          //
-    {"DETAILDIRECTUV", 0},           //
-    {"DETAIL_NORMALBLENDMETHOD", 0}, //
-    {"AMBIENTDIRECTUV", 0},          //
-    {"OPACITYDIRECTUV", 0},          //
-    {"EMISSIVEDIRECTUV", 0},         //
-    {"SPECULARDIRECTUV", 0},         //
-    {"BUMPDIRECTUV", 0},             //
-    {"NUM_BONE_INFLUENCERS", 0},     //
-    {"BonesPerMesh", 0},             //
-    {"LIGHTMAPDIRECTUV", 0},         //
-    {"NUM_MORPH_INFLUENCERS", 0},    //
-    {"SCENE_MRT_COUNT", 0},          //
+    {"DIFFUSEDIRECTUV", 0},             //
+    {"DETAILDIRECTUV", 0},              //
+    {"DETAIL_NORMALBLENDMETHOD", 0},    //
+    {"AMBIENTDIRECTUV", 0},             //
+    {"OPACITYDIRECTUV", 0},             //
+    {"EMISSIVEDIRECTUV", 0},            //
+    {"SPECULARDIRECTUV", 0},            //
+    {"BUMPDIRECTUV", 0},                //
+    {"NUM_BONE_INFLUENCERS", 0},        //
+    {"BonesPerMesh", 0},                //
+    {"LIGHTMAPDIRECTUV", 0},            //
+    {"NUM_MORPH_INFLUENCERS", 0},       //
+    {"PREPASS_IRRADIANCE_INDEX", -1},   //
+    {"PREPASS_ALBEDO_INDEX", -1},       //
+    {"PREPASS_DEPTHNORMAL_INDEX", -1},  //
+    {"PREPASS_POSITION_INDEX", -1},     //
+    {"PREPASS_VELOCITY_INDEX", -1},     //
+    {"PREPASS_REFLECTIVITY_INDEX", -1}, //
+    {"SCENE_MRT_COUNT", 0},             //
   };
 }
 
