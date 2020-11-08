@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_STANDARD_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/maths/color3.h>
 #include <babylon/misc/observer.h>
@@ -10,14 +11,12 @@ namespace BABYLON {
 
 class ColorCurves;
 class DetailMapConfiguration;
-class FresnelParameters;
-class IAnimatable;
 class ImageProcessingConfiguration;
-class StandardMaterial;
 struct StandardMaterialDefines;
-using FresnelParametersPtr = std::shared_ptr<FresnelParameters>;
-using IAnimatablePtr       = std::shared_ptr<IAnimatable>;
-using StandardMaterialPtr  = std::shared_ptr<StandardMaterial>;
+FWD_CLASS_SPTR(FresnelParameters)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_STRUCT_SPTR(PrePassConfiguration)
+FWD_CLASS_SPTR(StandardMaterial)
 
 /**
  * @brief This is the default material used in Babylon. It is the best trade off between quality and
@@ -436,12 +435,22 @@ protected:
 
 protected:
   /**
-   * Attaches a new image processing configuration to the Standard Material.
+   * @brief Attaches a new image processing configuration to the Standard Material.
    * @param configuration
    */
   void _attachImageProcessingConfiguration(ImageProcessingConfiguration* configuration);
 
-  bool _shouldUseAlphaFromDiffuseTexture() const;
+  /**
+   * @brief Specifies whether or not the alpha value of the diffuse texture should be used for alpha
+   * blending.
+   */
+  virtual bool _shouldUseAlphaFromDiffuseTexture() const;
+
+  /**
+   * @brief Specifies whether or not there is a usable alpha channel for transparency.
+   */
+  virtual bool _hasAlphaChannel() const;
+
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:
@@ -705,6 +714,11 @@ public:
    * The image processing configuration used either in this material
    */
   Property<StandardMaterial, ImageProcessingConfiguration*> imageProcessingConfiguration;
+
+  /**
+   * Defines additionnal PrePass parameters for the material.
+   */
+  PrePassConfigurationPtr prePassConfiguration;
 
   /**
    * Whether the color curves effect is enabled

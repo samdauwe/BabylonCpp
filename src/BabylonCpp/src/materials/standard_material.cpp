@@ -22,6 +22,7 @@
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/pre_pass_configuration.h>
 #include <babylon/materials/standard_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/color_grading_texture.h>
@@ -123,6 +124,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
                        &StandardMaterial::set_twoSidedLighting}
     , imageProcessingConfiguration{this, &StandardMaterial::get_imageProcessingConfiguration,
                                    &StandardMaterial::set_imageProcessingConfiguration}
+    , prePassConfiguration{nullptr}
     , cameraColorCurvesEnabled{this, &StandardMaterial::get_cameraColorCurvesEnabled,
                                &StandardMaterial::set_cameraColorCurvesEnabled}
     , cameraColorGradingEnabled{this, &StandardMaterial::get_cameraColorGradingEnabled,
@@ -179,6 +181,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
+  prePassConfiguration = std::make_shared<PrePassConfiguration>();
 
   getRenderTargetTextures = [this]() {
     _renderTargets.clear();
@@ -396,15 +399,21 @@ bool StandardMaterial::needAlphaTesting() const
     return true;
   }
 
-  return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha()
-         && (_transparencyMode.has_value() && *_transparencyMode == Material::MATERIAL_ALPHATEST);
+  return _hasAlphaChannel()
+         && (!_transparencyMode
+             || (_transparencyMode.has_value()
+                 && *_transparencyMode == Material::MATERIAL_ALPHATEST));
 }
 
 bool StandardMaterial::_shouldUseAlphaFromDiffuseTexture() const
 {
   return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha() && _useAlphaFromDiffuseTexture
-         && (!_transparencyMode
-             || (_transparencyMode.has_value() && *_transparencyMode != Material::MATERIAL_OPAQUE));
+         && (_transparencyMode.has_value() && *_transparencyMode != Material::MATERIAL_OPAQUE);
+}
+
+bool StandardMaterial::_hasAlphaChannel() const
+{
+  return (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()) || _opacityTexture != nullptr;
 }
 
 BaseTexturePtr StandardMaterial::getAlphaTestTexture()
@@ -873,6 +882,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
     DetailMapConfiguration::AddUniforms(uniforms);
     DetailMapConfiguration::AddSamplers(samplers);
 
+    PrePassConfiguration::AddUniforms(uniforms);
+    PrePassConfiguration::AddSamplers(uniforms);
+
     /* if (ImageProcessingConfiguration) */ {
       ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
       ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
@@ -1037,6 +1049,9 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     bindOnlyWorldMatrix(world);
   }
 
+  // PrePass
+  prePassConfiguration->bindForSubMesh(_activeEffect, scene, mesh, world, isFrozen());
+
   // Normal Matrix
   if (defines["OBJECTSPACE_NORMALMAP"]) {
     world.toNormalMatrix(_normalMatrix);
@@ -1099,10 +1114,6 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
           ubo.updateFloat2("vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
                            static_cast<float>(_diffuseTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_diffuseTexture, ubo, "diffuse");
-
-          if (_diffuseTexture->hasAlpha()) {
-            effect->setFloat("alphaCutOff", alphaCutOff);
-          }
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
@@ -1115,6 +1126,10 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
           ubo.updateFloat2("vOpacityInfos", static_cast<float>(_opacityTexture->coordinatesIndex),
                            static_cast<float>(_opacityTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_opacityTexture, ubo, "opacity");
+        }
+
+        if (_hasAlphaChannel()) {
+          effect->setFloat("alphaCutOff", alphaCutOff);
         }
 
         if (_reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
