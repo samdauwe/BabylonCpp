@@ -26,26 +26,34 @@ SubSurfaceScatteringPostProcess::SubSurfaceScatteringPostProcess(
   updateEffect();
 
   onApplyObservable.add([this](Effect* effect, EventState & /*es*/) -> void {
-    if (!_scene->prePassRenderer()) {
-      BABYLON_LOG_ERROR("SubSurfaceScatteringPostProcess",
-                        "PrePass needs to be enabled for subsurface scattering.");
+    if (!_scene->prePassRenderer() || !_scene->subSurfaceConfiguration()) {
+      BABYLON_LOG_ERROR(
+        "SubSurfaceScatteringPostProcess",
+        "PrePass and subsurface configuration needs to be enabled for subsurface scattering.");
       return;
     }
-    const auto iTexelSize        = texelSize();
-    const auto& prePassRenderer  = _scene->prePassRenderer();
-    const auto prePassRTTextures = prePassRenderer->prePassRT->textures();
-    effect->setFloat("metersPerUnit", prePassRenderer->subSurfaceConfiguration->metersPerUnit);
+    const auto iTexelSize = texelSize();
+    effect->setFloat("metersPerUnit", _scene->subSurfaceConfiguration()->metersPerUnit);
     effect->setFloat2("texelSize", iTexelSize.x, iTexelSize.y);
-    effect->setTexture("irradianceSampler", prePassRTTextures[1]);
-    effect->setTexture("depthSampler", prePassRTTextures[2]);
-    effect->setTexture("albedoSampler", prePassRTTextures[3]);
+    effect->setTexture(
+      "irradianceSampler",
+      _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
+        Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE)]);
+    effect->setTexture(
+      "depthSampler",
+      _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
+        Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
+    effect->setTexture(
+      "albedoSampler",
+      _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
+        Constants::PREPASS_ALBEDO_TEXTURE_TYPE)]);
     effect->setFloat2("viewportSize",
                       std::tan(_scene->activeCamera()->fov / 2.f)
                         * _scene->getEngine()->getAspectRatio(*_scene->activeCamera(), true),
                       std::tan(_scene->activeCamera()->fov / 2.f));
-    effect->setArray3("diffusionS", prePassRenderer->subSurfaceConfiguration->ssDiffusionS());
-    effect->setArray("diffusionD", prePassRenderer->subSurfaceConfiguration->ssDiffusionD());
-    effect->setArray("filterRadii", prePassRenderer->subSurfaceConfiguration->ssFilterRadii());
+    effect->setArray3("diffusionS", _scene->subSurfaceConfiguration()->ssDiffusionS());
+    effect->setArray("diffusionD", _scene->subSurfaceConfiguration()->ssDiffusionD());
+    effect->setArray("filterRadii", _scene->subSurfaceConfiguration()->ssFilterRadii());
   });
 }
 
