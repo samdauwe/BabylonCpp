@@ -693,8 +693,7 @@ protected:
   void _markAllSubMeshesAsLightsDirty();
 
   /**
-   * @brief Indicates that attributes need to be re-calculated for all
-   * submeshes.
+   * @brief Indicates that attributes need to be re-calculated for all submeshes.
    */
   void _markAllSubMeshesAsAttributesDirty();
 
@@ -709,8 +708,7 @@ protected:
   void _markAllSubMeshesAsPrePassDirty();
 
   /**
-   * @brief Indicates that textures and misc need to be re-calculated for all
-   * submeshes.
+   * @brief Indicates that textures and misc need to be re-calculated for all submeshes.
    */
   void _markAllSubMeshesAsTexturesAndMiscDirty();
 
