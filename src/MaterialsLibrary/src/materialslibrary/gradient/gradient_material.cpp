@@ -219,7 +219,7 @@ void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, effect);
+  MaterialHelper::BindBonesParameters(mesh, effect.get());
 
   if (_mustRebind(scene, effect)) {
     // Clip plane
@@ -234,7 +234,7 @@ void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   }
 
   if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, maxSimultaneousLights);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), *defines, maxSimultaneousLights);
   }
 
   // View

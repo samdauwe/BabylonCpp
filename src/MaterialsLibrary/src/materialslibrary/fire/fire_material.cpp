@@ -233,7 +233,7 @@ void FireMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get());
 
   if (_mustRebind(scene, effect)) {
     // Textures

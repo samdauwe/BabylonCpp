@@ -244,7 +244,7 @@ void SimpleMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get());
 
   if (_mustRebind(scene, effect)) {
     // Textures
@@ -272,7 +272,7 @@ void SimpleMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, maxSimultaneousLights());
+    MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), *defines, maxSimultaneousLights());
   }
 
   // View

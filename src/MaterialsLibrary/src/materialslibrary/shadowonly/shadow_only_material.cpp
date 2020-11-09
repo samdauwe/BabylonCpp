@@ -214,7 +214,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get());
 
   if (_mustRebind(scene, effect)) {
     // Clip plane
@@ -233,7 +233,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
 
   // Lights
   if (scene->lightsEnabled()) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, 1);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), *defines, 1);
 
     const auto light = _getFirstShadowLightForMesh(mesh);
 

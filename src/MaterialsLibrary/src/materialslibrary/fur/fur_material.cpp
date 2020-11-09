@@ -319,7 +319,7 @@ void FurMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get());
 
   if (scene->getCachedMaterial() != this) {
     // Textures
@@ -350,7 +350,7 @@ void FurMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, maxSimultaneousLights());
+    MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), *defines, maxSimultaneousLights());
   }
 
   // View

@@ -462,7 +462,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get());
 
   if (_mustRebind(scene, effect)) {
     // Textures
@@ -491,7 +491,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, maxSimultaneousLights());
+    MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, maxSimultaneousLights());
   }
 
   // View
@@ -503,7 +503,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   // Log. depth
-  MaterialHelper::BindLogDepth(defines, _activeEffect, scene);
+  MaterialHelper::BindLogDepth(defines, _activeEffect.get(), scene);
 
   // Water
   if (MaterialFlags::ReflectionTextureEnabled()) {
