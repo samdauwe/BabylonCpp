@@ -20,6 +20,7 @@
 #include <babylon/materials/node/blocks/particle/particle_texture_block.h>
 #include <babylon/materials/node/blocks/remap_block.h>
 #include <babylon/materials/node/blocks/transform_block.h>
+#include <babylon/materials/node/blocks/trigonometry_block.h>
 #include <babylon/materials/node/blocks/vector_merger_block.h>
 #include <babylon/materials/node/blocks/vertex/vertex_output_block.h>
 #include <babylon/materials/node/inode_material_options.h>
@@ -528,20 +529,24 @@ NodeMaterial::createPostProcess(const CameraPtr& camera,
                                 unsigned int samplingMode, Engine* engine, bool reusable,
                                 unsigned int textureType, unsigned int textureFormat)
 {
-  return _createEffectOrPostProcess(nullptr, camera, iOptions, samplingMode, engine, reusable,
-                                    textureType, textureFormat);
+  if (mode() != NodeMaterialModes::PostProcess) {
+    BABYLON_LOG_WARN("NodeMaterial", "Incompatible material mode");
+    return nullptr;
+  }
+  return _createEffectForPostProcess(nullptr, camera, iOptions, samplingMode, engine, reusable,
+                                     textureType, textureFormat);
 }
 
 void NodeMaterial::createEffectForPostProcess(const PostProcessPtr& postProcess)
 {
-  _createEffectOrPostProcess(postProcess);
+  _createEffectForPostProcess(postProcess);
 }
 
 PostProcessPtr
-NodeMaterial::_createEffectOrPostProcess(PostProcessPtr postProcess, const CameraPtr& camera,
-                                         const std::variant<float, PostProcessOptions>& iOptions,
-                                         unsigned int samplingMode, Engine* engine, bool reusable,
-                                         unsigned int textureType, unsigned int textureFormat)
+NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const CameraPtr& camera,
+                                          const std::variant<float, PostProcessOptions>& iOptions,
+                                          unsigned int samplingMode, Engine* engine, bool reusable,
+                                          unsigned int textureType, unsigned int textureFormat)
 {
   auto tempName = name + std::to_string(_buildId);
 
@@ -716,37 +721,47 @@ void NodeMaterial::_createEffectForParticles(
       return;
     }
 
-    // Animated blocks
-    if (!_sharedData->animatedInputs.empty()) {
-      const auto scene = getScene();
-
-      const auto frameId = scene->getFrameId();
-
-      if (_animationFrame != frameId) {
-        for (const auto& input : _sharedData->animatedInputs) {
-          input->animate(scene);
-        }
-
-        _animationFrame = frameId;
-      }
-    }
-
-    // Bindable blocks
-    for (const auto& block : _sharedData->bindableBlocks) {
-      block->bind(effect, shared_from_this());
-    }
-
-    // Connection points
-    for (const auto& inputBlock : _sharedData->inputBlocks) {
-      inputBlock->_transmit(effect.get(), getScene());
-    }
+    _checkInternals(effect.get());
   });
+}
+
+void NodeMaterial::_checkInternals(Effect* effect)
+{
+  // Animated blocks
+  if (!_sharedData->animatedInputs.empty()) {
+    const auto scene = getScene();
+
+    const auto frameId = scene->getFrameId();
+
+    if (_animationFrame != frameId) {
+      for (const auto& input : _sharedData->animatedInputs) {
+        input->animate(scene);
+      }
+
+      _animationFrame = frameId;
+    }
+  }
+
+  // Bindable blocks
+  for (const auto& block : _sharedData->bindableBlocks) {
+    block->bind(effect, shared_from_this());
+  }
+
+  // Connection points
+  for (const auto& inputBlock : _sharedData->inputBlocks) {
+    inputBlock->_transmit(effect, getScene());
+  }
 }
 
 void NodeMaterial::createEffectForParticles(
   const IParticleSystemPtr& particleSystem, const std::function<void(Effect* effect)>& iOnCompiled,
   const std::function<void(Effect* effect, const std::string& errors)>& iOnError)
 {
+  if (mode() != NodeMaterialModes::Particle) {
+    BABYLON_LOG_WARN("NodeMaterial", "Incompatible material mode");
+    return;
+  }
+
   _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_ONEONE, iOnCompiled,
                             iOnError);
   _createEffectForParticles(particleSystem, BaseParticleSystem::BLENDMODE_MULTIPLY, iOnCompiled,
@@ -994,7 +1009,7 @@ void NodeMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     if (effect && scene->getCachedEffect() != effect) {
       // Bindable blocks
       for (const auto& block : sharedData->bindableBlocks) {
-        block->bind(effect, shared_from_this(), mesh, subMesh);
+        block->bind(effect.get(), shared_from_this(), mesh, subMesh);
       }
 
       // Connection points
@@ -1161,14 +1176,14 @@ void NodeMaterial::setToDefaultPostProcess()
   vmerger->connectTo(vertexOutput);
 
   // Pixel
-  const auto scale          = InputBlock::New("scale");
+  const auto scale          = InputBlock::New("Scale");
   scale->visibleInInspector = true;
   scale->value              = std::make_shared<AnimationValue>(Vector2(1.f, 1.f));
 
   const auto uv0 = RemapBlock::New("uv0");
   position->connectTo(uv0);
 
-  const auto uv = MultiplyBlock::New("uv");
+  const auto uv = MultiplyBlock::New("UV scale");
   uv0->connectTo(uv);
   scale->connectTo(uv);
 
@@ -1189,6 +1204,62 @@ void NodeMaterial::setToDefaultPostProcess()
   addOutputNode(fragmentOutput);
 
   _mode = NodeMaterialModes::PostProcess;
+}
+
+void NodeMaterial::setToDefaultProceduralTexture()
+{
+  clear();
+
+  // editorData = nullptr;
+
+  const auto position = InputBlock::New("Position");
+  position->setAsAttribute("position2d");
+
+  const auto const1  = InputBlock::New("Constant1");
+  const1->isConstant = true;
+  const1->value      = std::make_shared<AnimationValue>(1.f);
+
+  const auto vmerger = VectorMergerBlock::New("Position3D");
+
+  position->connectTo(vmerger);
+  NodeMaterialBlockConnectionOptions options;
+  options.input = "w";
+  const1->connectTo(vmerger, options);
+
+  const auto vertexOutput = VertexOutputBlock::New("VertexOutput");
+  vmerger->connectTo(vertexOutput);
+
+  // Pixel
+  const auto time     = InputBlock::New("Time");
+  time->value         = std::make_shared<AnimationValue>(0.f);
+  time->min           = 0.f;
+  time->max           = 0.f;
+  time->isBoolean     = false;
+  time->matrixMode    = 0;
+  time->animationType = AnimatedInputBlockTypes::Time;
+  time->isConstant    = false;
+
+  const auto color          = InputBlock::New("Color3");
+  color->value              = std::make_shared<AnimationValue>(Color3(1.f, 1.f, 1.f));
+  color->isConstant         = false;
+  const auto fragmentOutput = FragmentOutputBlock::New("FragmentOutput");
+
+  const auto vectorMerger          = VectorMergerBlock::New("VectorMerger");
+  vectorMerger->visibleInInspector = false;
+
+  const auto cos = TrigonometryBlock::New("Cos");
+  cos->operation = TrigonometryBlockOperations::Cos;
+
+  position->connectTo(vectorMerger);
+  time->output()->connectTo(cos->input());
+  cos->output()->connectTo(vectorMerger->z());
+  vectorMerger->xyzOut()->connectTo(fragmentOutput->rgb());
+
+  // Add to nodes
+  addOutputNode(vertexOutput);
+  addOutputNode(fragmentOutput);
+
+  _mode = NodeMaterialModes::ProceduralTexture;
 }
 
 void NodeMaterial::setToDefaultParticle()
