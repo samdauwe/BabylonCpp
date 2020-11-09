@@ -1061,7 +1061,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, effect);
+  MaterialHelper::BindBonesParameters(mesh, effect.get());
   auto& ubo = *_uniformBuffer;
   if (mustRebind) {
     ubo.bindToEffect(effect.get(), "Material");
@@ -1276,7 +1276,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, effect, defines, _maxSimultaneousLights,
+      MaterialHelper::BindLights(scene, mesh, effect.get(), defines, _maxSimultaneousLights,
                                  _rebuildInParallel);
     }
 
@@ -1291,12 +1291,12 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
 
     // Morph targets
     if (defines.intDef["NUM_MORPH_INFLUENCERS"]) {
-      MaterialHelper::BindMorphTargetParameters(mesh, effect);
+      MaterialHelper::BindMorphTargetParameters(mesh, effect.get());
     }
 
     // Log. depth
     if (useLogarithmicDepth) {
-      MaterialHelper::BindLogDepth(defines, effect, scene);
+      MaterialHelper::BindLogDepth(defines, effect.get(), scene);
     }
 
     // Image processing

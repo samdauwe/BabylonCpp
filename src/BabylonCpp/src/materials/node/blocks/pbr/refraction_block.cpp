@@ -159,7 +159,7 @@ bool RefractionBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*n
   return true;
 }
 
-void RefractionBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
+void RefractionBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
                            SubMesh* /*subMesh*/)
 {
   NodeMaterialBlock::bind(effect, nodeMaterial, mesh);

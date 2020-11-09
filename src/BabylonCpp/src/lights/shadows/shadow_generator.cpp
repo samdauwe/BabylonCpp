@@ -927,7 +927,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
       }
 
       // Morph targets
-      MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), iEffect);
+      MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), iEffect.get());
 
       // Clip planes
       MaterialHelper::BindClipPlane(iEffect, scene);
@@ -1354,7 +1354,7 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines, unsigned int ligh
   }
 }
 
-void ShadowGenerator::bindShadowLight(const std::string& lightIndex, const EffectPtr& effect)
+void ShadowGenerator::bindShadowLight(const std::string& lightIndex, Effect* effect)
 {
   auto& scene = _scene;
   auto& light = _light;

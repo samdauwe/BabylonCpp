@@ -71,7 +71,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * effect
    * @param effect The effect we are binfing the information for
    */
-  virtual void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) = 0;
+  virtual void bindShadowLight(const std::string& lightIndex, Effect* effect) = 0;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the map from the light

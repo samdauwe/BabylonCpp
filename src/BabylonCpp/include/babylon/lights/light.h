@@ -183,9 +183,9 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The light
    */
-  virtual void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) = 0;
+  virtual void transferToEffect(Effect* effect, const std::string& lightIndex) = 0;
 
-  virtual void transferToEffect(const EffectPtr& effect, const std::string& uniformName0,
+  virtual void transferToEffect(Effect* effect, const std::string& uniformName0,
                                 const std::string& uniformName1);
 
   /**
@@ -194,7 +194,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The light
    */
-  virtual Light& transferTexturesToEffect(const EffectPtr& effect, const std::string& lightIndex);
+  virtual Light& transferTexturesToEffect(Effect* effect, const std::string& lightIndex);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -204,7 +204,7 @@ public:
    * @param useSpecular Defines if specular is supported
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
-  void _bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect, bool useSpecular,
+  void _bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bool useSpecular,
                   bool rebuildInParallel = false);
 
   /**
@@ -214,7 +214,7 @@ public:
    * or direction)
    * @returns The light
    */
-  virtual Light& transferToNodeMaterialEffect(const EffectPtr& effect,
+  virtual Light& transferToNodeMaterialEffect(Effect* effect,
                                               const std::string& lightDataUniformName)
     = 0;
 

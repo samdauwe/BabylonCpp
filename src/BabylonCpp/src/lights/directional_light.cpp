@@ -188,7 +188,7 @@ void DirectionalLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
+void DirectionalLight::transferToEffect(Effect* /*effect*/, const std::string& lightIndex)
 {
   const auto& iTransformedDirection = transformedDirection();
   if (computeTransformedInformation()) {
@@ -203,7 +203,7 @@ void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/, const std::
 }
 
 DirectionalLight&
-DirectionalLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+DirectionalLight::transferToNodeMaterialEffect(Effect* effect,
                                                const std::string& lightDataUniformName)
 {
   if (computeTransformedInformation()) {

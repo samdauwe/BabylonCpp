@@ -252,7 +252,7 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
 
     // Draw
     renderingMesh->_processRendering(

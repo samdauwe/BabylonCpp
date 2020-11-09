@@ -58,7 +58,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The hemispheric light
    */
-  void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -66,7 +66,7 @@ public:
    * @param lightDataUniformName The uniform used to store light data (position or direction)
    * @returns The light
    */
-  HemisphericLight& transferToNodeMaterialEffect(const EffectPtr& effect,
+  HemisphericLight& transferToNodeMaterialEffect(Effect* effect,
                                                  const std::string& lightDataUniformName) override;
 
   /**

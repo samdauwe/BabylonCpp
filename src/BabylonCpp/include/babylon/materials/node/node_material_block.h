@@ -7,6 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/enums/node_material_block_connection_point_types.h>
 #include <babylon/materials/node/enums/node_material_block_targets.h>
 
@@ -15,21 +16,16 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class AbstractMesh;
-class Effect;
 class EffectFallbacks;
 class Mesh;
-class NodeMaterial;
-class NodeMaterialBlock;
-class NodeMaterialConnectionPoint;
 struct NodeMaterialDefines;
 class NodeMaterialBuildState;
 class Scene;
-class SubMesh;
-using EffectPtr                      = std::shared_ptr<Effect>;
-using NodeMaterialPtr                = std::shared_ptr<NodeMaterial>;
-using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
-using SubMeshPtr                     = std::shared_ptr<SubMesh>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(NodeMaterial)
+FWD_CLASS_SPTR(NodeMaterialBlock)
+FWD_CLASS_SPTR(NodeMaterialConnectionPoint)
+FWD_CLASS_SPTR(SubMesh)
 
 struct NodeMaterialBlockConnectionOptions {
   std::string input{};
@@ -78,8 +74,8 @@ public:
    * @param mesh defines the mesh that will be rendered
    * @param subMesh defines the submesh that will be rendered
    */
-  virtual void bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                    Mesh* mesh = nullptr, SubMesh* subMesh = nullptr);
+  virtual void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr,
+                    SubMesh* subMesh = nullptr);
 
   /**
    * @brief Gets the current class name e.g. "NodeMaterialBlock".

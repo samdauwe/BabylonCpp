@@ -106,7 +106,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   }
 
   // Morph targets
-  MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
+  MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
 
   renderingMesh->_bind(subMesh, _effect, material->fillMode());
 

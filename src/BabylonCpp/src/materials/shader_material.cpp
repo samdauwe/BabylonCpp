@@ -504,7 +504,7 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
     }
 
     // Bones
-    MaterialHelper::BindBonesParameters(mesh, effect);
+    MaterialHelper::BindBonesParameters(mesh, effect.get());
 
     // Texture
     for (const auto& [channel, texture] : _textures) {

@@ -613,7 +613,8 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effectLayerMapGenerationEffect);
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(),
+                                              _effectLayerMapGenerationEffect.get());
 
     // Alpha mode
     if (enableAlphaMode) {

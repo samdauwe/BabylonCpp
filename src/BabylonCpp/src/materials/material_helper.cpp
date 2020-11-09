@@ -749,21 +749,19 @@ void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attrib
   attribs.emplace_back(VertexBuffer::World3Kind);
 }
 
-void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
-                                         unsigned int lightIndex)
+void MaterialHelper::BindLightProperties(Light& light, Effect* effect, unsigned int lightIndex)
 {
   light.transferToEffect(effect, std::to_string(lightIndex));
 }
 
 void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                               const EffectPtr& effect, bool useSpecular, bool rebuildInParallel)
+                               Effect* effect, bool useSpecular, bool rebuildInParallel)
 {
   light->_bindLight(lightIndex, scene, effect, useSpecular, rebuildInParallel);
 }
 
-void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
-                                bool defines, unsigned int maxSimultaneousLights,
-                                bool rebuildInParallel)
+void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, bool defines,
+                                unsigned int maxSimultaneousLights, bool rebuildInParallel)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
@@ -774,7 +772,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPt
   }
 }
 
-void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
+void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
                                 MaterialDefines& defines, unsigned int maxSimultaneousLights,
                                 bool rebuildInParallel)
 {
@@ -804,7 +802,7 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh, const E
   }
 }
 
-void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect,
+void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect,
                                          const PrePassConfigurationPtr& prePassConfiguration)
 {
   if (!effect || !mesh) {
@@ -857,7 +855,7 @@ Float32Array& MaterialHelper::_CopyBonesTransformationMatrices(const Float32Arra
   return target;
 }
 
-void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh, const EffectPtr& effect)
+void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh, Effect* effect)
 {
   auto mesh = static_cast<Mesh*>(abstractMesh);
   if (mesh) {
@@ -870,7 +868,7 @@ void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh, const
   }
 }
 
-void MaterialHelper::BindLogDepth(MaterialDefines& defines, const EffectPtr& effect, Scene* scene)
+void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect, Scene* scene)
 {
   if (defines["LOGARITHMICDEPTH"]) {
     effect->setFloat("logarithmicDepthConstant",

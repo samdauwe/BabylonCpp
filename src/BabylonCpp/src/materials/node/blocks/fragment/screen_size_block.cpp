@@ -47,8 +47,8 @@ NodeMaterialConnectionPointPtr& ScreenSizeBlock::get_y()
   return _outputs[2];
 }
 
-void ScreenSizeBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& /*nodeMaterial*/,
-                           Mesh* /*mesh*/, SubMesh* /*subMesh*/)
+void ScreenSizeBlock::bind(Effect* effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* /*mesh*/,
+                           SubMesh* /*subMesh*/)
 {
   const auto engine = _scene->getEngine();
 

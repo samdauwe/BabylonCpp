@@ -129,9 +129,8 @@ bool ReflectionTextureBaseBlock::isReady(AbstractMesh* /*mesh*/,
   return true;
 }
 
-void ReflectionTextureBaseBlock::bind(const EffectPtr& effect,
-                                      const NodeMaterialPtr& /*nodeMaterial*/, Mesh* mesh,
-                                      SubMesh* /*subMesh*/)
+void ReflectionTextureBaseBlock::bind(Effect* effect, const NodeMaterialPtr& /*nodeMaterial*/,
+                                      Mesh* mesh, SubMesh* /*subMesh*/)
 {
   const auto iTexture = _getTexture();
 

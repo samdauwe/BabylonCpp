@@ -269,7 +269,7 @@ void SpotLight::_computeAngleValues()
   _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 
-Light& SpotLight::transferTexturesToEffect(const EffectPtr& effect, const std::string& lightIndex)
+Light& SpotLight::transferTexturesToEffect(Effect* effect, const std::string& lightIndex)
 {
   if (projectionTexture() && projectionTexture()->isReady()) {
     if (_projectionTextureViewLightDirty) {
@@ -287,7 +287,7 @@ Light& SpotLight::transferTexturesToEffect(const EffectPtr& effect, const std::s
   return *this;
 }
 
-void SpotLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
+void SpotLight::transferToEffect(Effect* /*effect*/, const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 
@@ -331,7 +331,7 @@ void SpotLight::transferToEffect(const EffectPtr& /*effect*/, const std::string&
   );
 }
 
-SpotLight& SpotLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+SpotLight& SpotLight::transferToNodeMaterialEffect(Effect* effect,
                                                    const std::string& lightDataUniformName)
 {
   Vector3 normalizeDirection;

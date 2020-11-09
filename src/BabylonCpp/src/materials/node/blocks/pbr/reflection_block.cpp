@@ -159,7 +159,7 @@ void ReflectionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   }
 }
 
-void ReflectionBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
+void ReflectionBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
                            SubMesh* subMesh)
 {
   ReflectionTextureBaseBlock::bind(effect, nodeMaterial, mesh);

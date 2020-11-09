@@ -126,7 +126,7 @@ void PointLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-void PointLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
+void PointLight::transferToEffect(Effect* /*effect*/, const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {
     _uniformBuffer->updateFloat4("vLightData",            //
@@ -150,7 +150,7 @@ void PointLight::transferToEffect(const EffectPtr& /*effect*/, const std::string
   );
 }
 
-PointLight& PointLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+PointLight& PointLight::transferToNodeMaterialEffect(Effect* effect,
                                                      const std::string& lightDataUniformName)
 {
   if (computeTransformedInformation()) {

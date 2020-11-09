@@ -85,8 +85,8 @@ NodeMaterialConnectionPointPtr& ReflectivityBlock::get_reflectivity()
   return _outputs[0];
 }
 
-void ReflectivityBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                             Mesh* mesh, SubMesh* subMesh)
+void ReflectivityBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
+                             SubMesh* subMesh)
 {
   NodeMaterialBlock::bind(effect, nodeMaterial, mesh, subMesh);
 

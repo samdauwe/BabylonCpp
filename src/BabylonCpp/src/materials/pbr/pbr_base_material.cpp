@@ -1217,7 +1217,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect, prePassConfiguration);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get(), prePassConfiguration);
 
   BaseTexturePtr reflectionTexture = nullptr;
   auto& ubo                        = *_uniformBuffer;
@@ -1526,7 +1526,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
+      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights,
                                  _rebuildInParallel);
     }
 
@@ -1541,14 +1541,14 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
 
     // Morph targets
     if (defines.intDef["NUM_MORPH_INFLUENCERS"]) {
-      MaterialHelper::BindMorphTargetParameters(mesh, _activeEffect);
+      MaterialHelper::BindMorphTargetParameters(mesh, _activeEffect.get());
     }
 
     // image processing
     _imageProcessingConfiguration->bind(_activeEffect.get());
 
     // Log. depth
-    MaterialHelper::BindLogDepth(defines, _activeEffect, scene);
+    MaterialHelper::BindLogDepth(defines, _activeEffect.get(), scene);
   }
 
   ubo.update();

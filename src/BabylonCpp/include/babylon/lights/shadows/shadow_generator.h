@@ -226,7 +226,7 @@ public:
    * effect
    * @param effect The effect we are binfing the information for
    */
-  void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) override;
+  void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the map from the light

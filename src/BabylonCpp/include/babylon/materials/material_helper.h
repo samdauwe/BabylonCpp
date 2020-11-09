@@ -305,7 +305,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param lightIndex The light index in the effect used to render
    */
-  static void BindLightProperties(Light& light, const EffectPtr& effect, unsigned int lightIndex);
+  static void BindLightProperties(Light& light, Effect* effect, unsigned int lightIndex);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -317,7 +317,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                        const EffectPtr& effect, bool useSpecular, bool rebuildInParallel = false);
+                        Effect* effect, bool useSpecular, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -328,7 +328,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param maxSimultaneousLights The maximum number of light that can be bound to the effect
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
-  static void BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect, bool defines,
+  static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, bool defines,
                          unsigned int maxSimultaneousLights = 4, bool rebuildInParallel = false);
 
   /**
@@ -340,9 +340,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param maxSimultaneousLights The maximum number of light that can be bound to the effect
    * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
-  static void BindLights(Scene* scene, AbstractMesh* mesh, const EffectPtr& effect,
-                         MaterialDefines& defines, unsigned int maxSimultaneousLights = 4,
-                         bool rebuildInParallel = false);
+  static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, MaterialDefines& defines,
+                         unsigned int maxSimultaneousLights = 4, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the fog information from the scene to the effect for the given mesh.
@@ -360,7 +359,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param prePassConfiguration Configuration for the prepass, in case prepass is activated
    */
-  static void BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect,
+  static void BindBonesParameters(AbstractMesh* mesh, Effect* effect,
                                   const PrePassConfigurationPtr& prePassConfiguration = nullptr);
 
   /**
@@ -375,7 +374,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param abstractMesh The mesh we are binding the information to render
    * @param effect The effect we are binding the data to
    */
-  static void BindMorphTargetParameters(AbstractMesh* abstractMesh, const EffectPtr& effect);
+  static void BindMorphTargetParameters(AbstractMesh* abstractMesh, Effect* effect);
 
   /**
    * @brief Binds the logarithmic depth information from the scene to the effect for the given
@@ -384,7 +383,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param scene The scene we are willing to render with logarithmic scale for
    */
-  static void BindLogDepth(MaterialDefines& defines, const EffectPtr& effect, Scene* scene);
+  static void BindLogDepth(MaterialDefines& defines, Effect* effect, Scene* scene);
 
   /**
    * @brief Binds the clip plane information from the scene to the effect.

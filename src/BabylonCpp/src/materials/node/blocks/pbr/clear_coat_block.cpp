@@ -165,7 +165,7 @@ void ClearCoatBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& n
 }
 
 // TODO FIXME
-void ClearCoatBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
+void ClearCoatBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
                           SubMesh* /*subMesh*/)
 {
   NodeMaterialBlock::bind(effect, nodeMaterial, mesh);

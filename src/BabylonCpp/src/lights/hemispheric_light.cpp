@@ -65,7 +65,7 @@ IShadowGeneratorPtr HemisphericLight::getShadowGenerator()
   return nullptr;
 }
 
-void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/, const std::string& lightIndex)
+void HemisphericLight::transferToEffect(Effect* /*effect*/, const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Normalize(direction);
 
@@ -80,7 +80,7 @@ void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/, const std::
 }
 
 HemisphericLight&
-HemisphericLight::transferToNodeMaterialEffect(const EffectPtr& effect,
+HemisphericLight::transferToNodeMaterialEffect(Effect* effect,
                                                const std::string& lightDataUniformName)
 {
   const auto normalizeDirection = Vector3::Normalize(direction);

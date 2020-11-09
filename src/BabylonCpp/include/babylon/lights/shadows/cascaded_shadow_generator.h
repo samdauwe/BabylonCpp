@@ -136,7 +136,7 @@ public:
    * effect
    * @param effect The effect we are binfing the information for
    */
-  void bindShadowLight(const std::string& lightIndex, const EffectPtr& effect) override;
+  void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
 
   /**
    * @brief Gets the transformation matrix of the first cascade used to project the meshes into the

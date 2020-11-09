@@ -181,7 +181,7 @@ void LightBlock::updateUniformsAndSamples(NodeMaterialBuildState& state,
   }
 }
 
-void LightBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
+void LightBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
                       SubMesh* /*subMesh*/)
 {
   if (!mesh) {

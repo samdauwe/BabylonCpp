@@ -54,7 +54,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The light
    */
-  Light& transferTexturesToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
+  Light& transferTexturesToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect object with the SpotLight transfomed position (or position if not
@@ -63,7 +63,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The spot light
    */
-  void transferToEffect(const EffectPtr& effect, const std::string& lightIndex) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -71,7 +71,7 @@ public:
    * @param lightDataUniformName The uniform used to store light data (position or direction)
    * @returns The light
    */
-  SpotLight& transferToNodeMaterialEffect(const EffectPtr& effect,
+  SpotLight& transferToNodeMaterialEffect(Effect* effect,
                                           const std::string& lightDataUniformName) override;
 
   /**

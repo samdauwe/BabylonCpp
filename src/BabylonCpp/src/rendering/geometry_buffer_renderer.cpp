@@ -639,7 +639,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect);
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
 
     // Velocity
     if (_enableVelocity) {

@@ -269,24 +269,23 @@ Vector3 Light::getAbsolutePosition()
   return Vector3::Zero();
 }
 
-void Light::transferToEffect(const EffectPtr& /*effect*/, const std::string& /*lightIndex*/)
+void Light::transferToEffect(Effect* /*effect*/, const std::string& /*lightIndex*/)
 {
 }
 
-void Light::transferToEffect(const EffectPtr& /*effect*/, const std::string& /*uniformName0*/,
+void Light::transferToEffect(Effect* /*effect*/, const std::string& /*uniformName0*/,
                              const std::string& /*uniformName1*/)
 {
 }
 
-Light& Light::transferTexturesToEffect(const EffectPtr& /*effect*/,
-                                       const std::string& /*lightIndex*/)
+Light& Light::transferTexturesToEffect(Effect* /*effect*/, const std::string& /*lightIndex*/)
 {
   // Do nothing by default.
   return *this;
 }
 
-void Light::_bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& effect,
-                       bool useSpecular, bool rebuildInParallel)
+void Light::_bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bool useSpecular,
+                       bool rebuildInParallel)
 {
   auto iAsString  = std::to_string(lightIndex);
   auto needUpdate = false;
@@ -295,7 +294,7 @@ void Light::_bindLight(unsigned int lightIndex, Scene* scene, const EffectPtr& e
     return;
   }
 
-  _uniformBuffer->bindToEffect(effect.get(), "Light" + iAsString);
+  _uniformBuffer->bindToEffect(effect, "Light" + iAsString);
 
   if (_renderId != scene->getRenderId() || !_uniformBuffer->useUbo()) {
     _renderId = scene->getRenderId();

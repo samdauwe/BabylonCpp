@@ -74,8 +74,8 @@ void ImageProcessingBlock::prepareDefines(AbstractMesh* /*mesh*/,
   }
 }
 
-void ImageProcessingBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
-                                Mesh* mesh, SubMesh* /*subMesh*/)
+void ImageProcessingBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
+                                SubMesh* /*subMesh*/)
 {
   if (!mesh) {
     return;
@@ -85,7 +85,7 @@ void ImageProcessingBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& 
     return;
   }
 
-  nodeMaterial->imageProcessingConfiguration()->bind(effect.get());
+  nodeMaterial->imageProcessingConfiguration()->bind(effect);
 }
 
 ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& state)

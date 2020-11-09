@@ -1001,7 +1001,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
   bindOnlyWorldMatrix(world);
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect.get());
 
   auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
   if (mustRebind) {
@@ -1099,7 +1099,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
 
   if (mustRebind || !isFrozen()) {
     if (scene->lightsEnabled()) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
+      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights,
                                  false);
     }
 

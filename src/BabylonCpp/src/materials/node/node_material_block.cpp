@@ -126,7 +126,7 @@ void NodeMaterialBlock::initialize(NodeMaterialBuildState& /*state*/)
   // Do nothing
 }
 
-void NodeMaterialBlock::bind(const EffectPtr& /*effect*/, const NodeMaterialPtr& /*nodeMaterial*/,
+void NodeMaterialBlock::bind(Effect* /*effect*/, const NodeMaterialPtr& /*nodeMaterial*/,
                              Mesh* /*mesh*/, SubMesh* /*subMesh*/)
 {
   // Do nothing

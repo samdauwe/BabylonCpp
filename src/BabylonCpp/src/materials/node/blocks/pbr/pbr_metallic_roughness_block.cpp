@@ -554,7 +554,7 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
   MaterialHelper::PrepareUniformsAndSamplersList(options);
 }
 
-void PBRMetallicRoughnessBlock::bind(const EffectPtr& effect, const NodeMaterialPtr& nodeMaterial,
+void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
                                      Mesh* mesh, SubMesh* /*subMesh*/)
 {
   if (!mesh) {

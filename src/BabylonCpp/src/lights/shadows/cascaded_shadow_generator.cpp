@@ -793,8 +793,7 @@ void CascadedShadowGenerator::prepareDefines(MaterialDefines& defines, unsigned 
   }
 }
 
-void CascadedShadowGenerator::bindShadowLight(const std::string& lightIndex,
-                                              const EffectPtr& effect)
+void CascadedShadowGenerator::bindShadowLight(const std::string& lightIndex, Effect* effect)
 {
   const auto& light = _light;
   const auto& scene = _scene;
