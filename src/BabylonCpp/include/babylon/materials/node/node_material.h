@@ -29,6 +29,7 @@ FWD_STRUCT_SPTR(NodeMaterialOptimizer)
 FWD_STRUCT_SPTR(NodeMaterialBuildStateSharedData)
 FWD_CLASS_SPTR(ParticleTextureBlock)
 FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(ProceduralTexture)
 FWD_CLASS_SPTR(ReflectionTextureBlock)
 FWD_CLASS_SPTR(RefractionBlock)
 FWD_CLASS_SPTR(SubMesh)
@@ -196,6 +197,15 @@ public:
    * @param postProcess The post process to create the effect for
    */
   void createEffectForPostProcess(const PostProcessPtr& postProcess);
+
+  /**
+   * @brief Create a new procedural texture based on this node material.
+   * @param size defines the size of the texture
+   * @param scene defines the hosting scene
+   * @returns the new procedural texture attached to this node material
+   */
+  ProceduralTexturePtr createProceduralTexture(const std::variant<int, RenderTargetSize>& size,
+                                               Scene* scene);
 
   /**
    * @brief Create the effect to be used as the custom effect for a particle system.

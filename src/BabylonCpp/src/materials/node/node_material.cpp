@@ -606,35 +606,18 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
 #endif
       }
 
-      // Animated blocks
-      if (!_sharedData->animatedInputs.empty()) {
-        const auto scene = getScene();
-
-        const auto frameId = scene->getFrameId();
-
-        if (_animationFrame != frameId) {
-          for (const auto& input : _sharedData->animatedInputs) {
-            input->animate(scene);
-          }
-
-          _animationFrame = frameId;
-        }
-      }
-
-// Bindable blocks
-#if 0
-      for (const auto& block : _sharedData->bindableBlocks) {
-          block->bind(effect, shared_from_this());
-      }
-#endif
-
-      // Connection points
-      for (const auto& inputBlock : _sharedData->inputBlocks) {
-        inputBlock->_transmit(effect, getScene());
-      }
+      _checkInternals(effect);
     });
 
   return postProcess;
+}
+
+ProceduralTexturePtr
+NodeMaterial::createProceduralTexture(const std::variant<int, RenderTargetSize>& /*size*/,
+                                      Scene* /*scene*/)
+{
+  // TODO implement
+  return nullptr;
 }
 
 void NodeMaterial::_createEffectForParticles(
