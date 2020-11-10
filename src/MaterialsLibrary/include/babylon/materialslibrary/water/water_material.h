@@ -105,59 +105,63 @@ public:
   Property<WaterMaterial, bool> disableLighting;
   Property<WaterMaterial, unsigned int> maxSimultaneousLights;
   /**
-   * Represents the wind force
+   * Defines the wind force.
    */
   float windForce;
   /**
-   * The direction of the wind in the plane (X, Z)
+   * Defines the direction of the wind in the plane (X, Z).
    */
   Vector2 windDirection;
   /**
-   * Wave height, represents the height of the waves
+   * Defines the height of the waves.
    */
   float waveHeight;
   /**
-   * Bump height, represents the bump height related to the
-   * bump map
+   * Defines the bump height related to the bump map.
    */
   float bumpHeight;
   /**
-   * Add a smaller moving bump to less steady waves
+   * Defines wether or not: to add a smaller moving bump to less steady waves.
    */
   Property<WaterMaterial, bool> bumpSuperimpose;
   /**
-   * Color refraction and reflection differently with .waterColor2 and .colorBlendFactor2.
-   * Non-linear (physically correct) fresnel
+   * Defines wether or not color refraction and reflection differently with .waterColor2 and
+   * .colorBlendFactor2. Non-linear (physically correct) fresnel.
    */
   Property<WaterMaterial, bool> fresnelSeparate;
   /**
-   * Bump Waves modify the reflection
+   * Defines wether or not bump Wwves modify the reflection.
    */
   Property<WaterMaterial, bool> bumpAffectsReflection;
   /**
-   * The water color blended with the reflection and refraction samplers
+   * Defines the water color blended with the refraction (near).
    */
   Color3 waterColor;
   /**
-   * The blend factor related to the water color
+   * Defines the blend factor related to the water color.
    */
   float colorBlendFactor;
   /**
-   * The water color blended with the reflection (far)
+   * Defines the water color blended with the reflection (far).
    */
   Color3 waterColor2;
   /**
-   * The blend factor related to the water color (reflection, far)
+   * Defines the blend factor related to the water color (reflection, far).
    */
   float colorBlendFactor2;
   /**
-   * Represents the maximum length of a wave
+   * Defines the maximum length of a wave.
    */
   float waveLength;
   /**
-   * Defines the waves speed
+   * Defines the waves speed.
    */
   float waveSpeed;
+  /**
+   * Defines the number of times waves are repeated. This is typically used to adjust waves count
+   * according to the ground's size where the material is applied on.
+   */
+  float waveCount;
   /**
    * Sets or gets whether or not automatic clipping should be enabled or not. Setting to true will
    * save performances and will avoid calculating useless pixels in the pixel shader of the water

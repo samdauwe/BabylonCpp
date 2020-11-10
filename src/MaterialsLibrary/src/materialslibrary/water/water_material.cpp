@@ -51,6 +51,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , colorBlendFactor2{0.2f}
     , waveLength{0.1f}
     , waveSpeed{1.f}
+    , waveCount{20.f}
     , disableClipPlane{false}
     , refractionTexture{this, &WaterMaterial::get_refractionTexture}
     , reflectionTexture{this, &WaterMaterial::get_reflectionTexture}
@@ -402,7 +403,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool
       // Water
       "worldReflectionViewProjection", "windDirection", "waveLength", "time", "windForce",
       "cameraPosition", "bumpHeight", "waveHeight", "waterColor", "waterColor2", "colorBlendFactor",
-      "colorBlendFactor2", "waveSpeed"};
+      "colorBlendFactor2", "waveSpeed", "waveCount"};
 
     std::vector<std::string> samplers{"normalSampler",
                                       // Water
@@ -533,6 +534,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setColor4("waterColor2", waterColor2, 1.0);
   _activeEffect->setFloat("colorBlendFactor2", colorBlendFactor2);
   _activeEffect->setFloat("waveSpeed", waveSpeed);
+  _activeEffect->setFloat("waveCount", waveCount);
 
   // image processing
   if (_imageProcessingConfiguration && !_imageProcessingConfiguration->applyByPostProcess()) {
