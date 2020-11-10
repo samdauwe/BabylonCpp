@@ -6,26 +6,27 @@ namespace MaterialsLibrary {
 CellMaterialDefines::CellMaterialDefines()
 {
   boolDef = {
-    {"DIFFUSE", false},           //
-    {"CLIPPLANE", false},         //
-    {"CLIPPLANE2", false},        //
-    {"CLIPPLANE3", false},        //
-    {"CLIPPLANE4", false},        //
-    {"CLIPPLANE5", false},        //
-    {"CLIPPLANE6", false},        //
-    {"ALPHATEST", false},         //
-    {"POINTSIZE", false},         //
-    {"FOG", false},               //
-    {"NORMAL", false},            //
-    {"UV1", false},               //
-    {"UV2", false},               //
-    {"VERTEXCOLOR", false},       //
-    {"VERTEXALPHA", false},       //
-    {"INSTANCES", false},         //
-    {"NDOTL", true},              //
-    {"CUSTOMUSERLIGHTING", true}, //
-    {"CELLBASIC", true},          //
-    {"DEPTHPREPASS", false}       //
+    {"DIFFUSE", false},                   //
+    {"CLIPPLANE", false},                 //
+    {"CLIPPLANE2", false},                //
+    {"CLIPPLANE3", false},                //
+    {"CLIPPLANE4", false},                //
+    {"CLIPPLANE5", false},                //
+    {"CLIPPLANE6", false},                //
+    {"ALPHATEST", false},                 //
+    {"POINTSIZE", false},                 //
+    {"FOG", false},                       //
+    {"NORMAL", false},                    //
+    {"UV1", false},                       //
+    {"UV2", false},                       //
+    {"VERTEXCOLOR", false},               //
+    {"VERTEXALPHA", false},               //
+    {"INSTANCES", false},                 //
+    {"NDOTL", true},                      //
+    {"CUSTOMUSERLIGHTING", true},         //
+    {"CELLBASIC", true},                  //
+    {"DEPTHPREPASS", false},              //
+    {"IMAGEPROCESSINGPOSTPROCESS", false} //
   };
 
   intDef = {

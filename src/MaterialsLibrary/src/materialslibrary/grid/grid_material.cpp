@@ -7,6 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -135,6 +136,9 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2Kind);
     }
+
+    defines.boolDef["IMAGEPROCESSINGPOSTPROCESS"]
+      = scene->imageProcessingConfiguration()->applyByPostProcess();
 
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 

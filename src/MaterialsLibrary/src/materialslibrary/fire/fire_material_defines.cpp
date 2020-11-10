@@ -6,21 +6,22 @@ namespace MaterialsLibrary {
 FireMaterialDefines::FireMaterialDefines()
 {
   boolDef = {
-    {"DIFFUSE", false},      //
-    {"CLIPPLANE", false},    //
-    {"CLIPPLANE2", false},   //
-    {"CLIPPLANE3", false},   //
-    {"CLIPPLANE4", false},   //
-    {"CLIPPLANE5", false},   //
-    {"CLIPPLANE6", false},   //
-    {"ALPHATEST", false},    //
-    {"DEPTHPREPASS", false}, //
-    {"POINTSIZE", false},    //
-    {"FOG", false},          //
-    {"UV1", false},          //
-    {"VERTEXCOLOR", false},  //
-    {"VERTEXALPHA", false},  //
-    {"INSTANCES", false},    //
+    {"DIFFUSE", false},                   //
+    {"CLIPPLANE", false},                 //
+    {"CLIPPLANE2", false},                //
+    {"CLIPPLANE3", false},                //
+    {"CLIPPLANE4", false},                //
+    {"CLIPPLANE5", false},                //
+    {"CLIPPLANE6", false},                //
+    {"ALPHATEST", false},                 //
+    {"DEPTHPREPASS", false},              //
+    {"POINTSIZE", false},                 //
+    {"FOG", false},                       //
+    {"UV1", false},                       //
+    {"VERTEXCOLOR", false},               //
+    {"VERTEXALPHA", false},               //
+    {"INSTANCES", false},                 //
+    {"IMAGEPROCESSINGPOSTPROCESS", false} //
   };
 
   intDef = {

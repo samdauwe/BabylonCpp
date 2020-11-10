@@ -14,21 +14,22 @@ TriPlanarMaterialDefines::TriPlanarMaterialDefines()
     {"BUMPY", false}, //
     {"BUMPZ", false}, //
 
-    {"CLIPPLANE", false},    //
-    {"CLIPPLANE2", false},   //
-    {"CLIPPLANE3", false},   //
-    {"CLIPPLANE4", false},   //
-    {"CLIPPLANE5", false},   //
-    {"CLIPPLANE6", false},   //
-    {"ALPHATEST", false},    //
-    {"DEPTHPREPASS", false}, //
-    {"POINTSIZE", false},    //
-    {"FOG", false},          //
-    {"SPECULARTERM", false}, //
-    {"NORMAL", false},       //
-    {"VERTEXCOLOR", false},  //
-    {"VERTEXALPHA", false},  //
-    {"INSTANCES", false},    //
+    {"CLIPPLANE", false},                 //
+    {"CLIPPLANE2", false},                //
+    {"CLIPPLANE3", false},                //
+    {"CLIPPLANE4", false},                //
+    {"CLIPPLANE5", false},                //
+    {"CLIPPLANE6", false},                //
+    {"ALPHATEST", false},                 //
+    {"DEPTHPREPASS", false},              //
+    {"POINTSIZE", false},                 //
+    {"FOG", false},                       //
+    {"SPECULARTERM", false},              //
+    {"NORMAL", false},                    //
+    {"VERTEXCOLOR", false},               //
+    {"VERTEXALPHA", false},               //
+    {"INSTANCES", false},                 //
+    {"IMAGEPROCESSINGPOSTPROCESS", false} //
   };
 
   intDef = {

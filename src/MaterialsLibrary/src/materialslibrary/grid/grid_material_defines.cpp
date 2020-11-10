@@ -6,14 +6,15 @@ namespace MaterialsLibrary {
 GridMaterialDefines::GridMaterialDefines()
 {
   boolDef = {
-    {"OPACITY", false},          //
-    {"TRANSPARENT", false},      //
-    {"FOG", false},              //
-    {"PREMULTIPLYALPHA", false}, //
-    {"UV1", false},              //
-    {"UV2", false},              //
-    {"INSTANCES", false},        //
-    {"THIN_INSTANCES", false}    //
+    {"OPACITY", false},                   //
+    {"TRANSPARENT", false},               //
+    {"FOG", false},                       //
+    {"PREMULTIPLYALPHA", false},          //
+    {"UV1", false},                       //
+    {"UV2", false},                       //
+    {"INSTANCES", false},                 //
+    {"THIN_INSTANCES", false},            //
+    {"IMAGEPROCESSINGPOSTPROCESS", false} //
   };
 }
 

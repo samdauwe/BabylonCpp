@@ -8,6 +8,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materialslibrary/sky/sky_fragment_fx.h>
 #include <babylon/materialslibrary/sky/sky_vertex_fx.h>
@@ -97,6 +98,9 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
     if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
+
+    defines.boolDef["IMAGEPROCESSINGPOSTPROCESS"]
+      = scene->imageProcessingConfiguration()->applyByPostProcess();
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKind};

@@ -6,16 +6,17 @@ namespace MaterialsLibrary {
 ShadowOnlyMaterialDefines::ShadowOnlyMaterialDefines()
 {
   boolDef = {
-    {"CLIPPLANE", false},  //
-    {"CLIPPLANE2", false}, //
-    {"CLIPPLANE3", false}, //
-    {"CLIPPLANE4", false}, //
-    {"CLIPPLANE5", false}, //
-    {"CLIPPLANE6", false}, //
-    {"POINTSIZE", false},  //
-    {"FOG", false},        //
-    {"NORMAL", false},     //
-    {"INSTANCES", false}   //
+    {"CLIPPLANE", false},                 //
+    {"CLIPPLANE2", false},                //
+    {"CLIPPLANE3", false},                //
+    {"CLIPPLANE4", false},                //
+    {"CLIPPLANE5", false},                //
+    {"CLIPPLANE6", false},                //
+    {"POINTSIZE", false},                 //
+    {"FOG", false},                       //
+    {"NORMAL", false},                    //
+    {"INSTANCES", false},                 //
+    {"IMAGEPROCESSINGPOSTPROCESS", false} //
   };
 
   intDef = {

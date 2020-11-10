@@ -6,25 +6,26 @@ namespace MaterialsLibrary {
 FurMaterialDefines::FurMaterialDefines()
 {
   boolDef = {
-    {"DIFFUSE", false},      //
-    {"HEIGHTMAP", false},    //
-    {"CLIPPLANE", false},    //
-    {"CLIPPLANE2", false},   //
-    {"CLIPPLANE3", false},   //
-    {"CLIPPLANE4", false},   //
-    {"CLIPPLANE5", false},   //
-    {"CLIPPLANE6", false},   //
-    {"ALPHATEST", false},    //
-    {"DEPTHPREPASS", false}, //
-    {"POINTSIZE", false},    //
-    {"FOG", false},          //
-    {"NORMAL", false},       //
-    {"UV1", false},          //
-    {"UV2", false},          //
-    {"VERTEXCOLOR", false},  //
-    {"VERTEXALPHA", false},  //
-    {"INSTANCES", false},    //
-    {"HIGHLEVEL", false},    //
+    {"DIFFUSE", false},                   //
+    {"HEIGHTMAP", false},                 //
+    {"CLIPPLANE", false},                 //
+    {"CLIPPLANE2", false},                //
+    {"CLIPPLANE3", false},                //
+    {"CLIPPLANE4", false},                //
+    {"CLIPPLANE5", false},                //
+    {"CLIPPLANE6", false},                //
+    {"ALPHATEST", false},                 //
+    {"DEPTHPREPASS", false},              //
+    {"POINTSIZE", false},                 //
+    {"FOG", false},                       //
+    {"NORMAL", false},                    //
+    {"UV1", false},                       //
+    {"UV2", false},                       //
+    {"VERTEXCOLOR", false},               //
+    {"VERTEXALPHA", false},               //
+    {"INSTANCES", false},                 //
+    {"HIGHLEVEL", false},                 //
+    {"IMAGEPROCESSINGPOSTPROCESS", false} //
   };
 
   intDef = {

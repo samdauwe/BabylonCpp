@@ -13,6 +13,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_fragment_fx.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_vertex_fx.h>
@@ -153,6 +154,9 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
+
+    defines.boolDef["IMAGEPROCESSINGPOSTPROCESS"]
+      = scene->imageProcessingConfiguration()->applyByPostProcess();
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKind};

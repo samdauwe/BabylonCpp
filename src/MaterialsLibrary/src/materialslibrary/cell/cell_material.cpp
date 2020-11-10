@@ -8,6 +8,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/texture.h>
@@ -183,6 +184,9 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
+
+    defines.boolDef["IMAGEPROCESSINGPOSTPROCESS"]
+      = scene->imageProcessingConfiguration()->applyByPostProcess();
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKind};
