@@ -31,6 +31,7 @@
 #include <babylon/shaders/shadersinclude/harmonics_functions_fx.h>
 #include <babylon/shaders/shadersinclude/hdr_filtering_functions_fx.h>
 #include <babylon/shaders/shadersinclude/helper_functions_fx.h>
+#include <babylon/shaders/shadersinclude/image_processing_compatibility_fx.h>
 #include <babylon/shaders/shadersinclude/image_processing_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/image_processing_functions_fx.h>
 #include <babylon/shaders/shadersinclude/importance_sampling_fx.h>
@@ -87,6 +88,8 @@
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pre_pass_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pre_pass_vertex_fx.h>
+#include <babylon/shaders/shadersinclude/pre_pass_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/reflection_function_fx.h>
 #include <babylon/shaders/shadersinclude/shadow_map_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/shadow_map_fragment_declaration_fx.h>
@@ -149,6 +152,7 @@ std::unordered_map<std::string, std::string>
      {"harmonicsFunctions", harmonicsFunctions},
      {"hdrFilteringFunctions", hdrFilteringFunctions},
      {"helperFunctions", helperFunctions},
+     {"imageProcessingCompatibility", imageProcessingCompatibility},
      {"imageProcessingDeclaration", imageProcessingDeclaration},
      {"imageProcessingFunctions", imageProcessingFunctions},
      {"importanceSampling", importanceSampling},
@@ -205,6 +209,8 @@ std::unordered_map<std::string, std::string>
      {"pointCloudVertex", pointCloudVertex},
      {"pointCloudVertexDeclaration", pointCloudVertexDeclaration},
      {"prePassDeclaration", prePassDeclaration},
+     {"prePassVertex", prePassVertex},
+     {"prePassVertexDeclaration", prePassVertexDeclaration},
      {"reflectionFunction", reflectionFunction},
      {"shadowMapFragment", shadowMapFragment},
      {"shadowMapFragmentDeclaration", shadowMapFragmentDeclaration},

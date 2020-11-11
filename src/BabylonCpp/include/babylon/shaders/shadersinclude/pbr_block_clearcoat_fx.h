@@ -46,6 +46,9 @@ struct clearcoatOutParams
         const in vec3 geometricNormalW,
         const in vec3 viewDirectionW,
         const in vec2 vClearCoatParams,
+    #if defined(CLEARCOAT_TEXTURE_ROUGHNESS) && !defined(CLEARCOAT_TEXTURE_ROUGHNESS_IDENTICAL) && !defined(CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE)
+        const in vec4 clearCoatMapRoughnessData,
+    #endif
         const in vec3 specularEnvironmentR0,
     #ifdef CLEARCOAT_TEXTURE
         const in vec2 clearCoatMapData,
@@ -108,9 +111,20 @@ struct clearcoatOutParams
 
         #ifdef CLEARCOAT_TEXTURE
             clearCoatIntensity *= clearCoatMapData.x;
-            clearCoatRoughness *= clearCoatMapData.y;
+            #ifdef CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE
+                clearCoatRoughness *= clearCoatMapData.y;
+            #endif
             #if DEBUGMODE > 0
                 outParams.clearCoatMapData = clearCoatMapData;
+            #endif
+        #endif
+
+
+        #if defined(CLEARCOAT_TEXTURE_ROUGHNESS) && !defined(CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE)
+            #ifdef CLEARCOAT_TEXTURE_ROUGHNESS_IDENTICAL
+                clearCoatRoughness *= clearCoatMapData.y;
+            #else
+                clearCoatRoughness *= clearCoatMapRoughnessData.y;
             #endif
         #endif
 
@@ -138,7 +152,11 @@ struct clearcoatOutParams
         // clearCoatRoughness = mix(0.089, 0.6, clearCoatRoughness);
 
         // Remap F0 to account for the change of interface within the material.
-        vec3 specularEnvironmentR0Updated = getR0RemappedForClearCoat(specularEnvironmentR0);
+        #ifdef CLEARCOAT_REMAP_F0
+            vec3 specularEnvironmentR0Updated = getR0RemappedForClearCoat(specularEnvironmentR0);
+        #else
+            vec3 specularEnvironmentR0Updated = specularEnvironmentR0;
+        #endif
         outParams.specularEnvironmentR0 = mix(specularEnvironmentR0, specularEnvironmentR0Updated, clearCoatIntensity);
 
         // Needs to use the geometric normal before bump for this.
@@ -214,6 +232,10 @@ struct clearcoatOutParams
 
             vec4 environmentClearCoatRadiance = vec4(0., 0., 0., 0.);
 
+)ShaderCode"
+R"ShaderCode(
+
+
             vec3 clearCoatReflectionVector = computeReflectionCoords(vec4(vPositionW, 1.0), clearCoatNormalW);
             #ifdef REFLECTIONMAP_OPPOSITEZ
                 clearCoatReflectionVector.z *= -1.0;
@@ -229,10 +251,6 @@ struct clearcoatOutParams
                 #endif
                 clearCoatReflectionCoords.y = 1.0 - clearCoatReflectionCoords.y;
             #endif
-
-)ShaderCode"
-R"ShaderCode(
-
 
             sampleReflectionTexture(
                 clearCoatAlphaG,

@@ -39,10 +39,6 @@ varying vec3 vPositionW;
     varying vec4 vColor;
 #endif
 
-#ifdef PREPASS
-    varying vec3 vViewPos;
-#endif
-
 )ShaderCode";
 
 } // end of namespace BABYLON

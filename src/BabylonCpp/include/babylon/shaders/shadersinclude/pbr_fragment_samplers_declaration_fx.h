@@ -97,7 +97,7 @@ const char* pbrFragmentSamplersDeclaration
 #endif
 
 #ifdef CLEARCOAT
-    #ifdef CLEARCOAT_TEXTURE
+    #if defined(CLEARCOAT_TEXTURE)
         #if CLEARCOAT_TEXTUREDIRECTUV == 1
             #define vClearCoatUV vMainUV1
         #elif CLEARCOAT_TEXTUREDIRECTUV == 2
@@ -105,7 +105,24 @@ const char* pbrFragmentSamplersDeclaration
         #else
             varying vec2 vClearCoatUV;
         #endif
+    #endif
+
+    #if defined(CLEARCOAT_TEXTURE_ROUGHNESS)
+        #if CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV == 1
+            #define vClearCoatRoughnessUV vMainUV1
+        #elif CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV == 2
+            #define vClearCoatRoughnessUV vMainUV2
+        #else
+            varying vec2 vClearCoatRoughnessUV;
+        #endif
+    #endif
+
+    #ifdef CLEARCOAT_TEXTURE
         uniform sampler2D clearCoatSampler;
+    #endif
+
+    #if defined(CLEARCOAT_TEXTURE_ROUGHNESS) && !defined(CLEARCOAT_TEXTURE_ROUGHNESS_IDENTICAL)
+        uniform sampler2D clearCoatRoughnessSampler;
     #endif
 
     #ifdef CLEARCOAT_BUMP
@@ -140,7 +157,24 @@ const char* pbrFragmentSamplersDeclaration
         #else
             varying vec2 vSheenUV;
         #endif
+    #endif
+
+    #ifdef SHEEN_TEXTURE_ROUGHNESS
+        #if SHEEN_TEXTURE_ROUGHNESSDIRECTUV == 1
+            #define vSheenRoughnessUV vMainUV1
+        #elif SHEEN_TEXTURE_ROUGHNESSDIRECTUV == 2
+            #define vSheenRoughnessUV vMainUV2
+        #else
+            varying vec2 vSheenRoughnessUV;
+        #endif
+    #endif
+
+    #ifdef SHEEN_TEXTURE
         uniform sampler2D sheenSampler;
+    #endif
+
+    #if defined(SHEEN_ROUGHNESS) && defined(SHEEN_TEXTURE_ROUGHNESS) && !defined(SHEEN_TEXTURE_ROUGHNESS_IDENTICAL)
+        uniform sampler2D sheenRoughnessSampler;
     #endif
 #endif
 
