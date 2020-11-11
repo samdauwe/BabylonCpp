@@ -327,14 +327,12 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       if (CheckBoxLineComponent::render("Scattering Enabled", subSurface->isScatteringEnabled())) {
         subSurface->isScatteringEnabled = !subSurface->isScatteringEnabled();
       }
-      if (subSurface->isScatteringEnabled() && material->getScene()->prePassRenderer()) {
+      if (subSurface->isScatteringEnabled() && material->getScene()->subSurfaceConfiguration()) {
         sliderChange = SliderLineComponent::render(
-          "Meters per unit",
-          material->getScene()->prePassRenderer()->subSurfaceConfiguration->metersPerUnit, 0.01f,
+          "Meters per unit", material->getScene()->subSurfaceConfiguration()->metersPerUnit, 0.01f,
           2.f, 0.01f, "%.2f");
         if (sliderChange) {
-          material->getScene()->prePassRenderer()->subSurfaceConfiguration->metersPerUnit
-            = sliderChange.value();
+          material->getScene()->subSurfaceConfiguration()->metersPerUnit = sliderChange.value();
         }
       }
       if (CheckBoxLineComponent::render("Refraction Enabled", subSurface->isRefractionEnabled())) {

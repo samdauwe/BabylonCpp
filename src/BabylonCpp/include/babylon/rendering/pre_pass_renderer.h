@@ -15,6 +15,7 @@ class Engine;
 class Scene;
 class SubMesh;
 FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(GeometryBufferRenderer)
 FWD_CLASS_SPTR(ImageProcessingPostProcess)
 FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiRenderTarget)
@@ -95,11 +96,6 @@ public:
 
 protected:
   /**
-   * Configuration for prepass effects
-   */
-  std::vector<PrePassEffectConfigurationPtr> _effectConfigurations;
-
-  /**
    * @brief Indicates if the prepass is enabled.
    */
   bool get_enabled() const;
@@ -115,6 +111,16 @@ protected:
   void set_samples(unsigned int n);
 
   /**
+   * @brief Uses the geometry buffer renderer as a fallback for non prepass capable effects.
+   */
+  bool get_useGeometryBufferFallback() const;
+
+  /**
+   * @brief Uses the geometry buffer renderer as a fallback for non prepass capable effects.
+   */
+  void set_useGeometryBufferFallback(bool value);
+
+  /**
    * @brief Indicates if rendering a prepass is supported.
    */
   bool get_isSupported() const;
@@ -125,11 +131,20 @@ private:
   void _checkRTSize();
   void _bindFrameBuffer();
   void _setState(bool enabled);
+  void _updateGeometryBufferLayout();
   void _enable();
   void _disable();
+  void _resetLayout();
   void _resetPostProcessChain();
   void _bindPostProcessChain();
   void _update();
+
+  /**
+   * @brief Enables a texture on the MultiRenderTarget for prepass.
+   */
+  void _enableTextures(const std::vector<unsigned int>& types);
+
+  void _markAllMaterialsAsPrePassDirty();
 
 public:
   /**
@@ -160,21 +175,6 @@ public:
   ImageProcessingPostProcessPtr imageProcessingPostProcess;
 
   /**
-   * Configuration for sub surface scattering post process
-   */
-  SubSurfaceConfigurationPtr subSurfaceConfiguration;
-
-  /**
-   * Should materials render their geometry on the MRT
-   */
-  bool materialsShouldRenderGeometry;
-
-  /**
-   * Should materials render the irradiance information on the MRT
-   */
-  bool materialsShouldRenderIrradiance;
-
-  /**
    * Indicates if the prepass is enabled
    */
   ReadOnlyProperty<PrePassRenderer, bool> enabled;
@@ -185,13 +185,18 @@ public:
   Property<PrePassRenderer, unsigned int> samples;
 
   /**
+   * Uses the geometry buffer renderer as a fallback for non prepass capable effects
+   */
+  Property<PrePassRenderer, bool> useGeometryBufferFallback;
+
+  /**
    * Indicates if rendering a prepass is supported
    */
   ReadOnlyProperty<PrePassRenderer, bool> isSupported;
 
 private:
   static std::vector<TextureFormatMapping> _textureFormats;
-  IndicesArray _textureIndices;
+  std::vector<int> _textureIndices;
   Scene* _scene;
   Engine* _engine;
   bool _isDirty;
@@ -202,7 +207,17 @@ private:
   std::vector<PostProcessPtr> _postProcesses;
 
   const Color4 _clearColor;
+
+  /**
+   * Configuration for prepass effects
+   */
+  std::vector<PrePassEffectConfigurationPtr> _effectConfigurations;
+
+  std::vector<unsigned int> _mrtFormats;
+  std::vector<unsigned int> _mrtLayout;
   bool _enabled;
+  GeometryBufferRendererPtr _geometryBuffer;
+  bool _useGeometryBufferFallback;
 
 }; // end of class PrePassRenderer
 

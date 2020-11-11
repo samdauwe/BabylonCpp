@@ -145,9 +145,8 @@ void PBRSubSurfaceConfiguration::set_scatteringDiffusionProfile(const std::optio
   }
 
   // addDiffusionProfile automatically checks for doubles
-  if (c && _scene->prePassRenderer()->subSurfaceConfiguration) {
-    _scatteringDiffusionProfileIndex
-      = _scene->prePassRenderer()->subSurfaceConfiguration->addDiffusionProfile(*c);
+  if (c && _scene->subSurfaceConfiguration()) {
+    _scatteringDiffusionProfileIndex = _scene->subSurfaceConfiguration()->addDiffusionProfile(*c);
   }
 }
 
