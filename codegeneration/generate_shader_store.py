@@ -431,7 +431,7 @@ if __name__ == "__main__":
     # set default values when input is missing
     if not options.inputDir:
         options.inputDir = os.path.join(os.getcwd(), "..", "..", "..",
-                                    "Projects", "Babylon.js-4.2.0-beta.1_2020_09_11")
+                                    "Projects", "Babylon.js-4.2.0-beta.12_2020_10_12")
         args += [options.inputDir]
     if not options.outputDir:
         options.outputDir = os.path.join(os.getcwd(), "..", "src", "BabylonCpp")
