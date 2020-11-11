@@ -109,6 +109,8 @@ void main(void) {
 #include<fogFragment>
 
     gl_FragColor = color;
+
+#include<imageProcessingCompatibility>
 }
 
 )ShaderCode";
