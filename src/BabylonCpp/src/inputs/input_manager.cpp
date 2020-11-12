@@ -25,6 +25,7 @@ InputManager::InputManager(Scene* scene)
     , pointerX{this, &InputManager::get_pointerX, &InputManager::set_pointerX}
     , pointerY{this, &InputManager::get_pointerY, &InputManager::set_pointerY}
     , _alreadyAttached{false}
+    , _alreadyAttachedTo{nullptr}
     , _wheelEventName{""}
     , _onPointerMove{nullptr}
     , _onPointerDown{nullptr}
@@ -52,6 +53,7 @@ InputManager::InputManager(Scene* scene)
     , _previousStartingPointerTime{high_res_time_point_t()}
     , _onKeyDown{nullptr}
     , _onKeyUp{nullptr}
+    , _keyboardIsAttached{false}
     , _onCanvasFocusObserver{nullptr}
     , _onCanvasBlurObserver{nullptr}
     , _scene{scene}
@@ -444,8 +446,10 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     detachControl();
   }
 
+  _alreadyAttachedTo = elementToAttachTo;
+
   _initActionManager = [this](AbstractActionManagerPtr act,
-                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
+                              const ClickInfo& /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto& scene     = *_scene;
       auto pickResult = scene.pick(_unTranslatedPointerX, _unTranslatedPointerY,
@@ -886,10 +890,9 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
 
 void InputManager::detachControl()
 {
-  auto canvas = _scene->getEngine()->getInputElement();
   auto engine = _scene->getEngine();
 
-  if (!canvas) {
+  if (!_alreadyAttachedTo) {
     return;
   }
 
@@ -898,9 +901,9 @@ void InputManager::detachControl()
   }
 
   // Pointer
-  canvas->removeMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove);
-  canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown);
-  canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp);
+  _alreadyAttachedTo->removeMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove);
+  _alreadyAttachedTo->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN, _onPointerDown);
+  _alreadyAttachedTo->removeMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp);
 
   // Blur / Focus
   if (_onCanvasBlurObserver) {
@@ -912,12 +915,12 @@ void InputManager::detachControl()
   }
 
   // Wheel
-  canvas->removeMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove);
-  canvas->removeMouseEventListener(EventType::DOM_MOUSE_SCROLL, _onPointerMove);
+  _alreadyAttachedTo->removeMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove);
+  _alreadyAttachedTo->removeMouseEventListener(EventType::DOM_MOUSE_SCROLL, _onPointerMove);
 
   // Keyboard
-  canvas->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
-  canvas->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
+  _alreadyAttachedTo->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
+  _alreadyAttachedTo->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
 
   _alreadyAttached = false;
 }

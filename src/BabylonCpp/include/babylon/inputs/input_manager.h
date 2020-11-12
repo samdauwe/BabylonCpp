@@ -204,6 +204,7 @@ private:
    * already attached, previous control is unattached before attaching the new one.
    */
   bool _alreadyAttached;
+  ICanvas* _alreadyAttachedTo;
 
   // Pointers
   std::string _wheelEventName;
@@ -252,6 +253,7 @@ private:
   // Keyboard
   std::function<void(KeyboardEvent&& evt)> _onKeyDown;
   std::function<void(KeyboardEvent&& evt)> _onKeyUp;
+  bool _keyboardIsAttached;
   Observer<Engine>::Ptr _onCanvasFocusObserver;
   Observer<Engine>::Ptr _onCanvasBlurObserver;
 
