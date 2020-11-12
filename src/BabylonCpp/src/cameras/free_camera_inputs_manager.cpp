@@ -3,6 +3,7 @@
 #include <babylon/cameras/inputs/free_camera_gamepad_input.h>
 #include <babylon/cameras/inputs/free_camera_keyboard_move_input.h>
 #include <babylon/cameras/inputs/free_camera_mouse_input.h>
+#include <babylon/cameras/inputs/free_camera_mouse_wheel_input.h>
 #include <babylon/cameras/inputs/free_camera_touch_input.h>
 
 namespace BABYLON {
@@ -41,8 +42,8 @@ FreeCameraInputsManager& FreeCameraInputsManager::removeMouse()
 FreeCameraInputsManager& FreeCameraInputsManager::addMouseWheel()
 {
   if (!_mouseWheelInput) {
-    // _mouseWheelInput = std::make_shared<FreeCameraMouseWheelInput>();
-    // add(_mouseWheelInput);
+    _mouseWheelInput = std::make_shared<FreeCameraMouseWheelInput>();
+    add(_mouseWheelInput);
   }
   return *this;
 }
@@ -50,7 +51,7 @@ FreeCameraInputsManager& FreeCameraInputsManager::addMouseWheel()
 FreeCameraInputsManager& FreeCameraInputsManager::removeMouseWheel()
 {
   if (_mouseWheelInput) {
-    // remove(_mouseWheelInput);
+    remove(_mouseWheelInput.get());
   }
   return *this;
 }
