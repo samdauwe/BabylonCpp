@@ -182,6 +182,12 @@ struct MouseEvent {
   }
 }; // end of struct MouseEvent
 
+struct MouseWheelChangeEvent {
+  float wheelDeltaX;
+  float wheelDeltaY;
+  float wheelDeltaZ;
+}; // end of struct MouseWheelChangeEvent
+
 struct NodeCache {
   bool cache_inited = false;
 
@@ -278,8 +284,15 @@ struct MouseWheelEvent : public PointerEvent {
   MouseWheelEvent& operator=(const MouseWheelEvent& other) = default;
   MouseWheelEvent& operator=(MouseWheelEvent&& other) = default;
 
-  float wheelDelta = 0.f;
-  float detail     = 0.f;
+  WheelEvent deltaMode = WheelEvent::DOM_DELTA_PIXEL;
+  float wheelDelta     = 0.f;
+  float detail         = 0.f;
+  float deltaX         = 0.f;
+  float deltaY         = 0.f;
+  float wheelDeltaX    = 0.f;
+  float wheelDeltaY    = 0.f;
+  float wheelDeltaZ    = 0.f;
+  float deltaZ         = 0.f;
   void preventDefault() const
   {
   }

@@ -201,6 +201,15 @@ enum class Type : unsigned int {
   STANDARDRENDERINGPIPLINE = 400
 }; // end of enum class Type
 
+/**
+ * @brief Represents the unit of the delta* values' scroll amount.
+ */
+enum class WheelEvent : unsigned int {
+  DOM_DELTA_PIXEL = 0x00,
+  DOM_DELTA_LINE  = 0x01,
+  DOM_DELTA_PAGE  = 0x02,
+}; // end of enum class WheelEvent
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_ENUMS_H
