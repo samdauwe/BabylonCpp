@@ -1384,7 +1384,7 @@ bool Scene::_isPointerSwiping() const
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
   _initActionManager = [this](const AbstractActionManagerPtr& act,
-                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
+                              const ClickInfo& /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerDownPredicate,
                              false, cameraToUseForPointers);
@@ -2155,9 +2155,9 @@ void Scene::_animate()
     }
     _animationTimeLast = now;
   }
-  deltaTime = useConstantAnimationDeltaTime ?
-                16.f :
-                Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
+  deltaTime          = useConstantAnimationDeltaTime ?
+                         16.f :
+                         Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
   _animationTimeLast = now;
 
   // Animatable::_animate can remove elements from _activeAnimatables we need to make a copy of it
@@ -4735,7 +4735,7 @@ Scene::_internalPick(const std::function<Ray(Matrix& world)>& rayFunction,
 
     if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
       // first check if the ray intersects the whole bounding box/sphere of the mesh
-      auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, iFastCheck, true,
+      auto result = _internalPickForMesh(pickingInfo, rayFunction, mesh, world, true, true,
                                          trianglePredicate);
       if (result) {
         if (onlyBoundingInfo.value_or(false)) {
@@ -4801,7 +4801,7 @@ Scene::_internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
 
     auto _mesh = std::static_pointer_cast<Mesh>(mesh);
     if (mesh->hasThinInstances() && _mesh && _mesh->thinInstanceEnablePicking) {
-      auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, false, true,
+      auto result = _internalPickForMesh(std::nullopt, rayFunction, mesh, world, true, true,
                                          trianglePredicate);
       if (result) {
         auto& tmpMatrix   = TmpVectors::MatrixArray[1];
