@@ -144,7 +144,7 @@ MeshPtr& EnvironmentHelper::ground()
   return _ground;
 }
 
-BaseTexture* EnvironmentHelper::groundTexture()
+BaseTexturePtr& EnvironmentHelper::groundTexture()
 {
   return _groundTexture;
 }
@@ -356,10 +356,10 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
     return;
   }
 
-  const auto diffuseTexture  = Texture::New(std::get<std::string>(_options.groundTexture), _scene);
-  diffuseTexture->gammaSpace = false;
-  diffuseTexture->hasAlpha   = true;
-  _groundMaterial->diffuseTexture = diffuseTexture;
+  _groundTexture             = Texture::New(std::get<std::string>(_options.groundTexture), _scene);
+  _groundTexture->gammaSpace = false;
+  _groundTexture->hasAlpha   = true;
+  _groundMaterial->diffuseTexture = _groundTexture;
 }
 
 void EnvironmentHelper::_setupGroundMirrorTexture(const ISceneSize& sceneSize)

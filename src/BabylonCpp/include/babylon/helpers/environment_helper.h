@@ -2,24 +2,20 @@
 #define BABYLON_HELPERS_ENVIRONMENT_HELPER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/helpers/ienvironment_helper_options.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class BackgroundMaterial;
 struct ISceneSize;
-class Mesh;
-class MirrorTexture;
-class RenderTargetTexture;
 class Scene;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using BackgroundMaterialPtr  = std::shared_ptr<BackgroundMaterial>;
-using MeshPtr                = std::shared_ptr<Mesh>;
-using MirrorTexturePtr       = std::shared_ptr<MirrorTexture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(BackgroundMaterial)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(MirrorTexture)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief The Environment helper class can be used to add a fully featuread none expensive
@@ -104,7 +100,7 @@ public:
   /**
    * @brief Gets the ground texture created by the helper.
    */
-  BaseTexture* groundTexture();
+  BaseTexturePtr& groundTexture();
 
   /**
    * @brief Gets the ground mirror created by the helper.
@@ -209,7 +205,7 @@ private:
   BaseTexturePtr _skyboxTexture;
   BackgroundMaterialPtr _skyboxMaterial;
   MeshPtr _ground;
-  BaseTexture* _groundTexture;
+  BaseTexturePtr _groundTexture;
   MirrorTexturePtr _groundMirror;
   BackgroundMaterialPtr _groundMaterial;
   std::vector<AbstractMesh*> _emptyGroundMirrorRenderList;
