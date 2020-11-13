@@ -371,12 +371,23 @@ void Collider::_collide(std::vector<Plane>& trianglePlaneArray, const std::vecto
                         const IndicesArray& indices, size_t indexStart, size_t indexEnd,
                         unsigned int decal, bool hasMaterial, const AbstractMeshPtr& hostMesh)
 {
-  for (size_t i = indexStart; i < indexEnd; i += 3) {
-    const auto& p1 = pts[indices[i] - decal];
-    const auto& p2 = pts[indices[i + 1] - decal];
-    const auto& p3 = pts[indices[i + 2] - decal];
+  if (indices.empty()) {
+    for (size_t i = 0; i < pts.size(); i += 3) {
+      const auto& p1 = pts[i];
+      const auto& p2 = pts[i + 1];
+      const auto& p3 = pts[i + 2];
 
-    _testTriangle(i, trianglePlaneArray, p3, p2, p1, hasMaterial, hostMesh);
+      _testTriangle(i, trianglePlaneArray, p3, p2, p1, hasMaterial, hostMesh);
+    }
+  }
+  else {
+    for (size_t i = indexStart; i < indexEnd; i += 3) {
+      const auto& p1 = pts[indices[i] - decal];
+      const auto& p2 = pts[indices[i + 1] - decal];
+      const auto& p3 = pts[indices[i + 2] - decal];
+
+      _testTriangle(i, trianglePlaneArray, p3, p2, p1, hasMaterial, hostMesh);
+    }
   }
 }
 

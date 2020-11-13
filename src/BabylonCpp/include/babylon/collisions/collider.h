@@ -2,13 +2,13 @@
 #define BABYLON_COLLISIONS_COLLIDER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
 
 /**
  * @brief Implementation of the "Improved Collision detection and Response" algorithm proposed by
