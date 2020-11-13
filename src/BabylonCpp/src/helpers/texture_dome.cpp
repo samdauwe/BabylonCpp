@@ -99,7 +99,7 @@ void TextureDome::initializeTextureDome(const std::string& iName,
   // create
   _texture->anisotropicFilteringLevel = 1;
   _texture->onLoadObservable().addOnce(
-    [this](Texture* /*textre*/, EventState & /*es*/) -> void { _setReady(true); });
+    [this](Texture* /*textre*/, EventState& /*es*/) -> void { _setReady(true); });
 
   // Initial rotation
   if (options.faceForward.value_or(false) && scene->activeCamera()) {
@@ -137,6 +137,7 @@ void TextureDome::set_texture(const TexturePtr& newTexture)
     _texture->wrapV              = TextureConstants::CLAMP_ADDRESSMODE;
     _material->reflectionTexture = _texture;
   }
+  _changeTextureMode(_textureMode);
 }
 
 MeshPtr& TextureDome::get_mesh()
@@ -224,7 +225,7 @@ void TextureDome::_changeTextureMode(unsigned int value)
       // Use 0.99999 to boost perf by not switching program
       _texture->uScale              = _halfDome ? 0.99999f : 0.5f;
       _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
-        [this](Camera* camera, EventState & /*es*/) -> void {
+        [this](Camera* camera, EventState& /*es*/) -> void {
           const auto rightOffset = _halfDome ? 0.f : 0.5f;
           const auto leftOffset  = _halfDome ? -0.5f : 0.f;
           auto isRightCamera     = camera->isRightCamera();
@@ -244,7 +245,7 @@ void TextureDome::_changeTextureMode(unsigned int value)
       // Use 0.99999 to boost perf by not switching program
       _texture->vScale              = _halfDome ? 0.99999f : 0.5f;
       _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
-        [this](Camera* camera, EventState & /*es*/) -> void {
+        [this](Camera* camera, EventState& /*es*/) -> void {
           auto isRightCamera = camera->isRightCamera();
           // allow "cross-eye" if left and right were switched in this mode
           if (_crossEye) {

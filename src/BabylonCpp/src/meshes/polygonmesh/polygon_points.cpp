@@ -6,17 +6,14 @@ PolygonPoints::PolygonPoints() = default;
 
 PolygonPoints::~PolygonPoints() = default;
 
-std::vector<IndexedVector2>
-PolygonPoints::add(const std::vector<Vector2>& originalPoints)
+std::vector<IndexedVector2> PolygonPoints::add(const std::vector<Vector2>& originalPoints)
 {
   std::vector<IndexedVector2> result;
 
   for (auto& point : originalPoints) {
-    if (result.empty() || !point.equalsWithEpsilon(result[0])) {
-      IndexedVector2 newPoint(point, static_cast<int>(elements.size()));
-      result.emplace_back(newPoint);
-      elements.emplace_back(newPoint);
-    }
+    IndexedVector2 newPoint(point, static_cast<int>(elements.size()));
+    result.emplace_back(newPoint);
+    elements.emplace_back(newPoint);
   }
 
   return result;
