@@ -91,11 +91,14 @@ public:
   Plane& copyFromPoints(const Vector3& point1, const Vector3& point2, const Vector3& point3);
 
   /**
-   * @brief Checks if the plane is facing a given direction
+   * @brief Checks if the plane is facing a given direction (meaning if the plane's normal is
+   * pointing in the opposite direction of the given vector). Note that for this function to work as
+   * expected you should make sure that:
+   *   - direction and the plane normal are normalized
+   *   - epsilon is a number just bigger than -1, something like -0.99 for eg
    * @param direction the direction to check if the plane is facing
    * @param epsilon value the dot product is compared against (returns true if dot <= epsilon)
-   * @returns True is the vector "direction"  is the same side than the plane
-   * normal.
+   * @returns True if the plane is facing the given direction
    */
   [[nodiscard]] bool isFrontFacingTo(const Vector3& direction, float epsilon) const;
 
