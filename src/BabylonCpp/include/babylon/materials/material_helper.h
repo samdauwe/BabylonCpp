@@ -8,25 +8,22 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
 class AbstractMesh;
-class BaseTexture;
-class Effect;
 struct IEffectCreationOptions;
 class EffectFallbacks;
 class Engine;
-class Light;
 struct MaterialDefines;
-struct PrePassConfiguration;
 class Scene;
 class UniformBuffer;
-using BaseTexturePtr          = std::shared_ptr<BaseTexture>;
-using EffectPtr               = std::shared_ptr<Effect>;
-using LightPtr                = std::shared_ptr<Light>;
-using PrePassConfigurationPtr = std::shared_ptr<PrePassConfiguration>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Light)
+FWD_STRUCT_SPTR(PrePassConfiguration)
 
 struct BABYLON_SHARED_EXPORT PrepareDefinesForLightsState {
   bool needNormals     = false;
@@ -194,11 +191,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param uniformsList The uniform list
    * @param samplersList The sampler list
    * @param projectedLightTexture defines if projected texture must be used
+   * @param uniformBuffersList defines an optional list of uniform buffers
+   * @param updateOnlyBuffersList True to only update the uniformBuffersList array
    */
   static void PrepareUniformsAndSamplersForLight(unsigned int lightIndex,
                                                  std::vector<std::string>& uniformsList,
                                                  std::vector<std::string>& samplersList,
-                                                 bool projectedLightTexture = false);
+                                                 bool projectedLightTexture = false,
+                                                 bool updateOnlyBuffersList = false);
 
   /**
    * @brief Prepares the uniforms and samplers list to be used in the effect (for a specific light).
@@ -207,13 +207,15 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param samplersList The sampler list
    * @param projectedLightTexture defines if projected texture must be used
    * @param uniformBuffersList defines an optional list of uniform buffers
+   * @param updateOnlyBuffersList True to only update the uniformBuffersList array
    */
   static void PrepareUniformsAndSamplersForLight(unsigned int lightIndex,
                                                  std::vector<std::string>& uniformsList,
                                                  std::vector<std::string>& samplersList,
                                                  std::vector<std::string>& uniformBuffersList,
                                                  bool hasUniformBuffersList = false,
-                                                 bool projectedLightTexture = false);
+                                                 bool projectedLightTexture = false,
+                                                 bool updateOnlyBuffersList = false);
 
   /**
    * @brief Prepares the uniforms and samplers list to be used in the effect.

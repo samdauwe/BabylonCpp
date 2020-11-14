@@ -527,20 +527,30 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
 void MaterialHelper::PrepareUniformsAndSamplersForLight(unsigned int lightIndex,
                                                         std::vector<std::string>& uniformsList,
                                                         std::vector<std::string>& samplersList,
-                                                        bool projectedLightTexture)
+                                                        bool projectedLightTexture,
+                                                        bool updateOnlyBuffersList)
 {
 
   std::vector<std::string> uniformBuffersList;
   PrepareUniformsAndSamplersForLight(lightIndex, uniformsList, samplersList, uniformBuffersList,
-                                     false, projectedLightTexture);
+                                     false, projectedLightTexture, updateOnlyBuffersList);
 }
 
 void MaterialHelper::PrepareUniformsAndSamplersForLight(
   unsigned int lightIndex, std::vector<std::string>& uniformsList,
   std::vector<std::string>& samplersList, std::vector<std::string>& uniformBuffersList,
-  bool hasUniformBuffersList, bool projectedLightTexture)
+  bool hasUniformBuffersList, bool projectedLightTexture, bool updateOnlyBuffersList)
 {
   const auto lightIndexStr = std::to_string(lightIndex);
+
+  if (hasUniformBuffersList) {
+    uniformBuffersList.emplace_back("Light" + lightIndexStr);
+  }
+
+  if (updateOnlyBuffersList) {
+    return;
+  }
+
   stl_util::concat(uniformsList, {
                                    "vLightData" + lightIndexStr,      //
                                    "vLightDiffuse" + lightIndexStr,   //
@@ -552,10 +562,6 @@ void MaterialHelper::PrepareUniformsAndSamplersForLight(
                                    "shadowsInfo" + lightIndexStr,     //
                                    "depthValues" + lightIndexStr,     //
                                  });
-
-  if (hasUniformBuffersList) {
-    uniformBuffersList.emplace_back("Light" + lightIndexStr);
-  }
 
   samplersList.emplace_back("shadowSampler" + lightIndexStr);
   samplersList.emplace_back("depthSampler" + lightIndexStr);
