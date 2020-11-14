@@ -7,6 +7,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
 #include <babylon/interfaces/idisposable.h>
@@ -18,27 +19,19 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class BaseTexture;
-class Effect;
-class Material;
 struct MaterialDefines;
 class Mesh;
-class MultiMaterial;
-class PrePassRenderer;
-class RenderTargetTexture;
 class Scene;
-class ShadowDepthWrapper;
 class SubMesh;
 class UniformBuffer;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using EffectPtr              = std::shared_ptr<Effect>;
-using MaterialPtr            = std::shared_ptr<Material>;
-using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
-using PrePassRendererPtr     = std::shared_ptr<PrePassRenderer>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using ShadowDepthWrapperPtr  = std::shared_ptr<ShadowDepthWrapper>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(MultiMaterial)
+FWD_CLASS_SPTR(PrePassRenderer)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(ShadowDepthWrapper)
 
 /**
  * @brief Options for compiling materials.

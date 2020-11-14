@@ -60,8 +60,6 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     : customShaderNameResolve{nullptr}
     , shadowDepthWrapper{nullptr}
     , allowShaderHotSwapping{true}
-    , id{!iName.empty() ? iName : GUID::RandomId()}
-    , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
     , canRenderToMRT{this, &Material::get_canRenderToMRT}
@@ -108,12 +106,20 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _fillMode{Material::TriangleFillMode}
     , _cachedDepthWriteState{false}
     , _cachedColorWriteState{false}
     , _cachedDepthFunctionState{0}
 {
+  name             = iName;
+  auto idSubscript = 1u;
+  _scene           = scene ? scene : Engine::LastCreatedScene();
+
+  id = !iName.empty() ? iName : GUID::RandomId();
+  while (_scene->getMaterialByID(id)) {
+    id = name + " " + std::to_string(idSubscript++);
+  }
+
   uniqueId = _scene->getUniqueId();
 
   if (_scene->useRightHandedSystem()) {
