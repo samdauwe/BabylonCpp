@@ -63,6 +63,21 @@ std::vector<BaseTexturePtr> MultiMaterial::getActiveTextures() const
   return activeTextures;
 }
 
+bool MultiMaterial::hasTexture(const BaseTexturePtr& texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  for (const auto& subMaterial : subMaterials()) {
+    if (subMaterial && subMaterial->hasTexture(texture)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 std::string MultiMaterial::getClassName() const
 {
   return "MultiMaterial";
