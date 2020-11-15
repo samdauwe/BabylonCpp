@@ -49,6 +49,16 @@ class BABYLON_SHARED_EXPORT NodeMaterialConnectionPoint
     : public std::enable_shared_from_this<NodeMaterialConnectionPoint> {
 
 public:
+  /**
+   * @brief Checks if two types are equivalent.
+   * @param type1 type 1 to check
+   * @param type2 type 2 to check
+   * @returns true if both types are equivalent, else false
+   */
+  static bool AreEquivalentTypes(NodeMaterialBlockConnectionPointTypes type1,
+                                 NodeMaterialBlockConnectionPointTypes type2);
+
+public:
   template <typename... Ts>
   static NodeMaterialConnectionPointPtr New(Ts&&... args)
   {
@@ -234,6 +244,9 @@ public:
 
   /** Hidden */
   NodeMaterialConnectionPointPtr _linkedConnectionSource;
+
+  /** Hidden */
+  NodeMaterialConnectionPointPtr _acceptedConnectionPointType;
 
   /** Hidden */
   bool _enforceAssociatedVariableName;

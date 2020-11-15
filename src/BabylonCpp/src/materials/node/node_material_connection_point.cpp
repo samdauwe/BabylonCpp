@@ -7,6 +7,41 @@
 
 namespace BABYLON {
 
+bool NodeMaterialConnectionPoint::AreEquivalentTypes(NodeMaterialBlockConnectionPointTypes type1,
+                                                     NodeMaterialBlockConnectionPointTypes type2)
+{
+  switch (type1) {
+    case NodeMaterialBlockConnectionPointTypes::Vector3: {
+      if (type2 == NodeMaterialBlockConnectionPointTypes::Color3) {
+        return true;
+      }
+      break;
+    }
+    case NodeMaterialBlockConnectionPointTypes::Vector4: {
+      if (type2 == NodeMaterialBlockConnectionPointTypes::Color4) {
+        return true;
+      }
+      break;
+    }
+    case NodeMaterialBlockConnectionPointTypes::Color3: {
+      if (type2 == NodeMaterialBlockConnectionPointTypes::Vector3) {
+        return true;
+      }
+      break;
+    }
+    case NodeMaterialBlockConnectionPointTypes::Color4: {
+      if (type2 == NodeMaterialBlockConnectionPointTypes::Vector4) {
+        return true;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+  return false;
+}
+
 NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
   const std::string& iName, const NodeMaterialBlockPtr& ownerBlock,
   const NodeMaterialConnectionPointDirection& direction)
@@ -14,6 +49,7 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , _connectedPoint{nullptr}
     , _typeConnectionSource{nullptr}
     , _linkedConnectionSource{nullptr}
+    , _acceptedConnectionPointType{nullptr}
     , _enforceAssociatedVariableName{false}
     , direction{this, &NodeMaterialConnectionPoint::get_direction}
     , needDualDirectionValidation{false}
@@ -304,38 +340,16 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
   if (type != connectionPoint.type
       && connectionPoint.innerType() != NodeMaterialBlockConnectionPointTypes::AutoDetect) {
     // Equivalents
-    switch (type) {
-      case NodeMaterialBlockConnectionPointTypes::Vector3: {
-        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color3) {
-          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
-        }
-        break;
-      }
-      case NodeMaterialBlockConnectionPointTypes::Vector4: {
-        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Color4) {
-          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
-        }
-        break;
-      }
-      case NodeMaterialBlockConnectionPointTypes::Color3: {
-        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector3) {
-          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
-        }
-        break;
-      }
-      case NodeMaterialBlockConnectionPointTypes::Color4: {
-        if (connectionPoint.type() == NodeMaterialBlockConnectionPointTypes::Vector4) {
-          return NodeMaterialConnectionPointCompatibilityStates::Compatible;
-        }
-        break;
-      }
-      default:
-        break;
+    if (NodeMaterialConnectionPoint::AreEquivalentTypes(type, connectionPoint.type)) {
+      return NodeMaterialConnectionPointCompatibilityStates::Compatible;
     }
 
     // Accepted types
-    if (!connectionPoint.acceptedConnectionPointTypes.empty()
-        && stl_util::contains(connectionPoint.acceptedConnectionPointTypes, type)) {
+    if ((!connectionPoint.acceptedConnectionPointTypes.empty()
+         && stl_util::contains(connectionPoint.acceptedConnectionPointTypes, type))
+        || (connectionPoint._acceptedConnectionPointType
+            && NodeMaterialConnectionPoint::AreEquivalentTypes(
+              connectionPoint._acceptedConnectionPointType->type, type))) {
       return NodeMaterialConnectionPointCompatibilityStates::Compatible;
     }
     else {
