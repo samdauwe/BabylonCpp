@@ -54,7 +54,7 @@ protected:
    * @param reusable If the post process can be reused on the same frame. (default: false)
    * @param textureType Type of textures used when performing the post process. (default: 0)
    * @param blockCompilation If compilation of the shader should not be done in the constructor. The
-   * updateEffect method can be used to compile the shader at a later time. (default: false)
+   * updateEffect method can be used to compile the shader at a later time. (default: true)
    * @param forceGeometryBuffer If this post process should use geometry buffer instead of prepass
    * (default: false)
    */
@@ -62,7 +62,7 @@ protected:
                                    const CameraPtr& camera, unsigned int samplingMode = 0,
                                    Engine* engine = nullptr, bool reusable = false,
                                    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                                   bool blockCompilation = false, bool forceGeometryBuffer = false);
+                                   bool blockCompilation = false, bool forceGeometryBuffer = true);
 
   /**
    * @brief Gets wether or not smoothing reflections is enabled.
