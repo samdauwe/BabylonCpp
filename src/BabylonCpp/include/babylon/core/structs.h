@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include <babylon/babylon_enums.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector2.h>
@@ -11,10 +12,10 @@
 
 namespace BABYLON {
 
-class Effect;
 class ICanvas;
 class Node;
 class SubMesh;
+FWD_CLASS_SPTR(Effect)
 
 struct Bounds {
   Vector2 min;
@@ -57,7 +58,7 @@ struct DeviceOrientationEvent {
 }; // end of struct DeviceOrientationEvent
 
 struct DepthEffect {
-  Effect* depthEffect      = nullptr;
+  EffectPtr depthEffect    = nullptr;
   std::string depthDefines = "";
   std::string token        = "";
 }; // end of struct DepthEffect
