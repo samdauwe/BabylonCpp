@@ -344,7 +344,7 @@ protected:
   std::string _writeVariable(const NodeMaterialConnectionPointPtr& currentPoint) const;
   std::string _writeFloat(float value) const;
   virtual NodeMaterialBlock& _buildBlock(NodeMaterialBuildState& state);
-  void _linkConnectionTypes(size_t inputIndex0, size_t inputIndex1);
+  void _linkConnectionTypes(size_t inputIndex0, size_t inputIndex1, bool looseCoupling = false);
   virtual std::string _inputRename(const std::string& name);
   virtual std::string _outputRename(const std::string& name);
   virtual std::string _dumpPropertiesCode();

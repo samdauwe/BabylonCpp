@@ -172,8 +172,8 @@ NodeMaterialBlock::registerInput(const std::string& iName,
                                  const std::optional<NodeMaterialBlockTargets>& iTarget,
                                  const NodeMaterialConnectionPointPtr& point)
 {
-  auto iPoint = point ? point :
-                        NodeMaterialConnectionPoint::New(
+  auto iPoint        = point ? point :
+                               NodeMaterialConnectionPoint::New(
                           iName, shared_from_this(), NodeMaterialConnectionPointDirection::Input);
   iPoint->type       = type;
   iPoint->isOptional = isOptional;
@@ -192,8 +192,8 @@ NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const std::optional<NodeMaterialBlockTargets>& iTarget,
                                   const NodeMaterialConnectionPointPtr& point)
 {
-  auto iPoint = point ? point :
-                        NodeMaterialConnectionPoint::New(
+  auto iPoint  = point ? point :
+                         NodeMaterialConnectionPoint::New(
                           iName, shared_from_this(), NodeMaterialConnectionPointDirection::Output);
   iPoint->type = type;
   if (iTarget.has_value()) {
@@ -331,9 +331,15 @@ bool NodeMaterialBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /
   return true;
 }
 
-void NodeMaterialBlock::_linkConnectionTypes(size_t inputIndex0, size_t inputIndex1)
+void NodeMaterialBlock::_linkConnectionTypes(size_t inputIndex0, size_t inputIndex1,
+                                             bool looseCoupling)
 {
-  _inputs[inputIndex0]->_linkedConnectionSource = _inputs[inputIndex1];
+  if (looseCoupling) {
+    _inputs[inputIndex1]->_acceptedConnectionPointType = _inputs[inputIndex0];
+  }
+  else {
+    _inputs[inputIndex0]->_linkedConnectionSource = _inputs[inputIndex1];
+  }
   _inputs[inputIndex1]->_linkedConnectionSource = _inputs[inputIndex0];
 }
 
@@ -518,8 +524,8 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   // Get unique name
   auto nameAsVariableName = StringTools::regexReplace(name(), "[^A-Za-z_]+", "");
   _codeVariableName       = !nameAsVariableName.empty() ?
-                        nameAsVariableName :
-                        StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
+                              nameAsVariableName :
+                              StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
 
   if (stl_util::contains(uniqueNames, _codeVariableName)) {
     auto index = 0;
