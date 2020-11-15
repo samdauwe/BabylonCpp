@@ -4,18 +4,18 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/materials/iioption_shadow_depth_material.h>
 
 namespace BABYLON {
 
-class Effect;
 class Material;
 class Scene;
 class ShadowGenerator;
 class SubMesh;
-using EffectPtr   = std::shared_ptr<Effect>;
-using MaterialPtr = std::shared_ptr<Material>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Material)
 
 /**
  * @brief Class that can be used to wrap a base material to generate accurate shadows when using

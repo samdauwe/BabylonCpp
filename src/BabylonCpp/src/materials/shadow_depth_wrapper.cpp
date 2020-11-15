@@ -3,6 +3,8 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/node/blocks/input/input_block.h>
+#include <babylon/materials/node/node_material.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/observer.h>
@@ -16,7 +18,7 @@ public:
   std::optional<V> get(const Ka& a, const Kb& b)
   {
     if (stl_util::contains(mm, a)) {
-      const auto& m = mm[a];
+      auto& m = mm[a];
       if (stl_util::contains(m, b)) {
         return m[b];
       }
@@ -97,7 +99,7 @@ private:
   std::optional<IIOptionShadowDepthMaterial> _options;
   MaterialPtr _baseMaterial;
   Observer<OnCreatedEffectParameters>::Ptr _onEffectCreatedObserver;
-  std::unordered_map<SubMesh*, Effect> _subMeshToEffect;
+  std::unordered_map<SubMesh*, Effect*> _subMeshToEffect;
   MapMap<SubMesh*, ShadowGenerator*, DepthEffect> _subMeshToDepthEffect;
   std::unordered_map<AbstractMeshPtr, Observer<Node>::Ptr> _meshes;
 
@@ -113,25 +115,65 @@ ShadowDepthWrapper::ShadowDepthWrapperImpl::ShadowDepthWrapperImpl(
 
   const std::string prefix = baseMaterial->getClassName() == "NodeMaterial" ? "u_" : "";
 
-  _matriceNames = {
-    {"world", prefix + "world"},                            //
-    {"view", prefix + "view"},                              //
-    {"projection", prefix + "projection"},                  //
-    {"viewProjection", prefix + "viewProjection"},          //
-    {"worldView", prefix + "worldView"},                    //
-    {"worldViewProjection", prefix + "worldViewProjection"} //
-  };
+  if (!prefix.empty()) {
+    _matriceNames = {
+      {"world", prefix + "world"},                            //
+      {"view", prefix + "view"},                              //
+      {"projection", prefix + "projection"},                  //
+      {"viewProjection", prefix + "viewProjection"},          //
+      {"worldView", prefix + "worldView"},                    //
+      {"worldViewProjection", prefix + "worldViewProjection"} //
+    };
+
+    const auto nodeMat     = std::static_pointer_cast<NodeMaterial>(baseMaterial);
+    const auto inputBlocks = nodeMat->getInputBlocks();
+
+    for (const auto& inputBlock : inputBlocks) {
+      switch (*inputBlock->_systemValue) {
+        case NodeMaterialSystemValues::World:
+          _matriceNames["world"] = inputBlock->associatedVariableName;
+          break;
+        case NodeMaterialSystemValues::View:
+          _matriceNames["view"] = inputBlock->associatedVariableName;
+          break;
+        case NodeMaterialSystemValues::Projection:
+          _matriceNames["projection"] = inputBlock->associatedVariableName;
+          break;
+        case NodeMaterialSystemValues::ViewProjection:
+          _matriceNames["viewProjection"] = inputBlock->associatedVariableName;
+          break;
+        case NodeMaterialSystemValues::WorldView:
+          _matriceNames["worldView"] = inputBlock->associatedVariableName;
+          break;
+        case NodeMaterialSystemValues::WorldViewProjection:
+          _matriceNames["worldViewProjection"] = inputBlock->associatedVariableName;
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  else {
+    _matriceNames = {
+      {"world", prefix + "world"},                            //
+      {"view", prefix + "view"},                              //
+      {"projection", prefix + "projection"},                  //
+      {"viewProjection", prefix + "viewProjection"},          //
+      {"worldView", prefix + "worldView"},                    //
+      {"worldViewProjection", prefix + "worldViewProjection"} //
+    };
+  }
 
   // Register for onEffectCreated to store the effect of the base material when it is (re)generated.
   // This effect will be used to create the depth effect later on
   _onEffectCreatedObserver = _baseMaterial->onEffectCreatedObservable().add(
-    [this](OnCreatedEffectParameters* params, EventState & /*es*/) -> void {
+    [this](OnCreatedEffectParameters* params, EventState& /*es*/) -> void {
       const auto mesh = static_cast<SubMesh*>(params->subMesh)->getMesh();
 
       if (mesh && !stl_util::contains(_meshes, mesh)) {
         // Register for mesh onDispose to clean up our internal maps when a mesh is disposed
         _meshes[mesh]
-          = mesh->onDisposeObservable.add([this](Node* mesh, EventState & /*es*/) -> void {
+          = mesh->onDisposeObservable.add([this](Node* mesh, EventState& /*es*/) -> void {
               for (const auto& item : _subMeshToEffect) {
                 const auto subMesh = item.first;
                 if (subMesh->getMesh().get() == mesh) {
@@ -142,8 +184,8 @@ ShadowDepthWrapper::ShadowDepthWrapperImpl::ShadowDepthWrapperImpl(
             });
       }
 
-      // _subMeshToEffect.set(params->subMesh, params->effect);
-      // _subMeshToDepthEffect.mm.erase(params->subMesh); // trigger a depth effect recreation
+      _subMeshToEffect[params->subMesh] = params->effect;
+      _subMeshToDepthEffect.mm.erase(params->subMesh); // trigger a depth effect recreation
     });
 }
 
@@ -159,22 +201,38 @@ MaterialPtr& ShadowDepthWrapper::ShadowDepthWrapperImpl::get_baseMaterial()
   return _baseMaterial;
 }
 
-EffectPtr
-ShadowDepthWrapper::ShadowDepthWrapperImpl::getEffect(SubMesh* /*subMesh*/,
-                                                      ShadowGenerator* /*shadowGenerator*/)
+EffectPtr ShadowDepthWrapper::ShadowDepthWrapperImpl::getEffect(SubMesh* subMesh,
+                                                                ShadowGenerator* shadowGenerator)
 {
-  return nullptr;
+  if (!_subMeshToDepthEffect.get(subMesh, shadowGenerator)
+      || !_subMeshToDepthEffect.mm[subMesh][shadowGenerator].depthEffect) {
+    return nullptr;
+  }
+
+  return _subMeshToDepthEffect.mm[subMesh][shadowGenerator].depthEffect;
 }
 
 bool ShadowDepthWrapper::ShadowDepthWrapperImpl::isReadyForSubMesh(
-  SubMesh* /*subMesh*/, const std::vector<std::string>& /*defines*/,
-  ShadowGenerator* /*shadowGenerator*/, bool /*useInstances*/)
+  SubMesh* subMesh, const std::vector<std::string>& defines, ShadowGenerator* shadowGenerator,
+  bool useInstances)
 {
-  return false;
+  if (get_standalone()) {
+    // will ensure the effect is (re)created for the base material
+    _baseMaterial->isReadyForSubMesh(subMesh->getMesh().get(), subMesh, useInstances);
+  }
+
+  const auto effect = _makeEffect(subMesh, defines, shadowGenerator);
+  return effect ? effect->isReady() : false;
 }
 
 void ShadowDepthWrapper::ShadowDepthWrapperImpl::dispose()
 {
+  _baseMaterial->onEffectCreatedObservable().remove(_onEffectCreatedObserver);
+  _onEffectCreatedObserver = nullptr;
+
+  for (const auto& [mesh, observer] : _meshes) {
+    mesh->onDisposeObservable.remove(observer);
+  }
 }
 
 Effect*
@@ -182,6 +240,7 @@ ShadowDepthWrapper::ShadowDepthWrapperImpl::_makeEffect(SubMesh* /*subMesh*/,
                                                         const std::vector<std::string>& /*defines*/,
                                                         ShadowGenerator* /*shadowGenerator*/)
 {
+  // TODO implement
   return nullptr;
 }
 
