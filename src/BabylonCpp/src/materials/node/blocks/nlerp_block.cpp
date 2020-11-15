@@ -15,11 +15,15 @@ NLerpBlock::NLerpBlock(const std::string& iName)
 {
   registerInput("left", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("right", NodeMaterialBlockConnectionPointTypes::AutoDetect);
-  registerInput("gradient", NodeMaterialBlockConnectionPointTypes::Float);
+  registerInput("gradient", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::BasedOnInput);
 
   _outputs[0]->_typeConnectionSource = _inputs[0];
   _linkConnectionTypes(0, 1);
+  _linkConnectionTypes(1, 2, true);
+
+  _inputs[2]->acceptedConnectionPointTypes.emplace_back(
+    NodeMaterialBlockConnectionPointTypes::Float);
 }
 
 NLerpBlock::~NLerpBlock()

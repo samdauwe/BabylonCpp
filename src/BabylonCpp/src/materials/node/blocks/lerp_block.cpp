@@ -20,7 +20,7 @@ LerpBlock::LerpBlock(const std::string& iName)
 
   _outputs[0]->_typeConnectionSource = _inputs[0];
   _linkConnectionTypes(0, 1);
-  _linkConnectionTypes(1, 2);
+  _linkConnectionTypes(1, 2, true);
 
   _inputs[2]->acceptedConnectionPointTypes.emplace_back(
     NodeMaterialBlockConnectionPointTypes::Float);

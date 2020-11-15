@@ -39,6 +39,10 @@ DiscardBlock& DiscardBlock::_buildBlock(NodeMaterialBuildState& state)
 
   state.sharedData->hints.needAlphaTesting = true;
 
+  if (!cutoff()->isConnected() || !value()->isConnected()) {
+    return *this;
+  }
+
   state.compilationString
     += StringTools::printf("if (%s < %s) discard;\r\n", value()->associatedVariableName().c_str(),
                            cutoff()->associatedVariableName().c_str());
