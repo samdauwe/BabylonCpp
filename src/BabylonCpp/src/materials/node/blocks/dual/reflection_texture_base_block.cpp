@@ -63,7 +63,7 @@ void ReflectionTextureBaseBlock::autoConfigure(const NodeMaterialPtr& material)
     worldInput->output()->connectTo(world);
   }
 
-  if (!view()->isConnected()) {
+  if (view() && !view()->isConnected()) {
     auto viewInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
       return b->systemValue() == NodeMaterialSystemValues::View;
     });
@@ -97,8 +97,12 @@ void ReflectionTextureBaseBlock::prepareDefines(AbstractMesh* /*mesh*/,
                    iTexture->coordinatesMode() == Constants::TEXTURE_EXPLICIT_MODE, true);
   defines.setValue(_defineSkyboxName, iTexture->coordinatesMode() == Constants::TEXTURE_SKYBOX_MODE,
                    true);
-  defines.setValue(_defineCubicName, iTexture->coordinatesMode() == Constants::TEXTURE_CUBIC_MODE,
+  defines.setValue(_defineCubicName,
+                   iTexture->coordinatesMode() == Constants::TEXTURE_CUBIC_MODE
+                     || iTexture->coordinatesMode() == Constants::TEXTURE_INVCUBIC_MODE,
                    true);
+  defines.setValue("INVERTCUBICMAP",
+                   iTexture->coordinatesMode() == Constants::TEXTURE_INVCUBIC_MODE, true);
   defines.setValue(_defineSphericalName,
                    iTexture->coordinatesMode() == Constants::TEXTURE_SPHERICAL_MODE, true);
   defines.setValue(_definePlanarName, iTexture->coordinatesMode() == Constants::TEXTURE_PLANAR_MODE,
