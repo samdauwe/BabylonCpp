@@ -158,6 +158,8 @@ public:
    * @param normalized whether the data contains normalized data (optional)
    * @param useBytes set to true if stride and offset are in bytes (optional)
    * @param divisor defines the instance divisor to use (1 by default)
+   * @param takeBufferOwnership defines if the buffer should be released when the vertex buffer is
+   * disposed
    */
   VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, Buffer*>& data,
                const std::string& kind, bool updatable,
@@ -167,7 +169,7 @@ public:
                const std::optional<size_t>& offset                 = std::nullopt,
                const std::optional<size_t>& size                   = std::nullopt,
                std::optional<unsigned int> type = std::nullopt, bool normalized = false,
-               bool useBytes = false, unsigned int divisor = 1);
+               bool useBytes = false, unsigned int divisor = 1, bool takeBufferOwnership = false);
   virtual ~VertexBuffer(); // = default
 
   /**

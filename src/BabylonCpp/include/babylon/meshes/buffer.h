@@ -134,6 +134,11 @@ public:
                                     bool useBytes                            = false);
 
   /**
+   * @brief Hidden
+   */
+  void _increaseReferences();
+
+  /**
    * @brief Release all resources
    */
   void dispose();
@@ -155,6 +160,7 @@ private:
   bool _updatable;
   bool _instanced;
   unsigned int _divisor;
+  bool _isAlreadyOwned;
 
 }; // end of class Buffer
 

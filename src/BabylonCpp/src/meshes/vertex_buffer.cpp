@@ -13,13 +13,17 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
                            std::optional<size_t> stride, const std::optional<bool>& instanced,
                            const std::optional<size_t>& offset, const std::optional<size_t>& size,
                            std::optional<unsigned int> iType, bool iNormalized, bool useBytes,
-                           unsigned int divisor)
+                           unsigned int divisor, bool takeBufferOwnership)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor, &VertexBuffer::set_instanceDivisor}
 {
   if (std::holds_alternative<Buffer*>(data)) {
     _buffer      = std::get<Buffer*>(data);
     _ownedBuffer = nullptr;
-    _ownsBuffer  = false;
+    _ownsBuffer  = takeBufferOwnership;
+
+    if (takeBufferOwnership) {
+      _buffer->_increaseReferences();
+    }
   }
   else {
     _ownedBuffer = std::make_unique<Buffer>(
@@ -43,12 +47,12 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
 
   auto buffer = _buffer ? _buffer : _ownedBuffer.get();
   if (useBytes) {
-    _size = size.has_value() ?
-              *size :
-              (stride ? (*stride / typeByteLength) : VertexBuffer::DeduceStride(kind));
-    byteStride = stride.has_value() ?
-                   *stride :
-                   buffer->byteStride ? buffer->byteStride : (_size * typeByteLength);
+    _size      = size.has_value() ?
+                   *size :
+                   (stride ? (*stride / typeByteLength) : VertexBuffer::DeduceStride(kind));
+    byteStride = stride.has_value() ? *stride :
+                 buffer->byteStride ? buffer->byteStride :
+                                      (_size * typeByteLength);
     byteOffset = offset.has_value() ? *offset : 0ull;
   }
   else {
@@ -239,9 +243,9 @@ void VertexBuffer::ForEach(const std::variant<ArrayBuffer, DataView>& data, size
                            size_t count, bool normalized,
                            const std::function<void(float value, size_t index)>& callback)
 {
-  DataView dataView = std::holds_alternative<ArrayBuffer>(data) ?
-                        DataView(std::get<ArrayBuffer>(data)) :
-                        DataView(std::get<DataView>(data));
+  DataView dataView        = std::holds_alternative<ArrayBuffer>(data) ?
+                               DataView(std::get<ArrayBuffer>(data)) :
+                               DataView(std::get<DataView>(data));
   auto componentByteLength = VertexBuffer::GetTypeByteLength(componentType);
   for (size_t index = 0; index < count; index += componentCount) {
     auto componentByteOffset = byteOffset;

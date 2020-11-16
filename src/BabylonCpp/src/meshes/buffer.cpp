@@ -5,13 +5,14 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/webgl/webgl_data_buffer.h>
 
 namespace BABYLON {
 
 Buffer::Buffer(ThinEngine* engine, const Float32Array& data, bool updatable,
                std::optional<size_t> stride, bool postponeInternalCreation, bool instanced,
                bool useBytes, const std::optional<unsigned int>& divisor)
-    : _buffer{nullptr}
+    : _buffer{nullptr}, _isAlreadyOwned{false}
 {
   _engine    = engine ? engine : Engine::LastCreatedEngine();
   _updatable = updatable;
@@ -155,6 +156,20 @@ WebGLDataBufferPtr Buffer::updateDirectly(const Float32Array& data, size_t offse
   }
 
   return _buffer;
+}
+
+void Buffer::_increaseReferences()
+{
+  if (!_buffer) {
+    return;
+  }
+
+  if (!_isAlreadyOwned) {
+    _isAlreadyOwned = true;
+    return;
+  }
+
+  _buffer->references++;
 }
 
 void Buffer::dispose()
