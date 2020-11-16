@@ -5,6 +5,7 @@
 
 #include <babylon/animations/animation_value.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/blocks/input/animated_input_block_types.h>
 #include <babylon/materials/node/enums/node_material_block_connection_point_mode.h>
 #include <babylon/materials/node/enums/node_material_system_values.h>
@@ -13,12 +14,10 @@
 
 namespace BABYLON {
 
-class InputBlock;
-class InputValue;
 class Matrix;
-using AnimationValuePtr = std::shared_ptr<AnimationValue>;
-using InputBlockPtr     = std::shared_ptr<InputBlock>;
-using InputValuePtr     = std::shared_ptr<InputValue>;
+FWD_CLASS_SPTR(AnimationValue)
+FWD_CLASS_SPTR(InputBlock)
+FWD_CLASS_SPTR(InputValue)
 
 /**
  * @brief Block used to expose an input value.
@@ -298,6 +297,18 @@ public:
    * Gets an observable raised when the value is changed
    */
   Observable<InputBlock> onValueChangedObservable;
+
+  /**
+   * Gets or sets a boolean indicating if content needs to be converted to gamma space (for color3/4
+   * only)
+   */
+  bool convertToGammaSpace;
+
+  /**
+   * Gets or sets a boolean indicating if content needs to be converted to linear space (for
+   * color3/4 only)
+   */
+  bool convertToLinearSpace;
 
   /**
    * Gets or sets the connection point type (default is float)

@@ -11,6 +11,7 @@
 #include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
@@ -43,6 +44,8 @@ InputBlock::InputBlock(const std::string& iName, NodeMaterialBlockTargets iTarge
     , matrixMode{0}
     , _systemValue{std::nullopt}
     , isConstant{false}
+    , convertToGammaSpace{false}
+    , convertToLinearSpace{false}
     , type{this, &InputBlock::get_type}
     , output{this, &InputBlock::get_output}
     , value{this, &InputBlock::get_value, &InputBlock::set_value}
@@ -253,8 +256,8 @@ bool InputBlock::get_isUniform() const
 
 void InputBlock::set_isUniform(bool iValue)
 {
-  _mode = iValue ? NodeMaterialBlockConnectionPointMode::Uniform :
-                   NodeMaterialBlockConnectionPointMode::Undefined;
+  _mode                  = iValue ? NodeMaterialBlockConnectionPointMode::Uniform :
+                                    NodeMaterialBlockConnectionPointMode::Undefined;
   associatedVariableName = "";
 }
 
@@ -265,8 +268,8 @@ bool InputBlock::get_isAttribute() const
 
 void InputBlock::set_isAttribute(bool iValue)
 {
-  _mode = iValue ? NodeMaterialBlockConnectionPointMode::Attribute :
-                   NodeMaterialBlockConnectionPointMode::Undefined;
+  _mode                  = iValue ? NodeMaterialBlockConnectionPointMode::Attribute :
+                                    NodeMaterialBlockConnectionPointMode::Undefined;
   associatedVariableName = "";
 }
 
@@ -277,8 +280,8 @@ bool InputBlock::get_isVarying() const
 
 void InputBlock::set_isVarying(bool iValue)
 {
-  _mode = iValue ? NodeMaterialBlockConnectionPointMode::Varying :
-                   NodeMaterialBlockConnectionPointMode::Undefined;
+  _mode                  = iValue ? NodeMaterialBlockConnectionPointMode::Varying :
+                                    NodeMaterialBlockConnectionPointMode::Undefined;
   associatedVariableName = "";
 }
 
@@ -387,12 +390,28 @@ std::string InputBlock::_emitConstant(NodeMaterialBuildState& state)
     }
     case NodeMaterialBlockConnectionPointTypes::Color3: {
       const auto& color3Value = value()->get<Color3>();
-      return StringTools::printf("vec3(%f, %f, %f)", color3Value.r, color3Value.g, color3Value.b);
+      TmpVectors::Color3Array[0].set(color3Value.r, color3Value.g, color3Value.b);
+      if (convertToGammaSpace) {
+        TmpVectors::Color3Array[0].toGammaSpaceToRef(TmpVectors::Color3Array[0]);
+      }
+      if (convertToLinearSpace) {
+        TmpVectors::Color3Array[0].toLinearSpaceToRef(TmpVectors::Color3Array[0]);
+      }
+      return StringTools::printf("vec3(%f, %f, %f)", TmpVectors::Color3Array[0].r,
+                                 TmpVectors::Color3Array[0].g, TmpVectors::Color3Array[0].b);
     }
     case NodeMaterialBlockConnectionPointTypes::Color4: {
       const auto& color4Value = value()->get<Color4>();
-      return StringTools::printf("vec4(%f, %f, %f, %f)", color4Value.r, color4Value.g,
-                                 color4Value.b, color4Value.a);
+      TmpVectors::Color4Array[0].set(color4Value.r, color4Value.g, color4Value.b, color4Value.a);
+      if (convertToGammaSpace) {
+        TmpVectors::Color4Array[0].toGammaSpaceToRef(TmpVectors::Color4Array[0]);
+      }
+      if (convertToLinearSpace) {
+        TmpVectors::Color4Array[0].toLinearSpaceToRef(TmpVectors::Color4Array[0]);
+      }
+      return StringTools::printf("vec4(%f, %f, %f, %f)", TmpVectors::Color4Array[0].r,
+                                 TmpVectors::Color4Array[0].g, TmpVectors::Color4Array[0].b,
+                                 TmpVectors::Color4Array[0].a);
     }
     default:
       break;
@@ -582,12 +601,28 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
     case NodeMaterialBlockConnectionPointTypes::Int:
       effect->setInt(variableName, iValue->get<int>());
       break;
-    case NodeMaterialBlockConnectionPointTypes::Color3:
-      effect->setColor3(variableName, iValue->get<Color3>());
-      break;
-    case NodeMaterialBlockConnectionPointTypes::Color4:
-      effect->setDirectColor4(variableName, iValue->get<Color4>());
-      break;
+    case NodeMaterialBlockConnectionPointTypes::Color3: {
+      const auto& color3Value = value()->get<Color3>();
+      TmpVectors::Color3Array[0].set(color3Value.r, color3Value.g, color3Value.b);
+      if (convertToGammaSpace) {
+        TmpVectors::Color3Array[0].toGammaSpaceToRef(TmpVectors::Color3Array[0]);
+      }
+      if (convertToLinearSpace) {
+        TmpVectors::Color3Array[0].toLinearSpaceToRef(TmpVectors::Color3Array[0]);
+      }
+      effect->setColor3(variableName, TmpVectors::Color3Array[0]);
+    } break;
+    case NodeMaterialBlockConnectionPointTypes::Color4: {
+      const auto& color4Value = iValue->get<Color4>();
+      TmpVectors::Color4Array[0].set(color4Value.r, color4Value.g, color4Value.b, color4Value.a);
+      if (convertToGammaSpace) {
+        TmpVectors::Color4Array[0].toGammaSpaceToRef(TmpVectors::Color4Array[0]);
+      }
+      if (convertToLinearSpace) {
+        TmpVectors::Color4Array[0].toLinearSpaceToRef(TmpVectors::Color4Array[0]);
+      }
+      effect->setDirectColor4(variableName, TmpVectors::Color4Array[0]);
+    } break;
     case NodeMaterialBlockConnectionPointTypes::Vector2:
       effect->setVector2(variableName, iValue->get<Vector2>());
       break;
@@ -658,11 +693,23 @@ std::string InputBlock::_dumpPropertiesCode()
         const auto& color3Value = value()->get<Color3>();
         valueString
           = StringTools::printf("Color3(%f, %f, %f)", color3Value.r, color3Value.g, color3Value.b);
+        if (convertToGammaSpace) {
+          valueString += ".toGammaSpace()";
+        }
+        if (convertToLinearSpace) {
+          valueString += ".toLinearSpace()";
+        }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Color4: {
         const auto& color4Value = value()->get<Color4>();
         valueString = StringTools::printf("Color4(%f, %f, %f, %f)", color4Value.r, color4Value.g,
                                           color4Value.b, color4Value.a);
+        if (convertToGammaSpace) {
+          valueString += ".toGammaSpace()";
+        }
+        if (convertToLinearSpace) {
+          valueString += ".toLinearSpace()";
+        }
       } break;
       case NodeMaterialBlockConnectionPointTypes::Matrix: {
         // const auto& matrixValue = value()->get<Matrix>();
