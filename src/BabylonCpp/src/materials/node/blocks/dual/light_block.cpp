@@ -175,9 +175,11 @@ void LightBlock::updateUniformsAndSamples(NodeMaterialBuildState& state,
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
+    const auto onlyUpdateBuffersList
+      = stl_util::index_of(state.uniforms, "vLightData" + lightIndexStr) >= 0;
     MaterialHelper::PrepareUniformsAndSamplersForLight(
       lightIndex, state.uniforms, state.samplers, uniformBuffers, true,
-      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]);
+      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr], onlyUpdateBuffersList);
   }
 }
 
