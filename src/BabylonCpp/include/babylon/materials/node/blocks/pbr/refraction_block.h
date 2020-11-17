@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_REFRACTION_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-class RefractionBlock;
-using BaseTexturePtr     = std::shared_ptr<BaseTexture>;
-using RefractionBlockPtr = std::shared_ptr<RefractionBlock>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(RefractionBlock)
 
 /**
  * @brief Block used to implement the refraction part of the sub surface module of the PBR material.
@@ -108,11 +107,6 @@ protected:
   NodeMaterialConnectionPointPtr& get_intensity();
 
   /**
-   * @brief Gets the index of refraction input component.
-   */
-  NodeMaterialConnectionPointPtr& get_indexOfRefraction();
-
-  /**
    * @brief Gets the tint at distance input component.
    */
   NodeMaterialConnectionPointPtr& get_tintAtDistance();
@@ -166,6 +160,20 @@ public:
   std::string _vRefractionMicrosurfaceInfosName;
   /** @hidden */
   std::string _vRefractionInfosName;
+  /** @hidden */
+  std::string _vRefractionFilteringInfoName;
+
+  /**
+   * The properties below are set by the main PBR block prior to calling methods of this class.
+   * This is to avoid having to add them as inputs here whereas they are already inputs of the main
+   * block, so already known. It's less burden on the user side in the editor part.
+   */
+
+  /** @hidden */
+  NodeMaterialConnectionPointPtr viewConnectionPoint;
+
+  /** @hidden */
+  NodeMaterialConnectionPointPtr indexOfRefractionConnectionPoint;
 
   /**
    * This parameters will make the material used its opacity to control how much it is refracting
@@ -192,11 +200,6 @@ public:
    * Gets the intensity input component
    */
   ReadOnlyProperty<RefractionBlock, NodeMaterialConnectionPointPtr> intensity;
-
-  /**
-   * Gets the index of refraction input component
-   */
-  ReadOnlyProperty<RefractionBlock, NodeMaterialConnectionPointPtr> indexOfRefraction;
 
   /**
    * Gets the tint at distance input component

@@ -11,17 +11,19 @@
 #include <babylon/materials/node/node_material_connection_point_custom_object.h>
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/maths/scalar.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 RefractionBlock::RefractionBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Fragment}
+    , viewConnectionPoint{nullptr}
+    , indexOfRefractionConnectionPoint{nullptr}
     , linkRefractionWithTransparency{false}
     , invertRefractionY{false}
     , texture{nullptr}
     , intensity{this, &RefractionBlock::get_intensity}
-    , indexOfRefraction{this, &RefractionBlock::get_indexOfRefraction}
     , tintAtDistance{this, &RefractionBlock::get_tintAtDistance}
     , view{this, &RefractionBlock::get_view}
     , refraction{this, &RefractionBlock::get_refraction}
@@ -37,12 +39,8 @@ void RefractionBlock::RegisterConnections(const RefractionBlockPtr& refractionBl
 {
   refractionBlock->registerInput("intensity", NodeMaterialBlockConnectionPointTypes::Float, false,
                                  NodeMaterialBlockTargets::Fragment);
-  refractionBlock->registerInput("indexOfRefraction", NodeMaterialBlockConnectionPointTypes::Float,
-                                 true, NodeMaterialBlockTargets::Fragment);
   refractionBlock->registerInput("tintAtDistance", NodeMaterialBlockConnectionPointTypes::Float,
                                  true, NodeMaterialBlockTargets::Fragment);
-  refractionBlock->registerInput("view", NodeMaterialBlockConnectionPointTypes::Matrix, false,
-                                 NodeMaterialBlockTargets::Fragment);
 
   refractionBlock->registerOutput(
     "refraction", NodeMaterialBlockConnectionPointTypes::Object, NodeMaterialBlockTargets::Fragment,
@@ -62,19 +60,14 @@ NodeMaterialConnectionPointPtr& RefractionBlock::get_intensity()
   return _inputs[0];
 }
 
-NodeMaterialConnectionPointPtr& RefractionBlock::get_indexOfRefraction()
+NodeMaterialConnectionPointPtr& RefractionBlock::get_tintAtDistance()
 {
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& RefractionBlock::get_tintAtDistance()
-{
-  return _inputs[2];
-}
-
 NodeMaterialConnectionPointPtr& RefractionBlock::get_view()
 {
-  return _inputs[3];
+  return viewConnectionPoint;
 }
 
 NodeMaterialConnectionPointPtr& RefractionBlock::get_refraction()
@@ -106,7 +99,7 @@ void RefractionBlock::autoConfigure(const NodeMaterialPtr& material)
     intensityInput->output()->connectTo(intensity);
   }
 
-  if (!view()->isConnected()) {
+  if (view() && !view()->isConnected()) {
     auto viewInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
       return b->systemValue() == NodeMaterialSystemValues::View;
     });
@@ -187,9 +180,9 @@ void RefractionBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, 
   }
 
   auto iIndexOfRefraction = 1.f;
-  (indexOfRefraction() && indexOfRefraction()->connectInputBlock()
-   && indexOfRefraction()->connectInputBlock()->value()) ?
-    indexOfRefraction()->connectInputBlock()->value()->get<float>() :
+  (indexOfRefractionConnectionPoint && indexOfRefractionConnectionPoint->connectInputBlock()
+   && indexOfRefractionConnectionPoint->connectInputBlock()->value()) ?
+    indexOfRefractionConnectionPoint->connectInputBlock()->value()->get<float>() :
     1.5f;
 
   effect->setFloat4(_vRefractionInfosName, refractionTexture->level, 1.f / iIndexOfRefraction,
@@ -198,6 +191,10 @@ void RefractionBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, 
   effect->setFloat3(
     _vRefractionMicrosurfaceInfosName, static_cast<float>(refractionTexture->getSize().width),
     refractionTexture->lodGenerationScale(), refractionTexture->lodGenerationOffset());
+
+  const auto width = static_cast<float>(refractionTexture->getSize().width);
+
+  effect->setFloat2(_vRefractionFilteringInfoName, width, Scalar::Log2(width));
 }
 
 std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
@@ -270,6 +267,10 @@ std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
   _vRefractionInfosName = state._getFreeVariableName("vRefractionInfos");
 
   state._emitUniformFromString(_vRefractionInfosName, "vec4");
+
+  _vRefractionFilteringInfoName = state._getFreeVariableName("vRefractionFilteringInfo");
+
+  state._emitUniformFromString(_vRefractionFilteringInfoName, "vec2");
 
   return code;
 }

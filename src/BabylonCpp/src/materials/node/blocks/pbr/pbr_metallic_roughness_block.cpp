@@ -863,8 +863,10 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
                                    nullptr;
 
   if (reflectivityBlock) {
+#if 0
     reflectivityBlock->indexOfRefractionConnectionPoint
       = refractionBlock ? refractionBlock->indexOfRefraction() : nullptr;
+#endif
   }
 
   const auto aoIntensity = aoBlock ? (aoBlock->intensity()->isConnected() ?
