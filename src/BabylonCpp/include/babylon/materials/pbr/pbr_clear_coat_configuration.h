@@ -32,6 +32,14 @@ class BABYLON_SHARED_EXPORT PBRClearCoatConfiguration {
 
 public:
   /**
+   * This defaults to 1.5 corresponding to a 0.04 f0 or a 4% reflectance at normal incidence
+   * The default fits with a polyurethane material.
+   * @hidden
+   */
+  static constexpr float _DefaultIndexOfRefraction = 1.5f;
+
+public:
+  /**
    * @brief Instantiate a new istance of clear coat configuration.
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
@@ -262,8 +270,6 @@ public:
   Property<PBRClearCoatConfiguration, BaseTexturePtr> tintTexture;
 
 private:
-  static constexpr float _DefaultIndexOfRefraction = 1.5f;
-
   bool _isEnabled;
   float _indexOfRefraction;
   BaseTexturePtr _texture;
