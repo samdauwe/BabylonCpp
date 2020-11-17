@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_SUB_SURFACE_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class ReflectionBlock;
-class SubSurfaceBlock;
-using ReflectionBlockPtr = std::shared_ptr<ReflectionBlock>;
-using SubSurfaceBlockPtr = std::shared_ptr<SubSurfaceBlock>;
+FWD_CLASS_SPTR(ReflectionBlock)
+FWD_CLASS_SPTR(SubSurfaceBlock)
 
 /**
  * @brief Block used to implement the sub surface module of the PBR material.
@@ -84,19 +83,9 @@ protected:
   SubSurfaceBlock(const std::string& name);
 
   /**
-   * @brief Gets the min thickness input component.
+   * @brief Gets the thickness component.
    */
-  NodeMaterialConnectionPointPtr& get_minThickness();
-
-  /**
-   * @brief Gets the max thickness input component.
-   */
-  NodeMaterialConnectionPointPtr& get_maxThickness();
-
-  /**
-   * @brief Gets the thickness texture component.
-   */
-  NodeMaterialConnectionPointPtr& get_thicknessTexture();
+  NodeMaterialConnectionPointPtr& get_thickness();
 
   /**
    * @brief Gets the tint color input component.
@@ -111,7 +100,7 @@ protected:
   /**
    * @brief Gets the translucency diffusion distance input component.
    */
-  NodeMaterialConnectionPointPtr& get_translucencyDiffusionDistance();
+  NodeMaterialConnectionPointPtr& get_translucencyDiffusionDist();
 
   /**
    * @brief Gets the refraction object parameters.
@@ -130,29 +119,9 @@ protected:
 
 public:
   /**
-   * Stores the intensity of the different subsurface effects in the thickness texture.
-   * * the green channel is the translucency intensity.
-   * * the blue channel is the scattering intensity.
-   * * the alpha channel is the refraction intensity.
+   * Gets the thickness component
    */
-  // @editableInPropertyPage("Mask from thickness texture", PropertyTypeForEdition.Boolean,
-  // "PROPERTIES", { "notifiers": { "update": true }})
-  bool useMaskFromThicknessTexture;
-
-  /**
-   * Gets the min thickness input component
-   */
-  ReadOnlyProperty<SubSurfaceBlock, NodeMaterialConnectionPointPtr> minThickness;
-
-  /**
-   * Gets the max thickness input component
-   */
-  ReadOnlyProperty<SubSurfaceBlock, NodeMaterialConnectionPointPtr> maxThickness;
-
-  /**
-   * Gets the thickness texture component
-   */
-  ReadOnlyProperty<SubSurfaceBlock, NodeMaterialConnectionPointPtr> thicknessTexture;
+  ReadOnlyProperty<SubSurfaceBlock, NodeMaterialConnectionPointPtr> thickness;
 
   /**
    * Gets the tint color input component
@@ -167,7 +136,7 @@ public:
   /**
    * Gets the translucency diffusion distance input component
    */
-  ReadOnlyProperty<SubSurfaceBlock, NodeMaterialConnectionPointPtr> translucencyDiffusionDistance;
+  ReadOnlyProperty<SubSurfaceBlock, NodeMaterialConnectionPointPtr> translucencyDiffusionDist;
 
   /**
    * Gets the refraction object parameters

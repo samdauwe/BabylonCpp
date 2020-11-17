@@ -14,13 +14,10 @@ namespace BABYLON {
 
 SubSurfaceBlock::SubSurfaceBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Fragment}
-    , useMaskFromThicknessTexture{false}
-    , minThickness{this, &SubSurfaceBlock::get_minThickness}
-    , maxThickness{this, &SubSurfaceBlock::get_maxThickness}
-    , thicknessTexture{this, &SubSurfaceBlock::get_thicknessTexture}
+    , thickness{this, &SubSurfaceBlock::get_thickness}
     , tintColor{this, &SubSurfaceBlock::get_tintColor}
     , translucencyIntensity{this, &SubSurfaceBlock::get_translucencyIntensity}
-    , translucencyDiffusionDistance{this, &SubSurfaceBlock::get_translucencyDiffusionDistance}
+    , translucencyDiffusionDist{this, &SubSurfaceBlock::get_translucencyDiffusionDist}
     , refraction{this, &SubSurfaceBlock::get_refraction}
     , subsurface{this, &SubSurfaceBlock::get_subsurface}
 {
@@ -31,12 +28,8 @@ SubSurfaceBlock::~SubSurfaceBlock() = default;
 
 void SubSurfaceBlock::RegisterConnections(const SubSurfaceBlockPtr& subSurfaceBlock)
 {
-  subSurfaceBlock->registerInput("minThickness", NodeMaterialBlockConnectionPointTypes::Float,
-                                 false, NodeMaterialBlockTargets::Fragment);
-  subSurfaceBlock->registerInput("maxThickness", NodeMaterialBlockConnectionPointTypes::Float, true,
+  subSurfaceBlock->registerInput("thickness", NodeMaterialBlockConnectionPointTypes::Float, false,
                                  NodeMaterialBlockTargets::Fragment);
-  subSurfaceBlock->registerInput("thicknessTexture", NodeMaterialBlockConnectionPointTypes::Color4,
-                                 true, NodeMaterialBlockTargets::Fragment);
   subSurfaceBlock->registerInput("tintColor", NodeMaterialBlockConnectionPointTypes::Color3, true,
                                  NodeMaterialBlockTargets::Fragment);
   subSurfaceBlock->registerInput("translucencyIntensity",
@@ -74,39 +67,29 @@ std::string SubSurfaceBlock::getClassName() const
   return "SubSurfaceBlock";
 }
 
-NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_minThickness()
+NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_thickness()
 {
   return _inputs[0];
 }
 
-NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_maxThickness()
+NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_tintColor()
 {
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_thicknessTexture()
+NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_translucencyIntensity()
 {
   return _inputs[2];
 }
 
-NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_tintColor()
+NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_translucencyDiffusionDist()
 {
   return _inputs[3];
 }
 
-NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_translucencyIntensity()
-{
-  return _inputs[4];
-}
-
-NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_translucencyDiffusionDistance()
-{
-  return _inputs[5];
-}
-
 NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_refraction()
 {
-  return _inputs[6];
+  return _inputs[4];
 }
 
 NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_subsurface()
@@ -116,12 +99,12 @@ NodeMaterialConnectionPointPtr& SubSurfaceBlock::get_subsurface()
 
 void SubSurfaceBlock::autoConfigure(const NodeMaterialPtr& /*material*/)
 {
-  if (!minThickness()->isConnected()) {
-    auto minThicknessInput
-      = InputBlock::New("SubSurface min thickness", NodeMaterialBlockTargets::Fragment,
+  if (!thickness()->isConnected()) {
+    auto thicknessInput
+      = InputBlock::New("SubSurface thickness", NodeMaterialBlockTargets::Fragment,
                         NodeMaterialBlockConnectionPointTypes::Float);
-    minThicknessInput->value = 0;
-    minThicknessInput->output()->connectTo(minThickness);
+    thicknessInput->value = std::make_shared<AnimationValue>(0.f);
+    thicknessInput->output()->connectTo(thickness);
   }
 }
 
@@ -132,12 +115,13 @@ void SubSurfaceBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 
   const auto translucencyEnabled
-    = translucencyDiffusionDistance()->isConnected() || translucencyIntensity()->isConnected();
+    = translucencyDiffusionDist()->isConnected() || translucencyIntensity()->isConnected();
 
   defines.setValue("SUBSURFACE", translucencyEnabled || refraction()->isConnected(), true);
   defines.setValue("SS_TRANSLUCENCY", translucencyEnabled, true);
-  defines.setValue("SS_THICKNESSANDMASK_TEXTURE", thicknessTexture()->isConnected(), true);
-  defines.setValue("SS_MASK_FROM_THICKNESS_TEXTURE", useMaskFromThicknessTexture, true);
+  defines.setValue("SS_THICKNESSANDMASK_TEXTURE", false, true);
+  defines.setValue("SS_MASK_FROM_THICKNESS_TEXTURE", false, true);
+  defines.setValue("SS_MASK_FROM_THICKNESS_TEXTURE_GLTF", false, true);
 }
 
 std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
@@ -147,24 +131,18 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
 {
   std::string code = "";
 
-  const auto minThickness = ssBlock->minThickness()->isConnected() ?
-                              ssBlock->minThickness()->associatedVariableName() :
-                              "0.";
-  const auto maxThickness = ssBlock->maxThickness()->isConnected() ?
-                              ssBlock->maxThickness()->associatedVariableName() :
-                              "1.";
-  const auto thicknessTexture = ssBlock->thicknessTexture()->isConnected() ?
-                                  ssBlock->thicknessTexture()->associatedVariableName() :
-                                  "vec4(0.)";
-  const auto tintColor = ssBlock->tintColor()->isConnected() ?
-                           ssBlock->tintColor()->associatedVariableName() :
-                           "vec3(1.)";
-  const auto translucencyIntensity = ssBlock->translucencyIntensity()->isConnected() ?
+  const auto thickness             = ssBlock && ssBlock->thickness()->isConnected() ?
+                                       ssBlock->thickness()->associatedVariableName() :
+                                       "0.";
+  const auto tintColor             = ssBlock && ssBlock->tintColor()->isConnected() ?
+                                       ssBlock->tintColor()->associatedVariableName() :
+                                       "vec3(1.)";
+  const auto translucencyIntensity = ssBlock && ssBlock->translucencyIntensity()->isConnected() ?
                                        ssBlock->translucencyIntensity()->associatedVariableName() :
                                        "1.";
   const auto translucencyDiffusionDistance
-    = ssBlock->translucencyDiffusionDistance()->isConnected() ?
-        ssBlock->translucencyDiffusionDistance()->associatedVariableName() :
+    = ssBlock && ssBlock->translucencyDiffusionDist()->isConnected() ?
+        ssBlock->translucencyDiffusionDist()->associatedVariableName() :
         "vec3(1.)";
 
   RefractionBlockPtr refractionBlock = nullptr;
@@ -180,9 +158,9 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
   const auto refractionIntensity = refractionBlock->intensity()->isConnected() ?
                                      refractionBlock->intensity()->associatedVariableName() :
                                      "1.";
-  const auto refractionView = refractionBlock->view()->isConnected() ?
-                                refractionBlock->view()->associatedVariableName() :
-                                "";
+  const auto refractionView      = refractionBlock->view()->isConnected() ?
+                                     refractionBlock->view()->associatedVariableName() :
+                                     "";
 
   code += refractionBlock->getCode(state);
 
@@ -190,7 +168,7 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
     R"(subSurfaceOutParams subSurfaceOut;
 
     #ifdef SUBSURFACE
-        vec2 vThicknessParam = vec2(%s, %s - %s);
+        vec2 vThicknessParam = vec2(0., %s);
         vec4 vTintColor = vec4(%s, %s);
         vec3 vSubSurfaceIntensity = vec3(%s, %s, 0.);
 
@@ -201,7 +179,7 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
             normalW,
             specularEnvironmentReflectance,
         #ifdef SS_THICKNESSANDMASK_TEXTURE
-            %s,
+            vec4(0.),
         #endif
         #ifdef REFLECTION
             #ifdef SS_TRANSLUCENCY
@@ -209,6 +187,10 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
                 #ifdef USESPHERICALFROMREFLECTIONMAP
                     #if !defined(NORMAL) || !defined(USESPHERICALINVERTEX)
                         reflectionOut.irradianceVector,
+                    #endif
+                    #if defined(REALTIME_FILTERING)
+                        %s,
+                        %s,
                     #endif
                 #endif
                 #ifdef USEIRRADIANCEMAP
@@ -253,6 +235,9 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
             #ifdef ANISOTROPIC
                 anisotropicOut,
             #endif
+            #ifdef REALTIME_FILTERING
+                %s,
+            #endif
         #endif
         #ifdef SS_TRANSLUCENCY
             %s,
@@ -270,16 +255,17 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
         subSurfaceOut.specularEnvironmentReflectance = specularEnvironmentReflectance;
     #endif\r\n
    )",
-    minThickness.c_str(), maxThickness.c_str(), minThickness.c_str(), //
-    tintColor.c_str(), refractionTintAtDistance.c_str(),              //
-    refractionIntensity.c_str(), translucencyIntensity.c_str(),       //
-    thicknessTexture.c_str(),                                         //
-    reflectionBlock->_reflectionMatrixName.c_str(),                   //
-    worldPosVarName.c_str(),                                          //
-    refractionView.c_str(),                                           //
-    refractionBlock->_vRefractionInfosName.c_str(),                   //
-    refractionBlock->_refractionMatrixName.c_str(),                   //
-    refractionBlock->_vRefractionMicrosurfaceInfosName.c_str(),       //
+    thickness.c_str(),                                          //
+    tintColor.c_str(), refractionTintAtDistance.c_str(),        //
+    refractionIntensity.c_str(), translucencyIntensity.c_str(), //
+    reflectionBlock->_reflectionMatrixName.c_str(),             //
+    reflectionBlock->_cubeSamplerName.c_str(),                  //
+    reflectionBlock->_vReflectionFilteringInfoName.c_str(),     //
+    worldPosVarName.c_str(),                                    //
+    refractionView.c_str(),                                     //
+    refractionBlock->_vRefractionInfosName.c_str(),             //
+    refractionBlock->_refractionMatrixName.c_str(),             //
+    refractionBlock->_vRefractionMicrosurfaceInfosName.c_str(), //
     !refractionBlock->_defineLODRefractionAlpha.empty() ?
       refractionBlock->_defineLODRefractionAlpha.c_str() :
       "IGNORE", //
@@ -294,6 +280,7 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
     refractionBlock->_cubeSamplerName.c_str(),                                                   //
     refractionBlock->_2DSamplerName.c_str(),                                                     //
     refractionBlock->_2DSamplerName.c_str(),                                                     //
+    refractionBlock ? refractionBlock->_vRefractionFilteringInfoName.c_str() : "",               //
     translucencyDiffusionDistance.c_str()                                                        //
   );
 
