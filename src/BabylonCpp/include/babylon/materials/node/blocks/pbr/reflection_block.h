@@ -171,9 +171,9 @@ public:
   std::string _vReflectionFilteringInfoName;
 
   /**
-   * The three properties below are set by the main PBR block prior to calling methods of this
-   * class. This is to avoid having to add them as inputs here whereas they are already inputs of
-   * the main block, so already known. It's less burden on the user side in the editor part.
+   * The properties below are set by the main PBR block prior to calling methods of this class.
+   * This is to avoid having to add them as inputs here whereas they are already inputs of the main
+   * block, so already known. It's less burden on the user side in the editor part.
    */
 
   /** @hidden */
@@ -182,6 +182,8 @@ public:
   NodeMaterialConnectionPointPtr worldNormalConnectionPoint;
   /** @hidden */
   NodeMaterialConnectionPointPtr cameraPositionConnectionPoint;
+  /** @hidden */
+  NodeMaterialConnectionPointPtr viewConnectionPoint;
 
   /**
    * Defines if the material uses spherical harmonics vs spherical polynomials for the

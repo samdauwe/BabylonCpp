@@ -23,6 +23,7 @@ ReflectionBlock::ReflectionBlock(const std::string& iName)
     , worldPositionConnectionPoint{nullptr}
     , worldNormalConnectionPoint{nullptr}
     , cameraPositionConnectionPoint{nullptr}
+    , viewConnectionPoint{nullptr}
     , useSphericalHarmonics{true}
     , forceIrradianceInFragment{false}
     , color{this, &ReflectionBlock::get_color}
@@ -42,8 +43,6 @@ void ReflectionBlock::RegisterConnections(const ReflectionBlockPtr& reflectionBl
                                  NodeMaterialBlockTargets::Vertex);
   reflectionBlock->registerInput("world", NodeMaterialBlockConnectionPointTypes::Matrix, false,
                                  NodeMaterialBlockTargets::Vertex);
-  reflectionBlock->registerInput("view", NodeMaterialBlockConnectionPointTypes::Matrix, false,
-                                 NodeMaterialBlockTargets::Fragment);
   reflectionBlock->registerInput("color", NodeMaterialBlockConnectionPointTypes::Color3, true,
                                  NodeMaterialBlockTargets::Fragment);
 
@@ -87,12 +86,12 @@ NodeMaterialConnectionPointPtr& ReflectionBlock::get_cameraPosition()
 
 NodeMaterialConnectionPointPtr& ReflectionBlock::get_view()
 {
-  return _inputs[2];
+  return viewConnectionPoint;
 }
 
 NodeMaterialConnectionPointPtr& ReflectionBlock::get_color()
 {
-  return _inputs[3];
+  return _inputs[2];
 }
 
 NodeMaterialConnectionPointPtr& ReflectionBlock::get_reflection()
@@ -385,6 +384,8 @@ std::string ReflectionBlock::getCode(NodeMaterialBuildState& state,
                 %s,
                 %s,
             #endif
+        #ifdef REALTIME_FILTERING
+            %s,
         #endif
             reflectionOut
         );
@@ -406,8 +407,9 @@ std::string ReflectionBlock::getCode(NodeMaterialBuildState& state,
     _define3DName.c_str(),                                                                      //
     _cubeSamplerName.c_str(),                                                                   //
     _cubeSamplerName.c_str(),
-    _2DSamplerName.c_str(), //
-    _2DSamplerName.c_str()  //
+    _2DSamplerName.c_str(),               //
+    _2DSamplerName.c_str(),               //
+    _vReflectionFilteringInfoName.c_str() //
   );
 
   return code;
@@ -429,6 +431,10 @@ std::string ReflectionBlock::_dumpPropertiesCode()
 {
   auto codeString = ReflectionTextureBaseBlock::_dumpPropertiesCode();
 
+  if (texture) {
+    codeString += StringTools::printf("%s.texture.gammaSpace = %s);\r\n", _codeVariableName.c_str(),
+                                      texture->gammaSpace() ? "true" : "false");
+  }
   codeString += StringTools::printf("%s.useSphericalHarmonics = %s;\r\n", _codeVariableName.c_str(),
                                     useSphericalHarmonics ? "true" : "false");
   codeString
