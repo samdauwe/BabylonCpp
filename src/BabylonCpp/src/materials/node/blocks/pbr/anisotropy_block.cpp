@@ -16,7 +16,6 @@ AnisotropyBlock::AnisotropyBlock(const std::string& iName)
     , worldNormalConnectionPoint{nullptr}
     , intensity{this, &AnisotropyBlock::get_intensity}
     , direction{this, &AnisotropyBlock::get_direction}
-    , texture{this, &AnisotropyBlock::get_texture}
     , uv{this, &AnisotropyBlock::get_uv}
     , worldTangent{this, &AnisotropyBlock::get_worldTangent}
     , anisotropy{this, &AnisotropyBlock::get_anisotropy}
@@ -30,8 +29,6 @@ void AnisotropyBlock::RegisterConnections(const AnisotropyBlockPtr& anisotropyBl
   anisotropyBlock->registerInput("intensity", NodeMaterialBlockConnectionPointTypes::Float, true,
                                  NodeMaterialBlockTargets::Fragment);
   anisotropyBlock->registerInput("direction", NodeMaterialBlockConnectionPointTypes::Vector2, true,
-                                 NodeMaterialBlockTargets::Fragment);
-  anisotropyBlock->registerInput("texture", NodeMaterialBlockConnectionPointTypes::Color3, true,
                                  NodeMaterialBlockTargets::Fragment);
   anisotropyBlock->registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2,
                                  true); // need this property and the next one in case there's no
@@ -68,19 +65,14 @@ NodeMaterialConnectionPointPtr& AnisotropyBlock::get_direction()
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& AnisotropyBlock::get_texture()
+NodeMaterialConnectionPointPtr& AnisotropyBlock::get_uv()
 {
   return _inputs[2];
 }
 
-NodeMaterialConnectionPointPtr& AnisotropyBlock::get_uv()
-{
-  return _inputs[3];
-}
-
 NodeMaterialConnectionPointPtr& AnisotropyBlock::get_worldTangent()
 {
-  return _inputs[4];
+  return _inputs[3];
 }
 
 NodeMaterialConnectionPointPtr& AnisotropyBlock::get_anisotropy()
@@ -152,14 +144,13 @@ std::string AnisotropyBlock::getCode(NodeMaterialBuildState& state, bool generat
     = intensity()->isConnected() ? intensity()->associatedVariableName() : "1.0";
   const auto iDirection
     = direction()->isConnected() ? direction()->associatedVariableName() : "vec2(1., 0.)";
-  const auto iTexture = texture()->isConnected() ? texture()->associatedVariableName() : "vec3(0.)";
 
   code += StringTools::printf(
     R"(anisotropicOutParams anisotropicOut;
         anisotropicBlock(
             vec3(%s, %s),
         #ifdef ANISOTROPIC_TEXTURE
-            %s,
+            vec3(0.),
         #endif
             TBN,
             normalW,
@@ -167,8 +158,7 @@ std::string AnisotropyBlock::getCode(NodeMaterialBuildState& state, bool generat
             anisotropicOut
         );\r\n
       )",
-    iDirection.c_str(), iIntensity.c_str(), //
-    iTexture.c_str());
+    iDirection.c_str(), iIntensity.c_str());
 
   return code;
 }
@@ -180,7 +170,7 @@ void AnisotropyBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 
   defines.setValue("ANISOTROPIC", true);
-  defines.setValue("ANISOTROPIC_TEXTURE", texture()->isConnected(), true);
+  defines.setValue("ANISOTROPIC_TEXTURE", false, true);
 }
 
 AnisotropyBlock& AnisotropyBlock::_buildBlock(NodeMaterialBuildState& state)

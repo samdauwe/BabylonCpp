@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_ANISOTROPY_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class AnisotropyBlock;
-class NodeMaterialConnectionPoint;
-using AnisotropyBlockPtr             = std::shared_ptr<AnisotropyBlock>;
-using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
+FWD_CLASS_SPTR(AnisotropyBlock)
+FWD_CLASS_SPTR(NodeMaterialConnectionPoint)
 
 /**
  * @brief Block used to implement the reflectivity module of the PBR material.
@@ -83,11 +82,6 @@ protected:
   NodeMaterialConnectionPointPtr& get_direction();
 
   /**
-   * @brief Gets the texture input component
-   */
-  NodeMaterialConnectionPointPtr& get_texture();
-
-  /**
    * @brief Gets the uv input component
    */
   NodeMaterialConnectionPointPtr& get_uv();
@@ -131,11 +125,6 @@ public:
    * Gets the direction input component
    */
   ReadOnlyProperty<AnisotropyBlock, NodeMaterialConnectionPointPtr> direction;
-
-  /**
-   * Gets the texture input component
-   */
-  ReadOnlyProperty<AnisotropyBlock, NodeMaterialConnectionPointPtr> texture;
 
   /**
    * Gets the uv input component
