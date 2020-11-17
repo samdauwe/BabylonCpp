@@ -1,24 +1,29 @@
 #include <babylon/materials/node/blocks/pbr/clear_coat_block.h>
 
+#include <babylon/core/json_util.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/node/blocks/fragment/perturb_normal_block.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
+#include <babylon/materials/node/blocks/pbr/pbr_metallic_roughness_block.h>
 #include <babylon/materials/node/blocks/pbr/reflection_block.h>
 #include <babylon/materials/node/node_material_build_state.h>
 #include <babylon/materials/node/node_material_build_state_shared_data.h>
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_connection_point_custom_object.h>
 #include <babylon/materials/node/node_material_defines.h>
+#include <babylon/materials/pbr/pbr_clear_coat_configuration.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 ClearCoatBlock::ClearCoatBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Fragment}
+    , remapF0OnInterfaceChange{true}
     , intensity{this, &ClearCoatBlock::get_intensity}
     , roughness{this, &ClearCoatBlock::get_roughness}
-    , ior{this, &ClearCoatBlock::get_ior}
-    , texture{this, &ClearCoatBlock::get_texture}
-    , bumpTexture{this, &ClearCoatBlock::get_bumpTexture}
+    , indexOfRefraction{this, &ClearCoatBlock::get_indexOfRefraction}
+    , normalMapColor{this, &ClearCoatBlock::get_normalMapColor}
     , uv{this, &ClearCoatBlock::get_uv}
     , tintColor{this, &ClearCoatBlock::get_tintColor}
     , tintAtDistance{this, &ClearCoatBlock::get_tintAtDistance}
@@ -38,12 +43,10 @@ void ClearCoatBlock::RegisterConnections(const ClearCoatBlockPtr& clearCoatBlock
                                 NodeMaterialBlockTargets::Fragment);
   clearCoatBlock->registerInput("roughness", NodeMaterialBlockConnectionPointTypes::Float, true,
                                 NodeMaterialBlockTargets::Fragment);
-  clearCoatBlock->registerInput("ior", NodeMaterialBlockConnectionPointTypes::Float, true,
-                                NodeMaterialBlockTargets::Fragment);
-  clearCoatBlock->registerInput("texture", NodeMaterialBlockConnectionPointTypes::Color3, true,
-                                NodeMaterialBlockTargets::Fragment);
-  clearCoatBlock->registerInput("bumpTexture", NodeMaterialBlockConnectionPointTypes::Color4, true,
-                                NodeMaterialBlockTargets::Fragment);
+  clearCoatBlock->registerInput("indexOfRefraction", NodeMaterialBlockConnectionPointTypes::Float,
+                                true, NodeMaterialBlockTargets::Fragment);
+  clearCoatBlock->registerInput("normalMapColor", NodeMaterialBlockConnectionPointTypes::Color3,
+                                true, NodeMaterialBlockTargets::Fragment);
   clearCoatBlock->registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2, true,
                                 NodeMaterialBlockTargets::Fragment);
   clearCoatBlock->registerInput("tintColor", NodeMaterialBlockConnectionPointTypes::Color3, true,
@@ -87,44 +90,39 @@ NodeMaterialConnectionPointPtr& ClearCoatBlock::get_roughness()
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_ior()
+NodeMaterialConnectionPointPtr& ClearCoatBlock::get_indexOfRefraction()
 {
   return _inputs[2];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_texture()
+NodeMaterialConnectionPointPtr& ClearCoatBlock::get_normalMapColor()
 {
   return _inputs[3];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_bumpTexture()
+NodeMaterialConnectionPointPtr& ClearCoatBlock::get_uv()
 {
   return _inputs[4];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_uv()
+NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintColor()
 {
   return _inputs[5];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintColor()
+NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintAtDistance()
 {
   return _inputs[6];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintAtDistance()
+NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintThickness()
 {
   return _inputs[7];
 }
 
-NodeMaterialConnectionPointPtr& ClearCoatBlock::get_tintThickness()
-{
-  return _inputs[8];
-}
-
 NodeMaterialConnectionPointPtr& ClearCoatBlock::get_worldTangent()
 {
-  return _inputs[9];
+  return _inputs[8];
 }
 
 NodeMaterialConnectionPointPtr& ClearCoatBlock::get_clearcoat()
@@ -149,42 +147,65 @@ void ClearCoatBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& n
   NodeMaterialBlock::prepareDefines(mesh, nodeMaterial, defines);
 
   defines.setValue("CLEARCOAT", true);
-  defines.setValue("CLEARCOAT_TEXTURE", texture()->isConnected(), true);
+  defines.setValue("CLEARCOAT_TEXTURE", false, true);
   defines.setValue("CLEARCOAT_USE_ROUGHNESS_FROM_MAINTEXTURE", true, true);
   defines.setValue("CLEARCOAT_TINT",
                    tintColor()->isConnected() || tintThickness()->isConnected()
                      || tintAtDistance()->isConnected(),
                    true);
-  defines.setValue("CLEARCOAT_BUMP", bumpTexture()->isConnected(), true);
+  defines.setValue("CLEARCOAT_BUMP", normalMapColor()->isConnected(), true);
   defines.setValue("CLEARCOAT_DEFAULTIOR",
-                   ior()->isConnected() ?
-                     ior()->connectInputBlock()->value()
-                       && ior()->connectInputBlock()->value()->get<float>() == 1.5f :
-                     false,
+                   indexOfRefraction()->isConnected() ?
+                     indexOfRefraction()->connectInputBlock()->value()
+                       && indexOfRefraction()->connectInputBlock()->value()->get<float>()
+                            == PBRClearCoatConfiguration::_DefaultIndexOfRefraction :
+                     true,
                    true);
+  defines.setValue("CLEARCOAT_REMAP_F0", remapF0OnInterfaceChange, true);
 }
 
-// TODO FIXME
 void ClearCoatBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh,
                           SubMesh* /*subMesh*/)
 {
   NodeMaterialBlock::bind(effect, nodeMaterial, mesh);
 
   // Clear Coat Refraction params
-  const auto indexOfRefraction = ior()->connectInputBlock()->value() ?
-                                   ior()->connectInputBlock()->value()->get<float>() :
-                                   1.5f;
+  const auto _indexOfRefraction
+    = indexOfRefraction()->connectInputBlock()
+          && indexOfRefraction()->connectInputBlock()->value() ?
+        indexOfRefraction()->connectInputBlock()->value()->get<float>() :
+        PBRClearCoatConfiguration::_DefaultIndexOfRefraction;
 
-  const auto a  = 1.f - indexOfRefraction;
-  const auto b  = 1.f + indexOfRefraction;
+  const auto a  = 1.f - _indexOfRefraction;
+  const auto b  = 1.f + _indexOfRefraction;
   const auto f0 = std::pow((-a / b), 2.f); // Schlicks approx: (ior1 - ior2) / (ior1 + ior2) where
                                            // ior2 for air is close to vacuum = 1.
-  const auto eta = 1.f / indexOfRefraction;
+  const auto eta = 1.f / _indexOfRefraction;
 
   effect->setFloat4("vClearCoatRefractionParams", f0, eta, a, b);
 
   // Clear Coat tangent space params
-  // TODO implement
+  const PBRMetallicRoughnessBlockPtr mainPBRBlock
+    = clearcoat()->hasEndpoints() ? std::static_pointer_cast<PBRMetallicRoughnessBlock>(
+        clearcoat()->endpoints()[0]->ownerBlock()) :
+                                    nullptr;
+  const PerturbNormalBlockPtr perturbedNormalBlock
+    = mainPBRBlock && mainPBRBlock->perturbedNormal()->isConnected()
+          && mainPBRBlock->perturbedNormal()->connectedPoint() ?
+        std::static_pointer_cast<PerturbNormalBlock>(
+          mainPBRBlock->perturbedNormal()->connectedPoint()->ownerBlock()) :
+        nullptr;
+
+  if (_scene->_mirroredCameraPosition) {
+    effect->setFloat2("vClearCoatTangentSpaceParams",
+                      perturbedNormalBlock && perturbedNormalBlock->invertX ? 1.f : -1.f,
+                      perturbedNormalBlock && perturbedNormalBlock->invertY ? 1.f : -1.f);
+  }
+  else {
+    effect->setFloat2("vClearCoatTangentSpaceParams",
+                      perturbedNormalBlock && perturbedNormalBlock->invertX ? -1.f : 1.f,
+                      perturbedNormalBlock && perturbedNormalBlock->invertY ? -1.f : 1.f);
+  }
 }
 
 std::string ClearCoatBlock::_generateTBNSpace(NodeMaterialBuildState& state,
@@ -229,24 +250,22 @@ std::string ClearCoatBlock::GetCode(NodeMaterialBuildState& state, const ClearCo
     = ccBlock->intensity()->isConnected() ? ccBlock->intensity()->associatedVariableName() : "1.";
   const auto roughness
     = ccBlock->roughness()->isConnected() ? ccBlock->roughness()->associatedVariableName() : "0.";
-  const auto texture
-    = ccBlock->texture()->isConnected() ? ccBlock->texture()->associatedVariableName() : "vec2(0.)";
-  const auto bumpTexture = ccBlock->bumpTexture()->isConnected() ?
-                             ccBlock->bumpTexture()->associatedVariableName() :
-                             "vec4(0.)";
+  const auto normalMapColor = ccBlock->normalMapColor()->isConnected() ?
+                                ccBlock->normalMapColor()->associatedVariableName() :
+                                "vec3(0.)";
   const auto uv
     = ccBlock->uv()->isConnected() ? ccBlock->uv()->associatedVariableName() : "vec2(0.)";
 
-  const auto tintColor = ccBlock->tintColor()->isConnected() ?
-                           ccBlock->tintColor()->associatedVariableName() :
-                           "vec3(1.)";
-  const auto tintThickness = ccBlock->tintThickness()->isConnected() ?
-                               ccBlock->tintThickness()->associatedVariableName() :
-                               "1.";
+  const auto tintColor      = ccBlock->tintColor()->isConnected() ?
+                                ccBlock->tintColor()->associatedVariableName() :
+                                "vec3(1.)";
+  const auto tintThickness  = ccBlock->tintThickness()->isConnected() ?
+                                ccBlock->tintThickness()->associatedVariableName() :
+                                "1.";
   const auto tintAtDistance = ccBlock->tintAtDistance()->isConnected() ?
                                 ccBlock->tintAtDistance()->associatedVariableName() :
                                 "1.";
-  const auto tintTexture = "vec4(0.)";
+  const auto tintTexture    = "vec4(0.)";
 
   if (ccBlock) {
     state._emitUniformFromString("vClearCoatRefractionParams", "vec4");
@@ -272,7 +291,7 @@ std::string ClearCoatBlock::GetCode(NodeMaterialBuildState& state, const ClearCo
                 vClearCoatParams,
                 specularEnvironmentR0,
             #ifdef CLEARCOAT_TEXTURE
-                %s.rg,
+                vec2(0.),
             #endif
             #ifdef CLEARCOAT_TINT
                 vClearCoatTintParams,
@@ -284,7 +303,7 @@ std::string ClearCoatBlock::GetCode(NodeMaterialBuildState& state, const ClearCo
             #endif
             #ifdef CLEARCOAT_BUMP
                 vec2(0., 1.),
-                %s,
+                vec4(%s, 0.),
                 %s,
                 #if defined(%s) && defined(NORMAL)
                     vTBN,
@@ -332,10 +351,9 @@ std::string ClearCoatBlock::GetCode(NodeMaterialBuildState& state, const ClearCo
     intensity.c_str(), roughness.c_str(),                       //
     tintColor.c_str(), tintThickness.c_str(),                   //
     worldPosVarName.c_str(),                                    //
-    texture.c_str(),                                            //
     tintAtDistance.c_str(),                                     //
     tintTexture,                                                //
-    bumpTexture.c_str(),                                        //
+    normalMapColor.c_str(),                                     //
     uv.c_str(),                                                 //
     vTBNAvailable ? "TANGENT" : "IGNORE",                       //
     reflectionBlock->_vReflectionMicrosurfaceInfosName.c_str(), //
@@ -365,6 +383,27 @@ ClearCoatBlock& ClearCoatBlock::_buildBlock(NodeMaterialBuildState& state)
   }
 
   return *this;
+}
+
+std::string ClearCoatBlock::_dumpPropertiesCode()
+{
+  std::string codeString;
+
+  codeString
+    += StringTools::printf("%s.remapF0OnInterfaceChange = %s;\r\n", _codeVariableName.c_str(),
+                           remapF0OnInterfaceChange ? "true" : "false");
+
+  return codeString;
+}
+
+json ClearCoatBlock::serialize() const
+{
+  return nullptr;
+}
+
+void ClearCoatBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
+                                  const std::string& /*rootUrl*/)
+{
 }
 
 } // end of namespace BABYLON

@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_CLEAR_COAT_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class ClearCoatBlock;
-class ReflectionBlock;
-using ClearCoatBlockPtr  = std::shared_ptr<ClearCoatBlock>;
-using ReflectionBlockPtr = std::shared_ptr<ReflectionBlock>;
+FWD_CLASS_SPTR(ClearCoatBlock)
+FWD_CLASS_SPTR(ReflectionBlock)
 
 /**
  * @brief Block used to implement the clear coat module of the PBR material.
@@ -91,6 +90,18 @@ public:
                              const std::string& worldPosVarName, bool generateTBNSpace,
                              bool vTBNAvailable, const std::string& worldNormalVarName);
 
+  /**
+   * @brief Serializes this block in a JSON representation.
+   * @returns the serialized block object
+   */
+  json serialize() const override;
+
+  /**
+   * @brief Hidden
+   */
+  void _deserialize(const json& serializationObject, Scene* scene,
+                    const std::string& rootUrl) override;
+
 protected:
   /**
    * @brief Creates a new ClearCoatBlock.
@@ -111,17 +122,12 @@ protected:
   /**
    * @brief Gets the ior input component.
    */
-  NodeMaterialConnectionPointPtr& get_ior();
-
-  /**
-   * @brief Gets the texture input component.
-   */
-  NodeMaterialConnectionPointPtr& get_texture();
+  NodeMaterialConnectionPointPtr& get_indexOfRefraction();
 
   /**
    * @brief Gets the bump texture input component.
    */
-  NodeMaterialConnectionPointPtr& get_bumpTexture();
+  NodeMaterialConnectionPointPtr& get_normalMapColor();
 
   /**
    * @brief Gets the uv input component.
@@ -158,12 +164,24 @@ protected:
    */
   ClearCoatBlock& _buildBlock(NodeMaterialBuildState& state) override;
 
+  /**
+   * @brief Hidden
+   */
+  std::string _dumpPropertiesCode() override;
+
 private:
   std::string _generateTBNSpace(NodeMaterialBuildState& state,
                                 const std::string& worldPositionVarName,
                                 const std::string& worldNormalVarName);
 
 public:
+  /**
+   * Defines if the F0 value should be remapped to account for the interface change in the material.
+   */
+  // @editableInPropertyPage("Remap F0 on interface change", PropertyTypeForEdition.Boolean,
+  // "ADVANCED")
+  bool remapF0OnInterfaceChange;
+
   /**
    * Gets the intensity input component
    */
@@ -177,17 +195,12 @@ public:
   /**
    * Gets the ior input component
    */
-  ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> ior;
-
-  /**
-   * Gets the texture input component
-   */
-  ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> texture;
+  ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> indexOfRefraction;
 
   /**
    * Gets the bump texture input component
    */
-  ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> bumpTexture;
+  ReadOnlyProperty<ClearCoatBlock, NodeMaterialConnectionPointPtr> normalMapColor;
 
   /**
    * Gets the uv input component
