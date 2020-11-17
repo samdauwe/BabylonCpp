@@ -2,13 +2,13 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_REFLECTIVITY_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class ReflectivityBlock;
-using ReflectivityBlockPtr = std::shared_ptr<ReflectivityBlock>;
+FWD_CLASS_SPTR(ReflectivityBlock)
 
 /**
  * @brief Block used to implement the reflectivity module of the PBR material.

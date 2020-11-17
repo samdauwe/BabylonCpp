@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_SHEEN_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class ReflectionBlock;
-class SheenBlock;
-using ReflectionBlockPtr = std::shared_ptr<ReflectionBlock>;
-using SheenBlockPtr      = std::shared_ptr<SheenBlock>;
+FWD_CLASS_SPTR(ReflectionBlock)
+FWD_CLASS_SPTR(SheenBlock)
 
 /**
  * @brief Block used to implement the sheen module of the PBR material.

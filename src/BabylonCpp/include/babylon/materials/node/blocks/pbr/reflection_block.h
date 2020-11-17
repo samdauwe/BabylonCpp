@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_REFLECTION_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/blocks/dual/reflection_texture_base_block.h>
 
 namespace BABYLON {
 
-class ReflectionBlock;
-using ReflectionBlockPtr = std::shared_ptr<ReflectionBlock>;
+FWD_CLASS_SPTR(ReflectionBlock)
 
 /**
  * @brief Block used to implement the reflection module of the PBR material.

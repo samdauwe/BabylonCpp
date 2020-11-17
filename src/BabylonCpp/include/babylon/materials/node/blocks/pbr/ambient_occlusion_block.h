@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_AMBIENT_OCCLUSION_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class AmbientOcclusionBlock;
-using AmbientOcclusionBlockPtr = std::shared_ptr<AmbientOcclusionBlock>;
+FWD_CLASS_SPTR(AmbientOcclusionBlock)
 
 /**
  * @brief Block used to implement the ambient occlusion module of the PBR material.
