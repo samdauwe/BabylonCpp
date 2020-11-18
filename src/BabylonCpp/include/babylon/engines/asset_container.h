@@ -2,14 +2,13 @@
 #define BABYLON_ENGINES_ASSET_CONTAINER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/abstract_scene.h>
 
 namespace BABYLON {
 
-class AssetContainer;
-class Mesh;
-using AssetContainerPtr = std::shared_ptr<AssetContainer>;
-using MeshPtr           = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(AssetContainer)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Container with a set of assets that can be added or removed from a scene.
