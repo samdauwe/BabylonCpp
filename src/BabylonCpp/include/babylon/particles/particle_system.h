@@ -3,6 +3,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
@@ -17,16 +18,13 @@ class IGLVertexArrayObject;
 }
 
 class Buffer;
-class Effect;
 class Mesh;
 class Particle;
 class Scene;
 class ThinEngine;
-class VertexBuffer;
-class WebGLDataBuffer;
-using EffectPtr                 = std::shared_ptr<Effect>;
-using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**

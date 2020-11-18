@@ -1780,7 +1780,9 @@ size_t ParticleSystem::render(bool /*preWarm*/)
     outparticles
       = _render(ParticleSystem::BLENDMODE_MULTIPLY) + _render(ParticleSystem::BLENDMODE_ADD);
   }
-  outparticles = _render(blendMode);
+  else {
+    outparticles = _render(blendMode);
+  }
 
   _engine->unbindInstanceAttributes();
   _engine->setAlphaMode(Constants::ALPHA_DISABLE);
