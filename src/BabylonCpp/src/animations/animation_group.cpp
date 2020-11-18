@@ -159,7 +159,7 @@ AnimationGroup& AnimationGroup::normalize(const std::optional<int>& iBeginFrame,
   auto beginFrame = iBeginFrame ? *iBeginFrame : _from;
   auto endFrame   = iEndFrame ? *iEndFrame : _to;
 
-  for (auto& targetedAnimation : _targetedAnimations) {
+  for (const auto& targetedAnimation : _targetedAnimations) {
     auto& keys           = targetedAnimation->animation->getKeys();
     const auto& startKey = keys.front();
     const auto& endKey   = keys.back();

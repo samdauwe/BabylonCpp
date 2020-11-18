@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observable.h>
 
@@ -12,16 +13,12 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class Animatable;
-class Animation;
-class AnimationGroup;
-class IAnimatable;
 struct TargetedAnimation;
 class Scene;
-using AnimatablePtr     = std::shared_ptr<Animatable>;
-using AnimationPtr      = std::shared_ptr<Animation>;
-using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
-using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(Animation)
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(IAnimatable)
 
 /**
  * @brief Use this class to create coordinated animations on multiple targets.
