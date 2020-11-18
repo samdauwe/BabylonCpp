@@ -2,6 +2,7 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/lights/shadows/icustom_shader_options.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
@@ -12,21 +13,15 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Effect;
-class IShadowLight;
 struct ICustomShaderOptions;
 class Mesh;
-class PostProcess;
 class Scene;
-class ShadowGenerator;
-class SubMesh;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using EffectPtr          = std::shared_ptr<Effect>;
-using IShadowLightPtr    = std::shared_ptr<IShadowLight>;
-using PostProcessPtr     = std::shared_ptr<PostProcess>;
-using ShadowGeneratorPtr = std::shared_ptr<ShadowGenerator>;
-using SubMeshPtr         = std::shared_ptr<SubMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(IShadowLight)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(ShadowGenerator)
+FWD_CLASS_SPTR(SubMesh)
 
 /**
  * @brief Default implementation IShadowGenerator.
@@ -553,6 +548,11 @@ public:
    * Gets or sets the custom shader name to use
    */
   std::optional<ICustomShaderOptions> customShaderOptions;
+
+  /**
+   * Gets or sets a custom function to allow/disallow rendering a sub mesh in the shadow map
+   */
+  std::function<bool(SubMesh* subMesh)> customAllowRendering;
 
   /**
    * Observable triggered before the shadow is rendered. Can be used to update internal effect state

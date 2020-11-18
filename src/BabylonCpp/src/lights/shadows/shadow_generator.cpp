@@ -47,6 +47,7 @@ ShadowGenerator::ShadowGenerator(int mapSize, const IShadowLightPtr& light, bool
 ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
                                  bool usefulFloatFirst)
     : customShaderOptions{std::nullopt}
+    , customAllowRendering{nullptr}
     , bias{this, &ShadowGenerator::get_bias, &ShadowGenerator::set_bias}
     , normalBias{this, &ShadowGenerator::get_normalBias, &ShadowGenerator::set_normalBias}
     , blurBoxOffset{this, &ShadowGenerator::get_blurBoxOffset, &ShadowGenerator::set_blurBoxOffset}
@@ -838,13 +839,8 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     = (engine->getCaps().instancedArrays)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty() || renderingMesh->hasThinInstances());
-  if (effectiveMesh->_internalAbstractMeshDataInfo._currentLOD != effectiveMesh) {
-    if (hardwareInstancedRendering) {
-      batch->renderSelf.erase(subMesh->_id);
-    }
-    else {
-      return;
-    }
+  if (customAllowRendering && !customAllowRendering(subMesh)) {
+    return;
   }
 
   if (isReady(subMesh, hardwareInstancedRendering, isTransparent)) {
