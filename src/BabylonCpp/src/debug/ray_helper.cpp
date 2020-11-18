@@ -82,6 +82,8 @@ void RayHelper::_render()
   point.scaleInPlace(len);
   point.addInPlace(ray->origin);
 
+  _renderPoints[0].copyFrom(ray->origin);
+
   Mesh::CreateLines("ray", _renderPoints, _scene, true, _renderLine);
 }
 
@@ -107,9 +109,9 @@ void RayHelper::attachToMesh(const AbstractMeshPtr& mesh, const Vector3& meshSpa
 
   if (!_onAfterRenderObserver) {
     _onAfterRenderObserver = _scene->onBeforeRenderObservable.add(
-      [this](Scene* /*scene*/, EventState & /*es*/) -> void { _updateToMesh(); });
+      [this](Scene* /*scene*/, EventState& /*es*/) -> void { _updateToMesh(); });
     _onAfterStepObserver = _scene->onAfterStepObservable.add(
-      [this](Scene* /*scene*/, EventState & /*es*/) -> void { _updateToMesh(); });
+      [this](Scene* /*scene*/, EventState& /*es*/) -> void { _updateToMesh(); });
   }
 
   // force world matrix computation before the first ray helper computation

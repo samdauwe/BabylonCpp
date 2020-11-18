@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/culling/ray.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/event_state.h>
@@ -11,12 +12,10 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Color3;
-class LinesMesh;
 class Scene;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(LinesMesh)
 
 /**
  * @brief As raycast might be hard to debug, the RayHelper can help rendering the different rays
