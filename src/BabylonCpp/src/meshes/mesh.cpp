@@ -1171,10 +1171,10 @@ _InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId, bool isReplac
   auto scene                     = getScene();
   auto isInIntermediateRendering = scene->_isInIntermediateRendering();
   auto onlyForInstances          = isInIntermediateRendering ?
-                            _internalAbstractMeshDataInfo._onlyForInstancesIntermediate :
-                            _internalAbstractMeshDataInfo._onlyForInstances;
-  auto& batchCache       = _instanceDataStorage->batchCache;
-  batchCache->mustReturn = false;
+                                     _internalAbstractMeshDataInfo._onlyForInstancesIntermediate :
+                                     _internalAbstractMeshDataInfo._onlyForInstances;
+  auto& batchCache               = _instanceDataStorage->batchCache;
+  batchCache->mustReturn         = false;
   batchCache->renderSelf[subMeshId]
     = isReplacementMode || (!onlyForInstances && isEnabled() && isVisible);
   batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
@@ -1564,8 +1564,8 @@ void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInst
   const auto stride      = kindIsMatrix ? 16 : _userThinInstanceBuffersStorage->strides[kind];
   const auto currentSize = kindIsMatrix ? _thinInstanceDataStorage->matrixBufferSize :
                                           _userThinInstanceBuffersStorage->sizes[kind];
-  auto data = kindIsMatrix ? _thinInstanceDataStorage->matrixData :
-                             _userThinInstanceBuffersStorage->data[kind];
+  auto data              = kindIsMatrix ? _thinInstanceDataStorage->matrixData :
+                                          _userThinInstanceBuffersStorage->data[kind];
 
   const auto bufferSize = (_thinInstanceDataStorage->instancesCount + numInstances) * stride;
 
@@ -1763,7 +1763,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
     return *this;
   }
 
-  {
+  /* if (_internalMeshDataInfo->_onBeforeRenderObservable) */ {
     _internalMeshDataInfo->_onBeforeRenderObservable.notifyObservers(this);
   }
 
@@ -1798,10 +1798,6 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
     engine->setAlphaMode(static_cast<unsigned>(_effectiveMaterial->alphaMode()));
   }
 
-  for (const auto& step : scene._beforeRenderingMeshStage) {
-    step.action(this, subMesh, batch);
-  }
-
   EffectPtr effect = nullptr;
   if (_effectiveMaterial->_storeEffectOnSubMeshes) {
     effect = subMesh->effect();
@@ -1810,13 +1806,12 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
     effect = _effectiveMaterial->getEffect();
   }
 
-  if (!effect) {
-    return *this;
+  for (const auto& step : scene._beforeRenderingMeshStage) {
+    step.action(this, subMesh, batch, effect ? effect.get() : nullptr);
   }
 
-  // Render to MRT
-  if (scene.prePassRenderer()) {
-    scene.prePassRenderer()->bindAttachmentsForEffect(*effect, subMesh);
+  if (!effect) {
+    return *this;
   }
 
   auto& effectiveMesh = effectiveMeshReplacement ? *effectiveMeshReplacement : *_effectiveMesh();
@@ -1853,7 +1848,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
         Material::PointFillMode :
         (scene.forceWireframe() ? Material::WireFrameFillMode : _effectiveMaterial->fillMode());
 
-  {
+  /* if (_internalMeshDataInfo->_onBeforeBindObservable) */ {
     _internalMeshDataInfo->_onBeforeBindObservable.notifyObservers(this);
   }
 
@@ -1893,10 +1888,10 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
   _effectiveMaterial->unbind();
 
   for (const auto& step : scene._afterRenderingMeshStage) {
-    step.action(this, subMesh, batch);
+    step.action(this, subMesh, batch, effect ? effect.get() : nullptr);
   }
 
-  {
+  /* if (_internalMeshDataInfo->_onAfterRenderObservable) */ {
     _internalMeshDataInfo->_onAfterRenderObservable.notifyObservers(this);
   }
 
@@ -2155,7 +2150,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
   FileTools::LoadFile(
     delayLoadingFile,
     [this, &scene](const std::variant<std::string, ArrayBufferView>& data,
-                   const std::string & /*responseURL*/) -> void {
+                   const std::string& /*responseURL*/) -> void {
       if (std::holds_alternative<ArrayBufferView>(data)) {
         // _delayLoadingFunction(data, shared_from_base<Mesh>());
       }
@@ -2452,10 +2447,12 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer, unsigned int
     Vector2::FromArrayToRef(uvs, (index / 3) * 2, uv);
 
     // Compute height
-    auto u = static_cast<unsigned int>(std::abs(uv.x * uvScale.x + uvOffset.x) * heightMapWidth)
-             % heightMapWidth;
-    auto v = static_cast<unsigned int>(std::abs(uv.y * uvScale.y + uvOffset.y) * heightMapHeight)
-             % heightMapHeight;
+    auto u
+      = static_cast<unsigned int>(std::abs(uv.x * uvScale.x + uvOffset.x) * (heightMapWidth - 1.f))
+        % heightMapWidth;
+    auto v
+      = static_cast<unsigned int>(std::abs(uv.y * uvScale.y + uvOffset.y) * (heightMapHeight - 1.f))
+        % heightMapHeight;
 
     auto pos = (u + v * heightMapWidth) * 4;
     auto r   = buffer[pos] / 255.f;

@@ -32,6 +32,7 @@ struct BABYLON_SHARED_EXPORT _InternalAbstractMeshDataInfo {
   bool _onlyForInstancesIntermediate = false;
   bool _actAsRegularMesh             = false;
   AbstractMeshPtr _currentLOD        = nullptr;
+  bool _currentLODIsUpToDate         = false;
 }; // end of struct _InternalAbstractMeshDataInfo
 
 } // end of namespace BABYLON

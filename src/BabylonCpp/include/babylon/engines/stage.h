@@ -5,21 +5,21 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-struct _InstancesBatch;
 class AbstractMesh;
 class Camera;
+class Effect;
 class ICanvas;
 struct ISceneComponent;
 class Mesh;
 class PickingInfo;
 struct PointerEvent;
-class RenderTargetTexture;
 class SubMesh;
-using _InstancesBatchPtr     = std::shared_ptr<_InstancesBatch>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_STRUCT_SPTR(_InstancesBatch)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * Strong typing of a Mesh related stage step action
@@ -59,8 +59,8 @@ using RenderingGroupStageAction = std::function<void(int renderingGroupId)>;
 /**
  * Strong typing of a Mesh Render related stage step action
  */
-using RenderingMeshStageAction
-  = std::function<void(Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch)>;
+using RenderingMeshStageAction = std::function<void(
+  Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch, Effect* effect)>;
 
 /**
  * Strong typing of a simple stage step action

@@ -6,6 +6,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/meshes/iget_set_vertices_data.h>
 
@@ -18,19 +19,14 @@ class IGLVertexArrayObject;
 } // end of namespace GL
 
 class BoundingInfo;
-class Effect;
 class Engine;
-class Geometry;
-class Mesh;
 class Scene;
-class VertexBuffer;
 class VertexData;
-class WebGLDataBuffer;
-using EffectPtr                 = std::shared_ptr<Effect>;
-using GeometryPtr               = std::shared_ptr<Geometry>;
-using MeshPtr                   = std::shared_ptr<Mesh>;
-using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Geometry)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**

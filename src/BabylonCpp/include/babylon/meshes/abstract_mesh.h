@@ -4,6 +4,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/collisions/_mesh_collision_data.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/culling/icullable.h>
@@ -28,34 +29,24 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class _MeshCollisionData;
-struct _OcclusionDataStorage;
-class BoundingInfo;
-class Camera;
-class Collider;
-struct IEdgesRenderer;
-class IParticleSystem;
-class Light;
-class Material;
 struct MaterialDefines;
 class Mesh;
 class PickingInfo;
 struct PhysicsParams;
-class RawTexture;
 class RenderingGroup;
-class Skeleton;
 class SolidParticle;
 class VertexBuffer;
-using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
-using BoundingInfoPtr          = std::shared_ptr<BoundingInfo>;
-using ColliderPtr              = std::shared_ptr<Collider>;
-using CameraPtr                = std::shared_ptr<Camera>;
-using IEdgesRendererPtr        = std::shared_ptr<IEdgesRenderer>;
-using IParticleSystemPtr       = std::shared_ptr<IParticleSystem>;
-using LightPtr                 = std::shared_ptr<Light>;
-using MaterialPtr              = std::shared_ptr<Material>;
-using PhysicsImpostorPtr       = std::shared_ptr<PhysicsImpostor>;
-using RawTexturePtr            = std::shared_ptr<RawTexture>;
-using SkeletonPtr              = std::shared_ptr<Skeleton>;
+FWD_STRUCT_SPTR(_OcclusionDataStorage)
+FWD_CLASS_SPTR(BoundingInfo)
+FWD_CLASS_SPTR(Collider)
+FWD_CLASS_SPTR(Camera)
+FWD_STRUCT_SPTR(IEdgesRenderer)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(PhysicsImpostor)
+FWD_CLASS_SPTR(RawTexture)
+FWD_CLASS_SPTR(Skeleton)
 
 namespace GL {
 class IGLQuery;
@@ -288,10 +279,10 @@ public:
   /**
    * @brief Enables the edge rendering mode on the mesh.
    * This mode makes the mesh edges visible
-   * @param epsilon defines the maximal distance between two angles to detect a
-   * face
-   * @param checkVerticesInsteadOfIndices indicates that we should check vertex
-   * list directly instead of faces
+   * @param epsilon defines the maximal distance between two angles to detect a face
+   * @param checkVerticesInsteadOfIndices indicates that we should check vertex list directly
+   * instead of faces
+   * @param options options to the edge renderer
    * @returns the currentAbstractMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
