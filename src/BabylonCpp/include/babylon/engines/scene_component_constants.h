@@ -47,9 +47,11 @@ struct BABYLON_SHARED_EXPORT SceneComponentConstants {
 
   static constexpr unsigned int STEP_BEFORERENDERTARGETDRAW_LAYER = 0;
 
-  static constexpr unsigned int STEP_BEFORERENDERINGMESH_OUTLINE = 0;
+  static constexpr unsigned int STEP_BEFORERENDERINGMESH_PREPASS = 0;
+  static constexpr unsigned int STEP_BEFORERENDERINGMESH_OUTLINE = 1;
 
-  static constexpr unsigned int STEP_AFTERRENDERINGMESH_OUTLINE = 0;
+  static constexpr unsigned int STEP_AFTERRENDERINGMESH_PREPASS = 0;
+  static constexpr unsigned int STEP_AFTERRENDERINGMESH_OUTLINE = 1;
 
   static constexpr unsigned int STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW    = 0;
   static constexpr unsigned int STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER = 1;
