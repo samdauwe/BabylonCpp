@@ -18,6 +18,35 @@ public:
   ~RecastJSPlugin() override;
 
   /**
+   * @brief Set the time step of the navigation tick update.
+   * Default is 1/60.
+   * A value of 0 will disable fixed time update
+   * @param newTimeStep the new timestep to apply to this world.
+   */
+  void setTimeStep(float newTimeStep = 1.f / 60.f) override;
+
+  /**
+   * @brief Get the time step of the navigation tick update.
+   * @returns the current time step
+   */
+  float getTimeStep() const override;
+
+  /**
+   * @brief If delta time in navigation tick update is greater than the time step
+   * a number of sub iterations are done. If more iterations are need to reach deltatime
+   * they will be discarded.
+   * A value of 0 will set to no maximum and update will use as many substeps as needed
+   * @param newStepCount the maximum number of iterations
+   */
+  void setMaximumSubStepCount(unsigned int newStepCount = 10) override;
+
+  /**
+   * @brief Get the maximum number of iterations per navigation tick update
+   * @returns the maximum number of iterations
+   */
+  unsigned int getMaximumSubStepCount() const override;
+
+  /**
    * @brief Creates a navigation mesh.
    * @param meshes array of all the geometry used to compute the navigatio mesh
    * @param parameters bunch of parameters used to filter geometry
@@ -147,6 +176,10 @@ public:
    * The first navmesh created. We might extend this to support multiple navmeshes
    */
   std::unique_ptr<NavMesh> navMesh;
+
+private:
+  unsigned int _maximumSubStepCount;
+  float _timeStep;
 
 }; // end of class RecastJSPlugin
 

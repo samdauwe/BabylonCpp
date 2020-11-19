@@ -6,16 +6,15 @@
 #include <vector>
 
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-struct ICrowd;
 struct INavMeshParameters;
-class Mesh;
 class Scene;
 class Vector3;
-using ICrowdPtr = std::shared_ptr<ICrowd>;
-using MeshPtr   = std::shared_ptr<Mesh>;
+FWD_STRUCT_SPTR(ICrowd)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Navigation plugin interface to add navigation constrained by a navigation mesh.
@@ -153,6 +152,35 @@ struct INavigationEnginePlugin {
    * @param result output the box extent values
    */
   virtual void getDefaultQueryExtentToRef(Vector3& result) = 0;
+
+  /**
+   * @brief Set the time step of the navigation tick update.
+   * Default is 1/60.
+   * A value of 0 will disable fixed time update
+   * @param newTimeStep the new timestep to apply to this world.
+   */
+  virtual void setTimeStep(float newTimeStep = 1.f / 60.f) = 0;
+
+  /**
+   * @brief Get the time step of the navigation tick update.
+   * @returns the current time step
+   */
+  virtual float getTimeStep() const = 0;
+
+  /**
+   * @brief If delta time in navigation tick update is greater than the time step
+   * a number of sub iterations are done. If more iterations are need to reach deltatime
+   * they will be discarded.
+   * A value of 0 will set to no maximum and update will use as many substeps as needed
+   * @param newStepCount the maximum number of iterations
+   */
+  virtual void setMaximumSubStepCount(unsigned int newStepCount = 10) = 0;
+
+  /**
+   * @brief Get the maximum number of iterations per navigation tick update
+   * @returns the maximum number of iterations
+   */
+  virtual unsigned int getMaximumSubStepCount() const = 0;
 
   /**
    * @brief Release all resources.

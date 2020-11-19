@@ -13,14 +13,37 @@
 namespace BABYLON {
 namespace Extensions {
 
-RecastJSPlugin::RecastJSPlugin() : INavigationEnginePlugin{}
+RecastJSPlugin::RecastJSPlugin()
+    : INavigationEnginePlugin{}, _maximumSubStepCount{10u}, _timeStep{1.f / 60.f}
 {
   name = "RecastJSPlugin";
+
+  setTimeStep();
 }
 
 RecastJSPlugin::~RecastJSPlugin()
 {
   dispose();
+}
+
+void RecastJSPlugin::setTimeStep(float newTimeStep)
+{
+  _timeStep = newTimeStep;
+}
+
+float RecastJSPlugin::getTimeStep() const
+{
+  return _timeStep;
+}
+
+void RecastJSPlugin::setMaximumSubStepCount(unsigned int newStepCount)
+{
+  _maximumSubStepCount = newStepCount;
+}
+
+unsigned int RecastJSPlugin::getMaximumSubStepCount() const
+{
+  return _maximumSubStepCount;
 }
 
 void RecastJSPlugin::createNavMesh(const std::vector<MeshPtr>& meshes,

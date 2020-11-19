@@ -22,7 +22,7 @@ RecastJSCrowd::RecastJSCrowd(RecastJSPlugin* plugin, size_t maxAgents, float max
   _scene          = scene;
 
   _onBeforeAnimationsObserver
-    = scene->onBeforeAnimationsObservable.add([this](Scene* scene, EventState & /*es*/) -> void {
+    = scene->onBeforeAnimationsObservable.add([this](Scene* scene, EventState& /*es*/) -> void {
         update(scene->getEngine()->getDeltaTime() * 0.001f);
       });
 }
@@ -158,7 +158,23 @@ std::vector<int>& RecastJSCrowd::getAgents()
 void RecastJSCrowd::update(float deltaTime)
 {
   // update crowd
-  recastCrowd->update(deltaTime);
+  const auto timeStep     = bjsRECASTPlugin->getTimeStep();
+  const auto maxStepCount = bjsRECASTPlugin->getMaximumSubStepCount();
+  if (timeStep <= Math::Epsilon) {
+    recastCrowd->update(deltaTime);
+  }
+  else {
+    auto iterationCount = deltaTime / timeStep;
+    if (maxStepCount && iterationCount > maxStepCount) {
+      iterationCount = maxStepCount;
+    }
+    if (iterationCount < 1) {
+      iterationCount = 1;
+    }
+    for (auto i = 0u; i < iterationCount; ++i) {
+      recastCrowd->update(timeStep);
+    }
+  }
 
   // update transforms
   for (size_t index = 0; index < agents.size(); index++) {
