@@ -8,7 +8,12 @@
 
 namespace BABYLON {
 
+struct _InstancesBatch;
+class Effect;
+class AbstractMesh;
 class AbstractScene;
+class SubMesh;
+FWD_STRUCT_SPTR(_InstancesBatch)
 FWD_CLASS_SPTR(PrePassRendererSceneComponent)
 
 /**
@@ -58,6 +63,9 @@ private:
   void _beforeCameraDraw();
   void _afterCameraDraw();
   void _beforeClearStage();
+  void _beforeRenderingMeshStage(AbstractMesh* mesh, SubMesh* subMesh,
+                                 const _InstancesBatchPtr& batch, Effect* effect);
+  void _afterRenderingMeshStage(AbstractMesh* mesh);
 
 public:
   /**
