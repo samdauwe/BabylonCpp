@@ -22,6 +22,9 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
                              const std::optional<IEdgesRendererOptions>& options)
     : edgesWidthScalerForOrthographic{1000.f}
     , edgesWidthScalerForPerspective{50.f}
+    , linesPositions{this, &EdgesRenderer::get_linesPositions}
+    , linesNormals{this, &EdgesRenderer::get_linesNormals}
+    , linesIndices{this, &EdgesRenderer::get_linesIndices}
     , _lineShader{nullptr}
     , _ib{nullptr}
     , _options{std::nullopt}
@@ -53,6 +56,21 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
 }
 
 EdgesRenderer::~EdgesRenderer() = default;
+
+Float32Array& EdgesRenderer::get_linesPositions()
+{
+  return _linesPositions;
+}
+
+Float32Array& EdgesRenderer::get_linesNormals()
+{
+  return _linesNormals;
+}
+
+IndicesArray& EdgesRenderer::get_linesIndices()
+{
+  return _linesIndices;
+}
 
 ShaderMaterialPtr EdgesRenderer::GetShader(Scene* scene)
 {
@@ -342,8 +360,8 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
   const auto useFastVertexMerger = _options ? _options->useFastVertexMerger.value_or(true) : true;
   const auto epsilonVertexMerge  = _options ? _options->epsilonVertexMerge.value_or(1e-6f) : 1e-6f;
   const auto epsVertexMerge      = useFastVertexMerger ?
-                                std::round(-std::log(epsilonVertexMerge) / std::log(10.f)) :
-                                epsilonVertexMerge;
+                                     std::round(-std::log(epsilonVertexMerge) / std::log(10.f)) :
+                                     epsilonVertexMerge;
   IndicesArray remapVertexIndices;
   IndicesArray uniquePositions; // list of unique index of vertices - needed for tessellation
 
@@ -822,7 +840,9 @@ void EdgesRenderer::render()
     engine->unbindInstanceAttributes();
   }
 
-  customInstances.clear();
+  if (!_source->getScene()->_activeMeshesFrozen) {
+    customInstances.clear();
+  }
 }
 
 } // end of namespace BABYLON
