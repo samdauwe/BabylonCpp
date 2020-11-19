@@ -205,6 +205,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , getActiveSubMeshCandidates{nullptr}
     , getIntersectingSubMeshCandidates{nullptr}
     , getCollidingSubMeshCandidates{nullptr}
+    , _activeMeshesFrozen{false}
     , _physicsEngine{nullptr}
     , _physicsTimeAccumulator{0.f}
     , _transformMatrixR{Matrix::Zero()}
@@ -269,7 +270,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _alternateProjectionUpdateFlag{-1}
     , _isDisposed{false}
     , _activeMeshCandidateProvider{nullptr}
-    , _activeMeshesFrozen{false}
     , _skipEvaluateActiveMeshesCompletely{false}
     , _renderingManager{nullptr}
     , _transformMatrix{Matrix::Zero()}
