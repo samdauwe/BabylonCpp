@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/path3d.h>
 
 namespace BABYLON {
@@ -12,9 +13,9 @@ namespace BABYLON {
 struct _InstancesBatch;
 struct _VisibleInstances;
 class Buffer;
-using _InstancesBatchPtr   = std::shared_ptr<_InstancesBatch>;
-using _VisibleInstancesPtr = std::shared_ptr<_VisibleInstances>;
-using BufferPtr            = std::shared_ptr<Buffer>;
+FWD_STRUCT_SPTR(_InstancesBatch)
+FWD_STRUCT_SPTR(_VisibleInstances)
+FWD_CLASS_SPTR(Buffer)
 
 /**
  * @brief Hidden
