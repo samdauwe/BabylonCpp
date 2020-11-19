@@ -52,6 +52,11 @@ public:
   void bindAttachmentsForEffect(Effect& effect, SubMesh* subMesh);
 
   /**
+   * @brief Restores attachments for single texture draw.
+   */
+  void restoreAttachments();
+
+  /**
    * @brief Hidden
    */
   void _beforeCameraDraw();
@@ -188,6 +193,13 @@ public:
    * Uses the geometry buffer renderer as a fallback for non prepass capable effects
    */
   Property<PrePassRenderer, bool> useGeometryBufferFallback;
+
+  /**
+   * Set to true to disable gamma transform in PrePass.
+   * Can be useful in case you already proceed to gamma transform on a material level
+   * and your post processes don't need to be in linear color space.
+   */
+  bool disableGammaTransform;
 
   /**
    * Indicates if rendering a prepass is supported

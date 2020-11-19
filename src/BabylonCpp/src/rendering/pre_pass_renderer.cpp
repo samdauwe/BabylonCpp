@@ -61,12 +61,13 @@ PrePassRenderer::PrePassRenderer(Scene* scene)
     , samples{this, &PrePassRenderer::get_samples, &PrePassRenderer::set_samples}
     , useGeometryBufferFallback{this, &PrePassRenderer::get_useGeometryBufferFallback,
                                 &PrePassRenderer::set_useGeometryBufferFallback}
+    , disableGammaTransform{false}
     , isSupported{this, &PrePassRenderer::get_isSupported}
     , _isDirty{false}
     , _clearColor{Color4(0.f, 0.f, 0.f, 0.f)}
     , _enabled{false}
     , _geometryBuffer{nullptr}
-    , _useGeometryBufferFallback{true}
+    , _useGeometryBufferFallback{false}
 {
   _scene  = scene;
   _engine = scene->getEngine();
@@ -202,6 +203,13 @@ void PrePassRenderer::bindAttachmentsForEffect(Effect& effect, SubMesh* subMesh)
   }
 }
 
+void PrePassRenderer::restoreAttachments()
+{
+  if (enabled() && !_defaultAttachments.empty()) {
+    _engine->bindAttachments(_defaultAttachments);
+  }
+}
+
 void PrePassRenderer::_beforeCameraDraw()
 {
   if (_isDirty) {
@@ -220,7 +228,7 @@ void PrePassRenderer::_afterCameraDraw()
   if (_enabled) {
     const PostProcessPtr firstCameraPP
       = _scene->activeCamera() ? _scene->activeCamera()->_getFirstPostProcess() : nullptr;
-    if (firstCameraPP) {
+    if (firstCameraPP && !_postProcesses.empty()) {
       _scene->postProcessManager->_prepareFrame();
     }
     _scene->postProcessManager->directRender(
@@ -389,8 +397,18 @@ void PrePassRenderer::_enable()
   if (!imageProcessingPostProcess) {
     _createCompositionEffect();
   }
+  auto isIPPAlreadyPresent = false;
+  if (_scene->activeCamera() && !_scene->activeCamera()->_postProcesses.empty()) {
+    for (const auto& postProcess : _scene->activeCamera()->_postProcesses) {
+      if (postProcess && postProcess->getClassName() == "ImageProcessingPostProcess") {
+        isIPPAlreadyPresent = true;
+      }
+    }
+  }
 
-  _postProcesses.emplace_back(imageProcessingPostProcess);
+  if (!isIPPAlreadyPresent && !disableGammaTransform) {
+    _postProcesses.emplace_back(imageProcessingPostProcess);
+  }
   _bindPostProcessChain();
   _setState(true);
 }
@@ -435,7 +453,16 @@ void PrePassRenderer::_resetPostProcessChain()
 
 void PrePassRenderer::_bindPostProcessChain()
 {
-  _postProcesses[0]->inputTexture = prePassRT->getInternalTexture();
+  if (!_postProcesses.empty()) {
+    _postProcesses[0]->inputTexture = prePassRT->getInternalTexture();
+  }
+  else {
+    const PostProcessPtr pp
+      = _scene->activeCamera() ? _scene->activeCamera()->_getFirstPostProcess() : nullptr;
+    if (pp && prePassRT->getInternalTexture()) {
+      pp->inputTexture = prePassRT->getInternalTexture();
+    }
+  }
 }
 
 void PrePassRenderer::markAsDirty()
