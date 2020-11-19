@@ -36,18 +36,16 @@ void OutlineRenderer::addToScene(const OutlineRendererPtr& outlineRenderer)
 
 void OutlineRenderer::_register()
 {
-#if 0
   scene->_beforeRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERINGMESH_OUTLINE, this,
-    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
+    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch, Effect* /*effect*/) {
       _beforeRenderingMesh(mesh, subMesh, batch);
     });
   scene->_afterRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGMESH_OUTLINE, this,
-    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch) {
+    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch, Effect* /*effect*/) {
       _afterRenderingMesh(mesh, subMesh, batch);
     });
-#endif
 }
 
 void OutlineRenderer::rebuild()

@@ -13,6 +13,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/maths/size.h>
+#include <babylon/meshes/_instance_data_storage.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -78,7 +79,7 @@ void GeometryBufferRenderer::_linkPrePassRenderer(const PrePassRendererPtr& preP
   if (_multiRenderTarget) {
     // prevents clearing of the RT since it's done by prepass
     _multiRenderTarget->onClearObservable.clear();
-    _multiRenderTarget->onClearObservable.add([](Engine* /*engine*/, EventState & /*es*/) -> void {
+    _multiRenderTarget->onClearObservable.add([](Engine* /*engine*/, EventState& /*es*/) -> void {
       // pass
     });
   }
@@ -466,7 +467,7 @@ void GeometryBufferRenderer::_createRenderTargets()
   });
 
   _resizeObserver
-    = engine->onResizeObservable.add([this](Engine* engine, EventState & /*es*/) -> void {
+    = engine->onResizeObservable.add([this](Engine* engine, EventState& /*es*/) -> void {
         if (_multiRenderTarget) {
           _multiRenderTarget->resize(Size{
             static_cast<int>(engine->getRenderWidth() * _ratio), // width,
@@ -543,9 +544,6 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     }
   }
 
-  // Culling
-  engine->setState(material->backFaceCulling(), 0, false, _scene->useRightHandedSystem());
-
   // Managing instances
   auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
                                                       subMesh->getReplacementMesh() != nullptr);
@@ -568,6 +566,30 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     _effect->setMatrix("view", _scene->getViewMatrix());
 
     if (material) {
+      std::optional<unsigned int> sideOrientation = std::nullopt;
+      const auto effectiveMeshCasted              = std::static_pointer_cast<Mesh>(effectiveMesh);
+      const auto& instanceDataStorage             = effectiveMeshCasted->_instanceDataStorage;
+
+      if (!instanceDataStorage->isFrozen
+          && (material->backFaceCulling
+              || effectiveMeshCasted->overrideMaterialSideOrientation.has_value())) {
+        const auto mainDeterminant = effectiveMesh->_getWorldMatrixDeterminant();
+        sideOrientation            = effectiveMeshCasted->overrideMaterialSideOrientation;
+        if (!sideOrientation.has_value()) {
+          sideOrientation = material->sideOrientation;
+        }
+        if (mainDeterminant < 0.f) {
+          sideOrientation = (sideOrientation == Material::ClockWiseSideOrientation ?
+                               Material::CounterClockWiseSideOrientation :
+                               Material::ClockWiseSideOrientation);
+        }
+      }
+      else {
+        sideOrientation = instanceDataStorage->sideOrientation;
+      }
+
+      material->_preBind(_effect, sideOrientation);
+
       // Alpha test
       if (material->needAlphaTesting()) {
         auto alphaTexture = material->getAlphaTestTexture();

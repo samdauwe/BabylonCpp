@@ -54,7 +54,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
   // Render target
   const auto format = (isPacked || engine->webGLVersion() == 1.f) ? Constants::TEXTUREFORMAT_RGBA :
                                                                     Constants::TEXTUREFORMAT_R;
-  _depthMap = RenderTargetTexture::New(
+  _depthMap         = RenderTargetTexture::New(
     "depthMap", RenderTargetSize{engine->getRenderWidth(), engine->getRenderHeight()}, _scene,
     false, true, type, false, TextureConstants::TRILINEAR_SAMPLINGMODE, true, false, false, format);
   _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
@@ -206,7 +206,7 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
 
   effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
-  if (!material) {
+  if (!material || subMesh->verticesCount == 0 || subMesh->_renderId == scene->getRenderId()) {
     return;
   }
 
@@ -223,11 +223,14 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
 
   bool hardwareInstancedRendering
     = (engine->getCaps().instancedArrays
-       && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end()))
+       && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end()
+           && !batch->visibleInstances[subMesh->_id].empty()))
       || renderingMesh->hasThinInstances();
 
   auto camera = (!_camera) ? _camera : scene->activeCamera;
   if (isReady(subMesh, hardwareInstancedRendering) && camera) {
+    subMesh->_renderId = scene->getRenderId();
+
     engine->enableEffect(_effect);
     renderingMesh->_bind(subMesh, _effect, material->fillMode());
 
