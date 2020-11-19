@@ -3487,6 +3487,11 @@ public:
     getCollidingSubMeshCandidates;
 
   /**
+   * Hidden
+   */
+  bool _activeMeshesFrozen;
+
+  /**
    * Hidden (Backing field)
    */
   IPhysicsEnginePtr _physicsEngine;
@@ -3635,7 +3640,6 @@ private:
   bool _isDisposed;
   std::vector<AbstractMesh*> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
-  bool _activeMeshesFrozen;
   bool _skipEvaluateActiveMeshesCompletely;
   std::vector<MaterialPtr> _processedMaterials;
   std::vector<RenderTargetTexturePtr> _renderTargets;
