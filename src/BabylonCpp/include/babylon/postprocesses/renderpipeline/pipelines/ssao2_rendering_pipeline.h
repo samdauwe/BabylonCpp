@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 
@@ -13,18 +14,13 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class DynamicTexture;
-class PassPostProcess;
-class PostProcess;
 class Scene;
-class SSAO2RenderingPipeline;
-class Texture;
 class Vector3;
-using DynamicTexturePtr         = std::shared_ptr<DynamicTexture>;
-using PassPostProcessPtr        = std::shared_ptr<PassPostProcess>;
-using PostProcessPtr            = std::shared_ptr<PostProcess>;
-using SSAO2RenderingPipelinePtr = std::shared_ptr<SSAO2RenderingPipeline>;
-using TexturePtr                = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(DynamicTexture)
+FWD_CLASS_SPTR(PassPostProcess)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(SSAO2RenderingPipeline)
+FWD_CLASS_SPTR(Texture)
 
 struct SSAO2Ratio {
   float ssaoRatio;
@@ -126,9 +122,9 @@ protected:
    * @param forceGeometryBuffer Set to true if you want to use the legacy geometry buffer renderer
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = true);
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = true);
 
 private:
   void set_samples(unsigned int n);
