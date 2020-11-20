@@ -510,7 +510,7 @@ std::string NodeMaterialBlock::_outputRename(const std::string& iName)
 std::string NodeMaterialBlock::_dumpPropertiesCode()
 {
   const auto& variableName = _codeVariableName;
-  return StringTools::printf("%s.visibleInInspector = %s", variableName.c_str(),
+  return StringTools::printf("%s.visibleInInspector = %s;\r\n", variableName.c_str(),
                              visibleInInspector ? "true" : "false");
 }
 
