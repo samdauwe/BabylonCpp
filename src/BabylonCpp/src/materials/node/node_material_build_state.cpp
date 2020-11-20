@@ -75,6 +75,8 @@ void NodeMaterialBuildState::finalize(const NodeMaterialBuildState& state)
                             _attributeDeclaration.c_str(), compilationString.c_str());
   }
 
+  compilationString = "precision highp float;\r\n" + compilationString;
+
   for (const auto& extensionsItem : extensions) {
     const auto& extension = extensionsItem.second;
     compilationString

@@ -8,6 +8,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/enums/node_material_block_connection_point_types.h>
 #include <babylon/materials/node/enums/node_material_block_targets.h>
 
@@ -16,8 +17,8 @@ namespace BABYLON {
 class NodeMaterialBuildState;
 struct NodeMaterialBuildStateSharedData;
 struct ReplaceStrings;
-using NodeMaterialBuildStatePtr           = std::shared_ptr<NodeMaterialBuildState>;
-using NodeMaterialBuildStateSharedDataPtr = std::shared_ptr<NodeMaterialBuildStateSharedData>;
+FWD_CLASS_SPTR(NodeMaterialBuildState)
+FWD_STRUCT_SPTR(NodeMaterialBuildStateSharedData)
 
 struct BABYLON_SHARED_EXPORT StringsReplacement {
   std::string search  = "";
