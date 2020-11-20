@@ -588,6 +588,8 @@ void DefaultRenderingPipeline::_buildPipeline()
                      "MSAA failed to enable, MSAA is only supported in "
                      "browsers that support webGL >= 2.0")
   }
+
+  onBuildObservable.notifyObservers(this);
 }
 
 void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
@@ -662,6 +664,7 @@ void DefaultRenderingPipeline::removeCamera(Camera* camera)
 
 void DefaultRenderingPipeline::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
+  onBuildObservable.clear();
   _disposePostProcesses(true);
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(_name, _cameras);
   _scene->autoClear = true;

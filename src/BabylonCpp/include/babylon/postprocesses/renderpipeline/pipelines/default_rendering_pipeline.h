@@ -6,7 +6,9 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 #include <babylon/postprocesses/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
@@ -16,26 +18,17 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class Animation;
-class BloomEffect;
-class ChromaticAberrationPostProcess;
-class DefaultRenderingPipeline;
-class DepthOfFieldEffect;
-class FxaaPostProcess;
-class GlowLayer;
-class GrainPostProcess;
 class ImageProcessingConfiguration;
-class PostProcess;
 class Scene;
-class SharpenPostProcess;
-using BloomEffectPtr                    = std::shared_ptr<BloomEffect>;
-using ChromaticAberrationPostProcessPtr = std::shared_ptr<ChromaticAberrationPostProcess>;
-using DefaultRenderingPipelinePtr       = std::shared_ptr<DefaultRenderingPipeline>;
-using DepthOfFieldEffectPtr             = std::shared_ptr<DepthOfFieldEffect>;
-using FxaaPostProcessPtr                = std::shared_ptr<FxaaPostProcess>;
-using GlowLayerPtr                      = std::shared_ptr<GlowLayer>;
-using GrainPostProcessPtr               = std::shared_ptr<GrainPostProcess>;
-using PostProcessPtr                    = std::shared_ptr<PostProcess>;
-using SharpenPostProcessPtr             = std::shared_ptr<SharpenPostProcess>;
+FWD_CLASS_SPTR(BloomEffect)
+FWD_CLASS_SPTR(ChromaticAberrationPostProcess)
+FWD_CLASS_SPTR(DefaultRenderingPipeline)
+FWD_CLASS_SPTR(DepthOfFieldEffect)
+FWD_CLASS_SPTR(FxaaPostProcess)
+FWD_CLASS_SPTR(GlowLayer)
+FWD_CLASS_SPTR(GrainPostProcess)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(SharpenPostProcess)
 
 /**
  * @brief The default rendering pipeline can be added to a scene to apply common
@@ -287,6 +280,11 @@ public:
    * Animations which can be used to tweak settings over a period of time
    */
   std::vector<Animation*> animations;
+
+  /**
+   * This is triggered each time the pipeline has been built.
+   */
+  Observable<DefaultRenderingPipeline> onBuildObservable;
 
   /**
    * Specifies the size of the bloom blur kernel, relative to the final output
