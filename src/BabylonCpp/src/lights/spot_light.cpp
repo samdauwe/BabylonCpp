@@ -5,6 +5,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/axis.h>
@@ -165,12 +166,27 @@ void SpotLight::set_projectionTexture(const BaseTexturePtr& value)
   _projectionTexture      = value;
   _projectionTextureDirty = true;
   if (_projectionTexture && !_projectionTexture->isReady()) {
-    auto texture = std::static_pointer_cast<Texture>(_projectionTexture);
-    if (texture) {
-      texture->onLoadObservable().addOnce(
-        [this](Texture*, EventState&) -> void { _markMeshesAsLightDirty(); });
+    if (SpotLight::_IsProceduralTexture(_projectionTexture)) {
+      std::static_pointer_cast<ProceduralTexture>(_projectionTexture)
+        ->getEffect()
+        ->executeWhenCompiled([this](Effect* /*effect*/) -> void { _markMeshesAsLightDirty(); });
+    }
+    else if (SpotLight::_IsTexture(_projectionTexture)) {
+      std::static_pointer_cast<Texture>(_projectionTexture)
+        ->onLoadObservable()
+        .addOnce([this](Texture*, EventState&) -> void { _markMeshesAsLightDirty(); });
     }
   }
+}
+
+bool SpotLight::_IsProceduralTexture(const BaseTexturePtr& texture)
+{
+  return std::static_pointer_cast<ProceduralTexture>(texture) != nullptr;
+}
+
+bool SpotLight::_IsTexture(const BaseTexturePtr& texture)
+{
+  return std::static_pointer_cast<Texture>(texture) != nullptr;
 }
 
 void SpotLight::_setDirection(const Vector3& value)

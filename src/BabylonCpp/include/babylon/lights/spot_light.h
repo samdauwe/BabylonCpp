@@ -2,14 +2,13 @@
 #define BABYLON_LIGHTS_SPOT_LIGHT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-class SpotLight;
-using SpotLightPtr   = std::shared_ptr<SpotLight>;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+FWD_CLASS_SPTR(SpotLight)
+FWD_CLASS_SPTR(BaseTexture)
 
 /**
  * @brief A spot light is defined by a position, a direction, an angle, and an exponent.
@@ -207,6 +206,8 @@ protected:
   void _buildUniformLayout() override;
 
 private:
+  static bool _IsProceduralTexture(const BaseTexturePtr& texture);
+  static bool _IsTexture(const BaseTexturePtr& texture);
   void _computeAngleValues();
 
 public:
