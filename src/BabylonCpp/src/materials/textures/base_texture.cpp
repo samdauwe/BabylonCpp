@@ -17,18 +17,12 @@
 namespace BABYLON {
 
 BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine)
-    : hasAlpha{this, &BaseTexture::get_hasAlpha, &BaseTexture::set_hasAlpha}
+    : ThinTexture{nullptr}
+    , hasAlpha{this, &BaseTexture::get_hasAlpha, &BaseTexture::set_hasAlpha}
     , getAlphaFromRGB{false}
     , level{1.f}
     , coordinatesIndex{0}
-    , coordinatesMode{this, &BaseTexture::get_coordinatesMode, &BaseTexture::set_coordinatesMode}
-    , wrapU{this, &BaseTexture::get_wrapU, &BaseTexture::set_wrapU}
-    , wrapV{this, &BaseTexture::get_wrapV, &BaseTexture::set_wrapV}
-    , wrapR{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , anisotropicFilteringLevel{BaseTexture::DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
-    , isCube{this, &BaseTexture::get_isCube, &BaseTexture::set_isCube}
-    , is3D{this, &BaseTexture::get_is3D, &BaseTexture::set_is3D}
-    , is2DArray{this, &BaseTexture::get_is2DArray, &BaseTexture::set_is2DArray}
     , gammaSpace{this, &BaseTexture::get_gammaSpace, &BaseTexture::set_gammaSpace}
     , isRGBD{this, &BaseTexture::get_isRGBD, &BaseTexture::set_isRGBD}
     , invertZ{false}
@@ -46,8 +40,6 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _prefiltered{false}
     , uid{this, &BaseTexture::get_uid}
     , onDispose{this, &BaseTexture::set_onDispose}
-    , delayLoadState{Constants::DELAYLOADSTATE_NONE}
-    , _texture{nullptr}
     , isBlocking{this, &BaseTexture::get_isBlocking, &BaseTexture::set_isBlocking}
     , boundingBoxSize{this, &BaseTexture::get_boundingBoxSize, &BaseTexture::set_boundingBoxSize}
     , textureType{this, &BaseTexture::get_textureType}
@@ -59,20 +51,19 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _scene{nullptr}
-    , _engine{nullptr}
     , _hasAlpha{false}
-    , _wrapU{Constants::TEXTURE_WRAP_ADDRESSMODE}
-    , _wrapV{Constants::TEXTURE_WRAP_ADDRESSMODE}
+    , _isCube{false}
     , _gammaSpace{true}
     , _uid{GUID::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
     , emptyVector3{std::nullopt}
-    , _cachedSize{Size::Zero()}
     , _nullSphericalPolynomial{nullptr}
     , _nullBaseTexture{nullptr}
 {
+  wrapR = Constants::TEXTURE_WRAP_ADDRESSMODE;
+
   if (sceneOrEngine) {
     if (BaseTexture::_isScene(*sceneOrEngine)) {
       _scene = std::get<Scene*>(*sceneOrEngine);
@@ -161,7 +152,7 @@ void BaseTexture::set_wrapV(unsigned int value)
 bool BaseTexture::get_isCube() const
 {
   if (!_texture) {
-    return false;
+    return _isCube;
   }
 
   return _texture->isCube;
@@ -170,10 +161,11 @@ bool BaseTexture::get_isCube() const
 void BaseTexture::set_isCube(bool value)
 {
   if (!_texture) {
-    return;
+    _isCube = value;
   }
-
-  _texture->isCube = value;
+  else {
+    _texture->isCube = value;
+  }
 }
 
 bool BaseTexture::get_is3D() const
@@ -383,75 +375,9 @@ Matrix* BaseTexture::getReflectionTextureMatrix()
   return &_reflectionTextureMatrix;
 }
 
-InternalTexturePtr& BaseTexture::getInternalTexture()
-{
-  return _texture;
-}
-
 bool BaseTexture::isReadyOrNotBlocking()
 {
   return !isBlocking() || isReady();
-}
-
-bool BaseTexture::isReady()
-{
-  if (delayLoadState == Constants::DELAYLOADSTATE_NOTLOADED) {
-    delayLoad();
-    return false;
-  }
-
-  if (_texture) {
-    return _texture->isReady;
-  }
-
-  return false;
-}
-
-ISize BaseTexture::getSize()
-{
-  if (_texture) {
-    if (_texture->width) {
-      _cachedSize.width  = _texture->width;
-      _cachedSize.height = _texture->height;
-      return _cachedSize;
-    }
-
-    if (_texture->_size) {
-      _cachedSize.width  = _texture->_size;
-      _cachedSize.height = _texture->_size;
-      return _cachedSize;
-    }
-  }
-
-  return _cachedSize;
-}
-
-ISize BaseTexture::getBaseSize()
-{
-  if (!isReady() || !_texture) {
-    return Size::Zero();
-  }
-
-  if (_texture->_size) {
-    return Size(_texture->_size, _texture->_size);
-  }
-
-  return Size(_texture->baseWidth, _texture->baseHeight);
-}
-
-void BaseTexture::updateSamplingMode(unsigned int samplingMode)
-{
-  if (!_texture) {
-    return;
-  }
-
-  auto engine = _getEngine();
-
-  if (!engine) {
-    return;
-  }
-
-  engine->updateTextureSamplingMode(samplingMode, _texture);
 }
 
 void BaseTexture::scale(float /*ratio*/)
@@ -488,10 +414,6 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
 }
 
 void BaseTexture::_rebuild(bool /*forceFullRebuild*/)
-{
-}
-
-void BaseTexture::delayLoad(const std::string& /*forcedExtension*/)
 {
 }
 
@@ -575,14 +497,6 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
   return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer);
 }
 
-void BaseTexture::releaseInternalTexture()
-{
-  if (_texture) {
-    _texture->dispose();
-    _texture = nullptr;
-  }
-}
-
 SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
 {
   if (_texture) {
@@ -644,18 +558,11 @@ void BaseTexture::dispose()
     _scene = nullptr;
   }
 
-  if (_texture == nullptr) {
-    return;
-  }
-
-  // Release
-  releaseInternalTexture();
-
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
 
-  _engine = nullptr;
+  ThinTexture::dispose();
 }
 
 json BaseTexture::serialize() const
@@ -681,14 +588,13 @@ void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
     else {
       auto onLoadObservable = static_cast<Texture*>(texture)->onLoadObservable();
 
-      const std::function<void(Texture*, EventState&)> onLoadCallback = [&](Texture*, EventState&) {
-        onLoadObservable.removeCallback(onLoadCallback);
-        if (--numRemaining == 0) {
-          callback();
-        }
-      };
-
-      onLoadObservable.add(onLoadCallback);
+      /* if (onLoadObservable) */ {
+        onLoadObservable.addOnce([&](Texture*, EventState&) {
+          if (--numRemaining == 0) {
+            callback();
+          }
+        });
+      }
     }
   }
 }

@@ -4,21 +4,20 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
+#include <babylon/materials/textures/thin_texture.h>
 #include <babylon/maths/isize.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-class InternalTexture;
-class SphericalPolynomial;
 class ThinEngine;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
-using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(SphericalPolynomial)
 
 /**
  * @brief Base class of all the textures in babylon.
@@ -26,6 +25,7 @@ using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
  * in order to make a correct use of the texture.
  */
 class BABYLON_SHARED_EXPORT BaseTexture : public std::enable_shared_from_this<BaseTexture>,
+                                          public ThinTexture,
                                           public IAnimatable {
 public:
   /**
@@ -92,64 +92,10 @@ public:
   virtual Matrix* getReflectionTextureMatrix();
 
   /**
-   * @brief Get the underlying lower level texture from Babylon.
-   * @returns the insternal texture
-   */
-  InternalTexturePtr& getInternalTexture();
-
-  /**
    * @brief Get if the texture is ready to be consumed (either it is ready or it is not blocking)
    * @returns true if ready or not blocking
    */
   virtual bool isReadyOrNotBlocking();
-
-  /**
-   * @brief Get if the texture is ready to be used (downloaded, converted, mip mapped...).
-   * @returns true if fully ready
-   */
-  virtual bool isReady();
-
-  /**
-   * @brief Get the size of the texture.
-   * @returns the texture size.
-   */
-  ISize getSize();
-
-  /**
-   * @brief Get the base size of the texture.
-   * It can be different from the size if the texture has been resized for POT
-   * for instance
-   * @returns the base size
-   */
-  ISize getBaseSize();
-
-  // clang-format off
-  /**
-   * @brief Update the sampling mode of the texture.
-   * Default is Trilinear mode.
-   *
-   * | Value | Type               | Description |
-   * | ----- | ------------------ | ----------- |
-   * | 1     | NEAREST_SAMPLINGMODE or NEAREST_NEAREST_MIPLINEAR  | Nearest is: mag = nearest, min = nearest, mip = linear |
-   * | 2     | BILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPNEAREST | Bilinear is: mag = linear, min = linear, mip = nearest |
-   * | 3     | TRILINEAR_SAMPLINGMODE or LINEAR_LINEAR_MIPLINEAR | Trilinear is: mag = linear, min = linear, mip = linear |
-   * | 4     | NEAREST_NEAREST_MIPNEAREST |             |
-   * | 5    | NEAREST_LINEAR_MIPNEAREST |             |
-   * | 6    | NEAREST_LINEAR_MIPLINEAR |             |
-   * | 7    | NEAREST_LINEAR |             |
-   * | 8    | NEAREST_NEAREST |             |
-   * | 9   | LINEAR_NEAREST_MIPNEAREST |             |
-   * | 10   | LINEAR_NEAREST_MIPLINEAR |             |
-   * | 11   | LINEAR_LINEAR |             |
-   * | 12   | LINEAR_NEAREST |             |
-   *
-   *    > _mag_: magnification filter (close to the viewer)
-   *    > _min_: minification filter (far from the viewer)
-   *    > _mip_: filter used between mip map levels
-   *@param samplingMode Define the new sampling mode of the texture
-   */
-  // clang-format on
-  void updateSamplingMode(unsigned int samplingMode);
 
   /**
    * @brief Scales the texture if is `canRescale()`
@@ -173,10 +119,8 @@ public:
   virtual void _rebuild(bool forceFullRebuild = false);
 
   /**
-   * @brief Triggers the load sequence in delayed load mode.
+   * @brief Hidden
    */
-  virtual void delayLoad(const std::string& forcedExtension = "");
-
   std::vector<AnimationPtr> getAnimations() override;
 
   /**
@@ -198,14 +142,9 @@ public:
                              std::optional<ArrayBufferView> buffer = std::nullopt);
 
   /**
-   * @brief Release and destroy the underlying lower level texture aka internalTexture.
-   */
-  void releaseInternalTexture();
-
-  /**
    * @brief Dispose the texture and release its associated resources.
    */
-  virtual void dispose();
+  virtual void dispose() override;
 
   /**
    * @brief Serialize the texture into a JSON representation that can be parsed later on.
@@ -233,18 +172,18 @@ protected:
 
   void set_hasAlpha(bool value);
   bool get_hasAlpha() const;
-  void set_coordinatesMode(unsigned int value);
-  unsigned int get_coordinatesMode() const;
-  unsigned int get_wrapU() const;
-  void set_wrapU(unsigned int value);
-  unsigned int get_wrapV() const;
-  void set_wrapV(unsigned int value);
-  bool get_isCube() const;
-  void set_isCube(bool value);
-  bool get_is3D() const;
-  void set_is3D(bool value);
-  bool get_is2DArray() const;
-  void set_is2DArray(bool value);
+  void set_coordinatesMode(unsigned int value) override;
+  unsigned int get_coordinatesMode() const override;
+  unsigned int get_wrapU() const override;
+  void set_wrapU(unsigned int value) override;
+  unsigned int get_wrapV() const override;
+  void set_wrapV(unsigned int value) override;
+  bool get_isCube() const override;
+  void set_isCube(bool value) override;
+  bool get_is3D() const override;
+  void set_is3D(bool value) override;
+  bool get_is2DArray() const override;
+  void set_is2DArray(bool value) override;
   bool get_gammaSpace() const;
   void set_gammaSpace(bool gamma);
   virtual bool get_noMipmap() const;
@@ -331,71 +270,11 @@ public:
   unsigned int coordinatesIndex;
 
   /**
-   * How a texture is mapped.
-   *
-   * | Value | Type                                | Description |
-   * | ----- | ----------------------------------- | ----------- |
-   * | 0     | EXPLICIT_MODE                       |             |
-   * | 1     | SPHERICAL_MODE                      |             |
-   * | 2     | PLANAR_MODE                         |             |
-   * | 3     | CUBIC_MODE                          |             |
-   * | 4     | PROJECTION_MODE                     |             |
-   * | 5     | SKYBOX_MODE                         |             |
-   * | 6     | INVCUBIC_MODE                       |             |
-   * | 7     | EQUIRECTANGULAR_MODE                |             |
-   * | 8     | FIXED_EQUIRECTANGULAR_MODE          |             |
-   * | 9     | FIXED_EQUIRECTANGULAR_MIRRORED_MODE |             |
-   */
-  Property<BaseTexture, unsigned int> coordinatesMode;
-
-  /**
-   * | Value | Type               | Description |
-   * | ----- | ------------------ | ----------- |
-   * | 0     | CLAMP_ADDRESSMODE  |             |
-   * | 1     | WRAP_ADDRESSMODE   |             |
-   * | 2     | MIRROR_ADDRESSMODE |             |
-   */
-  Property<BaseTexture, unsigned int> wrapU;
-
-  /**
-   * | Value | Type               | Description |
-   * | ----- | ------------------ | ----------- |
-   * | 0     | CLAMP_ADDRESSMODE  |             |
-   * | 1     | WRAP_ADDRESSMODE   |             |
-   * | 2     | MIRROR_ADDRESSMODE |             |
-   */
-  Property<BaseTexture, unsigned int> wrapV;
-
-  /**
-   * | Value | Type               | Description |
-   * | ----- | ------------------ | ----------- |
-   * | 0     | CLAMP_ADDRESSMODE  |             |
-   * | 1     | WRAP_ADDRESSMODE   |             |
-   * | 2     | MIRROR_ADDRESSMODE |             |
-   */
-  unsigned int wrapR;
-
-  /**
    * With compliant hardware and browser (supporting anisotropic filtering) this defines the level
    * of anisotropic filtering in the texture. The higher the better but the slower. This defaults to
    * 4 as it seems to be the best tradeoff.
    */
   unsigned int anisotropicFilteringLevel;
-
-  /**
-   * Define if the texture is a cube texture or if false a 2d texture.
-   */
-  Property<BaseTexture, bool> isCube;
-
-  /**
-   * Define if the texture is a 3d texture (webgl 2) or if false a 2d texture.
-   */
-  Property<BaseTexture, bool> is3D;
-
-  /**
-   * Define if the texture is a 2d array texture (webgl 2) or if false a 2d texture.
-   */
-  Property<BaseTexture, bool> is2DArray;
 
   /**
    * Define if the texture contains data in gamma space (most of the png/jpg aside bump). HDR
@@ -479,14 +358,6 @@ public:
   WriteOnlyProperty<BaseTexture, std::function<void(BaseTexture*, EventState&)>> onDispose;
 
   /**
-   * Define the current state of the loading sequence when in delayed load mode.
-   */
-  unsigned int delayLoadState;
-
-  /** Hidden */
-  InternalTexturePtr _texture;
-
-  /**
    * Define if the texture is preventinga material to render or not.
    * If not and the texture is not ready, the engine will use a default black
    * texture instead.
@@ -527,19 +398,16 @@ public:
 protected:
   unsigned int _coordinatesMode;
   Scene* _scene;
-  ThinEngine* _engine;
 
 private:
   bool _hasAlpha;
-  unsigned int _wrapU;
-  unsigned int _wrapV;
+  bool _isCube;
   bool _gammaSpace;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;
   Matrix _reflectionTextureMatrix;
   std::optional<Vector3> emptyVector3;
-  ISize _cachedSize;
   SphericalPolynomialPtr _nullSphericalPolynomial;
   BaseTexturePtr _nullBaseTexture;
 
