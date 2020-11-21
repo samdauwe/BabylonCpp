@@ -34,6 +34,13 @@ public:
   static bool SerializeBuffers;
 
   /**
+   * Gets or sets a general boolean used to indicate that texture buffers must be saved as part of
+   * the serialization process. If no buffer exists, one will be created as base64 string from the
+   * internal webgl data.
+   */
+  static bool ForceSerializeBuffers;
+
+  /**
    * @brief Hidden
    */
   static MirrorTexturePtr

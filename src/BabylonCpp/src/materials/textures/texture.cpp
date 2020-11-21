@@ -17,6 +17,7 @@
 namespace BABYLON {
 
 bool Texture::SerializeBuffers      = true;
+bool Texture::ForceSerializeBuffers = false;
 bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
@@ -325,7 +326,7 @@ Matrix* Texture::getTextureMatrix(int uBase)
   _cachedWRotationCenter                  = wRotationCenter;
   _cachedHomogeneousRotationInUVTransform = homogeneousRotationInUVTransform;
 
-  if (!_cachedTextureMatrix) {
+  if (!_cachedTextureMatrix || !_rowGenerationMatrix) {
     _cachedTextureMatrix = std::make_unique<Matrix>(Matrix::Zero());
     _rowGenerationMatrix = std::make_unique<Matrix>();
     _t0                  = std::make_unique<Vector3>(Vector3::Zero());
