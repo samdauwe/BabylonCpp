@@ -143,7 +143,7 @@ CubeTexture::CubeTexture(
                                                    lodScale, lodOffset, nullptr, loaderOptions);
       }
       _texture->onLoadedObservable.add(
-        [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
+        [this](InternalTexture* /*internalTexture*/, EventState& /*es*/) -> void {
           onLoadObservable.notifyObservers(this);
         });
     }
@@ -156,10 +156,8 @@ CubeTexture::CubeTexture(
       Tools::SetImmediate([this]() { _onLoadProcessing(); });
     }
     else {
-      _texture->onLoadedObservable.add(
-        [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
-          _onLoadProcessing();
-        });
+      _texture->onLoadedObservable.add([this](InternalTexture* /*internalTexture*/,
+                                              EventState& /*es*/) -> void { _onLoadProcessing(); });
     }
   }
 }
@@ -244,8 +242,9 @@ void CubeTexture::delayLoad(const std::string& forcedExtension)
   if (!_texture) {
     auto scene = getScene();
     if (_prefiltered) {
-      _texture = _getEngine()->createPrefilteredCubeTexture(
-        url, scene, 0.8f, 0.f, _delayedOnLoad, nullptr, _format, "", _createPolynomials);
+      _texture
+        = _getEngine()->createPrefilteredCubeTexture(url, scene, 0.8f, 0.f, _delayedOnLoad, nullptr,
+                                                     _format, forcedExtension, _createPolynomials);
     }
     else {
       _texture = _getEngine()->createCubeTexture(url, scene, _files, _noMipmap, _delayedOnLoad,
@@ -253,7 +252,7 @@ void CubeTexture::delayLoad(const std::string& forcedExtension)
                                                  nullptr, _loaderOptions);
     }
     _texture->onLoadedObservable.add(
-      [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
+      [this](InternalTexture* /*internalTexture*/, EventState& /*es*/) -> void {
         onLoadObservable.notifyObservers(this);
       });
   }
