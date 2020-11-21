@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 #include <babylon/materials/textures/iinternal_texture_tracker.h>
@@ -12,14 +13,11 @@
 
 namespace BABYLON {
 
-class BaseTexture;
 class ICanvasRenderingContext2D;
-class InternalTexture;
-class SphericalPolynomial;
 class ThinEngine;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
-using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(SphericalPolynomial)
 
 namespace GL {
 class IGLFramebuffer;
@@ -184,6 +182,10 @@ public:
    * Gets the URL used to load this texture
    */
   std::string url;
+  /**
+   * @hidden
+   */
+  std::string _originalUrl; // not empty only if different from url
   /**
    * Gets the sampling mode of the texture
    */

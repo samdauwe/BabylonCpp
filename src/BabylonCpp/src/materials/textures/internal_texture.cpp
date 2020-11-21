@@ -121,9 +121,9 @@ void InternalTexture::_rebuild()
       return;
     case InternalTextureSource::Url: {
       proxy = _engine->createTexture(
-        url, !generateMipMaps, invertY, nullptr, samplingMode,
-        [this](InternalTexture*, EventState&) { isReady = true; }, nullptr, _buffer, nullptr,
-        format);
+        !_originalUrl.empty() ? _originalUrl : url, !generateMipMaps, invertY, nullptr,
+        samplingMode, [this](InternalTexture*, EventState&) { isReady = true; }, nullptr, _buffer,
+        nullptr, format);
       proxy->_swapAndDie(shared_from_this());
     }
       return;
