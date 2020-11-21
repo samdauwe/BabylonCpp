@@ -2665,6 +2665,13 @@ public:
    */
   Observable<Scene> onAnimationFileImportedObservable;
 
+  /**
+   * Gets or sets a user defined funtion to select LOD from a mesh and a camera.
+   * By default this function is undefined and Babylon.js will select LOD based on distance to
+   * camera
+   */
+  std::function<AbstractMesh*(AbstractMesh* mesh, Camera* camera)> customLODSelector;
+
   // Pointers
 
   /**

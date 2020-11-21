@@ -112,6 +112,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , afterRender{this, &Scene::set_afterRender}
     , beforeCameraRender{this, &Scene::set_beforeCameraRender}
     , afterCameraRender{this, &Scene::set_afterCameraRender}
+    , customLODSelector{nullptr}
     , pointerDownPredicate{nullptr}
     , pointerUpPredicate{nullptr}
     , pointerMovePredicate{nullptr}
