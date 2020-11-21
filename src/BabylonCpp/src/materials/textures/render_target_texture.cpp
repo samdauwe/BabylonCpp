@@ -107,8 +107,8 @@ RenderTargetTexture::RenderTargetTexture(const std::string& iName,
       auto renderSize = getRenderSize();
       _texture        = scene->getEngine()->createRenderTargetCubeTexture(
         ISize{renderSize.width, renderSize.height}, _renderTargetOptions);
-      coordinatesMode = TextureConstants::INVCUBIC_MODE;
-      _textureMatrix  = std::make_unique<Matrix>(Matrix::Identity());
+      _coordinatesMode = TextureConstants::INVCUBIC_MODE;
+      _textureMatrix   = std::make_unique<Matrix>(Matrix::Identity());
     }
     else {
       _texture = scene->getEngine()->createRenderTargetTexture(size, _renderTargetOptions);
@@ -558,7 +558,7 @@ void RenderTargetTexture::_prepareRenderingManager(
   for (size_t meshIndex = 0; meshIndex < currentRenderListLength; ++meshIndex) {
     auto mesh = currentRenderList[meshIndex];
 
-    if (mesh) {
+    if (mesh && !mesh->isBlocked()) {
       if (customIsReadyFunction) {
         if (!customIsReadyFunction(mesh, refreshRate())) {
           resetRefreshCounter();
@@ -570,10 +570,21 @@ void RenderTargetTexture::_prepareRenderingManager(
         continue;
       }
 
-      mesh->_preActivateForIntermediateRendering(sceneRenderId);
+      if (!mesh->_internalAbstractMeshDataInfo._currentLODIsUpToDate && scene->activeCamera()) {
+        mesh->_internalAbstractMeshDataInfo._currentLOD
+          = scene->customLODSelector ? scene->customLODSelector(mesh, scene->activeCamera().get()) :
+                                       mesh->getLOD(scene->activeCamera());
+        mesh->_internalAbstractMeshDataInfo._currentLODIsUpToDate = true;
+      }
+      if (!mesh->_internalAbstractMeshDataInfo._currentLOD) {
+        continue;
+      }
+
+      auto meshToRender = mesh->_internalAbstractMeshDataInfo._currentLOD;
+
+      meshToRender->_preActivateForIntermediateRendering(sceneRenderId);
 
       auto isMasked = false;
-
       if (checkLayerMask && camera) {
         isMasked = ((mesh->layerMask() & camera->layerMask) == 0);
       }
@@ -582,19 +593,22 @@ void RenderTargetTexture::_prepareRenderingManager(
       }
 
       if (mesh->isEnabled() && mesh->isVisible && (!mesh->subMeshes.empty()) && !isMasked) {
+        if (meshToRender != mesh) {
+          meshToRender->_activate(sceneRenderId, true);
+        }
         if (mesh->_activate(sceneRenderId, true) && !mesh->subMeshes.empty()) {
           if (!mesh->isAnInstance()) {
-            mesh->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate = false;
+            meshToRender->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate = false;
           }
           else {
             if (!mesh->_internalAbstractMeshDataInfo._actAsRegularMesh) {
-              mesh = static_cast<InstancedMesh*>(mesh);
+              meshToRender = mesh;
             }
           }
-          mesh->_internalAbstractMeshDataInfo._isActiveIntermediate = true;
+          meshToRender->_internalAbstractMeshDataInfo._isActiveIntermediate = true;
 
-          for (const auto& subMesh : mesh->subMeshes) {
-            _renderingManager->dispatch(subMesh.get(), mesh);
+          for (const auto& subMesh : meshToRender->subMeshes) {
+            _renderingManager->dispatch(subMesh.get(), meshToRender);
           }
         }
       }

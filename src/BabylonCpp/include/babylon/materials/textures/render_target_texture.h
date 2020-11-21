@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
@@ -10,19 +11,14 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Camera;
 class Engine;
-class PostProcess;
 class PostProcessManager;
 class RenderingManager;
-class RenderTargetTexture;
-class SubMesh;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using CameraPtr              = std::shared_ptr<Camera>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using SubMeshPtr             = std::shared_ptr<SubMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(SubMesh)
 
 /**
  * @brief This Helps creating a texture that will be created from a camera in your scene.
