@@ -51,6 +51,8 @@ Effect::Effect(
     , _pipelineContext{nullptr}
     , vertexSourceCode{this, &Effect::get_vertexSourceCode}
     , fragmentSourceCode{this, &Effect::get_fragmentSourceCode}
+    , rawVertexSourceCode{this, &Effect::get_rawVertexSourceCode}
+    , rawFragmentSourceCode{this, &Effect::get_rawFragmentSourceCode}
     , _onCompileObserver{nullptr}
     , _isReady{false}
     , _compilationError{""}
@@ -133,10 +135,12 @@ Effect::Effect(
   _loadShader(vertexSource, "Vertex", "",
               [this, &fragmentSource, &processorOptions, &baseName,
                &processFinalCode](const std::string& vertexCode) -> void {
+                _rawVertexSourceCode = vertexCode;
                 _loadShader(
                   fragmentSource, "Fragment", "Pixel",
                   [this, &vertexCode, &processorOptions, &baseName,
                    &processFinalCode](const std::string& fragmentCode) -> void {
+                    _rawFragmentSourceCode = fragmentCode;
                     ShaderProcessor::Process(
                       vertexCode, processorOptions,
                       [this, &fragmentCode, &processorOptions, &baseName,
@@ -406,6 +410,16 @@ std::string Effect::get_fragmentSourceCode() const
            _fragmentSourceCode;
 }
 
+std::string Effect::get_rawVertexSourceCode() const
+{
+  return _rawVertexSourceCode;
+}
+
+std::string Effect::get_rawFragmentSourceCode() const
+{
+  return _rawFragmentSourceCode;
+}
+
 void Effect::_rebuildProgram(
   const std::string& iVertexSourceCode, const std::string& iFragmentSourceCode,
   const std::function<void(const IPipelineContextPtr& pipelineContext)>& iOnCompiled,
@@ -639,7 +653,7 @@ void Effect::_bindTexture(const std::string& channel, const InternalTexturePtr& 
   _engine->_bindTexture(_getChannel(channel), texture);
 }
 
-void Effect::setTexture(const std::string& channel, const BaseTexturePtr& texture)
+void Effect::setTexture(const std::string& channel, const ThinTexturePtr& texture)
 {
   _engine->setTexture(_getChannel(channel), getUniform(channel), texture);
 }
@@ -654,7 +668,7 @@ void Effect::setDepthStencilTexture(const std::string& channel,
 }
 
 void Effect::setTextureArray(const std::string& channel,
-                             const std::vector<BaseTexturePtr>& textures)
+                             const std::vector<ThinTexturePtr>& textures)
 {
   const auto exName = channel + "Ex";
   if (!stl_util::contains(_samplerList, exName + "0")) {

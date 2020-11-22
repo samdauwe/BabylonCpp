@@ -23,12 +23,12 @@ class ThinEngine;
 class Vector2;
 class Vector3;
 class Vector4;
-FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(IPipelineContext)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(ThinTexture)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
 namespace GL {
@@ -229,7 +229,7 @@ public:
    * @param channel Name of the sampler variable.
    * @param texture Texture to set.
    */
-  void setTexture(const std::string& channel, const BaseTexturePtr& texture);
+  void setTexture(const std::string& channel, const ThinTexturePtr& texture);
 
   /**
    * @brief Sets a depth stencil texture from a render target on the engine to be used in the
@@ -244,7 +244,7 @@ public:
    * @param channel Name of the variable.
    * @param textures Textures to set.
    */
-  void setTextureArray(const std::string& channel, const std::vector<BaseTexturePtr>& textures);
+  void setTextureArray(const std::string& channel, const std::vector<ThinTexturePtr>& textures);
 
   /**
    * @brief Sets a texture to be the input of the specified post process. (To use the output, pass
@@ -583,6 +583,16 @@ protected:
    */
   std::string get_fragmentSourceCode() const;
 
+  /**
+   * @brief Gets the vertex shader source code before it has been processed by the preprocessor.
+   */
+  std::string get_rawVertexSourceCode() const;
+
+  /**
+   * @brief Gets the fragment shader source code before it has been processed by the preprocessor.
+   */
+  std::string get_rawFragmentSourceCode() const;
+
 private:
   void _useFinalCode(
     const std::string& migratedVertexCode, const std::string& migratedFragmentCode,
@@ -673,6 +683,16 @@ public:
    */
   ReadOnlyProperty<Effect, std::string> fragmentSourceCode;
 
+  /**
+   * Gets the vertex shader source code before it has been processed by the preprocessor
+   */
+  ReadOnlyProperty<Effect, std::string> rawVertexSourceCode;
+
+  /**
+   * Gets the fragment shader source code before it has been processed by the preprocessor
+   */
+  ReadOnlyProperty<Effect, std::string> rawFragmentSourceCode;
+
 private:
   Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
@@ -696,6 +716,8 @@ private:
   std::string _vertexSourceCodeOverride;
   std::string _fragmentSourceCodeOverride;
   std::vector<std::string> _transformFeedbackVaryings;
+  std::string _rawVertexSourceCode;
+  std::string _rawFragmentSourceCode;
   std::unordered_map<std::string, Float32Array> _valueCache;
   static std::unordered_map<unsigned int, WebGLDataBufferPtr> _baseCache;
 
