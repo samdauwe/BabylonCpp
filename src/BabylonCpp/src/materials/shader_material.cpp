@@ -513,7 +513,12 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
 
     // Texture arrays
     for (const auto& [channel, textureArray] : _textureArrays) {
-      effect->setTextureArray(channel, textureArray);
+      std::vector<ThinTexturePtr> thinTextureArray;
+      thinTextureArray.reserve(textureArray.size());
+      for (const auto& texture : textureArray) {
+        thinTextureArray.emplace_back(std::static_pointer_cast<ThinTexture>(texture));
+      }
+      effect->setTextureArray(channel, thinTextureArray);
     }
 
     // Int
