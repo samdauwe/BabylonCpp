@@ -37,15 +37,15 @@ public:
   /**
    * @brief Update the content of a dynamic texture.
    * @param texture defines the texture to update
-   * @param canvas defines the canvas containing the source
+   * @param source defines the source containing the data
    * @param invertY defines if data must be stored with Y axis inverted
    * @param premulAlpha defines if alpha is stored as premultiplied
    * @param format defines the format of the data
    * @param forceBindTexture if the texture should be forced to be bound eg. after a graphics
    * context loss (Default: false)
    */
-  void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas, bool invertY,
-                            bool premulAlpha                   = false,
+  void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* source,
+                            std::optional<bool> invertY = std::nullopt, bool premulAlpha = false,
                             std::optional<unsigned int> format = std::nullopt,
                             bool forceBindTexture              = false);
 

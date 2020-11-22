@@ -20,9 +20,9 @@ InternalTexturePtr DynamicTextureExtension::createDynamicTexture(int width, int 
   texture->baseHeight = height;
 
   if (generateMipMaps) {
-    width = _this->needPOTTextures() ?
-              ThinEngine::GetExponentOfTwo(width, _this->_caps.maxTextureSize) :
-              width;
+    width  = _this->needPOTTextures() ?
+               ThinEngine::GetExponentOfTwo(width, _this->_caps.maxTextureSize) :
+               width;
     height = _this->needPOTTextures() ?
                ThinEngine::GetExponentOfTwo(height, _this->_caps.maxTextureSize) :
                height;
@@ -43,32 +43,45 @@ InternalTexturePtr DynamicTextureExtension::createDynamicTexture(int width, int 
 }
 
 void DynamicTextureExtension::updateDynamicTexture(const InternalTexturePtr& texture,
-                                                   ICanvas* /*canvas*/, bool invertY,
+                                                   ICanvas* /*source*/, std::optional<bool> invertY,
                                                    bool premulAlpha,
-                                                   std::optional<unsigned int> /*format */,
+                                                   std::optional<unsigned int> /*format*/,
                                                    bool forceBindTexture)
 {
   if (!texture) {
     return;
   }
 
-  _this->_bindTextureDirectly(GL::TEXTURE_2D, texture, true, forceBindTexture);
-  _this->_unpackFlipY(invertY);
+  const auto target = GL::TEXTURE_2D;
+
+  const auto wasPreviouslyBound
+    = _this->_bindTextureDirectly(target, texture, true, forceBindTexture);
+
+  _this->_unpackFlipY(invertY.value_or(texture->invertY));
+
   if (premulAlpha) {
     _this->_gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
   }
+
 #if 0
-  auto internalFormat = format ? _getInternalFormat(format) : GL::RGBA;
-  _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
-                  internalFormat, GL::UNSIGNED_BYTE, canvas);
+  const auto textureType    = _this->_getWebGLTextureType(texture->type);
+  const auto glformat       = _this->_getInternalFormat(format.value_or(texture->format));
+  const auto internalFormat = _this->_getRGBABufferInternalSizedFormat(texture->type, glformat);
+  _this->_gl->texImage2D(target, 0, internalFormat, glformat, textureType, source);
 #endif
+
   if (texture->generateMipMaps) {
-    _this->_gl->generateMipmap(GL::TEXTURE_2D);
+    _this->_gl->generateMipmap(target);
   }
-  _this->_bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+
+  if (!wasPreviouslyBound) {
+    _this->_bindTextureDirectly(target, nullptr);
+  }
+
   if (premulAlpha) {
     _this->_gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
   }
+
   texture->isReady = true;
 }
 
