@@ -325,25 +325,25 @@ void ThinEngine::_initGLContext()
     = _webGLVersion > 1.f || (_gl->getExtension("OES_standard_derivatives") != nullptr);
   _caps.maxAnisotropy = 1;
   _caps.astc          = _gl->getExtension("WEBGL_compressed_texture_astc") ?
-                 _gl->getExtension("WEBGL_compressed_texture_astc") :
-                 _gl->getExtension("WEBKIT_WEBGL_compressed_texture_astc");
-  _caps.bptc = _gl->getExtension("EXT_texture_compression_bptc") ?
-                 _gl->getExtension("EXT_texture_compression_bptc") :
-                 _gl->getExtension("WEBKIT_EXT_texture_compression_bptc");
-  _caps.s3tc = (_gl->getExtension("WEBGL_compressed_texture_s3tc")
+                          _gl->getExtension("WEBGL_compressed_texture_astc") :
+                          _gl->getExtension("WEBKIT_WEBGL_compressed_texture_astc");
+  _caps.bptc          = _gl->getExtension("EXT_texture_compression_bptc") ?
+                          _gl->getExtension("EXT_texture_compression_bptc") :
+                          _gl->getExtension("WEBKIT_EXT_texture_compression_bptc");
+  _caps.s3tc          = (_gl->getExtension("WEBGL_compressed_texture_s3tc")
                 || _gl->getExtension("WEBKIT_WEBGL_compressed_texture_s3tc")) ?
-                 std::nullopt :
-                 std::nullopt;
-  _caps.pvrtc = _gl->getExtension("WEBGL_compressed_texture_pvrtc") ?
-                  _gl->getExtension("WEBGL_compressed_texture_pvrtc") :
-                  _gl->getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc");
-  _caps.etc1 = _gl->getExtension("WEBGL_compressed_texture_etc1") ?
-                 _gl->getExtension("WEBGL_compressed_texture_etc1") :
-                 _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc1");
+                          std::nullopt :
+                          std::nullopt;
+  _caps.pvrtc         = _gl->getExtension("WEBGL_compressed_texture_pvrtc") ?
+                          _gl->getExtension("WEBGL_compressed_texture_pvrtc") :
+                          _gl->getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc");
+  _caps.etc1          = _gl->getExtension("WEBGL_compressed_texture_etc1") ?
+                          _gl->getExtension("WEBGL_compressed_texture_etc1") :
+                          _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc1");
   _caps.etc2
     = _gl->getExtension("WEBGL_compressed_texture_etc") ?
         _gl->getExtension("WEBGL_compressed_texture_etc") :
-        _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc") ?
+      _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc") ?
         _gl->getExtension("WEBKIT_WEBGL_compressed_texture_etc") :
         _gl->getExtension("WEBGL_compressed_texture_es3_0"); // also a requirement of OpenGL ES 3
   _caps.textureAnisotropicFilterExtension
@@ -358,8 +358,8 @@ void ThinEngine::_initGLContext()
   _caps.highPrecisionShaderSupported = false;
   _caps.timerQuery                   = _gl->getExtension("EXT_disjoint_timer_query_webgl2")
                          || _gl->getExtension("EXT_disjoint_timer_query") ?
-                       nullptr :
-                       nullptr;
+                                         nullptr :
+                                         nullptr;
   _caps.canUseTimestampForTimerQuery = false;
   _caps.drawBuffersExtension         = false;
   _caps.maxMSAASamples               = 1;
@@ -1553,24 +1553,18 @@ EffectPtr ThinEngine::createEffect(
   }
   else if (std::holds_alternative<std::unordered_map<std::string, std::string>>(baseName)) {
     auto _baseName = std::get<std::unordered_map<std::string, std::string>>(baseName);
-    auto vertex
-      = stl_util::contains(_baseName, "vertexElement") ?
-          _baseName["vertexElement"] :
-          stl_util::contains(_baseName, "vertex") ?
-          _baseName["vertex"] :
-          stl_util::contains(_baseName, "vertexToken") ?
-          _baseName["vertexToken"] :
-          stl_util::contains(_baseName, "vertexSource") ? _baseName["vertexSource"] : "vertex";
-    auto fragment = stl_util::contains(_baseName, "fragmentElement") ?
-                      _baseName["fragmentElement"] :
-                      stl_util::contains(_baseName, "fragment") ?
-                      _baseName["fragment"] :
-                      stl_util::contains(_baseName, "fragmentToken") ?
-                      _baseName["fragmentToken"] :
-                      stl_util::contains(_baseName, "fragmentSource") ?
-                      _baseName["fragmentSource"] :
-                      "fragment";
-    name = vertex + "+" + fragment + "@" + options.defines;
+    auto vertex    = stl_util::contains(_baseName, "vertexElement") ? _baseName["vertexElement"] :
+                     stl_util::contains(_baseName, "vertex")        ? _baseName["vertex"] :
+                     stl_util::contains(_baseName, "vertexToken")   ? _baseName["vertexToken"] :
+                     stl_util::contains(_baseName, "vertexSource")  ? _baseName["vertexSource"] :
+                                                                      "vertex";
+    auto fragment  = stl_util::contains(_baseName, "fragmentElement") ?
+                                                                       _baseName["fragmentElement"] :
+                     stl_util::contains(_baseName, "fragment")       ? _baseName["fragment"] :
+                     stl_util::contains(_baseName, "fragmentToken")  ? _baseName["fragmentToken"] :
+                     stl_util::contains(_baseName, "fragmentSource") ? _baseName["fragmentSource"] :
+                                                                       "fragment";
+    name           = vertex + "+" + fragment + "@" + options.defines;
   }
 
   if (stl_util::contains(_compiledEffects, name)) {
@@ -2328,7 +2322,7 @@ InternalTexturePtr ThinEngine::createTexture(
   // processing for non-image formats
   if (loader) {
     const auto callback = [=](const std::variant<std::string, ArrayBufferView>& data,
-                              const std::string & /*responseURL*/) -> void {
+                              const std::string& /*responseURL*/) -> void {
       loader->loadData(std::get<ArrayBufferView>(data), texture,
                        [=](int width, int height, bool loadMipmap, bool isCompressed,
                            const std::function<void()>& done, bool loadFailed) -> void {
@@ -2340,7 +2334,7 @@ InternalTexturePtr ThinEngine::createTexture(
                              texture, scene, width, height, texture->invertY, !loadMipmap,
                              isCompressed,
                              [&](int /*width*/, int /*height*/,
-                                 const std::function<void()> & /*continuationCallback*/) -> bool {
+                                 const std::function<void()>& /*continuationCallback*/) -> bool {
                                done();
                                return false;
                              },
@@ -2655,16 +2649,16 @@ void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTex
                                            bool generateStencil, bool bilinearFiltering,
                                            int comparisonFunction)
 {
-  auto width = std::holds_alternative<int>(size) ?
-                 std::get<int>(size) :
-                 std::holds_alternative<RenderTargetSize>(size) ?
-                 std::get<RenderTargetSize>(size).width :
-                 static_cast<int>(std::holds_alternative<float>(size));
-  auto height = std::holds_alternative<int>(size) ?
-                  std::get<int>(size) :
-                  std::holds_alternative<RenderTargetSize>(size) ?
-                  std::get<RenderTargetSize>(size).height :
-                  static_cast<int>(std::holds_alternative<float>(size));
+  auto width                              = std::holds_alternative<int>(size) ?
+                                              std::get<int>(size) :
+                                            std::holds_alternative<RenderTargetSize>(size) ?
+                                              std::get<RenderTargetSize>(size).width :
+                                              static_cast<int>(std::holds_alternative<float>(size));
+  auto height                             = std::holds_alternative<int>(size) ?
+                                              std::get<int>(size) :
+                                            std::holds_alternative<RenderTargetSize>(size) ?
+                                              std::get<RenderTargetSize>(size).height :
+                                              static_cast<int>(std::holds_alternative<float>(size));
   internalTexture->baseWidth              = width;
   internalTexture->baseHeight             = height;
   internalTexture->width                  = width;
@@ -2676,7 +2670,7 @@ void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTex
   internalTexture->_generateStencilBuffer = generateStencil;
   internalTexture->samplingMode = bilinearFiltering ? Constants::TEXTURE_BILINEAR_SAMPLINGMODE :
                                                       Constants::TEXTURE_NEAREST_SAMPLINGMODE;
-  internalTexture->type                = Constants::TEXTURETYPE_UNSIGNED_INT;
+  internalTexture->type         = Constants::TEXTURETYPE_UNSIGNED_INT;
   internalTexture->_comparisonFunction = comparisonFunction;
 
   auto& gl                = *_gl;
@@ -3071,7 +3065,7 @@ void ThinEngine::unbindAllTextures()
 }
 
 void ThinEngine::setTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                            const BaseTexturePtr& texture)
+                            const ThinTexturePtr& texture)
 {
   if (channel < 0) {
     return;
@@ -3111,7 +3105,7 @@ unsigned int ThinEngine::_getTextureWrapMode(unsigned int mode) const
   return GL::REPEAT;
 }
 
-bool ThinEngine::_setTexture(int channel, const BaseTexturePtr& texture, bool isPartOfTextureArray,
+bool ThinEngine::_setTexture(int channel, const ThinTexturePtr& texture, bool isPartOfTextureArray,
                              bool depthStencilTexture)
 {
   // Not ready?
@@ -3220,7 +3214,7 @@ bool ThinEngine::_setTexture(int channel, const BaseTexturePtr& texture, bool is
 }
 
 void ThinEngine::setTextureArray(int channel, const WebGLUniformLocationPtr& uniform,
-                                 const std::vector<BaseTexturePtr>& textures)
+                                 const std::vector<ThinTexturePtr>& textures)
 {
   if (channel < 0 || !uniform) {
     return;

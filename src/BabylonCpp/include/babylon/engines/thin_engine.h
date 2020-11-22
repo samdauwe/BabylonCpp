@@ -52,6 +52,7 @@ class RenderTargetExtension;
 class Scene;
 class StencilState;
 class Texture;
+class ThinTexture;
 class UniformBuffer;
 class UniformBufferExtension;
 class VertexBuffer;
@@ -65,6 +66,7 @@ using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
 using IPipelineContextPtr       = std::shared_ptr<IPipelineContext>;
 using IShaderProcessorPtr       = std::shared_ptr<IShaderProcessor>;
 using LoaderOptionsPtr          = std::shared_ptr<LoaderOptions>;
+using ThinTexturePtr            = std::shared_ptr<ThinTexture>;
 using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
 using WebGLBufferPtr            = std::shared_ptr<GL::IGLBuffer>;
 using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
@@ -1059,7 +1061,7 @@ public:
    * @param texture The texture to apply
    */
   void setTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                  const BaseTexturePtr& texture);
+                  const ThinTexturePtr& texture);
 
   /**
    * @brief Sets an array of texture to the webGL context
@@ -1068,7 +1070,7 @@ public:
    * @param textures defines the array of textures to bind
    */
   void setTextureArray(int channel, const WebGLUniformLocationPtr& uniform,
-                       const std::vector<BaseTexturePtr>& textures);
+                       const std::vector<ThinTexturePtr>& textures);
 
   /**
    * @brief Hidden
@@ -1802,7 +1804,7 @@ protected:
                                         unsigned int samplingMode);
   void _deleteTexture(const WebGLTexturePtr& texture);
   void _setProgram(const WebGLProgramPtr& program);
-  bool _setTexture(int channel, const BaseTexturePtr& texture, bool isPartOfTextureArray = false,
+  bool _setTexture(int channel, const ThinTexturePtr& texture, bool isPartOfTextureArray = false,
                    bool depthStencilTexture = false);
 
 private:
