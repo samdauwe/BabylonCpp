@@ -644,7 +644,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
         else if (asPBRMaterial && asPBRMaterial->reflectivityTexture()) {
           _effect->setMatrix("reflectivityMatrix",
                              *asPBRMaterial->reflectivityTexture()->getTextureMatrix());
-          _effect->setTexture("reflectivitySampler", asPBRMaterial->reflectivityTexture);
+          _effect->setTexture("reflectivitySampler", asPBRMaterial->reflectivityTexture());
         }
       }
     }

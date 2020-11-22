@@ -298,7 +298,7 @@ Light& SpotLight::transferTexturesToEffect(Effect* effect, const std::string& li
       _computeProjectionTextureMatrix();
     }
     effect->setMatrix("textureProjectionMatrix" + lightIndex, _projectionTextureMatrix);
-    effect->setTexture("projectionLightSampler" + lightIndex, projectionTexture);
+    effect->setTexture("projectionLightSampler" + lightIndex, projectionTexture());
   }
   return *this;
 }

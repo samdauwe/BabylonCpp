@@ -396,7 +396,7 @@ void ImageProcessingConfiguration::bind(Effect* effect,
 
   // Color transform settings
   if (_colorGradingTexture) {
-    effect->setTexture("txColorTransform", colorGradingTexture);
+    effect->setTexture("txColorTransform", colorGradingTexture());
     const auto textureSize = static_cast<float>(_colorGradingTexture->getSize().height);
 
     const auto weight = static_cast<float>(_colorGradingTexture->level);
