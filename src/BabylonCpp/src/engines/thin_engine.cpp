@@ -3890,11 +3890,11 @@ InternalTexturePtr ThinEngine::createDynamicTexture(int width, int height, bool 
                                                         samplingMode);
 }
 
-void ThinEngine::updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
-                                      bool invertY, bool premulAlpha,
+void ThinEngine::updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* source,
+                                      std::optional<bool> invertY, bool premulAlpha,
                                       std::optional<unsigned int> format, bool forceBindTexture)
 {
-  _dynamicTextureExtension->updateDynamicTexture(texture, canvas, invertY, premulAlpha, format,
+  _dynamicTextureExtension->updateDynamicTexture(texture, source, invertY, premulAlpha, format,
                                                  forceBindTexture);
 }
 

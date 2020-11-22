@@ -488,8 +488,8 @@ WebGLDataBufferPtr NullEngine::createDynamicVertexBuffer(const Float32Array& /*v
   return buffer;
 }
 
-void NullEngine::updateDynamicTexture(const InternalTexturePtr& /*texture*/, ICanvas* /*canvas*/,
-                                      bool /*invertY*/, bool /*premulAlpha*/,
+void NullEngine::updateDynamicTexture(const InternalTexturePtr& /*texture*/, ICanvas* /*source*/,
+                                      std::optional<bool> /*invertY*/, bool /*premulAlpha*/,
                                       std::optional<unsigned int> /*format*/,
                                       bool /*forceBindTexture*/)
 {
