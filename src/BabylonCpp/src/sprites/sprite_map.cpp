@@ -137,8 +137,10 @@ SpriteMap::SpriteMap(const std::string& iName, const ISpriteJSONAtlas& iAtlasJSO
   _output              = Mesh::CreatePlane(name + ":output", 1, scene, true);
   _output->scaling().x = options.outputSize->x;
   _output->scaling().y = options.outputSize->y;
+  position             = *options.outputPosition;
+  rotation             = *options.outputRotation;
 
-  const auto obfunction = [this](Scene* /*scene*/, EventState & /*es*/) -> void {
+  const auto obfunction = [this](Scene* /*scene*/, EventState& /*es*/) -> void {
     _time += _scene->getEngine()->getDeltaTime();
     _material->setFloat("time", _time);
   };

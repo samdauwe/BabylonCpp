@@ -4,20 +4,17 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/sprites/isprite_map.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-class Mesh;
-class RawTexture;
 class Scene;
-class ShaderMaterial;
-using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
-using MeshPtr           = std::shared_ptr<Mesh>;
-using RawTexturePtr     = std::shared_ptr<RawTexture>;
-using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(RawTexture)
+FWD_CLASS_SPTR(ShaderMaterial)
 
 /**
  * @brief Class used to manage a grid restricted sprite deployment on an Output plane.
