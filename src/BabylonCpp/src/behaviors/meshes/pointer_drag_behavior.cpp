@@ -39,7 +39,7 @@ PointerDragBehavior::PointerDragBehavior(const PointerDragBehaviorOptions& iOpti
     , _alternatePickedPoint{Vector3{0.f, 0.f, 0.f}}
     , _worldDragAxis{Vector3{0.f, 0.f, 0.f}}
     , _targetPosition{Vector3{0.f, 0.f, 0.f}}
-    , _attachedElement{nullptr}
+    , _attachedToElement{false}
     , _startDragRay{Ray(Vector3(), Vector3())}
     , _pointA{Vector3{0.f, 0.f, 0.f}}
     , _pointC{Vector3{0.f, 0.f, 0.f}}
@@ -59,7 +59,7 @@ PointerDragBehavior::PointerDragBehavior(const PointerDragBehaviorOptions& iOpti
       "expected");
   }
 
-  validateDrag = [](const Vector3 & /*targetPosition*/) -> bool { return true; };
+  validateDrag = [](const Vector3& /*targetPosition*/) -> bool { return true; };
 }
 
 PointerDragBehavior::~PointerDragBehavior() = default;
@@ -198,20 +198,19 @@ void PointerDragBehavior::releaseDrag()
   _moving                  = false;
 
   // Reattach camera controls
-  if (detachCameraControls && _attachedElement && _scene->activeCamera()
+  if (detachCameraControls && _attachedToElement && _scene->activeCamera()
       && !_scene->activeCamera()->leftCamera()) {
     if (_scene->activeCamera()->getClassName() == "ArcRotateCamera") {
       const auto arcRotateCamera
         = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera());
       arcRotateCamera->attachControl(
-        _attachedElement,
         arcRotateCamera->inputs ? arcRotateCamera->inputs->noPreventDefault : true,
         arcRotateCamera->_useCtrlForPanning, arcRotateCamera->_panningMouseButton);
     }
     else {
-      _scene->activeCamera()->attachControl(_attachedElement,
-                                            _scene->activeCamera()->inputs.noPreventDefault);
+      _scene->activeCamera()->attachControl(_scene->activeCamera()->inputs.noPreventDefault);
     }
+    _attachedToElement = false;
   }
 }
 
@@ -268,14 +267,14 @@ void PointerDragBehavior::_startDrag(int pointerId, const std::optional<Ray>& fr
     onDragStartObservable.notifyObservers(&dragStartOrEndEvent);
     _targetPosition.copyFrom(std::dynamic_pointer_cast<Mesh>(attachedNode)->absolutePosition());
 
-    // Detatch camera controls
+    // Detach camera controls
     if (detachCameraControls && _scene->activeCamera() && !_scene->activeCamera()->leftCamera()) {
-      if (_scene->activeCamera()->inputs.attachedElement) {
-        _attachedElement = _scene->activeCamera()->inputs.attachedElement;
-        _scene->activeCamera()->detachControl(_scene->activeCamera()->inputs.attachedElement);
+      if (_scene->activeCamera()->inputs.attachedToElement) {
+        _scene->activeCamera()->detachControl();
+        _attachedToElement = true;
       }
       else {
-        _attachedElement = nullptr;
+        _attachedToElement = false;
       }
     }
   }

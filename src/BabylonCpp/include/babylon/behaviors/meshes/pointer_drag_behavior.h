@@ -2,6 +2,7 @@
 #define BABYLON_BEHAVIORS_MESHES_POINTER_DRAG_BEHAVIOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/meshes/pointer_drag_behavior_options.h>
 #include <babylon/core/structs.h>
@@ -11,14 +12,12 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Mesh;
 class PointerInfo;
 class Ray;
 class Scene;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using MeshPtr         = std::shared_ptr<Mesh>;
-using NodePtr         = std::shared_ptr<Node>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(Node)
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to be dragged around the
@@ -225,7 +224,7 @@ private:
   Vector3 _alternatePickedPoint;
   Vector3 _worldDragAxis;
   Vector3 _targetPosition;
-  ICanvas* _attachedElement;
+  bool _attachedToElement;
   Ray _startDragRay;
   std::unordered_map<int, Ray> _lastPointerRay;
   Vector3 _dragDelta;
