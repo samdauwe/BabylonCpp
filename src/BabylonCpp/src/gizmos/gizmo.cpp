@@ -1,9 +1,12 @@
 #include <babylon/gizmos/gizmo.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/standard_material.h>
+#include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
@@ -257,8 +260,12 @@ void Gizmo::_matrixChanged()
       bone->getWorldMatrix().multiplyToRef(invParent, boneLocalMatrix);
       auto& lmat = bone->getLocalMatrix();
       lmat.copyFrom(boneLocalMatrix);
-      bone->markAsDirty();
     }
+    else {
+      auto& lmat = bone->getLocalMatrix();
+      lmat.copyFrom(bone->getWorldMatrix());
+    }
+    bone->markAsDirty();
   }
 }
 
@@ -268,6 +275,84 @@ void Gizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   if (_beforeRenderObserver) {
     gizmoLayer->utilityLayerScene->onBeforeRenderObservable.remove(_beforeRenderObserver);
   }
+}
+
+Observer<PointerInfo>::Ptr
+Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
+                                std::unordered_map<Mesh*, GizmoAxisCache>& gizmoAxisCache)
+{
+  return gizmoLayer->utilityLayerScene->onPointerObservable.add([&](PointerInfo* pointerInfo,
+                                                                    EventState& /*es*/) -> void {
+    bool dragging = false;
+    if (pointerInfo) {
+      // On Hover Logic
+      if (pointerInfo->type == PointerEventTypes::POINTERMOVE) {
+        if (dragging) {
+          return;
+        }
+        for (const auto& cacheItem : gizmoAxisCache) {
+          const auto& cache = cacheItem.second;
+          if (!cache.colliderMeshes.empty() && !cache.gizmoMeshes.empty()) {
+            const auto pickedMesh
+              = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
+            const auto isHovered
+              = (pickedMesh && stl_util::index_of(cache.colliderMeshes, pickedMesh) != -1);
+            const auto material = isHovered || cache.active ? cache.hoverMaterial : cache.material;
+            for (const auto& m : cache.gizmoMeshes) {
+              m->material         = material;
+              const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
+              if (lineMesh /* && lineMesh->color */) {
+                lineMesh->color = material->diffuseColor;
+              }
+            }
+          }
+        }
+      }
+
+      // On Mouse Down
+      if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
+        auto parentMesh = static_cast<Mesh*>(pointerInfo->pickInfo.pickedMesh->parent());
+        // If user Clicked Gizmo
+        if (stl_util::contains(gizmoAxisCache, parentMesh)) {
+          dragging         = true;
+          auto& statusMap  = gizmoAxisCache[parentMesh];
+          statusMap.active = true;
+          for (const auto& cacheItem : gizmoAxisCache) {
+            const auto& cache = cacheItem.second;
+            const auto pickedMesh
+              = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
+            const auto isHovered
+              = (pickedMesh && stl_util::index_of(cache.colliderMeshes, pickedMesh) != -1);
+            const auto material
+              = isHovered || cache.active ? cache.hoverMaterial : cache.disableMaterial;
+            for (const auto& m : cache.gizmoMeshes) {
+              m->material         = material;
+              const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
+              if (lineMesh /* && lineMesh->color */) {
+                lineMesh->color = material->diffuseColor;
+              }
+            }
+          }
+        }
+      }
+
+      // On Mouse Up
+      if (pointerInfo->type == PointerEventTypes::POINTERUP) {
+        for (auto& cacheItem : gizmoAxisCache) {
+          auto& cache  = cacheItem.second;
+          cache.active = false;
+          dragging     = false;
+          for (const auto& m : cache.gizmoMeshes) {
+            m->material         = cache.material;
+            const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
+            if (lineMesh /* && lineMesh->color */) {
+              lineMesh->color = cache.material->diffuseColor;
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 } // end of namespace BABYLON

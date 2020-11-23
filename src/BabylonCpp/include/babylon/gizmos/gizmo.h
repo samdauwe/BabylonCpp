@@ -2,6 +2,8 @@
 #define BABYLON_GIZMOS_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
+#include <babylon/events/pointer_info.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/quaternion.h>
@@ -10,15 +12,31 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Mesh;
-class Node;
 class Scene;
-class UtilityLayerRenderer;
-using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
-using MeshPtr                 = std::shared_ptr<Mesh>;
-using NodePtr                 = std::shared_ptr<Node>;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
+
+/**
+ * @brief Cache built by each axis. Used for managing state between all elements of gizmo for
+ * enhanced UI.
+ */
+struct BABYLON_SHARED_EXPORT GizmoAxisCache {
+  /** Mesh used to runder the Gizmo */
+  std::vector<MeshPtr> gizmoMeshes;
+  /** Mesh used to detect user interaction with Gizmo */
+  std::vector<MeshPtr> colliderMeshes;
+  /** Material used to inicate color of gizmo mesh */
+  StandardMaterialPtr material = nullptr;
+  /** Material used to inicate hover state of the Gizmo */
+  StandardMaterialPtr hoverMaterial = nullptr;
+  /** Material used to inicate disabled state of the Gizmo */
+  StandardMaterialPtr disableMaterial = nullptr;
+  /** Used to indicate Active state of the Gizmo */
+  bool active = false;
+}; // end of struct GizmoAxisCache
 
 /**
  * @brief Renders gizmos on top of an existing scene which provide controls for position, rotation,
@@ -45,6 +63,16 @@ public:
    * @brief Disposes of the gizmo.
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Subscribes to pointer up, down, and hover events. Used for responsive gizmos.
+   * @param gizmoLayer The utility layer the gizmo will be added to
+   * @param gizmoAxisCache Gizmo axis definition used for reactive gizmo UI
+   * @returns {Observer<PointerInfo>} pointerObserver
+   */
+  static Observer<PointerInfo>::Ptr
+  GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
+                           std::unordered_map<Mesh*, GizmoAxisCache>& gizmoAxisCache);
 
 protected:
   /**
