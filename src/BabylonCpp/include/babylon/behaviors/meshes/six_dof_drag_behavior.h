@@ -2,6 +2,7 @@
 #define BABYLON_BEHAVIORS_MESHES_SIX_DOF_DRAG_BEHAVIOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/core/structs.h>
 #include <babylon/maths/quaternion.h>
@@ -11,14 +12,11 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Camera;
-class Mesh;
 class PointerInfo;
 class Scene;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using CameraPtr       = std::shared_ptr<Camera>;
-using MeshPtr         = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to be dragged around based on
@@ -98,6 +96,11 @@ public:
   Observable<DragStartOrEndEvent> onDragStartObservable;
 
   /**
+   * Fires each time a drag happens
+   */
+  Observable<void> onDragObservable;
+
+  /**
    * Fires each time a drag ends (eg. mouse release after drag)
    */
   Observable<DragStartOrEndEvent> onDragEndObservable;
@@ -113,7 +116,7 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   bool _moving;
   Quaternion _startingOrientation;
-  ICanvas* _attachedElement;
+  bool _attachedToElement;
 
   /**
    * In the case of multiplea active cameras, the cameraToUseForPointers should

@@ -24,7 +24,7 @@ SixDofDragBehavior::SixDofDragBehavior()
     , _virtualDragMesh{nullptr}
     , _pointerObserver{nullptr}
     , _moving{false}
-    , _attachedElement{nullptr}
+    , _attachedToElement{false}
     , _pointerCamera{this, &SixDofDragBehavior::get__pointerCamera}
     , zDragFactor{3.f}
 {
@@ -57,7 +57,9 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
   _ownerNode = ownerNode;
   _scene     = _ownerNode->getScene();
   if (!SixDofDragBehavior::_virtualScene) {
-    SixDofDragBehavior::_virtualScene = Scene::New(_scene->getEngine());
+    SceneOptions options              = {};
+    options.isVirtual                 = true;
+    SixDofDragBehavior::_virtualScene = Scene::New(_scene->getEngine(), options);
     SixDofDragBehavior::_virtualScene->detachControl();
     _scene->getEngine()->scenes.pop_back();
   }
@@ -117,12 +119,12 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
 
           // Detach camera controls
           if (detachCameraControls && _pointerCamera() && !_pointerCamera()->leftCamera()) {
-            if (_pointerCamera()->inputs.attachedElement) {
-              _attachedElement = _pointerCamera()->inputs.attachedElement;
-              _pointerCamera()->detachControl(_pointerCamera()->inputs.attachedElement);
+            if (_pointerCamera()->inputs.attachedToElement) {
+              _pointerCamera()->detachControl();
+              _attachedToElement = true;
             }
             else {
-              _attachedElement = nullptr;
+              _attachedToElement = false;
             }
           }
           PivotTools::_RestorePivotPoint(pickedMesh);
@@ -139,9 +141,10 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
           _virtualOriginMesh->removeChild(*_virtualDragMesh);
 
           // Reattach camera controls
-          if (detachCameraControls && _attachedElement && _pointerCamera()
+          if (detachCameraControls && _attachedToElement && _pointerCamera()
               && !_pointerCamera()->leftCamera()) {
-            _pointerCamera()->attachControl(_attachedElement, true);
+            _pointerCamera()->attachControl(true);
+            _attachedToElement = false;
           }
           onDragEndObservable.notifyObservers(nullptr);
         }
@@ -234,6 +237,8 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
         }
       }
       PivotTools::_RestorePivotPoint(pickedMesh);
+
+      onDragObservable.notifyObservers();
     }
   });
 }
@@ -241,9 +246,10 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
 void SixDofDragBehavior::detach()
 {
   if (_scene) {
-    if (detachCameraControls && _attachedElement && _pointerCamera()
+    if (detachCameraControls && _attachedToElement && _pointerCamera()
         && !_pointerCamera()->leftCamera()) {
-      _pointerCamera()->attachControl(_attachedElement, true);
+      _pointerCamera()->attachControl(true);
+      _attachedToElement = false;
     }
     _scene->onPointerObservable.remove(_pointerObserver);
   }
@@ -257,6 +263,7 @@ void SixDofDragBehavior::detach()
     _virtualDragMesh->dispose();
   }
   onDragEndObservable.clear();
+  onDragObservable.clear();
   onDragStartObservable.clear();
 }
 
