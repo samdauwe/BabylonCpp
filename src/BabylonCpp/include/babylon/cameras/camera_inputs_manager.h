@@ -120,6 +120,9 @@ public:
    */
   ICanvas* attachedElement;
 
+  // TODO update to v4.2.0
+  bool attachedToElement = false;
+
   /**
    * Defines whether event caught by the controls should call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)

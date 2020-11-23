@@ -205,11 +205,18 @@ public:
                              bool useCtrlForPanning             = true,
                              MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
 
+  // TODO update to v4.2.0
+  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
+
   /**
    * @brief Detach the current controls from the specified dom element.
    * @param element Defines the element to stop listening the inputs from
    */
   virtual void detachControl(ICanvas* canvas);
+
+  // TODO update to v4.2.0
+  void detachControl();
 
   /**
    * @brief Update the camera state according to the different inputs gathered

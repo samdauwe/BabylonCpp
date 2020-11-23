@@ -296,7 +296,15 @@ void Camera::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/,
 {
 }
 
+void Camera::attachControl(bool, bool, MouseButtonType)
+{
+}
+
 void Camera::detachControl(ICanvas* /*canvas*/)
+{
+}
+
+void Camera::detachControl()
 {
 }
 

@@ -92,6 +92,10 @@ public:
   void attachControl(ICanvas* canvas, bool noPreventDefault = false, bool useCtrlForPanning = true,
                      MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
+  // TODO update to v4.2.0
+  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
+
   /**
    * @brief Detach the current controls from the camera.
    * The camera will stop reacting to inputs.

@@ -312,6 +312,10 @@ void ArcRotateCamera::attachControl(ICanvas* canvas, bool noPreventDefault, bool
   };
 }
 
+void ArcRotateCamera::attachControl(bool, bool, MouseButtonType)
+{
+}
+
 void ArcRotateCamera::detachControl(ICanvas* canvas)
 {
   inputs->detachElement(canvas);
