@@ -5273,9 +5273,9 @@ void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace, bool a
     camera->speed = radius * 0.2f;
     _activeCamera = camera;
 
-    auto canvas = getEngine()->getRenderingCanvas();
+    const auto canvas = getEngine()->getInputElement();
     if (attachCameraControls && canvas) {
-      camera->attachControl(canvas);
+      camera->attachControl();
     }
   }
 }
