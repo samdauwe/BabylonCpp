@@ -34,14 +34,14 @@ void Tools::setFallbackTexture(const std::string& value)
 
 void Tools::FetchToRef(int u, int v, int width, int height, const Uint8Array& pixels, Color4& color)
 {
-  auto wrappedU = ((std::abs(u) * width) % width);
-  auto wrappedV = ((std::abs(v) * height) % height);
+  const auto wrappedU = (std::abs(u) * width) % width;
+  const auto wrappedV = (std::abs(v) * height) % height;
 
-  auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
-  color.r       = pixels[position] / 255.f;
-  color.g       = pixels[position + 1] / 255.f;
-  color.b       = pixels[position + 2] / 255.f;
-  color.a       = pixels[position + 3] / 255.f;
+  const auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
+  color.r             = pixels[position] / 255.f;
+  color.g             = pixels[position + 1] / 255.f;
+  color.b             = pixels[position + 2] / 255.f;
+  color.a             = pixels[position + 3] / 255.f;
 }
 
 float Tools::Mix(float a, float b, float alpha)
@@ -85,12 +85,12 @@ std::string Tools::GetFolderPath(const std::string& uri, bool returnUnchangedIfN
 
 float Tools::ToDegrees(float angle)
 {
-  return angle * 180.f / Math::PI;
+  return (angle * 180.f) / Math::PI;
 }
 
 float Tools::ToRadians(float angle)
 {
-  return angle * Math::PI / 180.f;
+  return (angle * Math::PI) / 180.f;
 }
 
 Image Tools::CreateCheckerboardImage(unsigned int size)
