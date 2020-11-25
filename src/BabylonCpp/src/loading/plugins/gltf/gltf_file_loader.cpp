@@ -256,7 +256,7 @@ void GLTFFileLoader::_clear()
   onExtensionLoadedObservable.clear();
 }
 
-ImportedMeshes GLTFFileLoader::importMeshAsync(
+ISceneLoaderAsyncResult GLTFFileLoader::importMeshAsync(
   const std::vector<std::string>& meshesNames, Scene* scene, const std::string& data,
   const std::string& rootUrl,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
@@ -291,12 +291,12 @@ AssetContainerPtr GLTFFileLoader::loadAssetContainerAsync(
   // Get materials/textures when loading to add to container
   std::vector<MaterialPtr> materials;
   onMaterialLoadedObservable.add(
-    [&materials, &scene](Material* material, EventState & /*es*/) -> void {
+    [&materials, &scene](Material* material, EventState& /*es*/) -> void {
       materials.emplace_back(scene->getMaterialByUniqueID(material->uniqueId));
     });
   std::vector<BaseTexturePtr> textures;
   onTextureLoadedObservable.add(
-    [&textures, &scene](BaseTexture* texture, EventState & /*es*/) -> void {
+    [&textures, &scene](BaseTexture* texture, EventState& /*es*/) -> void {
       textures.emplace_back(scene->getTextureByUniqueID(texture->uniqueId));
     });
 

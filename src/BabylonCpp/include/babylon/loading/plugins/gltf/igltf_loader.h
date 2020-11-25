@@ -4,30 +4,26 @@
 #include <optional>
 #include <string>
 
-#include <nlohmann/json.hpp>
-
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/loading/iscene_loader_async_result.h>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class AnimationGroup;
 class ArrayBufferView;
-struct ImportedMeshes;
-class IParticleSystem;
 class ProgressEvent;
 class Scene;
 class SceneLoaderProgressEvent;
-class Skeleton;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using AnimationGroupPtr  = std::shared_ptr<AnimationGroup>;
-using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
-using SkeletonPtr        = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(Skeleton)
 
 namespace GLTF2 {
 
@@ -134,7 +130,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
 
   std::optional<GLTFLoaderState> state = std::nullopt;
 
-  virtual ImportedMeshes
+  virtual ISceneLoaderAsyncResult
   importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
                   const IGLTFLoaderData& data, const std::string& rootUrl,
                   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress

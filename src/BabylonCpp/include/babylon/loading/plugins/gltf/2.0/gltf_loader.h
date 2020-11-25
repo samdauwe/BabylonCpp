@@ -179,7 +179,7 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /** Hidden */
-  ImportedMeshes
+  ISceneLoaderAsyncResult
   importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
                   const IGLTFLoaderData& data, const std::string& rootUrl,
                   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress

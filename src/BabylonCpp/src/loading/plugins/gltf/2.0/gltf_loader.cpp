@@ -99,7 +99,7 @@ void GLTFLoader::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTexture
 {
 }
 
-ImportedMeshes GLTFLoader::importMeshAsync(
+ISceneLoaderAsyncResult GLTFLoader::importMeshAsync(
   const std::vector<std::string>& meshesNames, Scene* scene, const IGLTFLoaderData& data,
   const std::string& rootUrl,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
@@ -132,13 +132,16 @@ ImportedMeshes GLTFLoader::importMeshAsync(
     }
   }
 
-  ImportedMeshes result;
+  ISceneLoaderAsyncResult result;
   _loadAsync(nodes, [this, &result]() -> void {
     result = {
-      _getMeshes(),         // meshes
-      {},                   // particleSystems
-      _getSkeletons(),      // skeletons
-      _getAnimationGroups() // animationGroups
+      _getMeshes(),          // meshes
+      {},                    // particleSystems
+      _getSkeletons(),       // skeletons
+      _getAnimationGroups(), // animationGroups
+      {},                    // transformNodes
+      {},                    // geometries
+      {},                    // lights
     };
   });
 
@@ -822,10 +825,10 @@ void GLTFLoader::_createMorphTargets(const std::string& context, INode& node, co
 
   babylonMesh->morphTargetManager = MorphTargetManager::New(babylonMesh->getScene());
   for (size_t index = 0; index < primitive.targets.size(); ++index) {
-    const auto weight = (index < node.weights.size()) ?
-                          node.weights[index] :
-                          (index < mesh.weights.size()) ? mesh.weights[index] : 0.f;
-    const auto name = StringTools::printf("morphTarget%ld", index);
+    const auto weight = (index < node.weights.size()) ? node.weights[index] :
+                        (index < mesh.weights.size()) ? mesh.weights[index] :
+                                                        0.f;
+    const auto name   = StringTools::printf("morphTarget%ld", index);
     babylonMesh->morphTargetManager()->addTarget(
       MorphTarget::New(name, weight, babylonMesh->getScene()));
     // TODO: tell the target whether it has positions, normals, tangents
@@ -1988,19 +1991,19 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
     url, _babylonScene, samplerData.noMipMaps, false, samplerData.samplingMode, nullptr,
     [this, &context](const std::string& message, const std::string& exception) {
       if (!_disposed) {
-        throw std::runtime_error(StringTools::printf(
-          "%s: %s", context.c_str(),
-          !exception.empty() ? exception.c_str() :
-                               !message.empty() ? message.c_str() : "Failed to load texture"));
+        throw std::runtime_error(StringTools::printf("%s: %s", context.c_str(),
+                                                     !exception.empty() ? exception.c_str() :
+                                                     !message.empty()   ? message.c_str() :
+                                                                          "Failed to load texture"));
       }
     });
 
   if (url.empty()) {
     promises.emplace_back([this, &image, &babylonTexture]() -> void {
-      const auto data = loadImageAsync(StringTools::printf("/images/%ld", image.index), image);
-      const auto name = !image.uri.empty() ?
-                          image.uri :
-                          StringTools::printf("%s#image%ld", _fileName.c_str(), image.index);
+      const auto data    = loadImageAsync(StringTools::printf("/images/%ld", image.index), image);
+      const auto name    = !image.uri.empty() ?
+                             image.uri :
+                             StringTools::printf("%s#image%ld", _fileName.c_str(), image.index);
       const auto dataUrl = StringTools::printf("data:%s%s", _uniqueRootUrl.c_str(), name.c_str());
       babylonTexture->updateURL(dataUrl, data.uint8Array());
     });
@@ -2084,7 +2087,7 @@ ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::
     FileTools::LoadFile(
       url,
       [this, &data, &uri](const std::variant<std::string, ArrayBufferView>& fileData,
-                          const std::string & /*responseURL*/) -> void {
+                          const std::string& /*responseURL*/) -> void {
         if (!_disposed) {
           if (std::holds_alternative<ArrayBufferView>(fileData)) {
             data = std::get<ArrayBufferView>(fileData).uint8Array();

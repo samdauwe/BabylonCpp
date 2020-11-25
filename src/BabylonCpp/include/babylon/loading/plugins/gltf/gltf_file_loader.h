@@ -72,19 +72,17 @@ public:
   void _clear();
 
   /**
-   * @brief Imports one or more meshes from the loaded glTF data and adds them
-   * to the scene.
-   * @param meshesNames a string or array of strings of the mesh names that
-   * should be loaded from the file
+   * @brief Imports one or more meshes from the loaded glTF data and adds them to the scene.
+   * @param meshesNames a string or array of strings of the mesh names that should be loaded from
+   * the file
    * @param scene the scene the meshes should be added to
    * @param data the glTF data to load
    * @param rootUrl root url to load from
    * @param onProgress event that fires when loading progress has occured
    * @param fileName Defines the name of the file to load
-   * @returns a promise containg the loaded meshes, particles, skeletons and
-   * animations
+   * @returns a promise containg the loaded meshes, particles, skeletons and animations
    */
-  ImportedMeshes
+  ISceneLoaderAsyncResult
   importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
                   const std::string& data, const std::string& rootUrl,
                   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
