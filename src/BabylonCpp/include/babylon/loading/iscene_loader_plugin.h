@@ -8,19 +8,16 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/loading/iscene_loader_plugin_extensions.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class AssetContainer;
-class IParticleSystem;
 class Scene;
-class Skeleton;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using AssetContainerPtr  = std::shared_ptr<AssetContainer>;
-using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
-using SkeletonPtr        = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(AssetContainer)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(Skeleton)
 
 /**
  * @brief Interface used to define a SceneLoader plugin.

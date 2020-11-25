@@ -5,15 +5,13 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-struct ISceneLoaderPlugin;
-struct ISceneLoaderPluginAsync;
-struct ISceneLoaderPluginFactory;
-using ISceneLoaderPluginPtr        = std::shared_ptr<ISceneLoaderPlugin>;
-using ISceneLoaderPluginAsyncPtr   = std::shared_ptr<ISceneLoaderPluginAsync>;
-using ISceneLoaderPluginFactoryPtr = std::shared_ptr<ISceneLoaderPluginFactory>;
+FWD_STRUCT_SPTR(ISceneLoaderPlugin)
+FWD_STRUCT_SPTR(ISceneLoaderPluginAsync)
+FWD_STRUCT_SPTR(ISceneLoaderPluginFactory)
 
 /**
  * @brief Defines a plugin registered by the SceneLoader.
