@@ -6,36 +6,45 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class AnimationGroup;
 class Engine;
 struct IFileInfo;
-class IParticleSystem;
 struct IRegisteredPlugin;
 class Scene;
 class SceneLoaderProgressEvent;
-class Skeleton;
-struct ISceneLoaderPlugin;
-struct ISceneLoaderPluginAsync;
-struct ISceneLoaderPluginFactory;
-using AbstractMeshPtr              = std::shared_ptr<AbstractMesh>;
-using AnimationGroupPtr            = std::shared_ptr<AnimationGroup>;
-using IParticleSystemPtr           = std::shared_ptr<IParticleSystem>;
-using ISceneLoaderPluginPtr        = std::shared_ptr<ISceneLoaderPlugin>;
-using ISceneLoaderPluginAsyncPtr   = std::shared_ptr<ISceneLoaderPluginAsync>;
-using ISceneLoaderPluginFactoryPtr = std::shared_ptr<ISceneLoaderPluginFactory>;
-using SkeletonPtr                  = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_STRUCT_SPTR(ISceneLoaderPlugin)
+FWD_STRUCT_SPTR(ISceneLoaderPluginAsync)
+FWD_STRUCT_SPTR(ISceneLoaderPluginFactory)
+FWD_CLASS_SPTR(Geometry)
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Class used to load scene from various file formats using registered plugins.
  * @see http://doc.babylonjs.com/how_to/load_from_any_file_type
  */
 class BABYLON_SHARED_EXPORT SceneLoader {
+
+public:
+  /**
+   * Type used for the success callback of ImportMesh
+   */
+  using SceneLoaderSuccessCallback = std::function<void(
+    const std::vector<AbstractMeshPtr>& meshes,
+    const std::vector<IParticleSystemPtr>& particleSystems,
+    const std::vector<SkeletonPtr>& skeletons,
+    const std::vector<AnimationGroupPtr>& animationGroups,
+    const std::vector<TransformNodePtr>& transformNodes, const std::vector<GeometryPtr>& geometries,
+    const std::vector<LightPtr>& lights)>;
 
 public:
   /**
@@ -167,19 +176,15 @@ public:
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> ImportMesh(
-    const std::vector<std::string>& meshNames, std::string rootUrl, std::string sceneFilename,
-    Scene* scene = nullptr,
-    const std::function<void(const std::vector<AbstractMeshPtr>& meshes,
-                             const std::vector<IParticleSystemPtr>& particleSystems,
-                             const std::vector<SkeletonPtr>& skeletons,
-                             const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess
-    = nullptr,
-    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
-    const std::function<void(Scene* scene, const std::string& message,
-                             const std::string& exception)>& onError
-    = nullptr,
-    const std::string& pluginExtension = "");
+  static std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
+  ImportMesh(const std::vector<std::string>& meshNames, std::string rootUrl,
+             std::string sceneFilename, Scene* scene = nullptr,
+             const SceneLoaderSuccessCallback& onSuccess                                  = nullptr,
+             const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress = nullptr,
+             const std::function<void(Scene* scene, const std::string& message,
+                                      const std::string& exception)>& onError
+             = nullptr,
+             const std::string& pluginExtension = "");
 
   /**
    * @brief Load a scene.

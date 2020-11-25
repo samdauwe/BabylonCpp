@@ -7,33 +7,23 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
+#include <babylon/loading/iscene_loader_async_result.h>
 #include <babylon/loading/iscene_loader_plugin_extensions.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class AnimationGroup;
-class AssetContainer;
-class IParticleSystem;
 class Scene;
 class SceneLoaderProgressEvent;
-class Skeleton;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using AnimationGroupPtr  = std::shared_ptr<AnimationGroup>;
-using AssetContainerPtr  = std::shared_ptr<AssetContainer>;
-using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
-using SkeletonPtr        = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(AssetContainer)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(Skeleton)
 
 /**
- * @brief The loaded meshes, particle systems, skeletons, and animation groups.
+ * @brief Interface used to define an async SceneLoader plugin.
  */
-struct ImportedMeshes {
-  std::vector<AbstractMeshPtr> meshes;
-  std::vector<IParticleSystemPtr> particleSystems;
-  std::vector<SkeletonPtr> skeletons;
-  std::vector<AnimationGroupPtr> animationGroups;
-}; // end of struct ImportedMeshes
-
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
   virtual ~ISceneLoaderPluginAsync() = default;
   /**
@@ -55,10 +45,9 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * @param rootUrl The root url for scene and resources
    * @param onProgress The callback when the load progresses
    * @param fileName Defines the name of the file to load
-   * @returns The loaded meshes, particle systems, skeletons, and animation
-   * groups
+   * @returns The loaded objects (e.g. meshes, particle systems, skeletons, animation groups, etc.)
    */
-  virtual ImportedMeshes
+  virtual ISceneLoaderAsyncResult
   importMeshAsync(const std::vector<std::string>& meshesNames, Scene* scene,
                   const std::string& data, const std::string& rootUrl,
                   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress

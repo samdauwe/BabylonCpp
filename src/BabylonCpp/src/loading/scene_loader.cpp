@@ -312,11 +312,7 @@ void SceneLoader::RegisterPlugin(
 std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
 SceneLoader::ImportMesh(
   const std::vector<std::string>& meshNames, std::string rootUrl, std::string sceneFilename,
-  Scene* scene,
-  const std::function<void(const std::vector<AbstractMeshPtr>& meshes,
-                           const std::vector<IParticleSystemPtr>& particleSystems,
-                           const std::vector<SkeletonPtr>& skeletons,
-                           const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess,
+  Scene* scene, const SceneLoaderSuccessCallback& onSuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
   const std::function<void(Scene* scene, const std::string& message, const std::string& exception)>&
     onError,
@@ -363,21 +359,25 @@ SceneLoader::ImportMesh(
     };
   }
 
-  const auto successHandler = [=](const std::vector<AbstractMeshPtr>& meshes,
-                                  const std::vector<IParticleSystemPtr>& particleSystems,
-                                  const std::vector<SkeletonPtr>& skeletons,
-                                  const std::vector<AnimationGroupPtr>& animationGroups) {
-    scene->importedMeshesFiles.emplace_back(fileInfo->url);
+  const auto successHandler
+    = [=](const std::vector<AbstractMeshPtr>& meshes,
+          const std::vector<IParticleSystemPtr>& particleSystems,
+          const std::vector<SkeletonPtr>& skeletons,
+          const std::vector<AnimationGroupPtr>& animationGroups,
+          const std::vector<TransformNodePtr>& transformNodes,
+          const std::vector<GeometryPtr>& geometries, const std::vector<LightPtr>& lights) {
+        scene->importedMeshesFiles.emplace_back(fileInfo->url);
 
-    if (onSuccess) {
-      try {
-        onSuccess(meshes, particleSystems, skeletons, animationGroups);
-      }
-      catch (const std::exception& e) {
-        errorHandler(StringTools::printf("Error in onSuccess callback", e.what()), e.what());
-      }
-    }
-  };
+        if (onSuccess) {
+          try {
+            onSuccess(meshes, particleSystems, skeletons, animationGroups, transformNodes,
+                      geometries, lights);
+          }
+          catch (const std::exception& e) {
+            errorHandler(StringTools::printf("Error in onSuccess callback", e.what()), e.what());
+          }
+        }
+      };
 
   return SceneLoader::_LoadData(
     *fileInfo, scene,
@@ -397,7 +397,6 @@ SceneLoader::ImportMesh(
         std::vector<AbstractMeshPtr> meshes;
         std::vector<IParticleSystemPtr> particleSystems;
         std::vector<SkeletonPtr> skeletons;
-        std::vector<AnimationGroupPtr> animationGroups;
 
         if (!syncedPlugin->importMesh(meshNames, scene, data, fileInfo->rootUrl, meshes,
                                       particleSystems, skeletons, errorHandler)) {
@@ -405,7 +404,7 @@ SceneLoader::ImportMesh(
         }
 
         scene->loadingPluginName = syncedPlugin->name;
-        successHandler(meshes, particleSystems, skeletons, animationGroups);
+        successHandler(meshes, particleSystems, skeletons, {}, {}, {}, {});
       }
       else {
         auto asyncedPlugin = std::get<ISceneLoaderPluginAsyncPtr>(plugin);
@@ -413,7 +412,8 @@ SceneLoader::ImportMesh(
                                                      progressHandler, fileInfo->name);
         scene->loadingPluginName = asyncedPlugin->name;
         successHandler(result.meshes, result.particleSystems, result.skeletons,
-                       result.animationGroups);
+                       result.animationGroups, result.transformNodes, result.geometries,
+                       result.lights);
       }
     },
     progressHandler, errorHandler, disposeHandler, pluginExtension);
@@ -504,7 +504,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
   return SceneLoader::_LoadData(
     *fileInfo, scene,
     [=](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin,
-        const std::string& data, const std::string & /*responseURL*/) -> void {
+        const std::string& data, const std::string& /*responseURL*/) -> void {
       if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
         auto syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);
         if (!syncedPlugin->load(scene, data, fileInfo->rootUrl, errorHandler)) {

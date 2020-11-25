@@ -41,7 +41,10 @@ void ViveController::initControllerMesh(Scene* scene,
     [this, &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
                         const std::vector<IParticleSystemPtr>& /*particleSystems*/,
                         const std::vector<SkeletonPtr>& /*skeletons*/,
-                        const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+                        const std::vector<AnimationGroupPtr>& /*animationGroups*/,
+                        const std::vector<TransformNodePtr>& /*transformNodes*/,
+                        const std::vector<GeometryPtr>& /*geometries*/,
+                        const std::vector<LightPtr>& /*lights*/) {
       /*
       Parent Mesh name: ViveWand
       - body
