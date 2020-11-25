@@ -7,8 +7,7 @@
 namespace BABYLON {
 
 /**
- * @brief The ProgressEvent class represents events measuring progress of an
- * underlying process.
+ * @brief The ProgressEvent class represents events measuring progress of an underlying process.
  */
 class BABYLON_SHARED_EXPORT ProgressEvent {
 
@@ -16,19 +15,16 @@ public:
   /**
    * @brief Creates a ProgressEvent event with the given parameters.
    * @param type represents the name of the type of the ProgressEvent
-   * @param lengthComputable indicates if the total work to be done, and the
-   * amount of work already done, by the underlying process is calculable. In
-   * other words, it tells if the progress is measurable or not. It defaults to
-   * false.
-   * @param loaded represents the amount of work already performed by the
-   * underlying process. The ratio of work done can be calculated with the
-   * property and ProgressEvent.total. When downloading a resource using HTTP,
-   * this only represent the part of the content itself, not headers and other
-   * overhead. It defaults to 0.
-   * @param total represents the total amount of work that the underlying
-   * process is in the progress of performing. When downloading a resource using
-   * HTTP, this only represent the content itself, not headers and other
-   * overhead. It defaults to 0.
+   * @param lengthComputable indicates if the total work to be done, and the amount of work already
+   * done, by the underlying process is calculable. In other words, it tells if the progress is
+   * measurable or not. It defaults to false.
+   * @param loaded represents the amount of work already performed by the underlying process. The
+   * ratio of work done can be calculated with the property and ProgressEvent.total. When
+   * downloading a resource using HTTP, this only represent the part of the content itself, not
+   * headers and other overhead. It defaults to 0.
+   * @param total represents the total amount of work that the underlying process is in the progress
+   * of performing. When downloading a resource using HTTP, this only represent the content itself,
+   * not headers and other overhead. It defaults to 0.
    */
   ProgressEvent(const std::string& type, bool lengthComputable = false, size_t loaded = 0,
                 size_t total = 0);
@@ -45,22 +41,21 @@ protected:
   [[nodiscard]] std::string get_type() const;
 
   /**
-   * @brief Gets the boolean flag indicating if the total work to be done, and
-   * the amount of work already done, by the underlying process is calculable.
-   * In other words, it tells if the progress is measurable or not.
+   * @brief Gets the boolean flag indicating if the total work to be done, and the amount of work
+   * already done, by the underlying process is calculable. In other words, it tells if the progress
+   * is measurable or not.
    */
   [[nodiscard]] bool get_lengthComputable() const;
 
   /**
    * @brief Gets the amount of work already performed by the underlying process.
-   * The ratio of work done can be calculated with the property and
-   * ProgressEvent.total.
+   * The ratio of work done can be calculated with the property and ProgressEvent.total.
    */
   [[nodiscard]] size_t get_loaded() const;
 
   /**
-   * @brief Gets the total amount of work that the underlying process is in the
-   * progress of performing.
+   * @brief Gets the total amount of work that the underlying process is in the progress of
+   * performing.
    */
   [[nodiscard]] size_t get_total() const;
 
@@ -71,21 +66,20 @@ public:
   ReadOnlyProperty<ProgressEvent, std::string> type;
 
   /**
-   * The Boolean flag indicating if the total work to be done, and the amount of
-   * work already done, by the underlying process is calculable. In other words,
-   * it tells if the progress is measurable or not.
+   * The Boolean flag indicating if the total work to be done, and the amount of work already done,
+   * by the underlying process is calculable. In other words, it tells if the progress is measurable
+   * or not.
    */
   ReadOnlyProperty<ProgressEvent, bool> lengthComputable;
 
   /**
-   * The amount of work already performed by the underlying process. The ratio
-   * of work done can be calculated with the property and ProgressEvent.total.
+   * The amount of work already performed by the underlying process. The ratio of work done can be
+   * calculated with the property and ProgressEvent.total.
    */
   ReadOnlyProperty<ProgressEvent, size_t> loaded;
 
   /**
-   * The total amount of work that the underlying process is in the progress of
-   * performing.
+   * The total amount of work that the underlying process is in the progress of performing.
    */
   ReadOnlyProperty<ProgressEvent, size_t> total;
 
