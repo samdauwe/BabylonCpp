@@ -58,7 +58,10 @@ public:
       [camera, shadowGenerator](const std::vector<AbstractMeshPtr>& newMeshes,
                                 const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
                                 const std::vector<SkeletonPtr>& /*newSkeletons*/,
-                                const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
+                                const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/,
+                                const std::vector<TransformNodePtr>& /*transformNodes*/,
+                                const std::vector<GeometryPtr>& /*geometries*/,
+                                const std::vector<LightPtr>& /*lights*/) {
         if (!newMeshes.empty()) {
           shadowGenerator->getShadowMap()->renderList().emplace_back(newMeshes[0].get());
           // Set the target of the camera to the first imported mesh

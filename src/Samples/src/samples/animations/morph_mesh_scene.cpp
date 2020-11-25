@@ -60,7 +60,10 @@ public:
       [this, scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
                     const std::vector<IParticleSystemPtr>& /*particleSystems*/,
                     const std::vector<SkeletonPtr>& /*skeletons*/,
-                    const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+                    const std::vector<AnimationGroupPtr>& /*animationGroups*/,
+                    const std::vector<TransformNodePtr>& /*transformNodes*/,
+                    const std::vector<GeometryPtr>& /*geometries*/,
+                    const std::vector<LightPtr>& /*lights*/) {
         auto test = std::static_pointer_cast<Mesh>(scene->getMeshByName("Sphere Default"));
         test->convertToFlatShadedMesh();
         test->position = Vector3::Zero();

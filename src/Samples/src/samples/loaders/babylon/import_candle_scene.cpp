@@ -30,7 +30,10 @@ struct ImportCandleScene : public IRenderableScene {
                             [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
                                     const std::vector<IParticleSystemPtr>& /*particleSystems*/,
                                     const std::vector<SkeletonPtr>& /*skeletons*/,
-                                    const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+                                    const std::vector<AnimationGroupPtr>& /*animationGroups*/,
+                                    const std::vector<TransformNodePtr>& /*transformNodes*/,
+                                    const std::vector<GeometryPtr>& /*geometries*/,
+                                    const std::vector<LightPtr>& /*lights*/) {
                               scene->createDefaultCameraOrLight(true, true, true);
                               scene->createDefaultEnvironment();
                             });

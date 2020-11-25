@@ -52,7 +52,10 @@ public:
       [this, scene, canvas](const std::vector<AbstractMeshPtr>& newMeshes,
                             const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
                             const std::vector<SkeletonPtr>& /*newSkeletons*/,
-                            const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
+                            const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/,
+                            const std::vector<TransformNodePtr>& /*transformNodes*/,
+                            const std::vector<GeometryPtr>& /*geometries*/,
+                            const std::vector<LightPtr>& /*lights*/) {
         // Set the target of the camera to the first imported mesh
         if (!newMeshes.empty()) {
           auto cat = newMeshes[0];

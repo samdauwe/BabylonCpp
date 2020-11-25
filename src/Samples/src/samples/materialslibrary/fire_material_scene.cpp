@@ -122,7 +122,10 @@ public:
       [this, scene](const std::vector<AbstractMeshPtr>& meshes,
                     const std::vector<IParticleSystemPtr>& /*particleSystems*/,
                     const std::vector<SkeletonPtr>& /*skeletons*/,
-                    const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+                    const std::vector<AnimationGroupPtr>& /*animationGroups*/,
+                    const std::vector<TransformNodePtr>& /*transformNodes*/,
+                    const std::vector<GeometryPtr>& /*geometries*/,
+                    const std::vector<LightPtr>& /*lights*/) {
         auto plane            = scene->getMeshByName("Plane");
         plane->receiveShadows = true;
 
