@@ -21,18 +21,18 @@ FreeCameraTouchInput::FreeCameraTouchInput(bool iAllowMouse)
 
 FreeCameraTouchInput::~FreeCameraTouchInput() = default;
 
-void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/, bool iNoPreventDefault)
+void FreeCameraTouchInput::attachControl(bool iNoPreventDefault)
 {
   noPreventDefault = iNoPreventDefault;
   previousPosition = std::nullopt;
 
   if (_pointerInput == nullptr) {
-    _onLostFocus = [this](FocusEvent & /*e*/) -> void {
+    _onLostFocus = [this](FocusEvent& /*e*/) -> void {
       _offsetX = std::nullopt;
       _offsetY = std::nullopt;
     };
 
-    _pointerInput = [this](PointerInfo* p, EventState & /*es*/) -> void {
+    _pointerInput = [this](PointerInfo* p, EventState& /*es*/) -> void {
       auto& evt = p->pointerEvent;
 
       if (!allowMouse && evt.pointerType == PointerType::MOUSE) {
@@ -109,9 +109,9 @@ void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/, bool iNoPreventDef
   }
 }
 
-void FreeCameraTouchInput::detachControl(ICanvas* canvas)
+void FreeCameraTouchInput::detachControl(ICanvas* /*ignored*/)
 {
-  if (_pointerInput && canvas) {
+  if (_pointerInput) {
     if (_observer) {
       camera->getScene()->onPointerObservable.remove(_observer);
       _observer = nullptr;
@@ -143,7 +143,7 @@ void FreeCameraTouchInput::checkInputs()
   }
   else {
     auto speed = camera->_computeLocalCameraSpeed();
-    Vector3 direction(0.f, 0.f, speed * _offsetY.value() / touchMoveSensibility);
+    Vector3 direction(0.f, 0.f, (speed * _offsetY.value()) / touchMoveSensibility);
 
     Matrix::RotationYawPitchRollToRef(camera->rotation().y, camera->rotation().x, 0.f,
                                       camera->_cameraRotationMatrix);
