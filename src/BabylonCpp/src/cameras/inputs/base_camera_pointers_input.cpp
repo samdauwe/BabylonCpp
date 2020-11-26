@@ -44,11 +44,11 @@ std::string BaseCameraPointersInput<TCamera>::getSimpleName() const
 }
 
 template <class TCamera>
-void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element, bool noPreventDefault)
+void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
 {
-  _element                       = element;
   _noPreventDefault              = noPreventDefault;
   _engine                        = ICameraInput<TCamera>::camera->getEngine();
+  _element                       = _engine->getInputElement();
   _previousPinchSquaredDistance  = 0.f;
   _previousMultiTouchPanPosition = std::nullopt;
 
@@ -61,7 +61,7 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element, bool noPr
   _shiftKey       = false;
   _buttonsPressed = MouseButtonType::LEFT;
 
-  _pointerInput = [this](PointerInfo* p, EventState & /*es*/) -> void {
+  _pointerInput = [this](PointerInfo* p, EventState& /*es*/) -> void {
     auto& evt    = p->pointerEvent;
     auto isTouch = evt.pointerType == PointerType::TOUCH;
 
@@ -112,7 +112,8 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element, bool noPr
 
       if (!_noPreventDefault) {
         evt.preventDefault();
-        _element->focus();
+        if (_element)
+          _element->focus();
       }
     }
     else if (p->type == PointerEventTypes::POINTERDOUBLETAP) {
@@ -228,7 +229,7 @@ void BaseCameraPointersInput<TCamera>::attachControl(ICanvas* element, bool noPr
 }
 
 template <class TCamera>
-void BaseCameraPointersInput<TCamera>::detachControl(ICanvas* element)
+void BaseCameraPointersInput<TCamera>::detachControl(ICanvas* /*ignored*/)
 {
   if (_onLostFocus) {
     /* Tools::UnregisterTopRootEvents([
@@ -236,7 +237,7 @@ void BaseCameraPointersInput<TCamera>::detachControl(ICanvas* element)
      ]);*/
   }
 
-  if (element && _observer) {
+  if (_observer) {
     ICameraInput<TCamera>::camera->getScene()->onPointerObservable.remove(_observer);
     _observer = nullptr;
 
