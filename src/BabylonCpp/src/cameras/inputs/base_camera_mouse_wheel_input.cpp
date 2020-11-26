@@ -21,7 +21,7 @@ BaseCameraMouseWheelInput::BaseCameraMouseWheelInput()
 
 BaseCameraMouseWheelInput::~BaseCameraMouseWheelInput() = default;
 
-void BaseCameraMouseWheelInput::attachControl(ICanvas* /*canvas*/, bool noPreventDefault)
+void BaseCameraMouseWheelInput::attachControl(bool noPreventDefault)
 {
   _wheel = [this, noPreventDefault](PointerInfo* pointer, EventState& /*es*/) -> void {
     // sanity check - this should be a PointerWheel event.
@@ -39,21 +39,21 @@ void BaseCameraMouseWheelInput::attachControl(ICanvas* /*canvas*/, bool noPreven
       // Chrome >=  v31  (Has WebGL >= v8)
       // Edge >=    v12  (Has WebGl >= v12)
       // https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
-      _wheelDeltaX += wheelPrecisionX * platformScale * event.deltaX / _normalize;
-      _wheelDeltaY -= wheelPrecisionY * platformScale * event.deltaY / _normalize;
-      _wheelDeltaZ += wheelPrecisionZ * platformScale * event.deltaZ / _normalize;
+      _wheelDeltaX += (wheelPrecisionX * platformScale * event.deltaX) / _normalize;
+      _wheelDeltaY -= (wheelPrecisionY * platformScale * event.deltaY) / _normalize;
+      _wheelDeltaZ += (wheelPrecisionZ * platformScale * event.deltaZ) / _normalize;
     }
     else if (event.wheelDeltaY != 0.f) {
       // Unsure whether these catch anything more. Documentation
       // online is contradictory.
-      _wheelDeltaX += wheelPrecisionX * platformScale * event.wheelDeltaX / _normalize;
-      _wheelDeltaY -= wheelPrecisionY * platformScale * event.wheelDeltaY / _normalize;
-      _wheelDeltaZ += wheelPrecisionZ * platformScale * event.wheelDeltaZ / _normalize;
+      _wheelDeltaX += (wheelPrecisionX * platformScale * event.wheelDeltaX) / _normalize;
+      _wheelDeltaY -= (wheelPrecisionY * platformScale * event.wheelDeltaY) / _normalize;
+      _wheelDeltaZ += (wheelPrecisionZ * platformScale * event.wheelDeltaZ) / _normalize;
     }
     else if (event.wheelDelta) {
       // IE >= v9   (Has WebGL >= v11)
       // Maybe others?
-      _wheelDeltaY -= wheelPrecisionY * event.wheelDelta / _normalize;
+      _wheelDeltaY -= (wheelPrecisionY * event.wheelDelta) / _normalize;
     }
 
     /* if (event.preventDefault) */ {
@@ -67,7 +67,7 @@ void BaseCameraMouseWheelInput::attachControl(ICanvas* /*canvas*/, bool noPreven
     _wheel, static_cast<int>(PointerEventTypes::POINTERWHEEL));
 }
 
-void BaseCameraMouseWheelInput::detachControl(ICanvas* /*canvas*/)
+void BaseCameraMouseWheelInput::detachControl(ICanvas* /*ignored*/)
 {
   if (_observer) {
     get_camera()->getScene()->onPointerObservable.remove(_observer);
