@@ -225,9 +225,9 @@ std::optional<Coordinate>& FreeCameraMouseWheelInput::get_wheelZMoveScene()
   return _wheelZActionCoordinate;
 }
 
-void FreeCameraMouseWheelInput::attachControl(ICanvas* canvas, bool noPreventDefault)
+void FreeCameraMouseWheelInput::attachControl(ICanvas* /*canvas*/, bool noPreventDefault)
 {
-  BaseCameraMouseWheelInput::attachControl(canvas, noPreventDefault);
+  BaseCameraMouseWheelInput::attachControl(noPreventDefault);
 }
 
 void FreeCameraMouseWheelInput::detachControl(ICanvas* canvas)

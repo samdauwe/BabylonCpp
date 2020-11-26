@@ -47,7 +47,7 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  virtual void attachControl(ICanvas* canvas, bool noPreventDefault = false) = 0;
+  virtual void attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault = false*/) {};
 
   // TODO update to v4.2.0
   virtual void attachControl(bool /*noPreventDefault*/) {}
