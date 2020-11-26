@@ -26,13 +26,12 @@ FreeCameraKeyboardMoveInput::FreeCameraKeyboardMoveInput()
 
 FreeCameraKeyboardMoveInput::~FreeCameraKeyboardMoveInput() = default;
 
-void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas, bool noPreventDefault)
+void FreeCameraKeyboardMoveInput::attachControl(bool noPreventDefault)
 {
   if (_onCanvasBlurObserver) {
     return;
   }
 
-  _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
   _scene  = camera->getScene();
@@ -85,7 +84,7 @@ void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas, bool noPreventD
   });
 }
 
-void FreeCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
+void FreeCameraKeyboardMoveInput::detachControl(ICanvas* /*ignored*/)
 {
   if (_scene) {
     if (_onKeyboardObserver) {
