@@ -49,6 +49,9 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
    */
   virtual void attachControl(ICanvas* canvas, bool noPreventDefault = false) = 0;
 
+  // TODO update to v4.2.0
+  virtual void attachControl(bool /*noPreventDefault*/) {}
+
   /**
    * @brief Detach the current controls from the specified dom element.
    * @param element Defines the element to stop listening the inputs from
