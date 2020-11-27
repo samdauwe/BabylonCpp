@@ -10,9 +10,8 @@ namespace BABYLON {
 class ICanvas;
 
 /**
- * @brief This is the contract to implement in order to create a new input
- * class. Inputs are dealing with listening to user actions and moving the
- * camera accordingly.
+ * @brief This is the contract to implement in order to create a new input class.
+ * Inputs are dealing with listening to user actions and moving the camera accordingly.
  */
 template <class TCamera>
 struct BABYLON_SHARED_EXPORT ICameraInput {
@@ -40,23 +39,20 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
   [[nodiscard]] virtual std::string getSimpleName() const = 0;
 
   /**
-   * @brief Attach the input controls to a specific dom element to get the input
-   * from.
-   * @param element Defines the element the controls should be listened from
-   * @param noPreventDefault Defines whether event caught by the controls should
-   * call preventdefault()
+   * @brief Attach the input controls to a specific dom element to get the input from.
+   * @param noPreventDefault Defines whether event caught by the controls should call
+   * preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  virtual void attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault = false*/) {};
-
-  // TODO update to v4.2.0
-  virtual void attachControl(bool /*noPreventDefault*/) {}
+  virtual void attachControl(bool noPreventDefault = false) = 0;
 
   /**
    * @brief Detach the current controls from the specified dom element.
-   * @param element Defines the element to stop listening the inputs from
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  virtual void detachControl(ICanvas* canvas) = 0;
+  virtual void detachControl(ICanvas* ignored = nullptr) = 0;
 
   /**
    * @brief Update the current camera state depending on the inputs that have
