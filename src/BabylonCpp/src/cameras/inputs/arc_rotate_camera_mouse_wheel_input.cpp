@@ -10,7 +10,6 @@ namespace BABYLON {
 ArcRotateCameraMouseWheelInput::ArcRotateCameraMouseWheelInput()
     : wheelPrecision{3.f}
     , wheelDeltaPercentage{0.f}
-    , _canvas{nullptr}
     , _noPreventDefault{false}
     , _wheel{nullptr}
     , _observer{nullptr}
@@ -33,9 +32,8 @@ float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(floa
   return delta;
 }
 
-void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas, bool noPreventDefault)
+void ArcRotateCameraMouseWheelInput::attachControl(bool noPreventDefault)
 {
-  _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
   _wheel = [this](PointerInfo* p, EventState&) {
@@ -90,9 +88,9 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas, bool noPreve
     _wheel, static_cast<int>(PointerEventTypes::POINTERWHEEL));
 }
 
-void ArcRotateCameraMouseWheelInput::detachControl(ICanvas* canvas)
+void ArcRotateCameraMouseWheelInput::detachControl(ICanvas* /*ignored*/)
 {
-  if (_observer && canvas) {
+  if (_observer) {
     camera->getScene()->onPointerObservable.remove(_observer);
     _observer = nullptr;
     _wheel    = nullptr;

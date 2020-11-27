@@ -38,7 +38,7 @@ public:
    * define the source input element, you can set engine.inputElement before calling
    * camera.attachControl
    */
-  void detachControl(ICanvas* ignored) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Update the current camera state depending on the inputs that have been used this frame.

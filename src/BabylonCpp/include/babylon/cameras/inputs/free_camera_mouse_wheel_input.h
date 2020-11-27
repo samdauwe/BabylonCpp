@@ -41,17 +41,18 @@ public:
 
   /**
    * @brief Attach the mouse control to the HTML DOM element.
-   * @param element Defines the element that listens to the input events.
    * @param noPreventDefault Defines whether events caught by the controls should call
    * preventdefault().
    */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
+  void attachControl(bool noPreventDefault = false) override;
 
   /**
    * @brief Detach the current controls from the specified dom element.
-   * @param element Defines the element to stop listening the inputs from
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  void detachControl(ICanvas* canvas) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Called for each rendered frame.

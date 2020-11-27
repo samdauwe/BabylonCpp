@@ -225,14 +225,14 @@ std::optional<Coordinate>& FreeCameraMouseWheelInput::get_wheelZMoveScene()
   return _wheelZActionCoordinate;
 }
 
-void FreeCameraMouseWheelInput::attachControl(ICanvas* /*canvas*/, bool noPreventDefault)
+void FreeCameraMouseWheelInput::attachControl(bool noPreventDefault)
 {
   BaseCameraMouseWheelInput::attachControl(noPreventDefault);
 }
 
-void FreeCameraMouseWheelInput::detachControl(ICanvas* canvas)
+void FreeCameraMouseWheelInput::detachControl(ICanvas* ignored)
 {
-  BaseCameraMouseWheelInput::detachControl(canvas);
+  BaseCameraMouseWheelInput::detachControl(ignored);
 }
 
 void FreeCameraMouseWheelInput::checkInputs()

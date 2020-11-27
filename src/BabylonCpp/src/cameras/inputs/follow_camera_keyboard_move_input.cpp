@@ -19,7 +19,6 @@ FollowCameraKeyboardMoveInput::FollowCameraKeyboardMoveInput()
     , heightSensibility{1.f}
     , rotationSensibility{1.f}
     , radiusSensibility{1.f}
-    , _canvas{nullptr}
     , _noPreventDefault{false}
     , _onCanvasBlurObserver{nullptr}
     , _onKeyboardObserver{nullptr}
@@ -36,13 +35,12 @@ FollowCameraKeyboardMoveInput::FollowCameraKeyboardMoveInput()
 
 FollowCameraKeyboardMoveInput::~FollowCameraKeyboardMoveInput() = default;
 
-void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas, bool noPreventDefault)
+void FollowCameraKeyboardMoveInput::attachControl(bool noPreventDefault)
 {
   if (_onCanvasBlurObserver) {
     return;
   }
 
-  _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
   _scene  = camera->getScene();
@@ -109,7 +107,7 @@ void FollowCameraKeyboardMoveInput::attachControl(ICanvas* canvas, bool noPreven
   });
 }
 
-void FollowCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
+void FollowCameraKeyboardMoveInput::detachControl(ICanvas* /*ignored*/)
 {
   if (_scene) {
     if (_onKeyboardObserver) {

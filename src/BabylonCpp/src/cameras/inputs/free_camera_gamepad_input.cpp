@@ -34,7 +34,7 @@ void FreeCameraGamepadInput::set_invertYAxis(bool value)
   _yAxisScale = value ? -1.f : 1.f;
 }
 
-void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/)
+void FreeCameraGamepadInput::attachControl(bool /*noPreventDefault*/)
 {
   auto& manager               = camera->getScene()->gamepadManager();
   _onGamepadConnectedObserver = manager->onGamepadConnectedObservable.add(
@@ -62,7 +62,7 @@ void FreeCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPrevent
   }
 }
 
-void FreeCameraGamepadInput::detachControl(ICanvas* /*canvas*/)
+void FreeCameraGamepadInput::detachControl(ICanvas* /*ignored*/)
 {
   camera->getScene()->gamepadManager()->onGamepadConnectedObservable.remove(
     _onGamepadConnectedObserver);

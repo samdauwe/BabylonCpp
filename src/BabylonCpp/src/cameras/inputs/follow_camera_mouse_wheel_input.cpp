@@ -11,7 +11,6 @@ FollowCameraMouseWheelInput::FollowCameraMouseWheelInput()
     , axisControlRotation{false}
     , wheelPrecision{3.f}
     , wheelDeltaPercentage{0.f}
-    , _canvas{nullptr}
     , _noPreventDefault{false}
     , _wheel{nullptr}
     , _observer{nullptr}
@@ -20,10 +19,8 @@ FollowCameraMouseWheelInput::FollowCameraMouseWheelInput()
 
 FollowCameraMouseWheelInput::~FollowCameraMouseWheelInput() = default;
 
-void FollowCameraMouseWheelInput::attachControl(ICanvas* canvas,
-                                                bool noPreventDefault)
+void FollowCameraMouseWheelInput::attachControl(bool noPreventDefault)
 {
-  _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
   _wheel = [this](PointerInfo* p, EventState&) {
@@ -43,12 +40,10 @@ void FollowCameraMouseWheelInput::attachControl(ICanvas* canvas,
         delta = wheelDelta * 0.01f * wheelDeltaPercentage * camera->radius;
       }
       else if (axisControlHeight) {
-        delta
-          = wheelDelta * 0.01f * wheelDeltaPercentage * camera->heightOffset;
+        delta = wheelDelta * 0.01f * wheelDeltaPercentage * camera->heightOffset;
       }
       else if (axisControlRotation) {
-        delta
-          = wheelDelta * 0.01f * wheelDeltaPercentage * camera->rotationOffset;
+        delta = wheelDelta * 0.01f * wheelDeltaPercentage * camera->rotationOffset;
       }
     }
     else {
@@ -76,9 +71,9 @@ void FollowCameraMouseWheelInput::attachControl(ICanvas* canvas,
     _wheel, static_cast<int>(PointerEventTypes::POINTERWHEEL));
 }
 
-void FollowCameraMouseWheelInput::detachControl(ICanvas* canvas)
+void FollowCameraMouseWheelInput::detachControl(ICanvas* /*ignored*/)
 {
-  if (_observer && canvas) {
+  if (_observer) {
     camera->getScene()->onPointerObservable.remove(_observer);
     _observer = nullptr;
     _wheel    = nullptr;

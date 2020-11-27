@@ -30,7 +30,7 @@ void ArcRotateCameraGamepadInput::set_invertYAxis(bool value)
   _yAxisScale = value ? -1.f : 1.f;
 }
 
-void ArcRotateCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/)
+void ArcRotateCameraGamepadInput::attachControl(bool /*noPreventDefault*/)
 {
   auto& manager               = camera->getScene()->gamepadManager();
   _onGamepadConnectedObserver = manager->onGamepadConnectedObservable.add(
@@ -53,7 +53,7 @@ void ArcRotateCameraGamepadInput::attachControl(ICanvas* /*canvas*/, bool /*noPr
   gamepad = manager->getGamepadByType(Gamepad::XBOX);
 }
 
-void ArcRotateCameraGamepadInput::detachControl(ICanvas* /*canvas*/)
+void ArcRotateCameraGamepadInput::detachControl(ICanvas* /*ignored*/)
 {
   camera->getScene()->gamepadManager()->onGamepadConnectedObservable.remove(
     _onGamepadConnectedObserver);

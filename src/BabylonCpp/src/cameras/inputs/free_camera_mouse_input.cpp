@@ -24,11 +24,11 @@ FreeCameraMouseInput::FreeCameraMouseInput(bool iTouchEnabled)
 
 FreeCameraMouseInput::~FreeCameraMouseInput() = default;
 
-void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
+void FreeCameraMouseInput::attachControl(bool noPreventDefault)
 {
-  _canvas           = canvas;
-  _engine           = camera->getEngine();
   _noPreventDefault = noPreventDefault;
+  _engine           = camera->getEngine();
+  _canvas           = _engine->getInputElement();
 
   if (!_pointerInput) {
     _pointerInput = [this](PointerInfo* p, EventState&) -> void {
@@ -56,7 +56,9 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 
         if (!_noPreventDefault) {
           evt.preventDefault();
-          _canvas->focus();
+          if (_canvas) {
+            _canvas->focus();
+          }
         }
 
         // This is required to move while pointer button is down
@@ -148,12 +150,12 @@ void FreeCameraMouseInput::onContextMenu(PointerEvent& evt)
   evt.preventDefault();
 }
 
-void FreeCameraMouseInput::detachControl(ICanvas* canvas)
+void FreeCameraMouseInput::detachControl(ICanvas* /*ignored*/)
 {
-  if (_observer && canvas) {
+  if (_observer) {
     camera->getScene()->onPointerObservable.remove(_observer);
 
-    {
+    /* if (onPointerMovedObservable) */ {
       onPointerMovedObservable.clear();
     }
 

@@ -19,15 +19,14 @@ FlyCameraMouseInput::FlyCameraMouseInput(bool iTouchEnabled)
     , _rollObserver{nullptr}
     , previousPosition{std::nullopt}
     , _noPreventDefault{std::nullopt}
-    , _canvas{nullptr}
+    , element{nullptr}
 {
 }
 
 FlyCameraMouseInput::~FlyCameraMouseInput() = default;
 
-void FlyCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
+void FlyCameraMouseInput::attachControl(bool noPreventDefault)
 {
-  _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
   _observer = camera->getScene()->onPointerObservable.add(
@@ -38,16 +37,16 @@ void FlyCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 
   // Correct Roll by rate, if enabled.
   _rollObserver = camera->getScene()->onBeforeRenderObservable.add(
-    [this](Scene* /*scene*/, EventState & /*es*/) -> void {
+    [this](Scene* /*scene*/, EventState& /*es*/) -> void {
       if (camera->rollCorrect != 0.f) {
         camera->restoreRoll(camera->rollCorrect);
       }
     });
 }
 
-void FlyCameraMouseInput::detachControl(ICanvas* canvas)
+void FlyCameraMouseInput::detachControl(ICanvas* /*ignored*/)
 {
-  if (_observer && canvas) {
+  if (_observer) {
     camera->getScene()->onPointerObservable.remove(_observer);
 
     camera->getScene()->onBeforeRenderObservable.remove(_rollObserver);
@@ -104,7 +103,9 @@ void FlyCameraMouseInput::_pointerInput(PointerInfo* p, EventState& /*s*/)
 
     if (!_noPreventDefault) {
       e.preventDefault();
-      _canvas->focus();
+      if (element) {
+        element->focus();
+      }
     }
 
     // This is required to move while pointer button is down

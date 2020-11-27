@@ -25,17 +25,18 @@ public:
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input from.
-   * @param element Defines the element the controls should be listened from
    * @param noPreventDefault Defines whether event caught by the controls should call
    * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false) override;
+  void attachControl(bool noPreventDefault = false) override;
 
   /**
    * @brief Detach the current controls from the specified dom element.
-   * @param element Defines the element to stop listening the inputs from
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  void detachControl(ICanvas* canvas) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Update the current camera state depending on the inputs that have been used this frame.
@@ -75,7 +76,6 @@ public:
   float wheelDeltaPercentage;
 
 private:
-  ICanvas* _canvas;
   bool _noPreventDefault;
   std::function<void(PointerInfo* p, EventState& es)> _wheel;
   Observer<PointerInfo>::Ptr _observer;
