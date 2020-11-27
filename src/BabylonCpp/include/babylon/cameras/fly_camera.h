@@ -2,16 +2,15 @@
 #define BABYLON_CAMERAS_FLY_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/target_camera.h>
 
 namespace BABYLON {
 
-class Collider;
-class FlyCamera;
 struct FlyCameraInputsManager;
 class ICanvas;
-using ColliderPtr  = std::shared_ptr<Collider>;
-using FlyCameraPtr = std::shared_ptr<FlyCamera>;
+FWD_CLASS_SPTR(Collider)
+FWD_CLASS_SPTR(FlyCamera)
 
 /**
  * @brief This is a flying camera, designed for 3D movement and rotation in all directions,
@@ -32,20 +31,20 @@ public:
 
   /**
    * @brief Attach a control to the HTML DOM element.
-   * @param element Defines the element that listens to the input events.
    * @param noPreventDefault Defines whether events caught by the controls
    * should call preventdefault().
    * https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
    */
-  void attachControl(ICanvas* element, bool noPreventDefault = false, bool useCtrlForPanning = true,
+  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
                      MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
-   * @brief Detach a control from the HTML DOM element.
-   * The camera will stop reacting to that input.
-   * @param element Defines the element that listens to the input events.
+   * @brief Detach the current controls from the specified dom element.
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  void detachControl(ICanvas* element) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Hidden

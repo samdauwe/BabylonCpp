@@ -9,16 +9,15 @@ bool FollowCamera::NodeConstructorAdded = false;
 
 void FollowCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "FollowCamera", [](const std::string& iName, Scene* scene,
-                       const std::optional<json>& /*options*/) {
-      return FollowCamera::New(iName, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("FollowCamera", [](const std::string& iName, Scene* scene,
+                                              const std::optional<json>& /*options*/) {
+    return FollowCamera::New(iName, Vector3::Zero(), scene);
+  });
   FollowCamera::NodeConstructorAdded = true;
 }
 
-FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
-                           Scene* scene, const AbstractMeshPtr& iLockedTarget)
+FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition, Scene* scene,
+                           const AbstractMeshPtr& iLockedTarget)
     : TargetCamera{iName, iPosition, scene}
     , radius{12.f}
     , lowerRadiusLimit{std::nullopt}
@@ -90,19 +89,18 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
   setTarget(targetPosition);
 }
 
-void FollowCamera::attachControl(ICanvas* element, bool noPreventDefault,
-                                 bool /*useCtrlForPanning*/,
+void FollowCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
                                  MouseButtonType /*panningMouseButton*/
 )
 {
-  inputs->attachElement(element, noPreventDefault);
+  inputs->attachElement(noPreventDefault);
 
   _reset = []() -> void {};
 }
 
-void FollowCamera::detachControl(ICanvas* element)
+void FollowCamera::detachControl(ICanvas* /*ignored*/)
 {
-  inputs->detachElement(element);
+  inputs->detachElement();
 
   if (_reset) {
     _reset();
@@ -128,21 +126,17 @@ void FollowCamera::_checkLimits()
     radius = *upperRadiusLimit;
   }
 
-  if (lowerHeightOffsetLimit.has_value()
-      && heightOffset < *lowerHeightOffsetLimit) {
+  if (lowerHeightOffsetLimit.has_value() && heightOffset < *lowerHeightOffsetLimit) {
     heightOffset = *lowerHeightOffsetLimit;
   }
-  if (upperHeightOffsetLimit.has_value()
-      && heightOffset > *upperHeightOffsetLimit) {
+  if (upperHeightOffsetLimit.has_value() && heightOffset > *upperHeightOffsetLimit) {
     heightOffset = *upperHeightOffsetLimit;
   }
 
-  if (lowerRotationOffsetLimit.has_value()
-      && rotationOffset < *lowerRotationOffsetLimit) {
+  if (lowerRotationOffsetLimit.has_value() && rotationOffset < *lowerRotationOffsetLimit) {
     rotationOffset = *lowerRotationOffsetLimit;
   }
-  if (upperRotationOffsetLimit.has_value()
-      && rotationOffset > *upperRotationOffsetLimit) {
+  if (upperRotationOffsetLimit.has_value() && rotationOffset > *upperRotationOffsetLimit) {
     rotationOffset = *upperRotationOffsetLimit;
   }
 }

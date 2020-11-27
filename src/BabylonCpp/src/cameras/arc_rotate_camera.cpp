@@ -295,13 +295,13 @@ bool ArcRotateCamera::_isSynchronizedViewMatrix()
          && _cache.targetScreenOffset.equals(targetScreenOffset);
 }
 
-void ArcRotateCamera::attachControl(ICanvas* canvas, bool noPreventDefault, bool useCtrlForPanning,
+void ArcRotateCamera::attachControl(bool noPreventDefault, bool useCtrlForPanning,
                                     MouseButtonType panningMouseButton)
 {
   _useCtrlForPanning  = useCtrlForPanning;
   _panningMouseButton = panningMouseButton;
 
-  inputs->attachElement(canvas, noPreventDefault);
+  inputs->attachElement(noPreventDefault);
 
   _reset = [&]() {
     inertialAlphaOffset  = 0.f;
@@ -312,13 +312,9 @@ void ArcRotateCamera::attachControl(ICanvas* canvas, bool noPreventDefault, bool
   };
 }
 
-void ArcRotateCamera::attachControl(bool, bool, MouseButtonType)
+void ArcRotateCamera::detachControl(ICanvas* /*ignored*/)
 {
-}
-
-void ArcRotateCamera::detachControl(ICanvas* canvas)
-{
-  inputs->detachElement(canvas);
+  inputs->detachElement();
 
   if (_reset) {
     _reset();
@@ -419,7 +415,7 @@ void ArcRotateCamera::_checkLimits()
 {
   if (lowerBetaLimit == 0.f) {
     if (allowUpsideDown && beta > Math::PI) {
-      beta = beta - (2 * Math::PI);
+      beta = beta - Math::PI2;
     }
   }
   else {
@@ -430,7 +426,7 @@ void ArcRotateCamera::_checkLimits()
 
   if (upperBetaLimit == 0.f) {
     if (allowUpsideDown && beta < -Math::PI) {
-      beta = beta + (2 * Math::PI);
+      beta = beta + Math::PI2;
     }
   }
   else {
@@ -472,6 +468,7 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   }
 
   // Alpha
+  const auto previousAlpha = alpha;
   if (_computationVector.x == 0.f && _computationVector.z == 0.f) {
     alpha = Math::PI_2; // avoid division by zero when looking along up axis,
                         // and set to acos(0)
@@ -485,6 +482,11 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   if (_computationVector.z < 0.f) {
     alpha = Math::PI2 - alpha;
   }
+
+  // Calculate the number of revolutions between the new and old alpha values.
+  const auto alphaCorrectionTurns = std::round((previousAlpha - alpha) / (2.f * Math::PI));
+  // Adjust alpha so that its numerical representation is the closest one to the old value.
+  alpha += alphaCorrectionTurns * 2.f * Math::PI;
 
   // Beta
   beta = std::acos(_computationVector.y / radius);

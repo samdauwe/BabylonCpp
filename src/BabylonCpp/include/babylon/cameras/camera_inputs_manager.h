@@ -62,21 +62,18 @@ public:
   /**
    * @brief Attach the current manager inputs controls to a specific dom element
    * to listen the events from.
-   * @param element Defines the dom element to collect the events from
    * @param noPreventDefault Defines whether event caught by the controls should
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  void attachElement(ICanvas* canvas, bool noPreventDefault = false);
+  void attachElement(bool noPreventDefault = false);
 
   /**
-   * @brief Detach the current manager inputs controls from a specific dom
-   * element.
-   * @param element Defines the dom element to collect the events from
+   * @brief Detach the current manager inputs controls from a specific dom element.
    * @param disconnect Defines whether the input should be removed from the
    * current list of attached inputs
    */
-  void detachElement(ICanvas* canvas, bool disconnect = false);
+  void detachElement(bool disconnect = false);
 
   /**
    * @brief Rebuild the dynamic inputCheck function from the current list of
@@ -118,10 +115,7 @@ public:
    * Defines the dom element the camera is collecting inputs from.
    * This is null if the controls have not been attached.
    */
-  ICanvas* attachedElement;
-
-  // TODO update to v4.2.0
-  bool attachedToElement = false;
+  bool attachedToElement;
 
   /**
    * Defines whether event caught by the controls should call preventdefault()

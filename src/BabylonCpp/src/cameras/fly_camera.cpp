@@ -205,15 +205,15 @@ void FlyCamera::set_keysRight(const Int32Array& value)
   }
 }
 
-void FlyCamera::attachControl(ICanvas* element, bool noPreventDefault, bool /*useCtrlForPanning*/,
+void FlyCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
                               MouseButtonType /*panningMouseButton*/)
 {
-  inputs->attachElement(element, noPreventDefault);
+  inputs->attachElement(noPreventDefault);
 }
 
-void FlyCamera::detachControl(ICanvas* element)
+void FlyCamera::detachControl(ICanvas* /*ignored*/)
 {
-  inputs->detachElement(element);
+  inputs->detachElement();
 
   cameraDirection = std::make_unique<Vector3>(0.f, 0.f, 0.f);
 }

@@ -228,15 +228,15 @@ void FreeCamera::set_keysRight(const Int32Array& value)
 }
 
 /** Controls **/
-void FreeCamera::attachControl(ICanvas* canvas, bool noPreventDefault, bool /*useCtrlForPanning*/,
+void FreeCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
                                MouseButtonType /*panningMouseButton*/)
 {
-  inputs->attachElement(canvas, noPreventDefault);
+  inputs->attachElement(noPreventDefault);
 }
 
-void FreeCamera::detachControl(ICanvas* canvas)
+void FreeCamera::detachControl(ICanvas* /*ignored*/)
 {
-  inputs->detachElement(canvas);
+  inputs->detachElement();
 
   cameraDirection = std::make_unique<Vector3>(0.f, 0.f, 0.f);
   cameraRotation  = std::make_unique<Vector2>(0.f, 0.f);

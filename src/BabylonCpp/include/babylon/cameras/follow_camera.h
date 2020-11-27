@@ -2,13 +2,13 @@
 #define BABYLON_CAMERAS_FOLLOW_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/follow_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 
 namespace BABYLON {
 
-class FollowCamera;
-using FollowCameraPtr = std::shared_ptr<FollowCamera>;
+FWD_CLASS_SPTR(FollowCamera)
 
 /**
  * @brief A follow camera takes a mesh as a target and follows it as it moves. Both a free camera
@@ -35,20 +35,20 @@ public:
 
   /**
    * @brief Attached controls to the current camera.
-   * @param element Defines the element the controls should be listened from
    * @param noPreventDefault Defines whether event caught by the controls should
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  void attachControl(ICanvas* element, bool noPreventDefault = false, bool useCtrlForPanning = true,
+  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
                      MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
-   * @brief Detach the current controls from the camera.
-   * The camera will stop reacting to inputs.
-   * @param element Defines the element to stop listening the inputs from
+   * @brief Detach the current controls from the specified dom element.
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  void detachControl(ICanvas* element) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Hidden

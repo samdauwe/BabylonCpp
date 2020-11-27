@@ -2,6 +2,7 @@
 #define BABYLON_CAMERAS_ARC_ROTATE_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/structs.h>
@@ -11,13 +12,11 @@
 
 namespace BABYLON {
 
-class ArcRotateCamera;
 class AutoRotationBehavior;
 class BouncingBehavior;
-class Collider;
 class FramingBehavior;
-using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
-using ColliderPtr        = std::shared_ptr<Collider>;
+FWD_CLASS_SPTR(ArcRotateCamera)
+FWD_CLASS_SPTR(Collider)
 
 /**
  * @brief This represents an orbital type of camera.
@@ -83,25 +82,24 @@ public:
 
   /**
    * @brief Attached controls to the current camera.
-   * @param element Defines the element the controls should be listened from
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    * @param noPreventDefault Defines whether event caught by the controls should call
    * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    * @param useCtrlForPanning  Defines whether ctrl is used for paning within the controls
    * @param panningMouseButton Defines whether panning is allowed through mouse click button
    */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false, bool useCtrlForPanning = true,
+  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
                      MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
-  // TODO update to v4.2.0
-  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
-
   /**
-   * @brief Detach the current controls from the camera.
-   * The camera will stop reacting to inputs.
-   * @param element Defines the element to stop listening the inputs from
+   * @brief Detach the current controls from the specified dom element.
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  void detachControl(ICanvas* canvas) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Hidden

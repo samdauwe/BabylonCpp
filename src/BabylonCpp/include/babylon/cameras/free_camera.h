@@ -2,16 +2,15 @@
 #define BABYLON_CAMERAS_FREE_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/free_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
 
-class Collider;
-class FreeCamera;
-using ColliderPtr   = std::shared_ptr<Collider>;
-using FreeCameraPtr = std::shared_ptr<FreeCamera>;
+FWD_CLASS_SPTR(Collider)
+FWD_CLASS_SPTR(FreeCamera)
 
 /**
  * @brief This represents a free type of camera. It can be useful in First Person Shooter game for
@@ -39,20 +38,20 @@ public:
 
   /**
    * @brief Attached controls to the current camera.
-   * @param element Defines the element the controls should be listened from
    * @param noPreventDefault Defines whether event caught by the controls should
    * call preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  void attachControl(ICanvas* canvas, bool noPreventDefault = false, bool useCtrlForPanning = true,
+  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
                      MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
-   * @brief Detach the current controls from the camera.
-   * The camera will stop reacting to inputs.
-   * @param element Defines the element to stop listening the inputs from
+   * @brief Detach the current controls from the specified dom element.
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  void detachControl(ICanvas* canvas) override;
+  void detachControl(ICanvas* ignored = nullptr) override;
 
   /**
    * @brief Hidden
