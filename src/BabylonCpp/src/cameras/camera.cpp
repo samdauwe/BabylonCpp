@@ -291,20 +291,12 @@ bool Camera::_isSynchronizedProjectionMatrix()
 }
 
 // Controls
-void Camera::attachControl(ICanvas* /*canvas*/, bool /*noPreventDefault*/,
-                           bool /*useCtrlForPanning*/, MouseButtonType /*panningMouseButton*/)
+void Camera::attachControl(bool /*noPreventDefault*/, bool /*useCtrlForPanning*/,
+                           MouseButtonType /*panningMouseButton*/)
 {
 }
 
-void Camera::attachControl(bool, bool, MouseButtonType)
-{
-}
-
-void Camera::detachControl(ICanvas* /*canvas*/)
-{
-}
-
-void Camera::detachControl()
+void Camera::detachControl(ICanvas* /*ignored*/)
 {
 }
 
@@ -1019,6 +1011,13 @@ CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
   //  camera->inputs.parse(parsedCamera);
   //  camera->_setupInputs();
   // }
+
+  if (json_util::has_valid_key_value(parsedCamera, "upVector")) {
+    const auto upVectorArray = json_util::get_array<float>(parsedCamera, "upVector");
+    if (upVectorArray.size() >= 3) {
+      camera->upVector = Vector3::FromArray(upVectorArray); // need to force the upVector
+    }
+  }
 
   // Need to force position
   if (camera->type() == Type::ARCROTATECAMERA) {

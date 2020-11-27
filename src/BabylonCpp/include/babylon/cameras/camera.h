@@ -4,6 +4,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/engines/node.h>
 #include <babylon/interfaces/idisposable.h>
@@ -17,16 +18,12 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class Camera;
 struct ICullable;
-class FreeCamera;
-class PostProcess;
 class Ray;
-class RenderTargetTexture;
-using CameraPtr              = std::shared_ptr<Camera>;
-using FreeCameraPtr          = std::shared_ptr<FreeCamera>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(FreeCamera)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 struct RigParamaters {
   std::optional<float> interaxialDistance = std::nullopt;
@@ -194,29 +191,22 @@ public:
   bool _isSynchronizedProjectionMatrix();
 
   /**
-   * @brief Attach the input controls to a specific dom element to get the input
-   * from.
+   * @brief Attach the input controls to a specific dom element to get the input from.
    * @param element Defines the element the controls should be listened from
-   * @param noPreventDefault Defines whether event caught by the controls should
-   * call preventdefault()
+   * @param noPreventDefault Defines whether event caught by the controls should call
+   * preventdefault()
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
-  virtual void attachControl(ICanvas* canvas, bool noPreventDefault = false,
-                             bool useCtrlForPanning             = true,
+  virtual void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
                              MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
-
-  // TODO update to v4.2.0
-  void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT);
 
   /**
    * @brief Detach the current controls from the specified dom element.
-   * @param element Defines the element to stop listening the inputs from
+   * @param ignored defines an ignored parameter kept for backward compatibility. If you want to
+   * define the source input element, you can set engine.inputElement before calling
+   * camera.attachControl
    */
-  virtual void detachControl(ICanvas* canvas);
-
-  // TODO update to v4.2.0
-  void detachControl();
+  virtual void detachControl(ICanvas* ignored = nullptr);
 
   /**
    * @brief Update the camera state according to the different inputs gathered
