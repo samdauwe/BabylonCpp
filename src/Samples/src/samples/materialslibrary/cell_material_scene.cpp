@@ -28,12 +28,12 @@ struct CellMaterialScene : public IRenderableScene {
     return "Cell Material Scene";
   }
 
-  void initializeScene(ICanvas* canvas, Scene* scene) override
+  void initializeScene(ICanvas* /*canvas*/, Scene* scene) override
   {
     scene->clearColor = Color3(0.5f, 0.5f, 0.5f);
 
     auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f, Vector3::Zero(), scene);
-    camera->attachControl(canvas, true, true);
+    camera->attachControl(true, true);
 
     auto knot  = Mesh::CreateTorusKnot("knot", 2, 0.5f, 128, 64, 2, 3, scene);
     auto light = PointLight::New("light", Vector3(10.f, 10.f, 10.f), scene);
