@@ -2,15 +2,16 @@
 #define BABYLON_GIZMOS_POSITION_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
 class AxisDragGizmo;
+class GizmoManager;
 class PlaneDragGizmo;
-class UtilityLayerRenderer;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
  * @brief Gizmo that enables dragging a mesh along 3 axis.
@@ -25,8 +26,16 @@ public:
    */
   PositionGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
-                float thickness = 1.f);
+                float thickness = 1.f, GizmoManager* gizmoManager = nullptr);
   ~PositionGizmo() override; // = default
+
+  /**
+   * @brief Builds Gizmo Axis Cache to enable features such as hover state preservation and graying
+   * out other axis during manipulation.
+   * @param mesh Axis gizmo mesh
+   * @param cache Gizmo axis definition used for reactive gizmo UI
+   */
+  void addToAxisCache(Mesh* mesh, const GizmoAxisCache& cache);
 
   /**
    * @brief Disposes of the gizmo.
@@ -128,6 +137,10 @@ private:
   AbstractMeshPtr _meshAttached;
   NodePtr _nodeAttached;
   float _snapDistance;
+  std::vector<Observer<PointerInfo>::Ptr> _observables;
+
+  /** Node Caching for quick lookup */
+  std::unordered_map<Mesh*, GizmoAxisCache> _gizmoAxisCache;
 
   /**
    * If set to true, planar drag is enabled

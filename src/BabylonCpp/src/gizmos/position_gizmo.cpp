@@ -2,15 +2,21 @@
 
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/scene.h>
 #include <babylon/gizmos/axis_drag_gizmo.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
+#include <babylon/gizmos/gizmo_manager.h>
 #include <babylon/gizmos/plane_drag_gizmo.h>
+#include <babylon/gizmos/rotation_gizmo.h>
+#include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
-PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer, float thickness)
+PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer, float thickness,
+                             GizmoManager* gizmoManager)
     : Gizmo{iGizmoLayer}
     , planarGizmoEnabled{this, &PositionGizmo::get_planarGizmoEnabled,
                          &PositionGizmo::set_planarGizmoEnabled}
@@ -57,6 +63,14 @@ PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer, float t
   }
 
   attachedMesh = nullptr;
+
+  if (gizmoManager) {
+    gizmoManager->addToAxisCache(_gizmoAxisCache);
+  }
+  else {
+    // Only subscribe to pointer event if gizmoManager isnt
+    Gizmo::GizmoAxisPointerObserver(gizmoLayer, _gizmoAxisCache);
+  }
 }
 
 PositionGizmo::~PositionGizmo() = default;
@@ -210,6 +224,11 @@ float PositionGizmo::get_scaleRatio() const
   return _scaleRatio;
 }
 
+void PositionGizmo::addToAxisCache(Mesh* mesh, const GizmoAxisCache& cache)
+{
+  _gizmoAxisCache[mesh] = cache;
+}
+
 void PositionGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
@@ -221,6 +240,9 @@ void PositionGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     if (gizmo) {
       gizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
     }
+  }
+  for (const auto& obs : _observables) {
+    gizmoLayer->utilityLayerScene->onPointerObservable.remove(obs);
   }
   onDragStartObservable.clear();
   onDragEndObservable.clear();
