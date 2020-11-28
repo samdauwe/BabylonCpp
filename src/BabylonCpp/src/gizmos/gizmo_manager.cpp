@@ -12,7 +12,9 @@
 
 namespace BABYLON {
 
-GizmoManager::GizmoManager(Scene* iScene, float thickness)
+GizmoManager::GizmoManager(Scene* iScene, float thickness,
+                           const UtilityLayerRendererPtr& utilityLayer,
+                           const UtilityLayerRendererPtr& keepDepthUtilityLayer)
     : clearGizmoOnEmptyPointerEvent{false}
     , boundingBoxDragBehavior{std::make_unique<SixDofDragBehavior>()}
     , attachableMeshes{std::nullopt}
@@ -31,20 +33,31 @@ GizmoManager::GizmoManager(Scene* iScene, float thickness)
                               &GizmoManager::set_boundingBoxGizmoEnabled}
     , _scene{iScene}
     , _gizmosEnabled{false, false, false, false}
-    , _pointerObserver{nullptr}
     , _attachedMesh{nullptr}
     , _attachedNode{nullptr}
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
     , _thickness{1.f}
 {
-  _defaultKeepDepthUtilityLayer = UtilityLayerRenderer::New(iScene);
+  _defaultUtilityLayer = utilityLayer ? utilityLayer : UtilityLayerRenderer::DefaultUtilityLayer();
+  _defaultKeepDepthUtilityLayer = keepDepthUtilityLayer ?
+                                    keepDepthUtilityLayer :
+                                    UtilityLayerRenderer::DefaultKeepDepthUtilityLayer();
   _defaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil = false;
   _defaultUtilityLayer = UtilityLayerRenderer::DefaultUtilityLayer();
 
   _thickness = thickness;
+  gizmos     = {};
 
+  const auto attachToMeshPointerObserver = _attachToMeshPointerObserver(iScene);
+  const auto gizmoAxisPointerObserver
+    = Gizmo::GizmoAxisPointerObserver(_defaultUtilityLayer, _gizmoAxisCache);
+  _pointerObservers = {attachToMeshPointerObserver, gizmoAxisPointerObserver};
+}
+
+Observer<PointerInfo>::Ptr GizmoManager::_attachToMeshPointerObserver(Scene* /*scene*/)
+{
   // Instatiate/dispose gizmos based on pointer actions
-  _pointerObserver
+  const auto pointerObserver
     = _scene->onPointerObservable.add([this](PointerInfo* pointerInfo, EventState& /*es*/) {
         if (!usePointerToAttachGizmos) {
           return;
@@ -90,6 +103,7 @@ GizmoManager::GizmoManager(Scene* iScene, float thickness)
           }
         }
       });
+  return pointerObserver;
 }
 
 GizmoManager::~GizmoManager() = default;
@@ -187,7 +201,8 @@ void GizmoManager::set_positionGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.positionGizmo) {
-      gizmos.positionGizmo = std::make_unique<PositionGizmo>(_defaultUtilityLayer, _thickness);
+      gizmos.positionGizmo
+        = std::make_unique<PositionGizmo>(_defaultUtilityLayer, _thickness, this);
     }
     if (_attachedNode) {
       gizmos.positionGizmo->attachedNode = _attachedNode;
@@ -212,7 +227,7 @@ void GizmoManager::set_rotationGizmoEnabled(bool value)
   if (value) {
     if (!gizmos.rotationGizmo) {
       gizmos.rotationGizmo
-        = std::make_unique<RotationGizmo>(_defaultUtilityLayer, 32, false, _thickness);
+        = std::make_unique<RotationGizmo>(_defaultUtilityLayer, 32, false, _thickness, this);
     }
     if (_attachedNode) {
       gizmos.rotationGizmo->attachedNode = _attachedNode;
@@ -236,7 +251,7 @@ void GizmoManager::set_scaleGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.scaleGizmo) {
-      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>(_defaultUtilityLayer, _thickness);
+      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>(_defaultUtilityLayer, _thickness, this);
     }
     if (_attachedNode) {
       gizmos.scaleGizmo->attachedNode = _attachedNode;
@@ -296,10 +311,20 @@ bool GizmoManager::get_boundingBoxGizmoEnabled() const
   return _gizmosEnabled.boundingBoxGizmo;
 }
 
+void GizmoManager::addToAxisCache(const std::unordered_map<Mesh*, GizmoAxisCache>& gizmoAxisCache)
+{
+  if (!gizmoAxisCache.empty()) {
+    for (const auto& [k, v] : gizmoAxisCache) {
+      _gizmoAxisCache[k] = v;
+    }
+  }
+}
+
 void GizmoManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
-  _scene->onPointerObservable.remove(_pointerObserver);
-
+  for (const auto& observer : _pointerObservers) {
+    _scene->onPointerObservable.remove(observer);
+  }
   if (gizmos.positionGizmo) {
     gizmos.positionGizmo->dispose();
     gizmos.positionGizmo = nullptr;

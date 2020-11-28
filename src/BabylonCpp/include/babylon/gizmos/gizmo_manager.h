@@ -2,6 +2,8 @@
 #define BABYLON_GIZMOS_GIZMO_MANAGER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
+#include <babylon/gizmos/gizmo.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/color3.h>
 #include <babylon/misc/observable.h>
@@ -9,19 +11,17 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
 class BoundingBoxGizmo;
-class Node;
+class Mesh;
 class PointerInfo;
 class PositionGizmo;
 class RotationGizmo;
 class ScaleGizmo;
 class Scene;
 class SixDofDragBehavior;
-class UtilityLayerRenderer;
-using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
-using NodePtr                 = std::shared_ptr<Node>;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 struct Gizmos {
   std::unique_ptr<PositionGizmo> positionGizmo       = nullptr;
@@ -47,8 +47,12 @@ public:
    * @brief Instatiates a gizmo manager.
    * @param scene the scene to overlay the gizmos on top of
    * @param thickness display gizmo axis thickness
+   * @param utilityLayer the layer where gizmos are rendered
+   * @param keepDepthUtilityLayer the layer where occluded gizmos are rendered
    */
-  GizmoManager(Scene* scene, float thickness = 1);
+  GizmoManager(Scene* scene, float thickness = 1,
+               const UtilityLayerRendererPtr& utilityLayer          = nullptr,
+               const UtilityLayerRendererPtr& keepDepthUtilityLayer = nullptr);
   ~GizmoManager() override; // = default
 
   /**
@@ -62,6 +66,13 @@ public:
    * @param node The node the gizmo's should be attached to
    */
   void attachToNode(const NodePtr& node);
+
+  /**
+   * @brief Builds Gizmo Axis Cache to enable features such as hover state preservation and graying
+   * out other axis during manipulation.
+   * @param gizmoAxisCache Gizmo axis definition used for reactive gizmo UI
+   */
+  void addToAxisCache(const std::unordered_map<Mesh*, GizmoAxisCache>& gizmoAxisCache);
 
   /**
    * @brief Disposes of the gizmo manager.
@@ -124,6 +135,13 @@ protected:
    * @brief Gets if the boundingBox gizmo is enabled.
    */
   [[nodiscard]] bool get_boundingBoxGizmoEnabled() const;
+
+private:
+  /**
+   * @brief Subscribes to pointer down events, for attaching and detaching mesh.
+   * @param scene The sceme layer the observer will be added to
+   */
+  Observer<PointerInfo>::Ptr _attachToMeshPointerObserver(Scene* scene);
 
 public:
   /**
@@ -209,13 +227,15 @@ public:
 private:
   Scene* _scene;
   GizmosEnabledSettings _gizmosEnabled;
-  Observer<PointerInfo>::Ptr _pointerObserver;
+  std::vector<Observer<PointerInfo>::Ptr> _pointerObservers;
   AbstractMeshPtr _attachedMesh;
   NodePtr _attachedNode;
   Color3 _boundingBoxColor;
   UtilityLayerRendererPtr _defaultUtilityLayer;
   UtilityLayerRendererPtr _defaultKeepDepthUtilityLayer;
   float _thickness;
+  /** Node Caching for quick lookup */
+  std::unordered_map<Mesh*, GizmoAxisCache> _gizmoAxisCache;
 
 }; // end of class GizmoManager
 
