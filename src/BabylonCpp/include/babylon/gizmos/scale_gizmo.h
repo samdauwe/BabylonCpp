@@ -8,6 +8,7 @@
 namespace BABYLON {
 
 class AxisScaleGizmo;
+class GizmoManager;
 
 /**
  * @brief Gizmo that enables scaling a mesh along 3 axis.
@@ -22,8 +23,16 @@ public:
    */
   ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
              = UtilityLayerRenderer::DefaultUtilityLayer(),
-             float thickness = 1.f);
+             float thickness = 1.f, GizmoManager* gizmoManager = nullptr);
   ~ScaleGizmo() override; // = default
+
+  /**
+   * @brief Builds Gizmo Axis Cache to enable features such as hover state preservation and graying
+   * out other axis during manipulation.
+   * @param mesh Axis gizmo mesh
+   * @param cache Gizmo axis definition used for reactive gizmo UI
+   */
+  void addToAxisCache(Mesh* mesh, const GizmoAxisCache& cache);
 
   /**
    * @brief Disposes of the gizmo.
@@ -49,6 +58,12 @@ protected:
   [[nodiscard]] float get_scaleRatio() const override;
   void set_sensitivity(float value);
   [[nodiscard]] float get_sensitivity() const;
+
+private:
+  /**
+   * @brief Create Geometry for Gizmo.
+   */
+  std::unique_ptr<AxisScaleGizmo> _createUniformScaleMesh();
 
 public:
   /**
@@ -98,6 +113,13 @@ private:
   MeshPtr _uniformScalingMesh;
   MeshPtr _octahedron;
   float _sensitivity;
+  StandardMaterialPtr _coloredMaterial;
+  StandardMaterialPtr _hoverMaterial;
+  StandardMaterialPtr _disableMaterial;
+  std::vector<Observer<PointerInfo>::Ptr> _observables;
+
+  /** Node Caching for quick lookup */
+  std::unordered_map<Mesh*, GizmoAxisCache> _gizmoAxisCache;
 
 }; // end of class ScaleGizmo
 
