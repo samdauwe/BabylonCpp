@@ -2,15 +2,20 @@
 
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/scene.h>
+#include <babylon/gizmos/gizmo_manager.h>
 #include <babylon/gizmos/plane_rotation_gizmo.h>
+#include <babylon/gizmos/position_gizmo.h>
+#include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
 
 namespace BABYLON {
 
 RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigned int tessellation,
-                             bool useEulerRotation, float thickness)
+                             bool useEulerRotation, float thickness, GizmoManager* gizmoManager)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &RotationGizmo::get_snapDistance, &RotationGizmo::set_snapDistance}
 {
@@ -38,6 +43,14 @@ RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigne
 
   attachedMesh = nullptr;
   attachedNode = nullptr;
+
+  if (gizmoManager) {
+    gizmoManager->addToAxisCache(_gizmoAxisCache);
+  }
+  else {
+    // Only subscribe to pointer event if gizmoManager isnt
+    Gizmo::GizmoAxisPointerObserver(gizmoLayer, _gizmoAxisCache);
+  }
 }
 
 RotationGizmo::~RotationGizmo() = default;
@@ -51,7 +64,7 @@ void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   _meshAttached = mesh;
   _nodeAttached = mesh;
-
+  _checkBillboardTransform();
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
     if (gizmo->isEnabled()) {
       gizmo->attachedMesh = mesh;
@@ -141,6 +154,11 @@ float RotationGizmo::get_scaleRatio() const
   return xGizmo->scaleRatio;
 }
 
+void RotationGizmo::addToAxisCache(Mesh* mesh, const GizmoAxisCache& cache)
+{
+  _gizmoAxisCache[mesh] = cache;
+}
+
 void RotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   xGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
@@ -148,6 +166,9 @@ void RotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   zGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
   onDragStartObservable.clear();
   onDragEndObservable.clear();
+  for (const auto& obs : _observables) {
+    gizmoLayer->utilityLayerScene->onPointerObservable.remove(obs);
+  }
 }
 
 void RotationGizmo::setCustomMesh(const MeshPtr& /*mesh*/, bool /*useGizmoMaterial*/)

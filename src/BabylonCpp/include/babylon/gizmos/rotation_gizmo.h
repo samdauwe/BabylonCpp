@@ -2,14 +2,16 @@
 #define BABYLON_GIZMOS_ROTATION_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
+class GizmoManager;
+class Mesh;
 class PlaneRotationGizmo;
-class UtilityLayerRenderer;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
  * @brief Gizmo that enables rotating a mesh along 3 axis.
@@ -27,8 +29,16 @@ public:
   RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
                 unsigned int tessellation = 32, bool useEulerRotation = false,
-                float thickness = 1.f);
+                float thickness = 1.f, GizmoManager* gizmoManager = nullptr);
   ~RotationGizmo() override; // = default
+
+  /**
+   * @brief Builds Gizmo Axis Cache to enable features such as hover state preservation and graying
+   * out other axis during manipulation
+   * @param mesh Axis gizmo mesh
+   * @param cache Gizmo axis definition used for reactive gizmo UI
+   */
+  void addToAxisCache(Mesh* mesh, const GizmoAxisCache& cache);
 
   /**
    * @brief Disposes of the gizmo.
@@ -95,6 +105,10 @@ public:
 private:
   AbstractMeshPtr _meshAttached;
   NodePtr _nodeAttached;
+  std::vector<Observer<PointerInfo>::Ptr> _observables;
+
+  /** Node Caching for quick lookup */
+  std::unordered_map<Mesh*, GizmoAxisCache> _gizmoAxisCache;
 
 }; // end of class RotationGizmo
 
