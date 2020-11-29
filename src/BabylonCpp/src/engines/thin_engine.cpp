@@ -2249,6 +2249,10 @@ InternalTexturePtr ThinEngine::createTexture(
     url = _transformTextureUrl(url);
   }
 
+  if (originalUrl != url) {
+    texture->_originalUrl = originalUrl;
+  }
+
   // establish the file extension, if possible
   const auto lastDot = StringTools::lastIndexOf(url, ".");
   auto extension

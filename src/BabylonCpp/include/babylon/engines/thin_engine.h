@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/structs.h>
@@ -21,7 +22,6 @@ namespace BABYLON {
 
 class AlphaExtension;
 class AlphaState;
-class BaseTexture;
 class CubeTextureExtension;
 struct CubeTextureData;
 class DepthCullingState;
@@ -29,20 +29,14 @@ struct DepthTextureCreationOptions;
 class DynamicBufferExtension;
 class DynamicTextureExtension;
 class Color4;
-class Effect;
 class ICanvasRenderingContext2D;
 struct IEffectCreationOptions;
 struct IFileRequest;
-struct IInternalTextureLoader;
 struct IMultiRenderTargetOptions;
 struct InstancingAttributeInfo;
-class InternalTexture;
-class IPipelineContext;
 struct RenderTargetCreationOptions;
 struct IRenderTargetOptions;
-struct IShaderProcessor;
 struct ISize;
-struct LoaderOptions;
 class MultiRenderExtension;
 class ProgressEvent;
 class RawTextureExtension;
@@ -52,33 +46,31 @@ class RenderTargetExtension;
 class Scene;
 class StencilState;
 class Texture;
-class ThinTexture;
 class UniformBuffer;
 class UniformBufferExtension;
-class VertexBuffer;
-class WebGLDataBuffer;
-class WebGLPipelineContext;
-using ArrayBufferViewArray      = std::vector<ArrayBufferView>;
-using BaseTexturePtr            = std::shared_ptr<BaseTexture>;
-using EffectPtr                 = std::shared_ptr<Effect>;
-using IInternalTextureLoaderPtr = std::shared_ptr<IInternalTextureLoader>;
-using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
-using IPipelineContextPtr       = std::shared_ptr<IPipelineContext>;
-using IShaderProcessorPtr       = std::shared_ptr<IShaderProcessor>;
-using LoaderOptionsPtr          = std::shared_ptr<LoaderOptions>;
-using ThinTexturePtr            = std::shared_ptr<ThinTexture>;
-using VertexBufferPtr           = std::shared_ptr<VertexBuffer>;
+using ArrayBufferViewArray = std::vector<ArrayBufferView>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(IInternalTextureLoader)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(IPipelineContext)
+FWD_STRUCT_SPTR(IShaderProcessor)
+FWD_STRUCT_SPTR(LoaderOptions)
+FWD_CLASS_SPTR(ThinTexture)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
+FWD_CLASS_SPTR(WebGLPipelineContext)
+
+// GL
 using WebGLBufferPtr            = std::shared_ptr<GL::IGLBuffer>;
-using WebGLDataBufferPtr        = std::shared_ptr<WebGLDataBuffer>;
 using WebGLFramebufferPtr       = std::shared_ptr<GL::IGLFramebuffer>;
-using WebGLPipelineContextPtr   = std::shared_ptr<WebGLPipelineContext>;
 using WebGLProgramPtr           = std::shared_ptr<GL::IGLProgram>;
 using WebGLRenderbufferPtr      = std::shared_ptr<GL::IGLRenderbuffer>;
-using WebGLRenderingContext     = GL::IGLRenderingContext;
 using WebGLShaderPtr            = std::shared_ptr<GL::IGLShader>;
 using WebGLTexturePtr           = std::shared_ptr<GL::IGLTexture>;
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 using WebGLUniformLocationPtr   = std::shared_ptr<GL::IGLUniformLocation>;
+using WebGLRenderingContext     = GL::IGLRenderingContext;
 
 struct FramebufferDimensionsObject {
   int framebufferWidth  = 0;
