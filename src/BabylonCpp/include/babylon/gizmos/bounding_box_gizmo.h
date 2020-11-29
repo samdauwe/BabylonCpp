@@ -2,6 +2,7 @@
 #define BABYLON_GIZMOS_BOUNDING_BOX_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/maths/color3.h>
@@ -12,13 +13,10 @@
 
 namespace BABYLON {
 
-class Node;
 class PointerDragBehavior;
-class StandardMaterial;
-class UtilityLayerRenderer;
-using NodePtr                 = std::shared_ptr<Node>;
-using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
  * @brief Bounding box gizmo.
@@ -116,9 +114,15 @@ public:
   /**
    * If set, the rotation spheres and scale boxes will increase in size based on the distance away
    * from the camera to have a consistent screen size (Default: false)
+   * Note : fixedDragMeshScreenSize takes precedence over fixedDragMeshBoundsSize if both are true
    */
   bool fixedDragMeshScreenSize;
-
+  /**
+   * If set, the rotation spheres and scale boxes will increase in size based on the size of the
+   * bounding box
+   * Note : fixedDragMeshScreenSize takes precedence over fixedDragMeshBoundsSize if both are true
+   */
+  bool fixedDragMeshBoundsSize;
   /**
    * The distance away from the object which the draggable meshes should appear
    * world sized when fixedDragMeshScreenSize is set to true (default: 10)

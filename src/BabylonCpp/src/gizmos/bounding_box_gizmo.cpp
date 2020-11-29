@@ -28,6 +28,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
     , rotationSphereSize{0.1f}
     , scaleBoxSize{0.1f}
     , fixedDragMeshScreenSize{false}
+    , fixedDragMeshBoundsSize{false}
     , fixedDragMeshScreenSizeDistanceFactor{10.f}
     , scalePivot{std::nullopt}
     , _lineBoundingBox{nullptr}
@@ -341,7 +342,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
       if (attachedMesh() && !_existingMeshScale.equals(attachedMesh()->scaling())) {
         updateBoundingBox();
       }
-      else if (fixedDragMeshScreenSize) {
+      else if (fixedDragMeshScreenSize || fixedDragMeshBoundsSize) {
         _updateRotationSpheres();
         _updateScaleBoxes();
       }
@@ -388,7 +389,7 @@ void BoundingBoxGizmo::_attachedNodeChanged(const NodePtr& iValue)
     }
 
     gizmoLayer->utilityLayerScene->onAfterRenderObservable.addOnce(
-      [this](Scene* /*scene*/, EventState & /*es*/) -> void { _updateDummy(); });
+      [this](Scene* /*scene*/, EventState& /*es*/) -> void { _updateDummy(); });
   }
 }
 
@@ -525,6 +526,11 @@ void BoundingBoxGizmo::_updateRotationSpheres()
             rotateSpheres[index]->scaling().set(distanceFromCamera, distanceFromCamera,
                                                 distanceFromCamera);
           }
+          else if (fixedDragMeshBoundsSize) {
+            rotateSpheres[index]->scaling().set(rotationSphereSize * _boundingDimensions.x,
+                                                rotationSphereSize * _boundingDimensions.y,
+                                                rotationSphereSize * _boundingDimensions.z);
+          }
           else {
             rotateSpheres[index]->scaling().set(rotationSphereSize, rotationSphereSize,
                                                 rotationSphereSize);
@@ -561,6 +567,11 @@ void BoundingBoxGizmo::_updateScaleBoxes()
               = scaleBoxSize * _tmpVector.length() / fixedDragMeshScreenSizeDistanceFactor;
             scaleBoxes[index]->scaling().set(distanceFromCamera, distanceFromCamera,
                                              distanceFromCamera);
+          }
+          else if (fixedDragMeshBoundsSize) {
+            scaleBoxes[index]->scaling().set(scaleBoxSize * _boundingDimensions.x,
+                                             scaleBoxSize * _boundingDimensions.y,
+                                             scaleBoxSize * _boundingDimensions.z);
           }
           else {
             scaleBoxes[index]->scaling().set(scaleBoxSize, scaleBoxSize, scaleBoxSize);
