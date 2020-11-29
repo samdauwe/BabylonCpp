@@ -9,24 +9,21 @@
 
 namespace BABYLON {
 
-class AudioEngine;
 class Camera;
 class EffectFallbacks;
 struct IEffectFallbacks;
-class ILoadingScreen;
-class IParticleSystem;
 class Material;
 class MultiviewExtension;
 class OcclusionQueryExtension;
-class PostProcess;
-class RenderTargetTexture;
 class TransformFeedbackExtension;
+FWD_CLASS_SPTR(AudioEngine)
+FWD_CLASS_SPTR(ILoadingScreen)
+FWD_CLASS_SPTR(IParticleSystem)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
+
+// GL
 using WebGLQuery                = GL::IGLQuery;
-using AudioEnginePtr            = std::shared_ptr<AudioEngine>;
-using ILoadingScreenPtr         = std::shared_ptr<ILoadingScreen>;
-using IParticleSystemPtr        = std::shared_ptr<IParticleSystem>;
-using PostProcessPtr            = std::shared_ptr<PostProcess>;
-using RenderTargetTexturePtr    = std::shared_ptr<RenderTargetTexture>;
 using WebGLTransformFeedback    = GL::IGLTransformFeedback;
 using WebGLTransformFeedbackPtr = std::shared_ptr<WebGLTransformFeedback>;
 using WebGLQueryPtr             = std::shared_ptr<WebGLQuery>;
