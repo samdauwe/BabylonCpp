@@ -29,27 +29,19 @@ TransformNodePtr PlaneDragGizmo::_CreatePlane(Scene* scene, const StandardMateri
   return plane;
 }
 
-TransformNodePtr PlaneDragGizmo::_CreateArrowInstance(Scene* scene, const TransformNodePtr& arrow)
-{
-  auto instance = TransformNode::New("arrow", scene);
-  for (const auto& mesh : arrow->getChildMeshes()) {
-    const auto childInstance = std::static_pointer_cast<Mesh>(mesh)->createInstance(mesh->name);
-    childInstance->parent    = instance.get();
-  }
-  return instance;
-}
-
 PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& color,
                                const UtilityLayerRendererPtr& iGizmoLayer, PositionGizmo* parent)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , isEnabled{this, &PlaneDragGizmo::get_isEnabled, &PlaneDragGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
-    , _plane{nullptr}
+    , _gizmoMesh{nullptr}
     , _coloredMaterial{nullptr}
     , _hoverMaterial{nullptr}
+    , _disableMaterial{nullptr}
     , _isEnabled{false}
     , _parent{nullptr}
+    , _dragging{false}
     , tmpSnapEvent{SnapEvent{0.f}}
 {
   _parent = parent;
@@ -59,14 +51,18 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
   _coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
   _hoverMaterial               = StandardMaterial::New("", iGizmoLayer->utilityLayerScene.get());
-  _hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
+  _hoverMaterial->diffuseColor = Color3::Yellow();
+
+  _disableMaterial               = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  _disableMaterial->diffuseColor = Color3::Gray();
+  _disableMaterial->alpha        = 0.4f;
 
   // Build plane mesh on root node
-  _plane = PlaneDragGizmo::_CreatePlane(iGizmoLayer->utilityLayerScene.get(), _coloredMaterial);
+  _gizmoMesh = PlaneDragGizmo::_CreatePlane(gizmoLayer->utilityLayerScene.get(), _coloredMaterial);
 
-  _plane->lookAt(_rootMesh->position().add(dragPlaneNormal));
-  _plane->scaling().scaleInPlace(1.f / 3.f);
-  _plane->parent = _rootMesh.get();
+  _gizmoMesh->lookAt(_rootMesh->position().add(dragPlaneNormal));
+  _gizmoMesh->scaling().scaleInPlace(1.f / 3.f);
+  _gizmoMesh->parent = _rootMesh.get();
 
   currentSnapDragDistance = 0.f;
   // Add dragPlaneNormal drag behavior to handle events when the gizmo is dragged
@@ -76,7 +72,7 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
   dragBehavior->moveAttached = false;
   // _rootMesh->addBehavior(dragBehavior);
 
-  dragBehavior->onDragObservable.add([this](DragMoveEvent* event, EventState & /*es*/) -> void {
+  dragBehavior->onDragObservable.add([this](DragMoveEvent* event, EventState& /*es*/) -> void {
     if (attachedNode()) {
       // Keep world translation and use it to update world transform
       // if the node has parent, the local transform properties (position, rotation, scale)
@@ -103,22 +99,50 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
       _matrixChanged();
     }
   });
+  dragBehavior->onDragStartObservable.add(
+    [this](DragStartOrEndEvent* /*evt*/, EventState& /*es*/) -> void { _dragging = true; });
+  dragBehavior->onDragEndObservable.add(
+    [this](DragStartOrEndEvent* /*evt*/, EventState& /*es*/) -> void { _dragging = false; });
+
+  auto light = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes
+    = stl_util::concat(light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
+
+  const auto toMeshArray = [](const std::vector<AbstractMeshPtr>& meshes) -> std::vector<MeshPtr> {
+    std::vector<MeshPtr> meshArray;
+    meshArray.reserve(meshes.size());
+    for (const auto& mesh : meshes) {
+      meshArray.emplace_back(std::static_pointer_cast<Mesh>(mesh));
+    }
+    return meshArray;
+  };
+
+  _cache.gizmoMeshes     = toMeshArray(_gizmoMesh->getChildMeshes());
+  _cache.colliderMeshes  = toMeshArray(_gizmoMesh->getChildMeshes());
+  _cache.material        = _coloredMaterial;
+  _cache.hoverMaterial   = _hoverMaterial;
+  _cache.disableMaterial = _disableMaterial;
+  _cache.active          = false;
+  if (_parent) {
+    _parent->addToAxisCache(static_cast<Mesh*>(_gizmoMesh.get()), _cache);
+  }
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
-    [this](PointerInfo* pointerInfo, EventState & /*es*/) -> void {
+    [this](PointerInfo* pointerInfo, EventState& /*es*/) -> void {
       if (_customMeshSet) {
         return;
       }
-      _isHovered
-        = stl_util::contains(_rootMesh->getChildMeshes(), pointerInfo->pickInfo.pickedMesh);
-      const auto material = _isHovered ? _hoverMaterial : _coloredMaterial;
-      for (const auto& m : _rootMesh->getChildMeshes()) {
-        m->material = material;
+
+      auto pickedMesh = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
+      _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
+
+      if (!_parent) {
+        const auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        for (const auto& m : _cache.gizmoMeshes) {
+          m->material = material;
+        }
       }
     });
-
-  auto light = gizmoLayer->_getSharedGizmoLight();
-  stl_util::concat(light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
 }
 
 PlaneDragGizmo::~PlaneDragGizmo() = default;
@@ -152,10 +176,10 @@ void PlaneDragGizmo::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTex
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   dragBehavior->detach();
   Gizmo::dispose();
-  if (_plane) {
-    _plane->dispose();
+  if (_gizmoMesh) {
+    _gizmoMesh->dispose();
   }
-  for (const auto& matl : {_coloredMaterial, _hoverMaterial}) {
+  for (const auto& matl : {_coloredMaterial, _hoverMaterial, _disableMaterial}) {
     if (matl) {
       matl->dispose();
     }

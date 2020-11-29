@@ -2,6 +2,7 @@
 #define BABYLON_GIZMOS_PLANE_DRAG_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/maths/color3.h>
@@ -10,13 +11,10 @@
 namespace BABYLON {
 
 class PositionGizmo;
-class StandardMaterial;
-class TransformNode;
-class UtilityLayerRenderer;
-using PointerDragBehaviorPtr  = std::shared_ptr<PointerDragBehavior>;
-using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
-using TransformNodePtr        = std::shared_ptr<TransformNode>;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(PointerDragBehavior)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(TransformNode)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
  * @brief Single plane drag gizmo.
@@ -28,11 +26,6 @@ public:
    * @brief Hidden
    */
   static TransformNodePtr _CreatePlane(Scene* scene, const StandardMaterialPtr& material);
-
-  /**
-   * @brief Hidden
-   */
-  static TransformNodePtr _CreateArrowInstance(Scene* scene, const TransformNodePtr& arrow);
 
 public:
   /**
@@ -89,16 +82,19 @@ public:
 private:
   Observer<PointerInfo>::Ptr _pointerObserver;
 
-  TransformNodePtr _plane;
+  TransformNodePtr _gizmoMesh;
   StandardMaterialPtr _coloredMaterial;
   StandardMaterialPtr _hoverMaterial;
+  StandardMaterialPtr _disableMaterial;
 
   bool _isEnabled;
   PositionGizmo* _parent;
+  bool _dragging;
 
   float currentSnapDragDistance;
   Vector3 tmpVector;
   SnapEvent tmpSnapEvent;
+  GizmoAxisCache _cache;
 
 }; // end of class PlaneDragGizmo
 
