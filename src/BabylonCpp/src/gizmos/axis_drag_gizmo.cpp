@@ -15,7 +15,7 @@
 namespace BABYLON {
 
 TransformNodePtr AxisDragGizmo::_CreateArrow(Scene* scene, const StandardMaterialPtr& material,
-                                             float thickness)
+                                             float thickness, bool isCollider)
 {
   auto arrow = TransformNode::New("arrow", scene);
   CylinderOptions cylinder1Options;
@@ -29,17 +29,24 @@ TransformNodePtr AxisDragGizmo::_CreateArrow(Scene* scene, const StandardMateria
   cylinder2Options.height         = 0.275f;
   cylinder2Options.diameterBottom = 0.005f * thickness;
   cylinder2Options.tessellation   = 96;
-  auto line        = CylinderBuilder::CreateCylinder("cylinder", cylinder2Options, scene);
-  line->material   = material;
-  cylinder->parent = arrow.get();
-  line->parent     = arrow.get();
+  auto line      = CylinderBuilder::CreateCylinder("cylinder", cylinder2Options, scene);
+  line->material = material;
 
   // Position arrow pointing in its drag axis
+  cylinder->parent       = arrow.get();
   cylinder->material     = material;
   cylinder->rotation().x = Math::PI / 2.f;
   cylinder->position().z += 0.3f;
+
+  line->parent   = arrow.get();
+  line->material = material;
   line->position().z += 0.275f / 2.f;
   line->rotation().x = Math::PI / 2.f;
+
+  if (isCollider) {
+    line->visibility     = 0.f;
+    cylinder->visibility = 0.f;
+  }
   return arrow;
 }
 
@@ -65,28 +72,42 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
     , _pointerObserver{nullptr}
     , _isEnabled{true}
     , _parent{nullptr}
-    , _arrow{nullptr}
+    , _gizmoMesh{nullptr}
     , _coloredMaterial{nullptr}
     , _hoverMaterial{nullptr}
+    , _disableMaterial{nullptr}
+    , _dragging{false}
     , _currentSnapDragDistance{0.f}
     , _tmpSnapEvent{0.f}
 {
   _parent = parent;
+
   // Create Material
   _coloredMaterial                = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   _coloredMaterial->diffuseColor  = color;
   _coloredMaterial->specularColor = color.subtract(Color3(0.1f, 0.1f, 0.1f));
 
   _hoverMaterial               = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  _hoverMaterial->diffuseColor = color.add(Color3(0.3f, 0.3f, 0.3f));
+  _hoverMaterial->diffuseColor = Color3::Yellow();
 
-  // Build mesh on root node
-  _arrow
-    = AxisDragGizmo::_CreateArrow(gizmoLayer->utilityLayerScene.get(), _coloredMaterial, thickness);
+  _disableMaterial               = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
+  _disableMaterial->diffuseColor = Color3::Gray();
+  _disableMaterial->alpha        = 0.4f;
 
-  _arrow->lookAt(_rootMesh->position().add(dragAxis));
-  _arrow->scaling().scaleInPlace(1.f / 3.f);
-  _arrow->parent = _rootMesh.get();
+  // Build Mesh + Collider
+  const auto arrow = std::static_pointer_cast<AbstractMesh>(
+    AxisDragGizmo::_CreateArrow(gizmoLayer->utilityLayerScene.get(), _coloredMaterial, thickness));
+  const auto collider = std::static_pointer_cast<AbstractMesh>(AxisDragGizmo::_CreateArrow(
+    gizmoLayer->utilityLayerScene.get(), _coloredMaterial, thickness + 4.f, true));
+
+  // Add to Root Node
+  _gizmoMesh = Mesh::New("", gizmoLayer->utilityLayerScene.get());
+  _gizmoMesh->addChild(*arrow);
+  _gizmoMesh->addChild(*collider);
+
+  _gizmoMesh->lookAt(_rootMesh->position().add(dragAxis));
+  _gizmoMesh->scaling().scaleInPlace(1.f / 3.f);
+  _gizmoMesh->parent = _rootMesh.get();
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
@@ -111,8 +132,8 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
         }
         // use _worldMatrix to not force a matrix update when calling GetWorldMatrix especialy with
         // Cameras
-        attachedNode()->_worldMatrix.addTranslationFromFloats(event->delta.x, event->delta.y,
-                                                              event->delta.z);
+        attachedNode()->getWorldMatrix().addTranslationFromFloats(event->delta.x, event->delta.y,
+                                                                  event->delta.z);
         attachedNode()->updateCache();
       }
       else {
@@ -122,8 +143,8 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
           _currentSnapDragDistance = std::fmod(_currentSnapDragDistance, snapDistance);
           event->delta.normalizeToRef(_tmpVector);
           _tmpVector.scaleInPlace(snapDistance * dragSteps);
-          attachedNode()->_worldMatrix.addTranslationFromFloats(_tmpVector.x, _tmpVector.y,
-                                                                _tmpVector.z);
+          attachedNode()->getWorldMatrix().addTranslationFromFloats(_tmpVector.x, _tmpVector.y,
+                                                                    _tmpVector.z);
           attachedNode()->updateCache();
           _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
           onSnapObservable.notifyObservers(&_tmpSnapEvent);
@@ -132,6 +153,33 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
       _matrixChanged();
     }
   });
+  dragBehavior->onDragStartObservable.add(
+    [this](DragStartOrEndEvent* /*evt*/, EventState& /*es*/) -> void { _dragging = true; });
+  dragBehavior->onDragEndObservable.add(
+    [this](DragStartOrEndEvent* /*evt*/, EventState& /*es*/) -> void { _dragging = false; });
+
+  auto light = gizmoLayer->_getSharedGizmoLight();
+  light->includedOnlyMeshes
+    = stl_util::concat(light->includedOnlyMeshes(), _rootMesh->getChildMeshes(false));
+
+  const auto toMeshArray = [](const std::vector<AbstractMeshPtr>& meshes) -> std::vector<MeshPtr> {
+    std::vector<MeshPtr> meshArray;
+    meshArray.reserve(meshes.size());
+    for (const auto& mesh : meshes) {
+      meshArray.emplace_back(std::static_pointer_cast<Mesh>(mesh));
+    }
+    return meshArray;
+  };
+
+  _cache.gizmoMeshes     = toMeshArray(arrow->getChildMeshes());
+  _cache.colliderMeshes  = toMeshArray(collider->getChildMeshes());
+  _cache.material        = _coloredMaterial;
+  _cache.hoverMaterial   = _hoverMaterial;
+  _cache.disableMaterial = _disableMaterial;
+  _cache.active          = false;
+  if (_parent) {
+    _parent->addToAxisCache(static_cast<Mesh*>(collider.get()), _cache);
+  }
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
@@ -139,24 +187,20 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
         return;
       }
 
-      auto pickedMesh = pointerInfo->pickInfo.pickedMesh;
-      auto it    = std::find(_rootMesh->getChildMeshes().begin(), _rootMesh->getChildMeshes().end(),
-                          pickedMesh);
-      _isHovered = (it != _rootMesh->getChildMeshes().end());
+      auto pickedMesh = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
+      _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
 
-      auto material = _isHovered ? _hoverMaterial : _coloredMaterial;
-      for (auto& m : _rootMesh->getChildMeshes()) {
-        m->material    = material;
-        auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
-        if (linesMesh) {
-          linesMesh->color = material->diffuseColor;
+      if (!_parent) {
+        auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        for (auto& m : _cache.gizmoMeshes) {
+          m->material    = material;
+          auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
+          if (linesMesh) {
+            linesMesh->color = material->diffuseColor;
+          }
         }
       }
     });
-
-  const auto& light = gizmoLayer->_getSharedGizmoLight();
-  light->includedOnlyMeshes
-    = stl_util::concat(light->includedOnlyMeshes(), _rootMesh->getChildMeshes());
 }
 
 AxisDragGizmo::~AxisDragGizmo() = default;
@@ -193,10 +237,10 @@ void AxisDragGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   onSnapObservable.clear();
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   dragBehavior->detach();
-  if (_arrow) {
-    _arrow->dispose();
+  if (_gizmoMesh) {
+    _gizmoMesh->dispose();
   }
-  for (const auto& matl : {_coloredMaterial, _hoverMaterial}) {
+  for (const auto& matl : {_coloredMaterial, _hoverMaterial, _disableMaterial}) {
     if (matl) {
       matl->dispose();
     }

@@ -2,6 +2,7 @@
 #define BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/maths/color3.h>
@@ -12,10 +13,8 @@ namespace BABYLON {
 
 class PointerDragBehavior;
 class PositionGizmo;
-class StandardMaterial;
-class TransformNode;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
-using TransformNodePtr    = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Single axis drag gizmo.
@@ -27,7 +26,7 @@ public:
    * @brief Hidden
    */
   static TransformNodePtr _CreateArrow(Scene* scene, const StandardMaterialPtr& material,
-                                       float thickness = 1.f);
+                                       float thickness = 1.f, bool isCollider = false);
 
   /**
    * @brief Hidden
@@ -93,15 +92,18 @@ private:
   bool _isEnabled;
   PositionGizmo* _parent;
 
-  TransformNodePtr _arrow;
+  MeshPtr _gizmoMesh;
   StandardMaterialPtr _coloredMaterial;
   StandardMaterialPtr _hoverMaterial;
+  StandardMaterialPtr _disableMaterial;
+  bool _dragging;
 
   float _currentSnapDragDistance;
   Vector3 _tmpVector;
   SnapEvent _tmpSnapEvent;
   Vector3 _localDelta;
   Matrix _tmpMatrix;
+  GizmoAxisCache _cache;
 
 }; // end of class PositionGizmo
 
