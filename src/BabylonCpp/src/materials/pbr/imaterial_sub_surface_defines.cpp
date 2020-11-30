@@ -25,7 +25,8 @@ IMaterialSubSurfaceDefines::IMaterialSubSurfaceDefines()
     {"SS_LINKREFRACTIONTOTRANSPARENCY", false}, //
     {"SS_ALBEDOFORREFRACTIONTINT", false},      //
 
-    {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
+    {"SS_MASK_FROM_THICKNESS_TEXTURE", false},      //
+    {"SS_MASK_FROM_THICKNESS_TEXTURE_GLTF", false}, //
   };
 }
 
