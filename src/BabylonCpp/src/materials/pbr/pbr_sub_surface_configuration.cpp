@@ -54,6 +54,11 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
     , useMaskFromThicknessTexture{this,
                                   &PBRSubSurfaceConfiguration::get_useMaskFromThicknessTexture,
                                   &PBRSubSurfaceConfiguration::set_useMaskFromThicknessTexture}
+    , useMaskFromThicknessTextureGltf{this,
+                                      &PBRSubSurfaceConfiguration::
+                                        get_useMaskFromThicknessTextureGltf,
+                                      &PBRSubSurfaceConfiguration::
+                                        set_useMaskFromThicknessTextureGltf}
     , _isRefractionEnabled{false}
     , _isTranslucencyEnabled{false}
     , _isScatteringEnabled{false}
@@ -67,6 +72,7 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
     , _invertRefractionY{false}
     , _linkRefractionWithTransparency{false}
     , _useMaskFromThicknessTexture{false}
+    , _useMaskFromThicknessTextureGltf{false}
 {
   _internalMarkAllSubMeshesAsTexturesDirty = markAllSubMeshesAsTexturesDirty;
   _internalMarkScenePrePassDirty           = markScenePrePassDirty;
@@ -264,6 +270,21 @@ void PBRSubSurfaceConfiguration::set_useMaskFromThicknessTexture(bool value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
+bool PBRSubSurfaceConfiguration::get_useMaskFromThicknessTextureGltf() const
+{
+  return _useMaskFromThicknessTextureGltf;
+}
+
+void PBRSubSurfaceConfiguration::set_useMaskFromThicknessTextureGltf(bool value)
+{
+  if (_useMaskFromThicknessTextureGltf == value) {
+    return;
+  }
+
+  _useMaskFromThicknessTextureGltf = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
 void PBRSubSurfaceConfiguration::_markAllSubMeshesAsTexturesDirty()
 {
   _internalMarkAllSubMeshesAsTexturesDirty();
@@ -303,19 +324,20 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
   if (defines._areTexturesDirty) {
     defines.boolDef["SUBSURFACE"] = false;
 
-    defines.boolDef["SS_TRANSLUCENCY"]                 = _isTranslucencyEnabled;
-    defines.boolDef["SS_SCATTERING"]                   = _isScatteringEnabled;
-    defines.boolDef["SS_THICKNESSANDMASK_TEXTURE"]     = false;
-    defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE"]  = false;
-    defines.boolDef["SS_REFRACTION"]                   = false;
-    defines.boolDef["SS_REFRACTIONMAP_3D"]             = false;
-    defines.boolDef["SS_GAMMAREFRACTION"]              = false;
-    defines.boolDef["SS_RGBDREFRACTION"]               = false;
-    defines.boolDef["SS_LINEARSPECULARREFRACTION"]     = false;
-    defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]      = false;
-    defines.boolDef["SS_LODINREFRACTIONALPHA"]         = false;
-    defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"] = false;
-    defines.boolDef["SS_ALBEDOFORREFRACTIONTINT"]      = false;
+    defines.boolDef["SS_TRANSLUCENCY"]                     = _isTranslucencyEnabled;
+    defines.boolDef["SS_SCATTERING"]                       = _isScatteringEnabled;
+    defines.boolDef["SS_THICKNESSANDMASK_TEXTURE"]         = false;
+    defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE"]      = false;
+    defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE_GLTF"] = false;
+    defines.boolDef["SS_REFRACTION"]                       = false;
+    defines.boolDef["SS_REFRACTIONMAP_3D"]                 = false;
+    defines.boolDef["SS_GAMMAREFRACTION"]                  = false;
+    defines.boolDef["SS_RGBDREFRACTION"]                   = false;
+    defines.boolDef["SS_LINEARSPECULARREFRACTION"]         = false;
+    defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]          = false;
+    defines.boolDef["SS_LODINREFRACTIONALPHA"]             = false;
+    defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"]     = false;
+    defines.boolDef["SS_ALBEDOFORREFRACTIONTINT"]          = false;
 
     if (_isRefractionEnabled || _isTranslucencyEnabled || _isScatteringEnabled) {
       defines.boolDef["SUBSURFACE"] = true;
@@ -329,7 +351,8 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
         }
       }
 
-      defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE"] = _useMaskFromThicknessTexture;
+      defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE"]      = _useMaskFromThicknessTexture;
+      defines.boolDef["SS_MASK_FROM_THICKNESS_TEXTURE_GLTF"] = _useMaskFromThicknessTextureGltf;
     }
 
     if (_isRefractionEnabled) {

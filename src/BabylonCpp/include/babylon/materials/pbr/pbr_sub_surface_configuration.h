@@ -203,6 +203,8 @@ protected:
   void set_linkRefractionWithTransparency(bool value);
   bool get_useMaskFromThicknessTexture() const;
   void set_useMaskFromThicknessTexture(bool value);
+  bool get_useMaskFromThicknessTextureGltf() const;
+  void set_useMaskFromThicknessTextureGltf(bool value);
 
 private:
   /**
@@ -336,6 +338,14 @@ public:
    */
   Property<PBRSubSurfaceConfiguration, bool> useMaskFromThicknessTexture;
 
+  /**
+   * Stores the intensity of the different subsurface effects in the thickness texture. This
+   * variation matches the channel-packing that is used by glTF.
+   * * the red channel is the transmission/translucency intensity.
+   * * the green channel is the thickness.
+   */
+  Property<PBRSubSurfaceConfiguration, bool> useMaskFromThicknessTextureGltf;
+
 private:
   bool _isRefractionEnabled;
   bool _isTranslucencyEnabled;
@@ -350,6 +360,7 @@ private:
   bool _linkRefractionWithTransparency;
   bool _useMaskFromThicknessTexture;
   Scene* _scene;
+  bool _useMaskFromThicknessTextureGltf;
 
   /** Hidden */
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;
