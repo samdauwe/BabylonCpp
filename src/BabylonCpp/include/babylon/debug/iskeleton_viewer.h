@@ -4,12 +4,12 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class Skeleton;
-using SkeletonPtr = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(Skeleton)
 
 /**
  * @brief Defines how to display the various bone meshes for the viewer.

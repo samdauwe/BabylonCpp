@@ -6,13 +6,13 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class Scene;
 class Vector3;
-class TransformNode;
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(TransformNode)
 
 namespace Debug {
 
