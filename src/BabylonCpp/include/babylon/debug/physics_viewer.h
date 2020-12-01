@@ -6,23 +6,19 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class EventState;
 struct IPhysicsEnginePlugin;
-class Material;
-class Mesh;
 class PhysicsImpostor;
 class Scene;
-class StandardMaterial;
-class UtilityLayerRenderer;
-using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
-using MaterialPtr             = std::shared_ptr<Material>;
-using MeshPtr                 = std::shared_ptr<Mesh>;
-using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 namespace Debug {
 
