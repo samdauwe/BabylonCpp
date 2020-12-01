@@ -43,6 +43,11 @@ ShaderMaterialPtr SkeletonViewer::CreateBoneWeightShader(const IBoneWeightShader
       uniform mat4 worldViewProjection;
 
       #include<bonesDeclaration>
+      #if NUM_BONE_INFLUENCERS == 0
+          attribute vec4 matricesIndices;
+          attribute vec4 matricesWeights;
+      #endif
+
       #include<instancesDeclaration>
 
       varying vec3 vColor;
@@ -101,7 +106,7 @@ ShaderMaterialPtr SkeletonViewer::CreateBoneWeightShader(const IBoneWeightShader
   )ShaderCode";
 
   IShaderMaterialOptions shaderMaterialOptions;
-  shaderMaterialOptions.attributes = {"position", "normal"};
+  shaderMaterialOptions.attributes = {"position", "normal", "matricesIndices", "matricesWeights"};
   shaderMaterialOptions.uniforms   = {
     "world",     "worldView", "worldViewProjection", "view",      "projection", "viewProjection",
     "colorBase", "colorZero", "colorQuarter",        "colorHalf", "colorFull",  "targetBoneIndex"};
@@ -168,6 +173,10 @@ ShaderMaterialPtr SkeletonViewer::CreateSkeletonMapShader(const ISkeletonMapShad
       uniform float colorMap[%ull];
 
       #include<bonesDeclaration>
+      #if NUM_BONE_INFLUENCERS == 0
+          attribute vec4 matricesIndices;
+          attribute vec4 matricesWeights;
+      #endif
       #include<instancesDeclaration>
 
       varying vec3 vColor;
@@ -217,7 +226,7 @@ ShaderMaterialPtr SkeletonViewer::CreateSkeletonMapShader(const ISkeletonMapShad
   )ShaderCode";
 
   IShaderMaterialOptions shaderMaterialOptions;
-  shaderMaterialOptions.attributes = {"position", "normal"};
+  shaderMaterialOptions.attributes = {"position", "normal", "matricesIndices", "matricesWeights"};
   shaderMaterialOptions.uniforms   = {"world', 'worldView", "worldViewProjectio", "view",
                                     "projection",         "viewProjection",     "colorMap"};
   auto shader                      = ShaderMaterial::New("boneWeight:" + skeleton->name, scene,
@@ -363,7 +372,7 @@ void SkeletonViewer::_bindObs()
   switch (displayMode) {
     case SkeletonViewer::DISPLAY_LINES: {
       _obs = scene()->onBeforeRenderObservable.add(
-        [this](Scene* /*scene*/, EventState & /*es*/) -> void { _displayLinesUpdate(); });
+        [this](Scene* /*scene*/, EventState& /*es*/) -> void { _displayLinesUpdate(); });
       break;
     }
   }

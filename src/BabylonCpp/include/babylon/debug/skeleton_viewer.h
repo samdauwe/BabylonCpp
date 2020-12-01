@@ -4,6 +4,7 @@
 #include <set>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/debug/iskeleton_viewer.h>
 #include <babylon/maths/color3.h>
 #include <babylon/misc/event_state.h>
@@ -11,23 +12,16 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Bone;
-class LinesMesh;
 class Matrix;
 class Scene;
-class ShaderMaterial;
-class Skeleton;
-class StandardMaterial;
 class Vector3;
-class UtilityLayerRenderer;
-using BonePtr                 = std::shared_ptr<Bone>;
-using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
-using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
-using ShaderMaterialPtr       = std::shared_ptr<ShaderMaterial>;
-using SkeletonPtr             = std::shared_ptr<Skeleton>;
-using StandardMaterialPtr     = std::shared_ptr<StandardMaterial>;
-using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Bone)
+FWD_CLASS_SPTR(LinesMesh)
+FWD_CLASS_SPTR(ShaderMaterial)
+FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 namespace Debug {
 
@@ -280,9 +274,8 @@ private:
    * @param scene The scene that the shader is scoped to
    * @returns an Array of floats from the color gradient values
    */
-  static Float32Array _CreateBoneMapColorBuffer(size_t size,
-                                   const std::vector<ISkeletonMapShaderColorMapKnot>& colorMap,
-                                   Scene* scene);
+  static Float32Array _CreateBoneMapColorBuffer(
+    size_t size, const std::vector<ISkeletonMapShaderColorMapKnot>& colorMap, Scene* scene);
 
 private:
   /**
