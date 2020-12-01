@@ -2594,11 +2594,14 @@ int Scene::removeCamera(Camera* toRemove)
     }
   }
   // Remove from activeCameras
-  auto it2 = std::find_if(activeCameras.begin(), activeCameras.end(),
-                          [toRemove](const CameraPtr& camera) { return camera.get() == toRemove; });
-  if (it2 != activeCameras.end()) {
-    // Remove from the scene if camera found
-    activeCameras.erase(it2);
+  if (!activeCameras.empty()) {
+    auto it2
+      = std::find_if(activeCameras.begin(), activeCameras.end(),
+                     [toRemove](const CameraPtr& camera) { return camera.get() == toRemove; });
+    if (it2 != activeCameras.end()) {
+      // Remove from the scene if camera found
+      activeCameras.erase(it2);
+    }
   }
   // Reset the _activeCamera
   if (_activeCamera.get() == toRemove) {
@@ -2655,6 +2658,9 @@ int Scene::removeMultiMaterial(const MultiMaterialPtr& toRemove)
   if (it != multiMaterials.end()) {
     multiMaterials.erase(it);
   }
+
+  onMultiMaterialRemovedObservable.notifyObservers(toRemove.get());
+
   return index;
 }
 
@@ -2797,6 +2803,7 @@ void Scene::addMultiMaterial(const MultiMaterialPtr& newMultiMaterial)
     return;
   }
   multiMaterials.emplace_back(newMultiMaterial);
+  onNewMultiMaterialAddedObservable.notifyObservers(newMultiMaterial.get());
 }
 
 void Scene::addMaterial(const MaterialPtr& newMaterial)
@@ -2848,12 +2855,12 @@ void Scene::switchActiveCamera(const CameraPtr& newCamera, bool attachControl)
   }
 
   if (_activeCamera) {
-    _activeCamera->detachControl(canvas);
+    _activeCamera->detachControl();
   }
 
   _activeCamera = newCamera;
   if (attachControl) {
-    newCamera->attachControl(canvas);
+    newCamera->attachControl();
   }
 }
 
@@ -3579,6 +3586,7 @@ void Scene::_evaluateActiveMeshes()
 
   // Check each mesh
   for (const auto& mesh : _meshes) {
+    mesh->_internalAbstractMeshDataInfo._currentLODIsUpToDate = false;
     if (mesh->isBlocked()) {
       continue;
     }
@@ -3602,7 +3610,10 @@ void Scene::_evaluateActiveMeshes()
     }
 
     // Switch to current LOD
+    // TODO FIXME
     auto meshLOD = mesh->getLOD(_activeCamera);
+    // mesh->_internalAbstractMeshDataInfo._currentLOD = meshToRender;
+    mesh->_internalAbstractMeshDataInfo._currentLODIsUpToDate = true;
     if (!meshLOD) {
       continue;
     }
@@ -4386,7 +4397,9 @@ void Scene::dispose()
   onNewMeshAddedObservable.clear();
   onMeshRemovedObservable.clear();
   onNewMaterialAddedObservable.clear();
+  onNewMultiMaterialAddedObservable.clear();
   onMaterialRemovedObservable.clear();
+  onMultiMaterialRemovedObservable.clear();
   onNewTextureAddedObservable.clear();
   onTextureRemovedObservable.clear();
   onPrePointerObservable.clear();
@@ -4398,9 +4411,10 @@ void Scene::dispose()
 
   // Detach cameras
   auto canvas = _engine->getInputElement();
+
   if (canvas) {
     for (const auto& camera : cameras) {
-      camera->detachControl(canvas);
+      camera->detachControl();
     }
   }
 

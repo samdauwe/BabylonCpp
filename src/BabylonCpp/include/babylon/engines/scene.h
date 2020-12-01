@@ -2594,9 +2594,19 @@ public:
   Observable<Material> onNewMaterialAddedObservable;
 
   /**
+   * An event triggered when a multi material is created
+   */
+  Observable<MultiMaterial> onNewMultiMaterialAddedObservable;
+
+  /**
    * An event triggered when a material is removed
    */
   Observable<Material> onMaterialRemovedObservable;
+
+  /**
+   * An event triggered when a multi material is removed
+   */
+  Observable<MultiMaterial> onMultiMaterialRemovedObservable;
 
   /**
    * An event triggered when a texture is created
