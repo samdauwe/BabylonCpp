@@ -6,11 +6,11 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
 
 /**
  * @brief Interface used to define a behavior.
@@ -24,8 +24,8 @@ struct BABYLON_SHARED_EXPORT Behavior {
   std::string name;
 
   /**
-   * @brief Function called when the behavior needs to be initialized (after
-   * attaching it to a target).
+   * @brief Function called when the behavior needs to be initialized (after attaching it to a
+   * target).
    */
   virtual void init() = 0;
   /**
@@ -33,10 +33,8 @@ struct BABYLON_SHARED_EXPORT Behavior {
    * @param target defines the target where the behavior is attached to
    * @param predicate Predicate to use for pick filtering
    */
-  virtual void
-  attach(const std::shared_ptr<T>& target,
-         const std::function<bool(const AbstractMeshPtr& m)>& predicate
-         = nullptr)
+  virtual void attach(const std::shared_ptr<T>& target,
+                      const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr)
     = 0;
   /**
    * @brief Called when the behavior is detached from its target.
