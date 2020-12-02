@@ -4,19 +4,17 @@
 #include <babylon/actions/abstract_action_manager.h>
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Action;
 class ActionEvent;
-class ActionManager;
-class IAnimatable;
 class Scene;
-using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
-using ActionManagerPtr = std::shared_ptr<ActionManager>;
-using IAnimatablePtr   = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(ActionManager)
+FWD_CLASS_SPTR(IAnimatable)
 
 /**
  * @brief Action Manager manages all events to be triggered on a given mesh or the global scene.
