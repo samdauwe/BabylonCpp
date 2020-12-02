@@ -3,18 +3,17 @@
 
 #include <babylon/actions/iaction.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-class Action;
 class ActionEvent;
 class ActionManager;
 class AnimationValue;
 class Condition;
-class IAnimatable;
-using ActionPtr      = std::shared_ptr<Action>;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(Action)
+FWD_CLASS_SPTR(IAnimatable)
 
 /**
  * @brief The action to be carried out following a trigger.
