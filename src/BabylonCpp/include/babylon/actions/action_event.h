@@ -18,13 +18,11 @@ public:
    * @param pointerX The X mouse cursor position at the time of the event
    * @param pointerY The Y mouse cursor position at the time of the event
    * @param meshUnderPointer The mesh that is currently pointed at (can be null)
-   * @param sourceEvent the original (browser) event that triggered the
-   * ActionEvent
+   * @param sourceEvent the original (browser) event that triggered the ActionEvent
    * @param additionalData additional data for the event
    */
   ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-              const AbstractMeshPtr& meshUnderPointer,
-              const std::optional<Event>& sourceEvent,
+              const AbstractMeshPtr& meshUnderPointer, const std::optional<Event>& sourceEvent,
               const std::string& additionalData = "");
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
@@ -50,12 +48,11 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNewFromSprite(const SpritePtr& source, Scene* scene,
-                                         const Event& evt);
+  static ActionEvent CreateNewFromSprite(const SpritePtr& source, Scene* scene, const Event& evt);
 
   /**
-   * @brief Helper function to auto-create an ActionEvent from a scene. If
-   * triggered by a mesh use ActionEvent.CreateNew.
+   * @brief Helper function to auto-create an ActionEvent from a scene. If triggered by a mesh use
+   * ActionEvent.CreateNew.
    * @param scene the scene where the event occurred
    * @param evt The original (browser) event
    * @returns the new ActionEvent
@@ -70,10 +67,9 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent
-  CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
-                         const Event& evt,
-                         const std::string& additionalData = "");
+  static ActionEvent CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
+                                            const Event& evt,
+                                            const std::string& additionalData = "");
 
 }; // end of class ActionEvent
 
