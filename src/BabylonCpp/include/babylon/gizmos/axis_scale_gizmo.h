@@ -2,6 +2,7 @@
 #define BABYLON_GIZMOS_AXIS_SCALE_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/maths/color3.h>
@@ -12,8 +13,7 @@ namespace BABYLON {
 
 class PointerDragBehavior;
 class ScaleGizmo;
-class StandardMaterial;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+FWD_CLASS_SPTR(StandardMaterial)
 
 /**
  * @brief Single axis scale gizmo.
@@ -59,6 +59,13 @@ protected:
    */
   void set_isEnabled(bool value);
 
+private:
+  /**
+   * @brief Create Geometry for Gizmo.
+   */
+  std::tuple<MeshPtr, MeshPtr> _createGizmoMesh(const AbstractMeshPtr& parentMesh, float thickness,
+                                                bool isCollider = false);
+
 public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
@@ -97,13 +104,30 @@ private:
   bool _isEnabled;
   ScaleGizmo* _parent;
 
-  AbstractMeshPtr _arrow;
+  AbstractMeshPtr _gizmoMesh;
+  MeshPtr _arrowMesh;
+  MeshPtr _arrowTail;
+  MeshPtr _colliderArrowMesh;
+  MeshPtr _colliderArrowTail;
   StandardMaterialPtr _coloredMaterial;
   StandardMaterialPtr _hoverMaterial;
+  StandardMaterialPtr _disableMaterial;
+  bool _dragging;
+  Vector3 _tmpVector;
+  Vector3 __tmpVector;
+  Matrix _tmpMatrix;
+  Matrix _tmpMatrix2;
 
   float _currentSnapDragDistance;
-  Vector3 _tmpVector;
   SnapEvent _tmpSnapEvent;
+
+  Vector3 _nodePosition;
+  Vector3 _linePosition;
+  Vector3 _lineScale;
+
+  std::function<void(float dragDistance)> _increaseGizmoMesh;
+  std::function<void()> _resetGizmoMesh;
+  GizmoAxisCache _cache;
 
 }; // end of class AxisScaleGizmo
 
