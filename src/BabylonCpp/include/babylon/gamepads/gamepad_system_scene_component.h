@@ -2,13 +2,13 @@
 #define BABYLON_GAMEPADS_GAMEPAD_SYSTEM_SCENE_COMPONENT_POSE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class GamepadSystemSceneComponent;
-using GamepadSystemSceneComponentPtr = std::shared_ptr<GamepadSystemSceneComponent>;
+FWD_CLASS_SPTR(GamepadSystemSceneComponent)
 
 /**
  * @brief Defines the gamepad scene component responsible to manage gamepads in

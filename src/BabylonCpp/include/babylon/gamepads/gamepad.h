@@ -6,12 +6,12 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/stick_values.h>
 
 namespace BABYLON {
 
-class IBrowserGamepad;
-using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+FWD_CLASS_SPTR(IBrowserGamepad)
 
 /**
  * @brief Represents a gamepad.
