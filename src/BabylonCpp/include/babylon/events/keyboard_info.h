@@ -7,16 +7,14 @@
 namespace BABYLON {
 
 /**
- * @brief This class is used to store keyboard related info for the
- * onKeyboardObservable event.
+ * @brief This class is used to store keyboard related info for the onKeyboardObservable event.
  */
 class BABYLON_SHARED_EXPORT KeyboardInfo {
 
 public:
   /**
    * @brief Instantiates a new keyboard info.
-   * This class is used to store keyboard related info for the
-   * onKeyboardObservable event.
+   * This class is used to store keyboard related info for the onKeyboardObservable event.
    * @param type Defines the type of event (KeyboardEventTypes)
    * @param event Defines the related dom event
    */
