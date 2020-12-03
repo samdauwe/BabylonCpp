@@ -9,26 +9,23 @@
 namespace BABYLON {
 
 /**
- * @brief This type contains all the data related to a pointer event in
- * Babylon.js.
- * The event member is an instance of PointerEvent for all types except
- * PointerWheel and is of type MouseWheelEvent when type equals PointerWheel.
- * The different event types can be found in the PointerEventTypes class.
+ * @brief This type contains all the data related to a pointer event in Babylon.js.
+ * The event member is an instance of PointerEvent for all types except PointerWheel and is of type
+ * MouseWheelEvent when type equals PointerWheel. The different event types can be found in the
+ * PointerEventTypes class.
  */
 class BABYLON_SHARED_EXPORT PointerInfo : public PointerInfoBase {
 
 public:
   /**
-   * @brief Instantiates a PointerInfo to store pointer related info to the
-   * onPointerObservable event.
+   * @brief Instantiates a PointerInfo to store pointer related info to the onPointerObservable
+   * event.
    * @param type Defines the type of event (PointerEventTypes)
    * @param event Defines the related dom event
    * @param pickInfo Defines the picking info associated to the info (if any)\
    */
-  PointerInfo(PointerEventTypes type, const PointerEvent& event,
-              const PickingInfo& pickInfo);
-  PointerInfo(PointerEventTypes type, const MouseWheelEvent& event,
-              const PickingInfo& pickInfo);
+  PointerInfo(PointerEventTypes type, const PointerEvent& event, const PickingInfo& pickInfo);
+  PointerInfo(PointerEventTypes type, const MouseWheelEvent& event, const PickingInfo& pickInfo);
   ~PointerInfo(); // = default
 
 public:

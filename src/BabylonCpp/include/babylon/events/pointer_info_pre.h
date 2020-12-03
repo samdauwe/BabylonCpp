@@ -9,11 +9,9 @@
 namespace BABYLON {
 
 /**
- * @brief This class is used to store pointer related info for the
- * onPrePointerObservable event.
- * Set the skipOnPointerObservable property to true if you want the engine
- * to stop any process after this event is triggered, even not calling
- * onPointerObservable
+ * @brief This class is used to store pointer related info for the onPrePointerObservable event.
+ * Set the skipOnPointerObservable property to true if you want the engine to stop any process after
+ * this event is triggered, even not calling onPointerObservable
  */
 class BABYLON_SHARED_EXPORT PointerInfoPre : public PointerInfoBase {
 
@@ -23,15 +21,11 @@ public:
    * onPrePointerObservable event.
    * @param type Defines the type of event (PointerEventTypes)
    * @param event Defines the related dom event
-   * @param localX Defines the local x coordinates of the pointer when the event
-   * occured
-   * @param localY Defines the local y coordinates of the pointer when the event
-   * occured
+   * @param localX Defines the local x coordinates of the pointer when the event occured
+   * @param localY Defines the local y coordinates of the pointer when the event occured
    */
-  PointerInfoPre(PointerEventTypes type, const PointerEvent& event,
-                 float localX, float localY);
-  PointerInfoPre(PointerEventTypes type, const MouseWheelEvent& event,
-                 float localX, float localY);
+  PointerInfoPre(PointerEventTypes type, const PointerEvent& event, float localX, float localY);
+  PointerInfoPre(PointerEventTypes type, const MouseWheelEvent& event, float localX, float localY);
   ~PointerInfoPre(); // = default
 
 public:
@@ -46,8 +40,7 @@ public:
   Vector2 localPosition;
 
   /**
-   * Defines whether the engine should skip the next OnPointerObservable
-   * associated to this pre.
+   * Defines whether the engine should skip the next OnPointerObservable associated to this pre.
    */
   bool skipOnPointerObservable;
 

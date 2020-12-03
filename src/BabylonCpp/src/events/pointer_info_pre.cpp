@@ -2,8 +2,7 @@
 
 namespace BABYLON {
 
-PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
-                               const PointerEvent& event, float localX,
+PointerInfoPre::PointerInfoPre(PointerEventTypes _type, const PointerEvent& event, float localX,
                                float localY)
     : PointerInfoBase(_type, event)
     , ray{std::nullopt}
@@ -12,8 +11,7 @@ PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
 {
 }
 
-PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
-                               const MouseWheelEvent& event, float localX,
+PointerInfoPre::PointerInfoPre(PointerEventTypes _type, const MouseWheelEvent& event, float localX,
                                float localY)
     : PointerInfoBase(_type, event)
     , ray{std::nullopt}

@@ -7,19 +7,16 @@
 namespace BABYLON {
 
 /**
- * @brief This class is used to store keyboard related info for the
- * onPreKeyboardObservable event.
- * Set the skipOnKeyboardObservable property to true if you want the engine to
- * stop any process after this event is triggered, even not calling
- * onKeyboardObservable
+ * @brief This class is used to store keyboard related info for the onPreKeyboardObservable event.
+ * Set the skipOnKeyboardObservable property to true if you want the engine to stop any process
+ * after this event is triggered, even not calling onKeyboardObservable
  */
 class BABYLON_SHARED_EXPORT KeyboardInfoPre : public KeyboardInfo {
 
 public:
   /**
    * @brief Instantiates a new keyboard pre info.
-   * This class is used to store keyboard related info for the
-   * onPreKeyboardObservable event.
+   * This class is used to store keyboard related info for the onPreKeyboardObservable event.
    * @param type Defines the type of event (KeyboardEventTypes)
    * @param event Defines the related dom event
    */
@@ -28,8 +25,7 @@ public:
 
 public:
   /**
-   * Defines whether the engine should skip the next onKeyboardObservable
-   * associated to this pre.
+   * Defines whether the engine should skip the next onKeyboardObservable associated to this pre.
    */
   bool skipOnPointerObservable;
 
