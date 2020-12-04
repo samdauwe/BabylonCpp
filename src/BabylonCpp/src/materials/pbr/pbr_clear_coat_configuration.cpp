@@ -316,8 +316,9 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sce
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "clearCoat");
     }
     else if ((_texture || _textureRoughness) && MaterialFlags::ClearCoatTextureEnabled()) {
-      uniformBuffer.updateFloat4("vClearCoatInfos", _texture->coordinatesIndex, _texture->level,
-                                 _textureRoughness->coordinatesIndex, _textureRoughness->level, "");
+      uniformBuffer.updateFloat4(
+        "vClearCoatInfos", static_cast<float>(_texture->coordinatesIndex), _texture->level,
+        static_cast<float>(_textureRoughness->coordinatesIndex), _textureRoughness->level, "");
       if (_texture) {
         MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "clearCoat");
       }

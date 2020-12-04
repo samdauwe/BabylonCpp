@@ -474,7 +474,7 @@ void PrePassRenderer::_enableTextures(const std::vector<unsigned int>& types)
 {
   for (const auto& type : types) {
     if (_textureIndices[type] == -1) {
-      _textureIndices[type] = _mrtLayout.size();
+      _textureIndices[type] = static_cast<int>(_mrtLayout.size());
       _mrtLayout.emplace_back(type);
 
       _mrtFormats.emplace_back(_textureFormats[type].format);

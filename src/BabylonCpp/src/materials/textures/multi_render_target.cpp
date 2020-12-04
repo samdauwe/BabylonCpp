@@ -105,11 +105,11 @@ void MultiRenderTarget::set_wrapV(unsigned int wrap)
   }
 }
 
-void MultiRenderTarget::_initTypes(size_t count, std::vector<unsigned int>& types,
+void MultiRenderTarget::_initTypes(size_t iCount, std::vector<unsigned int>& types,
                                    std::vector<unsigned int>& samplingModes,
                                    const std::optional<IMultiRenderTargetOptions>& options)
 {
-  for (auto i = 0ull; i < count; ++i) {
+  for (auto i = 0ull; i < iCount; ++i) {
     if (options && i < (*options).types.size()) {
       types.emplace_back((*options).types[i]);
     }
@@ -200,16 +200,16 @@ void MultiRenderTarget::resize(Size size)
   _rebuild();
 }
 
-void MultiRenderTarget::updateCount(size_t count,
+void MultiRenderTarget::updateCount(size_t iCount,
                                     const std::optional<IMultiRenderTargetOptions>& options)
 {
-  _multiRenderTargetOptions.textureCount = count;
-  _count                                 = count;
+  _multiRenderTargetOptions.textureCount = iCount;
+  _count                                 = iCount;
 
   std::vector<unsigned int> types;
   std::vector<unsigned int> samplingModes;
 
-  _initTypes(count, types, samplingModes, options);
+  _initTypes(iCount, types, samplingModes, options);
   _multiRenderTargetOptions.types         = types;
   _multiRenderTargetOptions.samplingModes = samplingModes;
   _rebuild(true);

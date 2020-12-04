@@ -206,8 +206,8 @@ void SpriteRenderer::render(
     const auto scene = _scene;
 
     // Fog
-    effect->setFloat4("vFogInfos", scene->fogMode(), scene->fogStart, scene->fogEnd,
-                      scene->fogDensity);
+    effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()), scene->fogStart,
+                      scene->fogEnd, scene->fogDensity);
     effect->setColor3("vFogColor", scene->fogColor);
   }
 

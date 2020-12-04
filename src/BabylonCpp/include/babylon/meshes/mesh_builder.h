@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 class BoxOptions;
-class CapsuleBuilder;
+struct CapsuleBuilder;
 class CylinderOptions;
 class DashedLinesOptions;
 class DecalOptions;

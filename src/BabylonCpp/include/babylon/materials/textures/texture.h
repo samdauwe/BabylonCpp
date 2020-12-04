@@ -394,9 +394,9 @@ private:
   float _cachedVAng;
   float _cachedWAng;
   int _cachedProjectionMatrixId;
-  int _cachedURotationCenter;
-  int _cachedVRotationCenter;
-  int _cachedWRotationCenter;
+  float _cachedURotationCenter;
+  float _cachedVRotationCenter;
+  float _cachedWRotationCenter;
   bool _cachedHomogeneousRotationInUVTransform;
   int _cachedCoordinatesMode;
   std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>> _buffer;

@@ -370,7 +370,7 @@ void SpriteManager::_customUpdate(ThinSprite* sprite, const ISize& /*baseSize*/)
     sprite->cellIndex = 0;
   }
   auto num = sprite->cellIndex;
-  if (std::isfinite(num) && std::floor(num) == num) {
+  if (static_cast<int>(std::floor(num)) == num) {
     sprite->cellRef = _spriteMap[sprite->cellIndex];
   }
   // sprite->_xOffset = _cellData[sprite->cellRef].frame.x / baseSize.width;

@@ -1205,9 +1205,9 @@ void NodeMaterial::setToDefaultProceduralTexture()
   const auto vmerger = VectorMergerBlock::New("Position3D");
 
   position->connectTo(vmerger);
-  NodeMaterialBlockConnectionOptions options;
-  options.input = "w";
-  const1->connectTo(vmerger, options);
+  NodeMaterialBlockConnectionOptions iOptions;
+  iOptions.input = "w";
+  const1->connectTo(vmerger, iOptions);
 
   const auto vertexOutput = VertexOutputBlock::New("VertexOutput");
   vmerger->connectTo(vertexOutput);

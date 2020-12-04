@@ -692,7 +692,7 @@ bool Geometry::_generatePointsArray()
     if (arrayIdx >= _positionsCache.size()) {
       _positionsCache.resize((_positionsCache.size() + 1) * 3);
     }
-    _positionsCache[arrayIdx] = Vector3::FromArray(data, index);
+    _positionsCache[arrayIdx] = Vector3::FromArray(data, static_cast<unsigned int>(index));
   }
 
   for (auto index = 0ull, arrayIdx = 0ull; index < data.size(); index += 3, ++arrayIdx) {

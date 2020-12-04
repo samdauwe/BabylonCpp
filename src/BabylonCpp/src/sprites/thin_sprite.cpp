@@ -72,13 +72,13 @@ void ThinSprite::set_delay(float /*value*/)
 {
 }
 
-void ThinSprite::playAnimation(int from, int to, bool loop, float delay,
+void ThinSprite::playAnimation(int from, int to, bool loop, float iDelay,
                                const std::function<void()>& onAnimationEnd)
 {
   _fromIndex          = from;
   _toIndex            = to;
   _loopAnimation      = loop;
-  _delay              = delay;
+  _delay              = iDelay;
   _animationStarted   = true;
   _onBaseAnimationEnd = onAnimationEnd;
 

@@ -1340,7 +1340,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1348,7 +1348,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1385,7 +1385,7 @@ bool Scene::_isPointerSwiping() const
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
   _initActionManager = [this](const AbstractActionManagerPtr& act,
-                              const ClickInfo& /*clickInfo*/) -> AbstractActionManagerPtr {
+                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerDownPredicate,
                              false, cameraToUseForPointers);
@@ -1708,14 +1708,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -2156,9 +2156,9 @@ void Scene::_animate()
     }
     _animationTimeLast = now;
   }
-  deltaTime          = useConstantAnimationDeltaTime ?
-                         16.f :
-                         Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
+  deltaTime = useConstantAnimationDeltaTime ?
+                16.f :
+                Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
   _animationTimeLast = now;
 
   // Animatable::_animate can remove elements from _activeAnimatables we need to make a copy of it
@@ -5507,10 +5507,10 @@ SubSurfaceConfigurationPtr Scene::enableSubSurfaceForPrePass()
     return _subSurfaceConfiguration;
   }
 
-  const auto prePassRenderer = enablePrePassRenderer();
-  if (prePassRenderer) {
+  const auto iPrePassRenderer = enablePrePassRenderer();
+  if (iPrePassRenderer) {
     _subSurfaceConfiguration = std::make_shared<SubSurfaceConfiguration>(this);
-    prePassRenderer->addEffectConfiguration(_subSurfaceConfiguration);
+    iPrePassRenderer->addEffectConfiguration(_subSurfaceConfiguration);
     return _subSurfaceConfiguration;
   }
 

@@ -17,12 +17,12 @@ PrePassRendererSceneComponent::~PrePassRendererSceneComponent() = default;
 void PrePassRendererSceneComponent::_register()
 {
   scene->_beforeCameraDrawStage.registerStep(SceneComponentConstants::STEP_BEFORECAMERADRAW_PREPASS,
-                                             this, [this](Camera* /*camera*/) -> bool {
+                                             this, [this](Camera * /*camera*/) -> bool {
                                                _beforeCameraDraw();
                                                return true;
                                              });
   scene->_afterCameraDrawStage.registerStep(SceneComponentConstants::STEP_AFTERCAMERADRAW_PREPASS,
-                                            this, [this](Camera* /*camera*/) -> bool {
+                                            this, [this](Camera * /*camera*/) -> bool {
                                               _afterCameraDraw();
                                               return true;
                                             });
@@ -36,7 +36,7 @@ void PrePassRendererSceneComponent::_register()
   scene->_afterRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGMESH_PREPASS, this,
     [this](Mesh* mesh, SubMesh* /*subMesh*/, const _InstancesBatchPtr& /*batch*/,
-           Effect* /*effect*/) -> void { _afterRenderingMeshStage(mesh); });
+           Effect * /*effect*/) -> void { _afterRenderingMeshStage(mesh); });
 }
 
 void PrePassRendererSceneComponent::_beforeCameraDraw()
@@ -69,18 +69,18 @@ void PrePassRendererSceneComponent::_beforeRenderingMeshStage(AbstractMesh* mesh
   }
 
   // Render to MRT
-  const auto scene = mesh->getScene();
-  if (scene->prePassRenderer() && effect) {
-    scene->prePassRenderer()->bindAttachmentsForEffect(*effect, subMesh);
+  const auto iScene = mesh->getScene();
+  if (iScene->prePassRenderer() && effect) {
+    iScene->prePassRenderer()->bindAttachmentsForEffect(*effect, subMesh);
   }
 }
 
 void PrePassRendererSceneComponent::_afterRenderingMeshStage(AbstractMesh* mesh)
 {
-  const auto scene = mesh->getScene();
+  const auto iScene = mesh->getScene();
 
-  if (scene->prePassRenderer()) {
-    scene->prePassRenderer()->restoreAttachments();
+  if (iScene->prePassRenderer()) {
+    iScene->prePassRenderer()->restoreAttachments();
   }
 }
 

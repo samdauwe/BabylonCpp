@@ -234,8 +234,9 @@ void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Scene* 
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "sheen");
     }
     else if ((_texture || _textureRoughness) && MaterialFlags::SheenTextureEnabled()) {
-      uniformBuffer.updateFloat4("vSheenInfos", _texture->coordinatesIndex, _texture->level,
-                                 _textureRoughness->coordinatesIndex, _textureRoughness->level, "");
+      uniformBuffer.updateFloat4(
+        "vSheenInfos", static_cast<float>(_texture->coordinatesIndex), _texture->level,
+        static_cast<float>(_textureRoughness->coordinatesIndex), _textureRoughness->level, "");
       if (_texture) {
         MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "sheen");
       }

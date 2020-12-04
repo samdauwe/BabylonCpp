@@ -689,7 +689,7 @@ void MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(std::vector<std
 void MaterialHelper::PrepareAttributesForMorphTargets(std::vector<std::string>& attribs,
                                                       AbstractMesh* mesh, MaterialDefines& defines)
 {
-  auto influencers = defines.intDef["NUM_MORPH_INFLUENCERS"];
+  auto influencers = static_cast<unsigned int>(defines.intDef["NUM_MORPH_INFLUENCERS"]);
 
   auto engine = Engine::LastCreatedEngine();
   auto _mesh  = static_cast<Mesh*>(mesh);
@@ -833,7 +833,7 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect,
         effect->setMatrices("mBones", matrices);
         if (prePassConfiguration && mesh->getScene()->prePassRenderer()
             && mesh->getScene()->prePassRenderer()->getIndex(
-              Constants::PREPASS_VELOCITY_TEXTURE_TYPE)) {
+                 Constants::PREPASS_VELOCITY_TEXTURE_TYPE)) {
           if (mesh->uniqueId < prePassConfiguration->previousBones.size()
               && !prePassConfiguration->previousBones[mesh->uniqueId].empty()) {
             effect->setMatrices("mPreviousBones",

@@ -37,7 +37,7 @@ struct BABYLON_SHARED_EXPORT PrePassConfiguration {
    * Previous bones of meshes carrying this material
    * Used for computing velocity
    */
-  std::unordered_map<unsigned int, Float32Array> previousBones;
+  std::unordered_map<size_t, Float32Array> previousBones;
 
   /**
    * @brief Add the required uniforms to the current list.

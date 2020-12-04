@@ -115,7 +115,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
 
   // Properties
   std::unordered_map<std::string, bool> boolDef;
-  std::unordered_map<std::string, unsigned int> intDef;
+  std::unordered_map<std::string, int> intDef;
   std::unordered_map<std::string, float> floatDef;
   std::unordered_map<std::string, std::string> stringDef;
 

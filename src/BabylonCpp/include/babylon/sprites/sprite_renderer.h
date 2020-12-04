@@ -16,7 +16,7 @@ class IGLVertexArrayObject;
 } // end of namespace GL
 
 class Buffer;
-class ISize;
+struct ISize;
 class Matrix;
 class Scene;
 class ThinEngine;
