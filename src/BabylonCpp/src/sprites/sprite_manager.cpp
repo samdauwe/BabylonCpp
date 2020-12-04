@@ -2,26 +2,13 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/collisions/picking_info.h>
 #include <babylon/core/json_util.h>
-#include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/engines/scene_component_constants.h>
-#include <babylon/materials/effect.h>
-#include <babylon/materials/effect_fallbacks.h>
-#include <babylon/materials/ieffect_creation_options.h>
-#include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/maths/color3.h>
-#include <babylon/maths/matrix.h>
 #include <babylon/maths/tmp_vectors.h>
-#include <babylon/meshes/buffer.h>
-#include <babylon/meshes/vertex_buffer.h>
-#include <babylon/misc/string_tools.h>
-#include <babylon/misc/tools.h>
+#include <babylon/sprites/sprite_renderer.h>
 #include <babylon/sprites/sprite_scene_component.h>
-#include <babylon/states/depth_culling_state.h>
 
 namespace BABYLON {
 
@@ -31,22 +18,19 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
                              const std::string& iSpriteJSON)
     : name{iName}
     , spriteJSON{iSpriteJSON}
-    , fogEnabled{true}
     , onDispose{this, &SpriteManager::set_onDispose}
     , children{this, &SpriteManager::get_children}
+    , scene{this, &SpriteManager::get_scene}
     , capacity{this, &SpriteManager::get_capacity}
+    , texture{this, &SpriteManager::get_texture, &SpriteManager::set_texture}
+    , cellWidth{this, &SpriteManager::get_cellWidth, &SpriteManager::set_cellWidth}
+    , cellHeight{this, &SpriteManager::get_cellHeight, &SpriteManager::set_cellHeight}
+    , fogEnabled{this, &SpriteManager::get_fogEnabled, &SpriteManager::set_fogEnabled}
     , blendMode{this, &SpriteManager::get_blendMode, &SpriteManager::set_blendMode}
     , disableDepthWrite{false}
     , _packedAndReady{false}
-    , _useInstancing{false}
     , _onDisposeObserver{nullptr}
-    , _buffer{nullptr}
-    , _spriteBuffer{nullptr}
-    , _indexBuffer{nullptr}
-    , _effectBase{nullptr}
-    , _effectFog{nullptr}
-    , _vertexBufferSize{0ull}
-    , _blendMode{Constants::ALPHA_COMBINE}
+    , _spriteRendererTexture{nullptr}
 {
   if (!scene) {
     scene = Engine::LastCreatedScene();
@@ -58,124 +42,25 @@ SpriteManager::SpriteManager(const std::string& iName, const std::string& imgUrl
     component = SpriteSceneComponent::New(scene);
     scene->_addComponent(component);
   }
-
-  // ISpriteManager interface properties
-  {
-    layerMask        = 0x0FFFFFFF;
-    isPickable       = false;
-    renderingGroupId = 0;
-  }
-
-  _capacity   = capacity;
   _fromPacked = fromPacked;
 
-  if (!imgUrl.empty()) {
-    _spriteTexture        = Texture::New(imgUrl, scene, true, false, samplingMode);
-    _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-    _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-  }
+  _scene            = scene;
+  const auto engine = _scene->getEngine();
+  _spriteRenderer   = std::make_unique<SpriteRenderer>(engine, capacity, epsilon, scene);
 
-  if (cellSize.width != -1 && cellSize.height != -1) {
+  if (cellSize.width && cellSize.height) {
     cellWidth  = cellSize.width;
-    cellHeight = cellSize.height;
-  }
-  else if (cellSize.width != -1 && cellSize.height == -1) {
-    cellWidth  = cellSize.width;
-    cellHeight = cellSize.width;
-  }
-  else if (cellSize.width == -1 && cellSize.height != -1) {
-    cellWidth  = cellSize.height;
     cellHeight = cellSize.height;
   }
   else {
+    _spriteRenderer = nullptr;
     return;
   }
 
-  _epsilon          = epsilon;
-  _scene            = scene;
-  uniqueId          = scene->getUniqueId();
-  const auto engine = _scene->getEngine();
-  _useInstancing    = engine->getCaps().instancedArrays;
+  uniqueId = scene->getUniqueId();
 
-  if (!_useInstancing) {
-    IndicesArray indices;
-    auto index = 0;
-    for (unsigned int count = 0; count < capacity; ++count) {
-      indices.emplace_back(index + 0);
-      indices.emplace_back(index + 1);
-      indices.emplace_back(index + 2);
-      indices.emplace_back(index + 0);
-      indices.emplace_back(index + 2);
-      indices.emplace_back(index + 3);
-      index += 4;
-    }
-
-    _indexBuffer = scene->getEngine()->createIndexBuffer(indices);
-  }
-
-  // VBO
-  // 18 floats per sprite (x, y, z, angle, sizeX, sizeY, offsetX, offsetY, invertU, invertV,
-  // cellLeft, cellTop, cellWidth, cellHeight, color r, color g, color b, color a)
-  // 16 when using instances
-  _vertexBufferSize = _useInstancing ? 16 : 18;
-  _vertexData       = Float32Array(capacity * _vertexBufferSize * (_useInstancing ? 1 : 4), 0.f);
-  _buffer           = std::make_unique<Buffer>(engine, _vertexData, true, _vertexBufferSize);
-
-  auto positions = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4, _vertexBufferSize,
-                                               _useInstancing);
-  auto options   = _buffer->createVertexBuffer("options", 4, 2, _vertexBufferSize, _useInstancing);
-
-  auto offset                           = 6ull;
-  std::unique_ptr<VertexBuffer> offsets = nullptr;
-
-  if (_useInstancing) {
-    const Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
-    _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
-    offsets       = _spriteBuffer->createVertexBuffer("offsets", 0, 2);
-  }
-  else {
-    offsets = _buffer->createVertexBuffer("offsets", offset, 2, _vertexBufferSize, _useInstancing);
-    offset += 2;
-  }
-
-  auto inverts
-    = _buffer->createVertexBuffer("inverts", offset, 2, _vertexBufferSize, _useInstancing);
-  auto cellInfo
-    = _buffer->createVertexBuffer("cellInfo", offset + 2, 4, _vertexBufferSize, _useInstancing);
-  auto colors = _buffer->createVertexBuffer(VertexBuffer::ColorKind, offset + 6, 4,
-                                            _vertexBufferSize, _useInstancing);
-
-  _vertexBuffers[VertexBuffer::PositionKind] = std::move(positions);
-  _vertexBuffers[VertexBuffer::OptionsKind]  = std::move(options);
-  _vertexBuffers[VertexBuffer::OffsetsKind]  = std::move(offsets);
-  _vertexBuffers[VertexBuffer::InvertsKind]  = std::move(inverts);
-  _vertexBuffers[VertexBuffer::CellInfoKind] = std::move(cellInfo);
-  _vertexBuffers[VertexBuffer::ColorKind]    = std::move(colors);
-
-  // Effects
-
-  {
-    IEffectCreationOptions spriteOptions;
-    spriteOptions.attributes
-      = {VertexBuffer::PositionKind, "options", "offsets", "inverts", "cellInfo",
-         VertexBuffer::ColorKind};
-    spriteOptions.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
-    spriteOptions.samplers      = {"diffuseSampler"};
-
-    _effectBase = _scene->getEngine()->createEffect("sprites", spriteOptions, _scene->getEngine());
-  }
-
-  {
-    IEffectCreationOptions spriteOptions;
-    spriteOptions.attributes
-      = {VertexBuffer::PositionKind, "options", "offsets", "inverts", "cellInfo",
-         VertexBuffer::ColorKind};
-    spriteOptions.uniformsNames
-      = {"view", "projection", "textureInfos", "alphaTest", "vFogInfos", "vFogColor"};
-    spriteOptions.samplers = {"diffuseSampler"};
-    spriteOptions.defines  = "#define FOG";
-
-    _effectFog = _scene->getEngine()->createEffect("sprites", spriteOptions, _scene->getEngine());
+  if (!imgUrl.empty()) {
+    texture = Texture::New(imgUrl, scene, true, false, samplingMode);
   }
 
   if (_fromPacked) {
@@ -198,7 +83,7 @@ void SpriteManager::set_onDispose(const std::function<void(SpriteManager*, Event
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-std::vector<SpritePtr>& SpriteManager::get_children()
+std::vector<ThinSpritePtr>& SpriteManager::get_children()
 {
   return sprites;
 }
@@ -210,30 +95,61 @@ Scene*& SpriteManager::get_scene()
 
 size_t SpriteManager::get_capacity() const
 {
-  return _capacity;
+  return _spriteRenderer->capacity();
 }
 
 TexturePtr& SpriteManager::get_texture()
 {
-  return _spriteTexture;
+  _spriteRendererTexture = std::static_pointer_cast<Texture>(_spriteRenderer->texture);
+  return _spriteRendererTexture;
 }
 
 void SpriteManager::set_texture(const TexturePtr& value)
 {
-  _spriteTexture        = value;
-  _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-  _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-  _textureContent       = {};
+  value->wrapU             = TextureConstants::CLAMP_ADDRESSMODE;
+  value->wrapV             = TextureConstants::CLAMP_ADDRESSMODE;
+  _spriteRenderer->texture = value;
+  _textureContent          = {};
+}
+
+int SpriteManager::get_cellWidth() const
+{
+  return _spriteRenderer->cellWidth;
+}
+
+void SpriteManager::set_cellWidth(int value)
+{
+  _spriteRenderer->cellWidth = value;
+}
+
+int SpriteManager::get_cellHeight() const
+{
+  return _spriteRenderer->cellHeight;
+}
+
+void SpriteManager::set_cellHeight(int value)
+{
+  _spriteRenderer->cellHeight = value;
+}
+
+bool SpriteManager::get_fogEnabled() const
+{
+  return _spriteRenderer->fogEnabled;
+}
+
+void SpriteManager::set_fogEnabled(bool value)
+{
+  _spriteRenderer->fogEnabled = value;
 }
 
 unsigned int SpriteManager::get_blendMode() const
 {
-  return _blendMode;
+  return _spriteRenderer->blendMode;
 }
 
 void SpriteManager::set_blendMode(unsigned int iBlendMode)
 {
-  _blendMode = iBlendMode;
+  _spriteRenderer->blendMode = iBlendMode;
 }
 
 std::string SpriteManager::getClassName() const
@@ -246,104 +162,17 @@ void SpriteManager::_makePacked(const std::string& /*imgUrl*/, const std::string
   // TODO Implement
 }
 
-void SpriteManager::_appendSpriteVertex(size_t index, Sprite& sprite, int offsetX, int offsetY,
-                                        const ISize& baseSize)
-{
-  size_t arrayOffset = index * _vertexBufferSize;
-
-  auto offsetXVal = static_cast<float>(offsetX);
-  auto offsetYVal = static_cast<float>(offsetY);
-
-  if (offsetX == 0) {
-    offsetXVal = _epsilon;
-  }
-  else if (offsetX == 1) {
-    offsetXVal = 1.f - _epsilon;
-  }
-
-  if (offsetY == 0) {
-    offsetYVal = _epsilon;
-  }
-  else if (offsetY == 1) {
-    offsetYVal = 1.f - _epsilon;
-  }
-
-  // Positions
-  _vertexData[arrayOffset + 0] = sprite.position.x;
-  _vertexData[arrayOffset + 1] = sprite.position.y;
-  _vertexData[arrayOffset + 2] = sprite.position.z;
-  _vertexData[arrayOffset + 3] = sprite.angle;
-  // Options
-  _vertexData[arrayOffset + 4] = static_cast<float>(sprite.width);
-  _vertexData[arrayOffset + 5] = static_cast<float>(sprite.height);
-
-  if (!_useInstancing) {
-    _vertexData[arrayOffset + 6] = offsetXVal;
-    _vertexData[arrayOffset + 7] = offsetYVal;
-  }
-  else {
-    arrayOffset -= 2;
-  }
-
-  // Inverts according to Right Handed
-  if (_scene->useRightHandedSystem()) {
-    _vertexData[arrayOffset + 8] = sprite.invertU ? 0.f : 1.f;
-  }
-  else {
-    _vertexData[arrayOffset + 8] = sprite.invertU ? 1.f : 0.f;
-  }
-  _vertexData[arrayOffset + 9] = sprite.invertV ? 1.f : 0.f;
-  // CellIfo
-  if (_packedAndReady) {
-    if (sprite.cellRef.empty()) {
-      sprite.cellIndex = 0;
-    }
-    auto num = sprite.cellIndex;
-    if (StringTools::isDigit(num)) {
-      sprite.cellRef = _spriteMap[static_cast<size_t>(sprite.cellIndex)];
-    }
-    /*
-    const auto spriteCellRef = StringTools::toNumber<size_t>(sprite.cellRef);
-    sprite._xOffset = _cellData[spriteCellRef].frame.x / baseSize.width;
-    sprite._yOffset = _cellData[spriteCellRef].frame.y / baseSize.height;
-    sprite._xSize = _cellData[spriteCellRef].frame.w;
-    sprite._ySize = _cellData[spriteCellRef].frame.h;
-    */
-    _vertexData[arrayOffset + 10] = static_cast<float>(sprite._xOffset);
-    _vertexData[arrayOffset + 11] = static_cast<float>(sprite._yOffset);
-    _vertexData[arrayOffset + 12] = static_cast<float>(sprite._xSize) / baseSize.width;
-    _vertexData[arrayOffset + 13] = static_cast<float>(sprite._ySize) / baseSize.height;
-  }
-  else {
-    auto rowSize    = baseSize.width / cellWidth;
-    auto offset     = (rowSize == 0) ? 0 : sprite.cellIndex / rowSize;
-    sprite._xOffset = (sprite.cellIndex - offset * rowSize) * cellWidth / baseSize.width;
-    sprite._yOffset = offset * cellHeight / baseSize.height;
-    sprite._xSize   = cellWidth;
-    sprite._ySize   = cellHeight;
-    _vertexData[arrayOffset + 10] = static_cast<float>(sprite._xOffset);
-    _vertexData[arrayOffset + 11] = static_cast<float>(sprite._yOffset);
-    _vertexData[arrayOffset + 12] = static_cast<float>(cellWidth) / baseSize.width;
-    _vertexData[arrayOffset + 13] = static_cast<float>(cellHeight) / baseSize.height;
-  }
-  // Color
-  _vertexData[arrayOffset + 14] = sprite.color->r;
-  _vertexData[arrayOffset + 15] = sprite.color->g;
-  _vertexData[arrayOffset + 16] = sprite.color->b;
-  _vertexData[arrayOffset + 17] = sprite.color->a;
-}
-
 bool SpriteManager::_checkTextureAlpha(Sprite& sprite, const Ray& ray, float distance,
                                        const Vector3& min, const Vector3& max)
 {
-  if (!sprite.useAlphaForPicking || !_spriteTexture) {
+  if (!sprite.useAlphaForPicking || !texture()) {
     return true;
   }
 
-  const auto textureSize = _spriteTexture->getSize();
+  const auto textureSize = texture()->getSize();
   if (_textureContent.empty()) {
     _textureContent = Uint8Array(static_cast<size_t>(textureSize.width * textureSize.height * 4));
-    _spriteTexture->readPixels(0, 0, _textureContent);
+    texture()->readPixels(0, 0, _textureContent);
   }
 
   auto& contactPoint = TmpVectors::Vector3Array[0];
@@ -374,7 +203,7 @@ std::optional<PickingInfo>
 SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
                           const std::function<bool(Sprite* sprite)>& predicate, bool fastCheck)
 {
-  auto count                = std::min(_capacity, sprites.size());
+  auto count                = std::min(capacity(), sprites.size());
   auto min                  = Vector3::Zero();
   auto max                  = Vector3::Zero();
   auto distance             = std::numeric_limits<float>::max();
@@ -384,7 +213,7 @@ SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
   auto cameraView           = camera->getViewMatrix();
 
   for (unsigned int index = 0; index < count; ++index) {
-    auto& sprite = sprites[index];
+    auto sprite = std::static_pointer_cast<Sprite>(sprites[index]);
     if (!sprite) {
       continue;
     }
@@ -453,7 +282,7 @@ std::vector<PickingInfo>
 SpriteManager::multiIntersects(const Ray& ray, const CameraPtr& camera,
                                const std::function<bool(Sprite* sprite)>& predicate)
 {
-  auto count     = std::min(_capacity, sprites.size());
+  auto count     = std::min(capacity(), sprites.size());
   auto min       = Vector3::Zero();
   auto max       = Vector3::Zero();
   float distance = 0.f;
@@ -463,7 +292,7 @@ SpriteManager::multiIntersects(const Ray& ray, const CameraPtr& camera,
   auto cameraView          = camera->getViewMatrix();
 
   for (size_t index = 0; index < count; index++) {
-    const auto& sprite = sprites[index];
+    const auto& sprite = std::static_pointer_cast<Sprite>(sprites[index]);
     if (!sprite) {
       continue;
     }
@@ -516,130 +345,45 @@ SpriteManager::multiIntersects(const Ray& ray, const CameraPtr& camera,
 void SpriteManager::render()
 {
   // Check
-  if (!_effectBase->isReady() || !_effectFog->isReady() || !_spriteTexture
-      || !_spriteTexture->isReady() || sprites.empty()) {
-    return;
-  }
-
   if (_fromPacked && (!_packedAndReady || _spriteMap.empty() || _cellData.empty())) {
     return;
   }
 
-  auto engine   = _scene->getEngine();
-  auto baseSize = _spriteTexture->getBaseSize();
-
-  // Sprites
+  auto engine    = _scene->getEngine();
   auto deltaTime = engine->getDeltaTime();
-  auto max       = std::min(_capacity, sprites.size());
-
-  auto offset   = 0u;
-  auto noSprite = true;
-  for (size_t index = 0; index < max; index++) {
-    const auto& sprite = sprites[index];
-    if (!sprite || !sprite->isVisible) {
-      continue;
-    }
-
-    noSprite = false;
-    sprite->_animate(deltaTime);
-
-    _appendSpriteVertex(offset++, *sprite, 0, 0, baseSize);
-    if (!_useInstancing) {
-      _appendSpriteVertex(offset++, *sprite, 1, 0, baseSize);
-      _appendSpriteVertex(offset++, *sprite, 1, 1, baseSize);
-      _appendSpriteVertex(offset++, *sprite, 0, 1, baseSize);
-    }
-  }
-
-  if (noSprite) {
-    return;
-  }
-
-  _buffer->update(_vertexData);
-
-  // Render
-  auto effect = _effectBase;
-
-  if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    effect = _effectFog;
-  }
-
-  engine->enableEffect(effect);
-
-  auto viewMatrix = _scene->getViewMatrix();
-  effect->setTexture("diffuseSampler", _spriteTexture);
-  effect->setMatrix("view", viewMatrix);
-  effect->setMatrix("projection", _scene->getProjectionMatrix());
-
-  // Fog
-  if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    effect->setFloat4("vFogInfos", static_cast<float>(_scene->fogMode()), _scene->fogStart,
-                      _scene->fogEnd, _scene->fogDensity);
-    effect->setColor3("vFogColor", _scene->fogColor);
-  }
-
-  // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
-
-  // Handle Right Handed
-  const auto culling = engine->depthCullingState()->cull().value_or(true);
-  const auto zOffset = engine->depthCullingState()->zOffset();
-  if (_scene->useRightHandedSystem()) {
-    engine->setState(culling, zOffset, false, false);
-  }
-
-  // Draw order
-  engine->setDepthFunctionToLessOrEqual();
-  if (!disableDepthWrite) {
-    effect->setBool("alphaTest", true);
-    engine->setColorWrite(false);
-    if (_useInstancing) {
-      engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
-    }
-    else {
-      engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
-    }
-    engine->setColorWrite(true);
-    effect->setBool("alphaTest", false);
-  }
-
-  engine->setAlphaMode(_blendMode);
-  if (_useInstancing) {
-    engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
+  if (_packedAndReady) {
+    _spriteRenderer->render(sprites, deltaTime, _scene->getViewMatrix(),
+                            _scene->getProjectionMatrix(),
+                            [this](ThinSprite* sprite, const ISize& baseSize) -> void {
+                              _customUpdate(sprite, baseSize);
+                            });
   }
   else {
-    engine->drawElementsType(Material::TriangleFillMode, 0, static_cast<int>((offset / 4.f) * 6));
+    _spriteRenderer->render(sprites, deltaTime, _scene->getViewMatrix(),
+                            _scene->getProjectionMatrix());
   }
-  engine->setAlphaMode(Constants::ALPHA_DISABLE);
+}
 
-  // Restore Right Handed
-  if (_scene->useRightHandedSystem()) {
-    engine->setState(culling, zOffset, false, true);
+void SpriteManager::_customUpdate(ThinSprite* sprite, const ISize& /*baseSize*/)
+{
+  if (sprite->cellRef.empty()) {
+    sprite->cellIndex = 0;
   }
-
-  engine->unbindInstanceAttributes();
+  auto num = sprite->cellIndex;
+  if (std::isfinite(num) && std::floor(num) == num) {
+    sprite->cellRef = _spriteMap[sprite->cellIndex];
+  }
+  // sprite->_xOffset = _cellData[sprite->cellRef].frame.x / baseSize.width;
+  // sprite->_yOffset = _cellData[sprite->cellRef].frame.y / baseSize.height;
+  // sprite->_xSize = _cellData[sprite->cellRef].frame.w;
+  // sprite->_ySize = _cellData[sprite->cellRef].frame.h;
 }
 
 void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
-  if (_buffer) {
-    _buffer->dispose();
-    _buffer = nullptr;
-  }
-
-  if (_spriteBuffer) {
-    _spriteBuffer->dispose();
-    _spriteBuffer = nullptr;
-  }
-
-  if (_indexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_indexBuffer);
-    _indexBuffer = nullptr;
-  }
-
-  if (_spriteTexture) {
-    _spriteTexture->dispose();
-    _spriteTexture = nullptr;
+  if (_spriteRenderer) {
+    _spriteRenderer->dispose();
+    _spriteRenderer = nullptr;
   }
 
   _textureContent = {};

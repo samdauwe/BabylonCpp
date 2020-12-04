@@ -2,6 +2,7 @@
 #define BABYLON_SPRITES_SPRITE_MANAGER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
@@ -10,21 +11,12 @@
 
 namespace BABYLON {
 
-class Buffer;
-class Camera;
-class Effect;
 class PickingInfo;
 class Ray;
-class SpriteManager;
-class Texture;
-class VertexBuffer;
-class WebGLDataBuffer;
-using CameraPtr          = std::shared_ptr<Camera>;
-using EffectPtr          = std::shared_ptr<Effect>;
-using SpriteManagerPtr   = std::shared_ptr<SpriteManager>;
-using TexturePtr         = std::shared_ptr<Texture>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+class SpriteRenderer;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(SpriteManager)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Class used to manage multiple sprites on the same spritesheet.
@@ -143,7 +135,7 @@ protected:
   /**
    * @brief Gets the array of sprites
    */
-  std::vector<SpritePtr>& get_children();
+  std::vector<ThinSpritePtr>& get_children();
 
   /**
    * @brief Gets the hosting scene
@@ -166,6 +158,32 @@ protected:
   void set_texture(const TexturePtr& value) override;
 
   /**
+   * @brief Defines the default width of a cell in the spritesheet.
+   */
+  int get_cellWidth() const;
+
+  /**
+   * @brief Defines the default width of a cell in the spritesheet.
+   */
+  void set_cellWidth(int value);
+
+  /** @brief Defines the default height of a cell in the spritesheet.
+   */
+  int get_cellHeight() const;
+
+  /** @brief Defines the default height of a cell in the spritesheet.
+   */
+  void set_cellHeight(int value);
+
+  /** @brief Gets a boolean indicating if the manager must consider scene fog when rendering.
+   */
+  bool get_fogEnabled() const;
+
+  /** @brief Sets a boolean indicating if the manager must consider scene fog when rendering.
+   */
+  void set_fogEnabled(bool value);
+
+  /**
    * @brief Gets theBlend mode use to render the particle, it can be any of the static
    * Constants.ALPHA_x properties provided in this class. Default value is Constants.ALPHA_COMBINE
    */
@@ -179,10 +197,9 @@ protected:
 
 private:
   void _makePacked(const std::string& imgUrl, const std::string& spriteJSON);
-  void _appendSpriteVertex(size_t index, Sprite& sprite, int offsetX, int offsetY,
-                           const ISize& baseSize);
   bool _checkTextureAlpha(Sprite& sprite, const Ray& ray, float distance, const Vector3& min,
                           const Vector3& max);
+  void _customUpdate(ThinSprite* sprite, const ISize& baseSize);
 
 public:
   /**
@@ -194,11 +211,6 @@ public:
    * A JSON object defining sprite sheet data
    */
   std::string spriteJSON;
-
-  /**
-   * Gets or sets a boolean indicating if the manager must consider scene fog when rendering
-   */
-  bool fogEnabled;
 
   /**
    * An event triggered when the manager is disposed.
@@ -218,12 +230,37 @@ public:
   /**
    * Gets the array of sprites
    */
-  ReadOnlyProperty<SpriteManager, std::vector<SpritePtr>> children;
+  ReadOnlyProperty<SpriteManager, std::vector<ThinSpritePtr>> children;
+
+  /**
+   * Gets the hosting scene
+   */
+  ReadOnlyProperty<SpriteManager, Scene*> scene;
 
   /**
    * Gets the capacity of the manager
    */
   ReadOnlyProperty<SpriteManager, size_t> capacity;
+
+  /**
+   * Gets or sets the spritesheet texture
+   */
+  Property<SpriteManager, TexturePtr> texture;
+
+  /**
+   * Defines the default width of a cell in the spritesheet
+   */
+  Property<SpriteManager, int> cellWidth;
+
+  /**
+   * Defines the default height of a cell in the spritesheet
+   */
+  Property<SpriteManager, int> cellHeight;
+
+  /**
+   * Gets or sets a boolean indicating if the manager must consider scene fog when rendering
+   */
+  Property<SpriteManager, bool> fogEnabled;
 
   /**
    * Blend mode use to render the particle, it can be any of
@@ -240,6 +277,8 @@ public:
   bool disableDepthWrite;
 
 private:
+  std::unique_ptr<SpriteRenderer> _spriteRenderer;
+
   /**
    * Associative array from JSON sprite data file
    */
@@ -256,24 +295,10 @@ private:
   bool _packedAndReady;
 
   Uint8Array _textureContent;
-
-  bool _useInstancing;
-
   Observer<SpriteManager>::Ptr _onDisposeObserver;
-  size_t _capacity;
   bool _fromPacked;
-  TexturePtr _spriteTexture;
-  float _epsilon;
   Scene* _scene;
-  Float32Array _vertexData;
-  std::unique_ptr<Buffer> _buffer;
-  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
-  std::unique_ptr<Buffer> _spriteBuffer;
-  WebGLDataBufferPtr _indexBuffer;
-  EffectPtr _effectBase;
-  EffectPtr _effectFog;
-  size_t _vertexBufferSize;
-  unsigned int _blendMode;
+  TexturePtr _spriteRendererTexture;
 
 }; // end of class Sprite
 
