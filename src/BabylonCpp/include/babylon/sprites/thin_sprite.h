@@ -54,23 +54,44 @@ protected:
   /**
    * @brief Gets the initial key for the animation (setting it will restart the animation).
    */
-  int get_fromIndex() const;
+  virtual int get_fromIndex() const;
+
+  /**
+   * @brief Sets the initial key for the animation (setting it will restart the animation).
+   */
+  virtual void set_fromIndex(int value);
 
   /**
    * @brief Gets or sets the end key for the animation (setting it will restart the animation).
    */
-  int get_toIndex() const;
+  virtual int get_toIndex() const;
+
+  /**
+   * @brief Sets the end key for the animation (setting it will restart the animation).
+   */
+  virtual void set_toIndex(int value);
 
   /**
    * @brief Gets or sets a boolean indicating if the animation is looping (setting it will restart
    * the animation).
    */
-  bool get_loopAnimation() const;
+  virtual bool get_loopAnimation() const;
+
+  /**
+   * @brief Sets a boolean indicating if the animation is looping (setting it will restart the
+   * animation).
+   */
+  virtual void set_loopAnimation(bool value);
 
   /**
    * @brief Gets or sets the delay between cell changes (setting it will restart the animation).
    */
-  float get_delay() const;
+  virtual float get_delay() const;
+
+  /**
+   * @brief Sets the delay between cell changes (setting it will restart the animation).
+   */
+  virtual void set_delay(float value);
 
 public:
   /** Gets or sets the cell index in the sprite sheet */
@@ -103,23 +124,23 @@ public:
   /**
    * Gets the initial key for the animation (setting it will restart the animation)
    */
-  ReadOnlyProperty<ThinSprite, int> fromIndex;
+  Property<ThinSprite, int> fromIndex;
 
   /**
    * Gets or sets the end key for the animation (setting it will restart the animation)
    */
-  ReadOnlyProperty<ThinSprite, int> toIndex;
+  Property<ThinSprite, int> toIndex;
 
   /**
    * Gets or sets a boolean indicating if the animation is looping (setting it will restart the
    * animation)
    */
-  ReadOnlyProperty<ThinSprite, bool> loopAnimation;
+  Property<ThinSprite, bool> loopAnimation;
 
   /**
    * Gets or sets the delay between cell changes (setting it will restart the animation)
    */
-  ReadOnlyProperty<ThinSprite, float> delay;
+  Property<ThinSprite, float> delay;
 
   /** @hidden */
   int _xOffset;
@@ -134,7 +155,7 @@ protected:
   bool _loopAnimation;
   int _fromIndex;
   int _toIndex;
-  int _delay;
+  float _delay;
 
 private:
   bool _animationStarted;

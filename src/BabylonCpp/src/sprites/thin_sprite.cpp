@@ -12,10 +12,10 @@ ThinSprite::ThinSprite()
     , invertV{false}
     , isVisible{true}
     , animationStarted{this, &ThinSprite::get_animationStarted}
-    , fromIndex{this, &ThinSprite::get_fromIndex}
-    , toIndex{this, &ThinSprite::get_toIndex}
-    , loopAnimation{this, &ThinSprite::get_loopAnimation}
-    , delay{this, &ThinSprite::get_delay}
+    , fromIndex{this, &ThinSprite::get_fromIndex, &ThinSprite::set_fromIndex}
+    , toIndex{this, &ThinSprite::get_toIndex, &ThinSprite::set_toIndex}
+    , loopAnimation{this, &ThinSprite::get_loopAnimation, &ThinSprite::set_loopAnimation}
+    , delay{this, &ThinSprite::get_delay, &ThinSprite::set_delay}
     , _loopAnimation{false}
     , _fromIndex{0}
     , _toIndex{0}
@@ -41,9 +41,17 @@ int ThinSprite::get_fromIndex() const
   return _fromIndex;
 }
 
+void ThinSprite::set_fromIndex(int /*value*/)
+{
+}
+
 int ThinSprite::get_toIndex() const
 {
   return _toIndex;
+}
+
+void ThinSprite::set_toIndex(int /*value*/)
+{
 }
 
 bool ThinSprite::get_loopAnimation() const
@@ -51,9 +59,17 @@ bool ThinSprite::get_loopAnimation() const
   return _loopAnimation;
 }
 
+void ThinSprite::set_loopAnimation(bool /*value*/)
+{
+}
+
 float ThinSprite::get_delay() const
 {
-  return std::max(_delay, 1);
+  return std::max(_delay, 1.f);
+}
+
+void ThinSprite::set_delay(float /*value*/)
+{
 }
 
 void ThinSprite::playAnimation(int from, int to, bool loop, float delay,
