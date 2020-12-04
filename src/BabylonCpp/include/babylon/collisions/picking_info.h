@@ -2,16 +2,15 @@
 #define BABYLON_COLLISIONS_PICKING_INFO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/culling/ray.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Sprite;
 class Vector2;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using SpritePtr       = std::shared_ptr<Sprite>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Sprite)
 
 /**
  * @brief Information about the result of picking within a scene.

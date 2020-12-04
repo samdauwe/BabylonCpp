@@ -71,6 +71,7 @@ FWD_CLASS_SPTR(PrePassRenderer)
 FWD_CLASS_SPTR(ShaderMaterial)
 FWD_CLASS_SPTR(SimplificationQueue)
 FWD_CLASS_SPTR(SoundTrack)
+FWD_CLASS_SPTR(Sprite)
 FWD_CLASS_SPTR(SubMesh)
 
 /**
