@@ -53,6 +53,16 @@ protected:
    */
   void set_isEnabled(bool value);
 
+private:
+  /** Create Geometry for Gizmo */
+  std::tuple<MeshPtr, MeshPtr> _createGizmoMesh(const AbstractMeshPtr& parentMesh, float thickness,
+                                                unsigned int tessellation);
+  MeshPtr setupRotationCircle(std::vector<std::vector<Vector3>>& paths,
+                              const AbstractMeshPtr& parentMesh);
+  void updateRotationPath(std::vector<std::vector<Vector3>>& pathArr, float newFill);
+  void updateRotationCircle(const MeshPtr& mesh, std::vector<std::vector<Vector3>>& paths,
+                            float newFill, const Vector3& dragPlanePoint);
+
 public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
@@ -79,12 +89,33 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   bool _isEnabled;
   RotationGizmo* _parent;
+  StandardMaterialPtr _coloredMaterial;
+  StandardMaterialPtr _hoverMaterial;
+  StandardMaterialPtr _disableMaterial;
+  MeshPtr _gizmoMesh;
+  MeshPtr _rotationCircle;
+  MeshPtr _rotationMesh;
+  MeshPtr _collider;
+  bool _dragging;
   bool _useEulerRotation;
+  GizmoAxisCache _cache;
 
+  struct CircleConstants {
+    float radius;
+    float pi2;
+    unsigned int tessellation;
+    unsigned int rotationCircleRange;
+  }; // end of struct
+  static CircleConstants _CircleConstants;
+
+  // Closures for drag logic
+  float _dragDistance;
   Vector3 _lastDragPosition;
+  Vector3 _dragPlanePoint;
   Matrix _rotationMatrix;
   Vector3 _planeNormalTowardsCamera;
   Vector3 _localPlaneNormalTowardsCamera;
+
   SnapEvent _tmpSnapEvent;
   float _currentSnapDragDistance;
   Matrix _tmpMatrix;
