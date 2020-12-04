@@ -2,26 +2,26 @@
 #define BABYLON_SPRITES_SPRITE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observable.h>
+#include <babylon/sprites/thin_sprite.h>
 
 namespace BABYLON {
 
 class ActionManager;
-class ISpriteManager;
-class Sprite;
-using ISpriteManagerPtr = std::shared_ptr<ISpriteManager>;
-using SpritePtr         = std::shared_ptr<Sprite>;
+FWD_CLASS_SPTR(ISpriteManager)
+FWD_CLASS_SPTR(Sprite)
 
 /**
  * @brief Class used to represent a sprite.
  * @see https://doc.babylonjs.com/babylon101/sprites
  */
-class BABYLON_SHARED_EXPORT Sprite : public IAnimatable {
+class BABYLON_SHARED_EXPORT Sprite : public ThinSprite, public IAnimatable {
 
 public:
   template <typename... Ts>
@@ -62,16 +62,6 @@ public:
                      const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
-   * @brief Stops current animation (if any).
-   */
-  void stopAnimation();
-
-  /**
-   * @brief Hidden
-   */
-  void _animate(float deltaTime);
-
-  /**
    * @brief Release associated resources.
    */
   void dispose();
@@ -98,7 +88,6 @@ protected:
    */
   Sprite(const std::string& name, const ISpriteManagerPtr& manager);
 
-private:
   /**
    * @brief Gets the sprite size.
    */
@@ -110,11 +99,6 @@ private:
   void set_size(float value);
 
   /**
-   * @brief Returns a boolean indicating if the animation is started.
-   */
-  bool get_animationStarted() const;
-
-  /**
    * @brief Gets the manager of this sprite.
    */
   ISpriteManagerPtr& get_manager();
@@ -122,44 +106,47 @@ private:
   /**
    * @brief Gets the initial key for the animation (setting it will restart the animation).
    */
-  int get_fromIndex() const;
+  int get_fromIndex() const override;
 
   /**
    * @brief Sets the initial key for the animation (setting it will restart the animation).
    */
-  void set_fromIndex(int value);
+  void set_fromIndex(int value) override;
 
   /**
    * @brief Gets the end key for the animation (setting it will restart the animation).
    */
-  int get_toIndex() const;
+  int get_toIndex() const override;
 
   /**
    * @brief Sets the end key for the animation (setting it will restart the animation).
    */
-  void set_toIndex(int value);
+  void set_toIndex(int value) override;
 
   /**
    * @brief Gets a boolean indicating if the animation is looping (setting it will restart the
    * animation).
    */
-  bool get_loopAnimation() const;
+  bool get_loopAnimation() const override;
 
   /**
    * @brief Sets a boolean indicating if the animation is looping (setting it will restart the
    * animation).
    */
-  void set_loopAnimation(bool value);
+  void set_loopAnimation(bool value) override;
 
   /**
    * @brief Gets the delay between cell changes (setting it will restart the animation).
    */
-  float get_delay() const;
+  float get_delay() const override;
 
   /**
    * @brief Sets the delay between cell changes (setting it will restart the animation).
    */
-  void set_delay(float value);
+  void set_delay(float value) override;
+
+private:
+  void _endAnimation();
 
 public:
   /**
@@ -176,44 +163,6 @@ public:
    * Gets or sets the main color
    */
   std::optional<Color4> color;
-
-  /**
-   * Gets or sets the width
-   */
-  float width;
-
-  /**
-   * Gets or sets the height
-   */
-  float height;
-
-  /**
-   * Gets or sets rotation angle
-   */
-  float angle;
-
-  /**
-   * Gets or sets the cell index in the sprite sheet
-   */
-  int cellIndex;
-
-  /**
-   * Gets or sets the cell reference in the sprite sheet, uses sprite's filename
-   * when added to sprite sheet
-   */
-  std::string cellRef;
-
-  /**
-   * Gets or sets a boolean indicating if UV coordinates should be inverted in U
-   * axis
-   */
-  bool invertU;
-
-  /**
-   * Gets or sets a boolean indicating if UV coordinates should be inverted in B
-   * axis
-   */
-  bool invertV;
 
   /**
    * Gets or sets a boolean indicating that this sprite should be disposed after
@@ -238,26 +187,6 @@ public:
   bool useAlphaForPicking;
 
   /**
-   * Hidden
-   */
-  int _xOffset;
-
-  /**
-   * Hidden
-   */
-  int _yOffset;
-
-  /**
-   * Hidden
-   */
-  int _xSize;
-
-  /**
-   * Hidden
-   */
-  int _ySize;
-
-  /**
    * Gets or sets the associated action manager
    */
   ActionManager* actionManager;
@@ -268,20 +197,9 @@ public:
   Observable<Sprite> onDisposeObservable;
 
   /**
-   * Gets or sets a boolean indicating if the sprite is visible (renderable).
-   * Default is true
-   */
-  bool isVisible;
-
-  /**
    * Gets or sets the sprite size
    */
   Property<Sprite, float> size;
-
-  /**
-   * Returns a boolean indicating if the animation is started
-   */
-  ReadOnlyProperty<Sprite, bool> animationStarted;
 
   /**
    * Gets or sets the unique id of the sprite
@@ -293,36 +211,8 @@ public:
    */
   ReadOnlyProperty<Sprite, ISpriteManagerPtr> manager;
 
-  /**
-   * Gets or sets the initial key for the animation (setting it will restart the animation)
-   */
-  Property<Sprite, int> fromIndex;
-
-  /**
-   * Gets or sets the end key for the animation (setting it will restart the animation)
-   */
-  Property<Sprite, int> toIndex;
-
-  /**
-   * Gets or sets a boolean indicating if the animation is looping (setting it will restart the
-   * animation)
-   */
-  Property<Sprite, bool> loopAnimation;
-
-  /**
-   * Gets or sets the delay between cell changes (setting it will restart the animation)
-   */
-  Property<Sprite, float> delay;
-
 private:
-  bool _animationStarted;
-  bool _loopAnimation;
-  int _fromIndex;
-  int _toIndex;
-  float _delay;
-  int _direction;
   ISpriteManagerPtr _manager;
-  float _time;
   std::function<void()> _onAnimationEnd;
 
 }; // end of class Sprite

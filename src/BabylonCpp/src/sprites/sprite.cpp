@@ -10,34 +10,18 @@
 namespace BABYLON {
 
 Sprite::Sprite(const std::string& iName, const ISpriteManagerPtr& manager)
-    : name{iName}
-    , color{Color4(1.f, 1.f, 1.f, 1.f)}
-    , width{1.f}
-    , height{1.f}
-    , angle{0.f}
-    , cellIndex{0}
-    , invertU{false}
-    , invertV{false}
+    : ThinSprite{}
+    , name{iName}
     , isPickable{false}
     , useAlphaForPicking{false}
     , actionManager{nullptr}
-    , isVisible{true}
     , size{this, &Sprite::get_size, &Sprite::set_size}
-    , animationStarted{this, &Sprite::get_animationStarted}
     , manager{this, &Sprite::get_manager}
-    , fromIndex{this, &Sprite::get_fromIndex, &Sprite::set_fromIndex}
-    , toIndex{this, &Sprite::get_toIndex, &Sprite::set_toIndex}
-    , loopAnimation{this, &Sprite::get_loopAnimation, &Sprite::set_loopAnimation}
-    , delay{this, &Sprite::get_delay, &Sprite::set_delay}
-    , _animationStarted{false}
-    , _loopAnimation{false}
-    , _fromIndex{0}
-    , _toIndex{0}
-    , _delay{0}
-    , _direction{1}
-    , _time{0}
     , _onAnimationEnd{nullptr}
 {
+  color    = Color4(1.f, 1.f, 1.f, 1.f);
+  position = Vector3::Zero();
+
   _manager = manager;
 
   uniqueId = _manager->scene()->getUniqueId();
@@ -71,11 +55,6 @@ void Sprite::set_size(float value)
 {
   width  = value;
   height = value;
-}
-
-bool Sprite::get_animationStarted() const
-{
-  return _animationStarted;
 }
 
 ISpriteManagerPtr& Sprite::get_manager()
@@ -126,57 +105,18 @@ void Sprite::set_delay(float value)
 void Sprite::playAnimation(int from, int to, bool loop, float iDelay,
                            const std::function<void()>& onAnimationEnd)
 {
-  _fromIndex        = from;
-  _toIndex          = to;
-  _loopAnimation    = loop;
-  _delay            = iDelay;
-  _animationStarted = true;
-
-  if (from < to) {
-    _direction = 1;
-  }
-  else {
-    _direction = -1;
-    _toIndex   = from;
-    _fromIndex = to;
-  }
-
-  cellIndex = from;
-  _time     = 0.f;
-
   _onAnimationEnd = onAnimationEnd;
+
+  ThinSprite::playAnimation(from, to, loop, iDelay, [this]() -> void { _endAnimation(); });
 }
 
-void Sprite::stopAnimation()
+void Sprite::_endAnimation()
 {
-  _animationStarted = false;
-}
-
-void Sprite::_animate(float deltaTime)
-{
-  if (!_animationStarted) {
-    return;
+  if (_onAnimationEnd) {
+    _onAnimationEnd();
   }
-
-  _time += deltaTime;
-  if (_time > _delay) {
-    _time = std::fmod(_time, _delay);
-    cellIndex += _direction;
-    if ((_direction > 0 && cellIndex > _toIndex) || (_direction < 0 && cellIndex < _fromIndex)) {
-      if (_loopAnimation) {
-        cellIndex = _direction > 0 ? _fromIndex : _toIndex;
-      }
-      else {
-        cellIndex         = _toIndex;
-        _animationStarted = false;
-        if (_onAnimationEnd) {
-          _onAnimationEnd();
-        }
-        if (disposeWhenFinishedAnimating) {
-          dispose();
-        }
-      }
-    }
+  if (disposeWhenFinishedAnimating) {
+    dispose();
   }
 }
 
