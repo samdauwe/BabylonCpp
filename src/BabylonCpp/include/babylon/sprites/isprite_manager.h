@@ -6,19 +6,18 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
-class Camera;
 class PickingInfo;
 class Ray;
 class Scene;
 class Sprite;
-class Texture;
-using CameraPtr  = std::shared_ptr<Camera>;
-using SpritePtr  = std::shared_ptr<Sprite>;
-using TexturePtr = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(Texture)
+FWD_CLASS_SPTR(ThinSprite)
 
 /**
  * @brief Defines the minimum interface to fullfil in order to be a sprite manager.
@@ -61,7 +60,7 @@ public:
   /**
    * Defines the list of sprites managed by the manager.
    */
-  std::vector<SpritePtr> sprites;
+  std::vector<ThinSpritePtr> sprites;
 
   /**
    * Gets or sets the spritesheet texture
