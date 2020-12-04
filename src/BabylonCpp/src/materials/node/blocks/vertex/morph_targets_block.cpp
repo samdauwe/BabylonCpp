@@ -165,7 +165,7 @@ void MorphTargetsBlock::replaceRepeatableContent(
   const auto& _tangentOutput  = tangentOutput();
   const auto& _uvOutput       = uvOutput();
   auto& _state                = vertexShaderState;
-  auto repeatCount            = defines.intDef["NUM_MORPH_INFLUENCERS"];
+  auto repeatCount = static_cast<size_t>(std::max(defines.intDef["NUM_MORPH_INFLUENCERS"], 0));
 
   auto& manager    = static_cast<Mesh*>(mesh)->morphTargetManager();
   auto hasNormals  = manager && manager->supportsNormals() && defines["NORMAL"];
@@ -215,7 +215,7 @@ void MorphTargetsBlock::replaceRepeatableContent(
     = StringTools::replace(_state.compilationString, _repeatableContentAnchor, injectionCode);
 
   if (repeatCount > 0) {
-    for (size_t index = 0; index < repeatCount; index++) {
+    for (size_t index = 0; index < static_cast<size_t>(repeatCount); index++) {
       _state.attributes.emplace_back(
         StringTools::printf("%s%zu", VertexBuffer::PositionKind, index));
 
