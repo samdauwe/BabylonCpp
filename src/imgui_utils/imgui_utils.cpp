@@ -6,8 +6,8 @@
 #ifndef __EMSCRIPTEN__
 #define STB_IMAGE_IMPLEMENTATION
 #endif
-#include <babylon/asio/asio.h>
 #include <babylon/core/logging.h>
+#include <babylon/misc/file_tools.h>
 #include <memory>
 #include <stb_image/stb_image.h>
 
@@ -40,7 +40,7 @@ struct ImageFileTexture {
       BABYLON_LOG_WARN("ImGuiUtils::ImageFileTexture ->", errorMessage.c_str(), "");
     };
 
-    BABYLON::asio::LoadAssetAsync_Binary(filename, onSuccessLoadBuffer, onError);
+    BABYLON::FileTools::LoadAssetSync_Binary(filename, onSuccessLoadBuffer, onError);
   }
 
   ~ImageFileTexture() = default;

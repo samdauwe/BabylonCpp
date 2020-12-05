@@ -1,6 +1,5 @@
 #include <babylon/sprites/sprite_map.h>
 
-#include <babylon/asio/asio.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
@@ -12,6 +11,7 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
@@ -414,7 +414,7 @@ void SpriteMap::loadTileMaps(const std::string& url)
 
   const auto onLoadFunction = [onErrorFunction](const std::string& /*response*/) {};
 
-  asio::LoadAssetAsync_Text(url, onLoadFunction, onErrorFunction);
+  FileTools::LoadAssetSync_Text(url, onLoadFunction, onErrorFunction);
 }
 
 void SpriteMap::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)

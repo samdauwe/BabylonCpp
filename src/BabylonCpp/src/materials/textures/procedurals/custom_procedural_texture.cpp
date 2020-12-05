@@ -1,10 +1,10 @@
 #include <babylon/materials/textures/procedurals/custom_procedural_texture.h>
 
-#include <babylon/asio/asio.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
+#include <babylon/misc/file_tools.h>
 
 namespace BABYLON {
 
@@ -61,7 +61,7 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
   };
 
   const auto configFileUrl = jsonUrl + "/config.json";
-  asio::LoadAssetAsync_Text(configFileUrl, onSuccessLoadJson, noConfigFile);
+  FileTools::LoadAssetSync_Text(configFileUrl, onSuccessLoadJson, noConfigFile);
 }
 
 bool CustomProceduralTexture::isReady()

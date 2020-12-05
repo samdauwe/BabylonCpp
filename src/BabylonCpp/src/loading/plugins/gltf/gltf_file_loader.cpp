@@ -1,6 +1,5 @@
 #include <babylon/loading/plugins/gltf/gltf_file_loader.h>
 
-#include <babylon/asio/asio.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>

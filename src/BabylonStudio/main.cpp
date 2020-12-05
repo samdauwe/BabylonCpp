@@ -1,11 +1,10 @@
-#include <babylon/core/system.h>
-#include <babylon/babylon_imgui/babylon_studio.h>
-#include <babylon/core/logging/init_console_logger.h>
-#include <babylon/utils/CLI11.h>
-#include <babylon/asio/asio.h>
-#include <babylon/core/logging.h>
-#include <babylon/samples/samples_info.h>
 #include "BabylonStudio/screenshoter/spawn_screenshots.h"
+#include <babylon/babylon_imgui/babylon_studio.h>
+#include <babylon/core/logging.h>
+#include <babylon/core/logging/init_console_logger.h>
+#include <babylon/core/system.h>
+#include <babylon/samples/samples_info.h>
+#include <babylon/utils/CLI11.h>
 
 #ifdef BABYLON_BUILD_PLAYGROUND
 #include <BabylonStudio/rtc/rtc_manager.h>
@@ -20,33 +19,29 @@ int main(int argc, char** argv)
 
   BABYLON::System::chdirToExecutableFolder();
 
-  //ImGuiUtils::ImGuiRunner::ShowDemo(); return 0;
-   
-  bool flagQuiet = false;
-  bool flagFullscreen = false;
-  bool flagAsync = false;
-  bool flagSpawnScreenshots = false;
+  // ImGuiUtils::ImGuiRunner::ShowDemo(); return 0;
+
+  bool flagQuiet                      = false;
+  bool flagFullscreen                 = false;
+  bool flagAsync                      = false;
+  bool flagSpawnScreenshots           = false;
   bool flagScreenshotOneSampleAndExit = false;
   std::string sampleName;
   {
-    CLI::App arg_cli{ "BabylonCpp samples runner" };
+    CLI::App arg_cli{"BabylonCpp samples runner"};
     arg_cli.add_flag("-q,--quiet", flagQuiet, "Quiet mode (not verbose)");
     arg_cli.add_option("-s,--sample", sampleName, "Which sample to run");
     arg_cli.add_flag("-f,--fullscreen", flagFullscreen, "run in fullscreen");
-    arg_cli.add_flag("-A,--async", flagAsync, "Use asynchronous loading");
 
-    arg_cli.add_flag("-a,--shot-all-samples", flagSpawnScreenshots, "run all samples and save a screenshot");
-    arg_cli.add_flag("-p,--shot-one-sample", flagScreenshotOneSampleAndExit, "run one sample, save a screenshot and exit");
+    arg_cli.add_flag("-a,--shot-all-samples", flagSpawnScreenshots,
+                     "run all samples and save a screenshot");
+    arg_cli.add_flag("-p,--shot-one-sample", flagScreenshotOneSampleAndExit,
+                     "run one sample, save a screenshot and exit");
     CLI11_PARSE(arg_cli, argc, argv);
   }
 
   if (!flagQuiet)
     BABYLON::initConsoleLogger();
-
-  if (!flagAsync) {
-    BABYLON::asio::push_HACK_DISABLE_ASYNC();
-    BABYLON_LOG_WARN("BabylonStudio", "Forcing synchronous loading mode!")
-  }
 
   if (flagSpawnScreenshots) {
     BABYLON::impl::spawnScreenshots(argv[0], flagAsync);
@@ -54,13 +49,14 @@ int main(int argc, char** argv)
   }
 
   std::shared_ptr<BABYLON::IRenderableScene> scene;
-  if (! sampleName.empty())
-    scene = BABYLON::SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName, nullptr);
+  if (!sampleName.empty())
+    scene = BABYLON::SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName,
+                                                                                      nullptr);
 
   BABYLON::BabylonStudioOptions options;
   options._flagScreenshotOneSampleAndExit = flagScreenshotOneSampleAndExit;
-  options._sceneName = sampleName;
-  options._appWindowParams.FullScreen = flagFullscreen;
+  options._sceneName                      = sampleName;
+  options._appWindowParams.FullScreen     = flagFullscreen;
 
 #ifdef BABYLON_BUILD_PLAYGROUND
   options._playgroundCompilerCallback = [&runtimeCompiler]() {

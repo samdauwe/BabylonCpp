@@ -1,6 +1,5 @@
 #include <babylon/engines/extensions/cube_texture_extension.h>
 
-#include <babylon/asio/asio.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/depth_texture_creation_options.h>
@@ -123,7 +122,7 @@ InternalTexturePtr CubeTextureExtension::createCubeTexture(
 
   if (loader) {
     const auto onloaddata = [=](const std::variant<std::string, ArrayBufferView>& data,
-                                const std::string & /*responseURL*/) -> void {
+                                const std::string& /*responseURL*/) -> void {
       _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
       loader->loadCubeData(data, texture, createPolynomials, onLoad, onError);
     };
