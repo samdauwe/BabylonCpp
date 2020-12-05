@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
+#include <babylon/maths/matrix.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
@@ -87,7 +88,7 @@ protected:
    * @param reusable If the post process can be reused on the same frame. (default: false)
    * @param textureType Type of textures used when performing the post process. (default: 0)
    * @param blockCompilation If compilation of the shader should not be done in the constructor. The
-   * updateEffect method can be used to compile the shader at a later time. (default: false)
+   * updateEffect method can be used to compile the shader at a later time. (default: true)
    * @param forceGeometryBuffer If this post process should use geometry buffer instead of prepass
    * (default: false)
    */
@@ -97,17 +98,50 @@ protected:
                         const std::optional<unsigned int>& samplingMode = std::nullopt,
                         Engine* engine = nullptr, bool reusable = false,
                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                        bool blockCompilation = false, bool forceGeometryBuffer = false);
+                        bool blockCompilation = false, bool forceGeometryBuffer = true);
   /**
    * @brief Gets the number of iterations are used for motion blur quality.
    * Default value is equal to 32.
    */
-  [[nodiscard]] unsigned int get_motionBlurSamples() const;
+  unsigned int get_motionBlurSamples() const;
 
   /**
    * @brief Sets the number of iterations to be used for motion blur quality.
    */
   void set_motionBlurSamples(unsigned int samples);
+
+  /**
+   * @brief Gets wether or not the motion blur post-process is in object based mode.
+   */
+  bool get_isObjectBased() const;
+
+  /**
+   * @brief Sets wether or not the motion blur post-process is in object based mode.
+   */
+  void set_isObjectBased(bool value);
+
+private:
+  /**
+   * @brief Called on the mode changed (object based or screen based).
+   */
+  void _applyMode();
+
+  /**
+   * @brief Called on the effect is applied when the motion blur post-process is in object based
+   * mode.
+   */
+  void _onApplyObjectBased(Effect* effect);
+
+  /**
+   * @brief Called on the effect is applied when the motion blur post-process is in screen based
+   * mode.
+   */
+  void _onApplyScreenBased(Effect* effect);
+
+  /**
+   * @brief Called on the effect must be updated (changed mode, samples count, etc.).
+   */
+  void _updateEffect();
 
 public:
   /**
@@ -120,11 +154,20 @@ public:
    */
   Property<MotionBlurPostProcess, unsigned int> motionBlurSamples;
 
+  /**
+   * Gets or sets wether or not the motion blur post-process is in object based mode.
+   */
+  Property<MotionBlurPostProcess, bool> isObjectBased;
+
 private:
   unsigned int _motionBlurSamples;
+  bool _isObjectBased;
   bool _forceGeometryBuffer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
   PrePassRendererPtr _prePassRenderer;
+
+  std::optional<Matrix> _invViewProjection;
+  std::optional<Matrix> _previousViewProjection;
 
 }; // end of class VRDistortionCorrectionPostProcess
 
