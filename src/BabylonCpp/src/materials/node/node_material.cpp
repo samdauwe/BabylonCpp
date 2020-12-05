@@ -128,7 +128,7 @@ void NodeMaterial::_attachImageProcessingConfiguration(
   // Attaches observer.
   if (_imageProcessingConfiguration) {
     _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration* /*ipc*/, EventState & /*es*/) -> void {
+      [this](ImageProcessingConfiguration* /*ipc*/, EventState& /*es*/) -> void {
         _markAllSubMeshesAsImageProcessingDirty();
       });
   }
@@ -578,7 +578,7 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
   postProcess->nodeMaterialSource = shared_from_this();
 
   postProcess->onApplyObservable.add(
-    [this, &buildId, &tempName, &defines, &dummyMesh](Effect* effect, EventState & /*es*/) -> void {
+    [this, &buildId, &tempName, &defines, &dummyMesh](Effect* effect, EventState& /*es*/) -> void {
       if (buildId != _buildId) {
         Effect::ShadersStore().erase(tempName + "VertexShader");
         Effect::ShadersStore().erase(tempName + "PixelShader");
@@ -666,7 +666,7 @@ void NodeMaterial::_createEffectForParticles(
   effect->onBindObservable().add([this, &buildId, &tempName, &blendMode, &defines,
                                   &particleSystemDefines, &particleSystem,
                                   &particleSystemDefinesJoined, &dummyMesh, iOnCompiled, iOnError,
-                                  &effect](Effect* /*effect*/, EventState & /*es*/) -> void {
+                                  &effect](Effect* /*effect*/, EventState& /*es*/) -> void {
     if (buildId != _buildId) {
       Effect::ShadersStore().erase(tempName + "PixelShader");
 
@@ -1296,7 +1296,7 @@ void NodeMaterial::loadAsync(const std::string& url)
   FileTools::LoadFile(
     url,
     [this](const std::variant<std::string, ArrayBufferView>& data,
-           const std::string & /*responseURL*/) -> void {
+           const std::string& /*responseURL*/) -> void {
       if (std::holds_alternative<std::string>(data)) {
         auto serializationObject = json::parse(std::get<std::string>(data));
 
@@ -1304,7 +1304,7 @@ void NodeMaterial::loadAsync(const std::string& url)
       }
     },
     nullptr, false,
-    [url](const std::string& message, const std::string & /*exception*/) -> void {
+    [url](const std::string& message, const std::string& /*exception*/) -> void {
       BABYLON_LOG_ERROR("NodeMaterial", "Could not load file %s, reason: %s", url.c_str(),
                         message.c_str())
     });
@@ -1398,7 +1398,12 @@ void NodeMaterial::_restoreConnections(const NodeMaterialBlockPtr& block, const 
   for (const auto& outputPoint : block->outputs()) {
     for (const auto& candidate : json_util::get_array<json>(source, "blocks")) {
       auto candidateId = json_util::get_number<size_t>(candidate, "id");
-      auto target      = map.at(candidateId);
+
+      if (!stl_util::contains(map, candidateId) || !map.at(candidateId)) {
+        continue;
+      }
+
+      auto target = map.at(candidateId);
 
       for (const auto& input : json_util::get_array<json>(source, "inputs")) {
         auto inputTargetBlockId = json_util::get_number<size_t>(input, "targetBlockId");
