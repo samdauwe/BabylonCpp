@@ -1,4 +1,3 @@
-#include <babylon/asio/asio.h>
 #include <babylon/misc/file_tools.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -43,6 +42,132 @@
 
 namespace BABYLON {
 
+namespace sync_io_impl {
+
+struct ErrorMessage {
+  std::string errorMessage;
+  explicit ErrorMessage(const std::string& message) : errorMessage(message){};
+};
+
+using ArrayBufferOrErrorMessage = std::variant<ArrayBuffer, ErrorMessage>;
+
+static std::string base64JpgDataprefix = "data:image/jpg;base64,";
+
+static bool IsBase64JpgDataUri(const std::string& uri)
+{
+  return StringTools::startsWith(uri, base64JpgDataprefix);
+}
+
+static std::string ArrayBufferToString(const ArrayBuffer& dataUint8)
+{
+  std::string dataString;
+  dataString.resize(dataUint8.size());
+  for (size_t i = 0; i < dataUint8.size(); ++i) {
+    dataString[i] = static_cast<char>(dataUint8[i]);
+  }
+  dataString = BABYLON::StringTools::replace(dataString, "\r\n", "\n");
+  return dataString;
+}
+
+static ArrayBuffer DecodeBase64JpgDataUri(const std::string& uri)
+{
+  assert(IsBase64JpgDataUri(uri));
+  std::string base64Data = uri.substr(base64JpgDataprefix.size());
+
+  std::string dataAsString = Base64::atob(base64Data);
+  ArrayBuffer dataAsBuffer;
+  for (char c : dataAsString)
+    dataAsBuffer.push_back(static_cast<uint8_t>(c));
+
+  return dataAsBuffer;
+}
+
+static ArrayBufferOrErrorMessage LoadFileSync_Binary(const std::string& filename,
+                                                     const OnProgressFunction& onProgressFunction)
+{
+  std::ifstream ifs(filename.c_str(), std::ios::binary | std::ios::ate);
+  if (!ifs.good()) {
+    std::string message = "LoadFileSync_Binary: Could not open file " + std::string(filename);
+    return ErrorMessage(message);
+  }
+
+  size_t fileSize = ifs.tellg();
+  ifs.seekg(0, std::ios::beg);
+
+  ArrayBuffer buffer;
+  buffer.resize(fileSize);
+
+  size_t alreadyReadSize = 0;
+  size_t blockSize       = 1024 * 1024; // blocks of 1MB
+
+  while (alreadyReadSize < fileSize) {
+    if (onProgressFunction) {
+      onProgressFunction(true, alreadyReadSize, fileSize);
+    }
+
+    size_t sizeToRead
+      = fileSize - alreadyReadSize > blockSize ? blockSize : fileSize - alreadyReadSize;
+    char* bufferPosition = (char*)(buffer.data() + alreadyReadSize);
+    ifs.read(bufferPosition, sizeToRead);
+    alreadyReadSize += sizeToRead;
+  }
+
+  if (onProgressFunction) {
+    onProgressFunction(true, alreadyReadSize, fileSize);
+  }
+
+  BABYLON_LOG_DEBUG("LoadFileSync_Binary", "Finished loading ", filename.c_str());
+  return buffer;
+}
+
+static void LoadFileSync_Binary(const std::string& filename,
+                                const OnSuccessFunction<ArrayBuffer>& onSuccessFunction,
+                                const OnErrorFunction& onErrorFunction,
+                                const OnProgressFunction& onProgressFunction)
+{
+  ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
+  if (std::holds_alternative<ErrorMessage>(r)) {
+    onErrorFunction(std::get<ErrorMessage>(r).errorMessage);
+  }
+  else {
+    onSuccessFunction(std::get<ArrayBuffer>(r));
+  }
+}
+
+static void
+LoadAssetSync_Binary(const std::string& assetPath,
+                     const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+                     const OnErrorFunction& onErrorFunction       = nullptr,
+                     const OnProgressFunction& onProgressFunction = nullptr)
+{
+  if (IsBase64JpgDataUri(assetPath)) {
+    onSuccessFunction(DecodeBase64JpgDataUri(assetPath));
+    return;
+  }
+
+  std::string filename = assets_folder() + assetPath;
+  LoadFileSync_Binary(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
+}
+
+static void LoadFileSync_Text(const std::string& filename,
+                              const OnSuccessFunction<std::string>& onSuccessFunction,
+                              const OnErrorFunction& onErrorFunction,
+                              const OnProgressFunction& onProgressFunction)
+{
+  ArrayBufferOrErrorMessage r = LoadFileSync_Binary(filename, onProgressFunction);
+  if (std::holds_alternative<ErrorMessage>(r)) {
+    onErrorFunction(std::get<ErrorMessage>(r).errorMessage);
+  }
+  else {
+    auto onSuccessFunctionArrayBuffer = [onSuccessFunction](const ArrayBuffer& dataUint8) {
+      onSuccessFunction(ArrayBufferToString(dataUint8));
+    };
+    onSuccessFunctionArrayBuffer(std::get<ArrayBuffer>(r));
+  }
+}
+
+} // end of namespace sync_io_impl
+
 std::string FileTools::PreprocessUrl(const std::string& url)
 {
   return url;
@@ -52,6 +177,24 @@ std::string FileTools::_CleanUrl(std::string url)
 {
   StringTools::replaceInPlace(url, "#", "%23");
   return url;
+}
+
+void FileTools::LoadAssetSync_Text(const std::string& assetPath,
+                                   const OnSuccessFunction<std::string>& onSuccessFunction,
+                                   const OnErrorFunction& onErrorFunction,
+                                   const OnProgressFunction& onProgressFunction)
+{
+  std::string filename = assets_folder() + assetPath;
+  sync_io_impl::LoadFileSync_Text(filename, onSuccessFunction, onErrorFunction, onProgressFunction);
+}
+
+void FileTools::LoadAssetSync_Binary(
+  const std::string& assetPath,
+  const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+  const OnErrorFunction& onErrorFunction, const OnProgressFunction& onProgressFunction)
+{
+  sync_io_impl::LoadAssetSync_Binary(assetPath, onSuccessFunction, onErrorFunction,
+                                     onProgressFunction);
 }
 
 void FileTools::LoadImageFromUrl(
@@ -70,7 +213,7 @@ void FileTools::LoadImageFromUrl(
   };
   auto onErrorWrapper = [=](const std::string& errorMessage) { onError(errorMessage, ""); };
 
-  asio::LoadAssetAsync_Binary(url, onArrayBufferReceived, onErrorWrapper);
+  LoadAssetSync_Binary(url, onArrayBufferReceived, onErrorWrapper);
 }
 
 void FileTools::LoadImageFromBuffer(
@@ -366,7 +509,7 @@ void FileTools::LoadFile(
       if (onSuccess)
         onSuccess(data, dummyResponseUrl);
     };
-    asio::LoadAssetAsync_Binary(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
+    LoadAssetSync_Binary(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
   else {
     auto onSuccessWrapper = [onSuccess](const std::string& data) {
@@ -374,7 +517,7 @@ void FileTools::LoadFile(
         onSuccess(data, dummyResponseUrl);
       }
     };
-    asio::LoadAssetAsync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
+    LoadAssetSync_Text(url_clean, onSuccessWrapper, onErrorWrapper, onProgressWrapper);
   }
 
   // asio::Service_WaitAll_Sync();

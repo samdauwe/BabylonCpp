@@ -13,6 +13,14 @@ namespace BABYLON {
 class ArrayBufferView;
 class ProgressEvent;
 
+// Callback types
+using OnErrorFunction = std::function<void(const std::string& errorMessage)>;
+
+using OnProgressFunction = std::function<void(bool lengthComputable, size_t loaded, size_t total)>;
+
+template <typename DataType>
+using OnSuccessFunction = std::function<void(const DataType& data)>;
+
 /**
  * @brief Hidden.
  */
@@ -20,6 +28,31 @@ class BABYLON_SHARED_EXPORT FileTools {
 
 public:
   static std::string PreprocessUrl(const std::string& url);
+
+  /**
+   * @brief Loads an asset binary file.
+   * @param assetPath
+   * @param onSuccessFunction
+   * @param onErrorFunction
+   * @param onProgressFunction
+   */
+  static void
+  LoadAssetSync_Binary(const std::string& assetPath,
+                       const std::function<void(const ArrayBuffer& data)>& onSuccessFunction,
+                       const OnErrorFunction& onErrorFunction       = nullptr,
+                       const OnProgressFunction& onProgressFunction = nullptr);
+
+  /**
+   * @brief Loads an asset text file.
+   * @param assetPath
+   * @param onSuccessFunction
+   * @param onErrorFunction
+   * @param onProgressFunction
+   */
+  static void LoadAssetSync_Text(const std::string& assetPath,
+                                 const OnSuccessFunction<std::string>& onSuccessFunction,
+                                 const OnErrorFunction& onErrorFunction,
+                                 const OnProgressFunction& onProgressFunction = nullptr);
 
   /**
    * @brief Loads an image from an url.
