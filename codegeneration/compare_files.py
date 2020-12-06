@@ -68,7 +68,8 @@ def main():
     current, previous = "4.2.0-alpha.32", "4.2.0-alpha.25"
     current, previous = "4.2.0-alpha.35", "4.2.0-alpha.32"
     current, previous = "4.2.0-beta.1", "4.2.0-alpha.35",
-    current, previous = "4.2.0-beta.12", "4.2.0-beta.1"
+    current, previous = "4.2.0-beta.12", "4.2.0-beta.1",
+    current, previous = "4.2.0", "4.2.0-beta.12"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.0.0"         : "4.0.0_2019_04_30",
@@ -82,7 +83,8 @@ def main():
         "4.2.0-alpha.32": "4.2.0-alpha.32_2020_08_12",
         "4.2.0-alpha.35": "4.2.0-alpha.35_2020_08_31",
         "4.2.0-beta.1"  : "4.2.0-beta.1_2020_09_11",
-        "4.2.0-beta.12" : "4.2.0-beta.12_2020_10_12"
+        "4.2.0-beta.12" : "4.2.0-beta.12_2020_10_12",
+        "4.2.0"         : "4.2.0_2020_11_12",
     }
     # List containing the files to ignore
     whiteList = [
@@ -91,6 +93,8 @@ def main():
         # Audio
         "analyser.ts", "audioEngine.ts", "audioSceneComponent.ts", "sound.ts",
         "soundTrack.ts", "weightedsound.ts",
+        # Audio / Interfaces
+        "IAudioEngine.ts",
         # Cameras / Inputs
         "arcRotateCameraVRDeviceOrientationInput.ts",
         "freeCameraDeviceOrientationInput.ts",
@@ -135,7 +139,7 @@ def main():
         "dracoCompression.ts",
         # Misc
         "andOrNotEvaluator.ts", "assetsManager.ts", "basis.ts", "baseError.ts",
-        "canvasGenerator.ts", "customAnimationFrameRequester.ts",
+        "canvasGenerator.ts", "copyTools.ts", "customAnimationFrameRequester.ts",
         "dataReader.ts", "DataStorage", "decorators.ts", "deepCopier.ts",
         "deferred.ts", "domManagement.ts", "fileRequest.ts", "filesInput.ts",
         "filesInputStore.ts", "instantiationTools.ts",
