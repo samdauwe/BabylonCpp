@@ -58,32 +58,11 @@ def fileComparisonToStr(fileComparisonDict):
 
 def main():
     # Versions to compare
-    current, previous = "4.1.0-alpha.17", "4.0.0"
-    current, previous = "4.1.0-beta.13", "4.1.0-alpha.17"
-    current, previous = "4.1.0-beta.23", "4.1.0-beta.13"
     current, previous = "4.1.0", "4.1.0-beta.23"
-    current, previous = "4.2.0-alpha.11", "4.1.0"
-    current, previous = "4.2.0-alpha.17", "4.2.0-alpha.11"
-    current, previous = "4.2.0-alpha.25", "4.2.0-alpha.17"
-    current, previous = "4.2.0-alpha.32", "4.2.0-alpha.25"
-    current, previous = "4.2.0-alpha.35", "4.2.0-alpha.32"
-    current, previous = "4.2.0-beta.1", "4.2.0-alpha.35",
-    current, previous = "4.2.0-beta.12", "4.2.0-beta.1",
     current, previous = "4.2.0", "4.2.0-beta.12"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
-        "4.0.0"         : "4.0.0_2019_04_30",
-        "4.1.0-alpha.17": "4.1.0-alpha.17_2019_08_30",
-        "4.1.0-beta.13" : "4.1.0-beta.13_2019_12_13",
-        "4.1.0-beta.23" : "4.1.0-beta.23_2020_02_07",
         "4.1.0"         : "4.1.0_2020_02_27",
-        "4.2.0-alpha.11": "4.2.0-alpha.11_2020_04_10",
-        "4.2.0-alpha.17": "4.2.0-alpha.17_2020_05_20",
-        "4.2.0-alpha.25": "4.2.0-alpha.25_2020_07_17",
-        "4.2.0-alpha.32": "4.2.0-alpha.32_2020_08_12",
-        "4.2.0-alpha.35": "4.2.0-alpha.35_2020_08_31",
-        "4.2.0-beta.1"  : "4.2.0-beta.1_2020_09_11",
-        "4.2.0-beta.12" : "4.2.0-beta.12_2020_10_12",
         "4.2.0"         : "4.2.0_2020_11_12",
     }
     # List containing the files to ignore
