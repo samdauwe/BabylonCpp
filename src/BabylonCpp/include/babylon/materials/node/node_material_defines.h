@@ -20,6 +20,8 @@ struct BABYLON_SHARED_EXPORT NodeMaterialDefines : public MaterialDefines,
   ~NodeMaterialDefines() override;
 
   void setValue(const std::string& name, bool value, bool markAsUnprocessedIfDirty = false);
+  void setValue(const std::string& name, const std::string& value,
+                bool markAsUnprocessedIfDirty = false);
 
 }; // end of struct NodeMaterialDefines
 

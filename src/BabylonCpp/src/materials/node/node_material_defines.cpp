@@ -62,4 +62,15 @@ void NodeMaterialDefines::setValue(const std::string& name, bool value,
   boolDef[name] = value;
 }
 
+void NodeMaterialDefines::setValue(const std::string& name, const std::string& value,
+                                   bool markAsUnprocessedIfDirty)
+{
+  if (markAsUnprocessedIfDirty
+      && (!stl_util::contains(stringDef, name) || stringDef[name] != value)) {
+    markAsUnprocessed();
+  }
+
+  stringDef[name] = value;
+}
+
 } // end of namespace BABYLON
