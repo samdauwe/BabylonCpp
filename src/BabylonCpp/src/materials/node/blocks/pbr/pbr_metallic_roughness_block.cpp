@@ -28,6 +28,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/pbr/pbr_base_material.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/misc/brdf_texture_tools.h>
@@ -37,19 +38,19 @@ namespace BABYLON {
 
 // clang-format off
 static const std::unordered_map<std::string, std::vector<std::string>> mapOutputToVariable{
-  {"ambient",      {"finalAmbient", ""}},
-  {"diffuse",      {"finalDiffuse", ""}},
-  {"specular",     {"finalSpecularScaled",                         "!defined(UNLIT) && defined(SPECULARTERM)"}},
-  {"sheenDir",     {"finalSheenScaled",                            "!defined(UNLIT) && defined(SHEEN)"}},
-  {"clearcoatDir", {"finalClearCoatScaled",                        "!defined(UNLIT) && defined(CLEARCOAT)"}},
-  {"diffuseInd",   {"finalIrradiance",                             "!defined(UNLIT) && defined(REFLECTION)"}},
-  {"specularInd",  {"finalRadianceScaled",                         "!defined(UNLIT) && defined(REFLECTION)"}},
-  {"sheenInd",     {"sheenOut.finalSheenRadianceScaled",           "!defined(UNLIT) && defined(REFLECTION) && defined(SHEEN) && defined(ENVIRONMENTBRDF)"}},
-  {"clearcoatInd", {"clearcoatOut.finalClearCoatRadianceScaled",   "!defined(UNLIT) && defined(REFLECTION) && defined(CLEARCOAT)"}},
-  { "refraction",  {"subSurfaceOut.finalRefraction",               "!defined(UNLIT) && defined(SS_REFRACTION)"}},
-  { "lighting",    {"finalColor.rgb", ""}},
-  { "shadow",      {"shadow", ""}},
-  { "alpha",       {"alpha", ""}}
+  {"ambientClr",   {"finalAmbient", ""}},
+  {"diffuseDir",   {"finalDiffuse", ""}},
+  {"specularDir",  {"finalSpecularScaled",                       "!defined(UNLIT) && defined(SPECULARTERM)"}},
+  {"clearcoatDir", {"finalClearCoatScaled",                      "!defined(UNLIT) && defined(CLEARCOAT)"}},
+  {"sheenDir",     {"finalSheenScaled",                          "!defined(UNLIT) && defined(SHEEN)"}},
+  {"diffuseInd",   {"finalIrradiance",                           "!defined(UNLIT) && defined(REFLECTION)"}},
+  {"specularInd",  {"finalRadianceScaled",                       "!defined(UNLIT) && defined(REFLECTION)"}},
+  {"clearcoatInd", {"clearcoatOut.finalClearCoatRadianceScaled", "!defined(UNLIT) && defined(REFLECTION) && defined(CLEARCOAT)"}},
+  {"sheenInd",     {"sheenOut.finalSheenRadianceScaled",         "!defined(UNLIT) && defined(REFLECTION) && defined(SHEEN) && defined(ENVIRONMENTBRDF)"}},
+  {"refraction",   {"subSurfaceOut.finalRefraction",             "!defined(UNLIT) && defined(SS_REFRACTION)"}},
+  {"lighting",     {"finalColor.rgb", ""}},
+  {"shadow",       {"shadow", ""}},
+  {"alpha",        {"alpha", ""}},
 };
 // clang-format on
 
@@ -70,11 +71,9 @@ PBRMetallicRoughnessBlock::PBRMetallicRoughnessBlock(const std::string& iName)
     , environmentIntensity{1.f}
     , specularIntensity{1.f}
     , lightFalloff{0}
-    , useAlphaFromAlbedoTexture{false}
     , useAlphaTest{false}
     , alphaTestCutoff{0.5f}
     , useAlphaBlending{false}
-    , opacityRGB{false}
     , useRadianceOverAlpha{true}
     , useSpecularOverAlpha{true}
     , enableSpecularAntiAliasing{false}
@@ -90,28 +89,30 @@ PBRMetallicRoughnessBlock::PBRMetallicRoughnessBlock(const std::string& iName)
     , debugFactor{1.f}
     , worldPosition{this, &PBRMetallicRoughnessBlock::get_worldPosition}
     , worldNormal{this, &PBRMetallicRoughnessBlock::get_worldNormal}
-    , perturbedNormal{this, &PBRMetallicRoughnessBlock::get_perturbedNormal}
+    , view{this, &PBRMetallicRoughnessBlock::get_view}
     , cameraPosition{this, &PBRMetallicRoughnessBlock::get_cameraPosition}
+    , perturbedNormal{this, &PBRMetallicRoughnessBlock::get_perturbedNormal}
     , baseColor{this, &PBRMetallicRoughnessBlock::get_baseColor}
-    , opacityTexture{this, &PBRMetallicRoughnessBlock::get_opacityTexture}
-    , ambientColor{this, &PBRMetallicRoughnessBlock::get_ambientColor}
-    , reflectivity{this, &PBRMetallicRoughnessBlock::get_reflectivity}
+    , metallic{this, &PBRMetallicRoughnessBlock::get_metallic}
+    , roughness{this, &PBRMetallicRoughnessBlock::get_roughness}
     , ambientOcc{this, &PBRMetallicRoughnessBlock::get_ambientOcc}
+    , opacity{this, &PBRMetallicRoughnessBlock::get_opacity}
+    , indexOfRefraction{this, &PBRMetallicRoughnessBlock::get_indexOfRefraction}
+    , ambientColor{this, &PBRMetallicRoughnessBlock::get_ambientColor}
     , reflection{this, &PBRMetallicRoughnessBlock::get_reflection}
-    , sheen{this, &PBRMetallicRoughnessBlock::get_sheen}
     , clearcoat{this, &PBRMetallicRoughnessBlock::get_clearcoat}
+    , sheen{this, &PBRMetallicRoughnessBlock::get_sheen}
     , subsurface{this, &PBRMetallicRoughnessBlock::get_subsurface}
     , anisotropy{this, &PBRMetallicRoughnessBlock::get_anisotropy}
-    , view{this, &PBRMetallicRoughnessBlock::get_view}
-    , ambient{this, &PBRMetallicRoughnessBlock::get_ambient}
-    , diffuse{this, &PBRMetallicRoughnessBlock::get_diffuse}
-    , specular{this, &PBRMetallicRoughnessBlock::get_specular}
-    , sheenDir{this, &PBRMetallicRoughnessBlock::get_sheenDir}
+    , ambientClr{this, &PBRMetallicRoughnessBlock::get_ambientClr}
+    , diffuseDir{this, &PBRMetallicRoughnessBlock::get_diffuseDir}
+    , specularDir{this, &PBRMetallicRoughnessBlock::get_specularDir}
     , clearcoatDir{this, &PBRMetallicRoughnessBlock::get_clearcoatDir}
+    , sheenDir{this, &PBRMetallicRoughnessBlock::get_sheenDir}
     , diffuseIndirect{this, &PBRMetallicRoughnessBlock::get_diffuseIndirect}
     , specularIndirect{this, &PBRMetallicRoughnessBlock::get_specularIndirect}
-    , sheenIndirect{this, &PBRMetallicRoughnessBlock::get_sheenIndirect}
     , clearcoatIndirect{this, &PBRMetallicRoughnessBlock::get_clearcoatIndirect}
+    , sheenIndirect{this, &PBRMetallicRoughnessBlock::get_sheenIndirect}
     , refraction{this, &PBRMetallicRoughnessBlock::get_refraction}
     , lighting{this, &PBRMetallicRoughnessBlock::get_lighting}
     , shadow{this, &PBRMetallicRoughnessBlock::get_shadow}
@@ -119,6 +120,8 @@ PBRMetallicRoughnessBlock::PBRMetallicRoughnessBlock(const std::string& iName)
     , _lightId{0}
     , _scene{nullptr}
     , _environmentBRDFTexture{nullptr}
+    , _metallicReflectanceColor{Color3::White()}
+    , _metallicF0Factor{1.f}
 {
   _isUnique = true;
 }
@@ -250,6 +253,13 @@ void PBRMetallicRoughnessBlock::initialize(NodeMaterialBuildState& state)
   state._excludeVariableName("surfaceAlbedo");
   state._excludeVariableName("alpha");
 
+  state._excludeVariableName("aoOut");
+
+  state._excludeVariableName("baseColor");
+  state._excludeVariableName("reflectivityOut");
+  state._excludeVariableName("microSurface");
+  state._excludeVariableName("roughness");
+
   state._excludeVariableName("NdotVUnclamped");
   state._excludeVariableName("NdotV");
   state._excludeVariableName("alphaG");
@@ -294,7 +304,7 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_worldNormal()
   return _inputs[1];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_perturbedNormal()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_view()
 {
   return _inputs[2];
 }
@@ -304,22 +314,22 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_cameraPosition()
   return _inputs[3];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_baseColor()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_perturbedNormal()
 {
   return _inputs[4];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_opacityTexture()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_baseColor()
 {
   return _inputs[5];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambientColor()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_metallic()
 {
   return _inputs[6];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_reflectivity()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_roughness()
 {
   return _inputs[7];
 }
@@ -329,57 +339,67 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambientOcc()
   return _inputs[8];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_reflection()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_opacity()
 {
   return _inputs[9];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheen()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_indexOfRefraction()
 {
   return _inputs[10];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoat()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambientColor()
 {
   return _inputs[11];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_subsurface()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_reflection()
 {
   return _inputs[12];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_anisotropy()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoat()
 {
   return _inputs[13];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_view()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheen()
 {
   return _inputs[14];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambient()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_subsurface()
+{
+  return _inputs[15];
+}
+
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_anisotropy()
+{
+  return _inputs[16];
+}
+
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_ambientClr()
 {
   return _outputs[0];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_diffuse()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_diffuseDir()
 {
   return _outputs[1];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specular()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specularDir()
 {
   return _outputs[2];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenDir()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatDir()
 {
   return _outputs[3];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatDir()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenDir()
 {
   return _outputs[4];
 }
@@ -394,12 +414,12 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specularIndirect(
   return _outputs[6];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenIndirect()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatIndirect()
 {
   return _outputs[7];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatIndirect()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenIndirect()
 {
   return _outputs[8];
 }
@@ -438,6 +458,18 @@ void PBRMetallicRoughnessBlock::autoConfigure(const NodeMaterialPtr& material)
     }
     cameraPositionInput->output()->connectTo(cameraPosition);
   }
+
+  if (!view()->isConnected()) {
+    auto viewInput = material->getInputBlockByPredicate([](const InputBlockPtr& b) -> bool {
+      return b->systemValue() == NodeMaterialSystemValues::View;
+    });
+
+    if (!viewInput) {
+      viewInput = InputBlock::New("view");
+      viewInput->setAsSystemValue(NodeMaterialSystemValues::View);
+    }
+    viewInput->output()->connectTo(view);
+  }
 }
 
 void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
@@ -454,7 +486,19 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
   defines.setValue("LODBASEDMICROSFURACE", _scene->getEngine()->getCaps().textureLOD);
 
   // Albedo & Opacity
-  defines.setValue("OPACITY", opacityTexture()->isConnected(), true);
+  defines.setValue("ALBEDO", false, true);
+  defines.setValue("OPACITY", opacity()->isConnected(), true);
+
+  // Ambient occlusion
+  defines.setValue("AMBIENT", true, true);
+  defines.setValue("AMBIENTINGRAYSCALE", false, true);
+
+  // Reflectivity
+  defines.setValue("REFLECTIVITY", false, true);
+  defines.setValue("AOSTOREINMETALMAPRED", false, true);
+  defines.setValue("METALLNESSSTOREINMETALMAPBLUE", false, true);
+  defines.setValue("ROUGHNESSSTOREINMETALMAPALPHA", false, true);
+  defines.setValue("ROUGHNESSSTOREINMETALMAPGREEN", false, true);
 
   // Lighting & colors
   if (lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_STANDARD) {
@@ -471,11 +515,17 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
   }
 
   // Transparency
+  const auto alphaTestCutOffString = std::to_string(alphaTestCutoff);
+
   defines.setValue("ALPHABLEND", useAlphaBlending, true);
-  defines.setValue("ALPHAFROMALBEDO", useAlphaFromAlbedoTexture, true);
+  defines.setValue("ALPHAFROMALBEDO", false, true);
   defines.setValue("ALPHATEST", useAlphaTest, true);
-  defines.setValue("ALPHATESTVALUE", alphaTestCutoff, true);
-  defines.setValue("OPACITYRGB", opacityRGB, true);
+  defines.setValue("ALPHATESTVALUE",
+                   StringTools::indexOf(alphaTestCutOffString, ".") < 0 ?
+                     alphaTestCutOffString + "." :
+                     alphaTestCutOffString,
+                   true);
+  defines.setValue("OPACITYRGB", false, true);
 
   // Rendering
   defines.setValue("RADIANCEOVERALPHA", useRadianceOverAlpha, true);
@@ -484,9 +534,11 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
                    _scene->getEngine()->getCaps().standardDerivatives && enableSpecularAntiAliasing,
                    true);
   defines.setValue("REALTIME_FILTERING", realTimeFiltering, true);
-  defines.setValue("NUM_SAMPLES", realTimeFilteringQuality, true);
 
   if (_scene->getEngine()->webGLVersion > 1) {
+    defines.setValue("NUM_SAMPLES", realTimeFilteringQuality, true);
+  }
+  else {
     defines.setValue("NUM_SAMPLES", realTimeFilteringQuality, true);
   }
 
@@ -544,14 +596,17 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
                                                          const NodeMaterialDefines& defines,
                                                          std::vector<std::string>& uniformBuffers)
 {
-  IEffectCreationOptions options;
-  options.uniformsNames         = state.uniforms;
-  options.uniformBuffersNames   = uniformBuffers;
-  options.samplers              = state.samplers;
-  options.materialDefines       = const_cast<NodeMaterialDefines*>(&defines);
-  options.maxSimultaneousLights = nodeMaterial->maxSimultaneousLights;
-
-  MaterialHelper::PrepareUniformsAndSamplersList(options);
+  for (size_t lightIndex = 0; lightIndex < nodeMaterial->maxSimultaneousLights; ++lightIndex) {
+    const auto lightIndexStr = std::to_string(lightIndex);
+    if (!defines["LIGHT" + lightIndexStr]) {
+      break;
+    }
+    const auto onlyUpdateBuffersList
+      = stl_util::index_of(state.uniforms, "vLightData" + lightIndexStr) >= 0;
+    MaterialHelper::PrepareUniformsAndSamplersForLight(
+      lightIndex, state.uniforms, state.samplers, uniformBuffers, true,
+      defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr], onlyUpdateBuffersList);
+  }
 }
 
 void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
@@ -587,6 +642,25 @@ void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& node
 
   effect->setFloat4("vLightingIntensity", directIntensity, 1.f,
                     environmentIntensity * _scene->environmentIntensity(), specularIntensity);
+
+  // reflectivity bindings
+  const auto outside_ior
+    = 1; // consider air as clear coat and other layers would remap in the shader.
+  const auto ior = indexOfRefraction()->connectInputBlock()
+                       && indexOfRefraction()->connectInputBlock()->value() ?
+                     indexOfRefraction()->connectInputBlock()->value()->get<float>() :
+                     1.5f;
+
+  // We are here deriving our default reflectance from a common value for none metallic surface.
+  // Based of the schlick fresnel approximation model
+  // for dielectrics.
+  const auto f0 = std::pow((ior - outside_ior) / (ior + outside_ior), 2.f);
+
+  // Tweak the default F0 and F90 based on our given setup
+  _metallicReflectanceColor.scaleToRef(f0 * _metallicF0Factor, TmpVectors::Color3Array[0]);
+  const auto metallicF90 = _metallicF0Factor;
+
+  effect->setColor4(_vMetallicReflectanceFactorsName, TmpVectors::Color3Array[0], metallicF90);
 }
 
 void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
@@ -631,6 +705,10 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
         std::static_pointer_cast<ReflectionBlock>(reflection()->connectedPoint()->ownerBlock()) :
         nullptr;
 
+  if (reflectionBlock) {
+    reflectionBlock->viewConnectionPoint = view();
+  }
+
   state.compilationString += reflectionBlock ? reflectionBlock->handleVertexSide(state) : "";
 
   state._emitUniformFromString("vDebugMode", "vec2", "defined(IGNORE) || DEBUGMODE > 0");
@@ -662,18 +740,17 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
   }
 }
 
-std::string PBRMetallicRoughnessBlock::getAlbedoOpacityCode() const
+std::string PBRMetallicRoughnessBlock::_getAlbedoOpacityCode() const
 {
   std::string code = "albedoOpacityOutParams albedoOpacityOut;\r\n";
 
   const auto albedoColor
-    = baseColor()->isConnected() ? baseColor()->associatedVariableName() : "vec4(1., 1., 1., 1.)";
-  const auto iOpacityTexture
-    = opacityTexture()->isConnected() ? opacityTexture()->associatedVariableName() : "";
+    = baseColor()->isConnected() ? baseColor()->associatedVariableName() : "vec3(1.)";
+  const auto iOpacity = opacity()->isConnected() ? opacity()->associatedVariableName() : "1.";
 
   code += StringTools::printf(
     R"(albedoOpacityBlock(
-            %s,
+            vec4(%s, 1.),
         #ifdef ALBEDO
             vec4(1.),
             vec2(1., 1.),
@@ -686,9 +763,77 @@ std::string PBRMetallicRoughnessBlock::getAlbedoOpacityCode() const
         );
 
         vec3 surfaceAlbedo = albedoOpacityOut.surfaceAlbedo;
-        float alpha = albedoOpacityOut.alpha;\r\n`
+        float alpha = albedoOpacityOut.alpha;\r\n
       )",
-    albedoColor.c_str(), iOpacityTexture.c_str());
+    albedoColor.c_str(), iOpacity.c_str());
+
+  return code;
+}
+
+std::string PBRMetallicRoughnessBlock::_getAmbientOcclusionCode() const
+{
+  std::string code = "ambientOcclusionOutParams aoOut;\r\n";
+
+  const auto ao = ambientOcc()->isConnected() ? ambientOcc()->associatedVariableName() : "1.";
+
+  code += StringTools::printf(
+    R"(ambientOcclusionBlock(
+        #ifdef AMBIENT
+            vec3(%s),
+            vec4(0., 1.0, 1.0, 0.),
+        #endif
+            aoOut
+        );\r\n
+      )",
+    ao.c_str());
+
+  return code;
+}
+
+std::string PBRMetallicRoughnessBlock::_getReflectivityCode(NodeMaterialBuildState& state)
+{
+  std::string code = "reflectivityOutParams reflectivityOut;\r\n";
+
+  const std::string aoIntensity = "1.";
+
+  _vMetallicReflectanceFactorsName = state._getFreeVariableName("vMetallicReflectanceFactors");
+  state._emitUniformFromString(_vMetallicReflectanceFactorsName, "vec4");
+
+  code += StringTools::printf(
+    R"(vec3 baseColor = surfaceAlbedo;
+
+        reflectivityBlock(
+            vec4(%s, %s, 0., 0.),
+        #ifdef METALLICWORKFLOW
+            surfaceAlbedo,
+            %s,
+        #endif
+        #ifdef REFLECTIVITY
+            vec3(0., 0., %s),
+            vec4(1.),
+        #endif
+        #if defined(METALLICWORKFLOW) && defined(REFLECTIVITY)  && defined(AOSTOREINMETALMAPRED)
+            aoOut.ambientOcclusionColor,
+        #endif
+        #ifdef MICROSURFACEMAP
+            microSurfaceTexel, <== not handled!
+        #endif
+            reflectivityOut
+        );
+
+        float microSurface = reflectivityOut.microSurface;
+        float roughness = reflectivityOut.roughness;
+
+        #ifdef METALLICWORKFLOW
+            surfaceAlbedo = reflectivityOut.surfaceAlbedo;
+        #endif
+        #if defined(METALLICWORKFLOW) && defined(REFLECTIVITY) && defined(AOSTOREINMETALMAPRED)
+            aoOut.ambientOcclusionColor = reflectivityOut.ambientOcclusionColor;
+        #endif\r\n
+     )",
+    metallic()->associatedVariableName().c_str(), roughness()->associatedVariableName().c_str(), //
+    _vMetallicReflectanceFactorsName.c_str(),                                                    //
+    aoIntensity.c_str());
 
   return code;
 }
@@ -741,6 +886,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
 
   state._emitExtension("lod", "#extension GL_EXT_shader_texture_lod : enable",
                        "defined(LODBASEDMICROSFURACE)");
+  state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
 
   //
   // Includes
@@ -765,15 +911,19 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state._emitFunctionFromInclude("pbrHelperFunctions", iComments);
   state._emitFunctionFromInclude("imageProcessingFunctions", iComments);
 
-  EmitFunctionFromIncludeOptions functionOptions;
+  EmitFunctionFromIncludeOptions functionOptions, functionOptionsRefl;
   functionOptions.replaceStrings = {{R"(vPositionW)", worldPosVarName + ".xyz"}};
+  functionOptionsRefl.replaceStrings
+    = {{R"(REFLECTIONMAP_SKYBOX)", reflectionBlock && !reflectionBlock->_defineSkyboxName.empty() ?
+                                     reflectionBlock->_defineSkyboxName :
+                                     "REFLECTIONMAP_SKYBOX"}};
 
   state._emitFunctionFromInclude("shadowsFragmentFunctions", iComments, functionOptions);
 
   state._emitFunctionFromInclude("pbrDirectLightingSetupFunctions", iComments, functionOptions);
 
   state._emitFunctionFromInclude("pbrDirectLightingFalloffFunctions", iComments);
-  state._emitFunctionFromInclude("pbrBRDFFunctions", iComments);
+  state._emitFunctionFromInclude("pbrBRDFFunctions", iComments, functionOptionsRefl);
   state._emitFunctionFromInclude("hdrFilteringFunctions", iComments);
 
   state._emitFunctionFromInclude("pbrDirectLightingFunctions", iComments, functionOptions);
@@ -826,17 +976,12 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
     += state._emitCodeFromInclude("pbrBlockNormalFinal", iComments, codeOptions);
 
   // _____________________________ Albedo & Opacity ______________________________
-  state.compilationString += getAlbedoOpacityCode();
+  state.compilationString += _getAlbedoOpacityCode();
 
   state.compilationString += state._emitCodeFromInclude("depthPrePass", iComments);
 
   // _____________________________ AO  _______________________________
-  const auto aoBlock = ambientOcc()->connectedPoint() ?
-                         std::static_pointer_cast<AmbientOcclusionBlock>(
-                           ambientOcc()->connectedPoint()->ownerBlock()) :
-                         nullptr;
-
-  state.compilationString += AmbientOcclusionBlock::GetCode(aoBlock);
+  state.compilationString += _getAmbientOcclusionCode();
 
   state.compilationString += state._emitCodeFromInclude("pbrBlockLightmapInit", iComments);
 
@@ -848,34 +993,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
                                        )";
 
   // _____________________________ Reflectivity _______________________________
-  const auto subsurfaceBlock
-    = subsurface()->isConnected() && subsurface()->connectedPoint() ?
-        std::static_pointer_cast<SubSurfaceBlock>(subsurface()->connectedPoint()->ownerBlock()) :
-        nullptr;
-  const auto refractionBlock = subsurfaceBlock && subsurfaceBlock->refraction()->connectedPoint() ?
-                                 std::static_pointer_cast<RefractionBlock>(
-                                   subsurfaceBlock->refraction()->connectedPoint()->ownerBlock()) :
-                                 nullptr;
-
-  const auto reflectivityBlock = reflectivity()->connectedPoint() ?
-                                   std::static_pointer_cast<ReflectivityBlock>(
-                                     reflectivity()->connectedPoint()->ownerBlock()) :
-                                   nullptr;
-
-  if (reflectivityBlock) {
-#if 0
-    reflectivityBlock->indexOfRefractionConnectionPoint
-      = refractionBlock ? refractionBlock->indexOfRefraction() : nullptr;
-#endif
-  }
-
-  const auto aoIntensity = aoBlock ? (aoBlock->intensity()->isConnected() ?
-                                        aoBlock->intensity()->associatedVariableName() :
-                                        "1.") :
-                                     "1.";
-
-  state.compilationString
-    += reflectivityBlock ? reflectivityBlock->getCode(state, aoIntensity) : "";
+  state.compilationString += _getReflectivityCode(state);
 
   // _____________________________ Geometry info _________________________________
   codeOptions.replaceStrings
@@ -938,11 +1056,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state._emitFunctionFromInclude("pbrBlockReflection", iComments, functionOptions);
 
   // ___________________ Compute Reflectance aka R0 F0 info _________________________
-  codeOptions.replaceStrings
-    = {{"metallicReflectanceFactors",
-        reflectivityBlock && !reflectivityBlock->_vMetallicReflectanceFactorsName.empty() ?
-          reflectivityBlock->_vMetallicReflectanceFactorsName :
-          "metallicReflectanceFactors"}};
+  codeOptions.replaceStrings = {{"metallicReflectanceFactors", _vMetallicReflectanceFactorsName}};
   state.compilationString
     += state._emitCodeFromInclude("pbrBlockReflectance0", iComments, codeOptions);
   // ________________________________ Sheen ______________________________
@@ -1042,6 +1156,21 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
     += state._emitCodeFromInclude("pbrBlockReflectance", iComments, codeOptions);
 
   // ___________________________________ SubSurface ______________________________________
+  const auto subsurfaceBlock
+    = subsurface()->isConnected() && subsurface()->connectedPoint() ?
+        std::static_pointer_cast<SubSurfaceBlock>(subsurface()->connectedPoint()->ownerBlock()) :
+        nullptr;
+  const auto refractionBlock = subsurface()->isConnected() && subsurfaceBlock
+                                   && subsurfaceBlock->refraction()->connectedPoint() ?
+                                 std::static_pointer_cast<RefractionBlock>(
+                                   subsurfaceBlock->refraction()->connectedPoint()->ownerBlock()) :
+                                 nullptr;
+
+  if (refractionBlock) {
+    refractionBlock->viewConnectionPoint              = view();
+    refractionBlock->indexOfRefractionConnectionPoint = indexOfRefraction();
+  }
+
   state.compilationString
     += SubSurfaceBlock::GetCode(state, subsurfaceBlock, reflectionBlock, worldPosVarName);
 
@@ -1096,12 +1225,9 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   const auto aoColor
     = ambientColor()->isConnected() ? ambientColor()->associatedVariableName() : "vec3(0., 0., 0.)";
 
-  auto aoDirectLightIntensity = aoBlock && aoBlock->directLightIntensity()->isConnected() ?
-                                  aoBlock->directLightIntensity()->associatedVariableName() :
-                                  std::to_string(PBRBaseMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS);
+  auto aoDirectLightIntensity = std::to_string(PBRBaseMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS);
 
-  if (aoBlock && !aoBlock->directLightIntensity()->isConnected()
-      && StringTools::indexOf(aoDirectLightIntensity, ".") == -1) {
+  if (StringTools::indexOf(aoDirectLightIntensity, ".") == -1) {
     aoDirectLightIntensity += ".";
   }
 
@@ -1129,8 +1255,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
     = {{R"(vNormalW)", _vNormalWName},
        {R"(vPositionW)", worldPosVarName},
        {R"(albedoTexture\.rgb;)",
-        "vec3(1.);\r\ngl_FragColor.rgb = toGammaSpace(gl_FragColor.rgb);\r\n"},
-       {R"(opacityMap)", opacityTexture()->associatedVariableName()}};
+        "vec3(1.);\r\ngl_FragColor.rgb = toGammaSpace(gl_FragColor.rgb);\r\n"}};
   state.compilationString += state._emitCodeFromInclude("pbrDebug", iComments, codeOptions);
 
   // _____________________________ Generate end points ________________________
@@ -1169,17 +1294,12 @@ std::string PBRMetallicRoughnessBlock::_dumpPropertiesCode()
 
   codeString
     += StringTools::printf("%s.lightFalloff = %u;\r\n", _codeVariableName.c_str(), lightFalloff);
-  codeString
-    += StringTools::printf("%s.useAlphaFromAlbedoTexture = %s;\r\n", _codeVariableName.c_str(),
-                           useAlphaFromAlbedoTexture ? "true" : "false");
   codeString += StringTools::printf("%s.useAlphaTest = $%s;\r\n", _codeVariableName.c_str(),
                                     useAlphaTest ? "true" : "false");
   codeString += StringTools::printf("%s.alphaTestCutoff = %f;\r\n", _codeVariableName.c_str(),
                                     alphaTestCutoff);
   codeString += StringTools::printf("%s.useAlphaBlending = %s;\r\n", _codeVariableName.c_str(),
                                     useAlphaBlending ? "true" : "false");
-  codeString += StringTools::printf("%s.opacityRGB = %s;\r\n", _codeVariableName.c_str(),
-                                    opacityRGB ? "true" : "false");
   codeString += StringTools::printf("%s.useRadianceOverAlpha = %s;\r\n", _codeVariableName.c_str(),
                                     useRadianceOverAlpha ? "true" : "false");
   codeString += StringTools::printf("%s.useSpecularOverAlpha = %s;\r\n", _codeVariableName.c_str(),

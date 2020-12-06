@@ -2,16 +2,15 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_PBR_PBR_METALLIC_ROUGHNESS_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
+#include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-class Light;
-class PBRMetallicRoughnessBlock;
-using BaseTexturePtr               = std::shared_ptr<BaseTexture>;
-using LightPtr                     = std::shared_ptr<Light>;
-using PBRMetallicRoughnessBlockPtr = std::shared_ptr<PBRMetallicRoughnessBlock>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(PBRMetallicRoughnessBlock)
 
 /**
  * @brief Block used to implement the PBR metallic/roughness model
@@ -85,12 +84,6 @@ public:
             SubMesh* subMesh = nullptr) override;
 
   /**
-   * @brief Gets the code corresponding to the albedo/opacity module.
-   * @returns the shader code
-   */
-  std::string getAlbedoOpacityCode() const;
-
-  /**
    * @brief Serializes this block in a JSON representation.
    * @returns the serialized block object
    */
@@ -120,9 +113,9 @@ protected:
   NodeMaterialConnectionPointPtr& get_worldNormal();
 
   /**
-   * @brief Gets the perturbed normal input component.
+   * @brief Gets the view matrix parameter.
    */
-  NodeMaterialConnectionPointPtr& get_perturbedNormal();
+  NodeMaterialConnectionPointPtr& get_view();
 
   /**
    * @brief Gets the camera position input component.
@@ -130,24 +123,24 @@ protected:
   NodeMaterialConnectionPointPtr& get_cameraPosition();
 
   /**
+   * @brief Gets the perturbed normal input component.
+   */
+  NodeMaterialConnectionPointPtr& get_perturbedNormal();
+
+  /**
    * @brief Gets the base color input component.
    */
   NodeMaterialConnectionPointPtr& get_baseColor();
 
   /**
-   * @brief Gets the opacity texture input component.
+   * @brief Gets the metallic input component.
    */
-  NodeMaterialConnectionPointPtr& get_opacityTexture();
+  NodeMaterialConnectionPointPtr& get_metallic();
 
   /**
-   * @brief Gets the ambient color input component.
+   * @brief Gets the roughness input component.
    */
-  NodeMaterialConnectionPointPtr& get_ambientColor();
-
-  /**
-   * @brief Gets the reflectivity object parameters.
-   */
-  NodeMaterialConnectionPointPtr& get_reflectivity();
+  NodeMaterialConnectionPointPtr& get_roughness();
 
   /**
    * @brief Gets the ambient occlusion object parameters.
@@ -155,19 +148,34 @@ protected:
   NodeMaterialConnectionPointPtr& get_ambientOcc();
 
   /**
+   * @brief Gets the opacity input component.
+   */
+  NodeMaterialConnectionPointPtr& get_opacity();
+
+  /**
+   * @brief Gets the index of refraction input component.
+   */
+  NodeMaterialConnectionPointPtr& get_indexOfRefraction();
+
+  /**
+   * @brief Gets the ambient color input component.
+   */
+  NodeMaterialConnectionPointPtr& get_ambientColor();
+
+  /**
    * @brief Gets the reflection object parameters.
    */
   NodeMaterialConnectionPointPtr& get_reflection();
 
   /**
-   * @brief Gets the sheen object parameters.
-   */
-  NodeMaterialConnectionPointPtr& get_sheen();
-
-  /**
    * @brief Gets the clear coat object parameters.
    */
   NodeMaterialConnectionPointPtr& get_clearcoat();
+
+  /**
+   * @brief Gets the sheen object parameters.
+   */
+  NodeMaterialConnectionPointPtr& get_sheen();
 
   /**
    * @brief Gets the sub surface object parameters.
@@ -180,34 +188,29 @@ protected:
   NodeMaterialConnectionPointPtr& get_anisotropy();
 
   /**
-   * @brief Gets the view matrix parameter.
-   */
-  NodeMaterialConnectionPointPtr& get_view();
-
-  /**
    * @brief Gets the ambient output component.
    */
-  NodeMaterialConnectionPointPtr& get_ambient();
+  NodeMaterialConnectionPointPtr& get_ambientClr();
 
   /**
    * @brief Gets the diffuse output component.
    */
-  NodeMaterialConnectionPointPtr& get_diffuse();
+  NodeMaterialConnectionPointPtr& get_diffuseDir();
 
   /**
    * @brief Gets the specular output component.
    */
-  NodeMaterialConnectionPointPtr& get_specular();
-
-  /**
-   * @brief Gets the sheen output component.
-   */
-  NodeMaterialConnectionPointPtr& get_sheenDir();
+  NodeMaterialConnectionPointPtr& get_specularDir();
 
   /**
    * @brief Gets the clear coat output component.
    */
   NodeMaterialConnectionPointPtr& get_clearcoatDir();
+
+  /**
+   * @brief Gets the sheen output component.
+   */
+  NodeMaterialConnectionPointPtr& get_sheenDir();
 
   /**
    * @brief Gets the indirect diffuse output component.
@@ -220,14 +223,14 @@ protected:
   NodeMaterialConnectionPointPtr& get_specularIndirect();
 
   /**
-   * @brief Gets the indirect sheen output component.
-   */
-  NodeMaterialConnectionPointPtr& get_sheenIndirect();
-
-  /**
    * @brief Gets the indirect clear coat output component.
    */
   NodeMaterialConnectionPointPtr& get_clearcoatIndirect();
+
+  /**
+   * @brief Gets the indirect sheen output component.
+   */
+  NodeMaterialConnectionPointPtr& get_sheenIndirect();
 
   /**
    * @brief Gets the refraction output component.
@@ -261,6 +264,9 @@ protected:
 
 private:
   void _injectVertexCode(NodeMaterialBuildState& state);
+  std::string _getAlbedoOpacityCode() const;
+  std::string _getAmbientOcclusionCode() const;
+  std::string _getReflectivityCode(NodeMaterialBuildState& state);
 
 public:
   /**
@@ -303,35 +309,22 @@ public:
   unsigned int lightFalloff;
 
   /**
-   * Specifies that the alpha is coming form the albedo channel alpha channel for alpha blending.
-   */
-  // @editableInPropertyPage("Alpha from albedo", PropertyTypeForEdition.Boolean, "TRANSPARENCY", { "notifiers": { "update": true }})
-  bool useAlphaFromAlbedoTexture;
-
-  /**
    * Specifies that alpha test should be used
    */
-  // @editableInPropertyPage("Alpha Testing", PropertyTypeForEdition.Boolean, "TRANSPARENCY")
+  // @editableInPropertyPage("Alpha Testing", PropertyTypeForEdition.Boolean, "OPACITY")
   bool useAlphaTest;
 
   /**
    * Defines the alpha limits in alpha test mode.
    */
-  // @editableInPropertyPage("Alpha CutOff", PropertyTypeForEdition.Float, "TRANSPARENCY", { min: 0, max: 1, "notifiers": { "update": true }})
+  // @editableInPropertyPage("Alpha CutOff", PropertyTypeForEdition.Float, "OPACITY", { min: 0, max: 1, "notifiers": { "update": true }})
   float alphaTestCutoff;
 
   /**
    * Specifies that alpha blending should be used
    */
-  // @editableInPropertyPage("Alpha blending", PropertyTypeForEdition.Boolean, "TRANSPARENCY")
+  // @editableInPropertyPage("Alpha blending", PropertyTypeForEdition.Boolean, "OPACITY")
   bool useAlphaBlending;
-
-  /**
-   * Defines if the alpha value should be determined via the rgb values.
-   * If true the luminance of the pixel might be used to find the corresponding alpha value.
-   */
-  // @editableInPropertyPage("Get alpha from opacity texture RGB", PropertyTypeForEdition.Boolean, "TRANSPARENCY", { "notifiers": { "update": true }})
-  bool opacityRGB;
 
   /**
    * Specifies that the material will keeps the reflection highlights over a transparent surface (only the most luminous ones).
@@ -424,18 +417,8 @@ public:
   //     { label: "Anisotropic Tangents", value: 12 },
   //     { label: "Anisotropic Bitangents", value: 13 },
   //     // Maps
-  //     { label: "Albedo Map", value: 20 },
-  //     { label: "Ambient Map", value: 21 },
-  //     { label: "Opacity Map", value: 22 },
   //     //{ label: "Emissive Map", value: 23 },
   //     //{ label: "Light Map", value: 24 },
-  //     { label: "Metallic Map", value: 25 },
-  //     { label: "Reflectivity Map", value: 26 },
-  //     { label: "ClearCoat Map", value: 27 },
-  //     { label: "ClearCoat Tint Map", value: 28 },
-  //     { label: "Sheen Map", value: 29 },
-  //     { label: "Anisotropic Map", value: 30 },
-  //     { label: "Thickness Map", value: 31 },
   //     // Env
   //     { label: "Env Refraction", value: 40 },
   //     { label: "Env Reflection", value: 41 },
@@ -500,9 +483,9 @@ public:
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> worldNormal;
 
   /**
-   * Gets the perturbed normal input component
+   * Gets the view matrix parameter
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> perturbedNormal;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> view;
 
   /**
    * Gets the camera position input component
@@ -510,24 +493,24 @@ public:
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> cameraPosition;
 
   /**
+   * Gets the perturbed normal input component
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> perturbedNormal;
+
+  /**
    * Gets the base color input component
    */
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> baseColor;
 
   /**
-   * Gets the opacity texture input component
+   * Gets the metallic input component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> opacityTexture;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> metallic;
 
   /**
-   * Gets the ambient color input component
+   * Gets the roughness input component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambientColor;
-
-  /**
-   * Gets the reflectivity object parameters
-   */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> reflectivity;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> roughness;
 
   /**
    * Gets the ambient occlusion object parameters
@@ -535,19 +518,34 @@ public:
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambientOcc;
 
   /**
+   * Gets the opacity input component
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> opacity;
+
+  /**
+   * Gets the index of refraction input component
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> indexOfRefraction;
+
+  /**
+   * Gets the ambient color input component
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambientColor;
+
+  /**
    * Gets the reflection object parameters
    */
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> reflection;
 
   /**
-   * Gets the sheen object parameters
-   */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheen;
-
-  /**
    * Gets the clear coat object parameters
    */
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoat;
+
+  /**
+   * Gets the sheen object parameters
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheen;
 
   /**
    * Gets the sub surface object parameters
@@ -560,34 +558,29 @@ public:
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> anisotropy;
 
   /**
-   * Gets the view matrix parameter
-   */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> view;
-
-  /**
    * Gets the ambient output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambient;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> ambientClr;
 
   /**
    * Gets the diffuse output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> diffuse;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> diffuseDir;
 
   /**
    * Gets the specular output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specular;
-
-  /**
-   * Gets the sheen output component
-   */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenDir;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specularDir;
 
   /**
    * Gets the clear coat output component
    */
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoatDir;
+
+  /**
+   * Gets the sheen output component
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenDir;
 
   /**
    * Gets the indirect diffuse output component
@@ -600,14 +593,14 @@ public:
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specularIndirect;
 
   /**
-   * Gets the indirect sheen output component
-   */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenIndirect;
-
-  /**
    * Gets the indirect clear coat output component
    */
   ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoatIndirect;
+
+  /**
+   * Gets the indirect sheen output component
+   */
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenIndirect;
 
   /**
    * Gets the refraction output component
@@ -636,6 +629,9 @@ private:
   std::string _environmentBrdfSamplerName;
   std::string _vNormalWName;
   std::string _invertNormalName;
+  Color3 _metallicReflectanceColor;
+  float _metallicF0Factor;
+  std::string _vMetallicReflectanceFactorsName;
 
 }; // end of class PBRMetallicRoughnessBlock
 
