@@ -92,6 +92,9 @@ const char* pbrBlockReflection
             const in sampler2D reflectionSamplerHigh,
         #endif
     #endif
+    #ifdef REALTIME_FILTERING
+        const in vec2 vReflectionFilteringInfo,
+    #endif
         out vec4 environmentRadiance
     )
     {
@@ -209,11 +212,18 @@ const char* pbrBlockReflection
             const in sampler2D reflectionSamplerHigh,
         #endif
     #endif
+    #ifdef REALTIME_FILTERING
+        const in vec2 vReflectionFilteringInfo,
+    #endif
         out reflectionOutParams outParams
     )
     {
         // _____________________________ Radiance ________________________________
         vec4 environmentRadiance = vec4(0., 0., 0., 0.);
+
+)ShaderCode"
+R"ShaderCode(
+
 
         #ifdef REFLECTIONMAP_3D
             vec3 reflectionCoords = vec3(0.);
@@ -222,10 +232,6 @@ const char* pbrBlockReflection
         #endif
 
         createReflectionCoords(
-
-)ShaderCode"
-R"ShaderCode(
-
             vPositionW,
             normalW,
         #ifdef ANISOTROPIC
@@ -255,6 +261,9 @@ R"ShaderCode(
         #ifndef LODBASEDMICROSFURACE
             reflectionSamplerLow,
             reflectionSamplerHigh,
+        #endif
+        #ifdef REALTIME_FILTERING
+            vReflectionFilteringInfo,
         #endif
             environmentRadiance
         );

@@ -64,7 +64,7 @@ void reflectivityBlock(
 
             #ifdef AOSTOREINMETALMAPRED
                 vec3 aoStoreInMetalMap = vec3(surfaceMetallicOrReflectivityColorMap.r, surfaceMetallicOrReflectivityColorMap.r, surfaceMetallicOrReflectivityColorMap.r);
-                outParams.ambientOcclusionColor = mix(ambientOcclusionColorIn, aoStoreInMetalMap, vReflectivityInfos.z);
+                outParams.ambientOcclusionColor = mix(ambientOcclusionColorIn, aoStoreInMetalMap, reflectivityInfos.z);
             #endif
 
             #ifdef METALLNESSSTOREINMETALMAPBLUE

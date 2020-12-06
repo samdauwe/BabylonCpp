@@ -285,6 +285,9 @@ void main(void) {
             reflectionSamplerLow,
             reflectionSamplerHigh,
         #endif
+        #ifdef REALTIME_FILTERING
+            vReflectionFilteringInfo,
+        #endif
             reflectionOut
         );
     #endif
@@ -293,14 +296,14 @@ void main(void) {
     #include<pbrBlockReflectance0>
 
     // ________________________________ Sheen ______________________________
-    #ifdef SHEEN
-        sheenOutParams sheenOut;
-
-        #ifdef SHEEN_TEXTURE
 
 )ShaderCode"
 R"ShaderCode(
 
+    #ifdef SHEEN
+        sheenOutParams sheenOut;
+
+        #ifdef SHEEN_TEXTURE
             vec4 sheenMapData = toLinearSpace(texture2D(sheenSampler, vSheenUV + uvOffset)) * vSheenInfos.y;
         #endif
         #if defined(SHEEN_ROUGHNESS) && defined(SHEEN_TEXTURE_ROUGHNESS) && !defined(SHEEN_TEXTURE_ROUGHNESS_IDENTICAL) && !defined(SHEEN_USE_ROUGHNESS_FROM_MAINTEXTURE)
@@ -340,6 +343,9 @@ R"ShaderCode(
             #ifndef LODBASEDMICROSFURACE
                 reflectionSamplerLow,
                 reflectionSamplerHigh,
+            #endif
+            #ifdef REALTIME_FILTERING
+                vReflectionFilteringInfo,
             #endif
             #if !defined(REFLECTIONMAP_SKYBOX) && defined(RADIANCEOCCLUSION)
                 seo,
@@ -422,6 +428,9 @@ R"ShaderCode(
                 reflectionSamplerLow,
                 reflectionSamplerHigh,
             #endif
+            #ifdef REALTIME_FILTERING
+                vReflectionFilteringInfo,
+            #endif
         #endif
         #if defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)
             #ifdef RADIANCEOCCLUSION
@@ -461,6 +470,10 @@ R"ShaderCode(
                     #if !defined(NORMAL) || !defined(USESPHERICALINVERTEX)
                         reflectionOut.irradianceVector,
                     #endif
+                    #if defined(REALTIME_FILTERING)
+                        reflectionSampler,
+                        vReflectionFilteringInfo,
+                    #endif
                 #endif
                 #ifdef USEIRRADIANCEMAP
                     irradianceSampler,
@@ -495,6 +508,9 @@ R"ShaderCode(
             #ifdef ANISOTROPIC
                 anisotropicOut,
             #endif
+            #ifdef REALTIME_FILTERING
+                vRefractionFilteringInfo,
+            #endif
         #endif
         #ifdef SS_TRANSLUCENCY
             vDiffusionDistance,
@@ -525,6 +541,10 @@ R"ShaderCode(
 
     #include<pbrBlockFinalColorComposition>
 
+)ShaderCode"
+R"ShaderCode(
+
+
     #include<logDepthFragment>
     #include<fogFragment>(color, finalColor)
     #include<pbrBlockImageProcessing>
@@ -543,10 +563,6 @@ R"ShaderCode(
     vec2 velocity = abs(a - b);
     velocity = vec2(pow(velocity.x, 1.0 / 3.0), pow(velocity.y, 1.0 / 3.0)) * sign(a - b) * 0.5 + 0.5;
 
-)ShaderCode"
-R"ShaderCode(
-
-
     gl_FragData[PREPASS_VELOCITY_INDEX] = vec4(velocity, 0.0, 1.0);
     #endif
 
@@ -559,13 +575,15 @@ R"ShaderCode(
         #endif
 
         vec3 sqAlbedo = sqrt(surfaceAlbedo); // for pre and post scatter
-        gl_FragData[0] = vec4(finalColor.rgb - irradiance, finalColor.a); // Split irradiance from final color
-        irradiance /= sqAlbedo;
-
-        #ifndef SS_SCATTERING
+        #ifdef SS_SCATTERING
+            gl_FragData[0] = vec4(finalColor.rgb - irradiance, finalColor.a); // Split irradiance from final color
+            irradiance /= sqAlbedo;
+        #else
+            gl_FragData[0] = finalColor; // No split lighting
             float scatteringDiffusionProfile = 255.;
         #endif
-        gl_FragData[PREPASS_IRRADIANCE_INDEX] = vec4(tagLightingForSSS(irradiance), scatteringDiffusionProfile / 255.); // Irradiance + SS diffusion profile
+
+        gl_FragData[PREPASS_IRRADIANCE_INDEX] = vec4(irradiance, scatteringDiffusionProfile / 255.); // Irradiance + SS diffusion profile
     #else
         gl_FragData[0] = vec4(finalColor.rgb, finalColor.a);
     #endif

@@ -96,6 +96,9 @@ struct clearcoatOutParams
                 const in sampler2D reflectionSamplerHigh,
             #endif
         #endif
+        #ifdef REALTIME_FILTERING
+            const in vec2 vReflectionFilteringInfo,
+        #endif
     #endif
     #if defined(ENVIRONMENTBRDF) && !defined(REFLECTIONMAP_SKYBOX)
         #ifdef RADIANCEOCCLUSION
@@ -228,13 +231,13 @@ struct clearcoatOutParams
             #ifdef SPECULARAA
                 // Adapt linear roughness (alphaG) to geometric curvature of the current pixel.
                 clearCoatAlphaG += outParams.clearCoatAARoughnessFactors.y;
-            #endif
-
-            vec4 environmentClearCoatRadiance = vec4(0., 0., 0., 0.);
 
 )ShaderCode"
 R"ShaderCode(
 
+            #endif
+
+            vec4 environmentClearCoatRadiance = vec4(0., 0., 0., 0.);
 
             vec3 clearCoatReflectionVector = computeReflectionCoords(vec4(vPositionW, 1.0), clearCoatNormalW);
             #ifdef REFLECTIONMAP_OPPOSITEZ
@@ -268,6 +271,9 @@ R"ShaderCode(
             #ifndef LODBASEDMICROSFURACE
                 reflectionSamplerLow,
                 reflectionSamplerHigh,
+            #endif
+            #ifdef REALTIME_FILTERING
+                vReflectionFilteringInfo,
             #endif
                 environmentClearCoatRadiance
             );
