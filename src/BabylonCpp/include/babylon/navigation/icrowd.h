@@ -4,14 +4,15 @@
 #include <memory>
 #include <vector>
 
+#include <babylon/babylon_fwd.h>
+
 namespace BABYLON {
 
 struct IAgentParameters;
 class Scene;
 class TransformNode;
 class Vector3;
-
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Crowd Interface. A Crowd is a collection of moving agents constrained by a navigation
