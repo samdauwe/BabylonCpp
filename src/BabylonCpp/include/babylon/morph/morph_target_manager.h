@@ -2,13 +2,13 @@
 #define BABYLON_MORPH_MORPH_TARGET_MANAGER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observer.h>
 #include <babylon/morph/morph_target.h>
 
 namespace BABYLON {
 
-class MorphTargetManager;
-using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
+FWD_CLASS_SPTR(MorphTargetManager)
 
 /**
  * @brief This class is used to deform meshes using morphing between different targets.

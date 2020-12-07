@@ -6,18 +6,17 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observable.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
 struct AnimationPropertiesOverride;
-class MorphTarget;
 class Scene;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using MorphTargetPtr  = std::shared_ptr<MorphTarget>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(MorphTarget)
 
 /**
  * @brief Defines a target to use with MorphTargetManager.
