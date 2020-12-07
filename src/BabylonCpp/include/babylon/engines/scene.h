@@ -1727,17 +1727,14 @@ public:
   std::vector<TransformNode*> getTransformNodesByTags();
 
   /**
-   * @brief Overrides the default sort function applied in the renderging group
-   * to prepare the meshes.
-   * This allowed control for front to back rendering or reversly depending of
-   * the special needs.
+   * @brief Overrides the default sort function applied in the renderging group to prepare the
+   * meshes. This allowed control for front to back rendering or reversly depending of the special
+   * needs.
+   *
    * @param renderingGroupId The rendering group id corresponding to its index
-   * @param opaqueSortCompareFn The opaque queue comparison function use to
-   * sort.
-   * @param alphaTestSortCompareFn The alpha test queue comparison function use
-   * to sort.
-   * @param transparentSortCompareFn The transparent queue comparison function
-   * use to sort.
+   * @param opaqueSortCompareFn The opaque queue comparison function use to sort.
+   * @param alphaTestSortCompareFn The alpha test queue comparison function use to sort.
+   * @param transparentSortCompareFn The transparent queue comparison function use to sort.
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
@@ -1747,22 +1744,20 @@ public:
     = nullptr);
 
   /**
-   * @brief Specifies whether or not the stencil and depth buffer are cleared
-   * between two rendering groups.
+   * @brief Specifies whether or not the stencil and depth buffer are cleared between two rendering
+   * groups.
+   *
    * @param renderingGroupId The rendering group id corresponding to its index
-   * @param autoClearDepthStencil Automatically clears depth and stencil between
-   * groups if true.
-   * @param depth Automatically clears depth between groups if true and
-   * autoClear is true.
-   * @param stencil Automatically clears stencil between groups if true and
-   * autoClear is true.
+   * @param autoClearDepthStencil Automatically clears depth and stencil between groups if true.
+   * @param depth Automatically clears depth between groups if true and autoClear is true.
+   * @param stencil Automatically clears stencil between groups if true and autoClear is true.
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId, bool autoClearDepthStencil,
                                          bool depth = true, bool stencil = true);
 
   /**
-   * @brief Gets the current auto clear configuration for one rendering group of
-   * the rendering manager.
+   * @brief Gets the current auto clear configuration for one rendering group of the rendering
+   * manager.
    * @param index the rendering group index to get the information for
    * @returns The auto clear setup for the requested rendering group
    */
@@ -1770,10 +1765,9 @@ public:
 
   /**
    * @brief Will flag all materials as dirty to trigger new shader compilation.
-   * @param flag defines the flag used to specify which material part must be
-   * marked as dirty
-   * @param predicate If not null, it will be used to specifiy if a material has
-   * to be marked as dirty
+   * @param flag defines the flag used to specify which material part must be marked as dirty
+   * @param predicate If not null, it will be used to specifiy if a material has to be marked as
+   * dirty
    */
   void markAllMaterialsAsDirty(unsigned int flag,
                                const std::function<bool(Material* mat)>& predicate = nullptr);
@@ -1866,6 +1860,7 @@ private:
    * @brief Hidden
    */
   void _processLateAnimationBindings();
+  GeometryPtr _getGeometryByUniqueID(size_t uniqueId);
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh, AbstractMesh* initialMesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
@@ -2277,10 +2272,27 @@ protected:
   bool get_isLoading() const;
 
   /**
-   * @brief Return a unique id as a string which can serve as an identifier for
-   * the scene.
+   * @brief Return a unique id as a string which can serve as an identifier for the scene.
    */
   std::string get_uid() const;
+
+  /**
+   * @brief Gets a boolean blocking all the calls to freeActiveMeshes and freeRenderingGroups
+   * It can be used in order to prevent going through methods freeRenderingGroups and
+   * freeActiveMeshes several times to improve performance when disposing several meshes in a row or
+   * a hierarchy of meshes. When used, it is the responsability of the user to
+   * blockfreeActiveMeshesAndRenderingGroups back to false.
+   */
+  bool get_blockfreeActiveMeshesAndRenderingGroups() const;
+
+  /**
+   * @brief Sets a boolean blocking all the calls to freeActiveMeshes and freeRenderingGroups
+   * It can be used in order to prevent going through methods freeRenderingGroups and
+   * freeActiveMeshes several times to improve performance when disposing several meshes in a row or
+   * a hierarchy of meshes. When used, it is the responsability of the user to
+   * blockfreeActiveMeshesAndRenderingGroups back to false.
+   */
+  void set_blockfreeActiveMeshesAndRenderingGroups(bool value);
 
   /** Audio **/
 
@@ -2588,6 +2600,16 @@ public:
    * An event triggered when a mesh is removed
    */
   Observable<AbstractMesh> onMeshRemovedObservable;
+
+  /**
+   * An event triggered when a skeleton is created
+   */
+  Observable<Skeleton> onNewSkeletonAddedObservable;
+
+  /**
+   * An event triggered when a skeleton is removed
+   */
+  Observable<Skeleton> onSkeletonRemovedObservable;
 
   /**
    * An event triggered when a material is created
@@ -3505,6 +3527,15 @@ public:
     getCollidingSubMeshCandidates;
 
   /**
+   * Gets or sets a boolean blocking all the calls to freeActiveMeshes and freeRenderingGroups
+   * It can be used in order to prevent going through methods freeRenderingGroups and
+   * freeActiveMeshes several times to improve performance when disposing several meshes in a row or
+   * a hierarchy of meshes. When used, it is the responsability of the user to
+   * blockfreeActiveMeshesAndRenderingGroups back to false.
+   */
+  Property<Scene, bool> blockfreeActiveMeshesAndRenderingGroups;
+
+  /**
    * Hidden
    */
   bool _activeMeshesFrozen;
@@ -3658,6 +3689,7 @@ private:
   bool _isDisposed;
   std::vector<AbstractMesh*> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
+  bool _preventFreeActiveMeshesAndRenderingGroups;
   bool _skipEvaluateActiveMeshesCompletely;
   std::vector<MaterialPtr> _processedMaterials;
   std::vector<RenderTargetTexturePtr> _renderTargets;
