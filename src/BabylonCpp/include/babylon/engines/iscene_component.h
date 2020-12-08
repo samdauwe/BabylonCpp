@@ -13,8 +13,8 @@ class Scene;
 /**
  * @brief This represents a scene component.
  *
- * This is used to decouple the dependency the scene is having on the different
- * workloads like layers, post processes...
+ * This is used to decouple the dependency the scene is having on the different workloads like
+ * layers, post processes...
  */
 struct BABYLON_SHARED_EXPORT ISceneComponent
     : public std::enable_shared_from_this<ISceneComponent> {
@@ -35,8 +35,7 @@ struct BABYLON_SHARED_EXPORT ISceneComponent
   virtual void _register() = 0;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   virtual void rebuild() = 0;
 
