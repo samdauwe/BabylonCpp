@@ -19,8 +19,7 @@ class AbstractScene;
  *
  * This extends Scene Component to add Serialization methods on top.
  */
-struct BABYLON_SHARED_EXPORT ISceneSerializableComponent
-    : public ISceneComponent {
+struct BABYLON_SHARED_EXPORT ISceneSerializableComponent : public ISceneComponent {
 
   /**
    * @brief Adds all the elements from the container to the scene.
@@ -33,9 +32,7 @@ struct BABYLON_SHARED_EXPORT ISceneSerializableComponent
    * @param container contains the elements to remove
    * @param dispose if the removed element should be disposed (default: false)
    */
-  virtual void removeFromContainer(AbstractScene& container,
-                                   bool dispose = false)
-    = 0;
+  virtual void removeFromContainer(AbstractScene& container, bool dispose = false) = 0;
 
   /**
    * @brief Serializes the component data to the specified json object.
