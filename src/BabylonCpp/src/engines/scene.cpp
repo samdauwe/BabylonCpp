@@ -1817,6 +1817,16 @@ bool Scene::isReady()
 
   auto engine = getEngine();
 
+  // Effects
+  if (!engine->areAllEffectsReady()) {
+    return false;
+  }
+
+  // Pending data
+  if (!_pendingData.empty()) {
+    return false;
+  }
+
   // Meshes
   for (const auto& mesh : meshes) {
     if (!mesh->isEnabled()) {
@@ -1844,11 +1854,6 @@ bool Scene::isReady()
         return false;
       }
     }
-  }
-
-  // Pending data
-  if (!_pendingData.empty()) {
-    return false;
   }
 
   // Geometries
@@ -2418,7 +2423,7 @@ void Scene::_setAlternateTransformMatrix(Matrix& view, Matrix& projection)
 
 UniformBuffer* Scene::getSceneUniformBuffer()
 {
-  return _useAlternateCameraConfiguration ? _alternateSceneUbo.get() : _sceneUbo.get();
+  return _multiviewSceneUbo ? _multiviewSceneUbo.get() : _sceneUbo.get();
 }
 
 size_t Scene::getUniqueId()
@@ -2502,13 +2507,16 @@ int Scene::removeTransformNode(const TransformNodePtr& toRemove)
 
 int Scene::removeTransformNode(TransformNode* toRemove)
 {
-  auto it = std::find_if(
-    transformNodes.begin(), transformNodes.end(),
-    [toRemove](const TransformNodePtr& transformNode) { return transformNode.get() == toRemove; });
-  auto index = static_cast<int>(it - transformNodes.begin());
-  if (it != transformNodes.end()) {
-    // Remove from the scene if found
-    transformNodes.erase(it);
+  const auto index = toRemove->_indexInSceneTransformNodesArray;
+  if (index != -1) {
+    if (index != static_cast<int>(transformNodes.size()) - 1) {
+      const auto lastNode                        = transformNodes.back();
+      transformNodes[static_cast<size_t>(index)] = lastNode;
+      lastNode->_indexInSceneTransformNodesArray = index;
+    }
+
+    toRemove->_indexInSceneTransformNodesArray = -1;
+    transformNodes.pop_back();
     if (!toRemove->parent()) {
       toRemove->_removeFromSceneRootNodes();
     }
@@ -2529,10 +2537,11 @@ int Scene::removeSkeleton(Skeleton* toRemove)
   auto it
     = std::find_if(skeletons.begin(), skeletons.end(),
                    [toRemove](const SkeletonPtr& skeleton) { return skeleton.get() == toRemove; });
-  int index = static_cast<int>(it - skeletons.begin());
+  auto index = static_cast<int>(it - skeletons.begin());
   if (it != skeletons.end()) {
     // Remove from the scene if found
     skeletons.erase(it);
+    onSkeletonRemovedObservable.notifyObservers(toRemove);
   }
 
   return index;
@@ -2540,8 +2549,8 @@ int Scene::removeSkeleton(Skeleton* toRemove)
 
 int Scene::removeMorphTargetManager(const MorphTargetManagerPtr& toRemove)
 {
-  auto it   = std::find(morphTargetManagers.begin(), morphTargetManagers.end(), toRemove);
-  int index = static_cast<int>(it - morphTargetManagers.begin());
+  auto it    = std::find(morphTargetManagers.begin(), morphTargetManagers.end(), toRemove);
+  auto index = static_cast<int>(it - morphTargetManagers.begin());
   if (it != morphTargetManagers.end()) {
     // Remove from the scene if found
     morphTargetManagers.erase(it);
@@ -2574,7 +2583,6 @@ int Scene::removeLight(Light* toRemove)
       toRemove->_removeFromSceneRootNodes();
     }
   }
-
   onLightRemovedObservable.notifyObservers(toRemove);
   return index;
 }
@@ -2616,9 +2624,7 @@ int Scene::removeCamera(Camera* toRemove)
       _activeCamera = nullptr;
     }
   }
-
   onCameraRemovedObservable.notifyObservers(toRemove);
-
   return index;
 }
 
@@ -2675,13 +2681,18 @@ int Scene::removeMaterial(const MaterialPtr& toRemove)
 
 int Scene::removeMaterial(Material* toRemove)
 {
-  auto it
-    = std::find_if(materials.begin(), materials.end(),
-                   [toRemove](const MaterialPtr& material) { return material.get() == toRemove; });
-  int index = static_cast<int>(it - materials.begin());
-  if (it != materials.end()) {
-    materials.erase(it);
+  const auto index = toRemove->_indexInSceneMaterialArray;
+  if (index != -1 && index < static_cast<int>(materials.size())) {
+    if (index != static_cast<int>(materials.size()) - 1) {
+      const auto lastMaterial                  = materials.back();
+      materials[static_cast<size_t>(index)]    = lastMaterial;
+      lastMaterial->_indexInSceneMaterialArray = index;
+    }
+
+    toRemove->_indexInSceneMaterialArray = -1;
+    materials.pop_back();
   }
+
   onMaterialRemovedObservable.notifyObservers(toRemove);
 
   return index;
@@ -2761,6 +2772,7 @@ void Scene::addCamera(const CameraPtr& newCamera)
   if (_blockEntityCollection) {
     return;
   }
+
   cameras.emplace_back(newCamera);
   onNewCameraAddedObservable.notifyObservers(newCamera.get());
 
@@ -2775,6 +2787,7 @@ void Scene::addSkeleton(const SkeletonPtr& newSkeleton)
     return;
   }
   skeletons.emplace_back(newSkeleton);
+  onNewSkeletonAddedObservable.notifyObservers(newSkeleton.get());
 }
 
 void Scene::addParticleSystem(const IParticleSystemPtr& newParticleSystem)
@@ -2815,6 +2828,8 @@ void Scene::addMaterial(const MaterialPtr& newMaterial)
   if (_blockEntityCollection) {
     return;
   }
+
+  newMaterial->_indexInSceneMaterialArray = materials.size();
   materials.emplace_back(newMaterial);
   onNewMaterialAddedObservable.notifyObservers(newMaterial.get());
 }
@@ -2832,7 +2847,11 @@ void Scene::addGeometry(const GeometryPtr& newGeometry)
   if (_blockEntityCollection) {
     return;
   }
-  geometriesById[newGeometry->id] = geometries.size();
+
+  /* if (geometriesByUniqueId) */ {
+    geometriesByUniqueId[std::to_string(newGeometry->uniqueId)] = geometries.size();
+  }
+
   geometries.emplace_back(newGeometry);
 }
 
