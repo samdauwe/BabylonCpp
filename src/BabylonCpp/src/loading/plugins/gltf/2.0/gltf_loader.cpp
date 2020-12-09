@@ -63,7 +63,9 @@ bool GLTFLoader::UnregisterExtension(const std::string& name)
 }
 
 GLTFLoader::GLTFLoader(GLTFFileLoader& parent)
-    : _disposed{false}
+    : _forAssetContainer{false}
+    , _disableInstancedMesh{0}
+    , _disposed{false}
     , _parent{parent}
     , _gltf{nullptr}
     , _bin{std::nullopt}
@@ -1604,8 +1606,8 @@ VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(const std::string& context
     accessor._babylonVertexBuffer
       = std::make_unique<VertexBuffer>(_babylonScene->getEngine(), data, kind, false);
   }
-  // HACK: If byte offset is not a multiple of component type byte length then
-  // load as a float array instead of using Babylon buffers.
+  // HACK: If byte offset is not a multiple of component type byte length then load as a float array
+  // instead of using Babylon buffers.
   else if (accessor.byteOffset
            && static_cast<unsigned int>(*accessor.byteOffset)
                   % VertexBuffer::GetTypeByteLength(
@@ -1679,6 +1681,7 @@ void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
     }
 
     if (properties->metallicRoughnessTexture) {
+      properties->metallicRoughnessTexture->nonColorData = true;
       promises.emplace_back([&]() -> BaseTexturePtr {
         return loadTextureInfoAsync(
           StringTools::printf("%s/metallicRoughnessTexture", context.c_str()),
@@ -1736,15 +1739,17 @@ MaterialPtr GLTFLoader::_loadMaterialAsync(
     logClose();
   }
 
-  babylonData->babylonMeshes.emplace_back(babylonMesh);
+  if (babylonMesh) {
+    babylonData->babylonMeshes.emplace_back(babylonMesh);
 
-  babylonMesh->onDisposeObservable.addOnce([&](Node*, EventState&) -> void {
-    auto it = std::find(babylonData->babylonMeshes.begin(), babylonData->babylonMeshes.end(),
-                        babylonMesh);
-    if (it != babylonData->babylonMeshes.end()) {
-      babylonData->babylonMeshes.erase(it);
-    }
-  });
+    babylonMesh->onDisposeObservable.addOnce([&](Node*, EventState&) -> void {
+      const auto it = std::find(babylonData->babylonMeshes.begin(),
+                                babylonData->babylonMeshes.end(), babylonMesh);
+      if (it != babylonData->babylonMeshes.end()) {
+        babylonData->babylonMeshes.erase(it);
+      }
+    });
+  }
 
   assign(babylonData->babylonMaterial);
 
@@ -1754,7 +1759,9 @@ MaterialPtr GLTFLoader::_loadMaterialAsync(
 MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
                                                unsigned int babylonDrawMode)
 {
-  auto babylonMaterial = PBRMaterial::New(name, _babylonScene);
+  _babylonScene->_blockEntityCollection = _forAssetContainer;
+  auto babylonMaterial                  = PBRMaterial::New(name, _babylonScene);
+  _babylonScene->_blockEntityCollection = false;
   // Moved to mesh so user can change materials on gltf meshes: babylonMaterial.sideOrientation =
   // this._babylonScene.useRightHandedSystem ? Material.CounterClockWiseSideOrientation :
   // Material.ClockWiseSideOrientation;
@@ -1829,7 +1836,7 @@ void GLTFLoader::loadMaterialBasePropertiesAsync(const std::string& context,
   babylonPBRMaterial->emissiveColor = !material.emissiveFactor.empty() ?
                                         Color3::FromArray(material.emissiveFactor) :
                                         Color3(0.f, 0.f, 0.f);
-  if (material.doubleSided.has_value() && *material.doubleSided) {
+  if (material.doubleSided.value_or(false)) {
     babylonPBRMaterial->backFaceCulling  = false;
     babylonPBRMaterial->twoSidedLighting = true;
   }
@@ -1896,8 +1903,7 @@ void GLTFLoader::loadMaterialAlphaProperties(const std::string& context, const I
       StringTools::printf("%s: Material type not supported", context.c_str()));
   }
 
-  const auto alphaMode
-    = material.alphaMode.has_value() ? *material.alphaMode : IGLTF2::MaterialAlphaMode::OPAQUE;
+  const auto alphaMode = material.alphaMode.value_or(IGLTF2::MaterialAlphaMode::OPAQUE);
   switch (alphaMode) {
     case IGLTF2::MaterialAlphaMode::OPAQUE: {
       babylonPBRMaterial->transparencyMode = PBRMaterial::PBRMATERIAL_OPAQUE;

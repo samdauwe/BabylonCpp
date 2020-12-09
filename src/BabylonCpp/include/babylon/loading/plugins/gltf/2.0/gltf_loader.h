@@ -9,6 +9,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/data_view.h>
 #include <babylon/loading/plugins/gltf/2.0/gltf_loader_interfaces.h>
@@ -25,36 +26,22 @@ struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {
 
 namespace BABYLON {
 
-class AbstractMesh;
-class AnimationGroup;
 class ArrayBufferView;
-class BaseTexture;
-class Bone;
-class Buffer;
-class Camera;
-class Geometry;
-class IAnimatable;
-class Material;
 class Matrix;
-class Mesh;
-class MorphTarget;
-class Skeleton;
-class TransformNode;
-class VertexBuffer;
-using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
-using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
-using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
-using BonePtr           = std::shared_ptr<Bone>;
-using BufferPtr         = std::shared_ptr<Buffer>;
-using CameraPtr         = std::shared_ptr<Camera>;
-using GeometryPtr       = std::shared_ptr<Geometry>;
-using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
-using MaterialPtr       = std::shared_ptr<Material>;
-using MeshPtr           = std::shared_ptr<Mesh>;
-using MorphTargetPtr    = std::shared_ptr<MorphTarget>;
-using SkeletonPtr       = std::shared_ptr<Skeleton>;
-using TransformNodePtr  = std::shared_ptr<TransformNode>;
-using VertexBufferPtr   = std::shared_ptr<VertexBuffer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Bone)
+FWD_CLASS_SPTR(Buffer)
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(Geometry)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(MorphTarget)
+FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(TransformNode)
+FWD_CLASS_SPTR(VertexBuffer)
 
 namespace GLTF2 {
 
@@ -529,6 +516,16 @@ private:
                                                   const IAnimation& animation);
   std::optional<ArrayBufferView> _extensionsLoadUriAsync(const std::string& context,
                                                          const std::string& uri);
+
+public:
+  /** @hidden */
+  bool _forAssetContainer;
+
+  /** Storage */
+  std::vector<LightPtr> _babylonLights;
+
+  /** @hidden */
+  int _disableInstancedMesh;
 
 private:
   bool _disposed;
