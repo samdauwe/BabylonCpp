@@ -2,6 +2,7 @@
 #define BABYLON_LENSFLARES_LENS_FLARE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 
@@ -10,9 +11,9 @@ namespace BABYLON {
 class LensFlare;
 class LensFlareSystem;
 class Texture;
-using LensFlarePtr       = std::shared_ptr<LensFlare>;
-using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
-using TexturePtr         = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(LensFlare)
+FWD_CLASS_SPTR(LensFlareSystem)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief This represents one of the lens effect in a `lensFlareSystem`.
