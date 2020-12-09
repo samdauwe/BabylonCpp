@@ -967,6 +967,8 @@ struct ITextureInfo : public IProperty {
    * mapping
    */
   std::optional<unsigned int> texCoord = std::nullopt;
+
+  bool nonColorData = false;
 }; // end of struct ITextureInfo
 
 /**
