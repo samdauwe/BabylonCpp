@@ -9,36 +9,27 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Camera;
-class Effect;
-class IShadowLight;
-class LensFlare;
-class LensFlareSystem;
-class Light;
-class Mesh;
 class Scene;
-class TransformNode;
 class Vector3;
 class VertexBuffer;
 class Viewport;
-class WebGLDataBuffer;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using CameraPtr          = std::shared_ptr<Camera>;
-using EffectPtr          = std::shared_ptr<Effect>;
-using IShadowLightPtr    = std::shared_ptr<IShadowLight>;
-using LensFlarePtr       = std::shared_ptr<LensFlare>;
-using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
-using LightPtr           = std::shared_ptr<Light>;
-using MeshPtr            = std::shared_ptr<Mesh>;
-using TransformNodePtr   = std::shared_ptr<TransformNode>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(IShadowLight)
+FWD_CLASS_SPTR(LensFlare)
+FWD_CLASS_SPTR(LensFlareSystem)
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(TransformNode)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief This represents a Lens Flare System or the shiny effect created by the light reflection on
