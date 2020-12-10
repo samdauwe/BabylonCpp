@@ -420,6 +420,7 @@ private:
   INodePtr _createRootNode();
   void _forEachPrimitive(const INode& node,
                          const std::function<void(const AbstractMeshPtr& babylonMesh)>& callback);
+  std::vector<GeometryPtr> _getGeometries();
   std::vector<AbstractMeshPtr> _getMeshes();
   std::vector<TransformNodePtr> _getTransformNodes();
   std::vector<SkeletonPtr> _getSkeletons();

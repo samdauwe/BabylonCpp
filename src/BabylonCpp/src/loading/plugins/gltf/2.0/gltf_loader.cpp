@@ -99,6 +99,23 @@ MeshPtr GLTFLoader::rootBabylonMesh()
 
 void GLTFLoader::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
+  if (_disposed) {
+    return;
+  }
+
+  _disposed = true;
+
+  for (const auto& item : _extensions) {
+    const auto extension = item.second;
+    extension->dispose();
+  }
+  _extensions.clear();
+
+  _gltf            = nullptr;
+  _babylonScene    = nullptr;
+  _rootBabylonMesh = nullptr;
+
+  _parent.dispose();
 }
 
 ISceneLoaderAsyncResult GLTFLoader::importMeshAsync(
@@ -107,10 +124,11 @@ ISceneLoaderAsyncResult GLTFLoader::importMeshAsync(
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
   const std::string& fileName)
 {
-  _babylonScene     = scene;
-  _rootUrl          = rootUrl;
-  _fileName         = !fileName.empty() ? fileName : "scene";
-  _progressCallback = onProgress;
+  _babylonScene      = scene;
+  _rootUrl           = rootUrl;
+  _fileName          = !fileName.empty() ? fileName : "scene";
+  _forAssetContainer = false;
+  _progressCallback  = onProgress;
   _loadData(data);
 
   std::vector<size_t> nodes;
@@ -141,9 +159,9 @@ ISceneLoaderAsyncResult GLTFLoader::importMeshAsync(
       {},                    // particleSystems
       _getSkeletons(),       // skeletons
       _getAnimationGroups(), // animationGroups
-      {},                    // transformNodes
-      {},                    // geometries
-      {},                    // lights
+      _getTransformNodes(),  // transformNodes
+      _getGeometries(),      // geometries
+      _babylonLights,        // lights
     };
   });
 
@@ -427,6 +445,28 @@ void GLTFLoader::_forEachPrimitive(
       callback(babylonMesh);
     }
   }
+}
+
+std::vector<GeometryPtr> GLTFLoader::_getGeometries()
+{
+  std::vector<GeometryPtr> geometries;
+
+  const auto& nodes = _gltf->nodes;
+  if (!nodes.empty()) {
+    for (const auto& node : nodes) {
+      _forEachPrimitive(*node, [&geometries](const AbstractMeshPtr& babylonMesh) -> void {
+        const auto mesh = std::static_pointer_cast<Mesh>(babylonMesh);
+        if (mesh) {
+          const auto geometry = mesh->geometry();
+          if (geometry && !stl_util::contains(geometries, geometry)) {
+            geometries.emplace_back(geometry);
+          }
+        }
+      });
+    }
+  }
+
+  return geometries;
 }
 
 std::vector<AbstractMeshPtr> GLTFLoader::_getMeshes()
@@ -1763,7 +1803,7 @@ MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
   auto babylonMaterial                  = PBRMaterial::New(name, _babylonScene);
   _babylonScene->_blockEntityCollection = false;
   // Moved to mesh so user can change materials on gltf meshes: babylonMaterial.sideOrientation =
-  // this._babylonScene.useRightHandedSystem ? Material.CounterClockWiseSideOrientation :
+  // _babylonScene.useRightHandedSystem ? Material.CounterClockWiseSideOrientation :
   // Material.ClockWiseSideOrientation;
   babylonMaterial->fillMode                   = babylonDrawMode;
   babylonMaterial->enableSpecularAntiAliasing = true;
