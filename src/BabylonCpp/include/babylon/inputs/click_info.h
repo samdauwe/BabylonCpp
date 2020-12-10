@@ -20,10 +20,10 @@ public:
   ~ClickInfo(); // = default
 
 private:
-  [[nodiscard]] bool get_singleClick() const;
-  [[nodiscard]] bool get_doubleClick() const;
-  [[nodiscard]] bool get_hasSwiped() const;
-  [[nodiscard]] bool get_ignore() const;
+  bool get_singleClick() const;
+  bool get_doubleClick() const;
+  bool get_hasSwiped() const;
+  bool get_ignore() const;
 
   void set_singleClick(bool b);
   void set_doubleClick(bool b);

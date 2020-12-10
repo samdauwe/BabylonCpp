@@ -3,10 +3,8 @@
 namespace BABYLON {
 
 ClickInfo::ClickInfo()
-    : singleClick{this, &ClickInfo::get_singleClick,
-                  &ClickInfo::set_singleClick}
-    , doubleClick{this, &ClickInfo::get_doubleClick,
-                  &ClickInfo::set_doubleClick}
+    : singleClick{this, &ClickInfo::get_singleClick, &ClickInfo::set_singleClick}
+    , doubleClick{this, &ClickInfo::get_doubleClick, &ClickInfo::set_doubleClick}
     , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
     , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
     , _singleClick{false}
@@ -17,10 +15,8 @@ ClickInfo::ClickInfo()
 }
 
 ClickInfo::ClickInfo(const ClickInfo& otherClickInfo)
-    : singleClick{this, &ClickInfo::get_singleClick,
-                  &ClickInfo::set_singleClick}
-    , doubleClick{this, &ClickInfo::get_doubleClick,
-                  &ClickInfo::set_doubleClick}
+    : singleClick{this, &ClickInfo::get_singleClick, &ClickInfo::set_singleClick}
+    , doubleClick{this, &ClickInfo::get_doubleClick, &ClickInfo::set_doubleClick}
     , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
     , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
     , _singleClick{otherClickInfo._singleClick}
@@ -31,10 +27,8 @@ ClickInfo::ClickInfo(const ClickInfo& otherClickInfo)
 }
 
 ClickInfo::ClickInfo(ClickInfo&& otherClickInfo)
-    : singleClick{this, &ClickInfo::get_singleClick,
-                  &ClickInfo::set_singleClick}
-    , doubleClick{this, &ClickInfo::get_doubleClick,
-                  &ClickInfo::set_doubleClick}
+    : singleClick{this, &ClickInfo::get_singleClick, &ClickInfo::set_singleClick}
+    , doubleClick{this, &ClickInfo::get_doubleClick, &ClickInfo::set_doubleClick}
     , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
     , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
     , _singleClick{std::move(otherClickInfo._singleClick)}
