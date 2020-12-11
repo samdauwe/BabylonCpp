@@ -1053,8 +1053,9 @@ void ThinEngine::bindBuffer(const WebGLDataBufferPtr& buffer, int target)
 {
   if (_vaoRecordInProgress || (_currentBoundBuffer.find(target) == _currentBoundBuffer.end())
       || (_currentBoundBuffer[target] != buffer)) {
-    _gl->bindBuffer(static_cast<unsigned int>(target),
-                    buffer ? buffer->underlyingResource().get() : nullptr);
+    _gl->bindBuffer(static_cast<unsigned int>(target), buffer && buffer->underlyingResource() ?
+                                                         buffer->underlyingResource().get() :
+                                                         nullptr);
     _currentBoundBuffer[target] = buffer;
   }
 }
@@ -1161,7 +1162,7 @@ void ThinEngine::_bindVertexBuffersAttributes(
         _vertexAttribArraysEnabled[_order] = true;
       }
 
-      auto buffer = vertexBuffer->getBuffer();
+      const auto& buffer = vertexBuffer->getBuffer();
       if (buffer) {
         _vertexAttribPointer(buffer, _order, static_cast<int>(vertexBuffer->getSize()),
                              vertexBuffer->type, vertexBuffer->normalized,
