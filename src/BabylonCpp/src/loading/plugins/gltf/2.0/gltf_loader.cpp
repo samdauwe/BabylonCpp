@@ -218,6 +218,16 @@ void GLTFLoader::_loadAsync(const std::vector<size_t>& nodes,
     });
   }
 
+  if (_parent.loadAllMaterials && !_gltf->materials.empty()) {
+    for (size_t m = 0; m < _gltf->materials.size(); ++m) {
+      promises.emplace_back([&]() -> void {
+        _loadMaterialAsync(StringTools::printf("/materials/%ull", m), _gltf->materials[m], nullptr,
+                           Material::TriangleFillMode,
+                           [&](const MaterialPtr& /*babylonMaterial*/) -> void {});
+      });
+    }
+  }
+
   // Restore the blocking of material dirty.
   _babylonScene->blockMaterialDirtyMechanism = oldBlockMaterialDirtyMechanism;
 
@@ -234,18 +244,21 @@ void GLTFLoader::_loadAsync(const std::vector<size_t>& nodes,
   }
 
   // LOADING => READY
+  {
   if (_rootBabylonMesh) {
     _rootBabylonMesh->setEnabled(true);
   }
 
-  _setState(GLTFLoaderState::READY);
   _extensionsOnReady();
+    _setState(GLTFLoaderState::READY);
 
   _startAnimations();
 
   resultFunc();
+  }
 
   // READY => COMPLETE
+  {
   _parent._endPerformanceCounter(loadingToReadyCounterName);
 
   if (!_disposed) {
@@ -258,6 +271,7 @@ void GLTFLoader::_loadAsync(const std::vector<size_t>& nodes,
 
     dispose();
   }
+}
 }
 
 void GLTFLoader::_loadData(const IGLTFLoaderData& data)
@@ -361,7 +375,9 @@ void GLTFLoader::_setState(const GLTFLoaderState& iState)
 
 INodePtr GLTFLoader::_createRootNode()
 {
-  _rootBabylonMesh = Mesh::New("__root__", _babylonScene);
+  _babylonScene->_blockEntityCollection = _forAssetContainer;
+  _rootBabylonMesh                      = Mesh::New("__root__", _babylonScene);
+  _babylonScene->_blockEntityCollection = false;
   _rootBabylonMesh->setEnabled(false);
 
   auto rootNode                   = std::make_shared<INode>();
@@ -1891,8 +1907,8 @@ void GLTFLoader::loadMaterialBasePropertiesAsync(const std::string& context,
         });
     });
 
-    babylonPBRMaterial->invertNormalMapX = !_babylonScene->useRightHandedSystem;
-    babylonPBRMaterial->invertNormalMapY = _babylonScene->useRightHandedSystem;
+    babylonPBRMaterial->invertNormalMapX = !_babylonScene->useRightHandedSystem();
+    babylonPBRMaterial->invertNormalMapY = _babylonScene->useRightHandedSystem();
     if (material.normalTexture->scale.has_value()) {
       babylonPBRMaterial->bumpTexture()->level = *material.normalTexture->scale;
     }
