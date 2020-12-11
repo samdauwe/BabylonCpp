@@ -223,7 +223,7 @@ void GLTFLoader::_loadAsync(const std::vector<size_t>& nodes,
       promises.emplace_back([&]() -> void {
         _loadMaterialAsync(StringTools::printf("/materials/%ull", m), _gltf->materials[m], nullptr,
                            Material::TriangleFillMode,
-                           [&](const MaterialPtr& /*babylonMaterial*/) -> void {});
+                           [&](const MaterialPtr & /*babylonMaterial*/) -> void {});
       });
     }
   }
@@ -245,33 +245,33 @@ void GLTFLoader::_loadAsync(const std::vector<size_t>& nodes,
 
   // LOADING => READY
   {
-  if (_rootBabylonMesh) {
-    _rootBabylonMesh->setEnabled(true);
-  }
+    if (_rootBabylonMesh) {
+      _rootBabylonMesh->setEnabled(true);
+    }
 
-  _extensionsOnReady();
+    _extensionsOnReady();
     _setState(GLTFLoaderState::READY);
 
-  _startAnimations();
+    _startAnimations();
 
-  resultFunc();
+    resultFunc();
   }
 
   // READY => COMPLETE
   {
-  _parent._endPerformanceCounter(loadingToReadyCounterName);
+    _parent._endPerformanceCounter(loadingToReadyCounterName);
 
-  if (!_disposed) {
-    _parent._endPerformanceCounter(loadingToCompleteCounterName);
+    if (!_disposed) {
+      _parent._endPerformanceCounter(loadingToCompleteCounterName);
 
-    _setState(GLTFLoaderState::COMPLETE);
+      _setState(GLTFLoaderState::COMPLETE);
 
-    _parent.onCompleteObservable.notifyObservers(nullptr);
-    _parent.onCompleteObservable.clear();
+      _parent.onCompleteObservable.notifyObservers(nullptr);
+      _parent.onCompleteObservable.clear();
 
-    dispose();
+      dispose();
+    }
   }
-}
 }
 
 void GLTFLoader::_loadData(const IGLTFLoaderData& data)
@@ -735,7 +735,7 @@ AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
                                                      Material::ClockWiseSideOrientation;
 
     _createMorphTargets(context, node, mesh, primitive, babylonMesh);
-    promises.emplace_back([&]() -> void {
+    promises.emplace_back([this, context, primitive, babylonMesh]() -> void {
       auto babylonGeometry = _loadVertexDataAsync(context, primitive, babylonMesh);
       _loadMorphTargetsAsync(context, primitive, babylonMesh, babylonGeometry);
       babylonGeometry->applyToMesh(babylonMesh.get());
@@ -788,7 +788,8 @@ AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
   return babylonAbstractMesh;
 }
 
-GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context, IMeshPrimitive& primitive,
+GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
+                                             const IMeshPrimitive& primitive,
                                              const MeshPtr& babylonMesh)
 {
   const auto extensionPromise = _extensionsLoadVertexDataAsync(context, primitive, babylonMesh);
@@ -831,7 +832,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context, IMeshPr
 
     auto& accessor
       = ArrayItem::Get(StringTools::printf("%s/attributes/%s", context.c_str(), attribute.c_str()),
-                       _gltf->accessors, attributes[attribute]);
+                       _gltf->accessors, attributes.at(attribute));
     promises.emplace_back([this, &babylonGeometry, &accessor, kind]() -> void {
       babylonGeometry->setVerticesBuffer(
         _loadVertexAccessorAsync(StringTools::printf("/accessors/%ld", accessor.index), accessor,
@@ -883,10 +884,10 @@ void GLTFLoader::_createMorphTargets(const std::string& context, INode& node, co
 
   babylonMesh->morphTargetManager = MorphTargetManager::New(babylonMesh->getScene());
   for (size_t index = 0; index < primitive.targets.size(); ++index) {
-    const auto weight = (index < node.weights.size()) ? node.weights[index] :
-                        (index < mesh.weights.size()) ? mesh.weights[index] :
-                                                        0.f;
-    const auto name   = StringTools::printf("morphTarget%ld", index);
+    const auto weight = (index < node.weights.size()) ?
+                          node.weights[index] :
+                          (index < mesh.weights.size()) ? mesh.weights[index] : 0.f;
+    const auto name = StringTools::printf("morphTarget%ld", index);
     babylonMesh->morphTargetManager()->addTarget(
       MorphTarget::New(name, weight, babylonMesh->getScene()));
     // TODO: tell the target whether it has positions, normals, tangents
@@ -1667,7 +1668,7 @@ VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(const std::string& context
   else if (accessor.byteOffset
            && static_cast<unsigned int>(*accessor.byteOffset)
                   % VertexBuffer::GetTypeByteLength(
-                    static_cast<unsigned int>(accessor.componentType))
+                      static_cast<unsigned int>(accessor.componentType))
                 != 0) {
     BABYLON_LOG_WARN("GLTFLoader",
                      "Accessor byte offset is not a multiple of component type byte length")
@@ -2053,19 +2054,19 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
     url, _babylonScene, samplerData.noMipMaps, false, samplerData.samplingMode, nullptr,
     [this, &context](const std::string& message, const std::string& exception) {
       if (!_disposed) {
-        throw std::runtime_error(StringTools::printf("%s: %s", context.c_str(),
-                                                     !exception.empty() ? exception.c_str() :
-                                                     !message.empty()   ? message.c_str() :
-                                                                          "Failed to load texture"));
+        throw std::runtime_error(StringTools::printf(
+          "%s: %s", context.c_str(),
+          !exception.empty() ? exception.c_str() :
+                               !message.empty() ? message.c_str() : "Failed to load texture"));
       }
     });
 
   if (url.empty()) {
     promises.emplace_back([this, &image, &babylonTexture]() -> void {
-      const auto data    = loadImageAsync(StringTools::printf("/images/%ld", image.index), image);
-      const auto name    = !image.uri.empty() ?
-                             image.uri :
-                             StringTools::printf("%s#image%ld", _fileName.c_str(), image.index);
+      const auto data = loadImageAsync(StringTools::printf("/images/%ld", image.index), image);
+      const auto name = !image.uri.empty() ?
+                          image.uri :
+                          StringTools::printf("%s#image%ld", _fileName.c_str(), image.index);
       const auto dataUrl = StringTools::printf("data:%s%s", _uniqueRootUrl.c_str(), name.c_str());
       babylonTexture->updateURL(dataUrl, data.uint8Array());
     });
@@ -2149,7 +2150,7 @@ ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context, const std::
     FileTools::LoadFile(
       url,
       [this, &data, &uri](const std::variant<std::string, ArrayBufferView>& fileData,
-                          const std::string& /*responseURL*/) -> void {
+                          const std::string & /*responseURL*/) -> void {
         if (!_disposed) {
           if (std::holds_alternative<ArrayBufferView>(fileData)) {
             data = std::get<ArrayBufferView>(fileData).uint8Array();

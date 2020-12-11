@@ -429,7 +429,7 @@ private:
   TransformNodePtr
   _loadMeshAsync(const std::string& context, INode& node, IMesh& mesh,
                  const std::function<void(const TransformNodePtr& babylonTransformNode)>& assign);
-  GeometryPtr _loadVertexDataAsync(const std::string& context, IMeshPrimitive& primitive,
+  GeometryPtr _loadVertexDataAsync(const std::string& context, const IMeshPrimitive& primitive,
                                    const MeshPtr& babylonMesh);
   void _createMorphTargets(const std::string& context, INode& node, const IMesh& mesh,
                            const IMeshPrimitive& primitive, const MeshPtr& babylonMesh);

@@ -1344,7 +1344,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1352,7 +1352,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1389,7 +1389,7 @@ bool Scene::_isPointerSwiping() const
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
   _initActionManager = [this](const AbstractActionManagerPtr& act,
-                              const ClickInfo& /*clickInfo*/) -> AbstractActionManagerPtr {
+                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerDownPredicate,
                              false, cameraToUseForPointers);
@@ -1712,14 +1712,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -2165,9 +2165,9 @@ void Scene::_animate()
     }
     _animationTimeLast = now;
   }
-  deltaTime          = useConstantAnimationDeltaTime ?
-                         16.f :
-                         Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
+  deltaTime = useConstantAnimationDeltaTime ?
+                16.f :
+                Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
   _animationTimeLast = now;
 
   // Animatable::_animate can remove elements from _activeAnimatables we need to make a copy of it
@@ -2829,7 +2829,7 @@ void Scene::addMaterial(const MaterialPtr& newMaterial)
     return;
   }
 
-  newMaterial->_indexInSceneMaterialArray = materials.size();
+  newMaterial->_indexInSceneMaterialArray = static_cast<int>(materials.size());
   materials.emplace_back(newMaterial);
   onNewMaterialAddedObservable.notifyObservers(newMaterial.get());
 }
@@ -2849,7 +2849,8 @@ void Scene::addGeometry(const GeometryPtr& newGeometry)
   }
 
   /* if (geometriesByUniqueId) */ {
-    geometriesByUniqueId[std::to_string(newGeometry->uniqueId)] = geometries.size();
+    geometriesByUniqueId[std::to_string(newGeometry->uniqueId)]
+      = static_cast<int>(geometries.size());
   }
 
   geometries.emplace_back(newGeometry);
@@ -3141,7 +3142,7 @@ bool Scene::removeGeometry(Geometry* geometry)
     if (lastGeometry) {
       geometries[index] = lastGeometry;
       if (!geometriesByUniqueId.empty()) {
-        geometriesByUniqueId[lastGeometry->id] = index;
+        geometriesByUniqueId[lastGeometry->id] = static_cast<int>(index);
         geometriesByUniqueId.erase(geometryUniqueId);
       }
     }
@@ -4671,7 +4672,7 @@ Scene::getWorldExtends(const std::function<bool(const AbstractMeshPtr& mesh)>& f
               std::numeric_limits<float>::lowest());
   const auto _filterPredicate = filterPredicate ?
                                   filterPredicate :
-                                  [](const AbstractMeshPtr& /*mesh*/) -> bool { return true; };
+                                  [](const AbstractMeshPtr & /*mesh*/) -> bool { return true; };
   std::vector<AbstractMeshPtr> filteredMeshes;
   if (filterPredicate) {
     for (const auto& mesh : meshes) {

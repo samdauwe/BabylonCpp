@@ -596,7 +596,8 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
                                                          const NodeMaterialDefines& defines,
                                                          std::vector<std::string>& uniformBuffers)
 {
-  for (size_t lightIndex = 0; lightIndex < nodeMaterial->maxSimultaneousLights; ++lightIndex) {
+  for (unsigned int lightIndex = 0; lightIndex < nodeMaterial->maxSimultaneousLights;
+       ++lightIndex) {
     const auto lightIndexStr = std::to_string(lightIndex);
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
