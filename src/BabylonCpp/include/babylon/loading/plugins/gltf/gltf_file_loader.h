@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/loading/iscene_loader_plugin_async.h>
@@ -14,25 +15,19 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class BaseTexture;
-class Camera;
-struct ISceneLoaderPluginAsync;
-class Material;
-using AbstractMeshPtr            = std::shared_ptr<AbstractMesh>;
-using BaseTexturePtr             = std::shared_ptr<BaseTexture>;
-using CameraPtr                  = std::shared_ptr<Camera>;
-using MaterialPtr                = std::shared_ptr<Material>;
-using ISceneLoaderPluginAsyncPtr = std::shared_ptr<ISceneLoaderPluginAsync>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Camera)
+FWD_STRUCT_SPTR(ISceneLoaderPluginAsync)
+FWD_CLASS_SPTR(Material)
 
 namespace GLTF2 {
 
 class BinaryReader;
-struct IGLTFLoader;
 struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
 struct IGLTFValidationResults;
-using IGLTFLoaderPtr = std::shared_ptr<IGLTFLoader>;
+FWD_STRUCT_SPTR(IGLTFLoader)
 
 struct UnpackedBinary {
   std::string json                   = "";
@@ -334,6 +329,33 @@ public:
    * effects are applied to transparent pixels.
    */
   bool transparencyAsCoverage;
+
+  /**
+   * Defines if the loader should use range requests when load binary glTF files from HTTP.
+   * Enabling will disable offline support and glTF validator.
+   * Defaults to false.
+   */
+  bool useRangeRequests;
+
+  /**
+   * Defines if the loader should create instances when multiple glTF nodes point to the same glTF
+   * mesh.
+   * Defaults to true.
+   */
+  bool createInstances;
+
+  /**
+   * Defines if the loader should always compute the bounding boxes of meshes and not use the
+   * min/max values from the position accessor.
+   * Defaults to false.
+   */
+  bool alwaysComputeBoundingBox;
+
+  /**
+   * If true, load all materials defined in the file, even if not used by any mesh.
+   * Defaults to false.
+   */
+  bool loadAllMaterials;
 
   /**
    * Function called before loading a url referenced by the asset.

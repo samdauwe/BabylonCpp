@@ -39,6 +39,10 @@ GLTFFileLoader::GLTFFileLoader()
     , useClipPlane{false}
     , compileShadowGenerators{false}
     , transparencyAsCoverage{false}
+    , useRangeRequests{false}
+    , createInstances{true}
+    , alwaysComputeBoundingBox{false}
+    , loadAllMaterials{false}
     , preprocessUrlAsync{nullptr}
     , onMeshLoaded{this, &GLTFFileLoader::set_onMeshLoaded}
     , onTextureLoaded{this, &GLTFFileLoader::set_onTextureLoaded}
