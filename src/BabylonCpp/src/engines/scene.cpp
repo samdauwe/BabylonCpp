@@ -3148,7 +3148,7 @@ bool Scene::removeGeometry(Geometry* geometry)
     }
   }
 
-  geometries.pop_back();
+  // geometries.pop_back();
 
   onGeometryRemovedObservable.notifyObservers(geometry);
   return true;
