@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_FREE_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/free_camera.h>
 
 namespace BABYLON {
 
-class AnaglyphFreeCamera;
-using AnaglyphFreeCameraPtr = std::shared_ptr<AnaglyphFreeCamera>;
+FWD_CLASS_SPTR(AnaglyphFreeCamera)
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on FreeCamera).

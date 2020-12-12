@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_ARC_ROTATE_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 
 namespace BABYLON {
 
-class AnaglyphArcRotateCamera;
-using AnaglyphArcRotateCameraPtr = std::shared_ptr<AnaglyphArcRotateCamera>;
+FWD_CLASS_SPTR(AnaglyphArcRotateCamera)
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on ArcRotateCamera).
