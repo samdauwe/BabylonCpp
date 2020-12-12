@@ -31,6 +31,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
     , useBoundingInfoFromGeometry{false}
     , extend(this, &Geometry::get_extend)
     , doNotSerialize(this, &Geometry::get_doNotSerialize)
+    , _mesh{mesh}
     , _totalVertices{0}
     , _isDisposed{false}
     , _extend{MinMax{Vector3::Zero(), Vector3::Zero()}}
@@ -60,7 +61,13 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
   if (_engine->getCaps().vertexArrayObject) {
     _vertexArrayObjects.clear();
   }
+}
 
+Geometry::~Geometry() = default;
+
+void Geometry::_applyToMeshInit(const GeometryPtr& newGeometry)
+{
+  auto mesh = newGeometry->_mesh;
   // applyToMesh
   if (mesh) {
     applyToMesh(mesh);
@@ -68,9 +75,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
   }
 }
 
-Geometry::~Geometry() = default;
-
-void Geometry::addToScene(const GeometryPtr& newGeometry)
+void Geometry::_addToScene(const GeometryPtr& newGeometry)
 {
   _scene->pushGeometry(newGeometry, true);
 }
@@ -519,7 +524,7 @@ void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 
 void Geometry::applyToMesh(Mesh* mesh)
 {
-  if (mesh->geometry() == this) {
+  if (mesh->geometry() && mesh->geometry().get() == this) {
     return;
   }
 
@@ -530,7 +535,7 @@ void Geometry::applyToMesh(Mesh* mesh)
 
   // must be done before setting vertexBuffers because of
   // mesh->_createGlobalSubMesh()
-  mesh->setGeometry(this);
+  mesh->setGeometry(shared_from_this());
 
   // Geometry is already in scene when constructed
   // _scene->pushGeometry(this);

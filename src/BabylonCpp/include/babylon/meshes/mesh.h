@@ -23,6 +23,7 @@ FWD_STRUCT_SPTR(_CreationDataStorage)
 FWD_STRUCT_SPTR(_InstancesBatch)
 FWD_CLASS_SPTR(Buffer)
 FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Geometry)
 FWD_CLASS_SPTR(GroundMesh)
 FWD_CLASS_SPTR(IAnimatable)
 FWD_CLASS_SPTR(InstancedMesh)
@@ -272,7 +273,7 @@ public:
    */
   AbstractMesh* getLOD(const CameraPtr& camera, BoundingSphere* boundingSphere = nullptr) override;
 
-  void setGeometry(Geometry* geometry);
+  void setGeometry(const GeometryPtr& geometry);
 
   /**
    * @brief Returns the total number of vertices within the mesh geometry or
@@ -1971,21 +1972,22 @@ protected:
   /**
    * @brief Gets the mesh internal Geometry object.
    */
-  Geometry*& get_geometry();
+  GeometryPtr& get_geometry();
 
+  /**
+   * @brief Returns if the mesh is blocked.
+   */
   bool get_isBlocked() const override;
 
   /**
-   * @brief Gets a boolean indicating if the normals aren't to be recomputed on
-   * next mesh `positions` array update. This property is pertinent only for
-   * updatable parametric shapes.
+   * @brief Gets a boolean indicating if the normals aren't to be recomputed on next mesh
+   * `positions` array update. This property is pertinent only for updatable parametric shapes.
    */
   bool get_areNormalsFrozen() const;
 
   /**
-   * @brief Sets a value overriding the instance count. Only applicable when
-   * custom instanced InterleavedVertexBuffer are used rather than
-   * InstancedMeshs.
+   * @brief Sets a value overriding the instance count. Only applicable when custom instanced
+   * InterleavedVertexBuffer are used rather than InstancedMeshs.
    */
   void set_overridenInstanceCount(size_t count);
 
@@ -2106,7 +2108,7 @@ public:
   /**
    * Gets the mesh internal Geometry object
    */
-  Geometry* _geometry;
+  GeometryPtr _geometry;
 
   /**
    * Hidden
@@ -2174,7 +2176,7 @@ public:
   /**
    * Gets the mesh internal Geometry object
    */
-  ReadOnlyProperty<Mesh, Geometry*> geometry;
+  ReadOnlyProperty<Mesh, GeometryPtr> geometry;
 
   /**
    * Gets a boolean indicating if the normals aren't to be recomputed on next

@@ -555,12 +555,12 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphe
   return this;
 }
 
-Geometry*& Mesh::get_geometry()
+GeometryPtr& Mesh::get_geometry()
 {
   return _geometry;
 }
 
-void Mesh::setGeometry(Geometry* iGeometry)
+void Mesh::setGeometry(const GeometryPtr& iGeometry)
 {
   _geometry = iGeometry;
 }
@@ -965,7 +965,7 @@ void Mesh::markVerticesDataAsUpdatable(const std::string& kind, bool updatable)
 Mesh& Mesh::setVerticesBuffer(const VertexBufferPtr& buffer)
 {
   if (!_geometry) {
-    _geometry = Geometry::CreateGeometryForMesh(this).get();
+    _geometry = Geometry::CreateGeometryForMesh(this);
   }
 
   _geometry->setVerticesBuffer(std::move(buffer));

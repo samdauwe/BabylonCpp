@@ -353,7 +353,7 @@ void PlaneRotationGizmo::updateRotationCircle(const MeshPtr& mesh,
 {
   updateRotationPath(paths, newFill);
   Mesh::CreateRibbon("rotationCircle", paths, false, false, 0, gizmoLayer->utilityLayerScene.get(),
-                     std::nullopt, std::nullopt, mesh->geometry ? mesh : nullptr);
+                     std::nullopt, std::nullopt, mesh->geometry() ? mesh : nullptr);
 }
 
 void PlaneRotationGizmo::set_isEnabled(bool value)

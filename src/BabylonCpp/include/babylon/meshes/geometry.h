@@ -32,7 +32,8 @@ using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 /**
  * @brief Class used to store geometry data (vertex buffers + index buffer).
  */
-class BABYLON_SHARED_EXPORT Geometry : public IGetSetVerticesData {
+class BABYLON_SHARED_EXPORT Geometry : public std::enable_shared_from_this<Geometry>,
+                                       public IGetSetVerticesData {
 
 public:
   friend class Mesh;
@@ -42,17 +43,24 @@ public:
   static GeometryPtr New(Ts&&... args)
   {
     auto geometry = std::shared_ptr<Geometry>(new Geometry(std::forward<Ts>(args)...));
-    geometry->addToScene(geometry);
+    geometry->_applyToMeshInit(geometry);
+    geometry->_addToScene(geometry);
 
     return geometry;
   }
   ~Geometry() override; // = default
 
   /**
+   * @brief Apply current geometry to a given mesh.
+   * @param mesh defines the mesh to apply geometry to
+   */
+  void _applyToMeshInit(const GeometryPtr& newGeometry);
+
+  /**
    * @brief Adds the geometry to the scene.
    * @param newGeometry
    */
-  void addToScene(const GeometryPtr& newGeometry);
+  void _addToScene(const GeometryPtr& newGeometry);
 
   /**
    * @brief Static function used to attach a new empty geometry to a mesh
@@ -477,6 +485,11 @@ public:
    * Gets a value indicating that the geometry should not be serialized
    */
   ReadOnlyProperty<Geometry, bool> doNotSerialize;
+
+  /**
+   * Defines the mesh that will be associated with the geometry
+   */
+  Mesh* _mesh;
 
 private:
   Scene* _scene;
