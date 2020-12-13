@@ -16,9 +16,9 @@ TEST(TestGeometry, TestGetVerticesData_Vec3FloatColor)
   auto subject = createSubject();
   auto scene   = Scene::New(subject.get());
   Float32Array data{0.4f, 0.4f, 0.4f, 0.6f, 0.6f, 0.6f, 0.8f, 0.8f, 0.8f, 1.f, 1.f, 1.f};
-  auto buffer = std::make_unique<Buffer>(subject.get(), data, false);
+  auto buffer = std::make_shared<Buffer>(subject.get(), data, false);
   auto vertexBuffer
-    = std::make_shared<VertexBuffer>(subject.get(), buffer.get(), VertexBuffer::ColorKind, false,
+    = std::make_shared<VertexBuffer>(subject.get(), buffer, VertexBuffer::ColorKind, false,
                                      std::nullopt, std::nullopt, std::nullopt, std::nullopt, 3);
 
   auto geometry = Geometry::New("geometry1", scene.get());
