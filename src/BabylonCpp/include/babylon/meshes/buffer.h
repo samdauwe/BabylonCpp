@@ -5,19 +5,19 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class Mesh;
 class ThinEngine;
 class VertexBuffer;
-class WebGLDataBuffer;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Class used to store data that will be store in GPU memory.
  */
-class BABYLON_SHARED_EXPORT Buffer {
+class BABYLON_SHARED_EXPORT Buffer : public std::enable_shared_from_this<Buffer> {
 
 public:
   /**

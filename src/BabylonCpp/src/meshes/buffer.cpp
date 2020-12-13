@@ -68,10 +68,10 @@ std::unique_ptr<VertexBuffer> Buffer::createVertexBuffer(const std::string& kind
     = stride.has_value() ? (useBytes ? *stride : *stride * sizeof(float)) : byteStride;
 
   // a lot of these parameters are ignored as they are overriden by the buffer
-  return std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true, _byteStride,
-                                        !instanced.has_value() ? _instanced : *instanced,
-                                        _byteOffset, size, std::nullopt, false, true,
-                                        divisor.value_or(_divisor));
+  return std::make_unique<VertexBuffer>(
+    _engine, shared_from_this(), kind, _updatable, true, _byteStride,
+    !instanced.has_value() ? _instanced : *instanced, _byteOffset, size, std::nullopt, false, true,
+    divisor.value_or(_divisor));
 }
 
 // Properties
