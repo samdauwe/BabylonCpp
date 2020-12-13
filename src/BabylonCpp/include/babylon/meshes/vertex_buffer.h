@@ -7,15 +7,15 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Buffer;
 class DataView;
 class Scene;
 class ThinEngine;
-class WebGLDataBuffer;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(Buffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Specialized buffer used to store vertex data.
@@ -161,7 +161,7 @@ public:
    * @param takeBufferOwnership defines if the buffer should be released when the vertex buffer is
    * disposed
    */
-  VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, Buffer*>& data,
+  VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, BufferPtr>& data,
                const std::string& kind, bool updatable,
                const std::optional<bool>& postponeInternalCreation = std::nullopt,
                std::optional<size_t> stride                        = std::nullopt,
@@ -350,7 +350,7 @@ public:
   /**
    * Hidden
    */
-  Buffer* _buffer;
+  BufferPtr _buffer;
 
   /**
    * Instance divisor when in instanced mode

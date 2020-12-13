@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, Buffer*>& data,
+VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, BufferPtr>& data,
                            const std::string& kind, bool updatable,
                            const std::optional<bool>& postponeInternalCreation,
                            std::optional<size_t> stride, const std::optional<bool>& instanced,
@@ -16,8 +16,8 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
                            unsigned int divisor, bool takeBufferOwnership)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor, &VertexBuffer::set_instanceDivisor}
 {
-  if (std::holds_alternative<Buffer*>(data)) {
-    _buffer      = std::get<Buffer*>(data);
+  if (std::holds_alternative<BufferPtr>(data)) {
+    _buffer      = std::get<BufferPtr>(data);
     _ownedBuffer = nullptr;
     _ownsBuffer  = takeBufferOwnership;
 
@@ -45,7 +45,7 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
 
   const auto typeByteLength = VertexBuffer::GetTypeByteLength(type);
 
-  auto buffer = _buffer ? _buffer : _ownedBuffer.get();
+  auto buffer = _buffer ? _buffer.get() : _ownedBuffer.get();
   if (useBytes) {
     _size      = size.has_value() ?
                    *size :
@@ -102,7 +102,7 @@ Buffer* VertexBuffer::_getBuffer() const
     return _ownedBuffer.get();
   }
   else {
-    return _buffer;
+    return _buffer.get();
   }
 }
 
