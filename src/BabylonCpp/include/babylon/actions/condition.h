@@ -7,14 +7,14 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
 class ActionManager;
-class IAnimatable;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(Animatable)
 
 /**
  * @brief A Condition applied to an Action.
