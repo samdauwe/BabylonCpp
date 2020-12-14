@@ -2,15 +2,15 @@
 #define BABYLON_ACTIONS_IACTION_EVENT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Scene;
 class Sprite;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using SpritePtr       = std::shared_ptr<Sprite>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Sprite)
 
 /**
  * @brief Interface used to define ActionEvent
@@ -18,8 +18,7 @@ using SpritePtr       = std::shared_ptr<Sprite>;
 struct BABYLON_SHARED_EXPORT IActionEvent {
 
   IActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-               const AbstractMeshPtr& meshUnderPointer,
-               const std::optional<Event>& sourceEvent,
+               const AbstractMeshPtr& meshUnderPointer, const std::optional<Event>& sourceEvent,
                const std::string& additionalData = "");
   IActionEvent(const IActionEvent& other);
   IActionEvent(IActionEvent&& other);

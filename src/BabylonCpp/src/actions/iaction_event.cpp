@@ -2,8 +2,7 @@
 
 namespace BABYLON {
 
-IActionEvent::IActionEvent(const AbstractMeshPtr& iSource, int iPointerX,
-                           int iPointerY,
+IActionEvent::IActionEvent(const AbstractMeshPtr& iSource, int iPointerX, int iPointerY,
                            const AbstractMeshPtr& iMeshUnderPointer,
                            const std::optional<Event>& iSourceEvent,
                            const std::string& iAdditionalData)
