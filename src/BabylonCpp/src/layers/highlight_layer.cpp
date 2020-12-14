@@ -138,11 +138,11 @@ void HighlightLayer::_createTextureAndPostProcesses()
   auto blurTextureHeight = static_cast<int>(static_cast<float>(_mainTextureDesiredSize.height)
                                             * _options.blurTextureSizeRatio);
   blurTextureWidth       = _engine->needPOTTextures() ?
-                       Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
-                       blurTextureWidth;
-  blurTextureHeight = _engine->needPOTTextures() ?
-                        Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
-                        blurTextureHeight;
+                             Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
+                             blurTextureWidth;
+  blurTextureHeight      = _engine->needPOTTextures() ?
+                             Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
+                             blurTextureHeight;
 
   auto textureType = 0u;
   if (_engine->getCaps().textureHalfFloatRender) {

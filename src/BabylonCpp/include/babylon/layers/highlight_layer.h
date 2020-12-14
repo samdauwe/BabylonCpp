@@ -12,12 +12,9 @@
 
 namespace BABYLON {
 
-class GlowBlurPostProcess;
-class HighlightLayer;
-class PassPostProcess;
-using GlowBlurPostProcessPtr = std::shared_ptr<GlowBlurPostProcess>;
-using HighlightLayerPtr      = std::shared_ptr<HighlightLayer>;
-using PassPostProcessPtr     = std::shared_ptr<PassPostProcess>;
+FWD_CLASS_SPTR(GlowBlurPostProcess)
+FWD_CLASS_SPTR(HighlightLayer)
+FWD_CLASS_SPTR(PassPostProcess)
 
 /**
  * @brief The highlight layer Helps adding a glow effect around a mesh.
