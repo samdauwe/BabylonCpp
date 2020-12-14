@@ -11,15 +11,15 @@
 #include <babylon/actions/iaction_event.h>
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-struct IAction;
 struct IActionEvent;
-using IActionPtr = std::shared_ptr<IAction>;
+FWD_CLASS_SPTR(IAction)
 
 /**
  * @brief Abstract class used to decouple action Manager from scene and meshes.
