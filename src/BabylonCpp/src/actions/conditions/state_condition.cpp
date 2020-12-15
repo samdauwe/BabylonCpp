@@ -6,8 +6,7 @@
 
 namespace BABYLON {
 
-StateCondition::StateCondition(ActionManager* actionManager,
-                               const IAnimatablePtr& target,
+StateCondition::StateCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                                AnimationValue* iValue)
     : Condition{actionManager}, value{iValue}, _target{target}
 {

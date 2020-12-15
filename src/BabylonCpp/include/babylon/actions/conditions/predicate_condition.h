@@ -17,8 +17,7 @@ public:
   /**
    * @brief Creates a new PredicateCondition.
    * @param actionManager manager for the action the condition applies to
-   * @param predicate defines the predicate function used to validate the
-   * condition
+   * @param predicate defines the predicate function used to validate the condition
    */
   PredicateCondition(ActionManager* actionManager, const std::function<bool()>& predicate);
   ~PredicateCondition() override; // = default

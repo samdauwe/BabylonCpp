@@ -6,12 +6,9 @@
 
 namespace BABYLON {
 
-ValueCondition::ValueCondition(ActionManager* actionManager,
-                               const IAnimatablePtr& target,
+ValueCondition::ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                                const std::string& propertyPath)
-    : Condition{actionManager}
-    , _propertyPath{propertyPath}
-    , _target{target}
+    : Condition{actionManager}, _propertyPath{propertyPath}, _target{target}
 {
   _effectiveTarget = _getEffectiveTarget(target, propertyPath);
   _property        = _getProperty(propertyPath);

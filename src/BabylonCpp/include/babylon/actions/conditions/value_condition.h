@@ -76,10 +76,9 @@ public:
    * @brief Creates a new ValueCondition.
    * @param actionManager manager for the action the condition applies to
    * @param target for the action
-   * @param propertyPath path to specify the property of the target the
-   * conditional operator uses
-   * @param value the value compared by the conditional operator against the
-   * current value of the property
+   * @param propertyPath path to specify the property of the target the conditional operator uses
+   * @param value the value compared by the conditional operator against the current value of the
+   * property
    * @param operator the conditional operator, default ValueCondition.IsEqual
    */
   ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
@@ -89,8 +88,7 @@ public:
   /** Methods **/
 
   /**
-   * @brief Compares the given value with the property value for the specified
-   * conditional operator.
+   * @brief Compares the given value with the property value for the specified conditional operator.
    * @returns the result of the comparison
    */
   bool isValid() override;
