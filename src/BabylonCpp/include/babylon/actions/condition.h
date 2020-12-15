@@ -14,7 +14,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class ActionManager;
-FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(IAnimatable)
 
 /**
  * @brief A Condition applied to an Action.
