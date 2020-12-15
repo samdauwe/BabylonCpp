@@ -7,8 +7,7 @@ namespace BABYLON {
 
 IncrementValueAction::IncrementValueAction(unsigned int iTtriggerOptions,
                                            const IAnimatablePtr& target,
-                                           const std::string& iPropertyPath,
-                                           AnimationValue* iValue,
+                                           const std::string& iPropertyPath, AnimationValue* iValue,
                                            Condition* condition)
     : Action(iTtriggerOptions, condition)
     , propertyPath{iPropertyPath}

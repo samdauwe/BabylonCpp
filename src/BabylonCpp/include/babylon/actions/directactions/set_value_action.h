@@ -33,8 +33,7 @@ public:
   void _prepare() override;
 
   /**
-   * @brief Execute the action and set the targetted property to the desired
-   * value.
+   * @brief Execute the action and set the targetted property to the desired value.
    */
   void execute(const std::optional<IActionEvent>& evt) override;
 

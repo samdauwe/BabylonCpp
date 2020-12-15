@@ -6,8 +6,7 @@ namespace BABYLON {
 
 ExecuteCodeAction::ExecuteCodeAction(
   unsigned int iTriggerOptions,
-  const std::function<void(const std::optional<IActionEvent>& evt)>& iFunc,
-  Condition* condition)
+  const std::function<void(const std::optional<IActionEvent>& evt)>& iFunc, Condition* condition)
     : Action(iTriggerOptions, condition), func{iFunc}
 {
 }

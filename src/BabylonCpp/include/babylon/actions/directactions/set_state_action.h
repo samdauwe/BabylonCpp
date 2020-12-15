@@ -7,8 +7,8 @@
 namespace BABYLON {
 
 /**
- * @brief This defines an action responsible to set a the state field of the target
- *  to a desired value once triggered.
+ * @brief This defines an action responsible to set a the state field of the target  to a desired
+ * value once triggered.
  * @see https://doc.babylonjs.com/how_to/how_to_use_actions
  */
 class BABYLON_SHARED_EXPORT SetStateAction : public Action {

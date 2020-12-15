@@ -10,14 +10,9 @@
 namespace BABYLON {
 
 PlayAnimationAction::PlayAnimationAction(unsigned int iTtriggerOptions,
-                                         const IAnimatablePtr& target,
-                                         float iFrom, float iTo, bool iLoop,
-                                         Condition* condition)
-    : Action(iTtriggerOptions, condition)
-    , from{iFrom}
-    , to{iTo}
-    , loop{iLoop}
-    , _target{target}
+                                         const IAnimatablePtr& target, float iFrom, float iTo,
+                                         bool iLoop, Condition* condition)
+    : Action(iTtriggerOptions, condition), from{iFrom}, to{iTo}, loop{iLoop}, _target{target}
 {
 }
 

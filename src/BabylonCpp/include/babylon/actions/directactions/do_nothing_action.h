@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT DoNothingAction : public Action {
 
 public:
   /**
-   * Instantiate the action
+   * @brief Instantiate the action.
    * @param triggerOptions defines the trigger options
    * @param condition defines the trigger related conditions
    */

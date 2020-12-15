@@ -6,10 +6,9 @@
 
 namespace BABYLON {
 
-SetValueAction::SetValueAction(unsigned int iTtriggerOptions,
-                               const IAnimatablePtr& target,
-                               const std::string& iPropertyPath,
-                               AnimationValue* iValue, Condition* condition)
+SetValueAction::SetValueAction(unsigned int iTtriggerOptions, const IAnimatablePtr& target,
+                               const std::string& iPropertyPath, AnimationValue* iValue,
+                               Condition* condition)
     : Action(iTtriggerOptions, condition)
     , propertyPath{iPropertyPath}
     , value{iValue}
