@@ -5,8 +5,7 @@
 
 namespace BABYLON {
 
-StopSoundAction::StopSoundAction(unsigned int iTriggerOptions, Sound* sound,
-                                 Condition* condition)
+StopSoundAction::StopSoundAction(unsigned int iTriggerOptions, Sound* sound, Condition* condition)
     : Action(iTriggerOptions, condition), _sound{sound}
 {
 }
