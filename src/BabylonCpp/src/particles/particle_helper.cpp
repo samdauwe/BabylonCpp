@@ -12,7 +12,7 @@ namespace BABYLON {
 const char* ParticleHelper::BaseAssetsUrl = ParticleSystemSet::BaseAssetsUrl;
 
 IParticleSystemPtr
-ParticleHelper::CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
+ParticleHelper::CreateDefault(const std::variant<AbstractMeshPtr, Mesh*, Vector3>& emitter,
                               size_t capacity, Scene* scene, bool useGPU)
 {
   IParticleSystemPtr system = nullptr;

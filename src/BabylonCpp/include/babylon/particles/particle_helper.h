@@ -14,6 +14,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class IParticleSystem;
+class Mesh;
 class ParticleSystem;
 class ParticleSystemSet;
 class Scene;
@@ -39,9 +40,9 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * @param useGPU defines if a GPUParticleSystem must be created (default is false)
    * @returns the new Particle system
    */
-  static IParticleSystemPtr CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
-                                          size_t capacity = 500, Scene* scene = nullptr,
-                                          bool useGPU = false);
+  static IParticleSystemPtr
+  CreateDefault(const std::variant<AbstractMeshPtr, Mesh*, Vector3>& emitter, size_t capacity = 500,
+                Scene* scene = nullptr, bool useGPU = false);
 
   /**
    * @brief This is the main static method (one-liner) of this helper to create different particle
