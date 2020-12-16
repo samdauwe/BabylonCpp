@@ -1632,7 +1632,9 @@ void GPUParticleSystem::dispose(bool disposeTexture, bool /*disposeMaterialAndTe
   onDisposeObservable.clear();
 }
 
-IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/, Mesh* /*newEmitter*/)
+IParticleSystemPtr
+GPUParticleSystem::clone(const std::string& /*name*/,
+                         const std::variant<AbstractMeshPtr, Mesh*, Vector3>& /*emitter*/)
 {
   return nullptr;
 }

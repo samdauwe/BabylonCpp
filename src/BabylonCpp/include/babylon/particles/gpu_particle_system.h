@@ -428,7 +428,8 @@ public:
    * @param newEmitter The new emitter to use
    * @returns the cloned particle system
    */
-  IParticleSystem* clone(const std::string& name, Mesh* newEmitter) override;
+  IParticleSystemPtr clone(const std::string& name,
+                           const std::variant<AbstractMeshPtr, Mesh*, Vector3>& emitter) override;
 
   /**
    * @brief Serializes the particle system to a JSON object.
