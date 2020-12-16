@@ -6,6 +6,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/matrix.h>
@@ -47,11 +48,12 @@ using CylinderParticleEmitterPtr         = std::shared_ptr<CylinderParticleEmitt
 using EffectPtr                          = std::shared_ptr<Effect>;
 using HemisphericParticleEmitterPtr      = std::shared_ptr<HemisphericParticleEmitter>;
 using IParticleEmitterTypePtr            = std::shared_ptr<IParticleEmitterType>;
-using PointParticleEmitterPtr            = std::shared_ptr<PointParticleEmitter>;
-using ProceduralTexturePtr               = std::shared_ptr<ProceduralTexture>;
-using SphereDirectedParticleEmitterPtr   = std::shared_ptr<SphereDirectedParticleEmitter>;
-using SphereParticleEmitterPtr           = std::shared_ptr<SphereParticleEmitter>;
-using TexturePtr                         = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(IParticleSystem)
+using PointParticleEmitterPtr          = std::shared_ptr<PointParticleEmitter>;
+using ProceduralTexturePtr             = std::shared_ptr<ProceduralTexture>;
+using SphereDirectedParticleEmitterPtr = std::shared_ptr<SphereDirectedParticleEmitter>;
+using SphereParticleEmitterPtr         = std::shared_ptr<SphereParticleEmitter>;
+using TexturePtr                       = std::shared_ptr<Texture>;
 
 /**
  * @brief Interface representing a particle system in Babylon.js.
@@ -83,7 +85,7 @@ public:
   /**
    * The emitter represents the Mesh or position we are attaching the particle system to.
    */
-  std::variant<AbstractMeshPtr, Vector3> emitter;
+  std::variant<AbstractMeshPtr, Mesh*, Vector3> emitter;
 
   /**
    * Gets or sets a boolean indicating if the particles must be rendered as billboard or aligned
@@ -419,7 +421,9 @@ public:
    * @param newEmitter The new emitter to use
    * @returns the cloned particle system
    */
-  virtual IParticleSystem* clone(const std::string& name, Mesh* newEmitter) = 0;
+  virtual IParticleSystemPtr clone(const std::string& name,
+                                   const std::variant<AbstractMeshPtr, Mesh*, Vector3>& emitter)
+    = 0;
 
   /**
    * @brief Serializes the particle system to a JSON object.
