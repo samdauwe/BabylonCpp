@@ -8,17 +8,16 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class ParticleSystem;
 class Scene;
-class SubEmitter;
 class ThinEngine;
-using ParticleSystemPtr = std::shared_ptr<ParticleSystem>;
-using SubEmitterPtr     = std::shared_ptr<SubEmitter>;
+FWD_CLASS_SPTR(ParticleSystem)
+FWD_CLASS_SPTR(SubEmitter)
 
 /**
  * @brief Type of sub emitter.

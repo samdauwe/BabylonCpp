@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/particles/particle_system.h>
 
 namespace BABYLON {
@@ -31,7 +32,32 @@ SubEmitter::~SubEmitter() = default;
 
 SubEmitterPtr SubEmitter::clone() const
 {
-  return nullptr;
+  // Clone particle system
+  std::variant<AbstractMeshPtr, Mesh*, Vector3> emitter;
+  if (std::holds_alternative<Vector3>(particleSystem->emitter)) {
+    emitter = std::get<Vector3>(particleSystem->emitter);
+  }
+  else if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+           || std::holds_alternative<Mesh*>(particleSystem->emitter)) {
+    const auto meshEmitter
+      = Mesh::New("", std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter) ?
+                        std::get<AbstractMeshPtr>(particleSystem->emitter)->getScene() :
+                        std::get<Mesh*>(particleSystem->emitter)->getScene());
+    meshEmitter->isVisible = false;
+    emitter                = meshEmitter;
+  }
+  auto clone = std::make_shared<SubEmitter>(
+    std::static_pointer_cast<ParticleSystem>(particleSystem->clone("", emitter)));
+
+  // Clone properties
+  clone->particleSystem->name += "Clone";
+  clone->type                    = type;
+  clone->inheritDirection        = inheritDirection;
+  clone->inheritedVelocityAmount = inheritedVelocityAmount;
+
+  clone->particleSystem->_disposeEmitterOnDispose = true;
+  clone->particleSystem->disposeOnStop            = true;
+  return clone;
 }
 
 json SubEmitter::serialize() const
