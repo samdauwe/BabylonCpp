@@ -1870,7 +1870,9 @@ std::vector<AnimationPtr> ParticleSystem::getAnimations()
   return animations;
 }
 
-IParticleSystem* ParticleSystem::clone(const std::string& /*iName*/, Mesh* /*newEmitter*/)
+IParticleSystemPtr
+ParticleSystem::clone(const std::string& /*iName*/,
+                      const std::variant<AbstractMeshPtr, Mesh*, Vector3>& /*newEmitter*/)
 {
   return nullptr;
 }
