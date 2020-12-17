@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
 
@@ -12,13 +13,11 @@ namespace BABYLON {
 
 class BoundingInfo;
 class Color4;
-class Mesh;
 class PointsCloudSystem;
-class PointsGroup;
 class Vector2;
 class Vector3;
-using MeshPtr        = std::shared_ptr<Mesh>;
-using PointsGroupPtr = std::shared_ptr<PointsGroup>;
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(PointsGroup)
 
 /**
  * @brief Represents one particle of a points cloud system.

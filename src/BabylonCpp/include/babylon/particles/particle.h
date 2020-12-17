@@ -2,6 +2,7 @@
 #define BABYLON_PARTICLES_PARTICLE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/maths/vector3.h>
@@ -12,8 +13,7 @@
 namespace BABYLON {
 
 class ParticleSystem;
-class SubEmitter;
-using SubEmitterPtr = std::shared_ptr<SubEmitter>;
+FWD_CLASS_SPTR(SubEmitter)
 
 /**
  * @brief A particle represents one of the element emitted by a particle system.
