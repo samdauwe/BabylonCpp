@@ -7,14 +7,14 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Material;
 class SolidParticle;
 class SolidParticleVertex;
 class Vector3;
-using MaterialPtr = std::shared_ptr<Material>;
+FWD_CLASS_SPTR(Material)
 
 /**
  * @brief Represents the shape of the model used by one particle of a solid particle system.

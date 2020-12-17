@@ -13,6 +13,7 @@ ModelShape::ModelShape(
                            const std::variant<Vector3, SolidParticleVertex>& vertex,
                            unsigned int i)>& vtxFunction,
   const MaterialPtr& material)
+    : _indicesLength{0}, _positionFunction{nullptr}, _vertexFunction{nullptr}, _material{nullptr}
 {
   shapeID           = id;
   _shape            = shape;
