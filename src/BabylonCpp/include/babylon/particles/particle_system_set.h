@@ -5,6 +5,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/particles/particle_system_set_emitter_creation_options.h>
 
@@ -12,12 +13,10 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
 class IParticleSystem;
 class Scene;
-class TransformNode;
-using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Represents a set of particle systems working together to create a specific effect.

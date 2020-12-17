@@ -7,6 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/color4.h>
 
@@ -16,9 +17,9 @@ class CloudPoint;
 class Mesh;
 class PointsGroup;
 class Scene;
-using CloudPointPtr  = std::shared_ptr<CloudPoint>;
-using MeshPtr        = std::shared_ptr<Mesh>;
-using PointsGroupPtr = std::shared_ptr<PointsGroup>;
+FWD_CLASS_SPTR(CloudPoint)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(PointsGroup)
 
 struct PointsCloudSystemOptions {
   std::optional<bool> updatable = std::nullopt;

@@ -7,20 +7,19 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/particles/particle_system_set.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class IParticleSystem;
 class Mesh;
 class ParticleSystem;
 class ParticleSystemSet;
 class Scene;
 class Vector3;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(IParticleSystem)
 
 /**
  * @brief This class is made for on one-liner static method to help creating particle systems.
