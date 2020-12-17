@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 /**
- * @brief Represents a solid particle vertex
+ * @brief Represents a solid particle vertex.
  */
 class BABYLON_SHARED_EXPORT SolidParticleVertex {
 
