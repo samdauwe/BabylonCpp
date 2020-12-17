@@ -11,7 +11,8 @@ SolidParticle::SolidParticle(size_t particleIndex, int particleId, size_t positi
                              size_t iIdxInShape, SolidParticleSystem* sps,
                              const std::optional<BoundingInfo>& modelBoundingInfo,
                              const std::optional<size_t>& iMaterialIndex)
-    : id{0}
+    : idx{0}
+    , id{0}
     , color{Color4(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
     , rotation{Vector3::Zero()}
@@ -23,6 +24,10 @@ SolidParticle::SolidParticle(size_t particleIndex, int particleId, size_t positi
     , translateFromPivot{false}
     , alive{true}
     , isVisible{true}
+    , _pos{0}
+    , _ind{0}
+    , shapeId{0}
+    , idxInShape{0}
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
     , parentId{std::nullopt}

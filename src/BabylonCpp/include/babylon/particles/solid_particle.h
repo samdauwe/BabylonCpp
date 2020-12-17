@@ -6,6 +6,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/quaternion.h>
@@ -17,9 +18,8 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class Mesh;
-class ModelShape;
 class SolidParticleSystem;
-using ModelShapePtr = std::shared_ptr<ModelShape>;
+FWD_CLASS_SPTR(ModelShape)
 
 /**
  * @brief Represents one particle of a solid particle system.
@@ -27,27 +27,22 @@ using ModelShapePtr = std::shared_ptr<ModelShape>;
 class BABYLON_SHARED_EXPORT SolidParticle {
 
 public:
+  // clang-format off
   /**
    * @brief Creates a Solid Particle object.
-   * Don't create particles manually, use instead the Solid Particle System internal tools like
-   * _addParticle()
+   * Don't create particles manually, use instead the Solid Particle System internal tools like _addParticle()
    * @param particleIndex (integer) is the particle index in the Solid Particle System pool.
-   * @param particleId (integer) is the particle identifier. Unless some particles are removed from
-   * the SPS, it's the same value than the particle idx.
-   * @param positionIndex (integer) is the starting index of the particle vertices in the SPS
-   * "positions" array.
-   * @param indiceIndex (integer) is the starting index of the particle indices in the SPS "indices"
-   * array.
+   * @param particleId (integer) is the particle identifier. Unless some particles are removed from the SPS, it's the same value than the particle idx.
+   * @param positionIndex (integer) is the starting index of the particle vertices in the SPS "positions" array.
+   * @param indiceIndex (integer) is the starting index of the particle indices in the SPS "indices" array.
    * @param model (ModelShape) is a reference to the model shape on what the particle is designed.
    * @param shapeId (integer) is the model shape identifier in the SPS.
-   * @param idxInShape (integer) is the index of the particle in the current model (ex: the 10th box
-   * of addShape(box, 30))
+   * @param idxInShape (integer) is the index of the particle in the current model (ex: the 10th box of addShape(box, 30))
    * @param sps defines the sps it is associated to
-   * @param modelBoundingInfo is the reference to the model BoundingInfo used for intersection
-   * computations.
-   * @param materialIndex is the particle material identifier (integer) when the MultiMaterials are
-   * enabled in the SPS.
+   * @param modelBoundingInfo is the reference to the model BoundingInfo used for intersection computations.
+   * @param materialIndex is the particle material identifier (integer) when the MultiMaterials are enabled in the SPS.
    */
+  // clang-format on
   SolidParticle(size_t particleIndex, int particleId, size_t positionIndex, size_t indiceIndex,
                 const ModelShapePtr& model, int shapeId, size_t idxInShape,
                 SolidParticleSystem* sps,
