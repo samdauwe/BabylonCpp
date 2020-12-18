@@ -17,8 +17,10 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
     , position{Vector3::Zero()}
     , samples{this, &ReflectionProbe::get_samples, &ReflectionProbe::set_samples}
     , refreshRate{this, &ReflectionProbe::get_refreshRate, &ReflectionProbe::set_refreshRate}
+    , cubeTexture{this, &ReflectionProbe::get_cubeTexture}
     , renderList{this, &ReflectionProbe::get_renderList}
     , _scene{scene}
+    , _renderTargetTexture{nullptr}
     , _viewMatrix{Matrix::Identity()}
     , _target{Vector3::Zero()}
     , _add{Vector3::Zero()}
@@ -117,7 +119,7 @@ Scene* ReflectionProbe::getScene() const
   return _scene;
 }
 
-RenderTargetTexturePtr& ReflectionProbe::cubeTexture()
+RenderTargetTexturePtr& ReflectionProbe::get_cubeTexture()
 {
   return _renderTargetTexture;
 }
