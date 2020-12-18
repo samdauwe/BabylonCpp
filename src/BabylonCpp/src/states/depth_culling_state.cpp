@@ -64,6 +64,10 @@ void DepthCullingState::set_cullFace(const std::optional<int>& value)
     return;
   }
 
+  if (_cullFace.has_value() && value.has_value() && *_cullFace == *value) {
+    return;
+  }
+
   _cullFace        = value;
   _isCullFaceDirty = true;
 }
@@ -79,6 +83,10 @@ void DepthCullingState::set_cull(const std::optional<bool>& value)
     return;
   }
 
+  if (_cull.has_value() && value.has_value() && *_cull == *value) {
+    return;
+  }
+
   _cull        = value;
   _isCullDirty = true;
 }
@@ -91,6 +99,10 @@ std::optional<int>& DepthCullingState::get_depthFunc()
 void DepthCullingState::set_depthFunc(const std::optional<int>& value)
 {
   if (_depthFunc == value) {
+    return;
+  }
+
+  if (_depthFunc.has_value() && value.has_value() && *_depthFunc == *value) {
     return;
   }
 
@@ -136,6 +148,10 @@ std::optional<unsigned int>& DepthCullingState::get_frontFace()
 void DepthCullingState::set_frontFace(const std::optional<unsigned int>& value)
 {
   if (_frontFace == value) {
+    return;
+  }
+
+  if (_frontFace.has_value() && value.has_value() && *_frontFace == *value) {
     return;
   }
 
