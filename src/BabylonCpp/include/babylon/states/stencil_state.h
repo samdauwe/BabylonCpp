@@ -39,22 +39,22 @@ public:
   void apply(GL::IGLRenderingContext& gl);
 
 protected:
-  [[nodiscard]] bool get_isDirty() const;
-  [[nodiscard]] unsigned int get_stencilFunc() const;
+  bool get_isDirty() const;
+  unsigned int get_stencilFunc() const;
   void set_stencilFunc(unsigned int value);
-  [[nodiscard]] int get_stencilFuncRef() const;
+  int get_stencilFuncRef() const;
   void set_stencilFuncRef(int value);
-  [[nodiscard]] unsigned int get_stencilFuncMask() const;
+  unsigned int get_stencilFuncMask() const;
   void set_stencilFuncMask(unsigned int value);
-  [[nodiscard]] unsigned int get_stencilOpStencilFail() const;
+  unsigned int get_stencilOpStencilFail() const;
   void set_stencilOpStencilFail(unsigned int value);
-  [[nodiscard]] unsigned int get_stencilOpDepthFail() const;
+  unsigned int get_stencilOpDepthFail() const;
   void set_stencilOpDepthFail(unsigned int value);
-  [[nodiscard]] unsigned int get_stencilOpStencilDepthPass() const;
+  unsigned int get_stencilOpStencilDepthPass() const;
   void set_stencilOpStencilDepthPass(unsigned int value);
-  [[nodiscard]] unsigned int get_stencilMask() const;
+  unsigned int get_stencilMask() const;
   void set_stencilMask(unsigned int value);
-  [[nodiscard]] bool get_stencilTest() const;
+  bool get_stencilTest() const;
   void set_stencilTest(bool value);
 
 public:
