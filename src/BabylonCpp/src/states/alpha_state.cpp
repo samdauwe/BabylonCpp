@@ -41,10 +41,10 @@ void AlphaState::set_alphaBlend(bool value)
 
 void AlphaState::setAlphaBlendConstants(float r, float g, float b, float a)
 {
-  if (stl_util::almost_equal(*_blendConstants[0], r)
-      && stl_util::almost_equal(*_blendConstants[1], g)
-      && stl_util::almost_equal(*_blendConstants[2], b)
-      && stl_util::almost_equal(*_blendConstants[3], a)) {
+  if ((_blendConstants[0] && stl_util::almost_equal(*_blendConstants[0], r))
+      && (_blendConstants[1] && stl_util::almost_equal(*_blendConstants[1], g))
+      && (_blendConstants[2] && stl_util::almost_equal(*_blendConstants[2], b))
+      && (_blendConstants[3] && stl_util::almost_equal(*_blendConstants[3], a))) {
     return;
   }
 
@@ -59,8 +59,10 @@ void AlphaState::setAlphaBlendConstants(float r, float g, float b, float a)
 void AlphaState::setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,
                                                  unsigned int value2, unsigned int value3)
 {
-  if (_blendFunctionParameters[0] == value0 && _blendFunctionParameters[1] == value1
-      && _blendFunctionParameters[2] == value2 && _blendFunctionParameters[3] == value3) {
+  if ((_blendFunctionParameters[0] && *_blendFunctionParameters[0] == value0)
+      && (_blendFunctionParameters[1] && *_blendFunctionParameters[1] == value1)
+      && (_blendFunctionParameters[2] && *_blendFunctionParameters[2] == value2)
+      && (_blendFunctionParameters[3] && *_blendFunctionParameters[3] == value3)) {
     return;
   }
 
@@ -74,7 +76,8 @@ void AlphaState::setAlphaBlendFunctionParameters(unsigned int value0, unsigned i
 
 void AlphaState::setAlphaEquationParameters(unsigned int rgb, unsigned int alpha)
 {
-  if (_blendEquationParameters[0] == rgb && _blendEquationParameters[1] == alpha) {
+  if ((_blendEquationParameters[0] && *_blendEquationParameters[0] == rgb)
+      && (_blendEquationParameters[1] && *_blendEquationParameters[1] == alpha)) {
     return;
   }
 
