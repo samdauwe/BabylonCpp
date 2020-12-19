@@ -8,8 +8,7 @@
 
 namespace BABYLON {
 
-LineEdgesRenderer::LineEdgesRenderer(const AbstractMeshPtr& source,
-                                     float epsilon,
+LineEdgesRenderer::LineEdgesRenderer(const AbstractMeshPtr& source, float epsilon,
                                      bool checkVerticesInsteadOfIndices)
     : EdgesRenderer{source, epsilon, checkVerticesInsteadOfIndices, false}
 {
@@ -39,8 +38,8 @@ void LineEdgesRenderer::_generateEdgesLines_specialized()
   // Merge into a single mesh
   auto engine = _source->getScene()->getEngine();
 
-  _buffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
-    engine, _linesPositions, VertexBuffer::PositionKind, false);
+  _buffers[VertexBuffer::PositionKind]
+    = std::make_shared<VertexBuffer>(engine, _linesPositions, VertexBuffer::PositionKind, false);
   _buffers[VertexBuffer::NormalKind] = std::make_shared<VertexBuffer>(
     engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
 
