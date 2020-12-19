@@ -6,18 +6,15 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class InternalTexture;
-class PostProcess;
 class Scene;
-class VertexBuffer;
-class WebGLDataBuffer;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
-using PostProcessPtr     = std::shared_ptr<PostProcess>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief PostProcessManager is used to manage one or more post processes or post process pipelines
