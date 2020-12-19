@@ -62,15 +62,13 @@ public:
 private:
   /**
    * @brief Gets the refraction texture.
-   * Please note that you are responsible for disposing the texture if you set
-   * it manually
+   * Please note that you are responsible for disposing the texture if you set it manually
    */
   TexturePtr& get_refractionTexture();
 
   /**
    * @brief Sets the refraction texture.
-   * Please note that you are responsible for disposing the texture if you set
-   * it manually
+   * Please note that you are responsible for disposing the texture if you set it manually
    */
   void set_refractionTexture(const TexturePtr& value);
 
