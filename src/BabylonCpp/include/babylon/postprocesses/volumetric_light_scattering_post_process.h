@@ -2,22 +2,17 @@
 #define BABYLON_POSTPROCESSES_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/viewport.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Mesh;
-class RenderTargetTexture;
-class SubMesh;
-class VolumetricLightScatteringPostProcess;
-using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
-using MeshPtr                = std::shared_ptr<Mesh>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using SubMeshPtr             = std::shared_ptr<SubMesh>;
-using VolumetricLightScatteringPostProcessPtr
-  = std::shared_ptr<VolumetricLightScatteringPostProcess>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(SubMesh)
+FWD_CLASS_SPTR(VolumetricLightScatteringPostProcess)
 
 /**
  * @brief VolumetricLightScatteringPostProcess class.
@@ -57,8 +52,7 @@ public:
   Vector3& getCustomMeshPosition();
 
   /**
-   * @brief Disposes the internal assets and detaches the post-process from the
-   * camera.
+   * @brief Disposes the internal assets and detaches the post-process from the camera.
    */
   void dispose(Camera* camera) override;
 
@@ -70,8 +64,7 @@ public:
 
   //** Static methods **/ /
   /**
-   * @brief Creates a default mesh for the Volumeric Light Scattering
-   * post-process.
+   * @brief Creates a default mesh for the Volumeric Light Scattering post-process.
    * @param name The mesh name
    * @param scene The scene where to create the mesh
    * @return the default mesh
@@ -82,17 +75,16 @@ protected:
   /**
    * @brief Constructor
    * @param name The post-process name
-   * @param ratio The size of the post-process and/or internal pass (0.5 means
-   * that your postprocess will have a width = canvas.width 0.5 and a height =
-   * canvas.height 0.5)
+   * @param ratio The size of the post-process and/or internal pass (0.5 means that your postprocess
+   * will have a width = canvas.width 0.5 and a height = canvas.height 0.5)
    * @param camera The camera that the post-process will be attached to
    * @param mesh The mesh used to create the light scattering
    * @param samples The post-process quality, default 100
    * @param samplingModeThe post-process filtering mode
    * @param engine The babylon engine
    * @param reusable If the post-process is reusable
-   * @param scene The constructor needs a scene reference to initialize internal
-   * components. If "camera" is null a "scene" must be provided
+   * @param scene The constructor needs a scene reference to initialize internal components. If
+   * "camera" is null a "scene" must be provided
    */
   VolumetricLightScatteringPostProcess(
     const std::string& name, float ratio, const CameraPtr& camera, const MeshPtr& mesh,
@@ -107,18 +99,16 @@ private:
 
 public:
   /**
-   * If not undefined, the mesh position is computed from the attached node
-   * position
+   * If not undefined, the mesh position is computed from the attached node position
    */
   Vector3* attachedNode;
   /**
-   * Custom position of the mesh. Used if "useCustomMeshPosition" is set to
-   * "true"
+   * Custom position of the mesh. Used if "useCustomMeshPosition" is set to "true"
    */
   Vector3 customMeshPosition;
   /**
-   * Set if the post-process should use a custom position for the light source
-   * (true) or the internal mesh position (false)
+   * Set if the post-process should use a custom position for the light source (true) or the
+   * internal mesh position (false)
    */
   bool useCustomMeshPosition;
   /**
@@ -166,5 +156,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of
-       // BABYLON_POSTPROCESSES_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H
+#endif // end of BABYLON_POSTPROCESSES_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H

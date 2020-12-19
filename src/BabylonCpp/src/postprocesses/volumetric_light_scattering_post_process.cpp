@@ -292,7 +292,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
       renderingMesh->_processRendering(
         effectiveMesh.get(), subMesh, _volumetricLightScatteringPass, Material::TriangleFillMode,
         batch, hardwareInstancedRendering,
-        [effect](bool /*isInstance*/, Matrix world, Material * /*effectiveMaterial*/) -> void {
+        [effect](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) -> void {
           effect->setMatrix("world", world);
         });
     }
