@@ -9,16 +9,13 @@ namespace BABYLON {
 /**
  * @brief FaceAdjacencies Helper class to generate edges.
  */
-class BABYLON_SHARED_EXPORT FaceAdjacencies {
-
-public:
+struct BABYLON_SHARED_EXPORT FaceAdjacencies {
   Int32Array edges;
   Vector3 p0;
   Vector3 p1;
   Vector3 p2;
   int edgesConnectedCount = 0;
-
-}; // end of class FaceAdjacencies
+}; // end of struct FaceAdjacencies
 
 } // end of namespace BABYLON
 
