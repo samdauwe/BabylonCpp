@@ -21,16 +21,14 @@ FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
- * @brief Component responsible of rendering the bounding box of the meshes in a
- * scene. This is usually used through the mesh.showBoundingBox or the
- * scene.forceShowBoundingBoxes properties
+ * @brief Component responsible of rendering the bounding box of the meshes in a scene. This is
+ * usually used through the mesh.showBoundingBox or the scene.forceShowBoundingBoxes properties
  */
 class BABYLON_SHARED_EXPORT BoundingBoxRenderer : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_BOUNDINGBOXRENDERER;
 
@@ -54,8 +52,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
@@ -71,8 +68,8 @@ public:
   void render(int renderingGroupId);
 
   /**
-   * @brief In case of occlusion queries, we can render the occlusion bounding
-   * box through this method.
+   * @brief In case of occlusion queries, we can render the occlusion bounding box through this
+   * method.
    * @param mesh Define the mesh to render the occlusion bounding box for
    */
   void renderOcclusionBoundingBox(AbstractMesh* mesh);
