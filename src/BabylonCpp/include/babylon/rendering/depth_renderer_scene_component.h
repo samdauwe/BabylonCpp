@@ -14,15 +14,14 @@ FWD_CLASS_SPTR(DepthRendererSceneComponent)
 FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
- * @brief Defines the Depth Renderer scene component responsible to manage a
- * depth buffer useful in several rendering techniques.
+ * @brief Defines the Depth Renderer scene component responsible to manage a depth buffer useful in
+ * several rendering techniques.
  */
 class BABYLON_SHARED_EXPORT DepthRendererSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_DEPTHRENDERER;
 
@@ -41,8 +40,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
