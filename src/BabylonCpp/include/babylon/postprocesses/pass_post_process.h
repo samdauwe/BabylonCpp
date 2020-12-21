@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_PASS_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class PassPostProcess;
-using PassPostProcessPtr = std::shared_ptr<PassPostProcess>;
+FWD_CLASS_SPTR(PassPostProcess)
 
 /**
  * @brief PassPostProcess which produces an output the same as it's input.
@@ -52,8 +52,9 @@ protected:
    * @param blockCompilation If compilation of the shader should not be done in the constructor. The
    * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
-  PassPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
-                  unsigned int samplingMode = 0, Engine* engine = nullptr, bool reusable = false,
+  PassPostProcess(const std::string& name, const std::variant<float, PostProcessOptions>& options,
+                  const CameraPtr& camera, unsigned int samplingMode = 0, Engine* engine = nullptr,
+                  bool reusable            = false,
                   unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
                   bool blockCompilation    = false);
 

@@ -2,11 +2,12 @@
 
 namespace BABYLON {
 
-PassPostProcess::PassPostProcess(const std::string& iName, float ratio, const CameraPtr& camera,
-                                 unsigned int samplingMode, Engine* engine, bool reusable,
-                                 unsigned int textureType, bool blockCompilation)
-    : PostProcess{iName,  "pass",   {}, {},          ratio, camera, samplingMode,
-                  engine, reusable, "", textureType, "",    {},     blockCompilation}
+PassPostProcess::PassPostProcess(const std::string& iName,
+                                 const std::variant<float, PostProcessOptions>& options,
+                                 const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+                                 bool reusable, unsigned int textureType, bool blockCompilation)
+    : PostProcess{iName,  "pass",   {}, {},          options, camera, samplingMode,
+                  engine, reusable, "", textureType, "",      {},     blockCompilation}
 {
 }
 
