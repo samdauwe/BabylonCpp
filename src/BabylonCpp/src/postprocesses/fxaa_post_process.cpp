@@ -7,14 +7,16 @@
 
 namespace BABYLON {
 
-FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio, const CameraPtr& camera,
+FxaaPostProcess::FxaaPostProcess(const std::string& iName,
+                                 const std::variant<float, PostProcessOptions>& options,
+                                 const CameraPtr& camera,
                                  const std::optional<unsigned int>& samplingMode, Engine* engine,
                                  bool reusable, unsigned int textureType)
     : PostProcess{iName,
                   "fxaa",
                   {"texelSize"},
                   {},
-                  ratio,
+                  options,
                   camera,
                   samplingMode.value_or(TextureConstants::BILINEAR_SAMPLINGMODE),
                   engine,

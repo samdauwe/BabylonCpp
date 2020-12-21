@@ -2,14 +2,14 @@
 #define BABYLON_POSTPROCESSES_FXAA_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class FxaaPostProcess;
-using FxaaPostProcessPtr = std::shared_ptr<FxaaPostProcess>;
+FWD_CLASS_SPTR(FxaaPostProcess)
 
 /**
  * @brief Fxaa post process.
@@ -42,7 +42,8 @@ public:
                                    Scene* scene, const std::string& rootUrl);
 
 protected:
-  FxaaPostProcess(const std::string& iName, float ratio, const CameraPtr& camera = nullptr,
+  FxaaPostProcess(const std::string& iName, const std::variant<float, PostProcessOptions>& options,
+                  const CameraPtr& camera                         = nullptr,
                   const std::optional<unsigned int>& samplingMode = std::nullopt,
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
