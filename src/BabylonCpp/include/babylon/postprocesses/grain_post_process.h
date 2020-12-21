@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_GRAIN_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class GrainPostProcess;
-using GrainPostProcessPtr = std::shared_ptr<GrainPostProcess>;
+FWD_CLASS_SPTR(GrainPostProcess)
 
 /**
  * @brief The GrainPostProcess adds noise to the image at mid luminance levels.
