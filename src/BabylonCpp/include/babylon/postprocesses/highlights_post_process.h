@@ -26,7 +26,9 @@ public:
    * @param textureType Type of texture for the post process (default:
    * Engine.TEXTURETYPE_UNSIGNED_INT)
    */
-  HighlightsPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
+  HighlightsPostProcess(const std::string& name,
+                        const std::variant<float, PostProcessOptions>& options,
+                        const CameraPtr& camera,
                         const std::optional<unsigned int>& samplingMode = std::nullopt,
                         Engine* engine = nullptr, bool reusable = false,
                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);

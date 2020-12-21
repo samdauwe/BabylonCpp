@@ -2,12 +2,13 @@
 
 namespace BABYLON {
 
-HighlightsPostProcess::HighlightsPostProcess(const std::string& iName, float ratio,
+HighlightsPostProcess::HighlightsPostProcess(const std::string& iName,
+                                             const std::variant<float, PostProcessOptions>& options,
                                              const CameraPtr& camera,
                                              const std::optional<unsigned int>& samplingMode,
                                              Engine* engine, bool reusable,
                                              unsigned int textureType)
-    : PostProcess{iName,        "highlights", {},       {},      ratio,      camera,
+    : PostProcess{iName,        "highlights", {},       {},      options,    camera,
                   samplingMode, engine,       reusable, nullptr, textureType}
 {
 }
