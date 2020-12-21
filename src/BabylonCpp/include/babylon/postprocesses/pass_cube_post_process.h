@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_PASS_CUBE_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class PassCubePostProcess;
-using PassCubePostProcessPtr = std::shared_ptr<PassCubePostProcess>;
+FWD_CLASS_SPTR(PassCubePostProcess)
 
 /**
  * @brief PassCubePostProcess which produces an output the same as it's input (which must be a cube
@@ -41,7 +41,9 @@ protected:
    * @param blockCompilation If compilation of the shader should not be done in the constructor. The
    * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
-  PassCubePostProcess(const std::string& name, float ratio, const CameraPtr& camera,
+  PassCubePostProcess(const std::string& name,
+                      const std::variant<float, PostProcessOptions>& options,
+                      const CameraPtr& camera,
                       const std::optional<unsigned int>& samplingMode = std::nullopt,
                       Engine* engine = nullptr, bool reusable = false,
                       unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
