@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_FILTER_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class FilterPostProcess;
-using FilterPostProcessPtr = std::shared_ptr<FilterPostProcess>;
+FWD_CLASS_SPTR(FilterPostProcess)
 
 /**
  * @brief Applies a kernel filter to the image.
@@ -26,8 +26,8 @@ public:
    * @param engine The engine which the post process will be applied. (default: current engine)
    * @param reusable If the post process can be reused on the same frame. (default: false)
    */
-  FilterPostProcess(const std::string& name, const Matrix& kernelMatrix, float ratio,
-                    const CameraPtr& camera,
+  FilterPostProcess(const std::string& name, const Matrix& kernelMatrix,
+                    const std::variant<float, PostProcessOptions>& options, const CameraPtr& camera,
                     const std::optional<unsigned int>& samplingMode = std::nullopt,
                     Engine* engine = nullptr, bool reusable = false);
   ~FilterPostProcess() override; // = default
