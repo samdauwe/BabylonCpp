@@ -2,12 +2,12 @@
 #define BABYLON_POSTPROCESSES_DISPLAY_PASS_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class DisplayPassPostProcess;
-using DisplayPassPostProcessPtr = std::shared_ptr<DisplayPassPostProcess>;
+FWD_CLASS_SPTR(DisplayPassPostProcess)
 
 /**
  * @brief DisplayPassPostProcess which produces an output the same as it's input.

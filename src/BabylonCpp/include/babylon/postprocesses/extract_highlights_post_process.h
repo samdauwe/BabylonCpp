@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_EXTRACT_HIGHLIGHTS_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class ExtractHighlightsPostProcess;
-using ExtractHighlightsPostProcessPtr = std::shared_ptr<ExtractHighlightsPostProcess>;
+FWD_CLASS_SPTR(ExtractHighlightsPostProcess)
 
 /**
  * @brief The extract highlights post process sets all pixels to black except pixels above the
