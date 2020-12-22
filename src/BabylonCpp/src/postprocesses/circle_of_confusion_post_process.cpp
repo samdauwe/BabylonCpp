@@ -34,7 +34,7 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
     , depthTexture{this, &CircleOfConfusionPostProcess::set_depthTexture}
     , _depthTexture{depthTexture}
 {
-  onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
+  onApplyObservable.add([=](Effect* effect, EventState& /*es*/) {
     if (!_depthTexture) {
       BABYLON_LOG_WARN("CircleOfConfusionPostProcess",
                        "No depth texture set on CircleOfConfusionPostProcess")
@@ -44,15 +44,15 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
 
     // Circle of confusion calculation, See
     // https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch23.html
-    float aperture          = lensSize / fStop;
-    float cocPrecalculation = ((aperture * focalLength)
-                               / ((focusDistance - focalLength))); // * ((focusDistance -
-                                                                   // pixelDistance)/pixelDistance)
-                                                                   // [This part is done in shader]
+    const auto aperture = lensSize / fStop;
+    const auto cocPrecalculation
+      = ((aperture * focalLength)
+         / ((focusDistance
+             - focalLength))); // * ((this.focusDistance - pixelDistance)/pixelDistance)
+                               // [This part is done in shader]
 
     effect->setFloat("focusDistance", focusDistance);
     effect->setFloat("cocPrecalculation", cocPrecalculation);
-
     if (_depthTexture->activeCamera) {
       effect->setFloat2("cameraMinMaxZ", _depthTexture->activeCamera->minZ,
                         _depthTexture->activeCamera->maxZ);

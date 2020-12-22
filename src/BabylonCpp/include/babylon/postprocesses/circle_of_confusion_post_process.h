@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_CIRCLE_OF_CONFUSION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class RenderTargetTexture;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief The CircleOfConfusionPostProcess computes the circle of confusion value for each pixel
@@ -48,8 +48,8 @@ public:
 
 protected:
   /**
-   * @brief Depth texture to be used to compute the circle of confusion. This must be set here or in
-   * the constructor in order for the post process to function.
+   * @brief Sets the depth texture to be used to compute the circle of confusion. This must be set
+   * here or in the constructor in order for the post process to function.
    */
   void set_depthTexture(const RenderTargetTexturePtr& value);
 
