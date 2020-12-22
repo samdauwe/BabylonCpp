@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/vector2.h>
@@ -9,8 +10,7 @@
 
 namespace BABYLON {
 
-class BlurPostProcess;
-using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
+FWD_CLASS_SPTR(BlurPostProcess)
 
 /**
  * @brief  The Blur Post Process which blurs an image based on a kernel and direction.
@@ -103,7 +103,7 @@ protected:
    * @param idealKernel Ideal blur kernel.
    * @return Nearest best kernel.
    */
-  [[nodiscard]] float _nearestBestKernel(float idealKernel) const;
+  float _nearestBestKernel(float idealKernel) const;
 
   /**
    * @brief Generates a string that can be used as a floating point number in GLSL.
@@ -111,17 +111,15 @@ protected:
    * @param decimalFigures Number of decimal places to print the number to (excluding trailing 0s).
    * @return GLSL float string.
    */
-  [[nodiscard]] float _gaussianWeight(float x) const;
+  float _gaussianWeight(float x) const;
 
   /**
-   * @brief Generates a string that can be used as a floating point number in
-   * GLSL.
+   * @brief Generates a string that can be used as a floating point number in GLSL.
    * @param x Value to print.
-   * @param decimalFigures Number of decimal places to print the number to
-   * (excluding trailing 0s).
+   * @param decimalFigures Number of decimal places to print the number to (excluding trailing 0s).
    * @return GLSL float string.
    */
-  [[nodiscard]] std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
+  std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
 
 private:
   /**
@@ -132,7 +130,7 @@ private:
   /**
    * @brief Gets the length in pixels of the blur sample region.
    */
-  [[nodiscard]] float get_kernel() const;
+  float get_kernel() const;
 
   /**
    * @brief Sets whether or not the blur needs to unpack/repack floats.
@@ -142,7 +140,7 @@ private:
   /**
    * @brief Gets whether or not the blur is unpacking/repacking floats.
    */
-  [[nodiscard]] bool get_packedFloat() const;
+  bool get_packedFloat() const;
 
 public:
   /**

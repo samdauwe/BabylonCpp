@@ -2,19 +2,18 @@
 #define BABYLON_POSTPROCESSES_BLOOM_MERGE_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class BloomMergePostProcess;
-class PostProcess;
-using BloomMergePostProcessPtr = std::shared_ptr<BloomMergePostProcess>;
-using PostProcessPtr           = std::shared_ptr<PostProcess>;
+FWD_CLASS_SPTR(BloomMergePostProcess)
+FWD_CLASS_SPTR(PostProcess)
 
 /**
- * @brief The BloomMergePostProcess merges blurred images with the original
- * based on the values of the circle of confusion.
+ * @brief The BloomMergePostProcess merges blurred images with the original based on the values of
+ * the circle of confusion.
  */
 class BABYLON_SHARED_EXPORT BloomMergePostProcess : public PostProcess {
 

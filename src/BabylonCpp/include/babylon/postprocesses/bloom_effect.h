@@ -2,23 +2,19 @@
 #define BABYLON_POSTPROCESSES_BLOOM_EFFECT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
 
 namespace BABYLON {
 
-class BloomEffect;
-class BloomMergePostProcess;
-class BlurPostProcess;
-class ExtractHighlightsPostProcess;
 class Scene;
-using BloomEffectPtr                  = std::shared_ptr<BloomEffect>;
-using BloomMergePostProcessPtr        = std::shared_ptr<BloomMergePostProcess>;
-using BlurPostProcessPtr              = std::shared_ptr<BlurPostProcess>;
-using ExtractHighlightsPostProcessPtr = std::shared_ptr<ExtractHighlightsPostProcess>;
+FWD_CLASS_SPTR(BloomEffect)
+FWD_CLASS_SPTR(BloomMergePostProcess)
+FWD_CLASS_SPTR(BlurPostProcess)
+FWD_CLASS_SPTR(ExtractHighlightsPostProcess)
 
 /**
- * @brief The bloom effect spreads bright areas of an image to simulate
- * artifacts seen in cameras.
+ * @brief The bloom effect spreads bright areas of an image to simulate artifacts seen in cameras.
  */
 class BABYLON_SHARED_EXPORT BloomEffect : public PostProcessRenderEffect {
 
@@ -46,58 +42,51 @@ public:
    * @returns if all the contained post processes are ready.
    * Hidden
    */
-  [[nodiscard]] bool _isReady() const;
+  bool _isReady() const;
 
 protected:
   /**
-   * @brief Creates a new instance of @see BloomEffect.
+   * @brief Creates a new instance of @see BloomEffect
    * @param scene The scene the effect belongs to.
-   * @param bloomScale The ratio of the blur texture to the input texture that
-   * should be used to compute the bloom.
-   * @param bloomKernel The size of the kernel to be used when applying the
-   * blur.
+   * @param bloomScale The ratio of the blur texture to the input texture that should be used to
+   * compute the bloom.
+   * @param bloomKernel The size of the kernel to be used when applying the blur.
    * @param bloomWeight The the strength of bloom.
-   * @param pipelineTextureType The type of texture to be used when performing
-   * the post processing.
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
+   * @param pipelineTextureType The type of texture to be used when performing the post processing.
+   * @param blockCompilation If compilation of the shader should not be done in the constructor. The
+   * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
   BloomEffect(const std::string& name, Scene* scene, float bloomScale, float bloomWeight,
               float bloomKernel, unsigned int pipelineTextureType = 0,
               bool blockCompilation = false);
 
   /**
-   * @brief Gets the luminance threshold to find bright areas of the image to
-   * bloom.
+   * @brief Gets the luminance threshold to find bright areas of the image to bloom.
    */
-  [[nodiscard]] float get_threshold() const;
+  float get_threshold() const;
 
   /**
-   * @brief Sets the luminance threshold to find bright areas of the image to
-   * bloom.
+   * @brief Sets the luminance threshold to find bright areas of the image to bloom.
    */
   void set_threshold(float value);
 
   /**
-   * @brief The strength of the bloom.
+   * @brief Gets the strength of the bloom.
    */
-  [[nodiscard]] float get_weight() const;
+  float get_weight() const;
 
   /**
-   * @brief The strength of the bloom.
+   * @brief Sets the strength of the bloom.
    */
   void set_weight(float value);
 
   /**
-   * @brief Specifies the size of the bloom blur kernel, relative to the final
-   * output size.
+   * @brief Specifies the size of the bloom blur kernel, relative to the final output size.
    */
-  [[nodiscard]] float get_kernel() const;
+  float get_kernel() const;
 
   /**
-   * @brief Specifies the size of the bloom blur kernel, relative to the final
-   * output size.
+   * @brief Specifies the size of the bloom blur kernel, relative to the final output size.
    */
   void set_kernel(float value);
 

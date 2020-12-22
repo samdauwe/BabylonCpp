@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_CHROMATIC_ABERRATION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class ChromaticAberrationPostProcess;
-using ChromaticAberrationPostProcessPtr = std::shared_ptr<ChromaticAberrationPostProcess>;
+FWD_CLASS_SPTR(ChromaticAberrationPostProcess)
 
 /**
  * @brief The ChromaticAberrationPostProcess separates the rgb channels in an image to produce

@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_CONVOLUTION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class ConvolutionPostProcess;
-using ConvolutionPostProcessPtr = std::shared_ptr<ConvolutionPostProcess>;
+FWD_CLASS_SPTR(ConvolutionPostProcess)
 
 /**
  * @brief The ConvolutionPostProcess applies a 3x3 kernel to every pixel of the

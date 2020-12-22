@@ -2,12 +2,12 @@
 #define BABYLON_POSTPROCESSES_BLACK_AND_WHITE_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class BlackAndWhitePostProcess;
-using BlackAndWhitePostProcessPtr = std::shared_ptr<BlackAndWhitePostProcess>;
+FWD_CLASS_SPTR(BlackAndWhitePostProcess)
 
 /**
  * @brief Post process used to render in black and white.

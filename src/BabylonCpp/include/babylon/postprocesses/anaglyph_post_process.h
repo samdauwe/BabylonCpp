@@ -2,12 +2,12 @@
 #define BABYLON_POSTPROCESSES_ANAGLYPH_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class AnaglyphPostProcess;
-using AnaglyphPostProcessPtr = std::shared_ptr<AnaglyphPostProcess>;
+FWD_CLASS_SPTR(AnaglyphPostProcess)
 
 /**
  * @brief Postprocess used to generate anaglyphic rendering.

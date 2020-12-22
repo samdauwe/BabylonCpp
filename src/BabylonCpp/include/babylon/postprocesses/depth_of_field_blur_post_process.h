@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_DEPTH_OF_FIELD_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/blur_post_process.h>
 
 namespace BABYLON {
 
-class DepthOfFieldBlurPostProcess;
-using DepthOfFieldBlurPostProcessPtr = std::shared_ptr<DepthOfFieldBlurPostProcess>;
+FWD_CLASS_SPTR(DepthOfFieldBlurPostProcess)
 
 /**
  * @brief The DepthOfFieldBlurPostProcess applied a blur in a give direction.

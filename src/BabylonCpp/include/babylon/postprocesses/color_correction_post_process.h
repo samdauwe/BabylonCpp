@@ -2,14 +2,13 @@
 #define BABYLON_POSTPROCESSES_COLOR_CORRECTION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class ColorCorrectionPostProcess;
-class Texture;
-using ColorCorrectionPostProcessPtr = std::shared_ptr<ColorCorrectionPostProcess>;
-using TexturePtr                    = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(ColorCorrectionPostProcess)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief This post-process allows the modification of rendered colors by using
