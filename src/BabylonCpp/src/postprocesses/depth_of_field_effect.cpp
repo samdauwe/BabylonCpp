@@ -25,16 +25,14 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene, RenderTargetTexture* iDepth
     , lensSize{this, &DepthOfFieldEffect::get_lensSize, &DepthOfFieldEffect::set_lensSize}
     , depthTexture{this, &DepthOfFieldEffect::set_depthTexture}
 {
-  // Circle of confusion value for each pixel is used to determine how
-  // much to blur that pixel
+  // Circle of confusion value for each pixel is used to determine how much to blur that pixel
   _circleOfConfusion = std::make_unique<CircleOfConfusionPostProcess>(
     "circleOfConfusion", iDepthTexture, 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
     scene->getEngine(), false, pipelineTextureType, blockCompilation);
 
-  // Create a pyramid of blurred images (eg. fullSize 1/4 blur, half
-  // size 1/2 blur, quarter size 3/4 blur, eith size 4/4 blur) Blur the
-  // image but do not blur on sharp far to near distance changes to
-  // avoid bleeding artifacts See section 2.6.2
+  // Create a pyramid of blurred images (eg. fullSize 1/4 blur, half size 1/2 blur, quarter size 3/4
+  // blur, eith size 4/4 blur) Blur the image but do not blur on sharp far to near distance changes
+  // to avoid bleeding artifacts See section 2.6.2
   // http://fileadmin.cs.lth.se/cs/education/edan35/lectures/12dof.pdf
   _depthOfFieldBlurY.clear();
   _depthOfFieldBlurX.clear();
@@ -77,7 +75,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene, RenderTargetTexture* iDepth
   }
 
   std::vector<PostProcessPtr> blurSteps;
-  for (auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
+  for (const auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
     blurSteps.emplace_back(std::dynamic_pointer_cast<PostProcess>(depthOfFieldBlurX));
   }
 
@@ -157,21 +155,21 @@ void DepthOfFieldEffect::set_depthTexture(const RenderTargetTexturePtr& value)
 
 void DepthOfFieldEffect::disposeEffects(Camera* camera)
 {
-  for (auto& effect : _effects) {
+  for (const auto& effect : _effects) {
     effect->dispose(camera);
   }
 }
 
 void DepthOfFieldEffect::_updateEffects()
 {
-  for (auto& effect : _effects) {
+  for (const auto& effect : _effects) {
     effect->updateEffect();
   }
 }
 
 bool DepthOfFieldEffect::_isReady() const
 {
-  for (auto& effect : _effects) {
+  for (const auto& effect : _effects) {
     if (!effect->isReady()) {
       return false;
     }

@@ -4,28 +4,23 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
 
 namespace BABYLON {
 
-class CircleOfConfusionPostProcess;
-class DepthOfFieldBlurPostProcess;
-class DepthOfFieldEffect;
-class DepthOfFieldMergePostProcess;
-class PassPostProcess;
-class RenderTargetTexture;
 class Scene;
-using CircleOfConfusionPostProcessPtr = std::shared_ptr<CircleOfConfusionPostProcess>;
-using DepthOfFieldBlurPostProcessPtr  = std::shared_ptr<DepthOfFieldBlurPostProcess>;
-using DepthOfFieldEffectPtr           = std::shared_ptr<DepthOfFieldEffect>;
-using DepthOfFieldMergePostProcessPtr = std::shared_ptr<DepthOfFieldMergePostProcess>;
-using RenderTargetTexturePtr          = std::shared_ptr<RenderTargetTexture>;
-using PassPostProcessPtr              = std::shared_ptr<PassPostProcess>;
+FWD_CLASS_SPTR(CircleOfConfusionPostProcess)
+FWD_CLASS_SPTR(DepthOfFieldBlurPostProcess)
+FWD_CLASS_SPTR(DepthOfFieldEffect)
+FWD_CLASS_SPTR(DepthOfFieldMergePostProcess)
+FWD_CLASS_SPTR(PassPostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
- * @brief The depth of field effect applies a blur to objects that are closer or
- * further from where the camera is focusing.
+ * @brief The depth of field effect applies a blur to objects that are closer or further from where
+ * the camera is focusing.
  */
 class BABYLON_SHARED_EXPORT DepthOfFieldEffect : public PostProcessRenderEffect {
 
@@ -41,7 +36,7 @@ public:
    * @brief Get the current class name of the current effet.
    * @returns "DepthOfFieldEffect"
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Disposes each of the internal effects for a given camera.
@@ -59,58 +54,53 @@ public:
    * @returns if all the contained post processes are ready.
    * Hidden
    */
-  [[nodiscard]] bool _isReady() const;
+  bool _isReady() const;
 
 protected:
   /**
-   * @brief  Creates a new instance DepthOfFieldEffect.
+   * @brief Creates a new instance DepthOfFieldEffect.
    * @param scene The scene the effect belongs to.
-   * @param depthTexture The depth texture of the scene to compute the circle of
-   * confusion.This must be set in order for this to function but may be set
-   * after initialization if needed.
-   * @param pipelineTextureType The type of texture to be used when performing
-   * the post processing.
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
+   * @param depthTexture The depth texture of the scene to compute the circle of confusion.This must
+   * be set in order for this to function but may be set after initialization if needed.
+   * @param pipelineTextureType The type of texture to be used when performing the post processing.
+   * @param blockCompilation If compilation of the shader should not be done in the constructor. The
+   * updateEffect method can be used to compile the shader at a later time. (default: false)
    */
   DepthOfFieldEffect(Scene* scene, RenderTargetTexture* depthTexture,
                      DepthOfFieldEffectBlurLevel blurLevel = DepthOfFieldEffectBlurLevel::Low,
                      unsigned int pipelineTextureType = 0, bool blockCompilation = false);
 
   /**
-   * @brief The focal the length of the camera used in the effect in scene
-   * units/1000 (eg. millimeter).
+   * @brief The focal the length of the camera used in the effect in scene units/1000 (eg.
+   * millimeter).
    */
   void set_focalLength(float value);
-  [[nodiscard]] float get_focalLength() const;
+  float get_focalLength() const;
 
   /**
-   * @brief F-Stop of the effect's camera. The diameter of the resulting
-   * aperture can be computed by lensSize/fStop. (default: 1.4).
+   * @brief F-Stop of the effect's camera. The diameter of the resulting aperture can be computed by
+   * lensSize/fStop. (default: 1.4).
    */
   void set_fStop(float value);
-  [[nodiscard]] float get_fStop() const;
+  float get_fStop() const;
 
   /**
-   * @brief Distance away from the camera to focus on in scene units/1000 (eg.
-   * millimeter). (default: 2000).
+   * @brief Distance away from the camera to focus on in scene units/1000 (eg. millimeter).
+   * (default: 2000).
    */
   void set_focusDistance(float value);
-  [[nodiscard]] float get_focusDistance() const;
+  float get_focusDistance() const;
 
   /**
-   * @brief Max lens size in scene units/1000 (eg. millimeter). Standard cameras
-   * are 50mm. (default: 50) The diamater of the resulting aperture can be
-   * computed by lensSize/fStop.
+   * @brief Max lens size in scene units/1000 (eg. millimeter). Standard cameras are 50mm. (default:
+   * 50) The diamater of the resulting aperture can be computed by lensSize/fStop.
    */
   void set_lensSize(float value);
-  [[nodiscard]] float get_lensSize() const;
+  float get_lensSize() const;
 
   /**
-   * @brief Depth texture to be used to compute the circle of confusion. This
-   * must be set here or in the constructor in order for the post process to
-   * function.
+   * @brief Depth texture to be used to compute the circle of confusion. This must be set here or in
+   * the constructor in order for the post process to function.
    */
   void set_depthTexture(const RenderTargetTexturePtr& value);
 
@@ -131,27 +121,25 @@ public:
   Property<DepthOfFieldEffect, float> focalLength;
 
   /**
-   * F-Stop of the effect's camera. The diameter of the resulting aperture can
-   * be computed by lensSize/fStop. (default: 1.4)
+   * F-Stop of the effect's camera. The diameter of the resulting aperture can be computed by
+   * lensSize/fStop. (default: 1.4)
    */
   Property<DepthOfFieldEffect, float> fStop;
 
   /**
-   * Distance away from the camera to focus on in scene units/1000 (eg.
-   * millimeter). (default: 2000)
+   * Distance away from the camera to focus on in scene units/1000 (eg. millimeter). (default: 2000)
    */
   Property<DepthOfFieldEffect, float> focusDistance;
 
   /**
-   * Max lens size in scene units/1000 (eg. millimeter). Standard cameras are
-   * 50mm. (default: 50) The diamater of the resulting aperture can be computed
-   * by lensSize/fStop.
+   * Max lens size in scene units/1000 (eg. millimeter). Standard cameras are 50mm. (default: 50)
+   * The diamater of the resulting aperture can be computed by lensSize/fStop.
    */
   Property<DepthOfFieldEffect, float> lensSize;
 
   /**
-   * Depth texture to be used to compute the circle of confusion. This must be
-   * set here or in the constructor in order for the post process to function.
+   * Depth texture to be used to compute the circle of confusion. This must be set here or in the
+   * constructor in order for the post process to function.
    */
   WriteOnlyProperty<DepthOfFieldEffect, RenderTargetTexturePtr> depthTexture;
 
