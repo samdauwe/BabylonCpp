@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_DEPTH_OF_FIELD_MERGE_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class DepthOfFieldMergePostProcess;
-using DepthOfFieldMergePostProcessPtr = std::shared_ptr<DepthOfFieldMergePostProcess>;
+FWD_CLASS_SPTR(DepthOfFieldMergePostProcess)
 
 /**
  * @brief The DepthOfFieldMergePostProcess merges blurred images with the original based on the
