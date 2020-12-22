@@ -23,7 +23,7 @@ struct DepthOfFieldOptions {
  */
 struct BloomOptions {
   PostProcess* blurred = nullptr;
-  float weight;
+  float weight         = 0.f;
 }; // end of struct DepthOfFieldOption
 
 /**
