@@ -11,20 +11,20 @@ namespace BABYLON {
 PostProcessRenderEffect::PostProcessRenderEffect(
   Engine* engine, const std::string& name,
   const std::function<std::vector<PostProcessPtr>()>& getPostProcesses, bool singleInstance)
-    : _name{name}
-    , _engine{engine}
-    , isSupported{this, &PostProcessRenderEffect::get_isSupported}
-    , _getPostProcesses{getPostProcesses}
-    , _singleInstance{singleInstance}
+    : _engine{engine}, isSupported{this, &PostProcessRenderEffect::get_isSupported}
 {
+  _name           = name;
+  _singleInstance = singleInstance;
+
+  _getPostProcesses = getPostProcesses;
 }
 
 PostProcessRenderEffect::~PostProcessRenderEffect() = default;
 
 bool PostProcessRenderEffect::get_isSupported() const
 {
-  for (auto& item : _postProcesses) {
-    for (auto& pps : item.second) {
+  for (const auto& item : _postProcesses) {
+    for (const auto& pps : item.second) {
       if (!pps->isSupported()) {
         return false;
       }
@@ -47,7 +47,7 @@ void PostProcessRenderEffect::_attachCameras(const std::vector<CameraPtr>& camer
     return;
   }
 
-  for (auto& camera : cams) {
+  for (const auto& camera : cams) {
     if (!camera) {
       continue;
     }
@@ -72,7 +72,7 @@ void PostProcessRenderEffect::_attachCameras(const std::vector<CameraPtr>& camer
       _indicesForCamera[cameraName].clear();
     }
 
-    for (auto& postProcess : _postProcesses[cameraKey]) {
+    for (const auto& postProcess : _postProcesses[cameraKey]) {
       auto index = camera->attachPostProcess(postProcess);
 
       _indicesForCamera[cameraName].emplace_back(index);
@@ -92,19 +92,18 @@ void PostProcessRenderEffect::_detachCameras(const std::vector<CameraPtr>& camer
     return;
   }
 
-  for (auto& camera : cams) {
+  for (const auto& camera : cams) {
     auto cameraName = camera->name;
 
     const auto cameraKey      = _singleInstance ? "0" : cameraName;
     const auto& postProcesses = _postProcesses[cameraKey];
     if (!postProcesses.empty()) {
-      for (auto& postProcess : postProcesses) {
+      for (const auto& postProcess : postProcesses) {
         camera->detachPostProcess(postProcess);
       }
     }
 
     if (stl_util::contains(_cameras, cameraName)) {
-      // _indicesForCamera.erase(cameraName);
       _cameras.erase(cameraName);
     }
   }
@@ -118,14 +117,14 @@ void PostProcessRenderEffect::_enable(const std::vector<CameraPtr>& cameras)
     return;
   }
 
-  for (auto& camera : cams) {
+  for (const auto& camera : cams) {
     auto cameraName = camera->name;
 
-    for (auto& j : _indicesForCamera[cameraName]) {
+    for (const auto& j : _indicesForCamera[cameraName]) {
       auto index = _indicesForCamera[cameraName][j];
       if (index >= camera->_postProcesses.size() || camera->_postProcesses[index] == nullptr) {
         const auto cameraKey = _singleInstance ? "0" : cameraName;
-        for (auto& postProcess : _postProcesses[cameraKey]) {
+        for (const auto& postProcess : _postProcesses[cameraKey]) {
           camera->attachPostProcess(postProcess,
                                     static_cast<int>(_indicesForCamera[cameraName][j]));
         }
@@ -142,10 +141,10 @@ void PostProcessRenderEffect::_disable(const std::vector<CameraPtr>& cameras)
     return;
   }
 
-  for (auto& camera : cams) {
+  for (const auto& camera : cams) {
     auto cameraName      = camera->name;
     const auto cameraKey = _singleInstance ? "0" : cameraName;
-    for (auto& postProcess : _postProcesses[cameraKey]) {
+    for (const auto& postProcess : _postProcesses[cameraKey]) {
       camera->detachPostProcess(postProcess);
     }
   }

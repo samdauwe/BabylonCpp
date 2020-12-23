@@ -1,26 +1,25 @@
 #ifndef BABYLON_POSTPROCESSES_RENDERPIPELINE_POST_PROCESS_RENDER_EFFECT_H
 #define BABYLON_POSTPROCESSES_RENDERPIPELINE_POST_PROCESS_RENDER_EFFECT_H
 
-#include <babylon/babylon_api.h>
-#include <babylon/babylon_common.h>
 #include <functional>
 #include <memory>
 #include <unordered_map>
 
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
+
 namespace BABYLON {
 
-class Camera;
 class Engine;
-class PostProcess;
-class PostProcessRenderEffect;
-using CameraPtr                  = std::shared_ptr<Camera>;
-using PostProcessPtr             = std::shared_ptr<PostProcess>;
-using PostProcessRenderEffectPtr = std::shared_ptr<PostProcessRenderEffect>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(PostProcessRenderEffect)
 
 /**
  * @brief This represents a set of one or more post processes in Babylon.
  * A post process can be used to apply a shader to a texture after it is rendered.
- * Example: https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
+ * @example https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
  */
 class BABYLON_SHARED_EXPORT PostProcessRenderEffect {
 
@@ -77,14 +76,13 @@ public:
 protected:
   /**
    * @brief Instantiates a post process render effect.
-   * A post process can be used to apply a shader to a texture after it is
-   * rendered.
+   * A post process can be used to apply a shader to a texture after it is rendered.
    * @param engine The engine the effect is tied to
    * @param name The name of the effect
-   * @param getPostProcesses A function that returns a set of post processes
-   * which the effect will run in order to be run.
-   * @param singleInstance False if this post process can be run on multiple
-   * cameras. (default: true)
+   * @param getPostProcesses A function that returns a set of post processes which the effect will
+   * run in order to be run.
+   * @param singleInstance False if this post process can be run on multiple cameras. (default:
+   * true)
    */
   PostProcessRenderEffect(Engine* engine, const std::string& name,
                           const std::function<std::vector<PostProcessPtr>()>& getPostProcesses,
@@ -93,7 +91,7 @@ protected:
   /**
    * @brief Checks if all the post processes in the effect are supported.
    */
-  [[nodiscard]] bool get_isSupported() const;
+  bool get_isSupported() const;
 
 public:
   /**
