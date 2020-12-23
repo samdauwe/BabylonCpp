@@ -5,22 +5,22 @@
 
 namespace BABYLON {
 
-PostProcessRenderPipelineManagerSceneComponent::
-  PostProcessRenderPipelineManagerSceneComponent(Scene* iScene)
+PostProcessRenderPipelineManagerSceneComponent::PostProcessRenderPipelineManagerSceneComponent(
+  Scene* iScene)
 {
   ISceneComponent::name = PostProcessRenderPipelineManagerSceneComponent::name;
   scene                 = iScene;
 }
 
-PostProcessRenderPipelineManagerSceneComponent::
-PostProcessRenderPipelineManagerSceneComponent::~PostProcessRenderPipelineManagerSceneComponent() = default;
+PostProcessRenderPipelineManagerSceneComponent::PostProcessRenderPipelineManagerSceneComponent::
+  ~PostProcessRenderPipelineManagerSceneComponent()
+  = default;
 
 void PostProcessRenderPipelineManagerSceneComponent::_register()
 {
   scene->_gatherRenderTargetsStage.registerStep(
-    SceneComponentConstants::
-      STEP_GATHERRENDERTARGETS_POSTPROCESSRENDERPIPELINEMANAGER,
-    this, [this](const std::vector<RenderTargetTexturePtr>& /*renderTargets*/) {
+    SceneComponentConstants::STEP_GATHERRENDERTARGETS_POSTPROCESSRENDERPIPELINEMANAGER, this,
+    [this](const std::vector<RenderTargetTexturePtr>& /*renderTargets*/) -> void {
       _gatherRenderTargets();
     });
 }

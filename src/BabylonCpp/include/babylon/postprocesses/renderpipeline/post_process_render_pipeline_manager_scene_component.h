@@ -4,28 +4,24 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class PostProcessRenderPipelineManagerSceneComponent;
-class RenderTargetTexture;
-using PostProcessRenderPipelineManagerSceneComponentPtr
-  = std::shared_ptr<PostProcessRenderPipelineManagerSceneComponent>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(PostProcessRenderPipelineManagerSceneComponent)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
- * @brief Defines the Render Pipeline scene component responsible to rendering
- * pipelines.
+ * @brief Defines the Render Pipeline scene component responsible to rendering pipelines.
  */
 class BABYLON_SHARED_EXPORT PostProcessRenderPipelineManagerSceneComponent
     : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name
     = SceneComponentConstants::NAME_POSTPROCESSRENDERPIPELINEMANAGER;
@@ -45,8 +41,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
