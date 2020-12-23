@@ -8,20 +8,17 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/iinspectable.h>
 
 namespace BABYLON {
 
-class Camera;
 class Engine;
-class PostProcessRenderEffect;
-class PostProcessRenderPipeline;
-class PrePassRenderer;
-using CameraPtr                    = std::shared_ptr<Camera>;
-using PostProcessRenderEffectPtr   = std::shared_ptr<PostProcessRenderEffect>;
-using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
-using PrePassRendererPtr           = std::shared_ptr<PrePassRenderer>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(PostProcessRenderEffect)
+FWD_CLASS_SPTR(PostProcessRenderPipeline)
+FWD_CLASS_SPTR(PrePassRenderer)
 
 /**
  * @brief PostProcessRenderPipeline
@@ -42,7 +39,7 @@ public:
    * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
-  [[nodiscard]] virtual std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Adds an effect to the pipeline.
@@ -108,7 +105,7 @@ protected:
   /**
    * @brief Gets pipeline name.
    */
-  [[nodiscard]] std::string get_name() const;
+  std::string get_name() const;
 
   /**
    * @brief Gets the list of attached cameras.
@@ -118,7 +115,7 @@ protected:
   /**
    * @brief If all the render effects in the pipeline are supported.
    */
-  [[nodiscard]] bool get_isSupported() const;
+  bool get_isSupported() const;
 
   /**
    * @brief Hidden

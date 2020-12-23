@@ -9,13 +9,12 @@
 namespace BABYLON {
 
 PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine, const std::string& name)
-
-    : _name{name}
-    , name{this, &PostProcessRenderPipeline::get_name}
+    : name{this, &PostProcessRenderPipeline::get_name}
     , cameras{this, &PostProcessRenderPipeline::get_cameras}
     , isSupported{this, &PostProcessRenderPipeline::get_isSupported}
     , engine{iEngine}
 {
+  _name = name;
 }
 
 PostProcessRenderPipeline::~PostProcessRenderPipeline() = default;
@@ -42,6 +41,7 @@ bool PostProcessRenderPipeline::get_isSupported() const
       return false;
     }
   }
+
   return true;
 }
 
@@ -57,13 +57,17 @@ void PostProcessRenderPipeline::_rebuild()
 void PostProcessRenderPipeline::_enableEffect(const std::string& renderEffectName,
                                               const std::vector<CameraPtr>& iCameras)
 {
-  auto& renderEffects = _renderEffects[renderEffectName];
+  if (!stl_util::contains(_renderEffects, renderEffectName)) {
+    return;
+  }
+
+  const auto& renderEffects = _renderEffects[renderEffectName];
 
   if (!renderEffects) {
     return;
   }
 
-  auto& _cam = iCameras.empty() ? _cameras : iCameras;
+  const auto& _cam = iCameras.empty() ? _cameras : iCameras;
   renderEffects->_enable(_cam);
 }
 
@@ -111,8 +115,9 @@ void PostProcessRenderPipeline::_attachCameras(const std::vector<CameraPtr>& iCa
       = std::find_if(_cameras.begin(), _cameras.end(), [&camera](const CameraPtr& cameraEntry) {
           return camera->name == cameraEntry->name;
         });
-    if (it != _cameras.end())
+    if (it != _cameras.end()) {
       _cameras.erase(it);
+    }
   }
 
   for (const auto& item : _renderEffects) {
