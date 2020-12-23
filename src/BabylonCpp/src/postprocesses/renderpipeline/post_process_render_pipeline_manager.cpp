@@ -13,8 +13,8 @@ std::vector<PostProcessRenderPipelinePtr> PostProcessRenderPipelineManager::supp
 {
   std::vector<PostProcessRenderPipelinePtr> result;
 
-  for (auto& renderPipelineItem : _renderPipelines) {
-    auto pipeline = renderPipelineItem.second;
+  for (const auto& renderPipelineItem : _renderPipelines) {
+    const auto pipeline = renderPipelineItem.second;
     if (pipeline->isSupported()) {
       result.emplace_back(pipeline);
     }
@@ -39,7 +39,8 @@ void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
 void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
   const std::string& renderPipelineName, const std::vector<CameraPtr>& cameras, bool unique)
 {
-  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)
+      || !_renderPipelines[renderPipelineName]) {
     return;
   }
 
@@ -56,7 +57,8 @@ void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
 void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
   const std::string& renderPipelineName, const std::vector<CameraPtr>& cameras)
 {
-  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)
+      || !_renderPipelines[renderPipelineName]) {
     return;
   }
 
@@ -75,7 +77,8 @@ void PostProcessRenderPipelineManager::enableEffectInPipeline(const std::string&
                                                               const std::string& renderEffectName,
                                                               const std::vector<CameraPtr>& cameras)
 {
-  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)
+      || !_renderPipelines[renderPipelineName]) {
     return;
   }
 
@@ -94,7 +97,8 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
   const std::string& renderPipelineName, const std::string& renderEffectName,
   const std::vector<CameraPtr>& cameras)
 {
-  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)
+      || !_renderPipelines[renderPipelineName]) {
     return;
   }
 
@@ -104,25 +108,24 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
 void PostProcessRenderPipelineManager::update()
 {
   std::vector<std::string> pipelinesToRemove;
-  for (auto& item : _renderPipelines) {
-    auto& pipeline = item.second;
+  for (const auto& [renderPipelineName, pipeline] : _renderPipelines) {
     if (!pipeline->isSupported()) {
       pipeline->dispose();
-      pipelinesToRemove.emplace_back(item.first);
+      pipelinesToRemove.emplace_back(renderPipelineName);
     }
     else {
       pipeline->_update();
     }
   }
 
-  for (auto& renderPipelineName : pipelinesToRemove) {
+  for (const auto& renderPipelineName : pipelinesToRemove) {
     _renderPipelines.erase(renderPipelineName);
   }
 }
 
 void PostProcessRenderPipelineManager::_rebuild()
 {
-  for (auto& item : _renderPipelines) {
+  for (const auto& item : _renderPipelines) {
     auto& pipeline = item.second;
     pipeline->_rebuild();
   }
@@ -130,7 +133,7 @@ void PostProcessRenderPipelineManager::_rebuild()
 
 void PostProcessRenderPipelineManager::dispose()
 {
-  for (auto& item : _renderPipelines) {
+  for (const auto& item : _renderPipelines) {
     auto& pipeline = item.second;
     pipeline->dispose();
   }

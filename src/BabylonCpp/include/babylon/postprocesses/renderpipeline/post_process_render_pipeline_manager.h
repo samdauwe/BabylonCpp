@@ -7,13 +7,12 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Camera;
-class PostProcessRenderPipeline;
-using CameraPtr                    = std::shared_ptr<Camera>;
-using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(PostProcessRenderPipeline)
 
 /**
  * @brief PostProcessRenderPipelineManager class
@@ -46,8 +45,7 @@ public:
    * @param cameras the camera to attach
    * @param unique if the camera can be attached multiple times to the pipeline
    */
-  void attachCamerasToRenderPipeline(const std::string& renderPipelineName,
-                                     const CameraPtr& camera,
+  void attachCamerasToRenderPipeline(const std::string& renderPipelineName, const CameraPtr& camera,
                                      bool unique = false);
 
   /**
@@ -57,8 +55,7 @@ public:
    * @param unique if the camera can be attached multiple times to the pipeline
    */
   void attachCamerasToRenderPipeline(const std::string& renderPipelineName,
-                                     const std::vector<CameraPtr>& cameras,
-                                     bool unique = false);
+                                     const std::vector<CameraPtr>& cameras, bool unique = false);
 
   /**
    * @brief Detaches a camera from the pipeline.
@@ -83,8 +80,7 @@ public:
    * @param cameras the cameras that the effect should be enabled on
    */
   void enableEffectInPipeline(const std::string& renderPipelineName,
-                              const std::string& renderEffectName,
-                              const CameraPtr& camera);
+                              const std::string& renderEffectName, const CameraPtr& camera);
 
   /**
    * @brief Enables an effect by name on a pipeline.
@@ -103,8 +99,7 @@ public:
    * @param cameras the cameras that the effect should be disabled on
    */
   void disableEffectInPipeline(const std::string& renderPipelineName,
-                               const std::string& renderEffectName,
-                               const CameraPtr& camera);
+                               const std::string& renderEffectName, const CameraPtr& camera);
 
   /**
    * @brief Disables an effect by name on a pipeline.
@@ -117,8 +112,8 @@ public:
                                const std::vector<CameraPtr>& cameras);
 
   /**
-   * @brief Updates the state of all contained render pipelines and disposes of
-   * any non supported pipelines.
+   * @brief Updates the state of all contained render pipelines and disposes of any non supported
+   * pipelines.
    */
   void update();
 
@@ -133,8 +128,7 @@ public:
   void dispose();
 
 private:
-  std::unordered_map<std::string, PostProcessRenderPipelinePtr>
-    _renderPipelines;
+  std::unordered_map<std::string, PostProcessRenderPipelinePtr> _renderPipelines;
 
 }; // end of class PostProcessRenderPipelineManager
 
