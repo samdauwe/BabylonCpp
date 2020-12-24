@@ -194,10 +194,11 @@ bool SSAO2RenderingPipeline::IsSupported()
 }
 
 void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
-                                     bool /*disposeMaterialAndTextures*/)
+                                     bool disposeMaterialAndTextures)
 {
   for (auto& camera : _scene->cameras) {
     auto _camera = camera.get();
+
     _originalColorPostProcess->dispose(_camera);
     _ssaoPostProcess->dispose(_camera);
     _blurHPostProcess->dispose(_camera);
@@ -213,6 +214,8 @@ void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
 
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(_name,
                                                                               _scene->cameras);
+
+  PostProcessRenderPipeline::dispose(disableGeometryBufferRenderer, disposeMaterialAndTextures);
 }
 
 void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurRatio)
@@ -230,7 +233,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16\n#define EXPENSIVE "
       + std::string(expensive ? "1" : "0") + "\n");
-  _blurHPostProcess->onApply = [&](Effect* effect, EventState&) {
+  _blurHPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
       return;
     }
@@ -257,7 +260,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     = PostProcess::New("BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, blurRatio,
                        nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
                        false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
-  _blurVPostProcess->onApply = [&](Effect* effect, EventState&) {
+  _blurVPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
       return;
     }
