@@ -75,7 +75,6 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     , _bloomScale{0.5f}
     , _chromaticAberrationEnabled{false}
     , _grainEnabled{false}
-    , _buildAllowed{automaticBuild}
     , _resizeObserver{nullptr}
     , _hardwareScaleLevel{1.f}
     , _bloomKernel{64.f}
@@ -90,10 +89,12 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
   _cameras             = stl_util::extract_values(cameras);
   _camerasToBeAttached = _cameras;
 
+  _buildAllowed = automaticBuild;
+
   // Initialize
   _scene           = scene ? scene : Engine::LastCreatedScene();
   const auto& caps = _scene->getEngine()->getCaps();
-  _hdr             = hdr;
+  _hdr             = hdr && (caps.textureHalfFloatRender || caps.textureFloatRender);
 
   // Misc
   if (hdr) {
@@ -206,7 +207,6 @@ void DefaultRenderingPipeline::set_bloomWeight(float value)
   if (stl_util::almost_equal(_bloomWeight, value)) {
     return;
   }
-
   bloom->weight = value;
 
   _bloomWeight = value;
@@ -584,9 +584,9 @@ void DefaultRenderingPipeline::_buildPipeline()
   }
 
   if (!_enableMSAAOnFirstPostProcess(samples) && samples > 1) {
-    BABYLON_LOG_WARN("DefaultRenderingPipeline",
-                     "MSAA failed to enable, MSAA is only supported in "
-                     "browsers that support webGL >= 2.0")
+    BABYLON_LOG_WARN(
+      "DefaultRenderingPipeline",
+      "MSAA failed to enable, MSAA is only supported in browsers that support webGL >= 2.0")
   }
 
   onBuildObservable.notifyObservers(this);
