@@ -34,10 +34,11 @@ SSAORenderingPipeline::SSAORenderingPipeline(const std::string& iName, Scene* sc
     , area{0.0075f}
     , fallOff{0.000001f}
     , base{0.5f}
-    , _scene{scene}
     , _cameraList{cameras}
     , _firstUpdate{true}
 {
+  _scene = scene;
+
   // Set up assets
   _createRandomTexture();
   // Force depth renderer "on"
@@ -93,10 +94,11 @@ std::string SSAORenderingPipeline::getClassName() const
   return "SSAORenderingPipeline";
 }
 
-void SSAORenderingPipeline::dispose(bool disableDepthRender, bool /*disposeMaterialAndTextures*/)
+void SSAORenderingPipeline::dispose(bool disableDepthRender, bool disposeMaterialAndTextures)
 {
-  for (auto& camera : _scene->cameras) {
-    auto _camera = camera.get();
+  for (const auto& camera : _scene->cameras) {
+    const auto _camera = camera.get();
+
     _originalColorPostProcess->dispose(_camera);
     _ssaoPostProcess->dispose(_camera);
     _blurHPostProcess->dispose(_camera);
@@ -113,12 +115,12 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender, bool /*disposeMater
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(_name,
                                                                               _scene->cameras);
 
-  PostProcessRenderPipeline::dispose(disableDepthRender);
+  PostProcessRenderPipeline::dispose(disableDepthRender, disposeMaterialAndTextures);
 }
 
 void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 {
-  auto size = 16.f;
+  const auto size = 16.f;
 
   _blurHPostProcess = BlurPostProcess::New(
     "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
@@ -148,7 +150,7 @@ void SSAORenderingPipeline::_rebuild()
 
 void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 {
-  const unsigned int numSamples = 16;
+  const auto numSamples = 16u;
   const Float32Array sampleSphere{{
     0.5381f,  0.1856f,  -0.4319f, //
     0.1379f,  0.2486f,  0.4430f,  //
@@ -167,7 +169,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
     0.0352f,  -0.0631f, 0.5460f,  //
     -0.4776f, 0.2847f,  -0.0271f  //
   }};
-  float samplesFactor = 1.f / static_cast<float>(numSamples);
+  const auto samplesFactor = 1.f / static_cast<float>(numSamples);
 
   _ssaoPostProcess = PostProcess::New(
     "ssao", "ssao",
@@ -176,7 +178,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
     {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
-  _ssaoPostProcess->onApply = [&](Effect* effect, EventState&) {
+  _ssaoPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (_firstUpdate) {
       effect->setArray3("sampleSphere", sampleSphere);
       effect->setFloat("samplesFactor", samplesFactor);
@@ -208,7 +210,7 @@ void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 
 void SSAORenderingPipeline::_createRandomTexture()
 {
-  size_t size = 512;
+  const auto size = 512ull;
 
   DynamicTextureOptions options;
   options.width  = static_cast<int>(size);
@@ -221,7 +223,8 @@ void SSAORenderingPipeline::_createRandomTexture()
 
   auto context = std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
 
-  const auto rand = [](float min, float max) { return Math::random() * (max - min) + min; };
+  const auto rand
+    = [](float min, float max) -> float { return Math::random() * (max - min) + min; };
 
   auto randVector = Vector3::Zero();
 

@@ -2,24 +2,19 @@
 #define BABYLON_POSTPROCESSES_RENDER_PIPELINE_PIPELINES_SSAO_RENDERING_PIPLINE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 
 namespace BABYLON {
 
-class BlurPostProcess;
-class DynamicTexture;
-class PassPostProcess;
-class PostProcess;
-class RenderTargetTexture;
 class Scene;
-class SSAORenderingPipeline;
-using BlurPostProcessPtr       = std::shared_ptr<BlurPostProcess>;
-using DynamicTexturePtr        = std::shared_ptr<DynamicTexture>;
-using PassPostProcessPtr       = std::shared_ptr<PassPostProcess>;
-using PostProcessPtr           = std::shared_ptr<PostProcess>;
-using RenderTargetTexturePtr   = std::shared_ptr<RenderTargetTexture>;
-using SSAORenderingPipelinePtr = std::shared_ptr<SSAORenderingPipeline>;
+FWD_CLASS_SPTR(BlurPostProcess)
+FWD_CLASS_SPTR(DynamicTexture)
+FWD_CLASS_SPTR(PassPostProcess)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(SSAORenderingPipeline)
 
 struct SSARatio {
   float ssaoRatio;
