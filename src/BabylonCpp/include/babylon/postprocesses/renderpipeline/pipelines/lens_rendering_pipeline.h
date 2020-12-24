@@ -2,20 +2,17 @@
 #define BABYLON_POSTPROCESSES_RENDER_PIPELINE_PIPELINES_LENS_RENDERING_PIPLINE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 
 namespace BABYLON {
 
-class LensRenderingPipeline;
-class PostProcess;
 class Scene;
-class RenderTargetTexture;
-class Texture;
-using LensRenderingPipelinePtr = std::shared_ptr<LensRenderingPipeline>;
-using PostProcessPtr           = std::shared_ptr<PostProcess>;
-using TexturePtr               = std::shared_ptr<Texture>;
-using RenderTargetTexturePtr   = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(LensRenderingPipeline)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(Texture)
 
 struct LensRenderingPipelineParameters {
   TexturePtr grain_texture   = nullptr;
@@ -84,7 +81,7 @@ public:
    * @brief Get the class name.
    * @returns "LensRenderingPipeline"
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   // public methods (self explanatory)
 
@@ -201,46 +198,34 @@ public:
   void dispose(bool disableDepthRender = false, bool disposeMaterialAndTextures = false) override;
 
 protected:
+  // clang-format off
   /**
    * @brief Constructor
    *
    * Effect parameters are as follow:
    * {
-   *      chromatic_aberration const;         // from 0 to x (1 for realism)
-   *      edge_blur const;                    // from 0 to x (1 for realism)
-   *      distortion const;                   // from 0 to x (1 for realism)
-   *      grain_float amount ;                // from 0 to 1
-   *      grain_texture: BABYLON.Texture;     // texture to use for grain
-   *                                          // effect; if unset, use random
-   *                                          // B&W noise
-   *      dof_focus_distance const;           // depth-of-field: focus distance;
-   *                                          // unset to disable (disabled by
-   *                                          // default)
-   *      dof_aperture const;                 // depth-of-field: focus blur bias
-   *                                          // (default: 1)
-   *      dof_darken const;                   // depth-of-field: darken that
-   *                                          // which is out of focus (from 0
-   *                                          // to 1, disabled by default)
-   *      dof_pentagon: boolean;              // depth-of-field: makes a
-   *                                          // pentagon-like "bokeh" effect
-   *      dof_gain const;                     // depth-of-field: highlights
-   *                                          // gain; unset to disable
-   *                                          // (disabled by default)
-   *      dof_threshold const;                // depth-of-field: highlights
-   *                                          // threshold (default: 1)
-   *      blur_noise: boolean;                // add a little bit of noise to
-   *                                          // the blur (default: true)
+   *      chromatic_aberration: number;       // from 0 to x (1 for realism)
+   *      edge_blur: number;                  // from 0 to x (1 for realism)
+   *      distortion: number;                 // from 0 to x (1 for realism)
+   *      grain_amount: number;               // from 0 to 1
+   *      grain_texture: BABYLON.Texture;     // texture to use for grain effect; if unset, use random B&W noise
+   *      dof_focus_distance: number;         // depth-of-field: focus distance; unset to disable (disabled by default)
+   *      dof_aperture: number;               // depth-of-field: focus blur bias (default: 1)
+   *      dof_darken: number;                 // depth-of-field: darken that which is out of focus (from 0 to 1, disabled by default)
+   *      dof_pentagon: boolean;              // depth-of-field: makes a pentagon-like "bokeh" effect
+   *      dof_gain: number;                   // depth-of-field: highlights gain; unset to disable (disabled by default)
+   *      dof_threshold: number;              // depth-of-field: highlights threshold (default: 1)
+   *      blur_noise: boolean;                // add a little bit of noise to the blur (default: true)
    * }
    * Note: if an effect parameter is unset, effect is disabled
    *
    * @param name The rendering pipeline name
    * @param parameters - An object containing all parameters (see above)
    * @param scene The scene linked to this pipeline
-   * @param ratio The size of the postprocesses (0.5 means that your postprocess
-   * will have a width = canvas.width 0.5 and a height = canvas.height 0.5)
-   * @param cameras The array of cameras that the rendering pipeline will be
-   * attached to
+   * @param ratio The size of the postprocesses (0.5 means that your postprocess will have a width = canvas.width 0.5 and a height = canvas.height 0.5)
+   * @param cameras The array of cameras that the rendering pipeline will be attached to
    */
+  // clang-format on
   LensRenderingPipeline(const std::string& name, const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
                         const std::vector<CameraPtr>& cameras = {});
@@ -255,67 +240,67 @@ protected:
   /**
    * @brief Gets or sets the edge blur
    */
-  [[nodiscard]] float get_edgeBlur() const;
+  float get_edgeBlur() const;
   void set_edgeBlur(float value);
 
   /**
    * @brief Gets or sets the grain amount
    */
-  [[nodiscard]] float get_grainAmount() const;
+  float get_grainAmount() const;
   void set_grainAmount(float value);
 
   /**
    * @brief Gets or sets the chromatic aberration amount
    */
-  [[nodiscard]] float get_chromaticAberration() const;
+  float get_chromaticAberration() const;
   void set_chromaticAberration(float value);
 
   /**
    * @brief Gets or sets the depth of field aperture
    */
-  [[nodiscard]] float get_dofAperture() const;
+  float get_dofAperture() const;
   void set_dofAperture(float value);
 
   /**
    * @brief Gets or sets the edge distortion
    */
-  [[nodiscard]] float get_edgeDistortion() const;
+  float get_edgeDistortion() const;
   void set_edgeDistortion(float value);
 
   /**
    * @brief Gets or sets the depth of field distortion
    */
-  [[nodiscard]] float get_dofDistortion() const;
+  float get_dofDistortion() const;
   void set_dofDistortion(float value);
 
   /**
    * @brief Gets or sets the darken out of focus amount
    */
-  [[nodiscard]] float get_darkenOutOfFocus() const;
+  float get_darkenOutOfFocus() const;
   void set_darkenOutOfFocus(float value);
 
   /**
    * @brief Gets or sets a boolean indicating if blur noise is enabled
    */
-  [[nodiscard]] bool get_blurNoise() const;
+  bool get_blurNoise() const;
   void set_blurNoise(bool value);
 
   /**
    * @brief Gets or sets a boolean indicating if pentagon bokeh is enabled
    */
-  [[nodiscard]] bool get_pentagonBokeh() const;
+  bool get_pentagonBokeh() const;
   void set_pentagonBokeh(bool value);
 
   /**
    * @brief Gets or sets the highlight grain amount
    */
-  [[nodiscard]] float get_highlightsGain() const;
+  float get_highlightsGain() const;
   void set_highlightsGain(float value);
 
   /**
    * @brief Gets or sets the highlight threshold
    */
-  [[nodiscard]] float get_highlightsThreshold() const;
+  float get_highlightsThreshold() const;
   void set_highlightsThreshold(float value);
 
 private:

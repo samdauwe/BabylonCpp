@@ -43,10 +43,11 @@ LensRenderingPipeline::LensRenderingPipeline(const std::string& iName,
                      &LensRenderingPipeline::set_highlightsGain}
     , highlightsThreshold{this, &LensRenderingPipeline::get_highlightsThreshold,
                           &LensRenderingPipeline::set_highlightsThreshold}
-    , _scene{scene}
     , _cameraList{cameras}
     , _pentagonBokehIsEnabled{false}
 {
+  _scene = scene;
+
   // Fetch texture samplers
   _depthTexture = scene->enableDepthRenderer()->getDepthMap(); // Force depth renderer "on"
   if (parameters.grain_texture) {
@@ -77,13 +78,13 @@ LensRenderingPipeline::LensRenderingPipeline(const std::string& iName,
   // Set up pipeline
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), LensChromaticAberrationEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_chromaticAberrationPostProcess}; }, true));
+    [=]() -> std::vector<PostProcessPtr> { return {_chromaticAberrationPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), HighlightsEnhancingEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_highlightsPostProcess}; }, true));
+    [=]() -> std::vector<PostProcessPtr> { return {_highlightsPostProcess}; }, true));
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), LensDepthOfFieldEffect,
-    [&]() -> std::vector<PostProcessPtr> { return {_depthOfFieldPostProcess}; }, true));
+    [=]() -> std::vector<PostProcessPtr> { return {_depthOfFieldPostProcess}; }, true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
     _disableEffect(HighlightsEnhancingEffect, std::vector<CameraPtr>());
@@ -434,7 +435,8 @@ void LensRenderingPipeline::_createGrainTexture()
   ICanvasRenderingContext2D* context
     = std::static_pointer_cast<DynamicTexture>(_grainTexture)->getContext();
 
-  auto rand = [](float min, float max) { return Math::random() * (max - min) + min; };
+  const auto rand
+    = [](float min, float max) -> float { return Math::random() * (max - min) + min; };
 
   std::string value;
   for (size_t x = 0; x < size; ++x) {
