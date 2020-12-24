@@ -832,7 +832,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(Scene* scene,
   auto lastLuminance = luminancePostProcess;
 
   std::size_t index = 0;
-  for (auto& pp : luminanceDownSamplePostProcesses) {
+  for (const auto& pp : luminanceDownSamplePostProcesses) {
     const std::string indexStr = std::to_string(index);
     Float32Array downSampleOffsets(18);
 
@@ -1102,7 +1102,7 @@ TexturePtr StandardRenderingPipeline::_getDepthTexture()
 
 void StandardRenderingPipeline::_disposePostProcesses()
 {
-  for (auto& cameraItem : _cameras) {
+  for (const auto& cameraItem : _cameras) {
     auto camera = cameraItem.get();
 
     if (originalPostProcess) {
@@ -1145,7 +1145,7 @@ void StandardRenderingPipeline::_disposePostProcesses()
       lensFlareComposePostProcess->dispose(camera);
     }
 
-    for (auto& luminanceDownSamplePostProcess : luminanceDownSamplePostProcesses) {
+    for (const auto& luminanceDownSamplePostProcess : luminanceDownSamplePostProcesses) {
       luminanceDownSamplePostProcess->dispose(camera);
     }
 
@@ -1171,11 +1171,11 @@ void StandardRenderingPipeline::_disposePostProcesses()
       fxaaPostProcess->dispose(camera);
     }
 
-    for (auto& blurHPostProcess : blurHPostProcesses) {
+    for (const auto& blurHPostProcess : blurHPostProcesses) {
       blurHPostProcess->dispose(camera);
     }
 
-    for (auto& blurVPostProcess : blurVPostProcesses) {
+    for (const auto& blurVPostProcess : blurVPostProcesses) {
       blurVPostProcess->dispose(camera);
     }
   }

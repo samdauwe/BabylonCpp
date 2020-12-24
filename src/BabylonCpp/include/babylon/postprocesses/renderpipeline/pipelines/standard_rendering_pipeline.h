@@ -6,6 +6,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/interfaces/idisposable.h>
@@ -15,27 +16,20 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class BlurPostProcess;
-class FxaaPostProcess;
 class Light;
-class PostProcess;
 class Scene;
-class ScreenSpaceReflectionPostProcess;
-class ShadowLight;
-class StandardRenderingPipeline;
-class Texture;
-using BlurPostProcessPtr                  = std::shared_ptr<BlurPostProcess>;
-using FxaaPostProcessPtr                  = std::shared_ptr<FxaaPostProcess>;
-using PostProcessPtr                      = std::shared_ptr<PostProcess>;
-using TexturePtr                          = std::shared_ptr<Texture>;
-using ScreenSpaceReflectionPostProcessPtr = std::shared_ptr<ScreenSpaceReflectionPostProcess>;
-using ShadowLightPtr                      = std::shared_ptr<ShadowLight>;
-using StandardRenderingPipelinePtr        = std::shared_ptr<StandardRenderingPipeline>;
+FWD_CLASS_SPTR(BlurPostProcess)
+FWD_CLASS_SPTR(FxaaPostProcess)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(ScreenSpaceReflectionPostProcess)
+FWD_CLASS_SPTR(ShadowLight)
+FWD_CLASS_SPTR(StandardRenderingPipeline)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Standard rendering pipeline.
- * Default pipeline should be used going forward but the standard pipeline will
- * be kept for backwards compatibility.
+ * Default pipeline should be used going forward but the standard pipeline will be kept for
+ * backwards compatibility.
  * @see https://doc.babylonjs.com/how_to/using_standard_rendering_pipeline
  */
 class BABYLON_SHARED_EXPORT StandardRenderingPipeline : public PostProcessRenderPipeline,
@@ -92,16 +86,16 @@ public:
 
 protected:
   /**
-   * @brief Default pipeline should be used going forward but the standard
-   * pipeline will be kept for backwards compatibility.
+   * @brief Default pipeline should be used going forward but the standard pipeline will be kept for
+   * backwards compatibility.
+   * @constructor
    * @param name The rendering pipeline name
    * @param scene The scene linked to this pipeline
-   * @param ratio The size of the postprocesses (0.5 means that your postprocess
-   * will have a width = canvas.width 0.5 and a height = canvas.height 0.5)
-   * @param originalPostProcess the custom original color post-process. Must be
-   * "reusable". Can be null.
-   * @param cameras The array of cameras that the rendering pipeline will be
-   * attached to
+   * @param ratio The size of the postprocesses (0.5 means that your postprocess will have a width =
+   * canvas.width 0.5 and a height = canvas.height 0.5)
+   * @param originalPostProcess the custom original color post-process. Must be "reusable". Can be
+   * null.
+   * @param cameras The array of cameras that the rendering pipeline will be attached to
    */
   StandardRenderingPipeline(const std::string& name, Scene* scene, float ratio,
                             const PostProcessPtr& originalPostProcess = nullptr,
@@ -295,8 +289,8 @@ public:
   // Post-processes
 
   /**
-   * Post-process which contains the original scene color before the pipeline
-   * applies all the effects
+   * Post-process which contains the original scene color before the pipeline applies all the
+   * effects
    */
   PostProcessPtr originalPostProcess;
   /**
@@ -304,23 +298,19 @@ public:
    */
   PostProcessPtr downSampleX4PostProcess;
   /**
-   * Post-process used to calculate the illuminated surfaces controlled by a
-   * threshold
+   * Post-process used to calculate the illuminated surfaces controlled by a threshold
    */
   PostProcessPtr brightPassPostProcess;
   /**
-   * Post-process array storing all the horizontal blur post-processes used by
-   * the pipeline
+   * Post-process array storing all the horizontal blur post-processes used by the pipeline
    */
   std::vector<PostProcessPtr> blurHPostProcesses;
   /**
-   * Post-process array storing all the vertical blur post-processes used by the
-   * pipeline
+   * Post-process array storing all the vertical blur post-processes used by the pipeline
    */
   std::vector<PostProcessPtr> blurVPostProcesses;
   /**
-   * Post-process used to add colors of 2 textures (typically brightness + real
-   * scene color)
+   * Post-process used to add colors of 2 textures (typically brightness + real scene color)
    */
   PostProcessPtr textureAdderPostProcess;
 
@@ -329,34 +319,30 @@ public:
    */
   PostProcessPtr volumetricLightPostProcess;
   /**
-   * Post-process used to smooth the previous volumetric light post-process on
-   * the X axis
+   * Post-process used to smooth the previous volumetric light post-process on the X axis
    */
   BlurPostProcessPtr volumetricLightSmoothXPostProcess;
   /**
-   * Post-process used to smooth the previous volumetric light post-process on
-   * the Y axis
+   * Post-process used to smooth the previous volumetric light post-process on the Y axis
    */
   BlurPostProcessPtr volumetricLightSmoothYPostProcess;
   /**
-   * Post-process used to merge the volumetric light effect and the real scene
-   * color
+   * Post-process used to merge the volumetric light effect and the real scene color
    */
   PostProcessPtr volumetricLightMergePostProces;
   /**
-   * Post-process used to store the final volumetric light post-process
-   * (attach/detach for debug purpose)
+   * Post-process used to store the final volumetric light post-process (attach/detach for debug
+   * purpose)
    */
   PostProcessPtr volumetricLightFinalPostProcess;
 
   /**
-   * Base post-process used to calculate the average luminance of the final
-   * image for HDR
+   * Base post-process used to calculate the average luminance of the final image for HDR
    */
   PostProcessPtr luminancePostProcess;
   /**
-   * Post-processes used to create down sample post-processes in order to get
-   * the average luminance of the final image for HDR
+   * Post-processes used to create down sample post-processes in order to get the average luminance
+   * of the final image for HDR
    * Array of length "StandardRenderingPipeline.LuminanceSteps"
    */
   std::vector<PostProcessPtr> luminanceDownSamplePostProcesses;
@@ -366,18 +352,16 @@ public:
   PostProcessPtr hdrPostProcess;
 
   /**
-   * Post-process used to store the final texture adder post-process
-   * (attach/detach for debug purpose)
+   * Post-process used to store the final texture adder post-process (attach/detach for debug
+   * purpose)
    */
   PostProcessPtr textureAdderFinalPostProcess;
   /**
-   * Post-process used to store the final lens flare post-process (attach/detach
-   * for debug purpose)
+   * Post-process used to store the final lens flare post-process (attach/detach for debug purpose)
    */
   PostProcessPtr lensFlareFinalPostProcess;
   /**
-   * Post-process used to merge the final HDR post-process and the real scene
-   * color
+   * Post-process used to merge the final HDR post-process and the real scene color
    */
   PostProcessPtr hdrFinalPostProcess;
 
@@ -386,8 +370,7 @@ public:
    */
   PostProcessPtr lensFlarePostProcess;
   /**
-   * Post-process that merges the result of the lens flare post-process and the
-   * real scene color
+   * Post-process that merges the result of the lens flare post-process and the real scene color
    */
   PostProcessPtr lensFlareComposePostProcess;
 
@@ -401,8 +384,7 @@ public:
    */
   PostProcessPtr depthOfFieldPostProcess;
   /**
-   * The Fast Approximate Anti-Aliasing post process which attemps to remove
-   * aliasing from an image.
+   * The Fast Approximate Anti-Aliasing post process which attemps to remove aliasing from an image.
    */
   FxaaPostProcessPtr fxaaPostProcess;
   /**
@@ -414,14 +396,13 @@ public:
   // Values
 
   /**
-   * Represents the brightness threshold in order to configure the illuminated
-   * surfaces
+   * Represents the brightness threshold in order to configure the illuminated surfaces
    */
   float brightThreshold;
 
   /**
-   * Configures the blur intensity used for surexposed surfaces are highlighted
-   * surfaces (light halo)
+   * Configures the blur intensity used for surexposed surfaces are highlighted surfaces (light
+   * halo)
    */
   float blurWidth;
   /**
@@ -435,8 +416,8 @@ public:
   Property<StandardRenderingPipeline, float> exposure;
 
   /**
-   * Wether or not the exposure of the overall pipeline should be automatically
-   * adjusted by the HDR post-process
+   * Wether or not the exposure of the overall pipeline should be automatically adjusted by the HDR
+   * post-process
    */
   Property<StandardRenderingPipeline, bool> hdrAutoExposure;
 
@@ -446,13 +427,12 @@ public:
   TexturePtr lensTexture;
 
   /**
-   * Represents the offset coefficient based on Rayleigh principle. Typically in
-   * interval [-0.2, 0.2]
+   * Represents the offset coefficient based on Rayleigh principle. Typically in interval [-0.2,
+   * 0.2]
    */
   float volumetricLightCoefficient;
   /**
-   * The overall power of volumetric lights, typically in interval [0, 10]
-   * maximum
+   * The overall power of volumetric lights, typically in interval [0, 10] maximum
    */
   float volumetricLightPower;
   /**
@@ -462,8 +442,7 @@ public:
 
   /**
    * Light (spot or directional) used to generate the volumetric lights rays
-   * The source light must have a shadow generate so the pipeline can get its
-   * depth map
+   * The source light must have a shadow generate so the pipeline can get its depth map
    */
   ShadowLightPtr sourceLight;
 
@@ -481,8 +460,7 @@ public:
   float hdrIncreaseRate;
 
   /**
-   * Lens color texture used by the lens flare effect. Mandatory if lens flare
-   * effect enabled
+   * Lens color texture used by the lens flare effect. Mandatory if lens flare effect enabled
    */
   TexturePtr lensColorTexture;
   /**
@@ -498,8 +476,7 @@ public:
    */
   float lensFlareHaloWidth;
   /**
-   * Based on the lens distortion effect, defines how much the lens flare result
-   * is distorted
+   * Based on the lens distortion effect, defines how much the lens flare result is distorted
    */
   float lensFlareDistortionStrength;
   /**
@@ -507,13 +484,13 @@ public:
    */
   float lensFlareBlurWidth;
   /**
-   * Lens star texture must be used to simulate rays on the flares and is
-   * available in the documentation
+   * Lens star texture must be used to simulate rays on the flares and is available in the
+   * documentation
    */
   TexturePtr lensStarTexture;
   /**
-   * As the "lensTexture" (can be the same texture or different), it is used to
-   * apply the lens flare effect by taking account of the dirt texture
+   * As the "lensTexture" (can be the same texture or different), it is used to apply the lens flare
+   * effect by taking account of the dirt texture
    */
   TexturePtr lensFlareDirtTexture;
 
@@ -523,20 +500,18 @@ public:
   float depthOfFieldDistance;
 
   /**
-   * Represents the blur intensity for the blurred part of the depth of field
-   * effect
+   * Represents the blur intensity for the blurred part of the depth of field effect
    */
   float depthOfFieldBlurWidth;
 
   /**
-   * Gets or sets how much the image is blurred by the movement while using the
-   * motion blur post-process
+   * Gets or sets how much the image is blurred by the movement while using the motion blur
+   * post-process
    */
   Property<StandardRenderingPipeline, float> motionStrength;
 
   /**
-   * Gets or sets wether or not the motion blur post-process is object based or
-   * screen based
+   * Gets or sets wether or not the motion blur post-process is object based or screen based
    */
   Property<StandardRenderingPipeline, bool> objectBasedMotionBlur;
 
@@ -598,8 +573,7 @@ public:
   Property<StandardRenderingPipeline, float> motionBlurSamples;
 
   /**
-   * Specifies MSAA sample count, setting this to 4 will provide 4x anti
-   * aliasing. (default: 1)
+   * Specifies MSAA sample count, setting this to 4 will provide 4x anti aliasing. (default: 1)
    */
   Property<StandardRenderingPipeline, unsigned int> samples;
 
