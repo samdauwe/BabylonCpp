@@ -103,9 +103,9 @@ void MorphTargetManager::addTarget(const MorphTargetPtr& target)
 {
   _targets.emplace_back(target);
   _targetInfluenceChangedObservers.emplace_back(_targets.back()->onInfluenceChanged.add(
-    [this](const bool* needUpdate, EventState&) { _syncActiveTargets(*needUpdate); }));
+    [this](const bool* needUpdate, EventState&) -> void { _syncActiveTargets(*needUpdate); }));
   _targetDataLayoutChangedObservers.emplace_back(_targets.back()->_onDataLayoutChanged.add(
-    [this](void*, EventState&) { _syncActiveTargets(true); }));
+    [this](void*, EventState&) -> void { _syncActiveTargets(true); }));
   _syncActiveTargets(true);
 }
 
@@ -146,7 +146,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
   _supportsUVs      = true;
   _vertexCount      = 0;
 
-  for (auto& target : _targets) {
+  for (const auto& target : _targets) {
     if (target->influence == 0.f) {
       continue;
     }

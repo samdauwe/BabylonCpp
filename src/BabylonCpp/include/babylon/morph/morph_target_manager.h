@@ -87,37 +87,37 @@ protected:
   /**
    * @brief Gets the unique ID of this manager.
    */
-  [[nodiscard]] size_t get_uniqueId() const;
+  size_t get_uniqueId() const;
 
   /**
    * @brief Gets the number of vertices handled by this manager.
    */
-  [[nodiscard]] size_t get_vertexCount() const;
+  size_t get_vertexCount() const;
 
   /**
    * @brief Gets a boolean indicating if this manager supports morphing of normals.
    */
-  [[nodiscard]] bool get_supportsNormals() const;
+  bool get_supportsNormals() const;
 
   /**
    * @brief Gets a boolean indicating if this manager supports morphing of tangents.
    */
-  [[nodiscard]] bool get_supportsTangents() const;
+  bool get_supportsTangents() const;
 
   /**
    * @brief Gets a boolean indicating if this manager supports morphing of texture coordinates.
    */
-  [[nodiscard]] bool get_supportsUVs() const;
+  bool get_supportsUVs() const;
 
   /**
    * @brief Gets the number of targets stored in this manager.
    */
-  [[nodiscard]] size_t get_numTargets() const;
+  size_t get_numTargets() const;
 
   /**
    * @brief Gets the number of influencers (ie. the number of targets with influences > 0)
    */
-  [[nodiscard]] size_t get_numInfluencers() const;
+  size_t get_numInfluencers() const;
 
   /**
    * @brief Gets the list of influences (one per target).
