@@ -5,12 +5,12 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class BaseTexture;
 class Scene;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+FWD_CLASS_SPTR(BaseTexture)
 
 /**
  * @brief Class used to host texture specific utilities.
