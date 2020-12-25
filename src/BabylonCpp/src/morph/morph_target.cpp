@@ -77,8 +77,8 @@ void MorphTarget::set_influence(float iInfluence)
     return;
   }
 
-  auto previous = _influence;
-  _influence    = iInfluence;
+  const auto previous = _influence;
+  _influence          = iInfluence;
 
   if (onInfluenceChanged.hasObservers()) {
     auto value = (previous == 0.f || iInfluence == 0.f);

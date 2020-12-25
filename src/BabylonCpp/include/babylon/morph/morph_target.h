@@ -32,7 +32,7 @@ public:
   }
   ~MorphTarget() override; // = default
 
-  [[nodiscard]] Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Gets a property.
@@ -66,7 +66,7 @@ public:
    * @brief Gets the position data stored in this target.
    * @returns a FloatArray containing the position data (or null if not present)
    */
-  [[nodiscard]] const Float32Array& getPositions() const;
+  const Float32Array& getPositions() const;
 
   /**
    * @brief Affects normal data to this target.
@@ -84,7 +84,7 @@ public:
    * @brief Gets the normal data stored in this target.
    * @returns a FloatArray containing the normal data (or null if not present)
    */
-  [[nodiscard]] const Float32Array& getNormals() const;
+  const Float32Array& getNormals() const;
 
   /**
    * @brief Affects tangent data to this target.
@@ -102,7 +102,7 @@ public:
    * @brief Gets the tangent data stored in this target.
    * @returns a FloatArray containing the tangent data (or null if not present)
    */
-  [[nodiscard]] const Float32Array& getTangents() const;
+  const Float32Array& getTangents() const;
 
   /**
    * @brief Affects texture coordinates data to this target.
@@ -114,7 +114,7 @@ public:
    * @brief Gets the texture coordinates data stored in this target.
    * @returns a FloatArray containing the texture coordinates data (or null if not present)
    */
-  [[nodiscard]] const Float32Array& getUVs() const;
+  const Float32Array& getUVs() const;
 
   /**
    * @brief Clone the current target.
@@ -126,13 +126,13 @@ public:
    * @brief Serializes the current target into a Serialization object.
    * @returns the serialized object.
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Returns the string "MorphTarget".
    * @returns "MorphTarget"
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   // Statics
 
@@ -165,7 +165,7 @@ protected:
   /**
    * @brief Gets the influence of this target (ie. its weight in the overall morphing).
    */
-  [[nodiscard]] float get_influence() const;
+  float get_influence() const;
 
   /**
    * @brief Sets the influence of this target (ie. its weight in the overall morphing).
@@ -185,27 +185,27 @@ protected:
   /**
    * @brief Gets the unique ID of this manager.
    */
-  [[nodiscard]] size_t get_uniqueId() const;
+  size_t get_uniqueId() const;
 
   /**
    * @brief Gets a boolean defining if the target contains position data.
    */
-  [[nodiscard]] bool get_hasPositions() const;
+  bool get_hasPositions() const;
 
   /**
    * @brief Gets a boolean defining if the target contains normal data.
    */
-  [[nodiscard]] bool get_hasNormals() const;
+  bool get_hasNormals() const;
 
   /**
    * @brief Gets a boolean defining if the target contains tangent data.
    */
-  [[nodiscard]] bool get_hasTangents() const;
+  bool get_hasTangents() const;
 
   /**
    * @brief Gets a boolean defining if the target contains texture coordinates data.
    */
-  [[nodiscard]] bool get_hasUVs() const;
+  bool get_hasUVs() const;
 
 public:
   /**
