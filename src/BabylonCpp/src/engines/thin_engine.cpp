@@ -2462,7 +2462,7 @@ InternalTexturePtr ThinEngine::createPrefilteredCubeTexture(
       return;
     }
 
-    auto texture = loadData->texture;
+    const auto& texture = loadData->texture;
     if (!createPolynomials) {
       texture->_sphericalPolynomial = std::make_shared<SphericalPolynomial>();
     }
