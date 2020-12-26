@@ -17,10 +17,9 @@ DDSInfo::DDSInfo()
 {
 }
 
-DDSInfo::DDSInfo(int iWidth, int iHeight, int iMipmapCount, bool iIsFourCC,
-                 bool iIsRGB, bool iIsLuminance, bool iIsCube,
-                 bool iIsCompressed, int iDxgiFormat, unsigned int iTextureType,
-                 SphericalPolynomialPtr iSphericalPolynomial)
+DDSInfo::DDSInfo(int iWidth, int iHeight, int iMipmapCount, bool iIsFourCC, bool iIsRGB,
+                 bool iIsLuminance, bool iIsCube, bool iIsCompressed, int iDxgiFormat,
+                 unsigned int iTextureType, SphericalPolynomialPtr iSphericalPolynomial)
     : width{iWidth}
     , height{iHeight}
     , mipmapCount{iMipmapCount}
@@ -35,10 +34,10 @@ DDSInfo::DDSInfo(int iWidth, int iHeight, int iMipmapCount, bool iIsFourCC,
 {
 }
 
-DDSInfo::DDSInfo(const DDSInfo& other) =  default;
-DDSInfo::DDSInfo(DDSInfo&& other) =  default;
-DDSInfo& DDSInfo::operator=(const DDSInfo& other) =  default;
-DDSInfo& DDSInfo::operator=(DDSInfo&& other) =  default;
+DDSInfo::DDSInfo(const DDSInfo& other) = default;
+DDSInfo::DDSInfo(DDSInfo&& other)      = default;
+DDSInfo& DDSInfo::operator=(const DDSInfo& other) = default;
+DDSInfo& DDSInfo::operator=(DDSInfo&& other) = default;
 
 DDSInfo::~DDSInfo() = default;
 

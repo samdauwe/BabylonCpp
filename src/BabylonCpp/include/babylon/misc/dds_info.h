@@ -10,16 +10,15 @@ using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
 
 /**
  * @brief Direct draw surface info.
- * @see
- * https://docs.microsoft.com/en-us/windows/desktop/direct3ddds/dx-graphics-dds-pguide
+ * @see https://docs.microsoft.com/en-us/windows/desktop/direct3ddds/dx-graphics-dds-pguide
  */
 class BABYLON_SHARED_EXPORT DDSInfo {
 
 public:
   DDSInfo();
-  DDSInfo(int width, int height, int mipmapCount, bool isFourCC, bool isRGB,
-          bool isLuminance, bool isCube, bool isCompressed, int dxgiFormat,
-          unsigned int textureType, SphericalPolynomialPtr sphericalPolynomial);
+  DDSInfo(int width, int height, int mipmapCount, bool isFourCC, bool isRGB, bool isLuminance,
+          bool isCube, bool isCompressed, int dxgiFormat, unsigned int textureType,
+          SphericalPolynomialPtr sphericalPolynomial);
   DDSInfo(const DDSInfo& other);
   DDSInfo(DDSInfo&& other);
   DDSInfo& operator=(const DDSInfo& other);
