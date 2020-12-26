@@ -25,7 +25,7 @@ DDSInfo DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBufferView>& i
   auto extendedHeader
     = stl_util::to_array<int32_t>(dataBuffer, byteOffset, DDS::headerLengthInt + 4);
 
-  int mipmapCount = 1;
+  auto mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT) {
     mipmapCount = std::max(1, header[off_mipmapCount]);
   }
@@ -92,8 +92,8 @@ float DDSTools::_ToHalfFloat(float value)
   auto m    = (x >> 12) & 0x07ff; /* Keep one extra bit for rounding */
   auto e    = (x >> 23) & 0xff;   /* Using int is faster here */
 
-  /* If zero, or denormal, or exponent underflows too much for a denormal
-   * half, return signed zero. */
+  /* If zero, or denormal, or exponent underflows too much for a denormal half, return signed zero.
+   */
   if (e < 103) {
     return static_cast<float>(bits);
   }
@@ -101,8 +101,8 @@ float DDSTools::_ToHalfFloat(float value)
   /* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
   if (e > 142) {
     bits |= 0x7c00;
-    /* If exponent was 0xff and one mantissa bit was set, it means NaN,
-     * not Inf, so make sure we set one mantissa bit too. */
+    /* If exponent was 0xff and one mantissa bit was set, it means NaN, not Inf, so make sure we set
+     * one mantissa bit too. */
     bits |= ((e == 255) ? 0 : 1) && (x & 0x007fffff);
     return static_cast<float>(bits);
   }
@@ -110,8 +110,7 @@ float DDSTools::_ToHalfFloat(float value)
   /* If exponent underflows but not too much, return a denormal */
   if (e < 113) {
     m |= 0x0800;
-    /* Extra rounding may overflow and set mantissa to 0 and exponent
-     * to 1, which is OK. */
+    /* Extra rounding may overflow and set mantissa to 0 and exponent to 1, which is OK. */
     bits |= (m >> (114 - e)) + ((m >> (113 - e)) & 1);
     return static_cast<float>(bits);
   }
@@ -123,9 +122,9 @@ float DDSTools::_ToHalfFloat(float value)
 
 float DDSTools::_FromHalfFloat(uint16_t value)
 {
-  auto s = (value & 0x8000) >> 15;
-  auto e = (value & 0x7C00) >> 10;
-  auto f = value & 0x03FF;
+  const auto s = (value & 0x8000) >> 15;
+  const auto e = (value & 0x7C00) >> 10;
+  const auto f = value & 0x03FF;
 
   if (e == 0) {
     auto result = (s ? -1 : 1) * std::pow(2, -14) * (f / std::pow(2, 10));
@@ -144,7 +143,8 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(float width, float he
                                                            const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
-  Uint16Array srcData(stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  const Uint16Array srcData(
+    stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -171,7 +171,8 @@ Uint16Array DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height, in
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Uint16Array destArray(dataLength);
-    Uint16Array srcData(stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+    const Uint16Array srcData(
+      stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
@@ -220,7 +221,8 @@ Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height,
                                                       const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
-  Float32Array srcData(stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  const Float32Array srcData(
+    stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -246,7 +248,8 @@ Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(float width, float hei
                                                           const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
-  Uint16Array srcData(stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  const Uint16Array srcData(
+    stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -273,7 +276,8 @@ Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height, int dataOffs
                                          int rOffset, int gOffset, int bOffset, int aOffset)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  const Uint8Array srcData(
+    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -304,7 +308,8 @@ Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height, int dataOffse
                                         int rOffset, int gOffset, int bOffset)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  const Uint8Array srcData(
+    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -324,7 +329,8 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height, int dat
                                               size_t dataLength, const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
+  const Uint8Array srcData(
+    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
@@ -347,7 +353,7 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
   if (info.sphericalPolynomial) {
     hasSphericalPolynomialFaces = true;
   }
-  auto ext = engine->getCaps().s3tc;
+  const auto ext = engine->getCaps().s3tc;
 
   const auto dataBuffer = ToArrayBuffer(iArrayBuffer);
   const auto byteOffset = static_cast<int>(GetByteOffset(iArrayBuffer));
@@ -438,7 +444,7 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
     internalCompressedFormat = engine->_getRGBABufferInternalSizedFormat(info.textureType);
   }
 
-  int mipmapCount = 1;
+  auto mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT && loadMipmaps) {
     mipmapCount = std::max(1, header[off_mipmapCount]);
   }

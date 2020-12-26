@@ -128,6 +128,10 @@ enum PixelFormat {
 class BABYLON_SHARED_EXPORT DDSTools {
 
 private:
+  /**
+   * @see
+   * http://stackoverflow.com/questions/32633585/how-do-you-convert-to-half-floats-in-javascript
+   */
   static float _ToHalfFloat(float value);
   static float _FromHalfFloat(uint16_t value);
   static Float32Array _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height, int dataOffset,
