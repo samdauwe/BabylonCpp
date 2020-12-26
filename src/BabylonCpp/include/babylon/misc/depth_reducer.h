@@ -2,12 +2,12 @@
 #define BABYLON_MISC_DEPTH_REDUCER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/min_max_reducer.h>
 
 namespace BABYLON {
 
-class DepthRenderer;
-using DepthRendererPtr = std::shared_ptr<DepthRenderer>;
+FWD_CLASS_SPTR(DepthRenderer)
 
 /**
  * @brief This class is a small wrapper around the MinMaxReducer class to compute the min/max values
