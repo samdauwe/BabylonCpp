@@ -5,15 +5,14 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/buffer_image_data.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class EnvironmentTextureSpecularInfoV1;
-using EnvironmentTextureSpecularInfoV1Ptr
-  = std::shared_ptr<EnvironmentTextureSpecularInfoV1>;
+FWD_CLASS_SPTR(EnvironmentTextureSpecularInfoV1)
 
 /**
  * @brief Defines the specular data enclosed in the file.
@@ -23,13 +22,10 @@ class BABYLON_SHARED_EXPORT EnvironmentTextureSpecularInfoV1 {
 
 public:
   EnvironmentTextureSpecularInfoV1();
-  EnvironmentTextureSpecularInfoV1(
-    const EnvironmentTextureSpecularInfoV1& other);
+  EnvironmentTextureSpecularInfoV1(const EnvironmentTextureSpecularInfoV1& other);
   EnvironmentTextureSpecularInfoV1(EnvironmentTextureSpecularInfoV1&& other);
-  EnvironmentTextureSpecularInfoV1&
-  operator=(const EnvironmentTextureSpecularInfoV1& other);
-  EnvironmentTextureSpecularInfoV1&
-  operator=(EnvironmentTextureSpecularInfoV1&& other);
+  EnvironmentTextureSpecularInfoV1& operator=(const EnvironmentTextureSpecularInfoV1& other);
+  EnvironmentTextureSpecularInfoV1& operator=(EnvironmentTextureSpecularInfoV1&& other);
   ~EnvironmentTextureSpecularInfoV1(); // = default
 
   /**
@@ -41,8 +37,8 @@ public:
 
 public:
   /**
-   * Defines where the specular Payload is located. It is a runtime value only
-   * not stored in the file.
+   * Defines where the specular Payload is located. It is a runtime value only not stored in the
+   * file.
    */
   std::optional<size_t> specularDataPosition;
   /**
@@ -50,8 +46,8 @@ public:
    */
   std::vector<BufferImageData> mipmaps;
   /**
-   * Defines the scale applied to environment texture. This manages the range of
-   * LOD level used for IBL according to the roughness.
+   * Defines the scale applied to environment texture. This manages the range of LOD level used for
+   * IBL according to the roughness.
    */
   std::optional<float> lodGenerationScale;
 
