@@ -33,8 +33,8 @@ struct BABYLON_SHARED_EXPORT GradientHelper {
     }
 
     for (size_t gradientIndex = 0; gradientIndex < gradients.size() - 1; ++gradientIndex) {
-      auto currentGradient = gradients[gradientIndex];
-      auto nextGradient    = gradients[gradientIndex + 1];
+      const auto currentGradient = gradients[gradientIndex];
+      const auto nextGradient    = gradients[gradientIndex + 1];
 
       if (ratio >= currentGradient.gradient && ratio <= nextGradient.gradient) {
         const auto scale
