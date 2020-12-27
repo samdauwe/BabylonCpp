@@ -7,24 +7,21 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class ArrayBufferView;
-class BaseTexture;
 class Engine;
 class EnvironmentTextureInfo;
 class EnvironmentTextureIrradianceInfoV1;
 struct Image;
-class InternalTexture;
-class PostProcess;
-class SphericalPolynomial;
-using BaseTexturePtr                        = std::shared_ptr<BaseTexture>;
-using EnvironmentTextureInfoPtr             = std::shared_ptr<EnvironmentTextureInfo>;
-using EnvironmentTextureIrradianceInfoV1Ptr = std::shared_ptr<EnvironmentTextureIrradianceInfoV1>;
-using InternalTexturePtr                    = std::shared_ptr<InternalTexture>;
-using PostProcessPtr                        = std::shared_ptr<PostProcess>;
-using SphericalPolynomialPtr                = std::shared_ptr<SphericalPolynomial>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(EnvironmentTextureInfo)
+FWD_CLASS_SPTR(EnvironmentTextureIrradianceInfoV1)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(SphericalPolynomial)
 
 /**
  * @brief Sets of helpers addressing the serialization and deserialization of environment texture
