@@ -3,13 +3,13 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/environment_texture_irradiance_info_v1.h>
 #include <babylon/misc/environment_texture_specular_info_v1.h>
 
 namespace BABYLON {
 
-class EnvironmentTextureInfo;
-using EnvironmentTextureInfoPtr = std::shared_ptr<EnvironmentTextureInfo>;
+FWD_CLASS_SPTR(EnvironmentTextureInfo)
 
 /**
  * @brief Raw texture data and descriptor sufficient for WebGL texture upload.
