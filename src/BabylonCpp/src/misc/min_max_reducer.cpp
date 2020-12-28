@@ -70,14 +70,14 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
   auto w = static_cast<float>(_sourceTexture->getRenderWidth()),
        h = static_cast<float>(_sourceTexture->getRenderHeight());
 
-  reductionInitial->onApply = [this, w, h](Effect* effect, EventState & /*es*/) -> void {
+  reductionInitial->onApply = [this, w, h](Effect* effect, EventState& /*es*/) -> void {
     effect->setTexture("sourceTexture", _sourceTexture);
     effect->setFloatArray2("texSize", {w, h});
   };
 
   _reductionSteps.emplace_back(reductionInitial);
 
-  unsigned int index = 1;
+  auto index = 1u;
 
   // create the additional steps
   while (w > 1 || h > 1) {
@@ -87,31 +87,30 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
     const auto _w = static_cast<int>(w);
     const auto _h = static_cast<int>(h);
 
-    auto reduction = PostProcess::New(
-      "Reduction phase " + std::to_string(index), // name
-      "minmaxRedux",                              // shader
-      {"texSize"},                                // parameters
-      {},                                         // textures
-      PostProcessOptions{_w, _h},                 // options
-      nullptr,                                    // camera
-      Constants::TEXTURE_NEAREST_NEAREST,         // sampling
-      scene->getEngine(),                         // engine
-      false,                                      // reusable
-      "#define "
-        + std::string((_w == 1 && _h == 1) ?
-                        "LAST" :
-                        (_w == 1 || _h == 1) ? "ONEBEFORELAST" : "MAIN"), // defines
-      type,                                                               // textureType
-      "",                                                                 // vertexUrl
-      {},                                                                 // indexParameters
-      false,                                                              // blockCompilation
-      Constants::TEXTUREFORMAT_RG                                         // textureFormat
+    auto reduction = PostProcess::New("Reduction phase " + std::to_string(index), // name
+                                      "minmaxRedux",                              // shader
+                                      {"texSize"},                                // parameters
+                                      {},                                         // textures
+                                      PostProcessOptions{_w, _h},                 // options
+                                      nullptr,                                    // camera
+                                      Constants::TEXTURE_NEAREST_NEAREST,         // sampling
+                                      scene->getEngine(),                         // engine
+                                      false,                                      // reusable
+                                      "#define "
+                                        + std::string((_w == 1 && _h == 1) ? "LAST" :
+                                                      (_w == 1 || _h == 1) ? "ONEBEFORELAST" :
+                                                                             "MAIN"), // defines
+                                      type,                                           // textureType
+                                      "",                                             // vertexUrl
+                                      {},                         // indexParameters
+                                      false,                      // blockCompilation
+                                      Constants::TEXTUREFORMAT_RG // textureFormat
     );
 
     reduction->autoClear               = false;
     reduction->forceFullscreenViewport = forceFullscreenViewport;
 
-    reduction->onApply = [_w, _h](Effect* effect, EventState & /*es*/) -> void {
+    reduction->onApply = [_w, _h](Effect* effect, EventState& /*es*/) -> void {
       if (_w == 1 || _h == 1) {
         effect->setIntArray2("texSize", {_w, _h});
       }
@@ -166,7 +165,7 @@ void MinMaxReducer::activate()
   }
 
   _onAfterUnbindObserver = _sourceTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
+    [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
       if (_reductionSteps.empty() || !_reductionSteps[0] || !_postProcessManager || !_camera) {
         return;
       }
