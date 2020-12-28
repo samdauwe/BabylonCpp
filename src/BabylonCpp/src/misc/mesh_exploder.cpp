@@ -37,9 +37,9 @@ MeshExploder::~MeshExploder() = default;
 
 void MeshExploder::_setCenterMesh()
 {
-  auto averageCenter     = Vector3::Zero();
-  auto totalCenters      = Vector3::Zero();
-  float shortestToCenter = std::numeric_limits<float>::max();
+  auto averageCenter    = Vector3::Zero();
+  auto totalCenters     = Vector3::Zero();
+  auto shortestToCenter = std::numeric_limits<float>::max();
   for (const auto& mesh : _meshes) {
     if (mesh) {
       const auto& boundingInfo = *mesh->getBoundingInfo();
@@ -53,7 +53,7 @@ void MeshExploder::_setCenterMesh()
     if (mesh) {
       const auto& boundingInfo = *mesh->getBoundingInfo();
       /*if (boundingInfo)*/ {
-        auto distanceToCenter
+        const auto distanceToCenter
           = boundingInfo.boundingBox.centerWorld.subtract(averageCenter).lengthSquared();
         if (distanceToCenter < shortestToCenter) {
           _centerMesh      = mesh;
