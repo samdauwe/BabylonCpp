@@ -9,22 +9,17 @@
 namespace BABYLON {
 
 /**
- * @brief This class is used to track a performance counter which is number
- * based.
- * The user has access to many properties which give statistics of different
- * nature
+ * @brief This class is used to track a performance counter which is number based.
+ * The user has access to many properties which give statistics of different nature.
  *
- * The implementer can track two kinds of Performance Counter: time and count
- * For time you can optionally call fetchNewFrame() to notify the start of a new
- * frame to monitor, then call beginMonitoring() to start and endMonitoring() to
- * record the lapsed time. endMonitoring takes a newFrame parameter for you to
- * specify if the monitored time should be set for a new frame or accumulated to
- * the current frame being monitored.
- * For count you first have to call fetchNewFrame() to notify the start of a new
- * frame to monitor, then call addCount() how many time required to increment
- * the count value you monitor.
+ * The implementer can track two kinds of Performance Counter: time and count.
+ * For time you can optionally call fetchNewFrame() to notify the start of a new frame to monitor,
+ * then call beginMonitoring() to start and endMonitoring() to record the lapsed time. endMonitoring
+ * takes a newFrame parameter for you to specify if the monitored time should be set for a new frame
+ * or accumulated to the current frame being monitored. For count you first have to call
+ * fetchNewFrame() to notify the start of a new frame to monitor, then call addCount() how many time
+ * required to increment the count value you monitor.
  */
-
 class BABYLON_SHARED_EXPORT PerfCounter {
 
 public:
@@ -60,15 +55,15 @@ public:
   /**
    * @brief Returns the smallest value ever.
    */
-  [[nodiscard]] size_t min() const
+  size_t min() const
   {
     return _min;
   }
 
   /**
-   * @brief eturns the biggest value ever.
+   * @brief Returns the biggest value ever.
    */
-  [[nodiscard]] size_t max() const
+  size_t max() const
   {
     return _max;
   }
@@ -76,16 +71,15 @@ public:
   /**
    * @brief Returns the average value since the performance counter is running.
    */
-  [[nodiscard]] double average() const
+  double average() const
   {
     return _average;
   }
 
   /**
-   * @brief Returns the average value of the last second the counter was
-   * monitored.
+   * @brief Returns the average value of the last second the counter was monitored.
    */
-  [[nodiscard]] double lastSecAverage() const
+  double lastSecAverage() const
   {
     return _lastSecAverage;
   }
@@ -93,7 +87,7 @@ public:
   /**
    * @brief Returns the current value.
    */
-  [[nodiscard]] size_t current() const
+  size_t current() const
   {
     return _current;
   }
@@ -101,7 +95,7 @@ public:
   /**
    * @brief Gets the accumulated total.
    */
-  [[nodiscard]] size_t total() const
+  size_t total() const
   {
     return _totalAccumulated;
   }
@@ -109,17 +103,16 @@ public:
   /**
    * @brief Gets the total value count.
    */
-  [[nodiscard]] size_t count() const
+  size_t count() const
   {
     return _totalValueCount;
   }
 
   /**
    * @brief Call this method to start monitoring a new frame.
-   * This scenario is typically used when you accumulate monitoring time many
-   * times for a single frame, you call this method at the start of the frame,
-   * then beginMonitoring to start recording and endMonitoring(false) to
-   * accumulated the recorded time to the PerfCounter or addCount() to
+   * This scenario is typically used when you accumulate monitoring time many times for a single
+   * frame, you call this method at the start of the frame, then beginMonitoring to start recording
+   * and endMonitoring(false) to accumulated the recorded time to the PerfCounter or addCount() to
    * accumulate a monitored count.
    */
   void fetchNewFrame()
@@ -130,12 +123,11 @@ public:
   }
 
   /**
-   * @brief Call this method to monitor a count of something (e.g. mesh drawn in
-   * viewport count)
-   * @param newCount the count value to add to the monitored count
-   * @param fetchResult true when it's the last time in the frame you add to the
-   * counter and you wish to update the statistics properties (min/max/average),
-   * false if you only want to update statistics.
+   * @brief Call this method to monitor a count of something (e.g. mesh drawn in viewport count)
+   * @param newCount the count value to add to the monitored count.
+   * @param fetchResult true when it's the last time in the frame you add to the counter and you
+   * wish to update the statistics properties (min/max/average), false if you only want to update
+   * statistics.
    */
   void addCount(size_t newCount, bool fetchResult)
   {
@@ -161,9 +153,8 @@ public:
 
   /**
    * @brief Compute the time lapsed since the previous beginMonitoring() call.
-   * @param newFrame true by default to fetch the result and monitor a new
-   * frame, if false the time monitored will be added to the current frame
-   * counter
+   * @param newFrame true by default to fetch the result and monitor a new frame, if false the time
+   * monitored will be added to the current frame counter
    */
   void endMonitoring(bool newFrame = true)
   {
@@ -195,7 +186,7 @@ private:
     _average = static_cast<double>(_totalAccumulated) / static_cast<double>(_totalValueCount);
 
     // Reset last sec?
-    auto now = Time::highresTimepointNow();
+    const auto now = Time::highresTimepointNow();
     if (Time::fpTimeDiff<double, std::milli>(_lastSecTime, now) > 1000.0) {
       _lastSecAverage
         = static_cast<double>(_lastSecAccumulated) / static_cast<double>(_lastSecValueCount);
