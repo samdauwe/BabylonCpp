@@ -24,10 +24,10 @@ KhronosTextureContainer::KhronosTextureContainer(const ArrayBufferView& iData, i
   }
 
   // load the reset of the header in native 32 bit uint
-  auto dataSize = sizeof(uint32_t); // Uint32Array.BYTES_PER_ELEMENT;
-  DataView headerDataView(data.uint8Array(), data.byteOffset + 12, 13 * dataSize);
-  auto endianness   = headerDataView.getUint32(0, true);
-  auto littleEndian = endianness == 0x04030201;
+  const auto dataSize = sizeof(uint32_t); // Uint32Array.BYTES_PER_ELEMENT;
+  const DataView headerDataView(data.uint8Array(), data.byteOffset + 12, 13 * dataSize);
+  const auto endianness   = headerDataView.getUint32(0, true);
+  const auto littleEndian = endianness == 0x04030201;
 
   glType
     = headerDataView.getUint32(1 * dataSize, littleEndian); // must be 0 for compressed textures
@@ -90,9 +90,8 @@ KhronosTextureContainer::KhronosTextureContainer(const ArrayBufferView& iData, i
     return;
   }
 
-  // we now have a completely validated file, so could use existence of loadType
-  // as success would need to make this more elaborate & adjust checks above to
-  // support more than one load type
+  // we now have a completely validated file, so could use existence of loadType as success
+  // would need to make this more elaborate & adjust checks above to support more than one load type
   loadType = KhronosTextureContainer::COMPRESSED_2D;
 }
 
@@ -119,14 +118,14 @@ void KhronosTextureContainer::_upload2DCompressedLevels(const InternalTexturePtr
   auto width      = pixelWidth;
   auto height     = pixelHeight;
 
-  auto mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
+  const auto mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
   for (auto level = 0u; level < mipmapCount; ++level) {
     // size per face, since not supporting array cubemaps
     auto imageSize
       = stl_util::to_array<int32_t>(data.uint8Array(), data.byteOffset + dataOffset, 1)[0];
     dataOffset += 4; // image data starts from next multiple of 4 offset. Each
                      // face refers to same imagesize field above.
-    for (unsigned int face = 0; face < numberOfFaces; face++) {
+    for (unsigned int face = 0; face < numberOfFaces; ++face) {
       auto byteArray = stl_util::to_array<uint8_t>(data.uint8Array(), data.byteOffset + dataOffset,
                                                    static_cast<size_t>(imageSize));
 

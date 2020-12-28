@@ -6,12 +6,12 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 
 namespace BABYLON {
 
-class InternalTexture;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * @brief KhronosTextureContainer class
@@ -124,8 +124,7 @@ public:
    */
   int loadType;
   /**
-   * If the container has been made invalid (eg. constructor failed to correctly
-   * load array buffer)
+   * If the container has been made invalid (eg. constructor failed to correctly load array buffer)
    */
   bool isInvalid;
 
