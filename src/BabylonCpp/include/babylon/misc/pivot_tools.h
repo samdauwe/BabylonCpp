@@ -2,12 +2,12 @@
 #define BABYLON_MISC_PIVOT_TOOLS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
 
 /**
  * @brief Class containing a set of static utilities functions for managing Pivots.
