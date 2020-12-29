@@ -5,14 +5,13 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class Engine;
-class InternalTexture;
-class Texture;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
-using TexturePtr         = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Class used to host RGBD texture specific utilities.

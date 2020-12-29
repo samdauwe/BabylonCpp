@@ -14,7 +14,7 @@ namespace BABYLON {
 
 void RGBDTextureTools::ExpandRGBDTexture(const TexturePtr& texture)
 {
-  auto& internalTexture = texture->_texture;
+  const auto& internalTexture = texture->_texture;
   if (!internalTexture || !texture->isRGBD()) {
     return;
   }
@@ -24,7 +24,7 @@ void RGBDTextureTools::ExpandRGBDTexture(const TexturePtr& texture)
   }
   else {
     texture->onLoadObservable().addOnce(
-      [internalTexture](Texture* iTtexture, EventState & /*es*/) -> void {
+      [internalTexture](Texture* iTtexture, EventState& /*es*/) -> void {
         RGBDTextureTools::runRgbdDecodePostProcess(iTtexture);
       });
   }
@@ -35,8 +35,8 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
   auto& internalTexture = texture->_texture;
 
   // Gets everything ready.
-  auto engine        = static_cast<Engine*>(internalTexture->getEngine());
-  auto& caps         = engine->getCaps();
+  const auto engine  = static_cast<Engine*>(internalTexture->getEngine());
+  const auto& caps   = engine->getCaps();
   auto expandTexture = false;
 
   // If half float available we can uncompress the texture
@@ -56,11 +56,11 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
     internalTexture->isReady = false;
 
     // Simply run through the decode PP.
-    auto rgbdPostProcess     = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
-                                            Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
-                                            false, "", internalTexture->type, "", {}, false);
-    internalTexture->_isRGBD = false;
-    internalTexture->invertY = false;
+    const auto rgbdPostProcess = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
+                                                  Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
+                                                  false, "", internalTexture->type, "", {}, false);
+    internalTexture->_isRGBD   = false;
+    internalTexture->invertY   = false;
 
     // Hold the output of the decoding.
     IRenderTargetOptions options;
@@ -70,14 +70,14 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
     options.samplingMode          = internalTexture->samplingMode;
     options.type                  = internalTexture->type;
     options.format                = Constants::TEXTUREFORMAT_RGBA;
-    auto expandedTexture
+    const auto expandedTexture
       = engine->createRenderTargetTexture(static_cast<float>(internalTexture->width), options);
 
     rgbdPostProcess->getEffect()->executeWhenCompiled([internalTexture, texture, expandedTexture,
                                                        rgbdPostProcess,
-                                                       engine](Effect * /*effect*/) -> void {
+                                                       engine](Effect* /*effect*/) -> void {
       // PP Render Pass
-      rgbdPostProcess->onApply = [internalTexture](Effect* effect, EventState & /*es*/) -> void {
+      rgbdPostProcess->onApply = [internalTexture](Effect* effect, EventState& /*es*/) -> void {
         effect->_bindTexture("textureSampler", internalTexture);
         effect->setFloat2("scale", 1.f, 1.f);
       };
