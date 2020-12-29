@@ -12,7 +12,7 @@ RollingAverage::~RollingAverage() = default;
 void RollingAverage::add(float v)
 {
   // http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-  float delta = 0.f;
+  auto delta = 0.f;
 
   // we need to check if we've already wrapped round
   if (isSaturated()) {
