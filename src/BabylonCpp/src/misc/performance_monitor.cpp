@@ -26,7 +26,7 @@ void PerformanceMonitor::sampleFrame(high_res_time_point_t timeMs)
   }
 
   if (_lastFrameTimeMs.has_value()) {
-    auto dt = Time::fpTimeDiff<float, std::milli>(*_lastFrameTimeMs, timeMs);
+    const auto dt = Time::fpTimeDiff<float, std::milli>(*_lastFrameTimeMs, timeMs);
     _rollingFrameTime.add(dt);
   }
 
@@ -55,7 +55,7 @@ float PerformanceMonitor::averageFPS() const
 
 float PerformanceMonitor::instantaneousFPS() const
 {
-  auto history = _rollingFrameTime.history(0);
+  const auto history = _rollingFrameTime.history(0);
 
   if (stl_util::almost_equal(history, 0.f)) {
     return 0;
