@@ -4,26 +4,23 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class Camera;
-class CubeTexture;
-class Light;
 class Scene;
-class StandardMaterial;
-class Texture;
-using CameraPtr           = std::shared_ptr<Camera>;
-using CubeTexturePtr      = std::shared_ptr<CubeTexture>;
-using LightPtr            = std::shared_ptr<Light>;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
-using TexturePtr          = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(CubeTexture)
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(Texture)
 
 struct BABYLON_SHARED_EXPORT SerializationHelper {
 
