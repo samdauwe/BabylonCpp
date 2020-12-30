@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-size_t UniqueIdGenerator::_UniqueIdCounter = 0;
+size_t UniqueIdGenerator::_UniqueIdCounter = 0ull;
 
 size_t UniqueIdGenerator::UniqueId()
 {
