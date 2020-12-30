@@ -36,7 +36,7 @@ public:
    * @brief Creates a new observable.
    * @param onObserverAdded defines a callback to call when a new observer is added
    */
-  Observable(const std::function<void(typename Observer<T>::Ptr& observer)>& onObserverAdded)
+  Observable(const std::function<void(const typename Observer<T>::Ptr& observer)>& onObserverAdded)
       : _eventState{0}, _onObserverAdded{onObserverAdded}
   {
   }
@@ -81,7 +81,7 @@ public:
       return nullptr;
     }
 
-    auto observer                  = std::make_shared<Observer<T>>(callback, mask, scope);
+    const auto observer            = std::make_shared<Observer<T>>(callback, mask, scope);
     observer->unregisterOnNextCall = unregisterOnFirstCall;
 
     if (insertFirst) {
@@ -117,7 +117,7 @@ public:
       return nullptr;
     }
 
-    auto observer = std::make_shared<Observer<T>>(std::move(callback), mask, scope);
+    const auto observer = std::make_shared<Observer<T>>(std::move(callback), mask, scope);
     observer->unregisterOnNextCall = unregisterOnFirstCall;
 
     if (insertFirst) {
@@ -156,7 +156,7 @@ public:
       return false;
     }
 
-    auto it
+    const auto it
       = std::find_if(_observers.begin(), _observers.end(),
                      [observer](const typename Observer<T>::Ptr& obs) { return obs == observer; });
 
@@ -175,12 +175,12 @@ public:
    */
   bool removeCallback(const CallbackFunc& callback)
   {
-    auto it = std::find_if(_observers.begin(), _observers.end(),
-                           [callback](const typename Observer<T>::Ptr& obs) {
-                             auto ptr1 = obs->callback.template target<CallbackFunc>();
-                             auto ptr2 = callback.template target<CallbackFunc>();
-                             return ptr1 < ptr2;
-                           });
+    const auto it = std::find_if(_observers.begin(), _observers.end(),
+                                 [callback](const typename Observer<T>::Ptr& obs) {
+                                   const auto ptr1 = obs->callback.template target<CallbackFunc>();
+                                   const auto ptr2 = callback.template target<CallbackFunc>();
+                                   return ptr1 < ptr2;
+                                 });
 
     if (it != _observers.end()) {
       _deferUnregister(*it);
@@ -190,7 +190,7 @@ public:
   }
 
 private:
-  void _deferUnregister(typename Observer<T>::Ptr& observer)
+  void _deferUnregister(const typename Observer<T>::Ptr& observer)
   {
     observer->unregisterOnNextCall = false;
     observer->_willBeUnregistered  = true;
@@ -199,13 +199,13 @@ private:
 
   // This should only be called when not iterating over _observers to avoid
   // callback skipping. Removes an observer from the _observer Array.
-  bool _remove(typename Observer<T>::Ptr& observer)
+  bool _remove(const typename Observer<T>::Ptr& observer)
   {
     if (!observer) {
       return false;
     }
 
-    auto index = std::find(_observers.begin(), _observers.end(), observer);
+    const auto index = std::find(_observers.begin(), _observers.end(), observer);
 
     if (index != _observers.end()) {
       _observers.erase(index);
@@ -221,7 +221,7 @@ public:
    * notified.
    * @param observer the observer to move
    */
-  void makeObserverTopPriority(typename Observer<T>::Ptr& observer)
+  void makeObserverTopPriority(const typename Observer<T>::Ptr& observer)
   {
     _remove(observer);
     _observers.insert(_observers.begin(), observer);
@@ -232,7 +232,7 @@ public:
    * notified.
    * @param observer the observer to move
    */
-  void makeObserverBottomPriority(typename Observer<T>::Ptr& observer)
+  void makeObserverBottomPriority(const typename Observer<T>::Ptr& observer)
   {
     _remove(observer);
     _observers.emplace_back(observer);
@@ -266,7 +266,7 @@ public:
     state.lastReturnValue   = eventData;
     state.userInfo          = userInfo;
 
-    for (auto& obs : _observers) {
+    for (const auto& obs : _observers) {
       if (obs->_willBeUnregistered) {
         continue;
       }
@@ -291,7 +291,8 @@ public:
    * @param eventData defines the data to be sent to each callback
    * @param mask is used to filter observers defaults to -1
    */
-  void notifyObserver(typename Observer<T>::Ptr& observer, T* eventData = nullptr, int mask = -1)
+  void notifyObserver(const typename Observer<T>::Ptr& observer, T* eventData = nullptr,
+                      int mask = -1)
   {
     auto& state             = _eventState;
     state.mask              = mask;
@@ -304,7 +305,7 @@ public:
    * @brief Gets a boolean indicating if the observable has at least one observer.
    * @returns true is the Observable has at least one Observer registered
    */
-  [[nodiscard]] bool hasObservers() const
+  bool hasObservers() const
   {
     return !_observers.empty();
   }
@@ -322,9 +323,9 @@ public:
    * @brief Clone the current observable.
    * @returns a new observable
    */
-  [[nodiscard]] std::shared_ptr<Observable<T>> clone() const
+  std::shared_ptr<Observable<T>> clone() const
   {
-    Observable<T>::SPtr result = std::make_shared<Observable<T>>();
+    const Observable<T>::SPtr result = std::make_shared<Observable<T>>();
 
     result->_observers = _observers;
 
@@ -349,7 +350,7 @@ public:
 private:
   std::vector<typename Observer<T>::Ptr> _observers;
   EventState _eventState;
-  std::function<void(typename Observer<T>::Ptr& observer)> _onObserverAdded;
+  std::function<void(const typename Observer<T>::Ptr& observer)> _onObserverAdded;
 
 }; // end of class Observable
 
