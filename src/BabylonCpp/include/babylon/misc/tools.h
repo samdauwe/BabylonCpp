@@ -43,8 +43,8 @@ struct BABYLON_SHARED_EXPORT Tools {
   static void setFallbackTexture(const std::string& value);
 
   /**
-   * @brief Read the content of a byte array at a specified coordinates (taking
-   * in account wrapping).
+   * @brief Read the content of a byte array at a specified coordinates (taking in account
+   * wrapping).
    * @param u defines the coordinate on X axis
    * @param v defines the coordinate on Y axis
    * @param width defines the width of the source data
@@ -79,11 +79,9 @@ struct BABYLON_SHARED_EXPORT Tools {
   static std::string GetFilename(const std::string& path);
 
   /**
-   * @brief Extracts the "folder" part of a path (everything before the
-   * filename).
+   * @brief Extracts the "folder" part of a path (everything before the filename).
    * @param uri The URI to extract the info from
-   * @param returnUnchangedIfNoSlash Do not touch the URI if no slashes are
-   * present
+   * @param returnUnchangedIfNoSlash Do not touch the URI if no slashes are present
    * @returns The "folder" part of the path
    */
   static std::string GetFolderPath(const std::string& uri, bool returnUnchangedIfNoSlash = false);
@@ -139,8 +137,7 @@ struct BABYLON_SHARED_EXPORT Tools {
 
   /**
    * @brief Polyfill for setImmediate.
-   * @param action defines the action to execute after the current execution
-   * block
+   * @param action defines the action to execute after the current execution block
    */
   static void SetImmediate(const std::function<void()>& immediate);
 
@@ -149,11 +146,10 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @param width defines the rendering width
    * @param height defines the rendering height
    * @param engine defines the hosting engine
-   * @param successCallback defines the callback triggered once the data are
-   * available
+   * @param successCallback defines the callback triggered once the data are available
    * @param mimeType defines the mime type of the result
-   * @param fileName defines the filename to download. If present, the result
-   * will automatically be downloaded
+   * @param fileName defines the filename to download. If present, the result will automatically be
+   * downloaded
    */
   static void DumpFramebuffer(int width, int height, Engine* engine);
 

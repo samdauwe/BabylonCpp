@@ -95,10 +95,10 @@ float Tools::ToRadians(float angle)
 
 Image Tools::CreateCheckerboardImage(unsigned int size)
 {
-  const int width         = static_cast<int>(size);
-  const int height        = static_cast<int>(size);
-  const int depth         = 4;
-  const unsigned int mode = GL::RGBA;
+  const auto width  = static_cast<int>(size);
+  const auto height = static_cast<int>(size);
+  const auto depth  = 4;
+  const auto mode   = GL::RGBA;
 
   Uint8Array imageData(static_cast<std::size_t>(width * height * depth));
 
@@ -134,10 +134,10 @@ Image Tools::CreateCheckerboardImage(unsigned int size)
 
 Image Tools::CreateNoiseImage(unsigned int size)
 {
-  const int width         = static_cast<int>(size);
-  const int height        = static_cast<int>(size);
-  const int depth         = 4;
-  const unsigned int mode = GL::RGBA;
+  const auto width  = static_cast<int>(size);
+  const auto height = static_cast<int>(size);
+  const auto depth  = 4;
+  const auto mode   = GL::RGBA;
 
   const std::size_t totalPixelsCount = size * size * 4;
   Uint8Array imageData(totalPixelsCount);
@@ -168,7 +168,7 @@ bool Tools::IsBase64(const std::string& uri)
 
 ArrayBuffer Tools::DecodeBase64(const std::string& uri)
 {
-  auto uriSplit = StringTools::split(uri, ',');
+  const auto uriSplit = StringTools::split(uri, ',');
   if (uriSplit.size() < 2) {
     return ArrayBuffer();
   }
