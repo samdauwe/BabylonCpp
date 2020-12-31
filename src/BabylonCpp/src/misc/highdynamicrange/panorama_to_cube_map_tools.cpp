@@ -81,12 +81,12 @@ Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(size_t texSize,
 {
   Float32Array textureArray(texSize * texSize * 4 * 3);
 
-  auto texSizef = static_cast<float>(texSize);
-  auto rotDX1   = faceData[1].subtract(faceData[0]).scale(1.f / texSizef);
-  auto rotDX2   = faceData[3].subtract(faceData[2]).scale(1.f / texSizef);
+  const auto texSizef = static_cast<float>(texSize);
+  const auto rotDX1   = faceData[1].subtract(faceData[0]).scale(1.f / texSizef);
+  const auto rotDX2   = faceData[3].subtract(faceData[2]).scale(1.f / texSizef);
 
-  auto dy = 1.f / static_cast<float>(texSize);
-  auto fy = 0.f;
+  const auto dy = 1.f / static_cast<float>(texSize);
+  auto fy       = 0.f;
 
   for (size_t y = 0; y < texSize; ++y) {
     auto xv1 = faceData[0];
@@ -149,11 +149,11 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(const Vector3& vDir,
     py = static_cast<int>(inputHeight) - 1;
   }
 
-  auto inputY = (inputHeight - static_cast<size_t>(py) - 1);
-  auto _px    = static_cast<size_t>(px);
-  auto r      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 0];
-  auto g      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 1];
-  auto b      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 2];
+  const auto inputY = (inputHeight - static_cast<size_t>(py) - 1);
+  const auto _px    = static_cast<size_t>(px);
+  const auto r      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 0];
+  const auto g      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 1];
+  const auto b      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 2];
 
   return Color3(r, g, b);
 }
