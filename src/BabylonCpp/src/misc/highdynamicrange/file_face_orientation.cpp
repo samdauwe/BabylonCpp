@@ -14,7 +14,7 @@ FileFaceOrientation::FileFaceOrientation(const std::string& iName,
 }
 
 FileFaceOrientation::FileFaceOrientation(const FileFaceOrientation& other) = default;
-FileFaceOrientation::FileFaceOrientation(FileFaceOrientation&& other) = default;
+FileFaceOrientation::FileFaceOrientation(FileFaceOrientation&& other)      = default;
 
 FileFaceOrientation& FileFaceOrientation::operator=(const FileFaceOrientation& other) = default;
 FileFaceOrientation& FileFaceOrientation::operator=(FileFaceOrientation&& other) = default;

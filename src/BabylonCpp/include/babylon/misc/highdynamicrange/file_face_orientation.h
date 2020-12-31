@@ -8,10 +8,8 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT FileFaceOrientation {
 
-  FileFaceOrientation(const std::string& name,
-                      const Vector3& worldAxisForNormal,
-                      const Vector3& worldAxisForFileX,
-                      const Vector3& worldAxisForFileY);
+  FileFaceOrientation(const std::string& name, const Vector3& worldAxisForNormal,
+                      const Vector3& worldAxisForFileX, const Vector3& worldAxisForFileY);
   FileFaceOrientation(const FileFaceOrientation& other);
   FileFaceOrientation(FileFaceOrientation&& other);
   FileFaceOrientation& operator=(const FileFaceOrientation& other);
