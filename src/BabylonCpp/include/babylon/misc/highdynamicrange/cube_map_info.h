@@ -7,8 +7,7 @@
 namespace BABYLON {
 
 /**
- * @brief CubeMap information grouping all the data for each faces as well as
- * the cubemap size.
+ * @brief CubeMap information grouping all the data for each faces as well as the cubemap size.
  */
 struct BABYLON_SHARED_EXPORT CubeMapInfo {
 
