@@ -22,14 +22,14 @@ std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces 
 SphericalPolynomialPtr
 CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(BaseTexture& texture)
 {
-  if (!texture.isCube) {
+  if (!texture.isCube()) {
     // Only supports cube Textures currently.
     return nullptr;
   }
 
-  auto size  = static_cast<std::size_t>(texture.getSize().width);
-  auto right = texture.readPixels(0);
-  auto left  = texture.readPixels(1);
+  const auto size  = static_cast<std::size_t>(texture.getSize().width);
+  const auto right = texture.readPixels(0);
+  const auto left  = texture.readPixels(1);
 
   ArrayBufferView up;
   ArrayBufferView down;
@@ -42,13 +42,13 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(Ba
     down = texture.readPixels(3);
   }
 
-  auto front = texture.readPixels(4);
-  auto back  = texture.readPixels(5);
+  const auto front = texture.readPixels(4);
+  const auto back  = texture.readPixels(5);
 
-  auto gammaSpace = texture.gammaSpace();
+  const auto gammaSpace = texture.gammaSpace();
   // Always read as RGBA.
-  auto format = Constants::TEXTUREFORMAT_RGBA;
-  auto type   = Constants::TEXTURETYPE_UNSIGNED_INT;
+  const auto format = Constants::TEXTUREFORMAT_RGBA;
+  auto type         = Constants::TEXTURETYPE_UNSIGNED_INT;
   if (texture.textureType() == Constants::TEXTURETYPE_FLOAT
       || texture.textureType() == Constants::TEXTURETYPE_HALF_FLOAT) {
     type = Constants::TEXTURETYPE_FLOAT;
@@ -77,11 +77,11 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(const Cub
   auto totalSolidAngle = 0.f;
 
   // The (u,v) range is [-1,+1], so the distance between each texel is 2/Size.
-  auto du = 2.f / static_cast<float>(cubeInfo.size);
-  auto dv = du;
+  const auto du = 2.f / static_cast<float>(cubeInfo.size);
+  const auto dv = du;
 
   // The (u,v) of the first texel is half a texel from the corner (-1,-1).
-  auto minUV = du * 0.5f - 1.f;
+  const auto minUV = du * 0.5f - 1.f;
 
   for (auto faceIndex = 0u; faceIndex < 6; ++faceIndex) {
     const auto& fileFace = FileFaces[faceIndex];
@@ -103,7 +103,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(const Cub
                                 .add(fileFace.worldAxisForNormal);
         worldDirection.normalize();
 
-        auto deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
+        const auto deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
 
         auto r = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 0];
         auto g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
@@ -155,17 +155,17 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(const Cub
   }
 
   // Solid angle for entire sphere is 4*pi
-  auto sphereSolidAngle = 4.f * Math::PI;
+  const auto sphereSolidAngle = 4.f * Math::PI;
 
   // Adjust the solid angle to allow for how many faces we processed.
-  auto facesProcessed     = 6.f;
-  auto expectedSolidAngle = sphereSolidAngle * facesProcessed / 6.f;
+  const auto facesProcessed     = 6.f;
+  const auto expectedSolidAngle = sphereSolidAngle * facesProcessed / 6.f;
 
   // Adjust the harmonics so that the accumulated solid angle matches the expected solid angle.
   // This is needed because the numerical integration over the cube uses a
   // small angle approximation of solid angle for each texel (see deltaSolidAngle),
   // and also to compensate for accumulative error due to float precision in the summation.
-  auto correctionFactor = expectedSolidAngle / totalSolidAngle;
+  const auto correctionFactor = expectedSolidAngle / totalSolidAngle;
   sphericalHarmonics.scaleInPlace(correctionFactor);
 
   sphericalHarmonics.convertIncidentRadianceToIrradiance();

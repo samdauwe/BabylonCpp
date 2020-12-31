@@ -2,6 +2,7 @@
 #define BABYLON_MISC_HIGH_DYNAMIC_RANGE_CUBE_MAP_TO_SPHERICAL_POLYNOMIAL_TOOLS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/highdynamicrange/cube_map_info.h>
 #include <babylon/misc/highdynamicrange/file_face_orientation.h>
 
@@ -12,8 +13,7 @@
 namespace BABYLON {
 
 class BaseTexture;
-class SphericalPolynomial;
-using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
+FWD_CLASS_SPTR(SphericalPolynomial)
 
 /**
  * @brief Helper class dealing with the extraction of spherical polynomial dataArray from a cube
