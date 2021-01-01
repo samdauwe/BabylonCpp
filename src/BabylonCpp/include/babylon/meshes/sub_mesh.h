@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_SUB_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/plane.h>
@@ -10,12 +11,10 @@
 namespace BABYLON {
 
 class IntersectionInfo;
-struct MaterialDefines;
-class SubMesh;
 class WebGLDataBuffer;
-using MaterialDefinesPtr = std::shared_ptr<MaterialDefines>;
-using SubMeshPtr         = std::shared_ptr<SubMesh>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_STRUCT_SPTR(MaterialDefines)
+FWD_CLASS_SPTR(SubMesh)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Defines a subdivision inside a mesh.
@@ -45,7 +44,7 @@ public:
   void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr);
 
   void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
-  [[nodiscard]] bool isGlobal() const;
+  bool isGlobal() const;
 
   /**
    * @brief Returns the submesh BoudingInfo object.
@@ -106,14 +105,14 @@ public:
   SubMesh& updateBoundingInfo(const Matrix& world);
 
   /**
-   * @brief Returns if the submesh bounding box intersects the frustum defined
-   * by the passed array of planes.
+   * @brief Returns if the submesh bounding box intersects the frustum defined by the passed array
+   * of planes.
    */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned int strategy = 0) override;
 
   /**
-   * @brief Returns if the submesh bounding box is completely inside the frustum
-   * defined by the passed array of planes.
+   * @brief Returns if the submesh bounding box is completely inside the frustum defined by the
+   * passed array of planes.
    */
   bool isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
@@ -171,7 +170,7 @@ public:
    * @brief Gets the class name
    * @returns the string "SubMesh".
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /** Statics **/
 
