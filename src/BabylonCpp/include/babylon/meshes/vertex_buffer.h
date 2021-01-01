@@ -190,13 +190,13 @@ public:
    * @brief Returns the kind of the VertexBuffer.
    * @returns a string
    */
-  [[nodiscard]] const std::string& getKind() const;
+  const std::string& getKind() const;
 
   /**
    * @brief Gets a boolean indicating if the VertexBuffer is updatable?
    * @returns true if the buffer is updatable
    */
-  [[nodiscard]] bool isUpdatable() const;
+  bool isUpdatable() const;
 
   /**
    * @brief Gets current buffer's data.
@@ -216,32 +216,32 @@ public:
    * @returns the stride in float32 units
    * @deprecated Please use byteStride instead.
    */
-  [[nodiscard]] size_t getStrideSize() const;
+  size_t getStrideSize() const;
 
   /**
    * @brief Returns the offset as a multiple of the type byte length.
    * @returns the offset in bytes
    * @deprecated Please use byteOffset instead.
    */
-  [[nodiscard]] size_t getOffset() const;
+  size_t getOffset() const;
 
   /**
    * @brief Returns the number of components per vertex attribute (integer).
    * @returns the size in float
    */
-  [[nodiscard]] size_t getSize() const;
+  size_t getSize() const;
 
   /**
    * @brief Gets a boolean indicating is the internal buffer of the VertexBuffer is instanced.
    * @returns true if this buffer is instanced
    */
-  [[nodiscard]] bool getIsInstanced() const;
+  bool getIsInstanced() const;
 
   /**
    * @brief Returns the instancing divisor, zero for non-instanced (integer).
    * @returns a number
    */
-  [[nodiscard]] unsigned int getInstanceDivisor() const;
+  unsigned int getInstanceDivisor() const;
 
   /** Methods **/
 
@@ -329,14 +329,14 @@ private:
   /**
    * @brief Gets the instance divisor when in instanced mode
    */
-  [[nodiscard]] unsigned int get_instanceDivisor() const;
+  unsigned int get_instanceDivisor() const;
 
   /**
    * @brief Sets the instance divisor when in instanced mode
    */
   void set_instanceDivisor(unsigned int value);
 
-  [[nodiscard]] Buffer* _getBuffer() const;
+  Buffer* _getBuffer() const;
 
   static float _GetFloatValue(const DataView& dataView, unsigned int type, size_t byteOffset,
                               bool normalized);
