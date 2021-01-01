@@ -2,24 +2,23 @@
 #define BABYLON_MESHES_MESH_SIMPLIFICATION_SCENE_COMPONENT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class SimplicationQueueSceneComponent;
-using SimplicationQueueSceneComponentPtr = std::shared_ptr<SimplicationQueueSceneComponent>;
+FWD_CLASS_SPTR(SimplicationQueueSceneComponent)
 
 /**
- * @brief Defines the simplification queue scene component responsible to help
- * scheduling the various simplification task created in a scene.
+ * @brief Defines the simplification queue scene component responsible to help scheduling the
+ * various simplification task created in a scene.
  */
 class BABYLON_SHARED_EXPORT SimplicationQueueSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
-   * components.
+   * The component name helpfull to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE;
 
@@ -37,8 +36,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
