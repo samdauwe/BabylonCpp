@@ -4,13 +4,13 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/node.h>
 
 namespace BABYLON {
 
 class Bone;
-class Camera;
-using CameraPtr = std::shared_ptr<Camera>;
+FWD_CLASS_SPTR(Camera)
 
 struct InstantiateHierarychyOptions {
   bool doNotInstantiate = false;
@@ -132,8 +132,7 @@ public:
 
   /**
    * @brief Flag the transform node as dirty (Forcing it to update everything).
-   * @param property if set to "rotation" the objects rotationQuaternion will be
-   * set to null
+   * @param property if set to "rotation" the objects rotationQuaternion will be set to null
    * @returns this transform node
    */
   TransformNode& markAsDirty(const std::string& property) override;
@@ -148,10 +147,9 @@ public:
   /**
    * @brief Sets a new pivot matrix to the current node.
    * @param matrix defines the new pivot matrix to use
-   * @param postMultiplyPivotMatrix defines if the pivot matrix must be
-   * cancelled in the world matrix. When this parameter is set to true
-   * (default), the inverse of the pivot matrix is also applied at the end to
-   * cancel the transformation effect
+   * @param postMultiplyPivotMatrix defines if the pivot matrix must be cancelled in the world
+   * matrix. When this parameter is set to true (default), the inverse of the pivot matrix is also
+   * applied at the end to cancel the transformation effect
    * @returns the current TransformNode
    */
   TransformNode& setPivotMatrix(Matrix matrix, bool postMultiplyPivotMatrix = true);
@@ -219,8 +217,7 @@ public:
   TransformNode& setPositionWithLocalVector(const Vector3& vector3);
 
   /**
-   * @brief Returns the mesh position in the local space from the current World
-   * matrix values.
+   * @brief Returns the mesh position in the local space from the current World matrix values.
    * @returns a new Vector3.
    */
   Vector3 getPositionExpressedInLocalSpace();
@@ -233,10 +230,8 @@ public:
   TransformNode& locallyTranslate(const Vector3& vector3);
 
   /**
-   * @brief Orients a mesh towards a target point. Mesh must be drawn facing
-   * user.
-   * @param targetPoint the position (must be in same space as current mesh) to
-   * look at
+   * @brief Orients a mesh towards a target point. Mesh must be drawn facing user.
+   * @param targetPoint the position (must be in same space as current mesh) to look at
    * @param yawCor optional yaw (y-axis) correction in radians
    * @param pitchCor optional pitch (x-axis) correction in radians
    * @param rollCor optional roll (z-axis) correction in radians
@@ -247,19 +242,18 @@ public:
                         float rollCor = 0.f, Space space = Space::LOCAL);
 
   /**
-   * @brief Returns a new Vector3 that is the localAxis, expressed in the mesh
-   * local space, rotated like the mesh. This Vector3 is expressed in the World
-   * space.
+   * @brief Returns a new Vector3 that is the localAxis, expressed in the mesh local space, rotated
+   * like the mesh. This Vector3 is expressed in the World space.
    * @param localAxis axis to rotate
-   * @returns a new Vector3 that is the localAxis, expressed in the mesh local
-   * space, rotated like the mesh.
+   * @returns a new Vector3 that is the localAxis, expressed in the mesh local space, rotated like
+   * the mesh.
    */
   Vector3 getDirection(const Vector3& localAxis);
 
   /**
-   * @brief Sets the Vector3 "result" as the rotated Vector3 "localAxis" in the
-   * same rotation than the mesh. localAxis is expressed in the mesh local
-   * space. result is computed in the Wordl space from the mesh World matrix.
+   * @brief Sets the Vector3 "result" as the rotated Vector3 "localAxis" in the same rotation than
+   * the mesh. localAxis is expressed in the mesh local space. result is computed in the Wordl space
+   * from the mesh World matrix.
    * @param localAxis axis to rotate
    * @param result the resulting transformnode
    * @returns this TransformNode.
@@ -280,37 +274,33 @@ public:
   /**
    * @brief Sets a new pivot point to the current node
    * @param point defines the new pivot point to use
-   * @param space defines if the point is in world or local space (local by
-   * default)
+   * @param space defines if the point is in world or local space (local by default)
    * @returns the current TransformNode
    */
   TransformNode& setPivotPoint(Vector3& point, Space space = Space::LOCAL);
 
   /**
-   * @brief Returns a new Vector3 set with the mesh pivot point coordinates in
-   * the local space.
+   * @brief Returns a new Vector3 set with the mesh pivot point coordinates in the local space.
    * @returns the pivot point
    */
   Vector3 getPivotPoint();
 
   /**
-   * @brief Sets the passed Vector3 "result" with the coordinates of the mesh
-   * pivot point in the local space.
+   * @brief Sets the passed Vector3 "result" with the coordinates of the mesh pivot point in the
+   * local space.
    * @param result the vector3 to store the result
    * @returns this TransformNode.
    */
   TransformNode& getPivotPointToRef(Vector3& result);
 
   /**
-   * @brief Returns a new Vector3 set with the mesh pivot point World
-   * coordinates.
+   * @brief Returns a new Vector3 set with the mesh pivot point World coordinates.
    * @returns a new Vector3 set with the mesh pivot point World coordinates.
    */
   Vector3 getAbsolutePivotPoint();
 
   /**
-   * @brief Sets the Vector3 "result" coordinates with the mesh pivot point
-   * World coordinates.
+   * @brief Sets the Vector3 "result" coordinates with the mesh pivot point World coordinates.
    * @param result vector3 to store the result
    * @returns this TransformNode.
    */
@@ -318,8 +308,8 @@ public:
 
   /**
    * @brief Defines the passed node as the parent of the current node.
-   * The node will remain exactly where it is and its position / rotation will
-   * be updated accordingly
+   * The node will remain exactly where it is and its position / rotation will be updated
+   * accordingly
    * @see https://doc.babylonjs.com/how_to/parenting
    * @param node the node ot set as the parent
    * @returns this TransformNode.
@@ -332,8 +322,7 @@ public:
   virtual bool _updateNonUniformScalingState(bool value);
 
   /**
-   * @brief Attach the current TransformNode to another TransformNode associated
-   * with a bone.
+   * @brief Attach the current TransformNode to another TransformNode associated with a bone.
    * @param bone Bone affecting the TransformNode
    * @param affectedTransformNode TransformNode associated with the bone
    * @returns this object
@@ -347,12 +336,10 @@ public:
   TransformNode& detachFromBone();
 
   /**
-   * @brief Rotates the mesh around the axis vector for the passed angle
-   * (amount) expressed in radians, in the given space. space (default LOCAL)
-   * can be either Space.LOCAL, either Space.WORLD. Note that the property
-   * `rotationQuaternion` is then automatically updated and the property
-   * `rotation` is set to (0,0,0) and no longer used. The passed axis is also
-   * normalized.
+   * @brief Rotates the mesh around the axis vector for the passed angle (amount) expressed in
+   * radians, in the given space. space (default LOCAL) can be either Space.LOCAL, either
+   * Space.WORLD. Note that the property `rotationQuaternion` is then automatically updated and the
+   * property `rotation` is set to (0,0,0) and no longer used. The passed axis is also normalized.
    * @param axis the axis to rotate around
    * @param amount the amount to rotate in radians
    * @param space Space to rotate in (Default: local)
@@ -361,11 +348,10 @@ public:
   TransformNode& rotate(Vector3 axis, float amount, Space space = Space::LOCAL);
 
   /**
-   * @brief Rotates the mesh around the axis vector for the passed angle
-   * (amount) expressed in radians, in world space. Note that the property
-   * `rotationQuaternion` is then automatically updated and the property
-   * `rotation` is set to (0,0,0) and no longer used. The passed axis is also
-   * normalized. . Method is based on
+   * @brief Rotates the mesh around the axis vector for the passed angle (amount) expressed in
+   * radians, in world space. Note that the property `rotationQuaternion` is then automatically
+   * updated and the property `rotation` is set to (0,0,0) and no longer used. The passed axis is
+   * also normalized. . Method is based on
    * http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
    * @param point the point to rotate around
    * @param axis the axis to rotate around
@@ -375,9 +361,8 @@ public:
   TransformNode& rotateAround(const Vector3& point, Vector3& axis, float amount);
 
   /**
-   * @brief Translates the mesh along the axis vector for the passed distance in
-   * the given space. space (default LOCAL) can be either Space.LOCAL, either
-   * Space.WORLD.
+   * @brief Translates the mesh along the axis vector for the passed distance in the given space.
+   * space (default LOCAL) can be either Space.LOCAL, either Space.WORLD.
    * @param axis the axis to translate in
    * @param distance the distance to translate
    * @param space Space to rotate in (Default: local)
@@ -387,20 +372,18 @@ public:
   /**
    * @brief Adds a rotation step to the mesh current rotation.
    * x, y, z are Euler angles expressed in radians.
-   * This methods updates the current mesh rotation, either mesh.rotation,
-   * either mesh.rotationQuaternion if it's set. This means this rotation is
-   * made in the mesh local space only. It's useful to set a custom rotation
-   * order different from the BJS standard one YXZ. Example : this rotates the
-   * mesh first around its local X axis, then around its local Z axis, finally
-   * around its local Y axis.
+   * This methods updates the current mesh rotation, either mesh.rotation, either
+   * mesh.rotationQuaternion if it's set. This means this rotation is made in the mesh local space
+   * only. It's useful to set a custom rotation order different from the BJS standard one YXZ.
+   * Example : this rotates the mesh first around its local X axis, then around its local Z axis,
+   * finally around its local Y axis.
    * ```javascript
    * mesh.addRotation(x1, 0, 0).addRotation(0, 0, z2).addRotation(0, 0, y3);
    * ```
-   * Note that `addRotation()` accumulates the passed rotation values to the
-   * current ones and computes the .rotation or .rotationQuaternion updated
-   * values. Under the hood, only quaternions are used. So it's a little faster
-   * is you use .rotationQuaternion because it doesn't need to translate them
-   * back to Euler angles.
+   * Note that `addRotation()` accumulates the passed rotation values to the current ones and
+   * computes the .rotation or .rotationQuaternion updated values. Under the hood, only quaternions
+   * are used. So it's a little faster is you use .rotationQuaternion because it doesn't need to
+   * translate them back to Euler angles.
    * @param x Rotation to add
    * @param y Rotation to add
    * @param z Rotation to add
@@ -475,8 +458,7 @@ public:
    * @brief Returns a new TransformNode object parsed from the source provided.
    * @param parsedTransformNode is the source.
    * @param scene the scne the object belongs to
-   * @param rootUrl is a string, it's the root URL to prefix the
-   * `delayLoadingFile` property with
+   * @param rootUrl is a string, it's the root URL to prefix the `delayLoadingFile` property with
    * @returns a new TransformNode object parsed from the source provided.
    */
   static TransformNodePtr Parse(const json& parsedTransformNode, Scene* scene,
@@ -484,13 +466,12 @@ public:
 
   /**
    * @brief Get all child-transformNodes of this node.
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
+   * @param directDescendantsOnly defines if true only direct descendants of 'this' will be
+   * considered, if false direct and also indirect (children of children, an so on in a recursive
+   * manner) descendants of 'this' will be considered
+   * @param predicate defines an optional predicate that will be called on every evaluated child,
+   * the predicate must return true for a given child to be part of the result, otherwise it will be
+   * ignored
    * @returns an array of TransformNode
    */
   virtual std::vector<TransformNodePtr>
@@ -499,22 +480,21 @@ public:
 
   /**
    * @brief Releases resources associated with this transform node.
-   * @param doNotRecurse Set to true to not recurse into each children (recurse
-   * into each children by default)
-   * @param disposeMaterialAndTextures Set to true to also dispose referenced
-   * materials and textures (false by default)
+   * @param doNotRecurse Set to true to not recurse into each children (recurse into each children
+   * by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced materials and textures
+   * (false by default)
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
-   * units).
-   * @param includeDescendants Use the hierarchy's bounding box instead of the
-   * mesh's bounding box. Default is false
-   * @param ignoreRotation ignore rotation when computing the scale (ie. object
-   * will be axis aligned). Default is false
-   * @param predicate predicate that is passed in to getHierarchyBoundingVectors
-   * when selecting which object should be included when scaling
+   * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1 units).
+   * @param includeDescendants Use the hierarchy's bounding box instead of the mesh's bounding box.
+   * Default is false
+   * @param ignoreRotation ignore rotation when computing the scale (ie. object will be axis
+   * aligned). Default is false
+   * @param predicate predicate that is passed in to getHierarchyBoundingVectors when selecting
+   * which object should be included when scaling
    * @returns the current mesh
    */
   TransformNode&
@@ -546,16 +526,16 @@ protected:
   void set_billboardMode(unsigned int value);
 
   /**
-   * @brief Gets or sets a boolean indicating that parent rotation should be
-   * preserved when using billboards. This could be useful for glTF objects
-   * where parent rotation helps converting from right handed to left handed.
+   * @brief Gets or sets a boolean indicating that parent rotation should be preserved when using
+   * billboards. This could be useful for glTF objects where parent rotation helps converting from
+   * right handed to left handed.
    */
   bool get_preserveParentRotationForBillboard() const;
 
   /**
-   * @brief Sets a boolean indicating that parent rotation should be preserved
-   * when using billboards. This could be useful for glTF objects where parent
-   * rotation helps converting from right handed to left handed.
+   * @brief Sets a boolean indicating that parent rotation should be preserved when using
+   * billboards. This could be useful for glTF objects where parent rotation helps converting from
+   * right handed to left handed.
    */
   void set_preserveParentRotationForBillboard(bool value);
 
@@ -580,46 +560,44 @@ protected:
   void set_position(const Vector3& newPosition);
 
   /**
-   * @brief Gets the rotation property : a Vector3 defining the rotation value
-   * in radians around each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If
-   * rotation quaternion is set, this Vector3 will be ignored and copy from the
-   * quaternion.
+   * @brief Gets the rotation property : a Vector3 defining the rotation value in radians around
+   * each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If rotation quaternion is set, this
+   * Vector3 will be ignored and copy from the quaternion.
    */
   Vector3& get_rotation();
 
   /**
-   * @brief Sets the rotation property : a Vector3 defining the rotation value
-   * in radians around each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If
-   * rotation quaternion is set, this Vector3 will be ignored and copy from the
-   * quaternion.
+   * @brief Sets the rotation property : a Vector3 defining the rotation value in radians around
+   * each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If rotation quaternion is set, this
+   * Vector3 will be ignored and copy from the quaternion.
    */
   void set_rotation(const Vector3& newRotation);
 
   /**
-   * @brief Gets the scaling property : a Vector3 defining the node scaling
-   * along each local axis X, Y, Z (default is (0.0, 0.0, 0.0)).
+   * @brief Gets the scaling property : a Vector3 defining the node scaling along each local axis X,
+   * Y, Z (default is (0.0, 0.0, 0.0)).
    */
   virtual Vector3& get_scaling();
 
   /**
-   * @brief Sets the scaling property : a Vector3 defining the node scaling
-   * along each local axis X, Y, Z (default is (0.0, 0.0, 0.0)).
+   * @brief Sets the scaling property : a Vector3 defining the node scaling along each local axis X,
+   * Y, Z (default is (0.0, 0.0, 0.0)).
    */
   virtual void set_scaling(const Vector3& newScaling);
 
   /**
-   * @brief Gets the rotation Quaternion property : this a Quaternion object
-   * defining the node rotation by using a unit quaternion (undefined by
-   * default, but can be null). If set, only the rotationQuaternion is then used
-   * to compute the node rotation (ie. node.rotation will be ignored).
+   * @brief Gets the rotation Quaternion property : this a Quaternion object defining the node
+   * rotation by using a unit quaternion (undefined by default, but can be null). If set, only the
+   * rotationQuaternion is then used to compute the node rotation (ie. node.rotation will be
+   * ignored).
    */
   std::optional<Quaternion>& get_rotationQuaternion();
 
   /**
-   * @brief Sets the rotation Quaternion property : this a Quaternion object
-   * defining the node rotation by using a unit quaternion (undefined by
-   * default, but can be null). If set, only the rotationQuaternion is then used
-   * to compute the node rotation (ie. node.rotation will be ignored).
+   * @brief Sets the rotation Quaternion property : this a Quaternion object defining the node
+   * rotation by using a unit quaternion (undefined by default, but can be null). If set, only the
+   * rotationQuaternion is then used to compute the node rotation (ie. node.rotation will be
+   * ignored).
    */
   void set_rotationQuaternion(const std::optional<Quaternion>& quaternion);
 
@@ -663,8 +641,7 @@ protected:
   bool get_isWorldMatrixFrozen() const;
 
   /**
-   * @brief True if the scaling property of this object is non uniform eg.
-   * (1,2,1)
+   * @brief True if the scaling property of this object is non uniform eg. (1,2,1)
    */
   bool get_nonUniformScaling() const;
 
@@ -692,9 +669,9 @@ public:
   Property<TransformNode, unsigned int> billboardMode;
 
   /**
-   * Gets or sets a boolean indicating that parent rotation should be preserved
-   * when using billboards. This could be useful for glTF objects where parent
-   * rotation helps converting from right handed to left handed
+   * Gets or sets a boolean indicating that parent rotation should be preserved when using
+   * billboards. This could be useful for glTF objects where parent rotation helps converting from
+   * right handed to left handed
    */
   Property<TransformNode, bool> preserveParentRotationForBillboard;
 
@@ -704,22 +681,21 @@ public:
   Property<TransformNode, bool> infiniteDistance;
 
   /**
-   * Multiplication factor on scale x/y/z when computing the world matrix. Eg.
-   * for a 1x1x1 cube setting this to 2 will make it a 2x2x2 cube
+   * Multiplication factor on scale x/y/z when computing the world matrix. Eg. for a 1x1x1 cube
+   * setting this to 2 will make it a 2x2x2 cube
    */
   float scalingDeterminant;
 
   /**
-   * Gets or sets a boolean indicating that non uniform scaling (when at least
-   * one component is different from others) should be ignored. By default the
-   * system will update normals to compensate
+   * Gets or sets a boolean indicating that non uniform scaling (when at least one component is
+   * different from others) should be ignored. By default the system will update normals to
+   * compensate
    */
   bool ignoreNonUniformScaling;
 
   /**
-   * Gets or sets a boolean indicating that even if rotationQuaternion is
-   * defined, you can keep updating rotation property and Babylon.js will just
-   * mix both
+   * Gets or sets a boolean indicating that even if rotationQuaternion is defined, you can keep
+   * updating rotation property and Babylon.js will just mix both
    */
   bool reIntegrateRotationIntoRotationQuaternion;
 
@@ -739,24 +715,23 @@ public:
   Property<TransformNode, Vector3> position;
 
   /**
-   * Gets or sets the rotation property : a Vector3 defining the rotation value
-   * in radians around each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If
-   * rotation quaternion is set, this Vector3 will be ignored and copy from the
-   * quaternion
+   * Gets or sets the rotation property : a Vector3 defining the rotation value in radians around
+   * each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If rotation quaternion is set, this
+   * Vector3 will be ignored and copy from the quaternion
    */
   Property<TransformNode, Vector3> rotation;
 
   /**
-   * Gets or sets the scaling property : a Vector3 defining the node scaling
-   * along each local axis X, Y, Z (default is (0.0, 0.0, 0.0)).
+   * Gets or sets the scaling property : a Vector3 defining the node scaling along each local axis
+   * X, Y, Z (default is (0.0, 0.0, 0.0)).
    */
   Property<TransformNode, Vector3> scaling;
 
   /**
-   * Gets or sets the rotation Quaternion property : this a Quaternion object
-   * defining the node rotation by using a unit quaternion (undefined by
-   * default, but can be null). If set, only the rotationQuaternion is then used
-   * to compute the node rotation (ie. node.rotation will be ignored)
+   * Gets or sets the rotation Quaternion property : this a Quaternion object defining the node
+   * rotation by using a unit quaternion (undefined by default, but can be null). If set, only the
+   * rotationQuaternion is then used to compute the node rotation (ie. node.rotation will be
+   * ignored)
    */
   Property<TransformNode, std::optional<Quaternion>> rotationQuaternion;
 
