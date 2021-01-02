@@ -20,8 +20,8 @@ std::vector<Vector2> Polygon::Circle(float radius, float cx, float cy, size_t nu
 {
   std::vector<Vector2> result;
 
-  float angle     = 0.f;
-  float increment = Math::PI2 / static_cast<float>(numberOfSides);
+  auto angle     = 0.f;
+  auto increment = Math::PI2 / static_cast<float>(numberOfSides);
 
   for (size_t i = 0; i < numberOfSides; ++i) {
     result.emplace_back(Vector2(cx + std::cos(angle) * radius, cy + std::sin(angle) * radius));

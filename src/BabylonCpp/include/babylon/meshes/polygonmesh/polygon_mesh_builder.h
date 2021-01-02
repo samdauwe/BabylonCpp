@@ -2,16 +2,16 @@
 #define BABYLON_MESHES_POLYGONMESH_POLYGON_MESH_BUILDER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/meshes/polygonmesh/polygon_points.h>
 
 namespace BABYLON {
 
-class Mesh;
 class Path2;
 class Scene;
 class VertexData;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Builds a polygon

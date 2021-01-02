@@ -10,7 +10,7 @@ std::vector<IndexedVector2> PolygonPoints::add(const std::vector<Vector2>& origi
 {
   std::vector<IndexedVector2> result;
 
-  for (auto& point : originalPoints) {
+  for (const auto& point : originalPoints) {
     IndexedVector2 newPoint(point, static_cast<int>(elements.size()));
     result.emplace_back(newPoint);
     elements.emplace_back(newPoint);
@@ -24,7 +24,7 @@ Bounds PolygonPoints::computeBounds()
   Vector2 lmin(elements[0].x, elements[0].y);
   Vector2 lmax(elements[0].x, elements[0].y);
 
-  for (auto& point : elements) {
+  for (const auto& point : elements) {
     // x
     if (point.x < lmin.x) {
       lmin.x = point.x;

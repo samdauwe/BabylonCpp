@@ -31,8 +31,7 @@
 
 namespace BABYLON {
 
-PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
-                                       const Path2& contours, Scene* scene)
+PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name, const Path2& contours, Scene* scene)
     : _name{name}
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
@@ -45,8 +44,7 @@ PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
 }
 
 PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
-                                       const std::vector<Vector2>& contours,
-                                       Scene* scene)
+                                       const std::vector<Vector2>& contours, Scene* scene)
     : _name{name}
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
@@ -61,14 +59,12 @@ PolygonMeshBuilder::~PolygonMeshBuilder() = default;
 
 void PolygonMeshBuilder::_addToepoint(const std::vector<Vector2>& points)
 {
-  for (auto& p : points) {
-    Point2D point{{p.x, p.y}};
-    _epoints.emplace_back(point);
+  for (const auto& p : points) {
+    _epoints.emplace_back(Point2D{{p.x, p.y}});
   }
 }
 
-PolygonMeshBuilder&
-PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
+PolygonMeshBuilder& PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
 {
   _points.add(hole);
   PolygonPoints holepoints;
@@ -85,12 +81,11 @@ MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
 {
   auto result = Mesh::New(_name, _scene);
 
-  const auto vertexData = buildVertexData(depth); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
+  const auto vertexData
+    = buildVertexData(depth); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
 
-  result->setVerticesData(VertexBuffer::PositionKind, vertexData->positions,
-                          updatable);
-  result->setVerticesData(VertexBuffer::NormalKind, vertexData->normals,
-                          updatable);
+  result->setVerticesData(VertexBuffer::PositionKind, vertexData->positions, updatable);
+  result->setVerticesData(VertexBuffer::NormalKind, vertexData->normals, updatable);
   result->setVerticesData(VertexBuffer::UVKind, vertexData->uvs, updatable);
   result->setIndices(vertexData->indices);
 
@@ -110,14 +105,15 @@ std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
   for (const auto& p : pointElements) {
     stl_util::concat(normals, {0.f, 1.f, 0.f});
     stl_util::concat(positions, {p.x, 0.f, p.y});
-    stl_util::concat(uvs, {(p.x - bounds.min.x) / bounds.width,
-                           (p.y - bounds.min.y) / bounds.height});
+    stl_util::concat(uvs,
+                     {(p.x - bounds.min.x) / bounds.width, (p.y - bounds.min.y) / bounds.height});
   }
 
   std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);
-  auto res = mapbox::earcut<uint32_t>(polygon); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
+  auto res = mapbox::earcut<uint32_t>(
+    polygon); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
 
   Uint32Array indices;
   for (auto r : res) {
@@ -147,10 +143,9 @@ std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
     }
 
     // Add the sides
-    addSide(positions, normals, uvs, indices, bounds, _outlinepoints, depth,
-            false);
+    addSide(positions, normals, uvs, indices, bounds, _outlinepoints, depth, false);
 
-    for (auto& hole : _holes) {
+    for (const auto& hole : _holes) {
       addSide(positions, normals, uvs, indices, bounds, hole, depth, true);
     }
   }
@@ -163,9 +158,8 @@ std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
   return result;
 }
 
-std::pair<Float32Array, Uint32Array>
-PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
-                              const Vector3& wall1Corner)
+std::pair<Float32Array, Uint32Array> PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
+                                                                   const Vector3& wall1Corner)
 {
   Float32Array positions;
   Uint32Array indices;
@@ -200,14 +194,12 @@ const PolygonPoints& PolygonMeshBuilder::points() const
   return _points;
 }
 
-void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
-                                 Float32Array& uvs, Uint32Array& indices,
-                                 const Bounds& bounds,
-                                 const PolygonPoints& points, float depth,
-                                 bool flip)
+void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals, Float32Array& uvs,
+                                 Uint32Array& indices, const Bounds& bounds,
+                                 const PolygonPoints& points, float depth, bool flip)
 {
   auto startIndex = static_cast<uint32_t>(positions.size() / 3);
-  float ulength   = 0.f;
+  auto ulength    = 0.f;
   for (size_t i = 0; i < points.elements.size(); ++i) {
     const auto& p = points.elements[i];
     IndexedVector2 p1;
@@ -287,14 +279,12 @@ void PolygonMeshBuilder::addHoles(const std::vector<Point2D>& epoints,
       holes.emplace_back(range);
     }
     // Add outer ring
-    std::vector<Point2D> ring(epoints.begin(),
-                              epoints.begin() + static_cast<long>(holes[0][0]));
+    std::vector<Point2D> ring(epoints.begin(), epoints.begin() + static_cast<long>(holes[0][0]));
     polygon.emplace_back(ring);
     // Add holes
-    for (auto& holeRange : holes) {
-      std::vector<Point2D> hole(
-        epoints.begin() + static_cast<long>(holeRange[0]),
-        epoints.begin() + static_cast<long>(holeRange[1]));
+    for (const auto& holeRange : holes) {
+      std::vector<Point2D> hole(epoints.begin() + static_cast<long>(holeRange[0]),
+                                epoints.begin() + static_cast<long>(holeRange[1]));
       polygon.emplace_back(hole);
     }
   }
