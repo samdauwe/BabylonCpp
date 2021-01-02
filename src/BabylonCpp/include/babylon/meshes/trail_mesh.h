@@ -2,12 +2,12 @@
 #define BABYLON_MESHES_TRAIL_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
-class TrailMesh;
-using TrailMeshPtr = std::shared_ptr<TrailMesh>;
+FWD_CLASS_SPTR(TrailMesh)
 
 /**
  * @brief Class used to create a trail following a mesh.

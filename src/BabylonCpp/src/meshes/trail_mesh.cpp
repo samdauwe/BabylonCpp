@@ -41,14 +41,14 @@ void TrailMesh::_createMesh()
   IndicesArray indices;
   auto meshCenter = Vector3::Zero();
 
-  auto generatorAsAbstractMesh = std::static_pointer_cast<AbstractMesh>(_generator);
+  const auto generatorAsAbstractMesh = std::static_pointer_cast<AbstractMesh>(_generator);
   if (generatorAsAbstractMesh && generatorAsAbstractMesh->_boundingInfo) {
     meshCenter = generatorAsAbstractMesh->_boundingInfo->boundingBox.centerWorld;
   }
   else {
     meshCenter = _generator->position();
   }
-  auto alpha = 2.f * Math::PI / _sectionPolygonPointsCount;
+  const auto alpha = 2.f * Math::PI / _sectionPolygonPointsCount;
   for (uint32_t i = 0; i < _sectionPolygonPointsCount; ++i) {
     stl_util::concat(positions, {meshCenter.x + std::cos(i * alpha) * _diameter,
                                  meshCenter.y + std::sin(i * alpha) * _diameter, meshCenter.z});
@@ -58,7 +58,7 @@ void TrailMesh::_createMesh()
       stl_util::concat(positions, {meshCenter.x + std::cos(j * alpha) * _diameter,
                                    meshCenter.y + std::sin(j * alpha) * _diameter, meshCenter.z});
     }
-    auto l = static_cast<uint32_t>(positions.size() / 3 - 2 * _sectionPolygonPointsCount);
+    const auto l = static_cast<uint32_t>(positions.size() / 3 - 2 * _sectionPolygonPointsCount);
     for (uint32_t j = 0; j < _sectionPolygonPointsCount - 1; ++j) {
       stl_util::concat(indices, {
                                   l + j,
@@ -90,7 +90,7 @@ void TrailMesh::start()
   if (!_running) {
     _running              = true;
     _beforeRenderObserver = getScene()->onBeforeRenderObservable.add(
-      [this](Scene* /*scene*/, EventState & /*s*/) -> void { update(); });
+      [this](Scene* /*scene*/, EventState& /*s*/) -> void { update(); });
   }
 }
 
@@ -119,7 +119,7 @@ void TrailMesh::update()
     auto alpha = 2 * Math::PI / _sectionPolygonPointsCount;
     for (uint32_t i = 0; i < _sectionPolygonPointsCount; ++i) {
       _sectionVectors[i].copyFromFloats(std::cos(i * alpha) * _diameter,
-                                        std::sin(i * alpha) * _diameter, 0);
+                                        std::sin(i * alpha) * _diameter, 0.f);
       _sectionNormalVectors[i].copyFromFloats(std::cos(i * alpha), std::sin(i * alpha), 0);
       Vector3::TransformCoordinatesToRef(_sectionVectors[i], wm, _sectionVectors[i]);
       Vector3::TransformNormalToRef(_sectionNormalVectors[i], wm, _sectionNormalVectors[i]);
