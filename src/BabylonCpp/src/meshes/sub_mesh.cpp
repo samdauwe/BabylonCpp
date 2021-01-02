@@ -195,8 +195,7 @@ SubMesh& SubMesh::refreshBoundingInfo(const Float32Array& iData)
   if (indexStart == 0 && indexCount == indices.size()) {
     const auto& boundingInfo = *_renderingMesh->getBoundingInfo();
 
-    // the rendering mesh's bounding info can be used, it is the standard
-    // submesh for all indices.
+    // the rendering mesh's bounding info can be used, it is the standard submesh for all indices.
     extend = {
       boundingInfo.minimum, // minimum
       boundingInfo.maximum  // maximum
@@ -235,7 +234,6 @@ SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
   if (boundingInfo) {
     boundingInfo->update(world);
   }
-
   return *this;
 }
 
@@ -246,7 +244,6 @@ bool SubMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes, unsigned in
   if (!boundingInfo) {
     return false;
   }
-
   return boundingInfo->isInFrustum(frustumPlanes, _mesh->cullingStrategy);
 }
 
@@ -257,7 +254,6 @@ bool SubMesh::isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes)
   if (!boundingInfo) {
     return false;
   }
-
   return boundingInfo->isCompletelyInFrustum(frustumPlanes);
 }
 
@@ -486,7 +482,6 @@ SubMesh::_intersectUnIndexedTriangles(Ray& ray, const std::vector<Vector3>& posi
       }
     }
   }
-
   return intersectInfo;
 }
 
