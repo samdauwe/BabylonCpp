@@ -644,10 +644,6 @@ Vector3 TransformNode::getAbsolutePivotPoint()
 
 TransformNode& TransformNode::getAbsolutePivotPointToRef(Vector3& result)
 {
-  const auto& _pivotMatrixM = _pivotMatrix.m();
-  result.x                  = _pivotMatrixM[12];
-  result.y                  = _pivotMatrixM[13];
-  result.z                  = _pivotMatrixM[14];
   getPivotPointToRef(result);
   Vector3::TransformCoordinatesToRef(result, getWorldMatrix(), result);
   return *this;
@@ -966,9 +962,9 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
       }
 
       // Extract scaling and translation from parent
+      std::optional<Vector3> scale        = TmpVectors::Vector3Array[6];
       std::optional<Quaternion> rotation_ = std::nullopt;
       std::optional<Vector3> translation  = TmpVectors::Vector3Array[5];
-      std::optional<Vector3> scale        = TmpVectors::Vector3Array[6];
       TmpVectors::MatrixArray[7].decompose(scale, rotation_, translation);
       Matrix::ScalingToRef(scale->x, scale->y, scale->z, TmpVectors::MatrixArray[7]);
       TmpVectors::MatrixArray[7].setTranslation(*translation);
@@ -991,8 +987,8 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
     _worldMatrix.copyFrom(_localMatrix);
   }
 
-  // Billboarding based on camera orientation
-  // (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
+  // Billboarding based on camera orientation (testing
+  // PG:http://www.babylonjs-playground.com/#UJEIL#13)
   if (useBillboardPath && camera && billboardMode && !useBillboardPosition) {
     auto& storedTranslation = TmpVectors::Vector3Array[0];
     _worldMatrix.getTranslationToRef(storedTranslation); // Save translation
@@ -1007,19 +1003,20 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
       std::optional<Quaternion> rotation_ = TmpVectors::QuaternionArray[0];
       std::optional<Vector3> translation  = std::nullopt;
       TmpVectors::MatrixArray[0].decompose(scale, rotation_, translation);
-      auto& eulerAngles = TmpVectors::Vector3Array[1];
+      TmpVectors::QuaternionArray[0] = *rotation_;
+      auto& eulerAngles              = TmpVectors::Vector3Array[1];
       TmpVectors::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
 
       if ((billboardMode & TransformNode::BILLBOARDMODE_X) != TransformNode::BILLBOARDMODE_X) {
-        eulerAngles.x = 0;
+        eulerAngles.x = 0.f;
       }
 
       if ((billboardMode & TransformNode::BILLBOARDMODE_Y) != TransformNode::BILLBOARDMODE_Y) {
-        eulerAngles.y = 0;
+        eulerAngles.y = 0.f;
       }
 
       if ((billboardMode & TransformNode::BILLBOARDMODE_Z) != TransformNode::BILLBOARDMODE_Z) {
-        eulerAngles.z = 0;
+        eulerAngles.z = 0.f;
       }
 
       Matrix::RotationYawPitchRollToRef(eulerAngles.y, eulerAngles.x, eulerAngles.z,
@@ -1075,9 +1072,9 @@ void TransformNode::resetLocalMatrix(bool independentOfChildren)
 {
   computeWorldMatrix();
   if (independentOfChildren) {
-    auto children = getChildren();
+    const auto children = getChildren();
     for (size_t i = 0; i < children.size(); ++i) {
-      auto child = std::static_pointer_cast<TransformNode>(children[i]);
+      const auto child = std::static_pointer_cast<TransformNode>(children[i]);
       if (child) {
         child->computeWorldMatrix();
         auto& bakedMatrix = TmpVectors::MatrixArray[0];
@@ -1217,15 +1214,15 @@ TransformNode& TransformNode::normalizeToUnitCube(
     }
   }
 
-  auto boundingVectors = getHierarchyBoundingVectors(includeDescendants, predicate);
-  auto sizeVec         = boundingVectors.max.subtract(boundingVectors.min);
-  auto maxDimension    = std::max(sizeVec.x, std::max(sizeVec.y, sizeVec.z));
+  const auto boundingVectors = getHierarchyBoundingVectors(includeDescendants, predicate);
+  const auto sizeVec         = boundingVectors.max.subtract(boundingVectors.min);
+  const auto maxDimension    = std::max(sizeVec.x, std::max(sizeVec.y, sizeVec.z));
 
   if (maxDimension == 0.f) {
     return *this;
   }
 
-  auto scale = 1.f / maxDimension;
+  const auto scale = 1.f / maxDimension;
 
   scaling().scaleInPlace(scale);
 
@@ -1248,7 +1245,9 @@ void TransformNode::_syncAbsoluteScalingAndRotation()
     std::optional<Quaternion> rotation_ = _absoluteRotationQuaternion;
     std::optional<Vector3> translation  = std::nullopt;
     _worldMatrix.decompose(scale, rotation_, translation);
-    _isAbsoluteSynced = true;
+    _absoluteScaling            = *scale;
+    _absoluteRotationQuaternion = *rotation_;
+    _isAbsoluteSynced           = true;
   }
 }
 
