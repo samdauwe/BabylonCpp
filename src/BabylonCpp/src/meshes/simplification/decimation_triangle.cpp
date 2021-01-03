@@ -3,8 +3,12 @@
 namespace BABYLON {
 
 DecimationTriangle::DecimationTriangle(const std::vector<DecimationVertex>& iVertices)
-    : deleted{false}, isDirty{false}, borderFactor{0}, deletePending{false}, vertices{iVertices}
+    : vertices{iVertices}
 {
+  deleted       = false;
+  isDirty       = false;
+  deletePending = false;
+  borderFactor  = 0;
 }
 
 DecimationTriangle::~DecimationTriangle() = default;
