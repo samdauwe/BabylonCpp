@@ -27,15 +27,15 @@ struct BABYLON_SHARED_EXPORT ISimplificationTask {
   /**
    * Mesh to simplify
    */
-  Mesh* mesh;
+  Mesh* mesh = nullptr;
   /**
    * Callback called on success
    */
-  std::function<void()> successCallback;
+  std::function<void()> successCallback = nullptr;
   /**
    * Defines if parallel processing can be used
    */
-  bool parallelProcessing;
+  bool parallelProcessing = false;
 }; // end of class ISimplificationTask
 
 } // end of namespace BABYLON
