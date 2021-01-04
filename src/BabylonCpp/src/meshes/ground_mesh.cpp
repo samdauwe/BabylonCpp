@@ -56,8 +56,8 @@ void GroundMesh::optimize(size_t chunksCount, size_t octreeBlocksSize)
 
 float GroundMesh::getHeightAtCoordinates(float x, float z)
 {
-  auto world   = getWorldMatrix();
-  auto& invMat = TmpVectors::MatrixArray[5];
+  const auto world = getWorldMatrix();
+  auto& invMat     = TmpVectors::MatrixArray[5];
   world.invertToRef(invMat);
   auto& tmpVect = TmpVectors::Vector3Array[8];
   // transform x,z in the mesh local space
@@ -71,8 +71,8 @@ float GroundMesh::getHeightAtCoordinates(float x, float z)
     _initHeightQuads();
     _computeHeightQuads();
   }
-  auto facet = _getFacetAt(x, z);
-  auto y     = -(facet.x * x + facet.z * z + facet.w) / facet.y;
+  const auto facet = _getFacetAt(x, z);
+  const auto y     = -(facet.x * x + facet.z * z + facet.w) / facet.y;
   // return y in the World system
   Vector3::TransformCoordinatesFromFloatsToRef(0.f, y, 0.f, world, tmpVect);
   return tmpVect.y;
@@ -87,8 +87,8 @@ Vector3 GroundMesh::getNormalAtCoordinates(float x, float z)
 
 GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z, Vector3& ref)
 {
-  auto world   = getWorldMatrix();
-  auto& tmpMat = TmpVectors::MatrixArray[5];
+  const auto world = getWorldMatrix();
+  auto& tmpMat     = TmpVectors::MatrixArray[5];
   world.invertToRef(tmpMat);
   auto& tmpVect = TmpVectors::Vector3Array[8];
   // transform x,z in the mesh local space
@@ -102,7 +102,7 @@ GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z, Vector3& r
     _initHeightQuads();
     _computeHeightQuads();
   }
-  auto facet = _getFacetAt(x, z);
+  const auto facet = _getFacetAt(x, z);
   Vector3::TransformNormalFromFloatsToRef(facet.x, facet.y, facet.z, world, ref);
   return *this;
 }
@@ -119,12 +119,12 @@ GroundMesh& GroundMesh::updateCoordinateHeights()
 Vector4 GroundMesh::_getFacetAt(float x, float z)
 {
   // retrieve col and row from x, z coordinates in the ground local system
-  auto subdivisionsXf = static_cast<float>(_subdivisionsX);
-  auto subdivisionsYf = static_cast<float>(_subdivisionsY);
-  auto col            = static_cast<size_t>(std::floor((x + _maxX) * subdivisionsXf / _width));
-  auto row
+  const auto subdivisionsXf = static_cast<float>(_subdivisionsX);
+  const auto subdivisionsYf = static_cast<float>(_subdivisionsY);
+  const auto col = static_cast<size_t>(std::floor((x + _maxX) * subdivisionsXf / _width));
+  const auto row
     = static_cast<size_t>(std::floor(-(z + _maxZ) * subdivisionsYf / _height + subdivisionsYf));
-  auto& quad = _heightQuads[row * _subdivisionsX + col];
+  const auto& quad = _heightQuads[row * _subdivisionsX + col];
   Vector4 facet;
   if (z < quad.slope.x * x + quad.slope.y) {
     facet = quad.facet1;
@@ -229,7 +229,7 @@ void GroundMesh::serialize(json& /*serializationObject*/) const
 
 GroundMeshPtr GroundMesh::Parse(const json& parsedMesh, Scene* scene)
 {
-  auto result = GroundMesh::New(json_util::get_string(parsedMesh, "name"), scene);
+  const auto result = GroundMesh::New(json_util::get_string(parsedMesh, "name"), scene);
 
   result->_subdivisionsX = json_util::get_number<size_t>(parsedMesh, "subdivisionsX", 1);
   result->_subdivisionsY = json_util::get_number<size_t>(parsedMesh, "subdivisionsY", 1);
