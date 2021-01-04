@@ -5,8 +5,7 @@
 
 namespace BABYLON {
 
-MeshLODLevel::MeshLODLevel(float iDistance, const MeshPtr& iMesh)
-    : distance{iDistance}, mesh{iMesh}
+MeshLODLevel::MeshLODLevel(float iDistance, const MeshPtr& iMesh) : distance{iDistance}, mesh{iMesh}
 {
 }
 
@@ -22,8 +21,7 @@ MeshLODLevel::~MeshLODLevel() = default;
 
 bool MeshLODLevel::operator==(const MeshLODLevel& other) const
 {
-  return stl_util::almost_equal(distance, other.distance)
-         && (mesh == other.mesh);
+  return stl_util::almost_equal(distance, other.distance) && (mesh == other.mesh);
 }
 
 bool MeshLODLevel::operator!=(const MeshLODLevel& other) const

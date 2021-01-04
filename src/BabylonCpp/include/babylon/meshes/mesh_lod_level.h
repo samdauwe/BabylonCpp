@@ -4,11 +4,11 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Mesh;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Class used to represent a specific level of detail of a mesh.
