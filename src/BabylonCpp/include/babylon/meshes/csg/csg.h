@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_CSG_CSG_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
@@ -9,11 +10,9 @@
 
 namespace BABYLON {
 
-class Material;
-class Mesh;
 class Scene;
-using MaterialPtr = std::shared_ptr<Material>;
-using MeshPtr     = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
 
 namespace CSG {
 
@@ -95,8 +94,8 @@ public:
   void inverseInPlace();
 
   /**
-   * @brief This is used to keep meshes transformations so they can be restored
-   * when we build back a Babylon Mesh.
+   * @brief This is used to keep meshes transformations so they can be restored when we build back a
+   * Babylon Mesh.
    * NB : All CSG operations are performed in world coordinates
    * @param csg The CSG to copy the transform attributes from
    * @returns This CSG

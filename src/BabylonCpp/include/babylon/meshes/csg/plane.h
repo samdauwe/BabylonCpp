@@ -19,8 +19,8 @@ class BABYLON_SHARED_EXPORT Plane {
 
 public:
   /**
-   * `CSG.Plane.EPSILON` is the tolerance used by `splitPolygon()` to decide if
-   * a point is on the plane
+   * `CSG.Plane.EPSILON` is the tolerance used by `splitPolygon()` to decide if a point is on the
+   * plane
    */
   static const float EPSILON;
   // Polygon types
@@ -61,16 +61,16 @@ public:
   void flip();
 
   /**
-   * @brief Split `polygon` by this plane if needed, then put the polygon or
-   * polygon fragments in the appropriate lists. Coplanar polygons go into
-   * either coplanarFront` or `coplanarBack` depending on their orientation with
+   * @brief Split `polygon` by this plane if needed, then put the polygon or polygon
+   * fragments in the appropriate lists. Coplanar polygons go into either
+  `* coplanarFront` or `coplanarBack` depending on their orientation with
    * respect to this plane. Polygons in front or in back of this plane go into
    * either `front` or `back`
    * @param polygon The polygon to be split
-   * @param coplanarFront Will contain polygons coplanar with the plane that are
-   * oriented to the front of the plane
-   * @param coplanarBack Will contain polygons coplanar with the plane that are
-   * oriented to the back of the plane
+   * @param coplanarFront Will contain polygons coplanar with the plane that are oriented to the
+   *                      front of the plane
+   * @param coplanarBack Will contain polygons coplanar with the plane that are oriented to the back
+   *                     of the plane
    * @param front Will contain the polygons in front of the plane
    * @param back Will contain the polygons begind the plane
    */
