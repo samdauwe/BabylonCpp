@@ -358,7 +358,7 @@ InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/, Node* newPa
 
   if (!doNotCloneChildren) {
     // Children
-    for (auto& mesh : getScene()->meshes) {
+    for (const auto& mesh : getScene()->meshes) {
       if (mesh->parent() == this) {
         // mesh->clone(mesh->name, std::static_pointer_cast<Node>(result));
       }

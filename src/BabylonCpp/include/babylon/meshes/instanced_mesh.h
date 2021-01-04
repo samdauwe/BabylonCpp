@@ -51,8 +51,7 @@ public:
   size_t getTotalVertices() const override;
 
   /**
-   * @brief Returns a positive integer : the total number of indices in this
-   * mesh geometry.
+   * @brief Returns a positive integer : the total number of indices in this mesh geometry.
    * @returns the numner of indices or zero if the mesh has no geometry.
    */
   size_t getTotalIndices() const;
@@ -67,8 +66,8 @@ public:
 
   /**
    * @brief Is this node ready to be used/rendered.
-   * @param completeCheck defines if a complete check (including materials and
-   * lights) has to be done (false by default)
+   * @param completeCheck defines if a complete check (including materials and lights) has to be
+   * done (false by default)
    * @return {boolean} is it ready
    */
   bool isReady(bool completeCheck = false, bool forceInstanceSupport = false) override;
@@ -76,30 +75,25 @@ public:
   /**
    * @brief Returns an array of integers or a typed array (Int32Array,
    * Uint32Array, Uint16Array) populated with the mesh indices.
-   * @param kind kind of verticies to retreive (eg. positons, normals, uvs,
-   * etc.)
-   * @param copyWhenShared If true (default false) and and if the mesh geometry
-   * is shared among some other meshes, the returned array is a copy of the
-   * internal one.
-   * @returns a float array or a Float32Array of the requested kind of data :
-   * positons, normals, uvs, etc.
+   * @param kind kind of verticies to retreive (eg. positons, normals, uvs, etc.)
+   * @param copyWhenShared If true (default false) and and if the mesh geometry is shared among some
+   * other meshes, the returned array is a copy of the internal one.
+   * @returns a float array or a Float32Array of the requested kind of data : positons, normals,
+   * uvs, etc.
    */
   Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
                                bool forceCopy = false) override;
 
   /**
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
-   * If the mesh has no geometry, a new Geometry object is set to the mesh and
-   * then passed this vertex data.
-   * The `data` are either a numeric array either a Float32Array.
-   * The parameter `updatable` is passed as is to the underlying Geometry object
-   * constructor (if initianilly none) or updater.
-   * The parameter `stride` is an optional positive integer, it is usually
-   * automatically deducted from the `kind` (3 for positions or normals, 2 for
-   * UV, etc).
-   * Note that a new underlying VertexBuffer object is created each call.
-   * If the `kind` is the `PositionKind`, the mesh BoundingInfo is renewed, so
-   * the bounding box and sphere, and the mesh World Matrix is recomputed.
+   * If the mesh has no geometry, a new Geometry object is set to the mesh and then passed this
+   * vertex data. The `data` are either a numeric array either a Float32Array. The parameter
+   * `updatable` is passed as is to the underlying Geometry object constructor (if initianilly none)
+   * or updater. The parameter `stride` is an optional positive integer, it is usually automatically
+   * deducted from the `kind` (3 for positions or normals, 2 for UV, etc). Note that a new
+   * underlying VertexBuffer object is created each call. If the `kind` is the `PositionKind`, the
+   * mesh BoundingInfo is renewed, so the bounding box and sphere, and the mesh World Matrix is
+   * recomputed.
    *
    * Possible `kind` values :
    * - VertexBuffer.PositionKind
@@ -115,23 +109,21 @@ public:
    * - VertexBuffer.MatricesWeightsKind
    * - VertexBuffer.MatricesWeightsExtraKind
    *
-   * @returns The Mesh.
+   * Returns the Mesh.
    */
   AbstractMesh* setVerticesData(const std::string& kind, const Float32Array& data,
                                 bool updatable                      = false,
                                 const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
-   * @brief Updates the existing vertex data of the mesh geometry for the
-   * requested `kind`.
+   * @brief Updates the existing vertex data of the mesh geometry for the requested `kind`.
    * If the mesh has no geometry, it is simply returned as it is.
    * The `data` are either a numeric array either a Float32Array.
    * No new underlying VertexBuffer object is created.
-   * If the `kind` is the `PositionKind` and if `updateExtends` is true, the
-   * mesh BoundingInfo is renewed, so the bounding box and sphere, and the mesh
-   * World Matrix is recomputed.
-   * If the parameter `makeItUnique` is true, a new global geometry is created
-   * from this positions and is set to the mesh.
+   * If the `kind` is the `PositionKind` and if `updateExtends` is true, the mesh BoundingInfo is
+   * renewed, so the bounding box and sphere, and the mesh World Matrix is recomputed. If the
+   * parameter `makeItUnique` is true, a new global geometry is created from this positions and is
+   * set to the mesh.
    *
    * Possible `kind` values :
    * - VertexBuffer.PositionKind
@@ -147,20 +139,16 @@ public:
    * - VertexBuffer.MatricesWeightsKind
    * - VertexBuffer.MatricesWeightsExtraKind
    *
-   * @returns The Mesh.
+   * Returns the Mesh.
    */
   AbstractMesh* updateVerticesData(const std::string& kind, const Float32Array& data,
                                    bool updateExtends = false, bool makeItUnique = false) override;
 
   /**
    * @brief Sets the mesh indices.
-   * Expects an array populated with integers or a typed array (Int32Array,
-   * Uint32Array, Uint16Array).
-   * If the mesh has no geometry, a new Geometry object is created and set to
-   * the mesh.
-   * This method creates a new index buffer each call.
-   *
-   * @returns The Mesh.
+   * Expects an array populated with integers or a typed array (Int32Array, Uint32Array,
+   * Uint16Array). If the mesh has no geometry, a new Geometry object is created and set to the
+   * mesh. This method creates a new index buffer each call. Returns the Mesh.
    */
   AbstractMesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
                            bool updatable = false) override;
@@ -181,11 +169,9 @@ public:
   std::vector<Vector3>& _positions();
 
   /**
-   * @brief This method recomputes and sets a new BoundingInfo to the mesh
-   * unless it is locked. This means the mesh underlying bounding box and sphere
-   * are recomputed.
-   * @param applySkeleton defines whether to apply the skeleton before computing
-   * the bounding info
+   * @brief This method recomputes and sets a new BoundingInfo to the mesh unless it is locked.
+   * This means the mesh underlying bounding box and sphere are recomputed.
+   * @param applySkeleton defines whether to apply the skeleton before computing the bounding info
    * @returns the current mesh
    */
   InstancedMesh& refreshBoundingInfo(bool applySkeleton = false);
