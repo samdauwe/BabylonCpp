@@ -228,8 +228,8 @@ void VertexBuffer::ForEach(const Float32Array& data, size_t byteOffset, size_t b
                            bool /*normalized*/,
                            const std::function<void(float value, size_t index)>& callback)
 {
-  auto offset = byteOffset / 4;
-  auto stride = byteStride / 4;
+  auto offset       = byteOffset / 4;
+  const auto stride = byteStride / 4;
   for (size_t index = 0; index < count; index += componentCount) {
     for (size_t componentIndex = 0; componentIndex < componentCount; componentIndex++) {
       callback(data[offset + componentIndex], index + componentIndex);
