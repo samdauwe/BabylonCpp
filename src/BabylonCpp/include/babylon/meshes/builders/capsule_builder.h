@@ -5,14 +5,14 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class ICreateCapsuleOptions;
-class Mesh;
 class Scene;
 class SphereOptions;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.

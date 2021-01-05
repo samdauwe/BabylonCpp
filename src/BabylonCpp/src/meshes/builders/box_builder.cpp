@@ -8,12 +8,12 @@ namespace BABYLON {
 
 MeshPtr BoxBuilder::CreateBox(const std::string& name, BoxOptions& options, Scene* scene)
 {
-  auto box = Mesh::New(name, scene);
+  const auto box = Mesh::New(name, scene);
 
   options.sideOrientation              = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   box->_originalBuilderSideOrientation = *options.sideOrientation;
 
-  auto vertexData = VertexData::CreateBox(options);
+  const auto vertexData = VertexData::CreateBox(options);
 
   vertexData->applyToMesh(*box, options.updatable);
 

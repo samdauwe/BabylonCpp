@@ -9,8 +9,8 @@ namespace BABYLON {
 MeshPtr CapsuleBuilder::CreateCapsule(const std::string& name, ICreateCapsuleOptions& options,
                                       Scene* scene)
 {
-  auto capsule    = Mesh::New(name, scene);
-  auto vertexData = VertexData::CreateCapsule(options);
+  const auto capsule    = Mesh::New(name, scene);
+  const auto vertexData = VertexData::CreateCapsule(options);
   vertexData->applyToMesh(*capsule);
   return capsule;
 }
