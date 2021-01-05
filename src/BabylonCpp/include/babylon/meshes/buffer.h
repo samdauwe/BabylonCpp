@@ -80,7 +80,7 @@ public:
    * @brief Gets a boolean indicating if the Buffer is updatable?
    * @returns true if the buffer is updatable
    */
-  [[nodiscard]] bool isUpdatable() const;
+  bool isUpdatable() const;
 
   /**
    * @brief Gets current buffer's data
@@ -100,7 +100,7 @@ public:
    * @returns the stride in float32 units
    * @deprecated Please use byteStride instead.
    */
-  [[nodiscard]] size_t getStrideSize() const;
+  size_t getStrideSize() const;
 
   // Methods
 
