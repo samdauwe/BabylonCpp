@@ -5,17 +5,16 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class GroundFromHeightMapOptions;
-class GroundMesh;
 class GroundOptions;
-class Mesh;
 class TiledGroundOptions;
 class Scene;
-using GroundMeshPtr = std::shared_ptr<GroundMesh>;
-using MeshPtr       = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(GroundMesh)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.

@@ -12,7 +12,7 @@ namespace BABYLON {
 GroundMeshPtr GroundBuilder::CreateGround(const std::string& name, GroundOptions& options,
                                           Scene* scene)
 {
-  auto ground = GroundMesh::New(name, scene);
+  const auto ground = GroundMesh::New(name, scene);
   ground->_setReady(false);
   ground->_subdivisionsX = options.subdivisionsX.value_or(options.subdivisions.value_or(1));
   ground->_subdivisionsY = options.subdivisionsY.value_or(options.subdivisions.value_or(1));
@@ -23,7 +23,7 @@ GroundMeshPtr GroundBuilder::CreateGround(const std::string& name, GroundOptions
   ground->_minX          = -ground->_maxX;
   ground->_minZ          = -ground->_maxZ;
 
-  auto vertexData = VertexData::CreateGround(options);
+  const auto vertexData = VertexData::CreateGround(options);
 
   vertexData->applyToMesh(*ground, options.updatable);
 
@@ -35,9 +35,9 @@ GroundMeshPtr GroundBuilder::CreateGround(const std::string& name, GroundOptions
 MeshPtr GroundBuilder::CreateTiledGround(const std::string& name, TiledGroundOptions& options,
                                          Scene* scene)
 {
-  auto tiledGround = Mesh::New(name, scene);
+  const auto tiledGround = Mesh::New(name, scene);
 
-  auto vertexData = VertexData::CreateTiledGround(options);
+  const auto vertexData = VertexData::CreateTiledGround(options);
 
   vertexData->applyToMesh(*tiledGround, options.updatable);
 
@@ -59,7 +59,7 @@ GroundMeshPtr GroundBuilder::CreateGroundFromHeightMap(const std::string& name,
   const auto& updatable   = options.updatable;
   const auto& onReady     = options.onReady;
 
-  auto ground            = GroundMesh::New(name, scene);
+  const auto ground      = GroundMesh::New(name, scene);
   ground->_subdivisionsX = subdivisions;
   ground->_subdivisionsY = subdivisions;
   ground->_width         = width;
