@@ -5,15 +5,15 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class DecalOptions;
 class Mesh;
 class Scene;
-using MeshPtr         = std::shared_ptr<Mesh>;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(AbstractMesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.
