@@ -9,20 +9,20 @@ namespace BABYLON {
 
 MeshPtr LatheBuilder::CreateLathe(const std::string& name, LatheOptions& options, Scene* scene)
 {
-  auto arc = options.arc.has_value() ?
-               ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-               1.f;
-  auto closed          = options.closed.value_or(true);
-  auto& shape          = options.shape;
-  auto radius          = options.radius.value_or(1.f);
-  auto tessellation    = static_cast<float>(options.tessellation.value_or(64));
-  auto clip            = static_cast<float>(options.clip.value_or(0));
-  auto updatable       = options.updatable;
-  auto sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
-  auto cap             = options.cap.value_or(Mesh::NO_CAP);
-  auto pi2             = Math::PI2;
+  const auto arc             = options.arc.has_value() ?
+                                 ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+                                 1.f;
+  const auto closed          = options.closed.value_or(true);
+  const auto& shape          = options.shape;
+  const auto radius          = options.radius.value_or(1.f);
+  const auto tessellation    = static_cast<float>(options.tessellation.value_or(64));
+  const auto clip            = static_cast<float>(options.clip.value_or(0));
+  const auto updatable       = options.updatable;
+  const auto sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  const auto cap             = options.cap.value_or(Mesh::NO_CAP);
+  const auto pi2             = Math::PI2;
   std::vector<std::vector<Vector3>> paths;
-  auto invertUV = options.invertUV.value_or(false);
+  const auto invertUV = options.invertUV.value_or(false);
 
   const auto step = pi2 / tessellation * arc;
   Vector3 rotated;
@@ -33,7 +33,7 @@ MeshPtr LatheBuilder::CreateLathe(const std::string& name, LatheOptions& options
       path.emplace_back(Vector3(std::cos((float)i * step) * shape[0].x * radius, shape[0].y,
                                 std::sin((float)i * step) * shape[0].x * radius));
     }
-    for (auto& p : shape) {
+    for (const auto& p : shape) {
       rotated = Vector3(std::cos(i * step) * p.x * radius, p.y, std::sin(i * step) * p.x * radius);
       path.emplace_back(rotated);
     }
@@ -55,7 +55,7 @@ MeshPtr LatheBuilder::CreateLathe(const std::string& name, LatheOptions& options
   ribbonOptions.invertUV        = invertUV;
   ribbonOptions.frontUVs        = options.frontUVs;
   ribbonOptions.backUVs         = options.backUVs;
-  auto lathe                    = RibbonBuilder::CreateRibbon(name, ribbonOptions, scene);
+  const auto lathe              = RibbonBuilder::CreateRibbon(name, ribbonOptions, scene);
   return lathe;
 }
 
