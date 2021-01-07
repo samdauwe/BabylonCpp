@@ -49,10 +49,10 @@ LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name, LineSystemO
   }
 
   // line system creation
-  auto useVertexColor = !colors.empty();
-  auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
-                                   options.useVertexAlpha.value_or(true));
-  auto vertexData     = VertexData::CreateLineSystem(options);
+  const auto useVertexColor = !colors.empty();
+  const auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
+                                         options.useVertexAlpha.value_or(true));
+  const auto vertexData     = VertexData::CreateLineSystem(options);
   vertexData->applyToMesh(*lineSystem, options.updatable);
   return lineSystem;
 }
@@ -73,15 +73,15 @@ LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name, DashedLine
 
   if (instance) { //  dashed lines update
     const auto positionFunction = [&](Float32Array& positions) -> void {
-      auto curvect  = Vector3::Zero();
-      auto nbSeg    = positions.size() / 6;
-      auto lg       = 0.f;
-      auto nb       = 0u;
-      auto shft     = 0.f;
-      auto dashshft = 0.f;
-      auto curshft  = 0.f;
-      auto p        = 0u;
-      auto j        = 0u;
+      auto curvect     = Vector3::Zero();
+      const auto nbSeg = positions.size() / 6;
+      auto lg          = 0.f;
+      auto nb          = 0u;
+      auto shft        = 0.f;
+      auto dashshft    = 0.f;
+      auto curshft     = 0.f;
+      auto p           = 0u;
+      auto j           = 0u;
       for (std::size_t i = 0; i < points.size() - 1; ++i) {
         points[i + 1].subtractToRef(points[i], curvect);
         lg += curvect.length();
@@ -119,9 +119,9 @@ LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name, DashedLine
     return instance;
   }
   // dashed lines creation
-  auto dashedLines = LinesMesh::New(name, scene, nullptr, nullptr, true, false,
-                                    options.useVertexAlpha.value_or(false));
-  auto vertexData  = VertexData::CreateDashedLines(options);
+  const auto dashedLines = LinesMesh::New(name, scene, nullptr, nullptr, true, false,
+                                          options.useVertexAlpha.value_or(false));
+  const auto vertexData  = VertexData::CreateDashedLines(options);
   vertexData->applyToMesh(*dashedLines, options.updatable);
 
   dashedLines->_creationDataStorage           = std::make_shared<_CreationDataStorage>();

@@ -5,15 +5,15 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class DashedLinesOptions;
-class LinesMesh;
 class LinesOptions;
 class LineSystemOptions;
 class Scene;
-using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+FWD_CLASS_SPTR(LinesMesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.
