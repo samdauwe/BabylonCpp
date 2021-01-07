@@ -21,9 +21,9 @@ MeshPtr HemisphereBuilder::CreateHemisphere(const std::string& name, HemisphereO
   sphereOptions.slice    = 0.5f;
   sphereOptions.diameter = *options.diameter;
   sphereOptions.segments = *options.segments;
-  auto halfSphere        = SphereBuilder::CreateSphere("", sphereOptions, scene);
-  auto disc              = Mesh::CreateDisc("", *options.diameter / 2.f,
-                               (*options.segments * 3) + (4 - *options.segments), scene);
+  const auto halfSphere  = SphereBuilder::CreateSphere("", sphereOptions, scene);
+  const auto disc        = Mesh::CreateDisc("", *options.diameter / 2.f,
+                                     (*options.segments * 3) + (4 - *options.segments), scene);
   disc->rotation().x     = -Math::PI_2;
   disc->parent           = halfSphere.get();
 

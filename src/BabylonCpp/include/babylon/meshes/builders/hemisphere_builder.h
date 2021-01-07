@@ -5,13 +5,13 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class HemisphereOptions;
-class Mesh;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.
@@ -25,8 +25,7 @@ struct BABYLON_SHARED_EXPORT HemisphereBuilder {
    * @param scene defines the hosting scene
    * @returns the hemisphere mesh
    */
-  static MeshPtr CreateHemisphere(const std::string& name,
-                                  HemisphereOptions& options,
+  static MeshPtr CreateHemisphere(const std::string& name, HemisphereOptions& options,
                                   Scene* scene = nullptr);
 
 }; // end of struct HemisphereBuilder
