@@ -5,6 +5,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/color4.h>
@@ -14,14 +15,10 @@
 
 namespace BABYLON {
 
-class GroundMesh;
-class LinesMesh;
-class Mesh;
-class plane;
-using GroundMeshPtr = std::shared_ptr<GroundMesh>;
-using LinesMeshPtr  = std::shared_ptr<LinesMesh>;
-using MeshPtr       = std::shared_ptr<Mesh>;
-using PlanePtr      = std::shared_ptr<Plane>;
+FWD_CLASS_SPTR(GroundMesh)
+FWD_CLASS_SPTR(LinesMesh)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(Plane)
 
 //--------------------------------------------------------------------------------------------------
 // Box mesh options
