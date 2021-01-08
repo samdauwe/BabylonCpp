@@ -8,12 +8,12 @@ namespace BABYLON {
 MeshPtr PolyhedronBuilder::CreatePolyhedron(const std::string& name, PolyhedronOptions& options,
                                             Scene* scene)
 {
-  auto polyhedron = Mesh::New(name, scene);
+  const auto polyhedron = Mesh::New(name, scene);
 
   options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   polyhedron->_originalBuilderSideOrientation = *options.sideOrientation;
 
-  auto vertexData = VertexData::CreatePolyhedron(options);
+  const auto vertexData = VertexData::CreatePolyhedron(options);
 
   vertexData->applyToMesh(*polyhedron, options.updatable);
 
