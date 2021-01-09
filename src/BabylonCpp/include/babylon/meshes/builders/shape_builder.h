@@ -7,15 +7,15 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector4.h>
 
 namespace BABYLON {
 
 class ExtrudeShapeOptions;
 class ExtrudeShapeCustomOptions;
-class Mesh;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.
