@@ -11,12 +11,12 @@ namespace BABYLON {
 
 MeshPtr RibbonBuilder::CreateRibbon(const std::string& name, RibbonOptions& options, Scene* scene)
 {
-  const auto& pathArray  = options.pathArray;
-  const auto& closeArray = options.closeArray;
-  const auto& closePath  = options.closePath;
-  auto sideOrientation   = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
-  const auto& instance   = options.instance;
-  const auto& updatable  = options.updatable;
+  const auto& pathArray      = options.pathArray;
+  const auto& closeArray     = options.closeArray;
+  const auto& closePath      = options.closePath;
+  const auto sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  const auto& instance       = options.instance;
+  const auto& updatable      = options.updatable;
 
   if (instance) { // existing ribbon instance update
                   // positionFunction : ribbon case
@@ -25,10 +25,10 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name, RibbonOptions& opti
     auto& minimum = TmpVectors::Vector3Array[0].setAll(std::numeric_limits<float>::max());
     auto& maximum = TmpVectors::Vector3Array[1].setAll(std::numeric_limits<float>::lowest());
     const auto positionFunction = [&](Float32Array& positions) -> void {
-      auto minlg = pathArray[0].size();
-      auto& mesh = instance;
-      auto i     = 0u;
-      auto ns    = (mesh->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2u : 1u;
+      auto minlg       = pathArray[0].size();
+      const auto& mesh = instance;
+      auto i           = 0u;
+      const auto ns    = (mesh->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2u : 1u;
       for (auto si = 1ull; si <= ns; ++si) {
         for (const auto& path : pathArray) {
           const auto l = path.size();
@@ -82,8 +82,8 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name, RibbonOptions& opti
       instance->updateVerticesData(VertexBuffer::UVKind, uvs, false, false);
     }
     if (!instance->areNormalsFrozen() || instance->isFacetDataEnabled()) {
-      auto indices = instance->getIndices();
-      auto normals = instance->getVerticesData(VertexBuffer::NormalKind);
+      const auto indices = instance->getIndices();
+      auto normals       = instance->getVerticesData(VertexBuffer::NormalKind);
       if (instance->isFacetDataEnabled()) {
         auto params = instance->getFacetDataParameters();
         VertexData::ComputeNormals(positions, indices, normals, params);
@@ -120,11 +120,11 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name, RibbonOptions& opti
     return instance;
   }
   else { // new ribbon creation
-    auto ribbon                             = Mesh::New(name, scene);
+    const auto ribbon                       = Mesh::New(name, scene);
     ribbon->_originalBuilderSideOrientation = sideOrientation;
     ribbon->_creationDataStorage            = std::make_shared<_CreationDataStorage>();
 
-    auto vertexData = VertexData::CreateRibbon(options);
+    const auto vertexData = VertexData::CreateRibbon(options);
     if (closePath) {
       ribbon->_creationDataStorage->idx = vertexData->_idx;
     }
