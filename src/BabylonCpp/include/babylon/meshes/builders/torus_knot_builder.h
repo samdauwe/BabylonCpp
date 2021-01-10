@@ -5,13 +5,13 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Mesh;
 class Scene;
 class TorusKnotOptions;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Class containing static functions to help procedurally build meshes.
@@ -35,8 +35,7 @@ struct BABYLON_SHARED_EXPORT TorusKnotBuilder {
    * @see  https://doc.babylonjs.com/how_to/set_shapes#torus-knot
    */
   // clang-format on
-  static MeshPtr CreateTorusKnot(const std::string& name,
-                                 TorusKnotOptions& options,
+  static MeshPtr CreateTorusKnot(const std::string& name, TorusKnotOptions& options,
                                  Scene* scene = nullptr);
 
 }; // end of struct TorusKnotBuilder

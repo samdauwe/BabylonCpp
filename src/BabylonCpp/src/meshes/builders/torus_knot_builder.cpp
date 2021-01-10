@@ -6,17 +6,15 @@
 
 namespace BABYLON {
 
-MeshPtr TorusKnotBuilder::CreateTorusKnot(const std::string& name,
-                                          TorusKnotOptions& options,
+MeshPtr TorusKnotBuilder::CreateTorusKnot(const std::string& name, TorusKnotOptions& options,
                                           Scene* scene)
 {
-  auto torusKnot = Mesh::New(name, scene);
+  const auto torusKnot = Mesh::New(name, scene);
 
-  options.sideOrientation
-    = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
+  options.sideOrientation = Mesh::_GetDefaultSideOrientation(options.sideOrientation);
   torusKnot->_originalBuilderSideOrientation = *options.sideOrientation;
 
-  auto vertexData = VertexData::CreateTorusKnot(options);
+  const auto vertexData = VertexData::CreateTorusKnot(options);
 
   vertexData->applyToMesh(*torusKnot, options.updatable);
 
