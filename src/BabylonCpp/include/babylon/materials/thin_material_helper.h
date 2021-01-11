@@ -4,12 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Effect;
 struct IClipPlanesHolder;
-using EffectPtr = std::shared_ptr<Effect>;
+FWD_CLASS_SPTR(Effect)
 
 /**
  * @brief "Static Class" containing a few commonly used helper while dealing with material for
