@@ -124,10 +124,11 @@ WebGLDataBufferPtr& UniformBuffer::getBuffer()
 
 void UniformBuffer::_fillAlignment(size_t size)
 {
-  // This code has been simplified because we only use floats, vectors of 1, 2,
-  // 3, 4 components and 4x4 matrices
+  // This code has been simplified because we only use floats, vectors of 1, 2, 3, 4 components
+  // and 4x4 matrices
+  // TODO : change if other types are used
 
-  size_t alignment;
+  size_t alignment = 0;
   if (size <= 2) {
     alignment = size;
   }
@@ -261,8 +262,6 @@ void UniformBuffer::_rebuild()
   else {
     _buffer = _engine->createUniformBuffer(_bufferData);
   }
-
-  _needSync = true;
 }
 
 void UniformBuffer::update()
@@ -284,7 +283,7 @@ void UniformBuffer::update()
 void UniformBuffer::updateUniform(const std::string& uniformName, const Float32Array& data,
                                   size_t size)
 {
-  size_t location = _uniformLocations[uniformName];
+  size_t location = 0;
   if (!stl_util::contains(_uniformLocations, uniformName)) {
     if (_buffer) {
       // Cannot add an uniform if the buffer is already created
@@ -294,6 +293,9 @@ void UniformBuffer::updateUniform(const std::string& uniformName, const Float32A
     addUniform(uniformName, static_cast<int>(size));
     location = _uniformLocations[uniformName];
   }
+  else {
+    location = _uniformLocations[uniformName];
+  }
 
   if (!_buffer) {
     create();
@@ -301,7 +303,7 @@ void UniformBuffer::updateUniform(const std::string& uniformName, const Float32A
 
   if (!_dynamic) {
     // Cache for static uniform buffers
-    bool changed = false;
+    auto changed = false;
 
     for (size_t i = 0; i < size; ++i) {
       // We are checking the matrix cache before calling updateUniform so we do not need to check it
@@ -492,6 +494,7 @@ void UniformBuffer::setTexture(const std::string& name, const BaseTexturePtr& te
 void UniformBuffer::updateUniformDirectly(const std::string& uniformName, const Float32Array& data)
 {
   updateUniform(uniformName, data, data.size());
+
   update();
 }
 

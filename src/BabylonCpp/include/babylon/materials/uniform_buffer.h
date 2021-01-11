@@ -8,20 +8,18 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class BaseTexture;
 class Color3;
-class Effect;
 class Engine;
 class Matrix;
 class Vector3;
 class Vector4;
-class WebGLDataBuffer;
-using BaseTexturePtr     = std::shared_ptr<BaseTexture>;
-using EffectPtr          = std::shared_ptr<Effect>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Uniform buffer objects.
@@ -58,13 +56,13 @@ public:
    * @brief Indicates if the buffer is using the WebGL2 UBO implementation, or just falling back on
    * setUniformXXX calls.
    */
-  [[nodiscard]] bool useUbo() const;
+  bool useUbo() const;
 
   /**
    * @brief Indicates if the WebGL underlying uniform buffer is in sync with the javascript cache
    * data.
    */
-  [[nodiscard]] bool isSync() const;
+  bool isSync() const;
 
   /**
    * @brief Indicates if the WebGL underlying uniform buffer is dynamic.
@@ -72,7 +70,7 @@ public:
    * WebGL uniform buffer to the GPU.
    * @returns if Dynamic, otherwise false
    */
-  [[nodiscard]] bool isDynamic() const;
+  bool isDynamic() const;
 
   /**
    * @brief The data cache on JS side.
@@ -90,8 +88,7 @@ public:
    * @brief Adds an uniform in the buffer.
    * Warning : the subsequents calls of this function must be in the same order as declared in the
    * shader for the layout to be correct !
-   * @param name Name of the uniform, as used in the uniform block in the
-   * shader.
+   * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param size Data size, or data directly.
    */
   void addUniform(const std::string& name, const std::variant<int, Float32Array>& size);
@@ -190,8 +187,7 @@ public:
 
   /**
    * @brief Directly updates the value of the uniform in the cache AND on the GPU.
-   * @param uniformName Define the name of the uniform, as used in the uniform
-   * block in the shader.
+   * @param uniformName Define the name of the uniform, as used in the uniform block in the shader.
    * @param data Define the flattened data
    */
   void updateUniformDirectly(const std::string& uniformName, const Float32Array& data);
@@ -211,8 +207,7 @@ public:
 private:
   /**
    * @brief std140 layout specifies how to align data within an UBO structure.
-   * @see https://khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159
-   * for specs.
+   * @see https://khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159 for specs.
    */
   void _fillAlignment(size_t size);
 
