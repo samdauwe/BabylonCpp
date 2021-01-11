@@ -26,8 +26,7 @@ FWD_CLASS_SPTR(StandardMaterial)
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
 private:
-  // Flags used to enable or disable a type of texture for all Standard
-  // Materials
+  // Flags used to enable or disable a type of texture for all Standard Materials
   static bool _DiffuseTextureEnabled;
   static bool _AmbientTextureEnabled;
   static bool _OpacityTextureEnabled;
@@ -80,8 +79,8 @@ public:
   BaseTexturePtr getAlphaTestTexture() override;
 
   /**
-   * @brief Get if the submesh is ready to be used and all its information
-   * available. Child classes can use it to update shaders.
+   * @brief Get if the submesh is ready to be used and all its information available. Child classes
+   * can use it to update shaders.
    * @param mesh defines the mesh to check
    * @param subMesh defines which submesh to check
    * @param useInstances specifies that instances should be used
@@ -101,8 +100,7 @@ public:
   void unbind() override;
 
   /**
-   * @brief Binds the submesh to this material by preparing the effect and
-   * shader to draw.
+   * @brief Binds the submesh to this material by preparing the effect and shader to draw.
    * @param world defines the world transformation matrix
    * @param mesh defines the mesh containing the submesh
    * @param subMesh defines the submesh to bind the material to
@@ -130,10 +128,8 @@ public:
 
   /**
    * @brief Disposes the material.
-   * @param forceDisposeEffect specifies if effects should be forcefully
-   * disposed
-   * @param forceDisposeTextures specifies if textures should be forcefully
-   * disposed
+   * @param forceDisposeEffect specifies if effects should be forcefully disposed
+   * @param forceDisposeTextures specifies if textures should be forcefully disposed
    */
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
@@ -235,8 +231,8 @@ public:
 protected:
   /**
    * @brief Instantiates a new standard material.
-   * This is the default material used in Babylon. It is the best trade off
-   * between quality and performances.
+   * This is the default material used in Babylon. It is the best trade off between quality and
+   * performances.
    * @see https://doc.babylonjs.com/babylon101/materials
    * @param name Define the name of the material in the scene
    * @param scene Define the scene the material belong to
@@ -311,14 +307,12 @@ protected:
   void set_twoSidedLighting(bool value);
 
   /**
-   * @brief Gets the image processing configuration used either in this
-   * material.
+   * @brief Gets the image processing configuration used either in this material.
    */
   ImageProcessingConfiguration*& get_imageProcessingConfiguration();
 
   /**
-   * @brief Sets the Default image processing configuration used either in the
-   * this material.
+   * @brief Sets the Default image processing configuration used either in the this material.
    *
    * If sets to null, the scene one is in use.
    */
@@ -356,16 +350,16 @@ protected:
 
   /**
    * @brief The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
+   * This property is here and not in the camera to allow controlling exposure without full screen
+   * post process.
    * This corresponds to a photographic exposure.
    */
   float get_cameraExposure() const;
 
   /**
    * @brief The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
+   * This property is here and not in the camera to allow controlling exposure without full screen
+   * post process.
    * This corresponds to a photographic exposure.
    */
   void set_cameraExposure(float value);
@@ -460,23 +454,20 @@ public:
   Property<StandardMaterial, BaseTexturePtr> diffuseTexture;
 
   /**
-   * AKA Occlusion Texture in other nomenclature, it helps adding baked shadows
-   * into your material.
+   * AKA Occlusion Texture in other nomenclature, it helps adding baked shadows into your material.
    */
   Property<StandardMaterial, BaseTexturePtr> ambientTexture;
 
   /**
    * Define the transparency of the material from a texture.
-   * The final alpha value can be read either from the red channel (if
-   * texture.getAlphaFromRGB is false) or from the luminance or the current
-   * texel (if texture.getAlphaFromRGB is true)
+   * The final alpha value can be read either from the red channel (if texture.getAlphaFromRGB is
+   * false) or from the luminance or the current texel (if texture.getAlphaFromRGB is true)
    */
   Property<StandardMaterial, BaseTexturePtr> opacityTexture;
 
   /**
    * Define the texture used to display the reflection.
-   * @see
-   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * @see https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   Property<StandardMaterial, BaseTexturePtr> reflectionTexture;
 
@@ -487,32 +478,29 @@ public:
   Property<StandardMaterial, BaseTexturePtr> emissiveTexture;
 
   /**
-   * Define how the color and intensity of the highlight given by the light in
-   * the material.
+   * Define how the color and intensity of the highlight given by the light in the material.
    */
   Property<StandardMaterial, BaseTexturePtr> specularTexture;
 
   /**
-   * Bump mapping is a technique to simulate bump and dents on a rendered
-   * surface. These are made by creating a normal map from an image. The means
-   * to do this can be found on the web, a search for 'normal map generator'
-   * will bring up free and paid for methods of doing this.
+   * Bump mapping is a technique to simulate bump and dents on a rendered surface. These are made by
+   * creating a normal map from an image. The means to do this can be found on the web, a search for
+   * 'normal map generator' will bring up free and paid for methods of doing this.
    * @see https://doc.babylonjs.com/how_to/more_materials#bump-map
    */
   Property<StandardMaterial, BaseTexturePtr> bumpTexture;
 
   /**
    * Complex lighting can be computationally expensive to compute at runtime.
-   * To save on computation, lightmaps may be used to store calculated lighting
-   * in a texture which will be applied to a given mesh.
+   * To save on computation, lightmaps may be used to store calculated lighting in a texture which
+   * will be applied to a given mesh.
    * @see https://doc.babylonjs.com/babylon101/lights#lightmaps
    */
   Property<StandardMaterial, BaseTexturePtr> lightmapTexture;
 
   /**
    * Define the texture used to display the refraction.
-   * @see
-   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * @see https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   Property<StandardMaterial, BaseTexturePtr> refractionTexture;
 
@@ -528,8 +516,7 @@ public:
   Color3 diffuseColor;
 
   /**
-   * Define how the color and intensity of the highlight given by the light in
-   * the material.
+   * Define how the color and intensity of the highlight given by the light in the material.
    */
   Color3 specularColor;
 
@@ -541,9 +528,8 @@ public:
 
   /**
    * Defines how sharp are the highlights in the material.
-   * The bigger the value the sharper giving a more glossy feeling to the
-   * result. Reversely, the smaller the value the blurrier giving a more rough
-   * feeling to the result.
+   * The bigger the value the sharper giving a more glossy feeling to the result. Reversely, the
+   * smaller the value the blurrier giving a more rough feeling to the result.
    */
   float specularPower;
 
@@ -559,31 +545,28 @@ public:
   Property<StandardMaterial, bool> useEmissiveAsIllumination;
 
   /**
-   * If true, some kind of energy conservation will prevent the end result to be
-   * more than 1 by reducing the emissive level when the final color is close to
-   * one.
+   * If true, some kind of energy conservation will prevent the end result to be more than 1 by
+   * reducing the emissive level when the final color is close to one.
    */
   Property<StandardMaterial, bool> linkEmissiveWithDiffuse;
 
   /**
-   * Specifies that the material will keep the specular highlights over a
-   * transparent surface (only the most limunous ones). A car glass is a good
-   * exemple of that. When sun reflects on it you can not see what is behind.
+   * Specifies that the material will keep the specular highlights over a transparent surface (only
+   * the most limunous ones). A car glass is a good exemple of that. When sun reflects on it you can
+   * not see what is behind.
    */
   Property<StandardMaterial, bool> useSpecularOverAlpha;
 
   /**
-   * Specifies that the material will keeps the reflection highlights over a
-   * transparent surface (only the most limunous ones). A car glass is a good
-   * exemple of that. When the street lights reflects on it you can not see what
-   * is behind.
+   * Specifies that the material will keeps the reflection highlights over a transparent surface
+   * (only the most limunous ones). A car glass is a good exemple of that. When the street lights
+   * reflects on it you can not see what is behind.
    */
   Property<StandardMaterial, bool> useReflectionOverAlpha;
 
   /**
    * Does lights from the scene impacts this material.
-   * It can be a nice trick for performance to disable lighting on a fully
-   * emissive material.
+   * It can be a nice trick for performance to disable lighting on a fully emissive material.
    */
   Property<StandardMaterial, bool> disableLighting;
 
@@ -600,16 +583,15 @@ public:
 
   /**
    * Is parallax occlusion enabled or not.
-   * If true, the outcome is way more realistic than traditional Parallax but
-   * you can expect a performance hit that worthes consideration.
+   * If true, the outcome is way more realistic than traditional Parallax but you can expect a
+   * performance hit that worthes consideration.
    * @see https://doc.babylonjs.com/how_to/using_parallax_mapping
    */
   Property<StandardMaterial, bool> useParallaxOcclusion;
 
   /**
-   * Apply a scaling factor that determine which "depth" the height map should
-   * reprensent. A value between 0.05 and 0.1 is reasonnable in Parallax, you
-   * can reach 0.2 using Parallax Occlusion.
+   * Apply a scaling factor that determine which "depth" the height map should reprensent. A value
+   * between 0.05 and 0.1 is reasonnable in Parallax, you can reach 0.2 using Parallax Occlusion.
    */
   float parallaxScaleBias;
 
@@ -620,16 +602,14 @@ public:
 
   /**
    * In case of refraction, define the value of the index of refraction.
-   * @see
-   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * @see https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   float indexOfRefraction;
 
   /**
    * Invert the refraction texture alongside the y axis.
    * It can be useful with procedural textures or probe for instance.
-   * @see
-   * https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   * @see https://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */
   bool invertRefractionY;
 
@@ -639,8 +619,7 @@ public:
   float alphaCutOff;
 
   /**
-   * In case of light mapping, define whether the map contains light or shadow
-   * informations.
+   * In case of light mapping, define whether the map contains light or shadow informations.
    */
   Property<StandardMaterial, bool> useLightmapAsShadowmap;
 
@@ -677,15 +656,14 @@ public:
   Property<StandardMaterial, FresnelParametersPtr> emissiveFresnelParameters;
 
   /**
-   * If true automatically deducts the fresnels values from the material
-   * specularity.
+   * If true automatically deducts the fresnels values from the material specularity.
    * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
    */
   Property<StandardMaterial, bool> useReflectionFresnelFromSpecular;
 
   /**
-   * Defines if the glossiness/roughness of the material should be read from the
-   * specular map alpha channel
+   * Defines if the glossiness/roughness of the material should be read from the specular map alpha
+   * channel
    */
   Property<StandardMaterial, bool> useGlossinessFromSpecularMapAlpha;
 
@@ -705,8 +683,7 @@ public:
   Property<StandardMaterial, bool> invertNormalMapY;
 
   /**
-   * If sets to true and backfaceCulling is false, normals will be flipped on
-   * the backside.
+   * If sets to true and backfaceCulling is false, normals will be flipped on the backside.
    */
   Property<StandardMaterial, bool> twoSidedLighting;
 
@@ -737,8 +714,8 @@ public:
 
   /**
    * The camera exposure used on this material
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
+   * This property is here and not in the camera to allow controlling exposure without full screen
+   * post process.
    * This corresponds to a photographic exposure.
    */
   Property<StandardMaterial, float> cameraExposure;
@@ -823,8 +800,7 @@ private:
   bool _invertNormalMapY;
 
   /**
-   * If sets to true and backfaceCulling is false, normals will be flipped on
-   * the backside.
+   * If sets to true and backfaceCulling is false, normals will be flipped on the backside.
    */
   bool _twoSidedLighting;
 
