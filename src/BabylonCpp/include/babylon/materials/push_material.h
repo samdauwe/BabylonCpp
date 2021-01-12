@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_PUSH_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/material.h>
 
 namespace BABYLON {
 
-class Effect;
-class PushMaterial;
-using EffectPtr       = std::shared_ptr<Effect>;
-using PushMaterialPtr = std::shared_ptr<PushMaterial>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(PushMaterial)
 
 /**
  * @brief Base class of materials working in push mode in babylon JS.
@@ -31,9 +30,9 @@ public:
   /**
    * @brief Returns the string "PushMaterial".
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
-  [[nodiscard]] Type type() const override;
+  Type type() const override;
 
   EffectPtr& getEffect();
   bool isReady(AbstractMesh* mesh, bool useInstances) override;
