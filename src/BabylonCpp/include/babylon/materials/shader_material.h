@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_SHADER_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/maths/color3.h>
@@ -14,10 +15,8 @@
 
 namespace BABYLON {
 
-class ShaderMaterial;
-class Texture;
-using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
-using TexturePtr        = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(ShaderMaterial)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief The ShaderMaterial object has the necessary methods to pass data from your scene to the
@@ -62,21 +61,21 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
-  [[nodiscard]] Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  [[nodiscard]] bool needAlphaBlending() const override;
+  bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode
    * @returns a boolean specifying if an alpha test is needed.
    */
-  [[nodiscard]] bool needAlphaTesting() const override;
+  bool needAlphaTesting() const override;
 
   /**
    * @brief Set a texture in the shader.
@@ -276,22 +275,21 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  [[nodiscard]] MaterialPtr clone(const std::string& name,
-                                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Disposes the material.
@@ -307,7 +305,7 @@ public:
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a shader material from parsed shader material data.
