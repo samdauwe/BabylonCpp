@@ -11,8 +11,7 @@ MultiMaterial::MultiMaterial(const std::string& name, Scene* scene)
     : Material{name, scene, true}
     , subMaterials{this, &MultiMaterial::get_subMaterials, &MultiMaterial::set_subMaterials}
 {
-  // multimaterial is considered like a push material
-  _storeEffectOnSubMeshes = true;
+  _storeEffectOnSubMeshes = true; // multimaterial is considered like a push material
 }
 
 MultiMaterial::~MultiMaterial() = default;
@@ -27,7 +26,6 @@ Type MultiMaterial::type() const
   return Type::MULTIMATERIAL;
 }
 
-// Properties
 std::vector<MaterialPtr>& MultiMaterial::get_subMaterials()
 {
   return _subMaterials;
@@ -150,7 +148,7 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
 
 MultiMaterialPtr MultiMaterial::ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene)
 {
-  auto multiMaterial
+  const auto multiMaterial
     = MultiMaterial::New(json_util::get_string(parsedMultiMaterial, "name"), scene);
 
   multiMaterial->id = json_util::get_string(parsedMultiMaterial, "id");
@@ -158,9 +156,9 @@ MultiMaterialPtr MultiMaterial::ParseMultiMaterial(const json& parsedMultiMateri
   for (const auto& subMatId : json_util::get_array<json>(parsedMultiMaterial, "materials")) {
 
     if (subMatId.is_string()) {
-      // If the same multimaterial is loaded twice, the 2nd multimaterial needs
-      // to reference the latest material by that id which is why this lookup
-      // should use getLastMaterialByID instead of getMaterialByID
+      // If the same multimaterial is loaded twice, the 2nd multimaterial needs to reference the
+      // latest material by that id which is why this lookup should use getLastMaterialByID instead
+      // of getMaterialByID
       multiMaterial->subMaterials().emplace_back(
         scene->getLastMaterialByID(subMatId.get<std::string>()));
     }

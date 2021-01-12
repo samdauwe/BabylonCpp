@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_MULTI_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/material.h>
 
 namespace BABYLON {
 
-class MultiMaterial;
-using MultiMaterialPtr = std::shared_ptr<MultiMaterial>;
+FWD_CLASS_SPTR(MultiMaterial)
 
 /**
  * @brief A multi-material is used to apply different materials to different parts of the same
@@ -36,7 +36,7 @@ public:
   /**
    * @brief Hidden
    */
-  [[nodiscard]] Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Get one of the submaterial by its index in the submaterials array.
@@ -49,7 +49,7 @@ public:
    * @brief Get the list of active textures for the whole sub materials list.
    * @returns All the textures that will be used during the rendering
    */
-  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Specifies if any sub-materials of this multi-material use a given texture.
@@ -63,7 +63,7 @@ public:
    * serialization.
    * @returns the class name
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Checks if the material is ready to render the requested sub mesh.
@@ -80,14 +80,13 @@ public:
    * @param cloneChildren Define if submaterial will be cloned or shared with the parent instance
    * @returns the cloned material
    */
-  [[nodiscard]] MaterialPtr clone(const std::string& iName,
-                                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& iName, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes the materials into a JSON representation.
    * @returns the JSON representation
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Dispose the material and release its associated resources.
