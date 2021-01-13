@@ -133,11 +133,11 @@ bool ImageProcessingConfiguration::get_colorGradingBGR() const
 
 void ImageProcessingConfiguration::set_colorGradingBGR(bool value)
 {
-  if (_colorGradingWithGreenDepth == value) {
+  if (_colorGradingBGR == value) {
     return;
   }
 
-  _colorGradingWithGreenDepth = value;
+  _colorGradingBGR = value;
   _updateParameters();
 }
 
@@ -367,23 +367,23 @@ void ImageProcessingConfiguration::bind(Effect* effect,
 
   // Vignette
   if (_vignetteEnabled) {
-    auto inverseWidth  = 1.f / effect->getEngine()->getRenderWidth();
-    auto inverseHeight = 1.f / effect->getEngine()->getRenderHeight();
+    const auto inverseWidth  = 1.f / effect->getEngine()->getRenderWidth();
+    const auto inverseHeight = 1.f / effect->getEngine()->getRenderHeight();
     effect->setFloat2("vInverseScreenSize", inverseWidth, inverseHeight);
 
-    auto aspectRatio = overrideAspectRatio.value_or(inverseHeight / inverseWidth);
+    const auto aspectRatio = overrideAspectRatio.value_or(inverseHeight / inverseWidth);
 
     auto vignetteScaleY = std::tan(vignetteCameraFov * 0.5f);
     auto vignetteScaleX = vignetteScaleY * aspectRatio;
 
-    auto vignetteScaleGeometricMean = std::sqrt(vignetteScaleX * vignetteScaleY);
+    const auto vignetteScaleGeometricMean = std::sqrt(vignetteScaleX * vignetteScaleY);
     vignetteScaleX = Tools::Mix(vignetteScaleX, vignetteScaleGeometricMean, vignetteStretch);
     vignetteScaleY = Tools::Mix(vignetteScaleY, vignetteScaleGeometricMean, vignetteStretch);
 
     effect->setFloat4("vignetteSettings1", vignetteScaleX, vignetteScaleY,
                       -vignetteScaleX * vignetteCentreX, -vignetteScaleY * vignetteCentreY);
 
-    auto vignettePower = -2.f * vignetteWeight;
+    const auto vignettePower = -2.f * vignetteWeight;
     effect->setFloat4("vignetteSettings2", vignetteColor.r, vignetteColor.g, vignetteColor.b,
                       vignettePower);
   }

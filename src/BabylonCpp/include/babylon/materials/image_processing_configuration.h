@@ -5,6 +5,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color4.h>
 #include <babylon/misc/observable.h>
 
@@ -12,13 +13,10 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class BaseTexture;
-class ColorCurves;
-class Effect;
 struct IImageProcessingConfigurationDefines;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
-using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
-using EffectPtr      = std::shared_ptr<Effect>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(ColorCurves)
+FWD_CLASS_SPTR(Effect)
 
 /**
  * @brief This groups together the common properties used for image processing either in direct
@@ -68,7 +66,7 @@ public:
    * @brief Gets the current class name.
    * @return "ImageProcessingConfiguration"
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Prepare the list of uniforms associated with the Image Processing effects.
@@ -97,7 +95,7 @@ public:
    * @brief Returns true if all the image processing information are ready.
    * @returns True if ready, otherwise, false
    */
-  [[nodiscard]] bool isReady() const;
+  bool isReady() const;
 
   /**
    * @brief Binds the image processing to the shader.
@@ -116,7 +114,7 @@ public:
    * @brief Serializes the current image processing instance to a json representation.
    * @return a JSON representation
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses the image processing from a json representation.
@@ -129,7 +127,7 @@ protected:
   /**
    * @brief Gets wether the color curves effect is enabled.
    */
-  [[nodiscard]] bool get_colorCurvesEnabled() const;
+  bool get_colorCurvesEnabled() const;
 
   /**
    * @brief Sets wether the color curves effect is enabled.
@@ -152,7 +150,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  [[nodiscard]] bool get_colorGradingEnabled() const;
+  bool get_colorGradingEnabled() const;
 
   /**
    * @brief Sets wether the color grading effect is enabled.
@@ -162,7 +160,7 @@ protected:
   /**
    * @brief Gets wether the color grading effect is using a green depth for the 3d Texture.
    */
-  [[nodiscard]] bool get_colorGradingWithGreenDepth() const;
+  bool get_colorGradingWithGreenDepth() const;
 
   /**
    * @brief Sets wether the color grading effect is using a green depth for the 3d Texture.
@@ -172,7 +170,7 @@ protected:
   /**
    * @brief Gets wether the color grading texture contains BGR values.
    */
-  [[nodiscard]] bool get_colorGradingBGR() const;
+  bool get_colorGradingBGR() const;
 
   /**
    * @brief Sets wether the color grading texture contains BGR values.
@@ -182,7 +180,7 @@ protected:
   /**
    * @brief Gets the Exposure used in the effect.
    */
-  [[nodiscard]] float get_exposure() const;
+  float get_exposure() const;
 
   /**
    * @brief Sets the Exposure used in the effect.
@@ -192,7 +190,7 @@ protected:
   /**
    * @brief Gets wether the tone mapping effect is enabled.
    */
-  [[nodiscard]] bool get_toneMappingEnabled() const;
+  bool get_toneMappingEnabled() const;
 
   /**
    * @brief Sets wether the tone mapping effect is enabled.
@@ -202,7 +200,7 @@ protected:
   /**
    *  @brief Gets the type of tone mapping effect.
    */
-  [[nodiscard]] unsigned int get_toneMappingType() const;
+  unsigned int get_toneMappingType() const;
 
   /**
    *  @brief Sets the type of tone mapping effect used in BabylonJS.
@@ -212,7 +210,7 @@ protected:
   /**
    * @brief Gets the contrast used in the effect.
    */
-  [[nodiscard]] float get_contrast() const;
+  float get_contrast() const;
 
   /**
    * @brief Sets the contrast used in the effect.
@@ -222,7 +220,7 @@ protected:
   /**
    * @brief Gets the vignette blend mode allowing different kind of effect.
    */
-  [[nodiscard]] unsigned int get_vignetteBlendMode() const;
+  unsigned int get_vignetteBlendMode() const;
 
   /**
    * @brief Sets the vignette blend mode allowing different kind of effect.
@@ -232,7 +230,7 @@ protected:
   /**
    * @brief Gets wether the vignette effect is enabled.
    */
-  [[nodiscard]] bool get_vignetteEnabled() const;
+  bool get_vignetteEnabled() const;
 
   /**
    * @brief Sets wether the vignette effect is enabled.
@@ -243,7 +241,7 @@ protected:
    * @brief Gets wether the image processing is applied through a post process
    * or not.
    */
-  [[nodiscard]] bool get_applyByPostProcess() const;
+  bool get_applyByPostProcess() const;
 
   /**
    * @brief Sets wether the image processing is applied through a post process
@@ -254,7 +252,7 @@ protected:
   /**
    * @brief Gets wether the image processing is enabled or not.
    */
-  [[nodiscard]] bool get_isEnabled() const;
+  bool get_isEnabled() const;
   /**
    * @brief Sets wether the image processing is enabled or not.
    */
