@@ -7,18 +7,17 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class IAnimatable;
 struct IMaterialDetailMapDefines;
-class BaseTexture;
 class Scene;
 class UniformBuffer;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(IAnimatable)
 
 // clang-format off
 /**
