@@ -2,13 +2,13 @@
 #define BABYLON_MATERIALS_EFFECT_WRAPPER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
-class Effect;
 struct EffectWrapperCreationOptions;
-using EffectPtr = std::shared_ptr<Effect>;
+FWD_CLASS_SPTR(Effect)
 
 /**
  * @brief Wraps an effect to be used for rendering.

@@ -27,14 +27,14 @@ EffectWrapper::EffectWrapper(const EffectWrapperCreationOptions& creationOptions
 
     // Sets the default scale to identity for the post process vertex shader.
     onApplyObservable.add(
-      [this](void*, EventState & /*es*/) -> void { effect->setFloat2("scale", 1.f, 1.f); });
+      [this](void*, EventState& /*es*/) -> void { effect->setFloat2("scale", 1.f, 1.f); });
   }
 
   const std::vector<std::string> fallbackAttributeNames = {"position"};
 
   IEffectCreationOptions options;
-  options.attributes = !creationOptions.attributeNames.empty() ? creationOptions.attributeNames :
-                                                                 fallbackAttributeNames;
+  options.attributes    = !creationOptions.attributeNames.empty() ? creationOptions.attributeNames :
+                                                                    fallbackAttributeNames;
   options.uniformsNames = uniformNames;
   options.samplers      = creationOptions.samplerNames;
 
