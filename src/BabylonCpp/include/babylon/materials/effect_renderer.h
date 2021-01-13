@@ -7,26 +7,20 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Effect;
-struct EffectWrapper;
 struct IEffectRendererOptions;
-class InternalTexture;
-class RenderTargetTexture;
-class Texture;
 class ThinEngine;
-class VertexBuffer;
 class Viewport;
-class WebGLDataBuffer;
-using EffectPtr              = std::shared_ptr<Effect>;
-using EffectWrapperPtr       = std::shared_ptr<EffectWrapper>;
-using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-using TexturePtr             = std::shared_ptr<Texture>;
-using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr     = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(EffectWrapper)
+FWD_CLASS_SPTR(InternalTexture)
+FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_CLASS_SPTR(Texture)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief Helper class to render one or more effects.

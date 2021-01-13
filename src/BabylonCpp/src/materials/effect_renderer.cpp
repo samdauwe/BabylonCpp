@@ -85,11 +85,11 @@ void EffectRenderer::render(
   // Reset state
   setViewport();
 
-  auto out = !outputTexture.has_value() ?
-               nullptr :
-               isRenderTargetTexture(*outputTexture) ?
-               std::get<RenderTargetTexturePtr>(*outputTexture)->getInternalTexture() :
-               std::get<InternalTexturePtr>(*outputTexture);
+  const auto out = !outputTexture.has_value() ?
+                     nullptr :
+                   isRenderTargetTexture(*outputTexture) ?
+                     std::get<RenderTargetTexturePtr>(*outputTexture)->getInternalTexture() :
+                     std::get<InternalTexturePtr>(*outputTexture);
 
   if (out) {
     engine->bindFramebuffer(out);
