@@ -32,7 +32,7 @@ public:
    * @brief Clones the current fresnel and its values.
    * @returns a clone fresnel configuration
    */
-  [[nodiscard]] std::unique_ptr<FresnelParameters> clone() const;
+  std::unique_ptr<FresnelParameters> clone() const;
 
   /**
    * @brief Determines equality between FresnelParameters objects.
@@ -60,7 +60,7 @@ protected:
   /**
    * @brief Define if the fresnel effect is enable or not.
    */
-  [[nodiscard]] bool get_isEnabled() const;
+  bool get_isEnabled() const;
   void set_isEnabled(bool value);
 
 public:
