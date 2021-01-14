@@ -86,7 +86,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
     StringTools::replaceInPlace(currentDefines, toReplace, "#define NUM_BONE_INFLUENCERS 0");
     effect->_bonesComputationForcedToCPU = true;
 
-    auto scene = _mesh->getScene();
+    const auto scene = _mesh->getScene();
     for (const auto& otherMesh : scene->meshes) {
       if (!otherMesh->material()) {
         if (!_mesh->material() && otherMesh->computeBonesUsingShaders()
@@ -105,7 +105,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
       }
       else if (!otherMesh->subMeshes.empty()) {
         for (const auto& subMesh : otherMesh->subMeshes) {
-          auto subMeshEffect = subMesh->effect();
+          const auto subMeshEffect = subMesh->effect();
 
           if (subMeshEffect.get() == effect) {
             otherMesh->computeBonesUsingShaders = false;

@@ -53,7 +53,7 @@ public:
   /**
    * @brief Checks to see if more fallbacks are still available.
    */
-  [[nodiscard]] bool hasMoreFallbacks() const override;
+  bool hasMoreFallbacks() const override;
 
   /**
    * @brief Removes the defines that should be removed when falling back.
