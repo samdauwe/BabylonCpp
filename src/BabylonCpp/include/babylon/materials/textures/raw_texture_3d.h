@@ -21,13 +21,13 @@ public:
    * @param depth defines the depth of the texture
    * @param format defines the texture format to use
    * @param scene defines the hosting scene
-   * @param generateMipMaps defines a boolean indicating if mip levels should be
-   * generated (true by default)
+   * @param generateMipMaps defines a boolean indicating if mip levels should be generated (true by
+   * default)
    * @param invertY defines if texture must be stored with Y axis inverted
-   * @param samplingMode defines the sampling mode to use
-   * (Texture.TRILINEAR_SAMPLINGMODE by default)
-   * @param textureType defines the texture Type
-   * (Engine.TEXTURETYPE_UNSIGNED_INT, Engine.TEXTURETYPE_FLOAT...)
+   * @param samplingMode defines the sampling mode to use (Texture.TRILINEAR_SAMPLINGMODE by
+   * default)
+   * @param textureType defines the texture Type (Engine.TEXTURETYPE_UNSIGNED_INT,
+   * Engine.TEXTURETYPE_FLOAT...)
    */
   RawTexture3D(const ArrayBufferView& data, int width, int height, int depth, unsigned int format,
                Scene* scene, bool generateMipMaps = true, bool invertY = false,

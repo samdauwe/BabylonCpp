@@ -30,7 +30,7 @@ RawTexture3D::~RawTexture3D() = default;
 
 void RawTexture3D::update(const ArrayBufferView& data)
 {
-  if (!_texture) {
+  if (!_texture || !_getEngine()) {
     return;
   }
   _getEngine()->updateRawTexture3D(_texture, data, _texture->format, _texture->invertY, "",
