@@ -436,10 +436,10 @@ void ColorCurves::PrepareUniforms(std::vector<std::string>& uniformsList)
 void ColorCurves::getColorGradingDataToRef(float iHue, float iDensity, float iSaturation,
                                            float iExposure, Color4& result)
 {
-  auto hue        = ColorCurves::clamp(iHue, 0, 360);
-  auto density    = ColorCurves::clamp(iDensity, -100, 100);
-  auto saturation = ColorCurves::clamp(iSaturation, -100, 100);
-  auto exposure   = ColorCurves::clamp(iExposure, -100, 100);
+  auto hue              = ColorCurves::clamp(iHue, 0, 360);
+  auto density          = ColorCurves::clamp(iDensity, -100, 100);
+  const auto saturation = ColorCurves::clamp(iSaturation, -100, 100);
+  auto exposure         = ColorCurves::clamp(iExposure, -100, 100);
 
   // Remap the slider/config filter density with non-linear mapping and also
   // scale by half so that the maximum filter density is only 50% control. This
@@ -463,8 +463,8 @@ float ColorCurves::applyColorGradingSliderNonlinear(float value)
 {
   value /= 100.f;
 
-  float x = std::abs(value);
-  x       = std::pow(x, 2.f);
+  auto x = std::abs(value);
+  x      = std::pow(x, 2.f);
 
   if (value < 0.f) {
     x *= -1.f;
@@ -489,13 +489,13 @@ void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness, Co
   else {
     // sector 0 to 5
     h /= 60.f;
-    float i = std::floor(h);
+    const auto i = std::floor(h);
 
     // fractional part of h
-    float f = h - i;
-    float p = v * (1 - s);
-    float q = v * (1 - s * f);
-    float t = v * (1 - s * (1 - f));
+    const auto f = h - i;
+    const auto p = v * (1 - s);
+    const auto q = v * (1 - s * f);
+    const auto t = v * (1 - s * (1 - f));
 
     switch (static_cast<unsigned int>(i)) {
       case 0:

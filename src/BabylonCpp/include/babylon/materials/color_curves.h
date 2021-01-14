@@ -5,14 +5,14 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color4.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class Effect;
-using EffectPtr = std::shared_ptr<Effect>;
+FWD_CLASS_SPTR(Effect)
 
 /**
  * @brief The color grading curves provide additional color adjustmnent that is applied after any
@@ -38,19 +38,19 @@ public:
    * @brief Returns the class name.
    * @returns The class name
    */
-  [[nodiscard]] std::string getClassName() const;
+  std::string getClassName() const;
 
   /**
    * @brief Clones the current color curve instance.
    * @return The cloned curves
    */
-  [[nodiscard]] std::unique_ptr<ColorCurves> clone() const;
+  std::unique_ptr<ColorCurves> clone() const;
 
   /**
    * @brief Serializes the current color curve instance to a json representation.
    * @return a JSON representation
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Binds the color curves to the shader.
@@ -121,7 +121,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red, 120=green and 240=blue.
    * The default value is 30 degrees (orange).
    */
-  [[nodiscard]] float get_globalHue() const;
+  float get_globalHue() const;
 
   /**
    * @brief Sets the global Hue value.
@@ -136,7 +136,7 @@ protected:
    * means the color filter has maximum effect. Values less than zero provide a filter of opposite
    * hue.
    */
-  [[nodiscard]] float get_globalDensity() const;
+  float get_globalDensity() const;
 
   /**
    * @brief Sets the global Density value.
@@ -151,7 +151,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase saturation and negative values decrease saturation.
    */
-  [[nodiscard]] float get_globalSaturation() const;
+  float get_globalSaturation() const;
 
   /**
    * @brief Sets the global Saturation value.
@@ -165,7 +165,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase exposure and negative values decrease exposure.
    */
-  [[nodiscard]] float get_globalExposure() const;
+  float get_globalExposure() const;
 
   /**
    * @brief Sets the global Exposure value.
@@ -179,7 +179,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red, 120=green and 240=blue.
    * The default value is 30 degrees (orange).
    */
-  [[nodiscard]] float get_highlightsHue() const;
+  float get_highlightsHue() const;
 
   /**
    * @brief Sets the highlights Hue value.
@@ -194,7 +194,7 @@ protected:
    * means the color filter has maximum effect. Values less than zero provide a filter of opposite
    * hue.
    */
-  [[nodiscard]] float get_highlightsDensity() const;
+  float get_highlightsDensity() const;
 
   /**
    * @brief Sets the highlights Density value.
@@ -209,7 +209,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase saturation and negative values decrease saturation.
    */
-  [[nodiscard]] float get_highlightsSaturation() const;
+  float get_highlightsSaturation() const;
 
   /**
    * @brief Sets the highlights Saturation value.
@@ -223,7 +223,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase exposure and negative values decrease exposure.
    */
-  [[nodiscard]] float get_highlightsExposure() const;
+  float get_highlightsExposure() const;
 
   /**
    * @brief Sets the highlights Exposure value.
@@ -237,7 +237,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red, 120=green and 240=blue.
    * The default value is 30 degrees (orange).
    */
-  [[nodiscard]] float get_midtonesHue() const;
+  float get_midtonesHue() const;
 
   /**
    * @brief Sets the midtones Hue value.
@@ -252,7 +252,7 @@ protected:
    * means the color filter has maximum effect. Values less than zero provide a filter of opposite
    * hue.
    */
-  [[nodiscard]] float get_midtonesDensity() const;
+  float get_midtonesDensity() const;
 
   /**
    * @brief Sets the midtones Density value.
@@ -267,7 +267,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase saturation and negative values decrease saturation.
    */
-  [[nodiscard]] float get_midtonesSaturation() const;
+  float get_midtonesSaturation() const;
 
   /**
    * @brief Sets the midtones Saturation value.
@@ -281,7 +281,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase exposure and negative values decrease exposure.
    */
-  [[nodiscard]] float get_midtonesExposure() const;
+  float get_midtonesExposure() const;
 
   /**
    * @brief Sets the midtones Exposure value.
@@ -295,7 +295,7 @@ protected:
    * The hue value is a standard HSB hue in the range [0,360] where 0=red, 120=green and 240=blue.
    * The default value is 30 degrees (orange).
    */
-  [[nodiscard]] float get_shadowsHue() const;
+  float get_shadowsHue() const;
 
   /**
    * @brief Sets the shadows Hue value.
@@ -310,7 +310,7 @@ protected:
    * means the color filter has maximum effect. Values less than zero provide a filter of opposite
    * hue.
    */
-  [[nodiscard]] float get_shadowsDensity() const;
+  float get_shadowsDensity() const;
 
   /**
    * @brief Sets the shadows Density value.
@@ -325,7 +325,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase saturation and negative values decrease saturation.
    */
-  [[nodiscard]] float get_shadowsSaturation() const;
+  float get_shadowsSaturation() const;
 
   /**
    * @brief Sets the shadows Saturation value.
@@ -339,7 +339,7 @@ protected:
    * This is an adjustment value in the range [-100,+100], where the default value of 0.0 makes no
    * adjustment, positive values increase exposure and negative values decrease exposure.
    */
-  [[nodiscard]] float get_shadowsExposure() const;
+  float get_shadowsExposure() const;
 
   /**
    * @brief Sets the shadows Exposure value.
