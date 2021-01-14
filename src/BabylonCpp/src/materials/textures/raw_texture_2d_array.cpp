@@ -31,7 +31,7 @@ RawTexture2DArray::~RawTexture2DArray() = default;
 
 void RawTexture2DArray::update(const ArrayBufferView& data)
 {
-  if (!_texture) {
+  if (!_texture || !_getEngine()) {
     return;
   }
   _getEngine()->updateRawTexture2DArray(_texture, data, _texture->format, _texture->invertY, "",
