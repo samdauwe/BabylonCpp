@@ -98,13 +98,13 @@ protected:
    * @brief Set the wrapping mode on U of all the textures we are rendering to.
    * Can be any of the Texture. (CLAMP_ADDRESSMODE, MIRROR_ADDRESSMODE or WRAP_ADDRESSMODE).
    */
-  void set_wrapU(unsigned int wrap);
+  void set_wrapU(unsigned int wrap) override;
 
   /**
    * @brief Set the wrapping mode on V of all the textures we are rendering to.
    * Can be any of the Texture. (CLAMP_ADDRESSMODE, MIRROR_ADDRESSMODE or WRAP_ADDRESSMODE).
    */
-  void set_wrapV(unsigned int wrap);
+  void set_wrapV(unsigned int wrap) override;
 
   /**
    * @brief Get the number of samples used if MSAA is enabled.
@@ -148,18 +148,6 @@ public:
    * has been set
    */
   ReadOnlyProperty<MultiRenderTarget, TexturePtr> depthTexture;
-
-  /**
-   *The wrapping mode on U of all the textures we are rendering to.
-   * Can be any of the Texture. (CLAMP_ADDRESSMODE, MIRROR_ADDRESSMODE or WRAP_ADDRESSMODE)
-   */
-  WriteOnlyProperty<MultiRenderTarget, unsigned int> wrapU;
-
-  /**
-   * The wrapping mode on V of all the textures we are rendering to.
-   * Can be any of the Texture. (CLAMP_ADDRESSMODE, MIRROR_ADDRESSMODE or WRAP_ADDRESSMODE)
-   */
-  WriteOnlyProperty<MultiRenderTarget, unsigned int> wrapV;
 
 private:
   std::vector<InternalTexturePtr> _internalTextures;

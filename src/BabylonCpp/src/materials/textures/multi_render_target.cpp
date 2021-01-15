@@ -20,8 +20,6 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
     , textures{this, &MultiRenderTarget::get_textures}
     , count{this, &MultiRenderTarget::get_count}
     , depthTexture{this, &MultiRenderTarget::get_depthTexture}
-    , wrapU{this, &MultiRenderTarget::set_wrapU}
-    , wrapV{this, &MultiRenderTarget::set_wrapV}
     , _nullTexture{nullptr}
 {
   auto generateMipMaps
@@ -40,9 +38,9 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
   Uint32Array samplingModes;
   _initTypes(count, types, samplingModes, options);
 
-  const auto generateDepthBuffer = !options || (*options).generateDepthBuffer == std::nullopt ?
-                                     true :
-                                     *(*options).generateDepthBuffer;
+  const auto generateDepthBuffer   = !options || (*options).generateDepthBuffer == std::nullopt ?
+                                       true :
+                                       *(*options).generateDepthBuffer;
   const auto generateStencilBuffer = !options || (*options).generateStencilBuffer == std::nullopt ?
                                        false :
                                        *(*options).generateStencilBuffer;
