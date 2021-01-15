@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/array_buffer_view.h>
+#include <babylon/core/logging.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/depth_texture_creation_options.h>
 #include <babylon/engines/thin_engine.h>
@@ -153,8 +154,8 @@ void InternalTexture::_rebuild()
     case InternalTextureSource::Dynamic: {
       proxy = _engine->createDynamicTexture(baseWidth, baseHeight, generateMipMaps, samplingMode);
       proxy->_swapAndDie(shared_from_this());
-      // _engine->updateDynamicTexture(this, _engine->getRenderingCanvas(),
-      // invertY, undefined, undefined, true);
+      _engine->updateDynamicTexture(shared_from_this(), _engine->getRenderingCanvas(), invertY,
+                                    false, std::nullopt, true);
 
       // The engine will make sure to update content so no need to flag it as isReady = true
     }
@@ -168,8 +169,8 @@ void InternalTexture::_rebuild()
       options.type                  = type;
 
       if (isCube) {
-        auto size = ISize{width, width};
-        proxy     = _engine->createRenderTargetCubeTexture(size, options);
+        const auto size = ISize{width, width};
+        proxy           = _engine->createRenderTargetCubeTexture(size, options);
       }
       else {
         std::optional<int> layers = std::nullopt;
@@ -234,6 +235,9 @@ void InternalTexture::_rebuild()
         proxy, _bufferViewArrayArray !, _sphericalPolynomial,
         _lodGenerationScale, _lodGenerationOffset)
         .then(() = > { isReady = true; });
+#else
+      BABYLON_LOG_WARN("InternalTexture",
+                       "Rebuilding internal textures of type 'CubeRawRGBD' not yet implemented");
 #endif
       proxy->_swapAndDie(shared_from_this());
     }
@@ -241,7 +245,7 @@ void InternalTexture::_rebuild()
     case InternalTextureSource::CubePrefiltered: {
       proxy = _engine->createPrefilteredCubeTexture(
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,
-        [this, &proxy](const std::optional<CubeTextureData>& /*data*/) {
+        [this, &proxy](const std::optional<CubeTextureData>& /*data*/) -> void {
           if (proxy) {
             proxy->_swapAndDie(shared_from_this());
           }
