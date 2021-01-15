@@ -43,10 +43,12 @@ MirrorTexture::MirrorTexture(const std::string& iName,
   _updateGammaSpace();
   _imageProcessingConfigChangeObserver
     = scene->imageProcessingConfiguration()->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration* /*ipc*/, EventState& /*es*/) { _updateGammaSpace(); });
+      [this](ImageProcessingConfiguration* /*ipc*/, EventState& /*es*/) -> void {
+        _updateGammaSpace();
+      });
 
-  onBeforeRenderObservable.add([this](int*, EventState&) {
-    auto scene_ = getScene();
+  onBeforeRenderObservable.add([this](int*, EventState&) -> void {
+    const auto scene_ = getScene();
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
     _savedViewMatrix = scene_->getViewMatrix();
     _mirrorMatrix.multiplyToRef(_savedViewMatrix, _transformMatrix);
@@ -57,8 +59,8 @@ MirrorTexture::MirrorTexture(const std::string& iName,
       Vector3::TransformCoordinates(scene_->activeCamera()->globalPosition(), _mirrorMatrix));
   });
 
-  onAfterRenderObservable.add([this](int*, EventState&) {
-    auto scene_ = getScene();
+  onAfterRenderObservable.add([this](int*, EventState&) -> void {
+    const auto scene_ = getScene();
     scene_->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
     scene_->getEngine()->cullBackFaces = true;
     scene_->_mirroredCameraPosition.reset(nullptr);
@@ -128,10 +130,12 @@ float MirrorTexture::get_blurKernelY() const
 
 void MirrorTexture::_autoComputeBlurKernel()
 {
-  auto engine = getScene()->getEngine();
+  const auto engine = getScene()->getEngine();
 
-  auto dw = static_cast<float>(getRenderWidth()) / static_cast<float>(engine->getRenderWidth());
-  auto dh = static_cast<float>(getRenderHeight()) / static_cast<float>(engine->getRenderHeight());
+  const auto dw
+    = static_cast<float>(getRenderWidth()) / static_cast<float>(engine->getRenderWidth());
+  const auto dh
+    = static_cast<float>(getRenderHeight()) / static_cast<float>(engine->getRenderHeight());
   blurKernelX = _adaptiveBlurKernel * dw;
   blurKernelY = _adaptiveBlurKernel * dh;
 }
@@ -161,10 +165,11 @@ void MirrorTexture::_preparePostProcesses()
   clearPostProcesses(true);
 
   if (_blurKernelX != 0.f && _blurKernelY != 0.f) {
-    auto engine = getScene()->getEngine();
+    const auto engine = getScene()->getEngine();
 
-    auto iTextureType = engine->getCaps().textureFloatRender ? Constants::TEXTURETYPE_FLOAT :
-                                                               Constants::TEXTURETYPE_HALF_FLOAT;
+    const auto iTextureType = engine->getCaps().textureFloatRender ?
+                                Constants::TEXTURETYPE_FLOAT :
+                                Constants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = BlurPostProcess::New("horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio,
                                   nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
@@ -203,21 +208,22 @@ void MirrorTexture::_preparePostProcesses()
 
 MirrorTexturePtr MirrorTexture::clone()
 {
-  auto iScene = getScene();
+  const auto iScene = getScene();
 
   if (!iScene) {
     return nullptr;
   }
 
-  auto textureSize = getSize();
-  auto newTexture  = MirrorTexture::New(name,                                                    //
-                                       RenderTargetSize{textureSize.width, textureSize.height}, //
-                                       iScene,                                                  //
-                                       _renderTargetOptions.generateMipMaps.value(),            //
-                                       _renderTargetOptions.type.value(),                       //
-                                       _renderTargetOptions.samplingMode.value(),               //
-                                       _renderTargetOptions.generateDepthBuffer.value()         //
-  );
+  const auto textureSize = getSize();
+  const auto newTexture
+    = MirrorTexture::New(name,                                                    //
+                         RenderTargetSize{textureSize.width, textureSize.height}, //
+                         iScene,                                                  //
+                         _renderTargetOptions.generateMipMaps.value(),            //
+                         _renderTargetOptions.type.value(),                       //
+                         _renderTargetOptions.samplingMode.value(),               //
+                         _renderTargetOptions.generateDepthBuffer.value()         //
+    );
 
   // Base texture
   newTexture->hasAlpha = hasAlpha();

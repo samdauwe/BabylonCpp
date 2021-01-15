@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/maths/matrix.h>
@@ -9,11 +10,9 @@
 
 namespace BABYLON {
 
-class BlurPostProcess;
 class ImageProcessingConfiguration;
-class MirrorTexture;
-using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
-using MirrorTexturePtr   = std::shared_ptr<MirrorTexture>;
+FWD_CLASS_SPTR(BlurPostProcess)
+FWD_CLASS_SPTR(MirrorTexture)
 
 /**
  * @brief Mirror texture can be used to simulate the view from a mirror in a scene.
