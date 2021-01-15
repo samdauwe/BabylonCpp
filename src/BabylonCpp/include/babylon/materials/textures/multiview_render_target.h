@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_TEXTURES_MULTIVIEW_RENDER_TARGET_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/render_target_texture.h>
 
 namespace BABYLON {
 
-class MultiviewRenderTarget;
-using MultiviewRenderTargetPtr = std::shared_ptr<MultiviewRenderTarget>;
+FWD_CLASS_SPTR(MultiviewRenderTarget)
 
 /**
  * @brief Renders to multiple views with a single draw call.

@@ -35,7 +35,7 @@ MultiviewRenderTarget::~MultiviewRenderTarget() = default;
 
 void MultiviewRenderTarget::_bindFrameBuffer(unsigned int /*faceIndex*/)
 {
-  if (!_texture) {
+  if (!_texture || !getScene()) {
     return;
   }
   getScene()->getEngine()->bindMultiviewFramebuffer(_texture);
