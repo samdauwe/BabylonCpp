@@ -29,8 +29,7 @@ public:
   ~CubeTexture() override; // = default
 
   /**
-   * @brief Get the current class name of the texture useful for serialization
-   * or dynamic coding.
+   * @brief Get the current class name of the texture useful for serialization or dynamic coding.
    * @returns "CubeTexture"
    */
   std::string getClassName() const;
