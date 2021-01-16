@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_TEXTURES_HDR_CUBE_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
 
-class HDRCubeTexture;
-using HDRCubeTexturePtr = std::shared_ptr<HDRCubeTexture>;
+FWD_CLASS_SPTR(HDRCubeTexture)
 
 /**
  * @brief This represents a texture coming from an HDR input.

@@ -141,7 +141,7 @@ void HDRCubeTexture::loadTexture()
     lodGenerationScale  = 0.8f;
 
     // Extract the raw linear data.
-    auto data = HDRTools::GetCubeMapTextureData(buffer, _size);
+    const auto data = HDRTools::GetCubeMapTextureData(buffer, _size);
 
     // Generate harmonics if needed.
     if (_generateHarmonics) {
@@ -182,7 +182,7 @@ void HDRCubeTexture::loadTexture()
             auto b = std::max(dataFace[(i * 3) + 2] * 255, 0.f);
 
             // May use luminance instead if the result is not accurate.
-            auto max = std::max(std::max(r, g), b);
+            const auto max = std::max(std::max(r, g), b);
             if (max > 255) {
               auto scale = 255.f / max;
               r *= scale;
@@ -275,8 +275,8 @@ void HDRCubeTexture::setReflectionTextureMatrix(Matrix& value)
   if (value.isIdentity() != _textureMatrix.isIdentity()) {
     getScene()->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
-        auto activeTextures = mat->getActiveTextures();
-        auto it
+        const auto activeTextures = mat->getActiveTextures();
+        const auto it
           = std::find_if(activeTextures.begin(), activeTextures.end(),
                          [this](const BaseTexturePtr& texture) { return texture.get() == this; });
         return it != activeTextures.end();
