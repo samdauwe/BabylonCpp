@@ -24,7 +24,7 @@ DynamicTexture::DynamicTexture(const std::string& iName, const DynamicTextureOpt
 
   _generateMipMaps = generateMipMaps;
 
-  auto engine = _getEngine();
+  const auto engine = _getEngine();
   if (!engine) {
     return;
   }
@@ -40,7 +40,7 @@ DynamicTexture::DynamicTexture(const std::string& iName, const DynamicTextureOpt
   }
 
   if (_canvas) {
-    auto textureSize = getSize();
+    const auto textureSize = getSize();
     _canvas->width   = textureSize.width;
     _canvas->height  = textureSize.height;
     _context         = _canvas->getContext2d();

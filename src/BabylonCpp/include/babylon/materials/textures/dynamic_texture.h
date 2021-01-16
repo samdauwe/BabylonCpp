@@ -2,14 +2,14 @@
 #define BABYLON_MATERIALS_TEXTURES_DYNAMIC_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
 
-class DynamicTexture;
 class ICanvasRenderingContext2D;
-using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
+FWD_CLASS_SPTR(DynamicTexture)
 
 struct DynamicTextureOptions {
   ICanvas* canvas = nullptr;
