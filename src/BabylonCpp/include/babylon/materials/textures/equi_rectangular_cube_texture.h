@@ -3,12 +3,12 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
 
-class EquiRectangularCubeTexture;
-using EquiRectangularCubeTexturePtr = std::shared_ptr<EquiRectangularCubeTexture>;
+FWD_CLASS_SPTR(EquiRectangularCubeTexture)
 
 /**
  * @brief This represents a texture coming from an equirectangular image supported by the web

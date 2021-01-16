@@ -38,7 +38,7 @@ EquiRectangularCubeTexture::EquiRectangularCubeTexture(
 
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
-      loadImage([this] { loadTexture(); }, _onError);
+      loadImage([this]() -> void { loadTexture(); }, _onError);
     }
     else {
       delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
@@ -64,17 +64,18 @@ EquiRectangularCubeTexture::~EquiRectangularCubeTexture() = default;
 
 void EquiRectangularCubeTexture::loadTexture()
 {
-  auto scene          = getScene();
-  const auto callback = [this](const ArrayBuffer & /*arrayBuffer*/) -> ArrayBufferViewArray {
-    auto imageData = getFloat32ArrayFromArrayBuffer(_buffer);
+  const auto scene    = getScene();
+  const auto callback = [this](const ArrayBuffer& /*arrayBuffer*/) -> ArrayBufferViewArray {
+    const auto imageData = getFloat32ArrayFromArrayBuffer(_buffer);
 
     // Extract the raw linear data.
-    auto data = PanoramaToCubeMapTools::ConvertPanoramaToCubemap(imageData, _width, _height, _size);
+    const auto data
+      = PanoramaToCubeMapTools::ConvertPanoramaToCubemap(imageData, _width, _height, _size);
 
     ArrayBufferViewArray results;
 
     // Push each faces.
-    for (unsigned int i = 0; i < 6; i++) {
+    for (unsigned int i = 0; i < 6; ++i) {
       const auto& faceMapping = EquiRectangularCubeTexture::_FacesMapping[i];
       if (faceMapping == "right") {
         results.emplace_back(data.right);
@@ -140,12 +141,12 @@ std::string EquiRectangularCubeTexture::getClassName() const
 
 EquiRectangularCubeTexturePtr EquiRectangularCubeTexture::clone() const
 {
-  const auto& scene = getScene();
+  const auto scene = getScene();
   if (!scene) {
     return nullptr;
   }
 
-  auto newTexture = EquiRectangularCubeTexture::New(url, scene, _size, _noMipmap, gammaSpace);
+  const auto newTexture = EquiRectangularCubeTexture::New(url, scene, _size, _noMipmap, gammaSpace);
 
   // Base texture
   newTexture->level            = level;
