@@ -65,7 +65,7 @@ Matrix* ColorGradingTexture::getTextureMatrix(int /*uBase*/)
 
 InternalTexturePtr ColorGradingTexture::load3dlTexture()
 {
-  auto engine                = _getEngine();
+  const auto engine          = _getEngine();
   InternalTexturePtr texture = nullptr;
   if (engine->webGLVersion() == 1.f) {
     texture = engine->createRawTexture(Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
@@ -91,12 +91,12 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
   anisotropicFilteringLevel = 1u;
 
   const auto callback = [=](const std::variant<std::string, ArrayBufferView>& iText,
-                            const std::string & /*onSuccess*/) -> void {
+                            const std::string& /*onSuccess*/) -> void {
     if (!std::holds_alternative<std::string>(iText)) {
       return;
     }
 
-    auto text = std::get<std::string>(iText);
+    const auto text = std::get<std::string>(iText);
 
     Uint8Array data;
     Float32Array tempData;
@@ -105,7 +105,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     auto size = 0ull, pixelIndexW = 0ull, pixelIndexH = 0ull, pixelIndexSlice = 0ull;
     auto maxColor = 0;
 
-    for (auto& line : lines) {
+    for (const auto& line : lines) {
 
       if (line.empty()) {
         continue;
@@ -115,7 +115,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
         continue;
       }
 
-      auto words = StringTools::split(line, ' ');
+      const auto words = StringTools::split(line, ' ');
       if (size == 0) {
         // Number of space + one
         size = words.size();
@@ -135,7 +135,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
         maxColor = std::max(g, maxColor);
         maxColor = std::max(b, maxColor);
 
-        size_t pixelStorageIndex
+        const size_t pixelStorageIndex
           = (pixelIndexW + pixelIndexSlice * size + pixelIndexH * size * size) * 4;
 
         if (pixelStorageIndex + 2 < tempData.size()) {
@@ -183,7 +183,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     _triggerOnLoad();
   };
 
-  auto scene = getScene();
+  const auto scene = getScene();
   if (scene) {
     scene->_loadFile(url, callback);
   }
