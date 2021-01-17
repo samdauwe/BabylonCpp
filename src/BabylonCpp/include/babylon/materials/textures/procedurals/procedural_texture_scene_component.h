@@ -4,13 +4,13 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class ProceduralTextureSceneComponent;
-using ProceduralTextureSceneComponentPtr = std::shared_ptr<ProceduralTextureSceneComponent>;
+FWD_CLASS_SPTR(ProceduralTextureSceneComponent)
 
 /**
  * @brief Defines the Procedural Texture scene component responsible to manage any Procedural
