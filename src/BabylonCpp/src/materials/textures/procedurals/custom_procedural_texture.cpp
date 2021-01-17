@@ -43,7 +43,7 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
     }
   };
 
-  const auto onSuccessLoadJson = [noConfigFile, this](const std::string& configJSON) {
+  const auto onSuccessLoadJson = [noConfigFile, this](const std::string& configJSON) -> void {
     try {
       _config    = json::parse(configJSON);
       _configSet = true;
@@ -70,8 +70,8 @@ bool CustomProceduralTexture::isReady()
     return false;
   }
 
-  for (auto& item : _textures) {
-    auto& texture = item.second;
+  for (const auto& item : _textures) {
+    const auto& texture = item.second;
 
     if (!texture->isReady()) {
       return false;
@@ -95,7 +95,7 @@ void CustomProceduralTexture::render(bool useCameraPostProcess)
 void CustomProceduralTexture::updateTextures()
 {
   if (_configSet) {
-    for (auto& sampler2D : json_util::get_array<json>(_config, "sampler2Ds")) {
+    for (const auto& sampler2D : json_util::get_array<json>(_config, "sampler2Ds")) {
       const auto sample2Dname       = json_util::get_string(sampler2D, "sample2Dname");
       const auto textureRelativeUrl = json_util::get_string(sampler2D, "textureRelativeUrl");
       setTexture(sample2Dname, Texture::New(_texturePath + "/" + textureRelativeUrl, getScene()));
@@ -115,7 +115,7 @@ void CustomProceduralTexture::updateShaderUniforms()
       return value;
     };
 
-    for (auto& uniform : json_util::get_array<json>(_config, "uniforms")) {
+    for (const auto& uniform : json_util::get_array<json>(_config, "uniforms")) {
       const auto uniformType = json_util::get_string(uniform, "type");
       const auto uniformName = json_util::get_string(uniform, "name");
 

@@ -4,14 +4,14 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class CustomProceduralTexture;
-using CustomProceduralTexturePtr = std::shared_ptr<CustomProceduralTexture>;
+FWD_CLASS_SPTR(CustomProceduralTexture)
 
 /**
  * @brief Procedural texturing is a way to programmatically create a texture. There are 2 types of
