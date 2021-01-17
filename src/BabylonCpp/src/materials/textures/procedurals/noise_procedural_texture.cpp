@@ -23,7 +23,7 @@ NoiseProceduralTexture::~NoiseProceduralTexture() = default;
 
 void NoiseProceduralTexture::_updateShaderUniforms()
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   if (!scene) {
     return;

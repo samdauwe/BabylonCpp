@@ -4,14 +4,14 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class NoiseProceduralTexture;
-using NoiseProceduralTexturePtr = std::shared_ptr<NoiseProceduralTexture>;
+FWD_CLASS_SPTR(NoiseProceduralTexture)
 
 /**
  * @brief Class used to generate noise procedural textures.
@@ -48,8 +48,7 @@ public:
   NoiseProceduralTexturePtr clone();
 
   /**
-   * @brief Creates a NoiseProceduralTexture from parsed noise procedural
-   * texture data
+   * @brief Creates a NoiseProceduralTexture from parsed noise procedural texture data
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
    * @returns a parsed NoiseProceduralTexture
@@ -81,8 +80,8 @@ public:
   float time;
 
   /**
-   * Gets or sets a value between 0 and 1 indicating the overall brightness of
-   * the texture (default is 0.2)
+   * Gets or sets a value between 0 and 1 indicating the overall brightness of the texture
+   * (default is 0.2)
    */
   float brightness;
 
@@ -105,5 +104,4 @@ public:
 
 } // end of namespace BABYLON
 
-#endif // end of
-       // BABYLON_MATERIALS_TEXTURES_PROCEDURALS_NOISE_PROCEDURAL_TEXTURE_H
+#endif // end of BABYLON_MATERIALS_TEXTURES_PROCEDURALS_NOISE_PROCEDURAL_TEXTURE_H
