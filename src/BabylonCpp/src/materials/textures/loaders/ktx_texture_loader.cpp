@@ -34,14 +34,14 @@ void _KTXTextureLoader::loadCubeData(
   if (!std::holds_alternative<ArrayBufferView>(iData)) {
     return;
   }
-  auto data = std::get<ArrayBufferView>(iData);
+  const auto data = std::get<ArrayBufferView>(iData);
 
   // Need to invert vScale as invertY via UNPACK_FLIP_Y_WEBGL is not supported by compressed texture
   texture->_invertVScale = !texture->invertY;
-  auto engine            = texture->getEngine();
+  const auto engine      = texture->getEngine();
   KhronosTextureContainer ktx(data, 6);
 
-  auto loadMipmap = ktx.numberOfMipmapLevels > 1 && texture->generateMipMaps;
+  const auto loadMipmap = ktx.numberOfMipmapLevels > 1 && texture->generateMipMaps;
 
   engine->_unpackFlipY(true);
 
