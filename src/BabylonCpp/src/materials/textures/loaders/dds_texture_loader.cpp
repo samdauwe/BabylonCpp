@@ -27,10 +27,10 @@ void _DDSTextureLoader::loadCubeData(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
-  auto engine = texture->getEngine();
+  const auto engine = texture->getEngine();
 
-  auto data = img;
-  auto info = DDSTools::GetDDSInfo(data);
+  const auto data = img;
+  auto info       = DDSTools::GetDDSInfo(data);
 
   texture->width  = info.width;
   texture->height = info.height;
@@ -39,7 +39,7 @@ void _DDSTextureLoader::loadCubeData(
     info.sphericalPolynomial = std::make_shared<SphericalPolynomial>();
   }
 
-  auto loadMipmap
+  const auto loadMipmap
     = (info.isRGB || info.isLuminance || info.mipmapCount > 1) && texture->generateMipMaps;
   engine->_unpackFlipY(info.isCompressed);
 
@@ -72,12 +72,12 @@ void _DDSTextureLoader::loadCubeData(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& /*onError*/)
 {
-  auto engine = static_cast<Engine*>(texture->getEngine());
+  const auto engine = static_cast<Engine*>(texture->getEngine());
   if (!engine) {
     return;
   }
   DDSInfo info;
-  bool loadMipmap = false;
+  auto loadMipmap = false;
   for (const auto& img : imgs) {
     auto data = img;
     info      = DDSTools::GetDDSInfo(data);
@@ -124,11 +124,12 @@ void _DDSTextureLoader::loadData(
 {
   auto info = DDSTools::GetDDSInfo(data);
 
-  auto loadMipmap = (info.isRGB || info.isLuminance || info.mipmapCount > 1)
-                    && texture->generateMipMaps && ((info.width >> (info.mipmapCount - 1)) == 1);
+  const auto loadMipmap = (info.isRGB || info.isLuminance || info.mipmapCount > 1)
+                          && texture->generateMipMaps
+                          && ((info.width >> (info.mipmapCount - 1)) == 1);
   callback(
     info.width, info.height, loadMipmap, info.isFourCC,
-    [&texture, &data, &info, &loadMipmap]() {
+    [&texture, &data, &info, &loadMipmap]() -> void {
       DDSTools::UploadDDSLevels(texture->getEngine(), texture, data, info, loadMipmap, 1);
     },
     false);
