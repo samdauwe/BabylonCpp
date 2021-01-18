@@ -32,8 +32,8 @@ void _ENVTextureLoader::loadCubeData(
     return;
   }
 
-  auto data = std::get<ArrayBufferView>(iData).uint8Array();
-  auto info = EnvironmentTextureTools::GetEnvInfo(data);
+  const auto data = std::get<ArrayBufferView>(iData).uint8Array();
+  const auto info = EnvironmentTextureTools::GetEnvInfo(data);
   if (info) {
     texture->width  = info->width;
     texture->height = info->width;
