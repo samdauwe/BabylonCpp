@@ -46,7 +46,7 @@ void _TGATextureLoader::loadData(
 {
   const auto bytes = stl_util::to_array<uint8_t>(data.buffer(), data.byteOffset, data.byteLength());
 
-  auto header = TGATools::GetTGAHeader(bytes);
+  const auto header = TGATools::GetTGAHeader(bytes);
   callback(
     header.width, header.height, texture->generateMipMaps, false,
     [&texture, &bytes]() -> void { TGATools::UploadContent(texture, bytes); }, false);
