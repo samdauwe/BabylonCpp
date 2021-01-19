@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT IMaterialBRDFDefines : public MaterialDefines {
    * @brief Converts the material define values to a string.
    * @returns - String of material define information.
    */
-  [[nodiscard]] std::string toString() const override;
+  std::string toString() const override;
 
 }; // end of struct IMaterialBRDFDefines
 
