@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_ADD_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class AddBlock;
-using AddBlockPtr = std::shared_ptr<AddBlock>;
+FWD_CLASS_SPTR(AddBlock)
 
 /**
  * @brief Block used to add 2 vectors.
