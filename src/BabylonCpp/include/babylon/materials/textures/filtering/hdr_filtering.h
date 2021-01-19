@@ -6,19 +6,16 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class BaseTexture;
 class Effect;
-class EffectRenderer;
-struct EffectWrapper;
-class InternalTexture;
 class ThinEngine;
-using BaseTexturePtr     = std::shared_ptr<BaseTexture>;
-using EffectRendererPtr  = std::shared_ptr<EffectRenderer>;
-using EffectWrapperPtr   = std::shared_ptr<EffectWrapper>;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(EffectRenderer)
+FWD_STRUCT_SPTR(EffectWrapper)
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * Options for texture filtering

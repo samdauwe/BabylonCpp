@@ -166,7 +166,7 @@ void HDRFiltering::prefilter(const BaseTexturePtr& texture, const std::function<
     _effectRenderer = std::make_shared<EffectRenderer>(_engine);
     _effectWrapper  = _createEffect(texture);
     _effectWrapper->effect->executeWhenCompiled(
-      [this, texture, onFinished](Effect * /*effect*/) -> void {
+      [this, texture, onFinished](Effect* /*effect*/) -> void {
         _prefilterInternal(texture);
         _effectRenderer->dispose();
         _effectWrapper->dispose();
