@@ -263,6 +263,20 @@ InternalTexturePtr& ThinEngine::get_emptyCubeTexture()
   return _emptyCubeTexture;
 }
 
+void ThinEngine::_debugPushGroup(const std::string& /*groupName*/,
+                                 const std::optional<int> /*targetObject*/)
+{
+}
+
+void ThinEngine::_debugPopGroup(const std::optional<int> /*targetObject*/)
+{
+}
+
+void ThinEngine::_debugInsertMarker(const std::string& /*text*/,
+                                    const std::optional<int> /*targetObject*/)
+{
+}
+
 void ThinEngine::_rebuildInternalTextures()
 {
   const auto currentState

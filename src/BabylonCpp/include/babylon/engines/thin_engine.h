@@ -139,6 +139,23 @@ public:
   virtual ~ThinEngine(); // = default
 
   /**
+   * @brief Hidden
+   */
+  virtual void _debugPushGroup(const std::string& groupName,
+                               const std::optional<int> targetObject = std::nullopt);
+
+  /**
+   * @brief Hidden
+   */
+  virtual void _debugPopGroup(const std::optional<int> targetObject = std::nullopt);
+
+  /**
+   * @brief Hidden
+   */
+  virtual void _debugInsertMarker(const std::string& text,
+                                  const std::optional<int> targetObject = std::nullopt);
+
+  /**
    * @brief Gets a boolean indicating if all created effects are ready.
    * @returns true if all effects are ready
    */
