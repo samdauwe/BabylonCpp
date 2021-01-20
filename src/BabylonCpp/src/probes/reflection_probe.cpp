@@ -8,6 +8,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -40,7 +41,8 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
   _renderTargetTexture = RenderTargetTexture::New(iName, RenderTargetSize{size.width, size.height},
                                                   scene, generateMipMaps, true, textureType, true);
 
-  _renderTargetTexture->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
+  _renderTargetTexture->onBeforeRenderObservable.add([scene, this](const int* faceIndex,
+                                                                   EventState&) {
     switch (*faceIndex) {
       case 0:
         _add.copyFromFloats(1.f, 0.f, 0.f);
@@ -55,10 +57,10 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
         _add.copyFromFloats(0.f, _invertYAxis ? -1.f : 1.f, 0.f);
         break;
       case 4:
-        _add.copyFromFloats(0.f, 0.f, 1.f);
+        _add.copyFromFloats(0.f, 0.f, scene->useRightHandedSystem() ? -1.f : 1.f);
         break;
       case 5:
-        _add.copyFromFloats(0.f, 0.f, -1.f);
+        _add.copyFromFloats(0.f, 0.f, scene->useRightHandedSystem() ? 1.f : -1.f);
         break;
       default:
         break;
@@ -70,21 +72,40 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
 
     position.addToRef(_add, _target);
 
-    Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
+    if (scene->useRightHandedSystem()) {
+      Matrix::LookAtRHToRef(position, _target, Vector3::Up(), _viewMatrix);
 
-    if (_scene->activeCamera()) {
-      _projectionMatrix = Matrix::PerspectiveFovLH(Math::PI_2, 1.f, _scene->activeCamera()->minZ,
-                                                   _scene->activeCamera()->maxZ);
-      _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+      if (scene->activeCamera()) {
+        _projectionMatrix = Matrix::PerspectiveFovRH(
+          Math::PI / 2.f, 1.f, scene->activeCamera()->minZ, scene->activeCamera()->maxZ);
+        scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+      }
+    }
+    else {
+      Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
+
+      if (_scene->activeCamera()) {
+        _projectionMatrix = Matrix::PerspectiveFovLH(Math::PI_2, 1.f, _scene->activeCamera()->minZ,
+                                                     _scene->activeCamera()->maxZ);
+        _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+      }
     }
 
     _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
   });
 
-  _renderTargetTexture->onAfterUnbindObservable.add([this](RenderTargetTexture*, EventState&) {
-    _scene->_forcedViewPosition = nullptr;
-    _scene->updateTransformMatrix(true);
-  });
+  _renderTargetTexture->onBeforeBindObservable.add(
+    [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+      _scene->getEngine()->_debugPushGroup(
+        StringTools::printf("reflection probe generation for %s", name.c_str()), 1);
+    });
+
+  _renderTargetTexture->onAfterUnbindObservable.add(
+    [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+      _scene->_forcedViewPosition = nullptr;
+      _scene->updateTransformMatrix(true);
+      _scene->getEngine()->_debugPopGroup(1);
+    });
 }
 
 ReflectionProbe::~ReflectionProbe() = default;

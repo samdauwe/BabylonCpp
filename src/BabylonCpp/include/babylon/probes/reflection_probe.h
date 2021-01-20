@@ -73,14 +73,14 @@ public:
   std::string toString(bool fullDetails = false);
 
   /**
-   * @brief Get the class name of the relfection probe.
+   * @brief Get the class name of the refection probe.
    * @returns "ReflectionProbe"
    */
   std::string getClassName() const;
 
   /**
    * @brief Serialize the reflection probe to a JSON representation we can easily use in the
-   * resepective Parse function.
+   * respective Parse function.
    * @returns The JSON representation of the texture
    */
   void serialize(json& serializationObject);
@@ -103,7 +103,7 @@ protected:
    * @param size defines the texture resolution (for each face)
    * @param scene defines the hosting scene
    * @param generateMipMaps defines if mip maps should be generated automatically (true by default)
-   * @param useFloat defines if HDR data (flaot data) should be used to store colors (false by
+   * @param useFloat defines if HDR data (float data) should be used to store colors (false by
    * default)
    */
   ReflectionProbe(const std::string& name, const ISize& size, Scene* scene,
