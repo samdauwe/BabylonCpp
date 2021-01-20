@@ -99,7 +99,7 @@ public:
   int getBoneIndexByName(const std::string& name);
 
   /**
-   * @brief Creater a new animation range.
+   * @brief Create a new animation range.
    * @param name defines the name of the range
    * @param from defines the start key
    * @param to defines the end key

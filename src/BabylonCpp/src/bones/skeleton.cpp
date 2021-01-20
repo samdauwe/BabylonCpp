@@ -224,8 +224,8 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& iName,
   auto ret         = true;
   auto frameOffset = _getHighestAnimationFrame() + 1;
 
-  // make a dictionary of source skeleton's bones, so exact same order or
-  // doublely nested loop is not required
+  // make a dictionary of source skeleton's bones, so exact same order or doubly nested loop is not
+  // required
   std::unordered_map<std::string, Bone*> boneDict;
   auto& sourceBones = source->bones;
   for (const auto& bone : sourceBones) {
