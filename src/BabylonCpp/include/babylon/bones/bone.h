@@ -228,7 +228,7 @@ public:
   void translate(const Vector3& vec, Space space = Space::LOCAL, AbstractMesh* mesh = nullptr);
 
   /**
-   * @brief Set the postion of the bone in local or world space.
+   * @brief Set the position of the bone in local or world space.
    * @param position The position to set the bone
    * @param space The space that the position is in
    * @param mesh The mesh that this bone is attached to.  This is only used in world space
@@ -486,7 +486,7 @@ protected:
    * @param localMatrix defines the local matrix
    * @param restPose defines the rest pose matrix
    * @param baseMatrix defines the base matrix
-   * @param index defines index of the bone in the hiearchy
+   * @param index defines index of the bone in the hierarchy
    */
   Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone = nullptr,
        const std::optional<Matrix>& localMatrix = std::nullopt,
