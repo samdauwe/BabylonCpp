@@ -11,7 +11,7 @@ namespace BABYLON {
 class Color4;
 
 /**
- * @brief Class used to hold a RBG color.
+ * @brief Class used to hold a RGB color.
  */
 class BABYLON_SHARED_EXPORT Color3 {
 
