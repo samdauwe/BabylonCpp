@@ -403,6 +403,16 @@ public:
   static Quaternion FromEulerVectorToRef(const Vector3& vec, Quaternion& result);
 
   /**
+   * @brief Updates a quaternion so that it rotates vector vecFrom to vector vecTo.
+   * @param vecFrom defines the direction vector from which to rotate
+   * @param vecTo defines the direction vector to which to rotate
+   * @param result the quaternion to store the result
+   * @returns the updated quaternion
+   */
+  static Quaternion& FromUnitVectorsToRef(const Vector3& vecFrom, const Vector3& vecTo,
+                                          Quaternion& result);
+
+  /**
    * @brief Creates a new quaternion from the given Euler float angles (y, x,
    * z).
    * @param yaw defines the rotation around Y axis

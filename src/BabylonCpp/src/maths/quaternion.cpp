@@ -6,6 +6,7 @@
 #include <babylon/maths/math_tmp.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/scalar.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
@@ -466,6 +467,31 @@ Quaternion Quaternion::FromEulerVectorToRef(const Vector3& vec, Quaternion& resu
 {
   Quaternion::RotationYawPitchRollToRef(vec.y, vec.x, vec.z, result);
   return result;
+}
+
+Quaternion& Quaternion::FromUnitVectorsToRef(const Vector3& vecFrom, const Vector3& vecTo,
+                                             Quaternion& result)
+{
+  const auto r = Vector3::Dot(vecFrom, vecTo) + 1.f;
+
+  if (r < Math::Epsilon) {
+    if (std::abs(vecFrom.x) > std::abs(vecFrom.z)) {
+      result.set(-vecFrom.y, vecFrom.x, 0.f, 0.f);
+    }
+    else {
+      result.set(0.f, -vecFrom.z, vecFrom.y, 0.f);
+    }
+  }
+  else {
+    Vector3::CrossToRef(vecFrom, vecTo, TmpVectors::Vector3Array[0]);
+    result.set(TmpVectors::Vector3Array[0].x, //
+               TmpVectors::Vector3Array[0].y, //
+               TmpVectors::Vector3Array[0].z, //
+               r                              //
+    );
+  }
+
+  return result.normalize();
 }
 
 Quaternion Quaternion::RotationYawPitchRoll(float yaw, float pitch, float roll)
