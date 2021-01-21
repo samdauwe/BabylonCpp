@@ -1,6 +1,7 @@
 #ifndef BABYLON_MATHS_SCALAR_H
 #define BABYLON_MATHS_SCALAR_H
 
+#include <cmath>
 #include <iomanip>
 
 #include <babylon/babylon_api.h>
@@ -26,13 +27,13 @@ constexpr float TwoPi()
 }
 
 /**
- * @brief Boolean : true if the absolute difference between a and b is lower
- * than epsilon (default = 1.401298E-45).
+ * @brief Boolean : true if the absolute difference between a and b is lower than epsilon (default
+ * = 1.401298E-45).
  * @param a number
  * @param b number
  * @param epsilon (default = 1.401298E-45)
- * @returns true if the absolute difference between a and b is lower than
- * epsilon (default = 1.401298E-45)
+ * @returns true if the absolute difference between a and b is lower than epsilon (default
+ * = 1.401298E-45)
  */
 template <typename T>
 constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
@@ -122,6 +123,17 @@ constexpr int IMul(int a, int b)
 }
 
 /**
+ * @brief The floor part of a log2 value.
+ * @param value the value to compute log2 of
+ * @returns the log2 of value.
+ */
+template <typename T>
+constexpr T ILog2(T value)
+{
+  return static_cast<T>(floor(log2(value)));
+}
+
+/**
  * @brief Loops the value, so that it is never larger than length and never smaller than 0.
  *
  * This is similar to the modulo operator but it works with floating point numbers. For example,
@@ -162,8 +174,7 @@ constexpr float Denormalize(float normalized, float min, float max)
 }
 
 /**
- * @brief Calculates the shortest difference between two given angles given in
- * degrees.
+ * @brief Calculates the shortest difference between two given angles given in degrees.
  * @param current current angle in degrees
  * @param target target angle in degrees
  * @returns the delta
@@ -178,8 +189,7 @@ inline float DeltaAngle(float current, float target)
 }
 
 /**
- * @brief PingPongs the value t, so that it is never larger than length and
- * never smaller than 0.
+ * @brief PingPongs the value t, so that it is never larger than length and never smaller than 0.
  * @param tx value
  * @param length length
  * @returns The returned value will move back and forth between 0 and length
@@ -194,9 +204,8 @@ inline float PingPong(float tx, float length)
  * @brief Interpolates between min and max with smoothing at the limits.
  *
  * This function interpolates between min and max in a similar way to Lerp.
- * However, the interpolation will gradually speed up from the start and slow
- * down toward the end. This is useful for creating natural-looking animation,
- * fading and other transitions.
+ * However, the interpolation will gradually speed up from the start and slow down toward the end.
+ * This is useful for creating natural-looking animation, fading and other transitions.
  * @param from from
  * @param to to
  * @param tx value
@@ -212,9 +221,8 @@ constexpr float SmoothStep(float from, float to, float tx)
 /**
  * @brief Moves a value current towards target.
  *
- * This is essentially the same as Mathf.Lerp but instead the function will
- * ensure that the speed never exceeds maxDelta. Negative values of maxDelta
- * pushes the value away from target.
+ * This is essentially the same as Mathf.Lerp but instead the function will ensure that the speed
+ * never exceeds maxDelta. Negative values of maxDelta pushes the value away from target.
  * @param current current value
  * @param target target value
  * @param maxDelta max distance to move
@@ -233,13 +241,12 @@ inline float MoveTowards(float current, float target, float maxDelta)
 }
 
 /**
- * @brief Same as MoveTowards but makes sure the values interpolate correctly
- * when they wrap around 360 degrees.
+ * @brief Same as MoveTowards but makes sure the values interpolate correctly when they wrap around
+ * 360 degrees.
  *
- * Variables current and target are assumed to be in degrees. For optimization
- * reasons, negative values of maxDelta are not supported and may cause
- * oscillation. To push current away from a target angle, add 180 to that angle
- * instead.
+ * Variables current and target are assumed to be in degrees. For optimization reasons, negative
+ * values of maxDelta are not supported and may cause oscillation. To push current away from a
+ * target angle, add 180 to that angle instead.
  * @param current current value
  * @param target target value
  * @param maxDelta max distance to move
@@ -260,8 +267,8 @@ inline float MoveTowardsAngle(float current, float target, float maxDelta)
 }
 
 /**
- * @brief Creates a new scalar with values linearly interpolated of "amount"
- * between the start scalar and the end scalar.
+ * @brief Creates a new scalar with values linearly interpolated of "amount" between the start
+ * scalar and the end scalar.
  * @param start start value
  * @param end target value
  * @param amount amount to lerp between
@@ -274,9 +281,9 @@ constexpr T Lerp(T start, T end, T amount)
 }
 
 /**
- * @brief Same as Lerp but makes sure the values interpolate correctly when they
- * wrap around 360 degrees. The parameter t is clamped to the range [0, 1].
- * Variables a and b are assumed to be in degrees.
+ * @brief Same as Lerp but makes sure the values interpolate correctly when they wrap around 360
+ * degrees. The parameter t is clamped to the range [0, 1]. Variables a and b are assumed to be in
+ * degrees.
  * @param start start value
  * @param end target value
  * @param amount amount to lerp between
@@ -292,8 +299,8 @@ inline float LerpAngle(float start, float end, float amount)
 }
 
 /**
- * @brief Calculates the linear parameter t that produces the interpolant value
- * within the range [a, b].
+ * @brief Calculates the linear parameter t that produces the interpolant value within the range [a,
+ * b].
  * @param a start value
  * @param b target value
  * @param value value between a and b
@@ -312,8 +319,8 @@ constexpr float InverseLerp(float a, float b, float value)
 }
 
 /**
- * @brief Returns a new scalar located for "amount" (float) on the Hermite
- * spline defined by the scalars "value1", "value3", "tangent1", "tangent2".
+ * @brief Returns a new scalar located for "amount" (float) on the Hermite spline defined by the
+ * scalars "value1", "value3", "tangent1", "tangent2".
  * @see http://mathworld.wolfram.com/HermitePolynomial.html
  * @param value1 spline value
  * @param tangent1 spline value
@@ -364,8 +371,7 @@ constexpr float RangeToPercent(float number, float min, float max)
 }
 
 /**
- * @brief This function returns number that corresponds to the percentage in a
- * given range.
+ * @brief This function returns number that corresponds to the percentage in a given range.
  *
  * PercentToRange(0.34,0,100) will return 34.
  * @param percent to convert to number
@@ -379,8 +385,7 @@ constexpr float PercentToRange(float percent, float min, float max)
 }
 
 /**
- * @brief Returns the angle converted to equivalent value between -Math.PI and
- * Math.PI radians.
+ * @brief Returns the angle converted to equivalent value between -Math.PI and Math.PI radians.
  * @param angle The angle to normalize in radian.
  * @return The converted angle.
  */
