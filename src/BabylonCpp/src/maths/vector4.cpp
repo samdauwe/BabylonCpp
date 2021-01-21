@@ -535,7 +535,7 @@ Vector4 Vector4::Center(const Vector4& value1, const Vector4& value2)
   return center;
 }
 
-Vector4& CenterToRef(const Vector4& value1, const Vector4& value2, Vector4& ref)
+Vector4& Vector4::CenterToRef(const Vector4& value1, const Vector4& value2, Vector4& ref)
 {
   return ref.copyFromFloats((value1.x + value2.x) / 2.f, (value1.y + value2.y) / 2.f,
                             (value1.z + value2.z) / 2.f, (value1.w + value2.w) / 2.f);

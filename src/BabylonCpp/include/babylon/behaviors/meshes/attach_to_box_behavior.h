@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-class Mesh;
+class Scene;
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(TransformNode)
 
