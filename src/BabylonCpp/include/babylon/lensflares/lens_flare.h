@@ -17,7 +17,7 @@ FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief This represents one of the lens effect in a `lensFlareSystem`.
- * It controls one of the indiviual texture used in the effect.
+ * It controls one of the individual texture used in the effect.
  * @see https://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
 class BABYLON_SHARED_EXPORT LensFlare {
@@ -41,7 +41,7 @@ public:
   /**
    * @brief Creates a new Lens Flare.
    * This represents one of the lens effect in a `lensFlareSystem`.
-   * It controls one of the indiviual texture used in the effect.
+   * It controls one of the individual texture used in the effect.
    * @see https://doc.babylonjs.com/how_to/how_to_use_lens_flares
    * @param size Define the size of the lens flare (a floating value between 0 and 1)
    * @param position Define the position of the lens flare in the system. (a floating value between
@@ -64,7 +64,7 @@ protected:
   /**
    * @brief Instantiates a new Lens Flare.
    * This represents one of the lens effect in a `lensFlareSystem`.
-   * It controls one of the indiviual texture used in the effect.
+   * It controls one of the individual texture used in the effect.
    * @see https://doc.babylonjs.com/how_to/how_to_use_lens_flares
    * @param size Define the size of the lens flare in the system (a floating value between 0 and 1)
    * @param position Define the position of the lens flare in the system. (a floating value between

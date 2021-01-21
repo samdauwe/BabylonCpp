@@ -26,7 +26,7 @@ class BABYLON_SHARED_EXPORT LensFlareSystemSceneComponent : public ISceneCompone
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene components.
+   * The component name helpful to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_LENSFLARESYSTEM;
 
