@@ -4,6 +4,7 @@
 #include <babylon/animations/easing/exponential_ease.h>
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/misc/observer.h>
 
@@ -11,14 +12,12 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Animatable;
-class Animation;
-class ArcRotateCamera;
 class Camera;
 class PointerInfoPre;
 class Vector2;
 class Vector3;
-using AnimationPtr       = std::shared_ptr<Animation>;
-using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+FWD_CLASS_SPTR(Animation)
+FWD_CLASS_SPTR(ArcRotateCamera)
 
 /**
  * @brief The framing behavior (FramingBehavior) is designed to automatically position an

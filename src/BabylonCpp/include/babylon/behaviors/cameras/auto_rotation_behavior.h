@@ -3,15 +3,15 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-class ArcRotateCamera;
 class Camera;
 class PointerInfoPre;
-using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+FWD_CLASS_SPTR(ArcRotateCamera)
 
 /**
  * @brief The autoRotation behavior (AutoRotationBehavior) is designed to create a smooth rotation

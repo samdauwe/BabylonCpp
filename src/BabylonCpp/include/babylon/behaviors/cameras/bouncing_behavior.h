@@ -4,6 +4,7 @@
 #include <babylon/animations/easing/back_ease.h>
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/misc/observer.h>
 
@@ -11,11 +12,9 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Animatable;
-class Animation;
-class ArcRotateCamera;
 class Camera;
-using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
-using AnimationPtr       = std::shared_ptr<Animation>;
+FWD_CLASS_SPTR(ArcRotateCamera)
+FWD_CLASS_SPTR(Animation)
 
 /**
  * @brief Add a bouncing effect to an ArcRotateCamera when reaching a specified minimum and maximum
