@@ -1381,8 +1381,8 @@ void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear, float z
   const auto t = 1.f / (std::tan(fov * 0.5f));
   const auto a = isVerticalFovFixed ? (t / aspect) : t;
   const auto b = isVerticalFovFixed ? t : (t * aspect);
-  const auto c = (f + n) / (f - n);
-  const auto d = -2.f * f * n / (f - n);
+  const auto c = f != 0.f ? (f + n) / (f - n) : 1.f;
+  const auto d = f != 0.f ? -2.f * f * n / (f - n) : -2.f * n;
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
                           0.f, b, 0.f, 0.f, //
@@ -1430,8 +1430,8 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear, float z
   const auto t = 1.f / (std::tan(fov * 0.5f));
   const auto a = isVerticalFovFixed ? (t / aspect) : t;
   const auto b = isVerticalFovFixed ? t : (t * aspect);
-  const auto c = -(f + n) / (f - n);
-  const auto d = -2.f * f * n / (f - n);
+  const auto c = f != 0.f ? -(f + n) / (f - n) : -1.f;
+  const auto d = f != 0.f ? -2.f * f * n / (f - n) : -2.f * n;
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,  //
                           0.f, b, 0.f, 0.f,  //

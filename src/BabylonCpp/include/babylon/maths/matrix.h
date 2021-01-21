@@ -881,8 +881,7 @@ public:
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
-   * @param isVerticalFovFixed defines it the fov is vertically fixed (default)
-   * or horizontally
+   * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
    */
   static void PerspectiveFovLHToRef(float fov, float aspect, float znear, float zfar,
                                     Matrix& result, bool isVerticalFovFixed = true);
