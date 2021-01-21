@@ -2,24 +2,22 @@
 #define BABYLON_BEHAVIORS_MESHES_FADE_IN_OUT_BEHAVIOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Mesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using MeshPtr         = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Mesh)
 
 /**
- * @brief A behavior that when attached to a mesh will allow the mesh to fade in
- * and out.
+ * @brief A behavior that when attached to a mesh will allow the mesh to fade in and out.
  */
 class BABYLON_SHARED_EXPORT FadeInOutBehavior : public Behavior<Mesh> {
 
 public:
   /**
-   * @brief Instatiates the FadeInOutBehavior.
+   * @brief Instantiates the FadeInOutBehavior.
    */
   FadeInOutBehavior();
   ~FadeInOutBehavior() override; // = default

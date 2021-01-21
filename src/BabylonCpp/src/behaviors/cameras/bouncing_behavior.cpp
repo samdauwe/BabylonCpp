@@ -53,7 +53,7 @@ void BouncingBehavior::set_autoTransitionRange(bool value)
 
   if (value) {
     _onMeshTargetChangedObserver
-      = camera->onMeshTargetChangedObservable.add([this](AbstractMesh* mesh, EventState&) {
+      = camera->onMeshTargetChangedObservable.add([this](AbstractMesh* mesh, EventState&) -> void {
           if (!mesh) {
             return;
           }

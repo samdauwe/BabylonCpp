@@ -2,6 +2,7 @@
 #define BABYLON_BEHAVIORS_MESHES_ATTACH_TO_BOX_BEHAVIOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/meshes/face_direction_info.h>
 #include <babylon/maths/matrix.h>
@@ -11,29 +12,27 @@
 namespace BABYLON {
 
 class Mesh;
-class Scene;
-class TransformNode;
-using MeshPtr          = std::shared_ptr<Mesh>;
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
- * @brief A behavior that when attached to a mesh will will place a specified
- * node on the meshes face pointing towards the camera.
+ * @brief A behavior that when attached to a mesh will will place a specified node on the meshes
+ * face pointing towards the camera.
  */
 class BABYLON_SHARED_EXPORT AttachToBoxBehavior : public Behavior<Mesh> {
 
 public:
   /**
-   * A behavior that when attached to a mesh will will place a specified node on
-   * the meshes face pointing towards the camera
+   * A behavior that when attached to a mesh will will place a specified node on the meshes face
+   * pointing towards the camera
    */
   static constexpr const char* name = "AttachToBoxBehavior";
 
 public:
   /**
-   * @brief Creates the AttachToBoxBehavior, used to attach UI to the closest
-   * face of the box to a camera
-   * @param ui The transform node that should be attched to the mesh
+   * @brief Creates the AttachToBoxBehavior, used to attach UI to the closest face of the box to a
+   * camera.
+   * @param ui The transform node that should be attached to the mesh
    */
   AttachToBoxBehavior(const TransformNodePtr& ui);
   ~AttachToBoxBehavior() override; // = default
@@ -62,14 +61,12 @@ private:
 
 public:
   /**
-   * The distance away from the face of the mesh that the UI should be attached
-   * to (default: 0.15)
+   * The distance away from the face of the mesh that the UI should be attached to (default: 0.15)
    */
   float distanceAwayFromFace;
 
   /**
-   * The distance from the bottom of the face that the UI should be attached to
-   * (default: 0.15)
+   * The distance from the bottom of the face that the UI should be attached to (default: 0.15)
    */
   float distanceAwayFromBottomOfFace;
 

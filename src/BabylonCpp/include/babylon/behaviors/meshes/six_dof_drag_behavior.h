@@ -57,8 +57,8 @@ public:
 
 protected:
   /**
-   * @brief In the case of multiplea active cameras, the cameraToUseForPointers
-   * should be used if set instead of active camera.
+   * @brief In the case of multiple active cameras, the cameraToUseForPointers should be used if set
+   * instead of active camera
    */
   CameraPtr& get__pointerCamera();
 
@@ -74,14 +74,14 @@ public:
   bool dragging;
 
   /**
-   * The distance towards the target drag position to move each frame. This can
-   * be useful to avoid jitter. Set this to 1 for no delay. (Default: 0.2)
+   * The distance towards the target drag position to move each frame. This can be useful to avoid
+   * jitter. Set this to 1 for no delay. (Default: 0.2)
    */
   float dragDeltaRatio;
 
   /**
-   * The id of the pointer that is currently interacting with the behavior (-1
-   * when no pointer is active)
+   * The id of the pointer that is currently interacting with the behavior (-1 when no pointer is
+   * active)
    */
   int currentDraggingPointerID;
 
@@ -119,15 +119,15 @@ private:
   bool _attachedToElement;
 
   /**
-   * In the case of multiplea active cameras, the cameraToUseForPointers should
-   * be used if set instead of active camera
+   * In the case of multiple active cameras, the cameraToUseForPointers should be used if set
+   * instead of active camera
    */
   ReadOnlyProperty<SixDofDragBehavior, CameraPtr> _pointerCamera;
 
   /**
    * How much faster the object should move when the controller is moving
-   * towards it. This is useful to bring objects that are far away from the user
-   * to them faster. Set this to 0 to avoid any speed increase. (Default: 3)
+   * towards it. This is useful to bring objects that are far away from the user to them faster. Set
+   * this to 0 to avoid any speed increase. (Default: 3)
    */
   float zDragFactor;
 

@@ -54,7 +54,7 @@ public:
               const std::function<bool(const AbstractMeshPtr& m)>& predicate = nullptr) override;
 
   /**
-   * @brief Force relase the drag action by code.
+   * @brief Force release the drag action by code.
    */
   void releaseDrag();
 

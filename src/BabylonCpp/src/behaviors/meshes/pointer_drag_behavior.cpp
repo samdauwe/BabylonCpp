@@ -402,7 +402,7 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
     else {
       Vector3::CrossToRef(_localAxis, _pointC, _lookAt);
       // Get perpendicular line from previous result and drag axis to adjust lineB to be
-      // perpendiculat to camera
+      // perpendicular to camera
       Vector3::CrossToRef(_localAxis, _lookAt, _lookAt);
       _lookAt.normalize();
     }

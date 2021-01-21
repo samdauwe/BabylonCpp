@@ -67,19 +67,18 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
   AbstractMeshPtr pickedMesh = nullptr;
   Vector3 lastSixDofOriginPosition(0.f, 0.f, 0.f);
 
-  // Setup virtual meshes to be used for dragging without dirtying the existing
-  // scene
+  // Setup virtual meshes to be used for dragging without dirtying the existing scene
   _virtualOriginMesh = AbstractMesh::New("", SixDofDragBehavior::_virtualScene.get());
   _virtualOriginMesh->rotationQuaternion = Quaternion();
   _virtualDragMesh = AbstractMesh::New("", SixDofDragBehavior::_virtualScene.get());
   _virtualDragMesh->rotationQuaternion = Quaternion();
 
-  const auto pickPredicate = [this](AbstractMesh* m) {
+  const auto pickPredicate = [this](AbstractMesh* m) -> bool {
     return _ownerNode.get() == m || m->isDescendantOf(_ownerNode.get());
   };
 
   _pointerObserver = _scene->onPointerObservable.add(
-    [&](PointerInfo* pointerInfo, EventState& /*es*/) {
+    [&](PointerInfo* pointerInfo, EventState& /*es*/) -> void {
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (!dragging && pointerInfo->pickInfo.hit && pointerInfo->pickInfo.pickedMesh
             && pointerInfo->pickInfo.ray && pickPredicate(pointerInfo->pickInfo.pickedMesh.get())) {
@@ -203,44 +202,44 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
 
   Quaternion tmpQuaternion;
   // On every frame move towards target scaling to avoid jitter caused by vr controllers
-  _sceneRenderObserver = ownerNode->getScene()->onBeforeRenderObservable.add([&](
-                                                                               Scene* /*scene*/,
-                                                                               EventState& /*es*/) {
-    if (dragging && _moving && pickedMesh) {
-      PivotTools::_RemoveAndStorePivotPoint(pickedMesh);
-      // Slowly move mesh to avoid jitter
-      pickedMesh->position().addInPlace(
-        _targetPosition.subtract(pickedMesh->position()).scale(dragDeltaRatio));
-
-      if (rotateDraggedObject) {
-        // Get change in rotation
-        tmpQuaternion.copyFrom(_startingOrientation);
-        tmpQuaternion.x = -tmpQuaternion.x;
-        tmpQuaternion.y = -tmpQuaternion.y;
-        tmpQuaternion.z = -tmpQuaternion.z;
-        _virtualDragMesh->rotationQuaternion()->multiplyToRef(tmpQuaternion, tmpQuaternion);
-        // Convert change in rotation to only y axis rotation
-        Quaternion::RotationYawPitchRollToRef(tmpQuaternion.toEulerAngles("xyz").y, 0, 0,
-                                              tmpQuaternion);
-        tmpQuaternion.multiplyToRef(_startingOrientation, tmpQuaternion);
+  _sceneRenderObserver = ownerNode->getScene()->onBeforeRenderObservable.add(
+    [&](Scene* /*scene*/, EventState& /*es*/) -> void {
+      if (dragging && _moving && pickedMesh) {
+        PivotTools::_RemoveAndStorePivotPoint(pickedMesh);
         // Slowly move mesh to avoid jitter
-        auto oldParent = pickedMesh->parent();
+        pickedMesh->position().addInPlace(
+          _targetPosition.subtract(pickedMesh->position()).scale(dragDeltaRatio));
 
-        // Only rotate the mesh if it's parent has uniform scaling
-        if (!oldParent
-            || (static_cast<Mesh*>(oldParent)
-                && !(static_cast<Mesh*>(oldParent)->scaling().isNonUniformWithinEpsilon(0.001f)))) {
-          pickedMesh->setParent(nullptr);
-          Quaternion::SlerpToRef(*pickedMesh->rotationQuaternion(), tmpQuaternion, dragDeltaRatio,
-                                 *pickedMesh->rotationQuaternion());
-          pickedMesh->setParent(oldParent);
+        if (rotateDraggedObject) {
+          // Get change in rotation
+          tmpQuaternion.copyFrom(_startingOrientation);
+          tmpQuaternion.x = -tmpQuaternion.x;
+          tmpQuaternion.y = -tmpQuaternion.y;
+          tmpQuaternion.z = -tmpQuaternion.z;
+          _virtualDragMesh->rotationQuaternion()->multiplyToRef(tmpQuaternion, tmpQuaternion);
+          // Convert change in rotation to only y axis rotation
+          Quaternion::RotationYawPitchRollToRef(tmpQuaternion.toEulerAngles("xyz").y, 0, 0,
+                                                tmpQuaternion);
+          tmpQuaternion.multiplyToRef(_startingOrientation, tmpQuaternion);
+          // Slowly move mesh to avoid jitter
+          auto oldParent = pickedMesh->parent();
+
+          // Only rotate the mesh if it's parent has uniform scaling
+          if (!oldParent
+              || (static_cast<Mesh*>(oldParent)
+                  && !(
+                    static_cast<Mesh*>(oldParent)->scaling().isNonUniformWithinEpsilon(0.001f)))) {
+            pickedMesh->setParent(nullptr);
+            Quaternion::SlerpToRef(*pickedMesh->rotationQuaternion(), tmpQuaternion, dragDeltaRatio,
+                                   *pickedMesh->rotationQuaternion());
+            pickedMesh->setParent(oldParent);
+          }
         }
-      }
-      PivotTools::_RestorePivotPoint(pickedMesh);
+        PivotTools::_RestorePivotPoint(pickedMesh);
 
-      onDragObservable.notifyObservers();
-    }
-  });
+        onDragObservable.notifyObservers();
+      }
+    });
 }
 
 void SixDofDragBehavior::detach()
