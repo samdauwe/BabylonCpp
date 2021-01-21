@@ -610,15 +610,16 @@ float Vector3::GetClipFactor(const Vector3& vector0, const Vector3& vector1, con
 float Vector3::GetAngleBetweenVectors(const Vector3& vector0, const Vector3& vector1,
                                       const Vector3& normal)
 {
-  const auto v0  = vector0.normalizeToRef(MathTmp::Vector3Array[1]);
-  const auto v1  = vector1.normalizeToRef(MathTmp::Vector3Array[2]);
-  const auto dot = Vector3::Dot(v0, v1);
-  auto& n        = MathTmp::Vector3Array[3];
+  const auto v0    = vector0.normalizeToRef(MathTmp::Vector3Array[1]);
+  const auto v1    = vector1.normalizeToRef(MathTmp::Vector3Array[2]);
+  const auto dot   = Vector3::Dot(v0, v1);
+  const auto angle = std::acos(dot);
+  auto& n          = MathTmp::Vector3Array[3];
   Vector3::CrossToRef(v0, v1, n);
   if (Vector3::Dot(n, normal) > 0.f) {
-    return std::acos(dot);
+    return std::isnan(angle) ? 0.f : angle;
   }
-  return -std::acos(dot);
+  return std::isnan(angle) ? -Math::PI : -std::acos(dot);
 }
 
 Vector3 Vector3::FromArray(const Float32Array& array, unsigned int offset)
@@ -998,9 +999,15 @@ float Vector3::DistanceSquared(const Vector3& value1, const Vector3& value2)
 
 Vector3 Vector3::Center(const Vector3& value1, const Vector3& value2)
 {
-  Vector3 center = value1.add(value2);
-  center.scaleInPlace(0.5f);
+  Vector3 center = Vector3::Zero();
+  Vector3::CenterToRef(value1, value2, center);
   return center;
+}
+
+Vector3& Vector3::CenterToRef(const Vector3& value1, const Vector3& value2, Vector3& ref)
+{
+  return ref.copyFromFloats((value1.x + value2.x) / 2.f, (value1.y + value2.y) / 2.f,
+                            (value1.z + value2.z) / 2.f);
 }
 
 Vector3 Vector3::RotationFromAxis(Vector3& axis1, Vector3& axis2, Vector3& axis3)

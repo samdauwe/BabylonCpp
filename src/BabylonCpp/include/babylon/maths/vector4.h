@@ -492,13 +492,22 @@ public:
   static float DistanceSquared(const Vector4& value1, const Vector4& value2);
 
   /**
-   * @brief Returns a new Vector4 located at the center between the vectors
-   * "value1" and "value2".
+   * @brief Returns a new Vector4 located at the center between the vectors "value1" and "value2".
    * @param value1 value to calulate the center between
    * @param value2 value to calulate the center between
    * @return the center between the two vectors
    */
   static Vector4 Center(const Vector4& value1, const Vector4& value2);
+
+  /**
+   * @brief Gets the center of the vectors "value1" and "value2" and stores the result in the vector
+   * "ref".
+   * @param value1 defines first vector
+   * @param value2 defines second vector
+   * @param ref defines third vector
+   * @returns ref
+   */
+  static Vector4& CenterToRef(const Vector4& value1, const Vector4& value2, Vector4& ref);
 
   /**
    * @brief Returns a new Vector4 set with the result of the normal

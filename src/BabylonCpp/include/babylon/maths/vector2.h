@@ -506,6 +506,16 @@ public:
   static Vector2 Center(const Vector2& value1, const Vector2& value2);
 
   /**
+   * @brief Gets the center of the vectors "value1" and "value2" and stores the result in the vector
+   * "ref".
+   * @param value1 defines first vector
+   * @param value2 defines second vector
+   * @param ref defines third vector
+   * @returns ref
+   */
+  static Vector2& CenterToRef(const Vector2& value1, const Vector2& value2, Vector2& ref);
+
+  /**
    * @brief Gets the shortest distance (float) between the point "p" and the segment defined by the
    * two points "segA" and "segB".
    * @param p defines the middle point

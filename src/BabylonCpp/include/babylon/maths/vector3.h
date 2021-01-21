@@ -1015,6 +1015,16 @@ public:
   static Vector3 Center(const Vector3& value1, const Vector3& value2);
 
   /**
+   * @brief Gets the center of the vectors "value1" and "value2" and stores the result in the vector
+   * "ref".
+   * @param value1 defines first vector
+   * @param value2 defines second vector
+   * @param ref defines third vector
+   * @returns ref
+   */
+  static Vector3& CenterToRef(const Vector3& value1, const Vector3& value2, Vector3& ref);
+
+  /**
    * @brief Given three orthogonal normalized left-handed oriented Vector3 axis in space (target
    * system), RotationFromAxis() returns the rotation Euler angles (ex : rotation.x, rotation.y,
    * rotation.z) to apply to something in order to rotate it from its local system to the given

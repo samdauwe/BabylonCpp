@@ -577,9 +577,14 @@ float Vector2::DistanceSquared(const Vector2& value1, const Vector2& value2)
 
 Vector2 Vector2::Center(const Vector2& value1, const Vector2& value2)
 {
-  Vector2 center = value1.add(value2);
-  center.scaleInPlace(0.5f);
+  Vector2 center = Vector2::Zero();
+  Vector2::CenterToRef(value1, value2, center);
   return center;
+}
+
+Vector2& Vector2::CenterToRef(const Vector2& value1, const Vector2& value2, Vector2& ref)
+{
+  return ref.copyFromFloats((value1.x + value2.x) / 2.f, (value1.y + value2.y) / 2.f);
 }
 
 float Vector2::DistanceOfPointFromSegment(const Vector2& p, const Vector2& segA,
