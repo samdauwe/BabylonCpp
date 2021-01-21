@@ -63,8 +63,7 @@ public:
   Observable<Gamepad> onGamepadConnectedObservable;
 
   /**
-   * observable to be triggered when the gamepad controller has been
-   * disconnected
+   * observable to be triggered when the gamepad controller has been disconnected
    */
   Observable<Gamepad> onGamepadDisconnectedObservable;
 

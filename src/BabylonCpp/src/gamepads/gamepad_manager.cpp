@@ -29,10 +29,18 @@ Gamepad* GamepadManager::_addNewGamepad(Gamepad* gamepad)
 
 void GamepadManager::_startMonitoringGamepads()
 {
+  if (!_isMonitoring) {
+    _isMonitoring = true;
+    // back-comp
+    if (!_scene) {
+      _checkGamepadsStatus();
+    }
+  }
 }
 
 void GamepadManager::_stopMonitoringGamepads()
 {
+  _isMonitoring = false;
 }
 
 void GamepadManager::_checkGamepadsStatus()
