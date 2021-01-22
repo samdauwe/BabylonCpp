@@ -174,7 +174,7 @@ void DepthCullingState::reset()
   _isDepthFuncDirty = false;
   _isCullFaceDirty  = false;
   _isCullDirty      = false;
-  _isZOffsetDirty   = false;
+  _isZOffsetDirty   = true;
   _isFrontFaceDirty = false;
 }
 
