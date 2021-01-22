@@ -38,14 +38,15 @@ public:
   Property<AlphaState, bool> alphaBlend;
 
 private:
-  bool _isAlphaBlendDirty;
-  bool _isBlendFunctionParametersDirty;
-  bool _isBlendEquationParametersDirty;
-  bool _isBlendConstantsDirty;
-  bool _alphaBlend;
   std::array<std::optional<unsigned int>, 4> _blendFunctionParameters;
   std::array<std::optional<unsigned int>, 2> _blendEquationParameters;
   std::array<std::optional<float>, 4> _blendConstants;
+  bool _isBlendConstantsDirty;
+
+  bool _alphaBlend;
+  bool _isAlphaBlendDirty;
+  bool _isBlendFunctionParametersDirty;
+  bool _isBlendEquationParametersDirty;
 
 }; // end of class AlphaState
 

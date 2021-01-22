@@ -8,11 +8,11 @@ namespace BABYLON {
 AlphaState::AlphaState()
     : isDirty{this, &AlphaState::get_isDirty}
     , alphaBlend{this, &AlphaState::get_alphaBlend, &AlphaState::set_alphaBlend}
+    , _isBlendConstantsDirty{false}
+    , _alphaBlend{false}
     , _isAlphaBlendDirty{false}
     , _isBlendFunctionParametersDirty{false}
     , _isBlendEquationParametersDirty{false}
-    , _isBlendConstantsDirty{false}
-    , _alphaBlend{false}
 {
   reset();
 }
