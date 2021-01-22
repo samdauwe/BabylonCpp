@@ -92,6 +92,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
     , overrideMaterialSideOrientation{std::nullopt}
+    , ignoreCameraMaxZ{false}
     , _source{this, &Mesh::get_source}
     , cloneMeshMap{this, &Mesh::get_cloneMeshMap}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}

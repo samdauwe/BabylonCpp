@@ -2136,6 +2136,13 @@ public:
   std::optional<unsigned int> overrideMaterialSideOrientation;
 
   /**
+   * Gets or sets a boolean indicating whether to render ignoring the active camera's max z setting.
+   * (false by default)
+   * Note this will reduce performance when set to true.
+   */
+  bool ignoreCameraMaxZ;
+
+  /**
    * Gets the source mesh (the one used to clone this one from)
    */
   ReadOnlyProperty<Mesh, Mesh*> _source;
