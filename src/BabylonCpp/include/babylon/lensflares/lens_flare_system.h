@@ -110,7 +110,7 @@ public:
   // Statics
 
   /**
-   * @brief Parse a lens flare system from a JSON repressentation.
+   * @brief Parse a lens flare system from a JSON representation.
    * @param parsedLensFlareSystem Define the JSON to parse
    * @param scene Define the scene the parsed system should be instantiated in
    * @param rootUrl Define the rootUrl of the load sequence to easily find a load relative

@@ -152,7 +152,10 @@ bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
     _positionY += viewportBorder;
   }
 
-  if (position.z > 0.f) {
+  const auto rhs = _scene->useRightHandedSystem();
+  const auto okZ = (position.z > 0.f && !rhs) || (position.z < 0.f && rhs);
+
+  if (okZ) {
     if ((_positionX > globalViewport.x) && (_positionX < globalViewport.x + globalViewport.width)) {
       if ((_positionY > globalViewport.y)
           && (_positionY < globalViewport.y + globalViewport.height)) {
@@ -207,8 +210,8 @@ bool LensFlareSystem::render()
   }
 
   // Intensity
-  float awayX = 0.f;
-  float awayY = 0.f;
+  auto awayX = 0.f;
+  auto awayY = 0.f;
 
   const auto borderLimitf    = static_cast<float>(borderLimit);
   auto globalViewport_x      = static_cast<float>(globalViewport.x);
