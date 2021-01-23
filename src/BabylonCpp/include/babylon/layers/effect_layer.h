@@ -39,7 +39,7 @@ struct EmissiveTextureAndColor {
 /**
  * @brief The effect layer Helps adding post process effect blended with the main pass.
  *
- * This can be for instance use to generate glow or higlight effects on the scene.
+ * This can be for instance use to generate glow or highlight effects on the scene.
  *
  * The effect layer class can not be used directly and is intented to inherited from to be
  * customized per effects.
@@ -70,7 +70,7 @@ public:
   virtual bool isReady(SubMesh* subMesh, bool useInstances) = 0;
 
   /**
-   * @brief Returns whether or nood the layer needs stencil enabled during the mesh rendering.
+   * @brief Returns whether or not the layer needs stencil enabled during the mesh rendering.
    * @returns true if the effect requires stencil during the main canvas render pass.
    */
   [[nodiscard]] virtual bool needStencil() const = 0;
@@ -329,7 +329,7 @@ public:
   Observable<EffectLayer> onAfterComposeObservable;
 
   /**
-   * An event triggered when the efffect layer changes its size.
+   * An event triggered when the effect layer changes its size.
    */
   Observable<EffectLayer> onSizeChangedObservable;
 

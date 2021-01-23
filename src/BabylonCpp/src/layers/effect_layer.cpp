@@ -196,16 +196,19 @@ void EffectLayer::_createMainTexture()
   _mainTexture->onClearObservable.add(
     [this](Engine* engine, EventState& /*es*/) { engine->clear(neutralColor, true, true, true); });
 
-  _mainTexture->onBeforeBindObservable.add(
-    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
-      _scene->getBoundingBoxRenderer()->enabled
-        = !disableBoundingBoxesFromEffectLayer && _scene->getBoundingBoxRenderer()->enabled;
-    });
+  // Prevent package size in es6 (getBoundingBoxRenderer might not be present)
+  if (_scene->getBoundingBoxRenderer()) {
+    _mainTexture->onBeforeBindObservable.add(
+      [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+        _scene->getBoundingBoxRenderer()->enabled
+          = !disableBoundingBoxesFromEffectLayer && _scene->getBoundingBoxRenderer()->enabled;
+      });
 
-  _mainTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
-      _scene->getBoundingBoxRenderer()->enabled = _scene->getBoundingBoxRenderer()->enabled;
-    });
+    _mainTexture->onAfterUnbindObservable.add(
+      [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+        _scene->getBoundingBoxRenderer()->enabled = _scene->getBoundingBoxRenderer()->enabled;
+      });
+  }
 }
 
 void EffectLayer::_addCustomEffectDefines(std::vector<std::string>& /*defines*/)
@@ -265,7 +268,8 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     }
 
     auto opacityTexture = standardMaterial ? standardMaterial->opacityTexture() :
-                                             pbrMaterial ? pbrMaterial->opacityTexture() : nullptr;
+                          pbrMaterial      ? pbrMaterial->opacityTexture() :
+                                             nullptr;
     if (opacityTexture) {
       defines.emplace_back("#define OPACITY");
       if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)
@@ -573,7 +577,8 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     }
 
     auto opacityTexture = standardMaterial ? standardMaterial->opacityTexture() :
-                                             pbrMaterial ? pbrMaterial->opacityTexture() : nullptr;
+                          pbrMaterial      ? pbrMaterial->opacityTexture() :
+                                             nullptr;
     if (opacityTexture) {
       _effectLayerMapGenerationEffect->setTexture("opacitySampler", opacityTexture);
       _effectLayerMapGenerationEffect->setFloat("opacityIntensity", opacityTexture->level);

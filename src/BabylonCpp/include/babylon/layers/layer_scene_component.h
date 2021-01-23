@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
@@ -13,10 +14,8 @@ class AbstractScene;
 class Camera;
 class Engine;
 class Layer;
-class LayerSceneComponent;
-class RenderTargetTexture;
-using LayerSceneComponentPtr = std::shared_ptr<LayerSceneComponent>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(LayerSceneComponent)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Defines the layer scene component responsible to manage any layers in a given scene.
@@ -25,7 +24,7 @@ class BABYLON_SHARED_EXPORT LayerSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene components.
+   * The component name helpful to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_LAYER;
 

@@ -66,53 +66,47 @@ public:
   [[nodiscard]] std::string getEffectName() const override;
 
   /**
-   * @brief Returns wether or nood the layer needs stencil enabled during the
-   * mesh rendering.
+   * @brief Returns whether or not the layer needs stencil enabled during the mesh rendering.
    */
   [[nodiscard]] bool needStencil() const override;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
    * @param subMesh the mesh to check for
-   * @param useInstances specify wether or not to use instances to render the
-   * mesh
-   * @param emissiveTexture the associated emissive texture used to generate the
-   * glow
+   * @param useInstances specify wether or not to use instances to render the mesh
+   * @param emissiveTexture the associated emissive texture used to generate the glow
    * @return true if ready otherwise, false
    */
   bool isReady(SubMesh* subMesh, bool useInstances) override;
 
   /**
-   * @brief Returns true if the layer contains information to display, otherwise
-   * false.
+   * @brief Returns true if the layer contains information to display, otherwise false.
    */
   [[nodiscard]] bool shouldRender() const override;
 
   /**
-   * @brief Add a mesh in the exclusion list to prevent it to impact or being
-   * impacted by the highlight layer.
+   * @brief Add a mesh in the exclusion list to prevent it to impact or being impacted by the
+   * highlight layer.
    * @param mesh The mesh to exclude from the highlight layer
    */
   void addExcludedMesh(Mesh* mesh);
 
   /**
-   * @brief Remove a mesh from the exclusion list to let it impact or being
-   * impacted by the highlight layer.
+   * @brief Remove a mesh from the exclusion list to let it impact or being impacted by the
+   * highlight layer.
    * @param mesh The mesh to highlight
    */
   void removeExcludedMesh(Mesh* mesh);
 
   /**
-   * @brief Determine if a given mesh will be highlighted by the current
-   * HighlightLayer
+   * @brief Determine if a given mesh will be highlighted by the current HighlightLayer
    * @param mesh mesh to test
    * @returns true if the mesh will be highlighted by the current HighlightLayer
    */
   bool hasMesh(AbstractMesh* mesh) const override;
 
   /**
-   * @brief Add a mesh in the highlight layer in order to make it glow with the
-   * chosen color.
+   * @brief Add a mesh in the highlight layer in order to make it glow with the chosen color.
    * @param mesh The mesh to highlight
    * @param color The color of the highlight
    * @param glowEmissiveOnly Extract the glow from the emissive texture
@@ -120,8 +114,7 @@ public:
   void addMesh(const MeshPtr& mesh, const Color3& color, bool glowEmissiveOnly = false);
 
   /**
-   * @brief Remove a mesh from the highlight layer in order to make it stop
-   * glowing.
+   * @brief Remove a mesh from the highlight layer in order to make it stop glowing.
    * @param mesh The mesh to highlight
    */
   void removeMesh(Mesh* mesh);
@@ -160,8 +153,7 @@ public:
    * @brief Creates a Highlight layer from parsed Highlight layer data.
    * @param parsedHightlightLayer defines the Highlight layer data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing the Highlight layer
-   * information
+   * @param rootUrl defines the root URL containing the Highlight layer information
    * @returns a parsed Highlight layer
    */
   static HighlightLayer* Parse(const json& parsedHightlightLayer, Scene* scene,
@@ -172,27 +164,25 @@ protected:
    * @brief Instantiates a new highlight Layer and references it to the scene..
    * @param name The name of the layer
    * @param scene The scene to use the layer in
-   * @param options Sets of none mandatory options to use with the layer (see
-   * IHighlightLayerOptions for more information)
+   * @param options Sets of none mandatory options to use with the layer (see IHighlightLayerOptions
+   * for more information)
    */
   HighlightLayer(const std::string& name, Scene* scene);
   HighlightLayer(const std::string& name, Scene* scene, const IHighlightLayerOptions& options);
 
   /**
-   * @brief Create the merge effect. This is the shader use to blit the
-   * information back to the main canvas at the end of the scene rendering.
+   * @brief Create the merge effect. This is the shader use to blit the information back to the main
+   * canvas at the end of the scene rendering.
    */
   EffectPtr _createMergeEffect() override;
 
   /**
-   * @brief Creates the render target textures and post processes used in the
-   * highlight layer.
+   * @brief Creates the render target textures and post processes used in the highlight layer.
    */
   void _createTextureAndPostProcesses() override;
 
   /**
-   * @brief Implementation specific of rendering the generating effect on the
-   * main canvas.
+   * @brief Implementation specific of rendering the generating effect on the main canvas.
    * @param effect The effect used to render through
    */
   void _internalRender(const EffectPtr& effect) override;
@@ -219,8 +209,7 @@ protected:
   void _addCustomEffectDefines(std::vector<std::string>& defines) override;
 
   /**
-   * @brief Sets the required values for both the emissive texture and and the
-   * main color.
+   * @brief Sets the required values for both the emissive texture and and the main color.
    */
   void _setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMesh,
                                    const MaterialPtr& material) override;
@@ -247,8 +236,7 @@ private:
   [[nodiscard]] float get_blurVerticalSize() const;
 
   /**
-   * @brief Force the stencil to the normal expected value for none glowing
-   * parts
+   * @brief Force the stencil to the normal expected value for none glowing parts
    */
   void _defaultStencilReference(Mesh* mesh);
 

@@ -5,12 +5,12 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
-class Camera;
-using CameraPtr = std::shared_ptr<Camera>;
+FWD_CLASS_SPTR(Camera)
 
 /**
  * @brief Highlight layer options. This helps customizing the behaviour
@@ -26,14 +26,13 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerOptions {
   float mainTextureRatio = 0.5f;
 
   /**
-   * Enforces a fixed size texture to ensure resize independant blur.
+   * Enforces a fixed size texture to ensure resize independent blur.
    */
   std::optional<int> mainTextureFixedSize = std::nullopt;
 
   /**
    * Multiplication factor apply to the main texture size in the first step of
-   * the blur to reduce the size
-   * of the picture to blur (the smaller the faster).
+   * the blur to reduce the size of the picture to blur (the smaller the faster).
    */
   float blurTextureSizeRatio = 0.5f;
 

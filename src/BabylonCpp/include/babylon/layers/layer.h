@@ -2,6 +2,7 @@
 #define BABYLON_LAYERS_LAYER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/scene.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
@@ -10,15 +11,11 @@
 
 namespace BABYLON {
 
-class Effect;
 class Layer;
-class Texture;
-class VertexBuffer;
-class WebGLDataBuffer;
-using EffectPtr          = std::shared_ptr<Effect>;
-using TexturePtr         = std::shared_ptr<Texture>;
-using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
-using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(Texture)
+FWD_CLASS_SPTR(VertexBuffer)
+FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief This represents a full screen 2d layer.
@@ -48,7 +45,7 @@ public:
   void render();
 
   /**
-   * @brief Disposes and releases the associated ressources.
+   * @brief Disposes and releases the associated resources.
    */
   void dispose();
 

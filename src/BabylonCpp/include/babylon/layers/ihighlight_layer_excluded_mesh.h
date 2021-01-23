@@ -9,8 +9,7 @@ namespace BABYLON {
 class Mesh;
 
 /**
- * @brief Storage interface grouping all the information required for an
- * excluded mesh.
+ * @brief Storage interface grouping all the information required for an excluded mesh.
  */
 struct BABYLON_SHARED_EXPORT IHighlightLayerExcludedMesh {
 

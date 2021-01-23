@@ -2,17 +2,16 @@
 #define BABYLON_LAYERS_IHIGHLIGHT_LAYER_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-class Mesh;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
- * @brief Storage interface grouping all the information required for glowing a
- * mesh.
+ * @brief Storage interface grouping all the information required for glowing a mesh.
  */
 struct BABYLON_SHARED_EXPORT IHighlightLayerMesh {
 
@@ -37,8 +36,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerMesh {
   Observer<Mesh>::Ptr observerDefault = nullptr;
 
   /**
-   * If it exists, the emissive color of the material will be used to generate
-   * the glow.
+   * If it exists, the emissive color of the material will be used to generate the glow.
    * Else it falls back to the current color.
    */
   bool glowEmissiveOnly;
