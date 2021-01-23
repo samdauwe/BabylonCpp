@@ -130,7 +130,7 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
           transformNode->position().addInPlaceFromFloats(event->delta.x, event->delta.y,
                                                          event->delta.z);
         }
-        // use _worldMatrix to not force a matrix update when calling GetWorldMatrix especialy with
+        // use _worldMatrix to not force a matrix update when calling GetWorldMatrix especially with
         // Cameras
         attachedNode()->getWorldMatrix().addTranslationFromFloats(event->delta.x, event->delta.y,
                                                                   event->delta.z);
@@ -192,9 +192,9 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
 
       if (!_parent) {
         auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
-        for (auto& m : _cache.gizmoMeshes) {
-          m->material    = material;
-          auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
+        for (const auto& m : _cache.gizmoMeshes) {
+          m->material          = material;
+          const auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
           if (linesMesh) {
             linesMesh->color = material->diffuseColor;
           }

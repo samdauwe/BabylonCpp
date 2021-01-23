@@ -44,7 +44,7 @@ class BABYLON_SHARED_EXPORT GizmoManager : public IDisposable {
 
 public:
   /**
-   * @brief Instatiates a gizmo manager.
+   * @brief Instantiates a gizmo manager.
    * @param scene the scene to overlay the gizmos on top of
    * @param thickness display gizmo axis thickness
    * @param utilityLayer the layer where gizmos are rendered
@@ -138,8 +138,8 @@ protected:
 
 private:
   /**
-   * @brief Subscribes to pointer down events, for attaching and detaching mesh.
-   * @param scene The sceme layer the observer will be added to
+   * @brief Subscribes to pointer down events, for attaching and detaching mesh
+   * @param scene The scene layer the observer will be added to
    */
   Observer<PointerInfo>::Ptr _attachToMeshPointerObserver(Scene* scene);
 

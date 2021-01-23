@@ -93,7 +93,7 @@ private:
 
 public:
   /**
-   * If child meshes should be ignored when calculating the boudning box. This should be set to true
+   * If child meshes should be ignored when calculating the bounding box. This should be set to true
    * to avoid perf hits with heavily nested meshes (Default: false)
    */
   bool ignoreChildren;

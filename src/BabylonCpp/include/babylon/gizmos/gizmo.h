@@ -24,15 +24,15 @@ FWD_CLASS_SPTR(UtilityLayerRenderer)
  * enhanced UI.
  */
 struct BABYLON_SHARED_EXPORT GizmoAxisCache {
-  /** Mesh used to runder the Gizmo */
+  /** Mesh used to render the Gizmo */
   std::vector<MeshPtr> gizmoMeshes;
   /** Mesh used to detect user interaction with Gizmo */
   std::vector<MeshPtr> colliderMeshes;
-  /** Material used to inicate color of gizmo mesh */
+  /** Material used to indicate color of gizmo mesh */
   StandardMaterialPtr material = nullptr;
-  /** Material used to inicate hover state of the Gizmo */
+  /** Material used to indicate hover state of the Gizmo */
   StandardMaterialPtr hoverMaterial = nullptr;
-  /** Material used to inicate disabled state of the Gizmo */
+  /** Material used to indicate disabled state of the Gizmo */
   StandardMaterialPtr disableMaterial = nullptr;
   /** Used to indicate Active state of the Gizmo */
   bool active = false;

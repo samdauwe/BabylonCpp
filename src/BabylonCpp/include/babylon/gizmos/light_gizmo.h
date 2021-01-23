@@ -2,17 +2,15 @@
 #define BABYLON_GIZMOS_LIGHT_GIZMO_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
-class Light;
-class StandardMaterial;
-class TransformNode;
-using LightPtr            = std::shared_ptr<Light>;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
-using TransformNodePtr    = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(Light)
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Gizmo that enables viewing a light.

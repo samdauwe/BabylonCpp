@@ -338,7 +338,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
   // Update bounding box positions
   _renderObserver = gizmoLayer->originalScene->onBeforeRenderObservable.add(
     [this](Scene* /*scene*/, EventState& /*es*/) {
-      // Only update the bouding box if scaling has changed
+      // Only update the bounding box if scaling has changed
       if (attachedMesh() && !_existingMeshScale.equals(attachedMesh()->scaling())) {
         updateBoundingBox();
       }
@@ -347,7 +347,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
         _updateScaleBoxes();
       }
 
-      // If dragg mesh is enabled and dragging, update the attached mesh pose to match the drag mesh
+      // If drag mesh is enabled and dragging, update the attached mesh pose to match the drag mesh
       if (_dragMesh && attachedMesh() && pointerDragBehavior->dragging) {
         _lineBoundingBox->position().rotateByQuaternionToRef(*_rootMesh->rotationQuaternion(),
                                                              _tmpVector);
@@ -377,6 +377,7 @@ void BoundingBoxGizmo::_attachedNodeChanged(const NodePtr& iValue)
   if (value) {
     // Reset anchor mesh to match attached mesh's scale
     // This is needed to avoid invalid box/sphere position on first drag
+    _anchorMesh->scaling().setAll(1.f);
     PivotTools::_RemoveAndStorePivotPoint(value);
     auto originalParent = value->parent();
     _anchorMesh->addChild(*value);
@@ -410,7 +411,7 @@ void BoundingBoxGizmo::updateBoundingBox()
     auto originalParent = attachedMesh()->parent();
     attachedMesh()->setParent(nullptr);
 
-    // Store original skelton override mesh
+    // Store original skeleton override mesh
     AbstractMeshPtr originalSkeletonOverrideMesh = nullptr;
     if (attachedMesh()->skeleton()) {
       originalSkeletonOverrideMesh             = attachedMesh()->skeleton()->overrideMesh;
@@ -604,7 +605,7 @@ void BoundingBoxGizmo::setEnabledScaling(bool enable, bool homogeneousScaling)
 {
   for (const auto& m : _scaleBoxesParent->getChildMeshes()) {
     auto enableMesh = enable;
-    // Disable heterogenous scale handles if requested.
+    // Disable heterogeneous scale handles if requested.
     if (homogeneousScaling && m->metadata == true) {
       enableMesh = false;
     }
@@ -654,7 +655,7 @@ MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
   };
   makeNotPickable(mesh);
 
-  // Reset position to get boudning box from origin with no rotation
+  // Reset position to get bounding box from origin with no rotation
   if (!mesh->rotationQuaternion()) {
     mesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
       mesh->rotation().y, mesh->rotation().x, mesh->rotation().z);

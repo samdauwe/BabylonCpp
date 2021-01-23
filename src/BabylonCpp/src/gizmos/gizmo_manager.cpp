@@ -56,7 +56,7 @@ GizmoManager::GizmoManager(Scene* iScene, float thickness,
 
 Observer<PointerInfo>::Ptr GizmoManager::_attachToMeshPointerObserver(Scene* /*scene*/)
 {
-  // Instatiate/dispose gizmos based on pointer actions
+  // Instantiate/dispose gizmos based on pointer actions
   const auto pointerObserver
     = _scene->onPointerObservable.add([this](PointerInfo* pointerInfo, EventState& /*es*/) {
         if (!usePointerToAttachGizmos) {

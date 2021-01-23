@@ -36,7 +36,7 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
   _material->specularColor = Color3(0.1f, 0.1f, 0.1f);
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
-    [this](PointerInfo* pointerInfo, EventState & /*es*/) -> void {
+    [this](PointerInfo* pointerInfo, EventState& /*es*/) -> void {
       if (!_light) {
         return;
       }
@@ -239,9 +239,8 @@ MeshPtr LightGizmo::_CreateHemisphericLightMesh(Scene* scene)
   hemisphere->rotation().x = Math::PI_2;
   hemisphere->parent       = root.get();
 
-  auto lines          = _CreateLightLines(3.f, scene);
-  lines->parent       = root.get();
-  lines->position().z = 0.15f;
+  auto lines    = _CreateLightLines(3.f, scene);
+  lines->parent = root.get();
 
   root->scaling().scaleInPlace(LightGizmo::_Scale);
   root->rotation().x = Math::PI_2;

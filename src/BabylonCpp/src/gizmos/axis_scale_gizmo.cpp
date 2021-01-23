@@ -62,7 +62,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   _rootMesh->addChild(*_gizmoMesh);
   _gizmoMesh->scaling().scaleInPlace(1.f / 3.f);
 
-  // Closure of inital prop values for resetting
+  // Closure of initial prop values for resetting
   _nodePosition = _arrowMesh->position();
   _linePosition = _arrowTail->position();
   _lineScale    = _arrowTail->scaling();
