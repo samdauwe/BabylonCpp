@@ -4,12 +4,10 @@
 
 namespace BABYLON {
 
-PhysicsJoint::PhysicsJoint(unsigned int iJointType,
-                           const PhysicsJointData& iJointData)
+PhysicsJoint::PhysicsJoint(unsigned int iJointType, const PhysicsJointData& iJointData)
     : jointType{iJointType}
     , jointData{iJointData}
-    , physicsJoint{this, &PhysicsJoint::get_physicsJoint,
-                   &PhysicsJoint::set_physicsJoint}
+    , physicsJoint{this, &PhysicsJoint::get_physicsJoint, &PhysicsJoint::set_physicsJoint}
     , physicsPlugin{this, &PhysicsJoint::set_physicsPlugin}
 {
 }
@@ -24,14 +22,13 @@ PhysicsJoint*& PhysicsJoint::get_physicsJoint()
 void PhysicsJoint::set_physicsJoint(PhysicsJoint* const& newJoint)
 {
   if (_physicsJoint) {
-    // remove from the wolrd
+    // remove from the world
   }
 
   _physicsJoint = newJoint;
 }
 
-void PhysicsJoint::set_physicsPlugin(
-  IPhysicsEnginePlugin* const& iPhysicsPlugin)
+void PhysicsJoint::set_physicsPlugin(IPhysicsEnginePlugin* const& iPhysicsPlugin)
 {
   _physicsPlugin = iPhysicsPlugin;
 }

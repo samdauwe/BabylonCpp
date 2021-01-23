@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/physics/physics_impostor_parameters.h>
@@ -14,19 +15,17 @@ class AbstractMesh;
 class Bone;
 struct IPhysicsBody;
 struct IPhysicsEnabledObject;
-struct IPhysicsEngine;
 class Mesh;
 class PhysicsEngine;
-class PhysicsImpostor;
 class PhysicsJoint;
 struct PhysicsJointData;
 class Scene;
-using IPhysicsEnginePtr  = std::shared_ptr<IPhysicsEngine>;
-using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
+FWD_STRUCT_SPTR(IPhysicsEngine)
+FWD_CLASS_SPTR(PhysicsImpostor)
 
 struct Joint {
   std::shared_ptr<PhysicsJoint> joint = nullptr;
-  PhysicsImpostorPtr otherImpostor= nullptr;
+  PhysicsImpostorPtr otherImpostor    = nullptr;
 }; // end of class JointElement
 
 /**
@@ -110,11 +109,11 @@ public:
   virtual ~PhysicsImpostor(); // = default
 
   /**
-   * @brief This function will completly initialize this impostor.
+   * @brief This function will completely initialize this impostor.
    * It will create a new body - but only if this mesh has no parent.
    * If it has, this impostor will not be used other than to define the impostor
    * of the child mesh.
-   * Hidden
+   * @hidden
    */
   void _init();
 
@@ -161,16 +160,14 @@ public:
   [[nodiscard]] float getParam(const std::string& paramName) const;
 
   /**
-   * @brief Sets a specific parameter in the options given to the physics
-   * plugin.
+   * @brief Sets a specific parameter in the options given to the physics plugin.
    * @param paramName The parameter name
    * @param value The value of the parameter
    */
   void setParam(const std::string& paramName, float value);
 
   /**
-   * @brief Specifically change the body's mass option. Won't recreate the
-   * physics body object
+   * @brief Specifically change the body's mass option. Won't recreate the physics body object
    * @param mass The mass of the physics imposter
    */
   void setMass(float mass);
@@ -201,26 +198,22 @@ public:
 
   /**
    * @brief Execute a function with the physics plugin native code
-   * Provide a function the will have two variables - the world object and the
-   * physics body object.
+   * Provide a function the will have two variables - the world object and the physics body object.
    * @param func The function to execute with the physics plugin native code
    */
   void
   executeNativeFunction(const std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
 
   /**
-   * @brief Register a function that will be executed before the physics world
-   * is stepping forward.
-   * @param func The function to execute before the physics world is stepped
-   * forward
+   * @brief Register a function that will be executed before the physics world is stepping forward.
+   * @param func The function to execute before the physics world is stepped forward
    */
   void registerBeforePhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
-   * @brief Unregister a function that will be executed before the physics world
-   * is stepping forward.
-   * @param func The function to execute before the physics world is stepped
-   * forward
+   * @brief Unregister a function that will be executed before the physics world is stepping
+   * forward.
+   * @param func The function to execute before the physics world is stepped forward
    */
   void unregisterBeforePhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
@@ -237,10 +230,9 @@ public:
   void unregisterAfterPhysicsStep(const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
-   * @brief Register a function that will be executed when this impostor
-   * collides against a different body.
-   * @param collideAgainst Physics imposter, or array of physics imposters to
-   * collide against
+   * @brief Register a function that will be executed when this impostor collides against a
+   * different body.
+   * @param collideAgainst Physics imposter, or array of physics imposters to collide against
    * @param func Callback that is executed on collision
    */
   void registerOnPhysicsCollide();
@@ -313,10 +305,10 @@ public:
    * @param otherImpostor rigid impostor to anchor to
    * @param width ratio across width from 0 to 1
    * @param height ratio up height from 0 to 1
-   * @param influence the elasticity between cloth impostor and anchor from 0,
-   * very stretchy to 1, little strech
-   * @param noCollisionBetweenLinkedBodies when true collisions between cloth
-   * impostor and anchor are ignored; default false
+   * @param influence the elasticity between cloth impostor and anchor from 0, very stretchy to 1,
+   * little stretch
+   * @param noCollisionBetweenLinkedBodies when true collisions between cloth impostor and anchor
+   * are ignored; default false
    * @returns impostor the soft imposter
    */
   PhysicsImpostor& addAnchor(const PhysicsImpostorPtr& otherImpostor, int width, int height,
@@ -326,10 +318,10 @@ public:
    * @brief Add a hook to a rope impostor.
    * @param otherImpostor rigid impostor to anchor to
    * @param length ratio across rope from 0 to 1
-   * @param influence the elasticity between rope impostor and anchor from 0,
-   * very stretchy to 1, little strech
-   * @param noCollisionBetweenLinkedBodies when true collisions between soft
-   * impostor and anchor are ignored; default false
+   * @param influence the elasticity between rope impostor and anchor from 0, very stretchy to 1,
+   * little stretch
+   * @param noCollisionBetweenLinkedBodies when true collisions between soft impostor and anchor are
+   * ignored; default false
    * @returns impostor the rope imposter
    */
   PhysicsImpostor& addHook(const PhysicsImpostorPtr& otherImpostor, float length, float influence,
@@ -372,8 +364,7 @@ public:
   void setDeltaRotation(const Quaternion& rotation);
 
   /**
-   * @brief Gets the box size of the physics imposter and stores the result in
-   * the input parameter.
+   * @brief Gets the box size of the physics imposter and stores the result in the input parameter.
    * @param result Stores the box size
    * @returns The physics imposter
    */
@@ -391,8 +382,7 @@ public:
    * @param boneMesh The mesh that the bone is influencing.
    * @param jointPivot The pivot of the joint / bone in local space.
    * @param distToJoint Optional distance from the impostor to the joint.
-   * @param adjustRotation Optional quaternion for adjusting the local rotation
-   * of the bone.
+   * @param adjustRotation Optional quaternion for adjusting the local rotation of the bone.
    */
   void syncBoneWithImpostor(Bone* bone, AbstractMesh* boneMesh,
                             const std::optional<Vector3>& jointPivot,
@@ -405,8 +395,7 @@ public:
    * @param boneMesh The mesh that the bone is influencing.
    * @param jointPivot The pivot of the joint / bone in local space.
    * @param distToJoint Optional distance from the impostor to the joint.
-   * @param adjustRotation Optional quaternion for adjusting the local rotation
-   * of the bone.
+   * @param adjustRotation Optional quaternion for adjusting the local rotation of the bone.
    * @param boneAxis Optional vector3 axis the bone is aligned with
    */
   void syncImpostorWithBone(Bone* bone, AbstractMesh* boneMesh,
@@ -456,56 +445,47 @@ private:
   void set_restitution(float value);
 
   /**
-   * @brief Gets the pressure of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Gets the pressure of a soft body; only supported by the AmmoJSPlugin.
    */
   [[nodiscard]] float get_pressure() const;
 
   /**
-   * @brief Sets the pressure of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Sets the pressure of a soft body; only supported by the AmmoJSPlugin.
    */
   void set_pressure(float value);
 
   /**
-   * @brief Gets the stiffness of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Gets the stiffness of a soft body; only supported by the AmmoJSPlugin.
    */
   [[nodiscard]] float get_stiffness() const;
 
   /**
-   * @brief Sets the stiffness of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Sets the stiffness of a soft body; only supported by the AmmoJSPlugin.
    */
   void set_stiffness(float value);
 
   /**
-   * @brief Gets the velocityIterations of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Gets the velocityIterations of a soft body; only supported by the AmmoJSPlugin.
    */
   [[nodiscard]] size_t get_velocityIterations() const;
 
   /**
-   * @brief Sets the velocityIterations of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Sets the velocityIterations of a soft body; only supported by the AmmoJSPlugin.
    */
   void set_velocityIterations(size_t value);
 
   /**
-   * @brief Gets the positionIterations of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Gets the positionIterations of a soft body; only supported by the AmmoJSPlugin.
    */
   [[nodiscard]] size_t get_positionIterations() const;
 
   /**
-   * @brief Sets the positionIterations of a soft body; only supported by the
-   * AmmoJSPlugin.
+   * @brief Sets the positionIterations of a soft body; only supported by the AmmoJSPlugin.
    */
   void set_positionIterations(size_t value);
 
   /**
-   * @brief Gets the body that holds this impostor. Either its own, or its.
-   * parent.
+   * @brief Gets the body that holds this impostor. Either its own, or its parent.
    */
   IPhysicsBody*& get_physicsBody();
 
@@ -557,32 +537,28 @@ public:
   Property<PhysicsImpostor, float> restitution;
 
   /**
-   * Gets or sets the pressure of a soft body; only supported by the
-   * AmmoJSPlugin
+   * Gets or sets the pressure of a soft body; only supported by the AmmoJSPlugin
    */
   Property<PhysicsImpostor, float> pressure;
 
   /**
-   * Gets or sets the stiffness of a soft body; only supported by the
-   * AmmoJSPlugin
+   * Gets or sets the stiffness of a soft body; only supported by the AmmoJSPlugin
    */
   Property<PhysicsImpostor, float> stiffness;
 
   /**
-   * Gets or sets the velocityIterations of a soft body; only supported by the
-   * AmmoJSPlugin
+   * Gets or sets the velocityIterations of a soft body; only supported by the AmmoJSPlugin
    */
   Property<PhysicsImpostor, size_t> velocityIterations;
 
   /**
-   * Gets or sets the positionIterations of a soft body; only supported by the
-   * AmmoJSPlugin
+   * Gets or sets the positionIterations of a soft body; only supported by the AmmoJSPlugin
    */
   Property<PhysicsImpostor, size_t> positionIterations;
 
   /**
-   * The unique id of the physics imposter
-   * set by the physics engine when adding this impostor to the array
+   * The unique id of the physics imposter set by the physics engine when adding this impostor to
+   * the array
    */
   size_t uniqueId;
 
@@ -607,8 +583,7 @@ public:
   unsigned int physicsImposterType;
 
   /**
-   * Gets or sets the body that holds this impostor. Either its own, or its
-   * parent
+   * Gets or sets the body that holds this impostor. Either its own, or its parent
    */
   Property<PhysicsImpostor, IPhysicsBody*> physicsBody;
 

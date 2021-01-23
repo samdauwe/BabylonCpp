@@ -22,8 +22,7 @@ public:
 
   /**
    * @brief Set the motor values.
-   * Attention, this function is plugin specific. Engines won't react 100% the
-   * same.
+   * Attention, this function is plugin specific. Engines won't react 100% the same.
    * @param {number} force the force to apply
    * @param {number} maxForce max force for this motor.
    */
@@ -31,8 +30,7 @@ public:
 
   /**
    * @brief Set the motor's limits.
-   * Attention, this function is plugin specific. Engines won't react 100% the
-   * same.
+   * Attention, this function is plugin specific. Engines won't react 100% the same.
    * @param upperLimit The upper limit of the motor
    * @param lowerLimit The lower limit of the motor
    */

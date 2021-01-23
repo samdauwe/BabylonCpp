@@ -26,12 +26,9 @@ PhysicsHelper::PhysicsHelper(Scene* scene)
 
 PhysicsHelper::~PhysicsHelper() = default;
 
-std::unique_ptr<PhysicsRadialExplosionEvent>
-PhysicsHelper::applyRadialExplosionImpulse(
-  const Vector3& origin,
-  RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
-  const std::optional<float>& strength,
-  const std::optional<PhysicsRadialImpulseFalloff>& falloff)
+std::unique_ptr<PhysicsRadialExplosionEvent> PhysicsHelper::applyRadialExplosionImpulse(
+  const Vector3& origin, RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
+  const std::optional<float>& strength, const std::optional<PhysicsRadialImpulseFalloff>& falloff)
 {
   if (!_physicsEngine) {
     BABYLON_LOG_WARN("PhysicsHelper",
@@ -78,12 +75,9 @@ PhysicsHelper::applyRadialExplosionImpulse(
   return event;
 }
 
-std::unique_ptr<PhysicsRadialExplosionEvent>
-PhysicsHelper::applyRadialExplosionForce(
-  const Vector3& origin,
-  RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
-  const std::optional<float>& strength,
-  const std::optional<PhysicsRadialImpulseFalloff>& falloff)
+std::unique_ptr<PhysicsRadialExplosionEvent> PhysicsHelper::applyRadialExplosionForce(
+  const Vector3& origin, RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
+  const std::optional<float>& strength, const std::optional<PhysicsRadialImpulseFalloff>& falloff)
 {
   if (!_physicsEngine) {
     BABYLON_LOG_WARN("PhysicsHelper",
@@ -130,12 +124,9 @@ PhysicsHelper::applyRadialExplosionForce(
   return event;
 }
 
-std::unique_ptr<PhysicsGravitationalFieldEvent>
-PhysicsHelper::gravitationalField(
-  const Vector3& origin,
-  RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
-  const std::optional<float>& strength,
-  const std::optional<PhysicsRadialImpulseFalloff>& falloff)
+std::unique_ptr<PhysicsGravitationalFieldEvent> PhysicsHelper::gravitationalField(
+  const Vector3& origin, RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
+  const std::optional<float>& strength, const std::optional<PhysicsRadialImpulseFalloff>& falloff)
 {
   if (!_physicsEngine) {
     BABYLON_LOG_WARN("PhysicsHelper",
@@ -158,8 +149,7 @@ PhysicsHelper::gravitationalField(
   }
 
   auto event = std::make_unique<PhysicsGravitationalFieldEvent>(
-    this, _scene, origin,
-    std::get<PhysicsRadialExplosionEventOptions>(radiusOrEventOptions));
+    this, _scene, origin, std::get<PhysicsRadialExplosionEventOptions>(radiusOrEventOptions));
 
   event->dispose(false);
 
@@ -169,8 +159,7 @@ PhysicsHelper::gravitationalField(
 std::unique_ptr<PhysicsUpdraftEvent>
 PhysicsHelper::updraft(const Vector3& origin,
                        RadiusOrPhysicsUpdraftEventOptions& radiusOrEventOptions,
-                       const std::optional<float>& strength,
-                       const std::optional<float>& height,
+                       const std::optional<float>& strength, const std::optional<float>& height,
                        const std::optional<PhysicsUpdraftMode>& updraftMode)
 {
   if (!_physicsEngine) {
@@ -204,8 +193,7 @@ PhysicsHelper::updraft(const Vector3& origin,
 std::unique_ptr<PhysicsVortexEvent>
 PhysicsHelper::vortex(const Vector3& origin,
                       RadiusOrPhysicsVortexEventOptions& radiusOrEventOptions,
-                      const std::optional<float>& strength,
-                      const std::optional<float>& height)
+                      const std::optional<float>& strength, const std::optional<float>& height)
 {
   if (!_physicsEngine) {
     BABYLON_LOG_WARN("PhysicsHelper",

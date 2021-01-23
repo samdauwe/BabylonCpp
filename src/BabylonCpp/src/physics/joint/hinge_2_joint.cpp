@@ -12,14 +12,12 @@ Hinge2Joint::Hinge2Joint(const PhysicsJointData& iJointData)
 
 Hinge2Joint::~Hinge2Joint() = default;
 
-void Hinge2Joint::setMotor(float targetSpeed, float maxForce,
-                           unsigned int motorIndex)
+void Hinge2Joint::setMotor(float targetSpeed, float maxForce, unsigned int motorIndex)
 {
   _physicsPlugin->setMotor(this, targetSpeed, maxForce, motorIndex);
 }
 
-void Hinge2Joint::setLimit(float upperLimit, float lowerLimit,
-                           unsigned int motorIndex)
+void Hinge2Joint::setLimit(float upperLimit, float lowerLimit, unsigned int motorIndex)
 {
   _physicsPlugin->setLimit(this, upperLimit, lowerLimit, motorIndex);
 }

@@ -23,18 +23,14 @@ struct BABYLON_SHARED_EXPORT IMotorEnabledJoint {
    * @param maxForce The maximum force of the motor
    * @param motorIndex The index of the motor
    */
-  virtual void setMotor(float force, float maxForce,
-                        unsigned int motorIndex = 0)
-    = 0;
+  virtual void setMotor(float force, float maxForce, unsigned int motorIndex = 0) = 0;
   /**
    * @brief Sets the limit of the motor.
    * @param upperLimit The upper limit of the motor
    * @param lowerLimit The lower limit of the motor
    * @param motorIndex The index of the motor
    */
-  virtual void setLimit(float upperLimit, float lowerLimit,
-                        unsigned int motorIndex = 0)
-    = 0;
+  virtual void setLimit(float upperLimit, float lowerLimit, unsigned int motorIndex = 0) = 0;
 
 }; // end of struct IMotorEnabledJoint
 

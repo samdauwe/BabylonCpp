@@ -82,7 +82,7 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
-  auto it = std::find_if(
+  const auto it = std::find_if(
     _impostors.begin(), _impostors.end(),
     [&impostor](const PhysicsImpostorPtr& _imposter) { return _imposter.get() == impostor; });
   if (it != _impostors.end()) {
@@ -109,7 +109,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* 
 {
   std::vector<PhysicsImpostorJointPtr> matchingJoints(_joints.size());
 
-  auto it = std::copy_if(
+  const auto it = std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
     [&connectedImpostor, &joint, &mainImpostor](const PhysicsImpostorJointPtr& impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
@@ -128,7 +128,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* 
 void PhysicsEngine::_step(float /*delta*/)
 {
   // check if any mesh has no body / requires an update
-  for (auto& impostor : _impostors) {
+  for (const auto& impostor : _impostors) {
     if (impostor->isBodyInitRequired()) {
       _physicsPlugin->generatePhysicsBody(*impostor);
     }
@@ -166,7 +166,7 @@ PhysicsImpostor* PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObjec
 
 PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
-  auto it = std::find_if(
+  const auto it = std::find_if(
     _impostors.begin(), _impostors.end(),
     [&body](const PhysicsImpostorPtr& impostor) { return impostor->physicsBody() == body; });
   return (it == _impostors.end()) ? nullptr : (*it).get();

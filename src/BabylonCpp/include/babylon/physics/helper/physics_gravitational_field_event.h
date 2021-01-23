@@ -5,17 +5,17 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/physics/helper/physics_event_options.h>
 
 namespace BABYLON {
 
 class EventState;
-class Mesh;
 struct PhysicsGravitationalFieldEventData;
 class PhysicsHelper;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Represents a gravitational field event.
@@ -34,9 +34,8 @@ public:
    * @param origin The origin position of the gravitational field event
    * @param options The options for the vortex event
    */
-  PhysicsGravitationalFieldEvent(
-    PhysicsHelper* physicsHelper, Scene* scene, const Vector3& origin,
-    const PhysicsRadialExplosionEventOptions& options);
+  PhysicsGravitationalFieldEvent(PhysicsHelper* physicsHelper, Scene* scene, const Vector3& origin,
+                                 const PhysicsRadialExplosionEventOptions& options);
   ~PhysicsGravitationalFieldEvent(); // = default
 
   /**

@@ -18,8 +18,7 @@ PhysicsGravitationalFieldEvent::PhysicsGravitationalFieldEvent(
     , _sphere{nullptr}
     , _dataFetched{false}
 {
-  _tickCallback
-    = [this](Scene* /*scene*/, EventState & /*es*/) -> void { _tick(); };
+  _tickCallback = [this](Scene* /*scene*/, EventState& /*es*/) -> void { _tick(); };
 
   PhysicsRadialExplosionEventOptions eventOptions;
   eventOptions.strength = options.strength * -1.f;
@@ -70,11 +69,9 @@ void PhysicsGravitationalFieldEvent::_tick()
     _physicsHelper->applyRadialExplosionForce(_origin, _options);
   }
   else {
-    auto radialExplosionEvent
-      = _physicsHelper->applyRadialExplosionForce(_origin, _options);
+    auto radialExplosionEvent = _physicsHelper->applyRadialExplosionForce(_origin, _options);
     if (radialExplosionEvent) {
-      _sphere = radialExplosionEvent->getData().sphere->clone(
-        "radialExplosionEventSphereClone");
+      _sphere = radialExplosionEvent->getData().sphere->clone("radialExplosionEventSphereClone");
     }
   }
 }

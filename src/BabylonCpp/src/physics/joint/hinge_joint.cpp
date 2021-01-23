@@ -17,8 +17,7 @@ void HingeJoint::setMotor(float force, float maxForce, unsigned int motorIndex)
   _physicsPlugin->setMotor(this, force, maxForce, motorIndex);
 }
 
-void HingeJoint::setLimit(float upperLimit, float lowerLimit,
-                          unsigned int motorIndex)
+void HingeJoint::setLimit(float upperLimit, float lowerLimit, unsigned int motorIndex)
 {
   _physicsPlugin->setLimit(this, upperLimit, lowerLimit, motorIndex);
 }

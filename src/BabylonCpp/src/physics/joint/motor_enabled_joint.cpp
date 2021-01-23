@@ -5,22 +5,19 @@
 
 namespace BABYLON {
 
-MotorEnabledJoint::MotorEnabledJoint(unsigned int iJointType,
-                                     const PhysicsJointData& iJointData)
+MotorEnabledJoint::MotorEnabledJoint(unsigned int iJointType, const PhysicsJointData& iJointData)
     : PhysicsJoint(iJointType, iJointData)
 {
 }
 
 MotorEnabledJoint::~MotorEnabledJoint() = default;
 
-void MotorEnabledJoint::setMotor(float force, float maxForce,
-                                 unsigned int motorIndex)
+void MotorEnabledJoint::setMotor(float force, float maxForce, unsigned int motorIndex)
 {
   _physicsPlugin->setMotor(this, force, maxForce, motorIndex);
 }
 
-void MotorEnabledJoint::setLimit(float upperLimit, float lowerLimit,
-                                 unsigned int motorIndex)
+void MotorEnabledJoint::setLimit(float upperLimit, float lowerLimit, unsigned int motorIndex)
 {
   _physicsPlugin->setLimit(this, upperLimit, lowerLimit, motorIndex);
 }

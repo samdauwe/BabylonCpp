@@ -17,15 +17,14 @@ public:
   /**
    * @brief Initializes the Motor-Enabled Joint.
    * @param type The type of the joint
-   * @param jointData The physica joint data for the joint
+   * @param jointData The physical joint data for the joint
    */
   MotorEnabledJoint(unsigned int jointType, const PhysicsJointData& jointData);
   ~MotorEnabledJoint() override; // = default
 
   /**
    * @brief Set the motor values.
-   * Attention, this function is plugin specific. Engines won't react 100% the
-   * same.
+   * Attention, this function is plugin specific. Engines won't react 100% the same.
    * @param force the force to apply
    * @param maxForce max force for this motor.
    */
@@ -33,8 +32,7 @@ public:
 
   /**
    * @brief Set the motor's limits.
-   * Attention, this function is plugin specific. Engines won't react 100% the
-   * same.
+   * Attention, this function is plugin specific. Engines won't react 100% the same.
    * @param upperLimit The upper limit of the motor
    * @param lowerLimit The lower limit of the motor
    */

@@ -12,9 +12,8 @@
 
 namespace BABYLON {
 
-PhysicsUpdraftEvent::PhysicsUpdraftEvent(
-  Scene* scene, const Vector3& origin,
-  const PhysicsUpdraftEventOptions& options)
+PhysicsUpdraftEvent::PhysicsUpdraftEvent(Scene* scene, const Vector3& origin,
+                                         const PhysicsUpdraftEventOptions& options)
     : _scene{scene}
     , _origin{origin}
     , _options{options}
@@ -35,8 +34,7 @@ PhysicsUpdraftEvent::PhysicsUpdraftEvent(
     _originDirection = _origin.subtract(_originTop).normalize();
   }
 
-  _tickCallback
-    = [this](Scene* /*scene*/, EventState & /*es*/) -> void { _tick(); };
+  _tickCallback = [this](Scene* /*scene*/, EventState& /*es*/) -> void { _tick(); };
 
   _prepareCylinder();
 }
@@ -78,8 +76,7 @@ void PhysicsUpdraftEvent::dispose(bool force)
   }
 }
 
-std::unique_ptr<PhysicsHitData>
-PhysicsUpdraftEvent::getImpostorHitData(PhysicsImpostor& impostor)
+std::unique_ptr<PhysicsHitData> PhysicsUpdraftEvent::getImpostorHitData(PhysicsImpostor& impostor)
 {
   if (impostor.mass == 0.f) {
     return nullptr;
@@ -129,10 +126,9 @@ void PhysicsUpdraftEvent::_prepareCylinder()
 {
   if (!_cylinder) {
     CylinderOptions options;
-    options.height   = _options.height;
-    options.diameter = _options.radius * 2.f;
-    _cylinder = CylinderBuilder::CreateCylinder("updraftEventCylinder", options,
-                                                _scene);
+    options.height       = _options.height;
+    options.diameter     = _options.radius * 2.f;
+    _cylinder            = CylinderBuilder::CreateCylinder("updraftEventCylinder", options, _scene);
     _cylinder->isVisible = false;
   }
 }

@@ -4,13 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class PhysicsImpostor;
-struct PhysicsHitData;
-using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
-using PhysicsHitDataPtr  = std::shared_ptr<PhysicsHitData>;
+FWD_CLASS_SPTR(PhysicsImpostor)
+FWD_STRUCT_SPTR(PhysicsHitData)
 
 /**
  * @brief Interface for an affected physics impostor.
@@ -24,7 +23,7 @@ struct BABYLON_SHARED_EXPORT PhysicsAffectedImpostorWithData {
   PhysicsImpostorPtr impostor = nullptr;
 
   /**
-   * The data about the hit/horce from the explosion
+   * The data about the hit/force from the explosion
    */
   PhysicsHitDataPtr hitData = nullptr;
 }; // end of struct PhysicsAffectedImpostorWithData

@@ -2,13 +2,13 @@
 #define BABYLON_PHYSICS_PHYSICS_ENGINE_COMPONENT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class PhysicsEngineSceneComponent;
-using PhysicsEngineSceneComponentPtr = std::shared_ptr<PhysicsEngineSceneComponent>;
+FWD_CLASS_SPTR(PhysicsEngineSceneComponent)
 
 /**
  * @brief Defines the physics engine scene component responsible to manage a
@@ -18,8 +18,7 @@ class BABYLON_SHARED_EXPORT PhysicsEngineSceneComponent : public ISceneComponent
 
 public:
   /**
-   * The component name helpful to identify the component in the list of scene
-   * components.
+   * The component name helpful to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_PHYSICSENGINE;
 
@@ -38,8 +37,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 

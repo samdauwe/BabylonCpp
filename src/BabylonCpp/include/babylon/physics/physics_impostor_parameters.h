@@ -49,19 +49,16 @@ struct BABYLON_SHARED_EXPORT PhysicsImpostorParameters {
    */
   std::optional<float> stiffness = std::nullopt;
   /**
-   * The number of iterations used in maintaining consistent vertex velocities,
-   * soft object only
+   * The number of iterations used in maintaining consistent vertex velocities, soft object only
    */
   std::optional<float> velocityIterations = std::nullopt;
   /**
-   * The number of iterations used in maintaining consistent vertex positions,
-   * soft object only
+   * The number of iterations used in maintaining consistent vertex positions, soft object only
    */
   std::optional<float> positionIterations = std::nullopt;
   /**
-   * The number used to fix points on a cloth (0, 1, 2, 4, 8) or rope (0, 1, 2)
-   * only 0 None, 1, back left or top, 2, back right or bottom, 4, front left,
-   * 8, front right Add to fix multiple points
+   * The number used to fix points on a cloth (0, 1, 2, 4, 8) or rope (0, 1, 2) only 0 None, 1, back
+   * left or top, 2, back right or bottom, 4, front left, 8, front right Add to fix multiple points
    */
   std::optional<float> fixedPoints = std::nullopt;
   /**

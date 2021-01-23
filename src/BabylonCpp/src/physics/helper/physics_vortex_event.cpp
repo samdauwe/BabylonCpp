@@ -30,8 +30,7 @@ PhysicsVortexEvent::PhysicsVortexEvent(Scene* scene, const Vector3& origin,
   _origin.addToRef(Vector3(0.f, _options.height / 2.f, 0.f), _cylinderPosition);
   _origin.addToRef(Vector3(0.f, _options.height, 0.f), _originTop);
 
-  _tickCallback
-    = [this](Scene* /*scene*/, EventState & /*es*/) -> void { _tick(); };
+  _tickCallback = [this](Scene* /*scene*/, EventState& /*es*/) -> void { _tick(); };
 
   _prepareCylinder();
 }
@@ -73,8 +72,7 @@ void PhysicsVortexEvent::dispose(bool force)
   }
 }
 
-std::unique_ptr<PhysicsHitData>
-PhysicsVortexEvent::getImpostorHitData(PhysicsImpostor& impostor)
+std::unique_ptr<PhysicsHitData> PhysicsVortexEvent::getImpostorHitData(PhysicsImpostor& impostor)
 {
   if (impostor.mass == 0.f) {
     return nullptr;
@@ -95,13 +93,13 @@ PhysicsVortexEvent::getImpostorHitData(PhysicsImpostor& impostor)
   auto originToImpostorDirection = impostorObjectCenter.subtract(originOnPlane);
 
   Ray ray{originOnPlane, originToImpostorDirection, _options.radius};
-  auto hit = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor.object));
+  const auto hit    = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor.object));
   auto contactPoint = hit.pickedPoint;
   if (!contactPoint) {
     return nullptr;
   }
 
-  auto absoluteDistanceFromOrigin = hit.distance / _options.radius;
+  const auto absoluteDistanceFromOrigin = hit.distance / _options.radius;
 
   auto directionToOrigin = contactPoint->normalize();
   if (absoluteDistanceFromOrigin > _options.centripetalForceThreshold) {
@@ -118,16 +116,13 @@ PhysicsVortexEvent::getImpostorHitData(PhysicsImpostor& impostor)
     const auto perpendicularDirection
       = Vector3::Cross(originOnPlane, impostorObjectCenter).normalize();
 
-    forceX = (perpendicularDirection.x + directionToOrigin.x)
-             * _options.centrifugalForceMultiplier;
+    forceX = (perpendicularDirection.x + directionToOrigin.x) * _options.centrifugalForceMultiplier;
     forceY = _originTop.y * _options.updraftForceMultiplier;
-    forceZ = (perpendicularDirection.z + directionToOrigin.z)
-             * _options.centrifugalForceMultiplier;
+    forceZ = (perpendicularDirection.z + directionToOrigin.z) * _options.centrifugalForceMultiplier;
   }
 
   auto force = Vector3(forceX, forceY, forceZ);
-  force      = force.multiplyByFloats(_options.strength, _options.strength,
-                                 _options.strength);
+  force      = force.multiplyByFloats(_options.strength, _options.strength, _options.strength);
 
   return std::make_unique<PhysicsHitData>(PhysicsHitData{
     force,                     // force,
@@ -153,17 +148,16 @@ void PhysicsVortexEvent::_prepareCylinder()
 {
   if (!_cylinder) {
     CylinderOptions options;
-    options.height   = _options.height;
-    options.diameter = _options.radius * 2.f;
-    _cylinder
-      = CylinderBuilder::CreateCylinder("vortexEventCylinder", options, _scene);
+    options.height       = _options.height;
+    options.diameter     = _options.radius * 2.f;
+    _cylinder            = CylinderBuilder::CreateCylinder("vortexEventCylinder", options, _scene);
     _cylinder->isVisible = false;
   }
 }
 
 bool PhysicsVortexEvent::_intersectsWithCylinder(PhysicsImpostor& impostor)
 {
-  auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
+  const auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
 
   _cylinder->position = _cylinderPosition;
 

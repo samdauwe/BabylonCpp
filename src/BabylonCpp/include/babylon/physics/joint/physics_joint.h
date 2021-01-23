@@ -49,8 +49,7 @@ public:
   /**
    * Universal-Joint type
    * ENERGY FTW! (compare with this
-   * @see
-   * http://ode-wiki.org/wiki/index.php?title=Manual:_Joint_Types_and_Functions)
+   * @see http://ode-wiki.org/wiki/index.php?title=Manual:_Joint_Types_and_Functions)
    */
   static constexpr unsigned int UniversalJoint = 6;
   /**
@@ -59,8 +58,7 @@ public:
   static constexpr unsigned int Hinge2Joint = PhysicsJoint::WheelJoint;
   // Cannon
   /**
-   * Point to Point Joint type.  Similar to a Ball-Joint.  Different in
-   * parameters
+   * Point to Point Joint type.  Similar to a Ball-Joint.  Different in parameters
    */
   static constexpr unsigned int PointToPointJoint = 8;
   // Cannon only at the moment
@@ -88,8 +86,8 @@ public:
    *                        It accepts two parameters: the physics world and the
    * physics joint
    */
-  void executeNativeFunction(
-    const std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
+  void
+  executeNativeFunction(const std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
 
 protected:
   /**

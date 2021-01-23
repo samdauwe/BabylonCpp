@@ -4,20 +4,19 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/physics/helper/physics_event_options.h>
 
 namespace BABYLON {
 
 class EventState;
-struct IPhysicsEngine;
-class Mesh;
 class PhysicsImpostor;
 struct PhysicsHitData;
 struct PhysicsVortexEventData;
 class Scene;
-using IPhysicsEnginePtr = std::shared_ptr<IPhysicsEngine>;
-using MeshPtr           = std::shared_ptr<Mesh>;
+FWD_STRUCT_SPTR(IPhysicsEngine)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Represents a physics vortex event.
@@ -31,8 +30,7 @@ public:
    * @param origin The origin position of the vortex
    * @param options The options for the vortex event
    */
-  PhysicsVortexEvent(Scene* scene, const Vector3& origin,
-                     const PhysicsVortexEventOptions& options);
+  PhysicsVortexEvent(Scene* scene, const Vector3& origin, const PhysicsVortexEventOptions& options);
   ~PhysicsVortexEvent(); // = default
 
   /**

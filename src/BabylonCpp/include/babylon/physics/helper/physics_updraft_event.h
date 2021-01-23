@@ -4,20 +4,19 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/physics/helper/physics_event_options.h>
 
 namespace BABYLON {
 
 class EventState;
-struct IPhysicsEngine;
-class Mesh;
 struct PhysicsHitData;
 class PhysicsImpostor;
 struct PhysicsUpdraftEventData;
 class Scene;
-using IPhysicsEnginePtr = std::shared_ptr<IPhysicsEngine>;
-using MeshPtr           = std::shared_ptr<Mesh>;
+FWD_STRUCT_SPTR(IPhysicsEngine)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Represents a physics updraft event.

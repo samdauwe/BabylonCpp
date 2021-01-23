@@ -2,6 +2,7 @@
 #define BABYLON_PHYSICS_IPHYSICS_ENGINE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
@@ -9,10 +10,9 @@ namespace BABYLON {
 struct IPhysicsBody;
 struct IPhysicsEnabledObject;
 struct IPhysicsEnginePlugin;
-class PhysicsImpostor;
 class PhysicsJoint;
 class PhysicsRaycastResult;
-using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
+FWD_CLASS_SPTR(PhysicsImpostor)
 
 /**
  * @brief Interface used to define a physics engine.
@@ -80,8 +80,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
 
   /**
    * @brief Remove an impostor from the engine.
-   * This impostor and its mesh will not longer be updated by the physics
-   * engine.
+   * This impostor and its mesh will not longer be updated by the physics* engine.
    * @param impostor the impostor to remove
    */
   virtual void removeImpostor(PhysicsImpostor* impostor) = 0;
@@ -89,8 +88,8 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   /**
    * @brief Add a joint to the physics engine
    * @param mainImpostor defines the main impostor to which the joint is added.
-   * @param connectedImpostor defines the impostor that is connected to the main
-   * impostor using this joint
+   * @param connectedImpostor defines the impostor that is connected to the main impostor using this
+   * joint
    * @param joint defines the joint that will connect both impostors.
    */
   virtual void addJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
@@ -100,8 +99,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   /**
    * @brief Removes a joint from the simulation
    * @param mainImpostor defines the impostor used with the joint
-   * @param connectedImpostor defines the other impostor connected to the main
-   * one by the joint
+   * @param connectedImpostor defines the other impostor connected to the main one by the joint
    * @param joint defines the joint to remove
    */
   virtual void removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
@@ -143,8 +141,8 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   virtual PhysicsRaycastResult raycast(const Vector3& from, const Vector3& to) = 0;
 
   /**
-   * @brief Called by the scene. No need to call it.
-   * @param delta defines the timespam between frames
+   * @brief CCalled by the scene. No need to call it.
+   * @param delta defines the timespan between frames
    */
   virtual void _step(float delta) = 0;
 

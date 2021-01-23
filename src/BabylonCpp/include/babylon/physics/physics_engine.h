@@ -2,17 +2,15 @@
 #define BABYLON_PHYSICS_PHYSICS_ENGINE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/physics/iphysics_engine.h>
 
 namespace BABYLON {
 
-class PhysicsEngine;
-class PhysicsImpostor;
-struct PhysicsImpostorJoint;
 class PhysicsRaycastResult;
-using PhysicsEnginePtr        = std::shared_ptr<PhysicsEngine>;
-using PhysicsImpostorPtr      = std::shared_ptr<PhysicsImpostor>;
-using PhysicsImpostorJointPtr = std::shared_ptr<PhysicsImpostorJoint>;
+FWD_CLASS_SPTR(PhysicsEngine)
+FWD_CLASS_SPTR(PhysicsImpostor)
+FWD_STRUCT_SPTR(PhysicsImpostorJoint)
 
 /**
  * @brief Class used to control physics engine.
@@ -22,8 +20,7 @@ class BABYLON_SHARED_EXPORT PhysicsEngine : public IPhysicsEngine {
 
 public:
   /**
-   * Global value used to control the smallest number supported by the
-   * simulation
+   * Global value used to control the smallest number supported by the simulation
    */
   static float Epsilon;
 
@@ -90,8 +87,7 @@ public:
 
   /**
    * @brief Remove an impostor from the engine.
-   * This impostor and its mesh will not longer be updated by the physics
-   * engine.
+   * This impostor and its mesh will not longer be updated by the physics engine.
    * @param impostor the impostor to remove
    */
   void removeImpostor(PhysicsImpostor* impostor) final;
@@ -99,8 +95,8 @@ public:
   /**
    * @brief Add a joint to the physics engine.
    * @param mainImpostor defines the main impostor to which the joint is added.
-   * @param connectedImpostor defines the impostor that is connected to the main
-   * impostor using this joint
+   * @param connectedImpostor defines the impostor that is connected to the main impostor using this
+   * joint
    * @param joint defines the joint that will connect both impostors.
    */
   void addJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
@@ -109,8 +105,7 @@ public:
   /**
    * @brief Removes a joint from the simulation.
    * @param mainImpostor defines the impostor used with the joint
-   * @param connectedImpostor defines the other impostor connected to the main
-   * one by the joint
+   * @param connectedImpostor defines the other impostor connected to the main one by the joint
    * @param joint defines the joint to remove
    */
   void removeJoint(PhysicsImpostor* mainImpostor, PhysicsImpostor* connectedImpostor,
@@ -118,7 +113,7 @@ public:
 
   /**
    * @brief Called by the scene. No need to call it.
-   * @param delta defines the timespam between frames
+   * @param delta defines the timespan between frames
    */
   void _step(float delta) final;
 

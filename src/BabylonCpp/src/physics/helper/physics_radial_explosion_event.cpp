@@ -28,9 +28,8 @@ PhysicsRadialExplosionEventData PhysicsRadialExplosionEvent::getData()
   };
 }
 
-PhysicsHitDataPtr
-PhysicsRadialExplosionEvent::getImpostorHitData(PhysicsImpostor& impostor,
-                                                const Vector3& origin)
+PhysicsHitDataPtr PhysicsRadialExplosionEvent::getImpostorHitData(PhysicsImpostor& impostor,
+                                                                  const Vector3& origin)
 {
   if (impostor.mass == 0.f) {
     return nullptr;
@@ -45,29 +44,28 @@ PhysicsRadialExplosionEvent::getImpostorHitData(PhysicsImpostor& impostor,
     return nullptr;
   }
 
-  auto impostorObjectCenter = impostor.getObjectCenter();
-  auto direction            = impostorObjectCenter.subtract(origin);
+  const auto impostorObjectCenter = impostor.getObjectCenter();
+  const auto direction            = impostorObjectCenter.subtract(origin);
 
   Ray ray{origin, direction, _options.radius};
   auto hit = ray.intersectsMesh(static_cast<AbstractMesh*>(impostor.object));
 
-  auto& contactPoint = hit.pickedPoint;
+  const auto& contactPoint = hit.pickedPoint;
   if (!contactPoint) {
     return nullptr;
   }
 
-  auto distanceFromOrigin = Vector3::Distance(origin, *contactPoint);
+  const auto distanceFromOrigin = Vector3::Distance(origin, *contactPoint);
 
   if (distanceFromOrigin > _options.radius) {
     return nullptr;
   }
 
-  auto multiplier
-    = (_options.falloff == PhysicsRadialImpulseFalloff::Constant) ?
-        _options.strength :
-        _options.strength * (1.f - (distanceFromOrigin / _options.radius));
+  const auto multiplier = (_options.falloff == PhysicsRadialImpulseFalloff::Constant) ?
+                            _options.strength :
+                            _options.strength * (1.f - (distanceFromOrigin / _options.radius));
 
-  auto force = direction.multiplyByFloats(multiplier, multiplier, multiplier);
+  const auto force = direction.multiplyByFloats(multiplier, multiplier, multiplier);
 
   return std::make_shared<PhysicsHitData>(PhysicsHitData{
     force,             // force
@@ -102,16 +100,15 @@ void PhysicsRadialExplosionEvent::dispose(bool force)
 void PhysicsRadialExplosionEvent::_prepareSphere()
 {
   if (!_sphere) {
-    _sphere = SphereBuilder::CreateSphere("radialExplosionEventSphere",
-                                          _options.sphere, _scene);
+    _sphere = SphereBuilder::CreateSphere("radialExplosionEventSphere", _options.sphere, _scene);
     _sphere->isVisible = false;
   }
 }
 
-bool PhysicsRadialExplosionEvent::_intersectsWithSphere(
-  PhysicsImpostor& impostor, const Vector3& origin, float radius)
+bool PhysicsRadialExplosionEvent::_intersectsWithSphere(PhysicsImpostor& impostor,
+                                                        const Vector3& origin, float radius)
 {
-  auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
+  const auto impostorObject = static_cast<AbstractMesh*>(impostor.object);
 
   _prepareSphere();
 

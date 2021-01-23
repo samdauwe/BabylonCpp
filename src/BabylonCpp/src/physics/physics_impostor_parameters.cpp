@@ -6,8 +6,8 @@ namespace BABYLON {
 
 bool PhysicsImpostorParameters::contains(const std::string& key) const
 {
-  return (key == "mass") || (key == "friction") || (key == "restitution")
-         || (key == "ignoreParent") || stl_util::contains(nativeOptions, key);
+  return (key == "mass") || (key == "friction") || (key == "restitution") || (key == "ignoreParent")
+         || stl_util::contains(nativeOptions, key);
 }
 
 float PhysicsImpostorParameters::operator[](const std::string& key) const

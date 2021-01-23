@@ -6,19 +6,19 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/physics/helper/physics_event_options.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {
 
-struct IPhysicsEngine;
 class PhysicsGravitationalFieldEvent;
 class PhysicsRadialExplosionEvent;
 class PhysicsUpdraftEvent;
 class PhysicsVortexEvent;
 class Scene;
 class Vector3;
-using IPhysicsEnginePtr = std::shared_ptr<IPhysicsEngine>;
+FWD_STRUCT_SPTR(IPhysicsEngine)
 
 /**
  * @brief A helper for physics simulations.
@@ -30,10 +30,8 @@ class BABYLON_SHARED_EXPORT PhysicsHelper {
 public:
   using RadiusOrPhysicsRadialExplosionEventOptions
     = std::variant<float, PhysicsRadialExplosionEventOptions>;
-  using RadiusOrPhysicsUpdraftEventOptions
-    = std::variant<float, PhysicsUpdraftEventOptions>;
-  using RadiusOrPhysicsVortexEventOptions
-    = std::variant<float, PhysicsVortexEventOptions>;
+  using RadiusOrPhysicsUpdraftEventOptions = std::variant<float, PhysicsUpdraftEventOptions>;
+  using RadiusOrPhysicsVortexEventOptions  = std::variant<float, PhysicsVortexEventOptions>;
 
 public:
   /**
@@ -52,8 +50,7 @@ public:
    * @returns A physics radial explosion event, or null
    */
   std::unique_ptr<PhysicsRadialExplosionEvent> applyRadialExplosionImpulse(
-    const Vector3& origin,
-    RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
+    const Vector3& origin, RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
     const std::optional<float>& strength                      = std::nullopt,
     const std::optional<PhysicsRadialImpulseFalloff>& falloff = std::nullopt);
 
@@ -66,8 +63,7 @@ public:
    * @returns A physics radial explosion event, or null
    */
   std::unique_ptr<PhysicsRadialExplosionEvent> applyRadialExplosionForce(
-    const Vector3& origin,
-    RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
+    const Vector3& origin, RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
     const std::optional<float>& strength                      = std::nullopt,
     const std::optional<PhysicsRadialImpulseFalloff>& falloff = std::nullopt);
 
@@ -79,11 +75,11 @@ public:
    * @param falloff possible options: Constant & Linear. Defaults to Constant
    * @returns A physics gravitational field event, or null
    */
-  std::unique_ptr<PhysicsGravitationalFieldEvent> gravitationalField(
-    const Vector3& origin,
-    RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
-    const std::optional<float>& strength                      = std::nullopt,
-    const std::optional<PhysicsRadialImpulseFalloff>& falloff = std::nullopt);
+  std::unique_ptr<PhysicsGravitationalFieldEvent>
+  gravitationalField(const Vector3& origin,
+                     RadiusOrPhysicsRadialExplosionEventOptions& radiusOrEventOptions,
+                     const std::optional<float>& strength                      = std::nullopt,
+                     const std::optional<PhysicsRadialImpulseFalloff>& falloff = std::nullopt);
 
   /**
    * @brief Creates a physics updraft event.
@@ -91,13 +87,11 @@ public:
    * @param radiusOrEventOptions the radius or the options of the updraft
    * @param strength the strength of the updraft
    * @param height the height of the updraft
-   * @param updraftMode possible options: Center & Perpendicular. Defaults to
-   * Center
+   * @param updraftMode possible options: Center & Perpendicular. Defaults to Center
    * @returns A physics updraft event, or null
    */
   std::unique_ptr<PhysicsUpdraftEvent>
-  updraft(const Vector3& origin,
-          RadiusOrPhysicsUpdraftEventOptions& radiusOrEventOptions,
+  updraft(const Vector3& origin, RadiusOrPhysicsUpdraftEventOptions& radiusOrEventOptions,
           const std::optional<float>& strength                 = std::nullopt,
           const std::optional<float>& height                   = std::nullopt,
           const std::optional<PhysicsUpdraftMode>& updraftMode = std::nullopt);
@@ -112,8 +106,7 @@ public:
    * A physics vortex event or null
    */
   std::unique_ptr<PhysicsVortexEvent>
-  vortex(const Vector3& origin,
-         RadiusOrPhysicsVortexEventOptions& radiusOrEventOptions,
+  vortex(const Vector3& origin, RadiusOrPhysicsVortexEventOptions& radiusOrEventOptions,
          const std::optional<float>& strength = std::nullopt,
          const std::optional<float>& height   = std::nullopt);
 
