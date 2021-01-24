@@ -31,7 +31,10 @@ struct BABYLON_SHARED_EXPORT SSAO2Configuration : public PrePassEffectConfigurat
    */
   std::vector<uint32_t> texturesRequired() const override
   {
-    return {Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE};
+    return {
+      Constants::PREPASS_NORMAL_TEXTURE_TYPE,
+      Constants::PREPASS_DEPTH_TEXTURE_TYPE,
+    };
   };
 
 }; // end of struct SSAO2Configuration

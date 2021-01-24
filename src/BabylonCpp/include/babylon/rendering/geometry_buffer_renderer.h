@@ -28,34 +28,36 @@ struct ISavedTransformationMatrix {
 }; // end of struct ISavedTransformationMatrix
 
 /**
- * @brief This renderer is helpfull to fill one of the render target with a
- * geometry buffer.
+ * @brief This renderer is helpful to fill one of the render target with a geometry buffer.
  */
 class BABYLON_SHARED_EXPORT GeometryBufferRenderer {
 
 public:
   /**
-   * Constant used to retrieve the depth + normal texture index in the G-Buffer textures array
-   * using getIndex(GeometryBufferRenderer.DEPTHNORMAL_TEXTURE_INDEX)
+   * Constant used to retrieve the depth texture index in the G-Buffer textures array
+   * using getIndex(GeometryBufferRenderer.DEPTH_TEXTURE_INDEX)
    */
-  static constexpr unsigned int DEPTHNORMAL_TEXTURE_TYPE = 0;
+  static constexpr unsigned int DEPTH_TEXTURE_TYPE = 0;
   /**
-   * Constant used to retrieve the position texture index in the G-Buffer
-   * textures array using
-   * getIndex(GeometryBufferRenderer.POSITION_TEXTURE_INDEX)
+   * Constant used to retrieve the normal texture index in the G-Buffer textures array
+   * using getIndex(GeometryBufferRenderer.NORMAL_TEXTURE_INDEX)
    */
-  static constexpr unsigned int POSITION_TEXTURE_TYPE = 1;
+  static constexpr unsigned int NORMAL_TEXTURE_TYPE = 1;
   /**
-   * Constant used to retrieve the velocity texture index in the G-Buffer
-   * textures array using
-   * getIndex(GeometryBufferRenderer.VELOCITY_TEXTURE_INDEX)
+   * Constant used to retrieve the position texture index in the G-Buffer textures array
+   * using getIndex(GeometryBufferRenderer.POSITION_TEXTURE_INDEX)
    */
-  static constexpr unsigned int VELOCITY_TEXTURE_TYPE = 2;
+  static constexpr unsigned int POSITION_TEXTURE_TYPE = 2;
+  /**
+   * Constant used to retrieve the velocity texture index in the G-Buffer textures array
+   * using getIndex(GeometryBufferRenderer.VELOCITY_TEXTURE_INDEX)
+   */
+  static constexpr unsigned int VELOCITY_TEXTURE_TYPE = 3;
   /**
    * Constant used to retrieve the reflectivity texture index in the G-Buffer textures array
    * using the getIndex(GeometryBufferRenderer.REFLECTIVITY_TEXTURE_TYPE)
    */
-  static constexpr unsigned int REFLECTIVITY_TEXTURE_TYPE = 3;
+  static constexpr unsigned int REFLECTIVITY_TEXTURE_TYPE = 4;
 
 public:
   /**
@@ -320,6 +322,8 @@ private:
   int _positionIndex;
   int _velocityIndex;
   int _reflectivityIndex;
+  int _depthIndex;
+  int _normalIndex;
   int _depthNormalIndex;
 
   bool _linkedWithPrePass;

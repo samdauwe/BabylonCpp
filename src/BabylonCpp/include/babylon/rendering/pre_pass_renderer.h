@@ -45,6 +45,13 @@ public:
   ~PrePassRenderer() = default;
 
   /**
+   * @return the prepass render target for the rendering pass.
+   * If we are currently rendering a render target, it returns the PrePassRenderTarget
+   * associated with that render target. Otherwise, it returns the scene default PrePassRenderTarget
+   */
+  MultiRenderTargetPtr& getRenderTarget();
+
+  /**
    * @brief Sets the proper output textures to draw in the engine.
    * @param effect The effect that is drawn. It can be or not be compatible with drawing to several
    * output textures.

@@ -98,7 +98,7 @@ protected:
                         const std::optional<unsigned int>& samplingMode = std::nullopt,
                         Engine* engine = nullptr, bool reusable = false,
                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                        bool blockCompilation = false, bool forceGeometryBuffer = true);
+                        bool blockCompilation = false, bool forceGeometryBuffer = false);
   /**
    * @brief Gets the number of iterations are used for motion blur quality.
    * Default value is equal to 32.
@@ -111,12 +111,12 @@ protected:
   void set_motionBlurSamples(unsigned int samples);
 
   /**
-   * @brief Gets wether or not the motion blur post-process is in object based mode.
+   * @brief Gets whether or not the motion blur post-process is in object based mode.
    */
   bool get_isObjectBased() const;
 
   /**
-   * @brief Sets wether or not the motion blur post-process is in object based mode.
+   * @brief Sets whether or not the motion blur post-process is in object based mode.
    */
   void set_isObjectBased(bool value);
 
@@ -155,7 +155,7 @@ public:
   Property<MotionBlurPostProcess, unsigned int> motionBlurSamples;
 
   /**
-   * Gets or sets wether or not the motion blur post-process is in object based mode.
+   * Gets or sets whether or not the motion blur post-process is in object based mode.
    */
   Property<MotionBlurPostProcess, bool> isObjectBased;
 

@@ -33,7 +33,7 @@ struct BABYLON_SHARED_EXPORT ScreenSpaceReflectionsConfiguration
   std::vector<uint32_t> texturesRequired() const override
   {
     return {
-      Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE,
+      Constants::PREPASS_NORMAL_TEXTURE_TYPE,
       Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE,
       Constants::PREPASS_POSITION_TEXTURE_TYPE,
     };

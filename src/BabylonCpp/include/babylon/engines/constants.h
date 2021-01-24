@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 /**
- * @brief Defines the cross module used constants to avoid circular dependencies.
+ * @brief Defines the cross module used constants to avoid circular dependencies
  */
 struct BABYLON_SHARED_EXPORT Constants {
   /** Defines that alpha blending is disabled */
@@ -83,16 +83,16 @@ struct BABYLON_SHARED_EXPORT Constants {
    */
   static constexpr unsigned int ALPHA_EQUATION_DARKEN = 5;
 
-  /** Defines that the ressource is not delayed*/
+  /** Defines that the resource is not delayed*/
   static constexpr unsigned int DELAYLOADSTATE_NONE = 0;
-  /** Defines that the ressource was successfully delay loaded */
+  /** Defines that the resource was successfully delay loaded */
   static constexpr unsigned int DELAYLOADSTATE_LOADED = 1;
-  /** Defines that the ressource is currently delay loading */
+  /** Defines that the resource is currently delay loading */
   static constexpr unsigned int DELAYLOADSTATE_LOADING = 2;
-  /** Defines that the ressource is delayed and has not started loading */
+  /** Defines that the resource is delayed and has not started loading */
   static constexpr unsigned int DELAYLOADSTATE_NOTLOADED = 4;
 
-  // Depht or Stencil test Constants.
+  // Depth or Stencil test Constants.
   /** Passed to depthFunction or stencilFunction to specify depth or stencil tests will never pass.
    * i.e. Nothing will be drawn */
   static constexpr unsigned int NEVER = 0x0200;
@@ -121,6 +121,8 @@ struct BABYLON_SHARED_EXPORT Constants {
   // Stencil Actions Constants.
   /** Passed to stencilOperation to specify that stencil value must be kept */
   static constexpr unsigned int KEEP = 0x1E00;
+  /** Passed to stencilOperation to specify that stencil value must be zero */
+  static constexpr unsigned int ZERO = 0x0000;
   /** Passed to stencilOperation to specify that stencil value must be replaced */
   static constexpr unsigned int REPLACE = 0x1E01;
   /** Passed to stencilOperation to specify that stencil value must be incremented */
@@ -167,6 +169,26 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int TEXTUREFORMAT_RGB_INTEGER = 10;
   /** RGBA_INTEGER */
   static constexpr unsigned int TEXTUREFORMAT_RGBA_INTEGER = 11;
+  /** BGRA */
+  static constexpr unsigned int TEXTUREFORMAT_BGRA = 12;
+
+  /** Depth 24 bits + Stencil 8 bits */
+  static constexpr unsigned int TEXTUREFORMAT_DEPTH24_STENCIL8 = 13;
+  /** Depth 32 bits float */
+  static constexpr unsigned int TEXTUREFORMAT_DEPTH32_FLOAT = 14;
+
+  /** Compressed BC7 */
+  static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGBA_BPTC_UNORM = 36492;
+  /** Compressed BC6 unsigned float */
+  static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT = 36495;
+  /** Compressed BC6 signed float */
+  static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGB_BPTC_SIGNED_FLOAT = 36494;
+  /** Compressed BC3 */
+  static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGBA_S3TC_DXT5 = 33779;
+  /** Compressed BC2 */
+  static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGBA_S3TC_DXT3 = 33778;
+  /** Compressed BC1 */
+  static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGBA_S3TC_DXT1 = 33777;
 
   /** UNSIGNED_BYTE */
   static constexpr unsigned int TEXTURETYPE_UNSIGNED_BYTE = 0;
@@ -502,7 +524,7 @@ struct BABYLON_SHARED_EXPORT Constants {
    */
   static constexpr unsigned int SCENELOADER_SUMMARY_LOGGING = 2;
   /**
-   * Detailled logging while loading
+   * Detailed logging while loading
    */
   static constexpr unsigned int SCENELOADER_DETAILED_LOGGING = 3;
 
@@ -532,15 +554,25 @@ struct BABYLON_SHARED_EXPORT Constants {
    */
   static constexpr unsigned int PREPASS_COLOR_TEXTURE_TYPE = 4;
   /**
-   * Constant used to retrieve depth + normal index in the textures array in the prepass
-   * using the getIndex(Constants.PREPASS_DEPTHNORMAL_TEXTURE_TYPE)
+   * Constant used to retrieve depth index in the textures array in the prepass
+   * using the getIndex(Constants.PREPASS_DEPTH_TEXTURE_TYPE)
    */
-  static constexpr unsigned int PREPASS_DEPTHNORMAL_TEXTURE_TYPE = 5;
+  static constexpr unsigned int PREPASS_DEPTH_TEXTURE_TYPE = 5;
+  /**
+   * Constant used to retrieve normal index in the textures array in the prepass
+   * using the getIndex(Constants.PREPASS_NORMAL_TEXTURE_TYPE)
+   */
+  static constexpr unsigned int PREPASS_NORMAL_TEXTURE_TYPE = 6;
   /**
    * Constant used to retrieve albedo index in the textures array in the prepass
    * using the getIndex(Constants.PREPASS_ALBEDO_TEXTURE_TYPE)
    */
-  static constexpr unsigned int PREPASS_ALBEDO_TEXTURE_TYPE = 6;
+  static constexpr unsigned int PREPASS_ALBEDO_TEXTURE_TYPE = 7;
+
+  /**
+   * Prefixes used by the engine for custom effects
+   */
+  static constexpr const char* CUSTOMEFFECT_PREFIX_SHADOWGENERATOR = "bjs_shadowgenerator_";
 }; // end of struct Constants
 
 } // end of namespace BABYLON

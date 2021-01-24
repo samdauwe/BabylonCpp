@@ -127,6 +127,11 @@ public:
   ReadOnlyProperty<SubSurfaceConfiguration, Float32Array> ssFilterRadii;
 
   /**
+   * Does the output of this prepass need to go through imageprocessing
+   */
+  bool needsImageProcessing;
+
+  /**
    * Diffusion profile colors for subsurface scattering
    * You can add one diffusion color using `addDiffusionProfile` on `scene.prePassRenderer`
    * See ...

@@ -25,7 +25,7 @@ SubSurfaceScatteringPostProcess::SubSurfaceScatteringPostProcess(
 
   updateEffect();
 
-  onApplyObservable.add([this](Effect* effect, EventState & /*es*/) -> void {
+  onApplyObservable.add([this](Effect* effect, EventState& /*es*/) -> void {
     if (!_scene->prePassRenderer() || !_scene->subSurfaceConfiguration()) {
       BABYLON_LOG_ERROR(
         "SubSurfaceScatteringPostProcess",
@@ -42,7 +42,7 @@ SubSurfaceScatteringPostProcess::SubSurfaceScatteringPostProcess(
     effect->setTexture(
       "depthSampler",
       _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
-        Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
+        Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     effect->setTexture(
       "albedoSampler",
       _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(

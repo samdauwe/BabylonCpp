@@ -16,6 +16,7 @@ SubSurfaceConfiguration::SubSurfaceConfiguration(Scene* scene)
     , ssDiffusionS{this, &SubSurfaceConfiguration::get_ssDiffusionS}
     , ssDiffusionD{this, &SubSurfaceConfiguration::get_ssDiffusionD}
     , ssFilterRadii{this, &SubSurfaceConfiguration::get_ssFilterRadii}
+    , needsImageProcessing{true}
     , metersPerUnit{1.f}
 {
   enabled = false;
@@ -40,10 +41,10 @@ std::string SubSurfaceConfiguration::name() const
 std::vector<uint32_t> SubSurfaceConfiguration::texturesRequired() const
 {
   return {
-    Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE, //
-    Constants::PREPASS_ALBEDO_TEXTURE_TYPE,      //
-    Constants::PREPASS_COLOR_TEXTURE_TYPE,       //
-    Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE,  //
+    Constants::PREPASS_DEPTH_TEXTURE_TYPE,      //
+    Constants::PREPASS_ALBEDO_TEXTURE_TYPE,     //
+    Constants::PREPASS_COLOR_TEXTURE_TYPE,      //
+    Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, //
   };
 }
 
@@ -108,7 +109,9 @@ void SubSurfaceConfiguration::clearAllDiffusionProfiles()
 void SubSurfaceConfiguration::dispose()
 {
   clearAllDiffusionProfiles();
-  postProcess->dispose();
+  if (postProcess) {
+    postProcess->dispose();
+  }
 }
 
 float SubSurfaceConfiguration::getDiffusionProfileParameters(const Color3& color) const

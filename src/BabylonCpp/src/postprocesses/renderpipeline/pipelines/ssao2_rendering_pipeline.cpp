@@ -251,7 +251,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
       effect->setTexture(
         "depthNormalSampler",
         _prePassRenderer->prePassRT
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -278,7 +278,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
       effect->setTexture(
         "depthNormalSampler",
         _prePassRenderer->prePassRT
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -404,7 +404,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
       effect->setTexture(
         "depthNormalSampler",
         _prePassRenderer->prePassRT
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE)]);
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
   };

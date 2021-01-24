@@ -326,9 +326,14 @@ void MaterialHelper::PrepareDefinesForPrePass(Scene* scene, MaterialDefines& def
          "PREPASS_ALBEDO_INDEX",                 // index
        },
        {
-         Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE, // type
-         "PREPASS_DEPTHNORMAL",                       // define
-         "PREPASS_DEPTHNORMAL_INDEX",                 // index
+         Constants::PREPASS_DEPTH_TEXTURE_TYPE, // type
+         "PREPASS_DEPTH",                       // define
+         "PREPASS_DEPTH_INDEX",                 // index
+       },
+       {
+         Constants::PREPASS_NORMAL_TEXTURE_TYPE, // type
+         "PREPASS_NORMAL",                       // define
+         "PREPASS_NORMAL_INDEX",                 // index
        }};
 
   if (scene->prePassRenderer() && scene->prePassRenderer()->enabled() && canRenderToMRT) {
@@ -833,7 +838,7 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect,
         effect->setMatrices("mBones", matrices);
         if (prePassConfiguration && mesh->getScene()->prePassRenderer()
             && mesh->getScene()->prePassRenderer()->getIndex(
-                 Constants::PREPASS_VELOCITY_TEXTURE_TYPE)) {
+              Constants::PREPASS_VELOCITY_TEXTURE_TYPE)) {
           if (mesh->uniqueId < prePassConfiguration->previousBones.size()
               && !prePassConfiguration->previousBones[mesh->uniqueId].empty()) {
             effect->setMatrices("mPreviousBones",

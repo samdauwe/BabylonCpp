@@ -23,35 +23,40 @@
 
 namespace BABYLON {
 
-std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats
-  = {{
-       Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_HALF_FLOAT,          // format
-     },
-     {
-       Constants::PREPASS_POSITION_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_HALF_FLOAT,        // format
-     },
-     {
-       Constants::PREPASS_VELOCITY_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_HALF_FLOAT,        // format
-     },
-     {
-       Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_UNSIGNED_INT,          // format
-     },
-     {
-       Constants::PREPASS_COLOR_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_HALF_FLOAT,     // format
-     },
-     {
-       Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_HALF_FLOAT,           // format
-     },
-     {
-       Constants::PREPASS_ALBEDO_TEXTURE_TYPE, // type
-       Constants::TEXTURETYPE_UNSIGNED_INT,    // format
-     }};
+std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats = {
+  {
+    Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,          // format
+  },
+  {
+    Constants::PREPASS_POSITION_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,        // format
+  },
+  {
+    Constants::PREPASS_VELOCITY_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,        // format
+  },
+  {
+    Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_UNSIGNED_INT,          // format
+  },
+  {
+    Constants::PREPASS_COLOR_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,     // format
+  },
+  {
+    Constants::PREPASS_DEPTH_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,     // format
+  },
+  {
+    Constants::PREPASS_NORMAL_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,      // format
+  },
+  {
+    Constants::PREPASS_ALBEDO_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_UNSIGNED_INT,    // format
+  },
+};
 
 PrePassRenderer::PrePassRenderer(Scene* scene)
     : mrtCount{0}
@@ -131,6 +136,11 @@ void PrePassRenderer::set_useGeometryBufferFallback(bool value)
     _geometryBuffer = nullptr;
     _scene->disableGeometryBufferRenderer();
   }
+}
+
+MultiRenderTargetPtr& PrePassRenderer::getRenderTarget()
+{
+  return prePassRT;
 }
 
 void PrePassRenderer::_initializeAttachments()
@@ -310,23 +320,28 @@ void PrePassRenderer::_updateGeometryBufferLayout()
       unsigned int geometryBufferConstant = 0;
     }; // end of struct ReplaceTextureFormatMapping
 
-    static const std::vector<ReplaceTextureFormatMapping> matches
-      = {{
-           Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE,      // prePassConstant
-           GeometryBufferRenderer::DEPTHNORMAL_TEXTURE_TYPE, // geometryBufferConstant
-         },
-         {
-           Constants::PREPASS_POSITION_TEXTURE_TYPE,      // prePassConstant
-           GeometryBufferRenderer::POSITION_TEXTURE_TYPE, // geometryBufferConstant
-         },
-         {
-           Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE,      // prePassConstant
-           GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE, // geometryBufferConstant
-         },
-         {
-           Constants::PREPASS_VELOCITY_TEXTURE_TYPE,      // prePassConstant
-           GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE, // geometryBufferConstant
-         }};
+    static const std::vector<ReplaceTextureFormatMapping> matches = {
+      {
+        Constants::PREPASS_DEPTH_TEXTURE_TYPE,      // prePassConstant
+        GeometryBufferRenderer::DEPTH_TEXTURE_TYPE, // geometryBufferConstant
+      },
+      {
+        Constants::PREPASS_NORMAL_TEXTURE_TYPE,      // prePassConstant
+        GeometryBufferRenderer::NORMAL_TEXTURE_TYPE, // geometryBufferConstant
+      },
+      {
+        Constants::PREPASS_POSITION_TEXTURE_TYPE,      // prePassConstant
+        GeometryBufferRenderer::POSITION_TEXTURE_TYPE, // geometryBufferConstant
+      },
+      {
+        Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE,      // prePassConstant
+        GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE, // geometryBufferConstant
+      },
+      {
+        Constants::PREPASS_VELOCITY_TEXTURE_TYPE,      // prePassConstant
+        GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE, // geometryBufferConstant
+      },
+    };
 
     // replace textures in the geometryBuffer RT
     for (const auto& match : matches) {

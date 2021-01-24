@@ -183,8 +183,7 @@ void MotionBlurPostProcess::_applyMode()
       if (_prePassEffectConfiguration->texturesRequired().empty()) {
         _prePassEffectConfiguration->texturesRequired().resize(1);
       }
-      _prePassEffectConfiguration->texturesRequired()[0]
-        = Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE;
+      _prePassEffectConfiguration->texturesRequired()[0] = Constants::PREPASS_DEPTH_TEXTURE_TYPE;
     }
 
     onApply = [this](Effect* effect, EventState& /*es*/) -> void { _onApplyScreenBased(effect); };
@@ -210,11 +209,12 @@ void MotionBlurPostProcess::_onApplyObjectBased(Effect* effect)
   }
   else if (_prePassRenderer) {
     const auto velocityIndex = _prePassRenderer->getIndex(Constants::PREPASS_VELOCITY_TEXTURE_TYPE);
-    effect->setTexture("velocitySampler", velocityIndex >= 0
-                                              && velocityIndex < static_cast<int>(
-                                                   _prePassRenderer->prePassRT->textures().size()) ?
-                                            _prePassRenderer->prePassRT->textures()[velocityIndex] :
-                                            nullptr);
+    effect->setTexture("velocitySampler",
+                       velocityIndex >= 0
+                           && velocityIndex < static_cast<int>(
+                                _prePassRenderer->getRenderTarget()->textures().size()) ?
+                         _prePassRenderer->getRenderTarget()->textures()[velocityIndex] :
+                         nullptr);
   }
 }
 
@@ -242,7 +242,7 @@ void MotionBlurPostProcess::_onApplyScreenBased(Effect* effect)
 
   if (_geometryBufferRenderer) {
     const auto depthIndex
-      = _geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::DEPTHNORMAL_TEXTURE_TYPE);
+      = _geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::DEPTH_TEXTURE_TYPE);
     effect->setTexture("depthSampler",
                        depthIndex >= 0
                            && depthIndex < static_cast<int>(
@@ -251,12 +251,13 @@ void MotionBlurPostProcess::_onApplyScreenBased(Effect* effect)
                          nullptr);
   }
   else if (_prePassRenderer) {
-    const auto depthIndex = _prePassRenderer->getIndex(Constants::PREPASS_DEPTHNORMAL_TEXTURE_TYPE);
-    effect->setTexture("depthSampler", depthIndex >= 0
-                                           && depthIndex < static_cast<int>(
-                                                _prePassRenderer->prePassRT->textures().size()) ?
-                                         _prePassRenderer->prePassRT->textures()[depthIndex] :
-                                         nullptr);
+    const auto depthIndex = _prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE);
+    effect->setTexture("depthSampler",
+                       depthIndex >= 0
+                           && depthIndex
+                                < static_cast<int>(_prePassRenderer->prePassRT->textures().size()) ?
+                         _prePassRenderer->getRenderTarget()->textures()[depthIndex] :
+                         nullptr);
   }
 }
 

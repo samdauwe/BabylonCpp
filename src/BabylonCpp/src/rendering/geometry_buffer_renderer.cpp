@@ -50,6 +50,8 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _positionIndex{-1}
     , _velocityIndex{-1}
     , _reflectivityIndex{-1}
+    , _depthIndex{-1}
+    , _normalIndex{-1}
     , _depthNormalIndex{-1}
     , _linkedWithPrePass{false}
     , _prePassRenderer{nullptr}
@@ -113,8 +115,11 @@ void GeometryBufferRenderer::_forceTextureType(unsigned int geometryBufferType, 
     _reflectivityIndex  = index;
     _enableReflectivity = true;
   }
-  else if (geometryBufferType == GeometryBufferRenderer::DEPTHNORMAL_TEXTURE_TYPE) {
-    _depthNormalIndex = index;
+  else if (geometryBufferType == GeometryBufferRenderer::DEPTH_TEXTURE_TYPE) {
+    _depthIndex = index;
+  }
+  else if (geometryBufferType == GeometryBufferRenderer::NORMAL_TEXTURE_TYPE) {
+    _normalIndex = index;
   }
 }
 
