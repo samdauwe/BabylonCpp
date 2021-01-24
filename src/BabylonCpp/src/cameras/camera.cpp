@@ -817,15 +817,24 @@ void Camera::_setStereoscopicRigMode(Camera& camera)
   const auto isStereoscopicHoriz
     = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL
       || camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
-
   const auto isCrossEye
     = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
-
-  camera._rigCameras[isCrossEye ? 1 : 0]->viewport
-    = Viewport(0.f, 0.f, isStereoscopicHoriz ? 0.5f : 1.f, isStereoscopicHoriz ? 1.f : 0.5f);
-  camera._rigCameras[isCrossEye ? 0 : 1]->viewport
-    = Viewport(isStereoscopicHoriz ? 0.5f : 0.f, isStereoscopicHoriz ? 0.f : 0.5f,
-               isStereoscopicHoriz ? 0.5f : 1.f, isStereoscopicHoriz ? 1.f : 0.5f);
+  const auto isInterlaced = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_INTERLACED;
+  // Use post-processors for interlacing
+  if (isInterlaced) {
+    camera._rigCameras[0]->_rigPostProcess
+      = PassPostProcess::New(camera.name + "_passthru", 1.f, camera._rigCameras[0]);
+    camera._rigCameras[1]->_rigPostProcess = StereoscopicInterlacePostProcessI::New(
+      camera.name + "_stereoInterlace", camera._rigCameras, false, true);
+  }
+  // Otherwise, create appropriate viewports
+  else {
+    camera._rigCameras[isCrossEye ? 1 : 0]->viewport
+      = Viewport(0.f, 0.f, isStereoscopicHoriz ? 0.5f : 1.f, isStereoscopicHoriz ? 1.f : 0.5f);
+    camera._rigCameras[isCrossEye ? 0 : 1]->viewport
+      = Viewport(isStereoscopicHoriz ? 0.5f : 0.f, isStereoscopicHoriz ? 0.f : 0.5f,
+                 isStereoscopicHoriz ? 0.5f : 1.f, isStereoscopicHoriz ? 1.f : 0.5f);
+  }
 }
 
 void Camera::_setStereoscopicAnaglyphRigMode(Camera& camera)
