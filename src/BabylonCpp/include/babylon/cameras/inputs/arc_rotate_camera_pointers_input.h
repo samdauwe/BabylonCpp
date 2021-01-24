@@ -67,6 +67,18 @@ public:
    */
   void onLostFocus() override;
 
+private:
+  /**
+   * @brief Move camera from multi touch panning positions.
+   */
+  void _computeMultiTouchPanning(const std::optional<PointerTouch>& previousMultiTouchPanPosition,
+                                 const std::optional<PointerTouch>& multiTouchPanPosition);
+
+  /**
+   * @brief Move camera from pinch zoom distances.
+   */
+  void _computePinchZoom(float previousPinchSquaredDistance, float pinchSquaredDistance);
+
 public:
   /**
    * Defines the pointer angular sensibility  along the X axis or how fast is the camera rotating.
@@ -95,6 +107,11 @@ public:
    * Overrides pinchDeltaPercentage and pinchPrecision.
    */
   bool useNaturalPinchZoom;
+
+  /**
+   * Defines whether zoom (2 fingers pinch) is enabled through multitouch
+   */
+  bool pinchZoom;
 
   /**
    * Defines the pointer panning sensibility or how fast is the camera moving.
