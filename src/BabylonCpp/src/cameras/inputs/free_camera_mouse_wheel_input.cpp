@@ -274,55 +274,49 @@ void FreeCameraMouseWheelInput::checkInputs()
 
 void FreeCameraMouseWheelInput::_updateCamera()
 {
-  const auto& moveRelative   = _moveRelative;
-  const auto& rotateRelative = _rotateRelative;
-  const auto& moveScene      = _moveScene;
-
-  const auto updateCameraProperty = [&](/* Mouse-wheel delta. */
-                                        float value,
-                                        /* Camera property to be changed. */
-                                        const std::optional<_CameraProperty>& cameraProperty,
-                                        /* Axis of Camera property to be changed. */
-                                        const std::optional<Coordinate>& coordinate) -> void {
-    if (value == 0.f) {
-      // Mouse wheel has not moved.
-      return;
-    }
-    if (!cameraProperty.has_value() || !coordinate.has_value()) {
-      // Mouse wheel axis not configured.
-      return;
-    }
-
-    Vector3 action;
-    switch (*cameraProperty) {
-      case _CameraProperty::MoveRelative:
-        action = moveRelative;
-        break;
-      case _CameraProperty::RotateRelative:
-        action = rotateRelative;
-        break;
-      case _CameraProperty::MoveScene:
-        action = moveScene;
-        break;
-    }
-
-    switch (*coordinate) {
-      case Coordinate::X:
-        action.set(value, 0.f, 0.f);
-        break;
-      case Coordinate::Y:
-        action.set(0.f, value, 0.f);
-        break;
-      case Coordinate::Z:
-        action.set(0.f, 0.f, value);
-        break;
-    }
-  };
-
   // Do the camera updates for each of the 3 touch-wheel axis.
-  updateCameraProperty(_wheelDeltaX, _wheelXAction, _wheelXActionCoordinate);
-  updateCameraProperty(_wheelDeltaY, _wheelYAction, _wheelYActionCoordinate);
-  updateCameraProperty(_wheelDeltaZ, _wheelZAction, _wheelZActionCoordinate);
+  _updateCameraProperty(_wheelDeltaX, _wheelXAction, _wheelXActionCoordinate);
+  _updateCameraProperty(_wheelDeltaY, _wheelYAction, _wheelYActionCoordinate);
+  _updateCameraProperty(_wheelDeltaZ, _wheelZAction, _wheelZActionCoordinate);
+}
+
+void FreeCameraMouseWheelInput::_updateCameraProperty(
+  float value, const std::optional<_CameraProperty>& cameraProperty,
+  const std::optional<Coordinate>& coordinate)
+{
+  if (value == 0.f) {
+    // Mouse wheel has not moved.
+    return;
+  }
+  if (!cameraProperty.has_value() || !coordinate.has_value()) {
+    // Mouse wheel axis not configured.
+    return;
+  }
+
+  Vector3 action;
+  switch (*cameraProperty) {
+    case _CameraProperty::MoveRelative:
+      action = _moveRelative;
+      break;
+    case _CameraProperty::RotateRelative:
+      action = _rotateRelative;
+      break;
+    case _CameraProperty::MoveScene:
+      action = _moveScene;
+      break;
+  }
+
+  switch (*coordinate) {
+    case Coordinate::X:
+      action.set(value, 0.f, 0.f);
+      break;
+    case Coordinate::Y:
+      action.set(0.f, value, 0.f);
+      break;
+    case Coordinate::Z:
+      action.set(0.f, 0.f, value);
+      break;
+  }
 }
 
 } // end of namespace BABYLON

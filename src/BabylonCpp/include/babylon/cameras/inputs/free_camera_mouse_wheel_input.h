@@ -194,6 +194,19 @@ private:
    */
   void _updateCamera();
 
+  /**
+   * @brief Update one property of the camera.
+   * @param value Mouse-wheel delta.
+   * @param cameraProperty Camera property to be changed.
+   * @param coordinate Axis of Camera property to be changed.
+   */
+  void _updateCameraProperty(/* Mouse-wheel delta. */
+                             float value,
+                             /* Camera property to be changed. */
+                             const std::optional<_CameraProperty>& cameraProperty,
+                             /* Axis of Camera property to be changed. */
+                             const std::optional<Coordinate>& coordinate);
+
 public:
   /**
    * Gets or sets the movement axis (relative to camera's orientation) the mouse wheel's X axis
