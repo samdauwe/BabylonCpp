@@ -47,7 +47,7 @@ public:
   void checkInputs() override;
 
   /**
-   * @brief Gets the class name of the current intput.
+   * @brief Gets the class name of the current input.
    * @returns the class name
    */
   [[nodiscard]] std::string getClassName() const override;

@@ -46,7 +46,7 @@ public:
   void checkInputs() override;
 
   /**
-   * @brief Gets the class name of the current intput.
+   * @brief Gets the class name of the current input.
    * @returns the class name
    */
   [[nodiscard]] std::string getClassName() const override;
@@ -68,10 +68,8 @@ public:
   float wheelPrecision;
 
   /**
-   * wheelDeltaPercentage will be used instead of wheelPrecision if different
-   * from 0.
-   * It defines the percentage of current camera.radius to use as delta when
-   * wheel is used.
+   * wheelDeltaPercentage will be used instead of wheelPrecision if different from 0.
+   * It defines the percentage of current camera.radius to use as delta when wheel is used.
    */
   float wheelDeltaPercentage;
 
