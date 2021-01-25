@@ -87,7 +87,7 @@ public:
    * camera.attachControl
    * @param noPreventDefault Defines whether event caught by the controls should call
    * preventdefault() (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
-   * @param useCtrlForPanning  Defines whether ctrl is used for paning within the controls
+   * @param useCtrlForPanning  Defines whether ctrl is used for panning within the controls
    * @param panningMouseButton Defines whether panning is allowed through mouse click button
    */
   void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
@@ -181,13 +181,13 @@ protected:
   /**
    * @brief Instantiates a new ArcRotateCamera in a given scene.
    * @param name Defines the name of the camera
-   * @param alpha Defines the camera rotation along the logitudinal axis
+   * @param alpha Defines the camera rotation along the longitudinal axis
    * @param beta Defines the camera rotation along the latitudinal axis
    * @param radius Defines the camera distance from its target
    * @param target Defines the camera target
    * @param scene Defines the scene the camera belongs to
-   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be marked as active if not
-   * other active cameras have been defined
+   * @param setActiveOnSceneIfNoneActive Defines whether the camera should be marked as active if
+   * not other active cameras have been defined
    */
   ArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
                   const std::optional<Vector3>& target, Scene* scene,
@@ -352,12 +352,12 @@ public:
 
   /**
    * Defines the maximum distance the camera can pan.
-   * This could help keeping the cammera always in your scene.
+   * This could help keeping the camera always in your scene.
    */
   std::optional<float> panningDistanceLimit;
 
   /**
-   * Defines the target of the camera before paning.
+   * Defines the target of the camera before panning.
    */
   Vector3 panningOriginTarget;
 
@@ -368,7 +368,7 @@ public:
   float panningInertia;
 
   /**
-   * Defines how much the radius should be scaled while zomming on a particular mesh (through the
+   * Defines how much the radius should be scaled while zooming on a particular mesh (through the
    * zoomOn function)
    */
   float zoomOnFactor;
@@ -481,7 +481,6 @@ protected:
   Matrix _upToYMatrix;
   Matrix _YToUpMatrix;
   // Panning
-  std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;
   // Collisions
   ColliderPtr _collider;

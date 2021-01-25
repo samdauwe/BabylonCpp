@@ -367,19 +367,21 @@ void ArcRotateCamera::_checkInputs()
   // Panning inertia
   if (!stl_util::almost_equal(inertialPanningX, 0.f)
       || !stl_util::almost_equal(inertialPanningY, 0.f)) {
-    if (!_localDirection) {
-      _localDirection       = std::make_unique<Vector3>(Vector3::Zero());
-      _transformedDirection = Vector3::Zero();
-    }
-
-    _localDirection->copyFromFloats(inertialPanningX, inertialPanningY, inertialPanningY);
-    _localDirection->multiplyInPlace(*panningAxis);
     _viewMatrix.invertToRef(_cameraTransformMatrix);
-    Vector3::TransformNormalToRef(*_localDirection, _cameraTransformMatrix, _transformedDirection);
-    // Eliminate y if map panning is enabled (panningAxis == 1,0,1)
-    if (!stl_util::almost_equal(panningAxis->y, 0.f)) {
-      _transformedDirection.y = 0;
-    }
+    _transformedDirection.set(_cameraTransformMatrix.m()[0], _cameraTransformMatrix.m()[1],
+                              _cameraTransformMatrix.m()[2]);
+
+    // panning on X Axis
+    _transformedDirection.x *= panningAxis->x * inertialPanningX;
+    _transformedDirection.y *= panningAxis->x * inertialPanningX;
+    _transformedDirection.z *= panningAxis->x * inertialPanningX;
+
+    // panning on Y axis
+    _transformedDirection.y += panningAxis->y * inertialPanningY;
+
+    // panning on Z axis
+    _transformedDirection.x -= std::cos(alpha) * panningAxis->z * inertialPanningY;
+    _transformedDirection.z -= std::sin(alpha) * panningAxis->z * inertialPanningY;
 
     if (!_targetHost) {
       if (panningDistanceLimit.has_value()) {
