@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_VIRTUAL_JOYSTICKS_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/free_camera.h>
 
 namespace BABYLON {
 
-class VirtualJoysticksCamera;
-using VirtualJoysticksCameraPtr = std::shared_ptr<VirtualJoysticksCamera>;
+FWD_CLASS_SPTR(VirtualJoysticksCamera)
 
 /**
  * @brief This represents a free type of camera. It can be useful in First Person Shooter game for
@@ -41,7 +41,7 @@ public:
 
 protected:
   /**
-   * @brief Intantiates a VirtualJoysticksCamera. It can be useful in First Person Shooter game for
+   * @brief Instantiates a VirtualJoysticksCamera. It can be useful in First Person Shooter game for
    * instance. It is identical to the Free Camera and simply adds by default a virtual joystick.
    * Virtual Joysticks are on-screen 2D graphics that are used to control the camera or other scene
    * items.

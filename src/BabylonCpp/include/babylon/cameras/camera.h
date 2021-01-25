@@ -70,7 +70,7 @@ public:
   static constexpr unsigned int FOVMODE_HORIZONTAL_FIXED = 1;
 
   /**
-   * This specifies ther is no need for a camera rig.
+   * This specifies there is no need for a camera rig.
    * Basically only one eye is rendered corresponding to the camera.
    */
   static constexpr unsigned int RIG_MODE_NONE = 0;
@@ -235,7 +235,7 @@ public:
   PostProcessPtr& rigPostProcess();
 
   /**
-   * @brief Internal, gets the first post proces.
+   * @brief Internal, gets the first post process.
    * @returns the first post process to be run on this camera.
    */
   PostProcessPtr _getFirstPostProcess() const;
@@ -328,7 +328,7 @@ public:
 
   /**
    * @brief Checks if a cullable object (mesh...) is in the camera frustum.
-   * Unlike isInFrustum this cheks the full bounding box
+   * Unlike isInFrustum this checks the full bounding box
    * @param target The object to check
    * @returns true if the object is in frustum otherwise false
    */
@@ -337,10 +337,9 @@ public:
   /**
    * @brief Gets a ray in the forward direction from the camera.
    * @param length Defines the length of the ray to create
-   * @param transform Defines the transform to apply to the ray, by default the
-   * world matrx is used to create a workd space ray
-   * @param origin Defines the start point of the ray which defaults to the
-   * camera position
+   * @param transform Defines the transform to apply to the ray, by default the world matrix is used
+   * to create a workd space ray
+   * @param origin Defines the start point of the ray which defaults to the camera position
    * @returns the forward ray
    */
   Ray getForwardRay(float length = 100.f, const std::optional<Matrix>& transform = std::nullopt,
@@ -435,7 +434,7 @@ public:
   virtual void _setupInputs();
 
   /**
-   * @brief Serialiaze the camera setup to a json represention.
+   * @brief Serialiaze the camera setup to a json representation.
    * @returns the JSON representation
    */
   virtual json serialize() const;
@@ -482,8 +481,7 @@ public:
   Matrix& computeWorldMatrix(bool force = false, bool useWasUpdatedFlag = false) override;
 
   /**
-   * @brief Ensures the multiview texture of the camera exists and has the
-   * specified width/height.
+   * @brief Ensures the multiview texture of the camera exists and has the specified width/height.
    * @param width height to set on the multiview texture
    * @param height width to set on the multiview texture
    */
@@ -502,16 +500,14 @@ public:
   static void _setWebVRRigMode(Camera& camera, const RigParamaters& rigParams);
 
   /**
-   * @brief Gets a camera constructor for a given camera type
-   * @param type The type of the camera to construct (should be equal to one of
-   * the camera class name)
+   * @brief Gets a camera constructor for a given camera type.
+   * @param type The type of the camera to construct (should be equal to one of the camera class
+   * name)
    * @param name The name of the camera the result will be able to instantiate
    * @param scene The scene the result will construct the camera in
-   * @param interaxial_distance In case of stereoscopic setup, the distance
-   * between both eyes
-   * @param isStereoscopicSideBySide In case of stereoscopic setup, should the
-   * sereo be side b side
-   * @returns a factory method to construc the camera
+   * @param interaxial_distance In case of stereoscopic setup, the distance between both eyes
+   * @param isStereoscopicSideBySide In case of stereoscopic setup, should the sereo be side b side
+   * @returns a factory method to construct the camera
    */
   static std::function<CameraPtr()> GetConstructorFromName(const std::string& type,
                                                            const std::string& name, Scene* scene,
@@ -711,15 +707,13 @@ public:
   bool isStereoscopicSideBySide;
 
   /**
-   * Defines the list of custom render target which are rendered to and then
-   * used as the input to this camera's render. Eg. display another camera view
-   * on a TV in the main scene This is pretty helpfull if you wish to make a
-   * camera render to a texture you could reuse somewhere else in the scene.
-   * (Eg. security camera)
+   * Defines the list of custom render target which are rendered to and then used as the input to
+   * this camera's render. Eg. display another camera view on a TV in the main scene This is pretty
+   * helpful if you wish to make a camera render to a texture you could reuse somewhere else in the
+   * scene. (Eg. security camera)
    *
-   * To change the final output target of the camera, camera.outputRenderTarget
-   * should be used instead (eg. webXR renders to a render target corrisponding
-   * to an HMD)
+   * To change the final output target of the camera, camera.outputRenderTarget should be used
+   * instead (eg. webXR renders to a render target corresponding to an HMD)
    */
   std::vector<RenderTargetTexturePtr> customRenderTargets;
 

@@ -2,13 +2,13 @@
 #define BABYLON_CAMERAS_ARC_FOLLOW_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class ArcFollowCamera;
-using ArcFollowCameraPtr = std::shared_ptr<ArcFollowCamera>;
+FWD_CLASS_SPTR(ArcFollowCamera)
 
 /**
  * @brief Arc Rotate version of the follow camera.
@@ -49,7 +49,7 @@ protected:
    * @brief Instantiates a new ArcFollowCamera.
    * @see https://doc.babylonjs.com/features/cameras#follow-camera
    * @param name Define the name of the camera
-   * @param alpha Define the rotation angle of the camera around the logitudinal axis
+   * @param alpha Define the rotation angle of the camera around the longitudinal axis
    * @param beta Define the rotation angle of the camera around the elevation axis
    * @param radius Define the radius of the camera from its target point
    * @param target Define the target of the camera

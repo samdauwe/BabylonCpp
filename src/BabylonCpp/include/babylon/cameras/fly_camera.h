@@ -87,13 +87,13 @@ public:
 protected:
   /**
    * @brief Instantiates a FlyCamera.
-   * This is a flying camera, designed for 3D movement and rotation in all directions, such as in a
-   * 3D Space Shooter or a Flight Simulator.
+   * This is a flying camera, designed for 3D movement and rotation in all directions,
+   * such as in a 3D Space Shooter or a Flight Simulator.
    * @param name Define the name of the camera in the scene.
    * @param position Define the starting position of the camera in the scene.
    * @param scene Define the scene the camera belongs to.
-   * @param setActiveOnSceneIfNoneActive Defines wheter the camera should be marked as active, if no
-   * other camera has been defined as active.
+   * @param setActiveOnSceneIfNoneActive Defines whether the camera should be marked as active, if
+   * no other camera has been defined as active.
    */
   FlyCamera(const std::string& name, const Vector3& position, Scene* scene,
             bool setActiveOnSceneIfNoneActive = true);

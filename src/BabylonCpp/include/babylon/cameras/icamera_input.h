@@ -27,7 +27,7 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
   bool hasCheckInputs = true;
 
   /**
-   * @brief Gets the class name of the current intput.
+   * @brief Gets the class name of the current input.
    * @returns the class name
    */
   [[nodiscard]] virtual std::string getClassName() const = 0;
