@@ -1,5 +1,6 @@
 #include <babylon/cameras/follow_camera.h>
 
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/tools.h>
 
@@ -52,26 +53,21 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
     return;
   }
 
-  auto yRotation = 0.f;
-  if (cameraTarget->rotationQuaternion()) {
-    Matrix rotMatrix;
-    cameraTarget->rotationQuaternion()->toRotationMatrix(rotMatrix);
-    yRotation = std::atan2(rotMatrix.m()[8], rotMatrix.m()[10]);
-  }
-  else {
-    yRotation = cameraTarget->rotation().y;
-  }
-  auto radians        = Tools::ToRadians(rotationOffset) + yRotation;
-  auto targetPosition = cameraTarget->getAbsolutePosition();
-  auto targetX        = targetPosition.x + std::sin(radians) * radius;
-  auto targetZ        = targetPosition.z + std::cos(radians) * radius;
+  auto& rotMatrix = TmpVectors::MatrixArray[0];
+  cameraTarget->absoluteRotationQuaternion().toRotationMatrix(rotMatrix);
+  const auto yRotation = std::atan2(rotMatrix.m()[8], rotMatrix.m()[10]);
 
-  auto dx = targetX - position().x;
-  auto dy = (targetPosition.y + heightOffset) - position().y;
-  auto dz = targetZ - position().z;
-  auto vx = dx * cameraAcceleration * 2.f; // this is set to .05
-  auto vy = dy * cameraAcceleration;
-  auto vz = dz * cameraAcceleration * 2.f;
+  const auto radians        = Tools::ToRadians(rotationOffset) + yRotation;
+  const auto targetPosition = cameraTarget->getAbsolutePosition();
+  const auto targetX        = targetPosition.x + std::sin(radians) * radius;
+  const auto targetZ        = targetPosition.z + std::cos(radians) * radius;
+
+  const auto dx = targetX - position().x;
+  const auto dy = (targetPosition.y + heightOffset) - position().y;
+  const auto dz = targetZ - position().z;
+  auto vx       = dx * cameraAcceleration * 2.f; // this is set to .05
+  auto vy       = dy * cameraAcceleration;
+  auto vz       = dz * cameraAcceleration * 2.f;
 
   if (vx > maxCameraSpeed || vx < -maxCameraSpeed) {
     vx = vx < 1.f ? -maxCameraSpeed : maxCameraSpeed;

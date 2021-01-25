@@ -118,7 +118,7 @@ public:
 
   /**
    * Define a height offset between the camera and the object it follows.
-   * It can help following an object from the top (like a car chaing a plane)
+   * It can help following an object from the top (like a car chasing a plane)
    */
   float heightOffset;
 
