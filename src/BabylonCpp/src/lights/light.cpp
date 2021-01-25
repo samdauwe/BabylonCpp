@@ -24,7 +24,8 @@ Light::Light(const std::string& iName, Scene* scene)
     , falloffType{Light::FALLOFF_DEFAULT}
     , intensity{1.f}
     , _shadowGenerator{nullptr}
-    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine(), Float32Array(),
+                                                     std::nullopt, iName)}
     , _renderId{-1}
     , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
     , radius{this, &Light::get_radius, &Light::set_radius}
@@ -363,7 +364,7 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
 int Light::CompareLightsPriority(Light* a, Light* b)
 {
   // shadow-casting lights have priority over non-shadow-casting lights
-  // the renderPrioirty is a secondary sort criterion
+  // the renderPriority is a secondary sort criterion
   if (a->shadowEnabled != b->shadowEnabled) {
     return (b->shadowEnabled ? 1 : 0) - (a->shadowEnabled ? 1 : 0);
   }
@@ -576,7 +577,7 @@ float Light::_getPhotometricScale()
       break;
 
     case Light::LIGHTTYPEID_HEMISPHERICLIGHT:
-      // No fall off in hemisperic light.
+      // No fall off in hemispheric light.
       photometricScale = 1.f;
       break;
   }

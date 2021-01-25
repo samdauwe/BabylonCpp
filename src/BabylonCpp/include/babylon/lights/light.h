@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/node.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/matrix.h>
@@ -10,68 +11,62 @@
 
 namespace BABYLON {
 
-class Effect;
-struct IShadowGenerator;
-class Light;
 struct MaterialDefines;
 class UniformBuffer;
-using EffectPtr           = std::shared_ptr<Effect>;
-using IShadowGeneratorPtr = std::shared_ptr<IShadowGenerator>;
-using LightPtr            = std::shared_ptr<Light>;
+FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(IShadowGenerator)
+FWD_CLASS_SPTR(Light)
 
 /**
- * @brief Base class of all the lights in Babylon. It groups all the generic
- * information about lights. Lights are used, as you would expect, to affect how
- * meshes are seen, in terms of both illumination and colour. All meshes allow
- * light to pass through them unless shadow generation is activated. The default
- * number of lights allowed is four but this can be increased.
+ * @brief Base class of all the lights in Babylon. It groups all the generic information about
+ * lights. Lights are used, as you would expect, to affect how meshes are seen, in terms of both
+ * illumination and colour. All meshes allow light to pass through them unless shadow generation is
+ * activated. The default number of lights allowed is four but this can be increased.
  */
 class BABYLON_SHARED_EXPORT Light : public Node {
 
 public:
   /**
    * Falloff Default: light is falling off following the material specification:
-   * standard material is using standard falloff whereas pbr material can
-   * request special falloff per materials.
+   * standard material is using standard falloff whereas pbr material can request special falloff
+   * per materials.
    */
   static constexpr unsigned int FALLOFF_DEFAULT = 0;
 
   /**
-   * Falloff Physical: light is falling off following the inverse squared
-   * distance law.
+   * Falloff Physical: light is falling off following the inverse squared distance law.
    */
   static constexpr unsigned int FALLOFF_PHYSICAL = 1;
 
   /**
-   * Falloff gltf: light is falling off as described in the gltf moving to PBR
-   * document to enhance interoperability with other engines.
+   * Falloff gltf: light is falling off as described in the gltf moving to PBR document to enhance
+   * interoperability with other engines.
    */
   static constexpr unsigned int FALLOFF_GLTF = 2;
 
   /**
-   * Falloff Standard: light is falling off like in the standard material
-   * to enhance interoperability with other materials.
+   * Falloff Standard: light is falling off like in the standard material to enhance
+   * interoperability with other materials.
    */
   static constexpr unsigned int FALLOFF_STANDARD = 3;
 
   // lightmapMode Consts
 
   /**
-   * If every light affecting the material is in this lightmapMode,
-   * material.lightmapTexture adds or multiplies (depends on
-   * material.useLightmapAsShadowmap) after every other light calculations.
+   * If every light affecting the material is in this lightmapMode, material.lightmapTexture adds or
+   * multiplies (depends on material.useLightmapAsShadowmap) after every other light calculations.
    */
   static constexpr unsigned int LIGHTMAP_DEFAULT = 0;
 
   /**
-   * material.lightmapTexture as only diffuse lighting from this light adds only
-   * specular lighting from this light adds dynamic shadows.
+   * material.lightmapTexture as only diffuse lighting from this light adds only specular lighting
+   * from this light adds dynamic shadows.
    */
   static constexpr unsigned int LIGHTMAP_SPECULAR = 1;
 
   /**
-   * material.lightmapTexture as only lighting no light calculation from this
-   * light only adds dynamic shadows from this light.
+   * material.lightmapTexture as only lighting no light calculation from this light only adds
+   * dynamic shadows from this light.
    */
   static constexpr unsigned int LIGHTMAP_SHADOWSONLY = 2;
 
@@ -315,7 +310,7 @@ protected:
   /**
    * @brief Creates a Light object in the scene.
    * Documentation : https://doc.babylonjs.com/babylon101/lights
-   * @param name The firendly name of the light
+   * @param name The friendly name of the light
    * @param scene The scene the light belongs too
    */
   Light(const std::string& name, Scene* scene);
@@ -361,14 +356,14 @@ protected:
   void set_radius(float value);
 
   /**
-   * @brief Gets wether or not the shadows are enabled for this light. This can
-   * help turning off/on shadow without detaching the current shadow generator.
+   * @brief Gets whether or not the shadows are enabled for this light. This can help turning off/on
+   * shadow without detaching the current shadow generator.
    */
   bool get_shadowEnabled() const;
 
   /**
-   * @brief Sets wether or not the shadows are enabled for this light. This can
-   * help turning off/on shadow without detaching the current shadow generator.
+   * @brief Sets whether or not the shadows are enabled for this light. This can help turning off/on
+   * shadow without detaching the current shadow generator.
    */
   void set_shadowEnabled(bool value);
 
@@ -488,12 +483,12 @@ public:
   Property<Light, float> range;
 
   /**
-   * Defines the falloff type for this light. This lets overrriding how punctual
-   * light are falling off base on range or angle. This can be set to any values
-   * in Light.FALLOFF_x.
+   * Defines the falloff type for this light. This lets overriding how punctual light are
+   * falling off base on range or angle.
+   * This can be set to any values in Light.FALLOFF_x.
    *
-   * Note: This is only useful for PBR Materials at the moment. This could be
-   * extended if required to other types of materials.
+   * Note: This is only useful for PBR Materials at the moment. This could be extended if required
+   * to other types of materials.
    */
   unsigned int falloffType;
 
@@ -506,8 +501,8 @@ public:
   float intensity;
 
   /**
-   * Shadow generator associted to the light.
-   * Hidden Internal use only.
+   * Shadow generator associated to the light.
+   * @hidden Internal use only.
    */
   IShadowGeneratorPtr _shadowGenerator;
 
@@ -522,8 +517,8 @@ public:
   std::vector<std::string> _includedOnlyMeshesIds;
 
   /**
-   * The current light unifom buffer.
-   * Internal use only.
+   * The current light uniform buffer.
+   * @hidden Internal use only.
    */
   std::unique_ptr<UniformBuffer> _uniformBuffer;
 
@@ -543,7 +538,7 @@ public:
   Property<Light, float> radius;
 
   /**
-   * Wether or not the shadows are enabled for this light. This can help turning
+   * Gets or sets whether or not the shadows are enabled for this light. This can help turning
    * off/on shadow without detaching the current shadow generator.
    */
   Property<Light, bool> shadowEnabled;

@@ -39,15 +39,17 @@ public:
    *
    * Handles blocks of uniform on the GPU.
    *
-   * If WebGL 2 is not available, this class falls back on traditionnal setUniformXXX calls.
+   * If WebGL 2 is not available, this class falls back on traditional setUniformXXX calls.
    *
    * For more information, please refer to :
    * @see https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
    * @param engine Define the engine the buffer is associated with
    * @param data Define the data contained in the buffer
    * @param dynamic Define if the buffer is updatable
+   * @param name to assign to the buffer (debugging purpose)
    */
-  UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(), bool dynamic = false);
+  UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
+                const std::optional<bool>& dynamic = std::nullopt, const std::string& name = "");
   UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer(); // = default
 
@@ -345,6 +347,7 @@ private:
   bool _needSync;
   bool _noUBO;
   Effect* _currentEffect;
+  std::string _name;
 
   // Matrix cache
   std::unordered_map<std::string, int> _valueCache;

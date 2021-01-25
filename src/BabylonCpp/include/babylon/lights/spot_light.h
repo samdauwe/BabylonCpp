@@ -56,8 +56,8 @@ public:
   Light& transferTexturesToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
-   * @brief Sets the passed Effect object with the SpotLight transfomed position (or position if not
-   * parented) and normalized direction.
+   * @brief Sets the passed Effect object with the SpotLight transformed position (or position if
+   * not parented) and normalized direction.
    * @param effect The effect to update
    * @param lightIndex The index of the light in the effect to update
    * @returns The spot light
@@ -133,7 +133,7 @@ protected:
   void set_shadowAngleScale(float value);
 
   /**
-   * @brief Allows reading the projecton texture.
+   * @brief Allows reading the projection texture.
    */
   Matrix& get_projectionTextureMatrix();
 

@@ -12,14 +12,16 @@ namespace BABYLON {
 
 Float32Array UniformBuffer::_tempBuffer = Float32Array(UniformBuffer::_MAX_UNIFORM_SIZE);
 
-UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data, bool dynamic)
+UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
+                             const std::optional<bool>& dynamic, const std::string& name)
     : _alreadyBound{false}
     , _engine{engine}
     , _data{data}
-    , _dynamic{dynamic}
+    , _dynamic{dynamic.value_or(false)}
     , _uniformLocationPointer{0}
     , _needSync{false}
     , _noUBO{!engine->supportsUniformBuffers()}
+    , _name{!name.empty() ? name : "no-name"}
 {
   if (_noUBO) {
     updateMatrix3x3 = [this](const std::string& name, const Float32Array& matrix) {

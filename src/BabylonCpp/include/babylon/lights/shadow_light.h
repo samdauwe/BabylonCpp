@@ -9,8 +9,8 @@ namespace BABYLON {
 
 /**
  * @brief Base implementation IShadowLight.
- * It groups all the common behaviour in order to reduce dupplication and better
- * follow the DRY pattern.
+ * It groups all the common behaviour in order to reduce duplication and better follow the DRY
+ * pattern.
  */
 class BABYLON_SHARED_EXPORT ShadowLight : public IShadowLight {
 
@@ -134,9 +134,8 @@ public:
   float getDepthMaxZ(const Camera& activeCamera) const override;
 
   /**
-   * @brief Sets the shadow projection matrix in parameter to the generated
-   * projection matrix.
-   * @param matrix The materix to updated with the projection information
+   * @brief Sets the shadow projection matrix in parameter to the generated projection matrix.
+   * @param matrix The matrix to updated with the projection information
    * @param viewMatrix The transform matrix of the light
    * @param renderList The list of mesh to render in the map
    * @returns The current light

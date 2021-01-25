@@ -2,12 +2,12 @@
 #define BABYLON_LIGHTS_POINT_LIGHT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-class PointLight;
-using PointLightPtr = std::shared_ptr<PointLight>;
+FWD_CLASS_SPTR(PointLight)
 
 /**
  * @brief A point light is a light defined by an unique point in world space.
@@ -59,7 +59,7 @@ public:
   unsigned int getTypeID() const override;
 
   /**
-   * @brief Specifies wether or not the shadowmap should be a cube texture.
+   * @brief Specifies whether or not the shadowmap should be a cube texture.
    * @returns true if the shadowmap needs to be a cube texture.
    */
   bool needCube() const override;

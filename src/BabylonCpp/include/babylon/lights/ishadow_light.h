@@ -11,8 +11,8 @@ class Camera;
 
 /**
  * @brief Interface describing all the common properties and methods a shadow light needs to
- * implement. This helps both the shadow generator and materials to genrate the corresponding shadow
- * maps as well as binding the different shadow properties to the effects.
+ * implement. This helps both the shadow generator and materials to generate the corresponding
+ * shadow maps as well as binding the different shadow properties to the effects.
  */
 class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
@@ -21,7 +21,7 @@ public:
   ~IShadowLight() override; // = default
 
   /**
-   * The position the shdow will be casted from.
+   * The position the shadow will be casted from.
    */
   Property<IShadowLight, Vector3> position;
 
@@ -57,7 +57,7 @@ public:
 
   /**
    * @brief Sets the shadow projection matrix in parameter to the generated projection matrix.
-   * @param matrix The materix to updated with the projection information
+   * @param matrix The matrix to updated with the projection information
    * @param viewMatrix The transform matrix of the light
    * @param renderList The list of mesh to render in the map
    * @returns The current light
