@@ -25,7 +25,7 @@ class BABYLON_SHARED_EXPORT CameraInputsManager {
 public:
   /**
    * @brief Instantiate a new Camera Input Manager.
-   * @param camera Defines the camera the input manager blongs to
+   * @param camera Defines the camera the input manager belongs to
    */
   CameraInputsManager();
   CameraInputsManager(TCamera* iCamera);
@@ -107,7 +107,7 @@ private:
 
 public:
   /**
-   * Defines the list of inputs attahed to the camera.
+   * Defines the list of inputs attached to the camera.
    */
   std::unordered_map<std::string, std::shared_ptr<ICameraInput<TCamera>>> attached;
 

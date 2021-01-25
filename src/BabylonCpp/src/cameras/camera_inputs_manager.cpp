@@ -21,8 +21,8 @@ CameraInputsManager<TCamera>::CameraInputsManager(TCamera* iCamera)
     : attachedToElement{false}, camera{iCamera}
 {
   checkInputs = [this]() -> void {
-    for (auto& item : attached) {
-      auto& input = item.second;
+    for (const auto& item : attached) {
+      const auto& input = item.second;
       if (input->hasCheckInputs) {
         input->checkInputs();
       }
@@ -55,8 +55,8 @@ void CameraInputsManager<TCamera>::add(std::shared_ptr<ICameraInput<TCamera>>&& 
 template <class TCamera>
 void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
 {
-  for (auto& item : attached) {
-    auto& input = item.second;
+  for (const auto& item : attached) {
+    const auto& input = item.second;
     if (input.get() == inputToRemove) {
       input->detachControl();
       input->camera = nullptr;
@@ -69,8 +69,8 @@ void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
 template <class TCamera>
 void CameraInputsManager<TCamera>::removeByType(const std::string& inputType)
 {
-  for (auto& item : attached) {
-    auto& input = item.second;
+  for (const auto& item : attached) {
+    const auto& input = item.second;
     if (input->getClassName() == inputType) {
       input->detachControl();
       input->camera = nullptr;
@@ -113,7 +113,7 @@ void CameraInputsManager<TCamera>::attachElement(bool _noPreventDefault)
 template <class TCamera>
 void CameraInputsManager<TCamera>::detachElement(bool disconnect)
 {
-  for (auto& item : attached) {
+  for (const auto& item : attached) {
     item.second->detachControl();
 
     if (disconnect) {
