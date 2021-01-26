@@ -525,24 +525,21 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  // us[path_id] = [uDist1, uDist2, uDist3 ... ] distances between points on
-  // path path_id
+  // us[path_id] = [uDist1, uDist2, uDist3 ... ] distances between points on path path_id
   std::vector<Float32Array> us;
-  // vs[i] = [vDist1, vDist2, vDist3, ... ] distances between points i of
-  // consecutives paths from pathArray
+  // vs[i] = [vDist1, vDist2, vDist3, ... ] distances between points i of consecutive paths from
+  // pathArray
   std::vector<Float32Array> vs;
   // uTotalDistance[p] : total distance of path p
   Float32Array uTotalDistance;
-  //  vTotalDistance[i] : total distance between points i of first and last path
-  //  from pathArray
+  //  vTotalDistance[i] : total distance between points i of first and last path  from pathArray
   Float32Array vTotalDistance;
   // minimal length among all paths from pathArray
   size_t minlg;
   // array of path lengths : nb of vertex per path
   Uint32Array lg;
   lg.resize(pathArray.size());
-  // array of path indexes : index of each path (first vertex) in the total
-  // vertex number
+  // array of path indexes : index of each path (first vertex) in the total vertex number
   Uint32Array idx;
   idx.resize(pathArray.size());
   size_t ul;
@@ -1518,8 +1515,8 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
   const auto diameterY = options.diameterY.value_or(options.diameter.value_or(1.f));
   const auto diameterZ = options.diameterZ.value_or(options.diameter.value_or(1.f));
   const auto arc       = options.arc.has_value() ?
-                     ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-                     1.f;
+                           ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+                           1.f;
   const auto slice
     = options.slice.has_value() ? ((*options.slice <= 0.f) ? 1.f : *options.slice) : 1.f;
   const auto sideOrientation       = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
@@ -1606,17 +1603,17 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 // Cylinder and cone
 std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 {
-  const auto height         = options.height.value_or(2.f);
-  const auto diameterTop    = options.diameterTop.value_or(options.diameter.value_or(1.f));
-  const auto diameterBottom = options.diameterBottom.value_or(options.diameter.value_or(1.f));
-  const auto tessellation   = options.tessellation.value_or(24);
-  const auto subdivisions   = options.subdivisions.value_or(1.f);
-  const auto hasRings       = options.hasRings.value_or(false);
-  const auto enclose        = options.enclose.value_or(false);
-  const auto cap            = options.cap.value_or(Mesh::CAP_ALL);
-  const auto arc            = options.arc.has_value() ?
-                     ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-                     1.f;
+  const auto height          = options.height.value_or(2.f);
+  const auto diameterTop     = options.diameterTop.value_or(options.diameter.value_or(1.f));
+  const auto diameterBottom  = options.diameterBottom.value_or(options.diameter.value_or(1.f));
+  const auto tessellation    = options.tessellation.value_or(24);
+  const auto subdivisions    = options.subdivisions.value_or(1.f);
+  const auto hasRings        = options.hasRings.value_or(false);
+  const auto enclose         = options.enclose.value_or(false);
+  const auto cap             = options.cap.value_or(Mesh::CAP_ALL);
+  const auto arc             = options.arc.has_value() ?
+                                 ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+                                 1.f;
   const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
   auto& faceUV               = options.faceUV;
   auto& faceColors           = options.faceColors;
@@ -2368,11 +2365,11 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  auto radius       = options.radius.value_or(0.5f);
-  auto tessellation = options.tessellation.value_or(64);
-  auto arc          = options.arc.has_value() ?
-               ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
-               1.f;
+  auto radius          = options.radius.value_or(0.5f);
+  auto tessellation    = options.tessellation.value_or(64);
+  auto arc             = options.arc.has_value() ?
+                           ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+                           1.f;
   auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // positions and uvs
@@ -2381,8 +2378,8 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
 
   auto theta = Math::PI2 * arc;
   auto step  = arc == 1.f ? theta / static_cast<float>(tessellation) :
-                           theta / static_cast<float>(tessellation - 1);
-  auto a = 0.f;
+                            theta / static_cast<float>(tessellation - 1);
+  auto a     = 0.f;
   for (unsigned int t = 0; t < tessellation; ++t) {
     auto x = std::cos(a);
     auto y = std::sin(a);
@@ -2742,8 +2739,8 @@ std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& option
       const auto pos_x0 = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
       const auto pos_x1 = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
       auto pos_interp   = (subdivisions == i2) ?
-                          face_vertex_pos[2] :
-                          Vector3::Lerp(pos_x0, pos_x1, i1 / static_cast<float>(subdivisions - i2));
+                            face_vertex_pos[2] :
+                            Vector3::Lerp(pos_x0, pos_x1, i1 / static_cast<float>(subdivisions - i2));
       pos_interp.normalize();
 
       Vector3 vertex_normal;
@@ -2777,8 +2774,8 @@ std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& option
       stl_util::concat(normals, {vertex_normal.x, vertex_normal.y, vertex_normal.z});
       stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
       // push each vertex has member of a face
-      // Same vertex can bleong to multiple face, it is pushed multiple time
-      // (duplicate vertex are present)
+      // Same vertex can belong to multiple face, it is pushed multiple time (duplicate vertex are
+      // present)
       indices.emplace_back(current_indice);
       ++current_indice;
     };
@@ -3111,19 +3108,19 @@ std::unique_ptr<VertexData> VertexData::CreatePolyhedron(PolyhedronOptions& opti
         {3, 6, 2, 0},      {9, 3, 1, 7},
         {9, 15, 12, 6, 3}, {22, 17, 11, 5, 4, 8, 14, 19, 23, 24}}};
 
-  const auto type = options.type.has_value() ?
-                      (*options.type >= polyhedraVertices.size()) ? 0u : *options.type :
-                      0u;
-  const auto size          = options.size.value_or(1.f);
-  const auto sizeX         = options.sizeX.value_or(size);
-  const auto sizeY         = options.sizeY.value_or(size);
-  const auto sizeZ         = options.sizeZ.value_or(size);
-  const auto& dataVertices = (options.custom.has_value() && !options.custom->vertices.empty()) ?
-                               options.custom->vertices :
-                               polyhedraVertices[type];
-  const auto& dataFaces = (options.custom.has_value() && !options.custom->faces.empty()) ?
-                            options.custom->faces :
-                            polyhedraFaces[type];
+  const auto type            = options.type.has_value() ?
+                                 (*options.type >= polyhedraVertices.size()) ? 0u : *options.type :
+                                 0u;
+  const auto size            = options.size.value_or(1.f);
+  const auto sizeX           = options.sizeX.value_or(size);
+  const auto sizeY           = options.sizeY.value_or(size);
+  const auto sizeZ           = options.sizeZ.value_or(size);
+  const auto& dataVertices   = (options.custom.has_value() && !options.custom->vertices.empty()) ?
+                                 options.custom->vertices :
+                                 polyhedraVertices[type];
+  const auto& dataFaces      = (options.custom.has_value() && !options.custom->faces.empty()) ?
+                                 options.custom->faces :
+                                 polyhedraFaces[type];
   const auto nbfaces         = dataFaces.size();
   const auto flat            = options.flat.value_or(true);
   const auto sideOrientation = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
