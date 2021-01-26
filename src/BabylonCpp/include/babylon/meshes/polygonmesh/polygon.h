@@ -21,10 +21,9 @@ struct BABYLON_SHARED_EXPORT Polygon {
    * @param ymin bottom Y coord
    * @param xmax top X coord
    * @param ymax top Y coord
-   * @returns points that make the resulting rectation
+   * @returns points that make the resulting rectangle
    */
-  static std::vector<Vector2> Rectangle(float xmin, float ymin, float xmax,
-                                        float ymax);
+  static std::vector<Vector2> Rectangle(float xmin, float ymin, float xmax, float ymax);
 
   /**
    * @brief Creates a circle.
@@ -34,8 +33,8 @@ struct BABYLON_SHARED_EXPORT Polygon {
    * @param numberOfSides number of sides that make up the circle
    * @returns points that make the resulting circle
    */
-  static std::vector<Vector2> Circle(float radius, float cx = 0.f,
-                                     float cy = 0.f, size_t numberOfSides = 32);
+  static std::vector<Vector2> Circle(float radius, float cx = 0.f, float cy = 0.f,
+                                     size_t numberOfSides = 32);
 
   /**
    * @brief Creates a polygon from input string.
