@@ -77,12 +77,13 @@ PolygonMeshBuilder& PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole
   return *this;
 }
 
-MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
+MeshPtr PolygonMeshBuilder::build(bool updatable, float depth, float smoothingThreshold)
 {
-  auto result = Mesh::New(_name, _scene);
+  const auto result = Mesh::New(_name, _scene);
 
-  const auto vertexData
-    = buildVertexData(depth); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
+  const auto vertexData = buildVertexData(
+    depth,
+    smoothingThreshold); // NOLINT (this leads to a clang-tidy warning in external earcut.hpp)
 
   result->setVerticesData(VertexBuffer::PositionKind, vertexData->positions, updatable);
   result->setVerticesData(VertexBuffer::NormalKind, vertexData->normals, updatable);
@@ -92,7 +93,8 @@ MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
   return result;
 }
 
-std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
+std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth,
+                                                                float smoothingThreshold)
 {
   auto result = std::make_unique<VertexData>();
 
@@ -143,10 +145,11 @@ std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
     }
 
     // Add the sides
-    addSide(positions, normals, uvs, indices, bounds, _outlinepoints, depth, false);
+    addSide(positions, normals, uvs, indices, bounds, _outlinepoints, depth, false,
+            smoothingThreshold);
 
     for (const auto& hole : _holes) {
-      addSide(positions, normals, uvs, indices, bounds, hole, depth, true);
+      addSide(positions, normals, uvs, indices, bounds, hole, depth, true, smoothingThreshold);
     }
   }
 
@@ -196,45 +199,79 @@ const PolygonPoints& PolygonMeshBuilder::points() const
 
 void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals, Float32Array& uvs,
                                  Uint32Array& indices, const Bounds& bounds,
-                                 const PolygonPoints& points, float depth, bool flip)
+                                 const PolygonPoints& points, float depth, bool flip,
+                                 float smoothingThreshold)
 {
   auto startIndex = static_cast<uint32_t>(positions.size() / 3);
   auto ulength    = 0.f;
   for (size_t i = 0; i < points.elements.size(); ++i) {
-    const auto& p = points.elements[i];
-    IndexedVector2 p1;
-    if ((i + 1) > points.elements.size() - 1) {
-      p1 = points.elements[0];
-    }
-    else {
-      p1 = points.elements[i + 1];
-    }
+    const auto& p  = points.elements[i];
+    const auto& p1 = points.elements[(i + 1) % points.elements.size()];
 
     stl_util::concat(positions, {p.x, 0.f, p.y});
     stl_util::concat(positions, {p.x, -depth, p.y});
     stl_util::concat(positions, {p1.x, 0.f, p1.y});
     stl_util::concat(positions, {p1.x, -depth, p1.y});
 
-    Vector3 v1(p.x, 0.f, p.y);
-    Vector3 v2(p1.x, 0.f, p1.y);
-    Vector3 v3 = v2.subtract(v1);
-    Vector3 v4(0.f, 1.f, 0.f);
-    Vector3 vn = Vector3::Cross(v3, v4);
-    vn         = vn.normalize();
+    const auto& p0 = points.elements[(i + points.elements.size() - 1) % points.elements.size()];
+    const auto& p2 = points.elements[(i + 2) % points.elements.size()];
 
-    stl_util::concat(uvs, {ulength / bounds.width, 0.f});
-    stl_util::concat(uvs, {ulength / bounds.width, 1.f});
-    ulength += v3.length();
-    stl_util::concat(uvs, {(ulength / bounds.width), 0.f});
-    stl_util::concat(uvs, {(ulength / bounds.width), 1.f});
+    Vector3 vc(-(p1.y - p.y), 0.f, p1.x - p.x);
+    Vector3 vp(-(p.y - p0.y), 0.f, p.x - p0.x);
+    Vector3 vn(-(p2.y - p1.y), 0.f, p2.x - p1.x);
 
     if (!flip) {
-      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
-      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
-      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
-      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
+      vc = vc.scale(-1.f);
+      vp = vp.scale(-1.f);
+      vn = vn.scale(-1.f);
+    }
 
-      indices.emplace_back(startIndex + 0);
+    auto vc_norm = vc.normalizeToNew();
+    auto vp_norm = vp.normalizeToNew();
+    auto vn_norm = vn.normalizeToNew();
+
+    const auto dotp = Vector3::Dot(vp_norm, vc_norm);
+    if (dotp > smoothingThreshold) {
+      if (dotp < Math::Epsilon - 1.f) {
+        vp_norm = (Vector3(p.x, 0.f, p.y)).subtract(Vector3(p1.x, 0.f, p1.y)).normalize();
+      }
+      else {
+        // cheap average weighed by side length
+        vp_norm = vp.add(vc).normalize();
+      }
+    }
+    else {
+      vp_norm = vc_norm;
+    }
+
+    const auto dotn = Vector3::Dot(vn, vc);
+    if (dotn > smoothingThreshold) {
+      if (dotn < Math::Epsilon - 1) {
+        // back to back
+        vn_norm = (Vector3(p1.x, 0.f, p1.y)).subtract(Vector3(p.x, 0.f, p.y)).normalize();
+      }
+      else {
+        // cheap average weighed by side length
+        vn_norm = vn.add(vc).normalize();
+      }
+    }
+    else {
+      vn_norm = vc_norm;
+    }
+
+    stl_util::concat(uvs, {ulength / bounds.width, 0});
+    stl_util::concat(uvs, {ulength / bounds.width, 1});
+    ulength += vc.length();
+    stl_util::concat(uvs, {(ulength / bounds.width), 0});
+    stl_util::concat(uvs, {(ulength / bounds.width), 1});
+
+    stl_util::concat(normals, {vp_norm.x, vp_norm.y, vp_norm.z});
+    stl_util::concat(normals, {vp_norm.x, vp_norm.y, vp_norm.z});
+    stl_util::concat(normals, {vn_norm.x, vn_norm.y, vn_norm.z});
+    stl_util::concat(normals, {vn_norm.x, vn_norm.y, vn_norm.z});
+
+    if (!flip) {
+      indices.emplace_back(startIndex);
       indices.emplace_back(startIndex + 1);
       indices.emplace_back(startIndex + 2);
 
@@ -243,12 +280,7 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
       indices.emplace_back(startIndex + 2);
     }
     else {
-      stl_util::concat(normals, {vn.x, vn.y, vn.z});
-      stl_util::concat(normals, {vn.x, vn.y, vn.z});
-      stl_util::concat(normals, {vn.x, vn.y, vn.z});
-      stl_util::concat(normals, {vn.x, vn.y, vn.z});
-
-      indices.emplace_back(startIndex + 0);
+      indices.emplace_back(startIndex);
       indices.emplace_back(startIndex + 2);
       indices.emplace_back(startIndex + 1);
 

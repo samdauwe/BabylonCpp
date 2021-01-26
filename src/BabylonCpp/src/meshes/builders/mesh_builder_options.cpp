@@ -333,6 +333,7 @@ PolyhedronOptions::~PolyhedronOptions() = default;
 
 PolygonOptions::PolygonOptions()
     : depth{std::nullopt}
+    , smoothingThreshold{std::nullopt}
     , faceUV{{
         Vector4(0.f, 0.f, 1.f, 1.f),
         Vector4(0.f, 0.f, 1.f, 1.f),

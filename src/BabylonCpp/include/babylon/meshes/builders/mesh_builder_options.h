@@ -503,6 +503,7 @@ public:
   std::vector<Vector3> shape;
   std::vector<std::vector<Vector3>> holes;
   std::optional<float> depth;
+  std::optional<float> smoothingThreshold;
   std::array<std::optional<Vector4>, 3> faceUV;
   std::optional<std::array<std::optional<Color4>, 3>> faceColors;
   std::optional<bool> updatable;
