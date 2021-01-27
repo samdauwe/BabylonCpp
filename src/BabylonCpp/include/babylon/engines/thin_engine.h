@@ -112,6 +112,16 @@ public:
    */
   std::string description() const;
 
+  /**
+   * @brief Returns the name of the engine.
+   */
+  std::string name() const;
+
+  /**
+   * @brief Returns the version of the engine.
+   */
+  float version() const;
+
   // Updatable statics so stick with vars here
 
   /**

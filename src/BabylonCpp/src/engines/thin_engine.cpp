@@ -71,6 +71,16 @@ std::string ThinEngine::description() const
   return description.str();
 }
 
+std::string ThinEngine::name() const
+{
+  return "WebGL";
+}
+
+float ThinEngine::version() const
+{
+  return _webGLVersion;
+}
+
 float ThinEngine::CollisionsEpsilon = 0.001f;
 
 std::string ThinEngine::ShadersRepository()
