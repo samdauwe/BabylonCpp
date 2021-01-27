@@ -45,9 +45,9 @@ enum class PointColor {
  * as any other BJS mesh : not more, not less. It can be scaled, rotated, translated, enlighted,
  * textured, moved, etc.
  *
- * The PointCloudSytem is also a particle system, with each point being a particle. It provides some
- * methods to manage the particles. However it is behavior agnostic. This means it has no emitter,
- * no particle physics, no particle recycler. You have to implement your own behavior.
+ * The PointCloudSystem is also a particle system, with each point being a particle. It provides
+ * some methods to manage the particles. However it is behavior agnostic. This means it has no
+ * emitter, no particle physics, no particle recycler. You have to implement your own behavior.
  *
  * Full documentation here : TO BE ENTERED
  */
@@ -139,7 +139,7 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Visibilty helper : Recomputes the visible size according to the mesh bounding box.
+   * @brief Visibility helper : Recomputes the visible size according to the mesh bounding box
    * doc :
    * @returns the PCS.
    */
@@ -330,7 +330,7 @@ public:
    */
   std::string name;
   /**
-   * The PCS mesh. It's a standard BJS Mesh, so all the methods from the Mesh class are avalaible.
+   * The PCS mesh. It's a standard BJS Mesh, so all the methods from the Mesh class are available.
    */
   MeshPtr mesh;
   /**

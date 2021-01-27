@@ -416,7 +416,7 @@ void PointsCloudSystem::_colorFromTexture(const MeshPtr& iMesh, const PointsGrou
   auto mat         = iMesh->material();
   auto textureList = mat->getActiveTextures();
   if (textureList.size() == 0) {
-    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no useable texture.", iMesh->name.c_str())
+    BABYLON_LOGF_WARN("PointsCloudSystem", "%s has no usable texture.", iMesh->name.c_str())
     pointsGroup->_groupImageData.clear();
     _setPointsColorOrUV(iMesh, pointsGroup, isVolume, true, false);
     return;
