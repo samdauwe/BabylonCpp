@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/maths/matrix.h>
@@ -12,22 +13,18 @@
 namespace BABYLON {
 
 struct DepthSortedParticle;
-class Material;
-class Mesh;
-class MultiMaterial;
 class PickingInfo;
-class SolidParticleSystem;
 class SolidParticleVertex;
 class Scene;
 class TargetCamera;
-using BoundingInfoPtr        = std::shared_ptr<BoundingInfo>;
-using MaterialPtr            = std::shared_ptr<Material>;
-using MeshPtr                = std::shared_ptr<Mesh>;
-using ModelShapePtr          = std::shared_ptr<ModelShape>;
-using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
-using TargetCameraPtr        = std::shared_ptr<TargetCamera>;
-using SolidParticlePtr       = std::shared_ptr<SolidParticle>;
-using SolidParticleSystemPtr = std::shared_ptr<SolidParticleSystem>;
+FWD_CLASS_SPTR(BoundingInfo)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(ModelShape)
+FWD_CLASS_SPTR(MultiMaterial)
+FWD_CLASS_SPTR(TargetCamera)
+FWD_CLASS_SPTR(SolidParticle)
+FWD_CLASS_SPTR(SolidParticleSystem)
 
 struct SolidParticleSystemOptions {
   std::optional<bool> updatable            = std::nullopt;
@@ -90,7 +87,7 @@ public:
    * `digest()` have their property `position` set yet.
    * @param mesh ( Mesh ) is the mesh to be digested
    * @param options {facetNb} (optional integer, default 1) is the number of mesh facets per
-   * particle, this parameter is overriden by the parameter `number` if any {delta} (optional
+   * particle, this parameter is overridden by the parameter `number` if any {delta} (optional
    * integer, default 0) is the random extra number of facets per particle , each particle will have
    * between `facetNb` and `facetNb + delta` facets {number} (optional positive integer) is the
    * wanted number of particles : each particle is built with `mesh_total_facets / number` facets
@@ -181,9 +178,11 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Returns an object {idx: numbern faceId: number} for the picked particle from the passed
-   * pickingInfo object. idx is the particle index in the SPS faceId is the picked face index
-   * counted within this particle. Returns null if the pickInfo can't identify a picked particle.
+   * @brief Returns an object {idx: number faceId: number} for the picked particle from the passed
+   * pickingInfo object.
+   * idx is the particle index in the SPS
+   * faceId is the picked face index counted within this particle.
+   * Returns null if the pickInfo can't identify a picked particle.
    * @param pickingInfo (PickingInfo object)
    * @returns {idx: number, faceId: number} or null
    */
@@ -219,8 +218,7 @@ public:
   SolidParticleSystem& computeSubMeshes();
 
   /**
-   * @brief Visibilty helper : Recomputes the visible size according to the mesh
-   * bounding box
+   * @brief Visibility helper : Recomputes the visible size according to the mesh bounding box
    * doc : https://doc.babylonjs.com/how_to/Solid_Particle_System#sps-visibility
    * @returns the SPS.
    */
@@ -337,6 +335,7 @@ public:
   virtual void afterUpdateParticles(size_t start, size_t stop, bool update);
 
 protected:
+  // clang-format off
   /**
    * @brief Creates a SPS (Solid Particle System) object.
    * @param name (String) is the SPS name, this will be the underlying mesh name.
@@ -344,23 +343,16 @@ protected:
    * @param options defines the options of the sps e.g.
    * * updatable (optional boolean, default true) : if the SPS must be updatable or immutable.
    * * isPickable (optional boolean, default false) : if the solid particles must be pickable.
-   * * enableDepthSort (optional boolean, default false) : if the solid particles must be sorted in
-   * the geometry according to their distance to the camera.
-   * * useModelMaterial (optional boolean, defaut false) : if the model materials must be used to
-   * create the SPS multimaterial. This enables the multimaterial supports of the SPS.
-   * * enableMultiMaterial (optional boolean, default false) : if the solid particles can be given
-   * different materials.
-   * * expandable (optional boolean, default false) : if particles can still be added after the
-   * initial SPS mesh creation.
-   * * particleIntersection (optional boolean, default false) : if the solid particle intersections
-   * must be computed.
-   * * boundingSphereOnly (optional boolean, default false) : if the particle intersection must be
-   * computed only with the bounding sphere (no bounding box computation, so faster).
-   * * bSphereRadiusFactor (optional float, default 1.0) : a number to multiply the boundind sphere
-   * radius by in order to reduce it for instance.
-   * @example bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere exactly matches a
-   * spherical mesh.
+   * * enableDepthSort (optional boolean, default false) : if the solid particles must be sorted in the geometry according to their distance to the camera.
+   * * useModelMaterial (optional boolean, default false) : if the model materials must be used to create the SPS multimaterial. This enables the multimaterial supports of the SPS.
+   * * enableMultiMaterial (optional boolean, default false) : if the solid particles can be given different materials.
+   * * expandable (optional boolean, default false) : if particles can still be added after the initial SPS mesh creation.
+   * * particleIntersection (optional boolean, default false) : if the solid particle intersections must be computed.
+   * * boundingSphereOnly (optional boolean, default false) : if the particle intersection must be computed only with the bounding sphere (no bounding box computation, so faster).
+   * * bSphereRadiusFactor (optional float, default 1.0) : a number to multiply the bounding sphere radius by in order to reduce it for instance.
+   * @example bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere exactly matches a spherical mesh.
    */
+  // clang-format on
   SolidParticleSystem(const std::string& name, Scene* scene,
                       const std::optional<SolidParticleSystemOptions>& options = std::nullopt);
 
@@ -685,7 +677,7 @@ public:
   std::string name;
 
   /**
-   * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh class are avalaible.
+   * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh class are available.
    */
   MeshPtr mesh;
 
@@ -729,7 +721,7 @@ public:
   bool _bSphereOnly;
 
   /**
-   * A number to multiply the boundind sphere radius by in order to reduce it for instance.
+   * A number to multiply the bounding sphere radius by in order to reduce it for instance.
    * (Internal use only)
    * @hidden
    */

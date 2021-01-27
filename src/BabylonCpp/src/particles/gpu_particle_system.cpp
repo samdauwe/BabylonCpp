@@ -36,7 +36,8 @@ bool GPUParticleSystem::IsSupported()
   if (!Engine::LastCreatedEngine()) {
     return false;
   }
-  return Engine::LastCreatedEngine()->webGLVersion() > 1.f;
+  return EngineStore::LastCreatedEngine()->name() == "WebGL"
+         && EngineStore::LastCreatedEngine()->version() > 1.f;
 }
 
 GPUParticleSystem::GPUParticleSystem(
