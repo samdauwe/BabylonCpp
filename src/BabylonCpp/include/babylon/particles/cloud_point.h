@@ -41,12 +41,12 @@ public:
   ~CloudPoint(); // default
 
   /**
-   * @brief  Returns a boolean. True if the particle intersects a mesh, else false
+   * @brief Returns a boolean. True if the particle intersects a mesh, else false
    * The intersection is computed on the particle position and Axis Aligned Bounding Box (AABB) or
    * Sphere
    * @param target is the object (point or mesh) what the intersection is computed against
    * @param isSphere is boolean flag when false (default) bounding box of mesh is used, when true
-   * the bouding sphere is used
+   * the bounding sphere is used
    * @returns true if it intersects
    */
   bool intersectsMesh(const MeshPtr& target, bool isSphere) const;

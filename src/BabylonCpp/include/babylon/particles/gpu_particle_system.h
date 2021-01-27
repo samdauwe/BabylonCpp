@@ -5,6 +5,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observable.h>
 #include <babylon/particles/base_particle_system.h>
 
@@ -15,14 +16,12 @@ class IGLVertexArrayObject;
 } // end of namespace GL
 
 class Buffer;
-class Effect;
 class Engine;
 class GPUParticleSystem;
 struct IEffectCreationOptions;
 class Mesh;
-class RawTexture;
-using EffectPtr                 = std::shared_ptr<Effect>;
-using RawTexturePtr             = std::shared_ptr<RawTexture>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(RawTexture)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
 
 /**

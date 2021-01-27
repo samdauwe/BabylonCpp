@@ -20,40 +20,25 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Animation;
-class BaseTexture;
-class BoxParticleEmitter;
 struct Color3Gradient;
-class ConeParticleEmitter;
-class CylinderDirectedParticleEmitter;
-class CylinderParticleEmitter;
-class Effect;
-class HemisphericParticleEmitter;
-struct IParticleEmitterType;
 class Mesh;
-class PointParticleEmitter;
-class ProceduralTexture;
-class SphereDirectedParticleEmitter;
-class SphereParticleEmitter;
 class Scene;
-class Texture;
-using AbstractMeshPtr                    = std::shared_ptr<AbstractMesh>;
-using AnimationPtr                       = std::shared_ptr<Animation>;
-using BaseTexturePtr                     = std::shared_ptr<BaseTexture>;
-using BoxParticleEmitterPtr              = std::shared_ptr<BoxParticleEmitter>;
-using ConeParticleEmitterPtr             = std::shared_ptr<ConeParticleEmitter>;
-using CylinderDirectedParticleEmitterPtr = std::shared_ptr<CylinderDirectedParticleEmitter>;
-using CylinderParticleEmitterPtr         = std::shared_ptr<CylinderParticleEmitter>;
-using EffectPtr                          = std::shared_ptr<Effect>;
-using HemisphericParticleEmitterPtr      = std::shared_ptr<HemisphericParticleEmitter>;
-using IParticleEmitterTypePtr            = std::shared_ptr<IParticleEmitterType>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Animation)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(BoxParticleEmitter)
+FWD_CLASS_SPTR(ConeParticleEmitter)
+FWD_CLASS_SPTR(CylinderDirectedParticleEmitter)
+FWD_CLASS_SPTR(CylinderParticleEmitter)
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(HemisphericParticleEmitter)
+FWD_STRUCT_SPTR(IParticleEmitterType)
 FWD_CLASS_SPTR(IParticleSystem)
-using PointParticleEmitterPtr          = std::shared_ptr<PointParticleEmitter>;
-using ProceduralTexturePtr             = std::shared_ptr<ProceduralTexture>;
-using SphereDirectedParticleEmitterPtr = std::shared_ptr<SphereDirectedParticleEmitter>;
-using SphereParticleEmitterPtr         = std::shared_ptr<SphereParticleEmitter>;
-using TexturePtr                       = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(PointParticleEmitter)
+FWD_CLASS_SPTR(ProceduralTexture)
+FWD_CLASS_SPTR(SphereDirectedParticleEmitter)
+FWD_CLASS_SPTR(SphereParticleEmitter)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Interface representing a particle system in Babylon.js.
@@ -339,6 +324,11 @@ public:
   bool disposeOnStop;
 
   /**
+   * If you want to launch only a few particles at once, that can be done, as well.
+   */
+  int manualEmitCount;
+
+  /**
    * Forces the particle to write their depth information to the depth buffer.
    * This can help preventing other draw calls to override the particles.
    */
@@ -400,8 +390,8 @@ public:
 
   /**
    * @brief Dispose the particle system and frees its associated resources.
-   * @param disposeTexture defines if the particule texture must be disposed as well
-   * (true by default)
+   * @param disposeTexture defines if the particle texture must be disposed as well (true by
+   * default)
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override = 0;
 
@@ -560,14 +550,14 @@ public:
 
   /**
    * @brief Gets the current list of size gradients.
-   * You must use addSizeGradient and removeSizeGradient to udpate this list
+   * You must use addSizeGradient and removeSizeGradient to update this list
    * @returns the list of size gradients
    */
   virtual std::vector<FactorGradient>& getSizeGradients() = 0;
 
   /**
    * @brief Gets the current list of angular speed gradients.
-   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to udpate this list
+   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to update this list
    * @returns the list of angular speed gradients
    */
   virtual std::vector<FactorGradient>& getAngularSpeedGradients() = 0;
@@ -594,7 +584,7 @@ public:
 
   /**
    * @brief Gets the current list of velocity gradients.
-   * You must use addVelocityGradient and removeVelocityGradient to udpate this list
+   * You must use addVelocityGradient and removeVelocityGradient to update this list
    * @returns the list of velocity gradients
    */
   virtual std::vector<FactorGradient>& getVelocityGradients() = 0;
@@ -620,7 +610,7 @@ public:
 
   /**
    * @brief Gets the current list of limit velocity gradients.
-   * You must use addLimitVelocityGradient and removeLimitVelocityGradient to udpate this list
+   * You must use addLimitVelocityGradient and removeLimitVelocityGradient to update this list
    * @returns the list of limit velocity gradients
    */
   virtual std::vector<FactorGradient>& getLimitVelocityGradients() = 0;
@@ -666,7 +656,7 @@ public:
 
   /**
    * @brief Gets the current list of drag gradients.
-   * You must use addDragGradient and removeDragGradient to udpate this list
+   * You must use addDragGradient and removeDragGradient to update this list
    * @returns the list of drag gradients
    */
   virtual std::vector<FactorGradient>& getDragGradients() = 0;
@@ -693,7 +683,7 @@ public:
 
   /**
    * @brief Gets the current list of emit rate gradients.
-   * You must use addEmitRateGradient and removeEmitRateGradient to udpate this list
+   * You must use addEmitRateGradient and removeEmitRateGradient to update this list
    * @returns the list of emit rate gradients
    */
   virtual std::vector<FactorGradient>& getEmitRateGradients() = 0;
@@ -720,7 +710,7 @@ public:
 
   /**
    * @brief Gets the current list of start size gradients.
-   * You must use addStartSizeGradient and removeStartSizeGradient to udpate this list
+   * You must use addStartSizeGradient and removeStartSizeGradient to update this list
    * @returns the list of start size gradients
    */
   virtual std::vector<FactorGradient>& getStartSizeGradients() = 0;
@@ -746,14 +736,14 @@ public:
 
   /**
    * @brief Gets the current list of life time gradients.
-   * You must use addLifeTimeGradient and removeLifeTimeGradient to udpate this list
+   * You must use addLifeTimeGradient and removeLifeTimeGradient to update this list
    * @returns the list of life time gradients
    */
   virtual std::vector<FactorGradient>& getLifeTimeGradients() = 0;
 
   /**
    * @brief Gets the current list of color gradients.
-   * You must use addColorGradient and removeColorGradient to udpate this list
+   * You must use addColorGradient and removeColorGradient to update this list
    * @returns the list of color gradients
    */
   virtual std::vector<ColorGradient>& getColorGradients() = 0;
@@ -775,7 +765,7 @@ public:
 
   /**
    * @brief Gets the current list of ramp gradients.
-   * You must use addRampGradient and removeRampGradient to udpate this list
+   * You must use addRampGradient and removeRampGradient to update this list
    * @returns the list of ramp gradients
    */
   virtual std::vector<Color3Gradient>& getRampGradients() = 0;
@@ -804,7 +794,7 @@ public:
 
   /**
    * @brief Gets the current list of color remap gradients.
-   * You must use addColorRemapGradient and removeColorRemapGradient to udpate this list
+   * You must use addColorRemapGradient and removeColorRemapGradient to update this list
    * @returns the list of color remap gradients
    */
   virtual std::vector<FactorGradient>& getColorRemapGradients() = 0;
@@ -827,7 +817,7 @@ public:
 
   /**
    * @brief Gets the current list of alpha remap gradients.
-   * You must use addAlphaRemapGradient and removeAlphaRemapGradient to udpate this list
+   * You must use addAlphaRemapGradient and removeAlphaRemapGradient to update this list
    * @returns the list of alpha remap gradients
    */
   virtual std::vector<FactorGradient>& getAlphaRemapGradients() = 0;
