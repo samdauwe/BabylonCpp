@@ -265,7 +265,7 @@ public:
 
   /**
    * @brief Gets the current list of ramp gradients.
-   * You must use addRampGradient and removeRampGradient to udpate this list
+   * You must use addRampGradient and removeRampGradient to update this list
    * @returns the list of ramp gradients
    */
   std::vector<Color3Gradient>& getRampGradients() override;
@@ -467,8 +467,8 @@ public:
 
   /**
    * @brief Disposes the particle system and free the associated resources.
-   * @param disposeTexture defines if the particule texture must be disposed as
-   * well (true by default)
+   * @param disposeTexture defines if the particle texture must be disposed as well (true by
+   * default)
    */
   void dispose(bool disposeTexture = true, bool disposeMaterialAndTextures = false) override;
 
@@ -585,7 +585,7 @@ public:
    * This function can be defined to specify initial direction for every new
    * particle. It by default use the emitterType defined function
    */
-  std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* particle,
+  std::function<void(const Matrix& worldMatrix, Vector3& directionToupdate, Particle* particle,
                      bool isLocal)>
     startDirectionFunction;
 
@@ -593,7 +593,7 @@ public:
    * This function can be defined to specify initial position for every new
    * particle. It by default use the emitterType defined function
    */
-  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate, Particle* particle,
+  std::function<void(const Matrix& worldMatrix, Vector3& positionToupdate, Particle* particle,
                      bool isLocal)>
     startPositionFunction;
 

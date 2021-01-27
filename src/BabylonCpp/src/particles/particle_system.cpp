@@ -808,7 +808,7 @@ void ParticleSystem::_createVertexBuffers()
 
   std::unique_ptr<VertexBuffer> offsets = nullptr;
   if (_useInstancing) {
-    Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
+    Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f};
     _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
     offsets       = _spriteBuffer->createVertexBuffer(VertexBuffer::OffsetKind, 0, 2);
   }
@@ -1747,7 +1747,7 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   if (_useInstancing) {
-    engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4,
+    engine->drawArraysType(Constants::MATERIAL_TriangleStripDrawMode, 0, 4,
                            static_cast<int>(_particles.size()));
   }
   else {
@@ -1899,6 +1899,7 @@ ParticleSystem* ParticleSystem::Parse(const json& parsedParticleSystem, Scene* s
   auto name = json_util::get_string(parsedParticleSystem, "name");
   auto particleSystem
     = new ParticleSystem(name, json_util::get_number(parsedParticleSystem, "capacity", 0ul), scene);
+  particleSystem->_rootUrl = rootUrl;
 
   if (json_util::has_key(parsedParticleSystem, "id")) {
     particleSystem->id = json_util::get_string(parsedParticleSystem, "id");
