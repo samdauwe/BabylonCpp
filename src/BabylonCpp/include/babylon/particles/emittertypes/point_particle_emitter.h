@@ -54,7 +54,7 @@ public:
 
   /**
    * @brief Returns a string to use to update the GPU particles update shader.
-   * @returns a string containng the defines string
+   * @returns a string containing the defines string
    */
   [[nodiscard]] std::string getEffectDefines() const override;
 

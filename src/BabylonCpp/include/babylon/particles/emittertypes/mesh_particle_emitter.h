@@ -3,14 +3,14 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_type.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Scene;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
 
 /**
  * @brief Particle emitter emitting particles from the inside of a box.
@@ -60,7 +60,7 @@ public:
 
   /**
    * @brief Returns a string to use to update the GPU particles update shader.
-   * @returns a string containng the defines string
+   * @returns a string containing the defines string
    */
   std::string getEffectDefines() const override;
 

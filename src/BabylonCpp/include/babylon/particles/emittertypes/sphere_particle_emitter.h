@@ -57,8 +57,8 @@ public:
   void applyToShader(Effect* effect) override;
 
   /**
-   * @brief Returns a string to use to update the GPU particles update shader
-   * @returns a string containng the defines string
+   * @brief Returns a string to use to update the GPU particles update shader.
+   * @returns a string containing the defines string
    */
   [[nodiscard]] std::string getEffectDefines() const override;
 

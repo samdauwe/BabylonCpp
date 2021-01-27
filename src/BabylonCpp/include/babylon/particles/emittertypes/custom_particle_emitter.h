@@ -55,7 +55,7 @@ public:
 
   /**
    * @brief Returns a string to use to update the GPU particles update shader.
-   * @returns a string containng the defines string
+   * @returns a string containing the defines string
    */
   std::string getEffectDefines() const override;
 
@@ -80,7 +80,7 @@ public:
 
 public:
   /**
-   * Gets or sets the position generator that will create the inital position of each particle.
+   * Gets or sets the position generator that will create the initial position of each particle.
    * Index will be provided when used with GPU particle. Particle will be provided when used with
    * CPU particles
    */
