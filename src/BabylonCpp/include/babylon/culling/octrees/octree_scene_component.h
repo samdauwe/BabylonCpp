@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
@@ -13,20 +14,17 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Collider;
-class OctreeSceneComponent;
 class SubMesh;
-using OctreeSceneComponentPtr = std::shared_ptr<OctreeSceneComponent>;
+FWD_CLASS_SPTR(OctreeSceneComponent)
 
 /**
- * @brief Defines the octree scene component responsible to manage any octrees
- * in a given scene.
+ * @brief Defines the octree scene component responsible to manage any octrees in a given scene.
  */
 class BABYLON_SHARED_EXPORT OctreeSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name help to identify the component in the list of scene
-   * components.
+   * The component name help to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_OCTREE;
 
@@ -74,8 +72,7 @@ public:
   std::vector<SubMesh*> getCollidingSubMeshCandidates(AbstractMesh* mesh, const Collider& collider);
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 

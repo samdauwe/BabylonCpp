@@ -15,19 +15,16 @@ OctreeSceneComponent::OctreeSceneComponent(Scene* iScene)
   ISceneComponent::name = OctreeSceneComponent::name;
   scene                 = iScene;
 
-  scene->getActiveMeshCandidates
-    = [this]() { return getActiveMeshCandidates(); };
+  scene->getActiveMeshCandidates = [this]() { return getActiveMeshCandidates(); };
 
   scene->getActiveSubMeshCandidates
     = [this](AbstractMesh* mesh) { return getActiveSubMeshCandidates(mesh); };
-  scene->getCollidingSubMeshCandidates
-    = [this](AbstractMesh* mesh, const Collider& collider) {
-        return getCollidingSubMeshCandidates(mesh, collider);
-      };
-  scene->getIntersectingSubMeshCandidates
-    = [this](AbstractMesh* mesh, const Ray& localRay) {
-        return getIntersectingSubMeshCandidates(mesh, localRay);
-      };
+  scene->getCollidingSubMeshCandidates = [this](AbstractMesh* mesh, const Collider& collider) {
+    return getCollidingSubMeshCandidates(mesh, collider);
+  };
+  scene->getIntersectingSubMeshCandidates = [this](AbstractMesh* mesh, const Ray& localRay) {
+    return getIntersectingSubMeshCandidates(mesh, localRay);
+  };
 }
 
 OctreeSceneComponent::~OctreeSceneComponent() = default;
@@ -39,24 +36,21 @@ bool OctreeSceneComponent::get_checksIsEnabled() const
 
 void OctreeSceneComponent::_register()
 {
-  scene->onMeshRemovedObservable.add(
-    [this](AbstractMesh* mesh, EventState& /*es*/) {
-      auto sceneOctree = scene->selectionOctree();
-      if (sceneOctree != nullptr) {
-        sceneOctree->dynamicContent.erase(
-          std::remove(sceneOctree->dynamicContent.begin(),
-                      sceneOctree->dynamicContent.end(), mesh),
-          sceneOctree->dynamicContent.end());
-      }
-    });
+  scene->onMeshRemovedObservable.add([this](AbstractMesh* mesh, EventState& /*es*/) {
+    auto sceneOctree = scene->selectionOctree();
+    if (sceneOctree != nullptr) {
+      sceneOctree->dynamicContent.erase(
+        std::remove(sceneOctree->dynamicContent.begin(), sceneOctree->dynamicContent.end(), mesh),
+        sceneOctree->dynamicContent.end());
+    }
+  });
 
-  scene->onMeshImportedObservable.add(
-    [this](AbstractMesh* mesh, EventState& /*es*/) {
-      auto sceneOctree = scene->selectionOctree();
-      if (sceneOctree != nullptr) {
-        sceneOctree->addMesh(mesh);
-      }
-    });
+  scene->onMeshImportedObservable.add([this](AbstractMesh* mesh, EventState& /*es*/) {
+    auto sceneOctree = scene->selectionOctree();
+    if (sceneOctree != nullptr) {
+      sceneOctree->addMesh(mesh);
+    }
+  });
 }
 
 std::vector<AbstractMesh*> OctreeSceneComponent::getActiveMeshCandidates()
@@ -68,8 +62,7 @@ std::vector<AbstractMesh*> OctreeSceneComponent::getActiveMeshCandidates()
   return scene->_getDefaultMeshCandidates();
 }
 
-std::vector<SubMesh*>
-OctreeSceneComponent::getActiveSubMeshCandidates(AbstractMesh* mesh)
+std::vector<SubMesh*> OctreeSceneComponent::getActiveSubMeshCandidates(AbstractMesh* mesh)
 {
   if (mesh->_submeshesOctree && mesh->useOctreeForRenderingSelection) {
     auto intersections = mesh->_submeshesOctree->select(scene->frustumPlanes());
@@ -78,9 +71,8 @@ OctreeSceneComponent::getActiveSubMeshCandidates(AbstractMesh* mesh)
   return scene->_getDefaultSubMeshCandidates(mesh);
 }
 
-std::vector<SubMesh*>
-OctreeSceneComponent::getIntersectingSubMeshCandidates(AbstractMesh* mesh,
-                                                       const Ray& localRay)
+std::vector<SubMesh*> OctreeSceneComponent::getIntersectingSubMeshCandidates(AbstractMesh* mesh,
+                                                                             const Ray& localRay)
 {
   if (mesh->_submeshesOctree && mesh->useOctreeForPicking) {
     Ray::TransformToRef(localRay, mesh->getWorldMatrix(), _tempRay);
@@ -91,16 +83,13 @@ OctreeSceneComponent::getIntersectingSubMeshCandidates(AbstractMesh* mesh,
   return scene->_getDefaultSubMeshCandidates(mesh);
 }
 
-std::vector<SubMesh*>
-OctreeSceneComponent::getCollidingSubMeshCandidates(AbstractMesh* mesh,
-                                                    const Collider& collider)
+std::vector<SubMesh*> OctreeSceneComponent::getCollidingSubMeshCandidates(AbstractMesh* mesh,
+                                                                          const Collider& collider)
 {
   if (mesh->_submeshesOctree && mesh->useOctreeForCollisions) {
     auto radius = collider._velocityWorldLength
-                  + stl_util::max(collider._radius.x, collider._radius.y,
-                                  collider._radius.z);
-    auto intersections
-      = mesh->_submeshesOctree->intersects(collider._basePointWorld, radius);
+                  + stl_util::max(collider._radius.x, collider._radius.y, collider._radius.z);
+    auto intersections = mesh->_submeshesOctree->intersects(collider._basePointWorld, radius);
 
     return intersections;
   }
