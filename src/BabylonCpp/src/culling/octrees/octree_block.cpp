@@ -10,10 +10,9 @@
 namespace BABYLON {
 
 template <class T>
-OctreeBlock<T>::OctreeBlock(
-  const Vector3& iMinPoint, const Vector3& iMaxPoint, size_t iCapacity,
-  size_t depth, size_t maxDepth,
-  const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
+OctreeBlock<T>::OctreeBlock(const Vector3& iMinPoint, const Vector3& iMaxPoint, size_t iCapacity,
+                            size_t depth, size_t maxDepth,
+                            const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
 {
   _capacity     = iCapacity;
   _depth        = depth;
@@ -109,8 +108,8 @@ void OctreeBlock<T>::addEntries(std::vector<T>& _entries)
 }
 
 template <class T>
-void OctreeBlock<T>::select(const std::array<Plane, 6>& frustumPlanes,
-                            std::vector<T>& selection, bool allowDuplicate)
+void OctreeBlock<T>::select(const std::array<Plane, 6>& frustumPlanes, std::vector<T>& selection,
+                            bool allowDuplicate)
 {
   if (BoundingBox::IsInFrustum(_boundingVectors, frustumPlanes)) {
     if (!IOctreeContainer<T>::blocks.empty()) {
@@ -133,8 +132,7 @@ template <class T>
 void OctreeBlock<T>::intersects(const Vector3& sphereCenter, float sphereRadius,
                                 std::vector<T>& selection, bool allowDuplicate)
 {
-  if (BoundingBox::IntersectsSphere(_minPoint, _maxPoint, sphereCenter,
-                                    sphereRadius)) {
+  if (BoundingBox::IntersectsSphere(_minPoint, _maxPoint, sphereCenter, sphereRadius)) {
     if (!IOctreeContainer<T>::blocks.empty()) {
       for (auto& block : IOctreeContainer<T>::blocks) {
         block.intersects(sphereCenter, sphereRadius, selection, allowDuplicate);
@@ -168,20 +166,19 @@ void OctreeBlock<T>::intersectsRay(const Ray& ray, std::vector<T>& selection)
 template <class T>
 void OctreeBlock<T>::createInnerBlocks()
 {
-  OctreeBlock<T>::_CreateBlocks(_minPoint, _maxPoint, entries, _capacity,
-                                _depth, _maxDepth, *this, _creationFunc);
+  OctreeBlock<T>::_CreateBlocks(_minPoint, _maxPoint, entries, _capacity, _depth, _maxDepth, *this,
+                                _creationFunc);
 }
 
 template <class T>
-void OctreeBlock<T>::_CreateBlocks(
-  const Vector3& worldMin, const Vector3& worldMax, std::vector<T>& entries,
-  size_t maxBlockCapacity, size_t currentDepth, size_t maxDepth,
-  IOctreeContainer<T>& target,
-  const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
+void OctreeBlock<T>::_CreateBlocks(const Vector3& worldMin, const Vector3& worldMax,
+                                   std::vector<T>& entries, size_t maxBlockCapacity,
+                                   size_t currentDepth, size_t maxDepth,
+                                   IOctreeContainer<T>& target,
+                                   const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
 {
   target.blocks.clear();
-  Vector3 blockSize((worldMax.x - worldMin.x) / 2.f,
-                    (worldMax.y - worldMin.y) / 2.f,
+  Vector3 blockSize((worldMax.x - worldMin.x) / 2.f, (worldMax.y - worldMin.y) / 2.f,
                     (worldMax.z - worldMin.z) / 2.f);
 
   // Segmenting space
@@ -190,11 +187,11 @@ void OctreeBlock<T>::_CreateBlocks(
       for (int z = 0; z < 2; ++z) {
         const auto& localMin
           = worldMin.add(blockSize.multiplyByFloats((float)x, (float)y, (float)z));
-        const auto& localMax
-          = worldMin.add(blockSize.multiplyByFloats((float)x + 1.f, (float)y + 1.f, (float)z + 1.f));
+        const auto& localMax = worldMin.add(
+          blockSize.multiplyByFloats((float)x + 1.f, (float)y + 1.f, (float)z + 1.f));
 
-        OctreeBlock<T> block(localMin, localMax, maxBlockCapacity,
-                             currentDepth + 1, maxDepth, creationFunc);
+        OctreeBlock<T> block(localMin, localMax, maxBlockCapacity, currentDepth + 1, maxDepth,
+                             creationFunc);
         block.addEntries(entries);
         target.blocks.emplace_back(block);
       }
