@@ -28,8 +28,8 @@ public:
   ~BoundingSphere(); // = default
 
   /**
-   * @brief Recreates the entire bounding sphere from scratch as if we call the
-   * constructor in place.
+   * @brief Recreates the entire bounding sphere from scratch as if we call the constructor in
+   * place.
    * @param min defines the new minimum vector (in local space)
    * @param max defines the new maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
@@ -65,8 +65,8 @@ public:
   [[nodiscard]] bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
 
   /**
-   * @brief Tests if the bounding sphere center is in between the frustum
-   * planes. Used for optimistic fast inclusion.
+   * @brief Tests if the bounding sphere center is in between the frustum planes. Used for
+   * optimistic fast inclusion.
    * @param frustumPlanes defines the frustum planes to test
    * @returns true if the sphere center is in between the frustum planes
    */
@@ -84,7 +84,7 @@ public:
    * @brief Checks if two sphere intersect.
    * @param sphere0 sphere 0
    * @param sphere1 sphere 1
-   * @returns true if the speres intersect
+   * @returns true if the spheres intersect
    */
   static bool Intersects(const BoundingSphere& sphere0, const BoundingSphere& sphere1);
 

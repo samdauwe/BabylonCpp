@@ -64,7 +64,7 @@ public:
 
   /**
    * @brief Subtracts this CSG with another CSG in place.
-   * @param csg The CSG to subtact against this CSG
+   * @param csg The CSG to subtract against this CSG
    */
   void subtractInPlace(const CSGPtr& csg);
 

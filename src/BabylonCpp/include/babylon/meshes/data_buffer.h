@@ -10,8 +10,12 @@ namespace BABYLON {
  * @brief Class used to store gfx data (like WebGLBuffer).
  */
 template <class T>
-struct BABYLON_SHARED_EXPORT DataBuffer {
+class BABYLON_SHARED_EXPORT DataBuffer {
 
+public:
+  DataBuffer() : uniqueId{DataBuffer::_Counter++}
+  {
+  }
   virtual ~DataBuffer() = default;
 
   /**
@@ -37,7 +41,15 @@ struct BABYLON_SHARED_EXPORT DataBuffer {
     return nullptr;
   }
 
-}; // end of struct DataBuffer
+  /**
+   * @brief Gets the unique id of this buffer
+   */
+  const size_t uniqueId;
+
+private:
+  static inline size_t _Counter = 0;
+
+}; // end of class DataBuffer
 
 } // end of namespace BABYLON
 
