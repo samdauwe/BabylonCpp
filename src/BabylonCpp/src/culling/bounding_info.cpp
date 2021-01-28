@@ -111,6 +111,24 @@ BoundingInfo& BoundingInfo::centerOn(const Vector3& center, const Vector3& exten
   return *this;
 }
 
+BoundingInfo& BoundingInfo::encapsulate(const Vector3& point)
+{
+  const auto iMinimum = Vector3::Minimize(minimum(), point);
+  const auto iMaximum = Vector3::Maximize(maximum(), point);
+  reConstruct(iMinimum, iMaximum, boundingBox.getWorldMatrix());
+
+  return *this;
+}
+
+BoundingInfo& BoundingInfo::encapsulateBoundingInfo(const BoundingInfo& toEncapsulate)
+{
+  encapsulate(
+    toEncapsulate.boundingBox.centerWorld.subtract(toEncapsulate.boundingBox.extendSizeWorld));
+  encapsulate(toEncapsulate.boundingBox.centerWorld.add(toEncapsulate.boundingBox.extendSizeWorld));
+
+  return *this;
+}
+
 BoundingInfo& BoundingInfo::scale(float factor)
 {
   boundingBox.scale(factor);

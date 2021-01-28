@@ -57,6 +57,20 @@ public:
   BoundingInfo& centerOn(const Vector3& center, const Vector3& extend);
 
   /**
+   * @brief Grows the bounding info to include the given point.
+   * @param point The point that will be included in the current bounding info
+   * @returns the current bounding info
+   */
+  BoundingInfo& encapsulate(const Vector3& point);
+
+  /**
+   * @brief Grows the bounding info to encapsulate the given bounding info.
+   * @param toEncapsulate The bounding info that will be encapsulated in the current bounding info
+   * @returns the current bounding info
+   */
+  BoundingInfo& encapsulateBoundingInfo(const BoundingInfo& toEncapsulate);
+
+  /**
    * @brief Scale the current bounding info by applying a scale factor.
    * @param factor defines the scale factor to apply
    * @returns the current bounding info
@@ -81,7 +95,7 @@ public:
 
   /**
    * @brief Checks if a cullable object (mesh...) is in the camera frustum.
-   * Unlike isInFrustum this cheks the full bounding box
+   * Unlike isInFrustum this checks the full bounding box
    * @param frustumPlanes Camera near/planes
    * @returns true if the object is in frustum otherwise false
    */
