@@ -72,7 +72,7 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
 
   reductionInitial->onApply = [this, w, h](Effect* effect, EventState& /*es*/) -> void {
     effect->setTexture("sourceTexture", _sourceTexture);
-    effect->setFloatArray2("texSize", {w, h});
+    effect->setFloat2("texSize", w, h);
   };
 
   _reductionSteps.emplace_back(reductionInitial);
@@ -112,10 +112,10 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
 
     reduction->onApply = [_w, _h](Effect* effect, EventState& /*es*/) -> void {
       if (_w == 1 || _h == 1) {
-        effect->setIntArray2("texSize", {_w, _h});
+        effect->setInt2("texSize", _w, _h);
       }
       else {
-        effect->setFloatArray2("texSize", {static_cast<float>(_w), static_cast<float>(_h)});
+        effect->setFloat2("texSize", static_cast<float>(_w), static_cast<float>(_h));
       }
     };
 
@@ -129,7 +129,8 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
           = [this, scene, reduction, w, h](Effect* /*effect*/, EventState /*es*/) -> void {
           Float32Array buffer(4 * static_cast<size_t>(w * h));
           MinMaxFloats minmax{0.f, 0.f};
-          scene->getEngine()->_readTexturePixels(reduction->inputTexture, w, h, -1, 0, buffer);
+          scene->getEngine()->_readTexturePixels(reduction->inputTexture, w, h, -1, 0, buffer,
+                                                 false);
           minmax.min = buffer[0];
           minmax.max = buffer[1];
           onAfterReductionPerformed.notifyObservers(&minmax);
@@ -170,11 +171,15 @@ void MinMaxReducer::activate()
         return;
       }
 
+      const auto engine = _camera->getScene()->getEngine();
+      engine->_debugPushGroup("min max reduction", 1);
       _reductionSteps[0]->activate(_camera);
       _postProcessManager->directRender(_reductionSteps, _reductionSteps[0]->inputTexture(),
                                         _forceFullscreenViewport);
       _camera->getScene()->getEngine()->unBindFramebuffer(_reductionSteps[0]->inputTexture(),
                                                           false);
+      engine->unBindFramebuffer(_reductionSteps[0]->inputTexture(), false);
+      engine->_debugPopGroup(1);
     });
 
   _activated = true;

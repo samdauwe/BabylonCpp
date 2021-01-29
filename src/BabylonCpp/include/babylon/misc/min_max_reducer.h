@@ -2,6 +2,7 @@
 #define BABYLON_MISC_MIN_MAX_REDUCER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
 #include <babylon/misc/observable.h>
@@ -9,14 +10,10 @@
 
 namespace BABYLON {
 
-class Camera;
-class PostProcess;
-class PostProcessManager;
-class RenderTargetTexture;
-using CameraPtr              = std::shared_ptr<Camera>;
-using PostProcessPtr         = std::shared_ptr<PostProcess>;
-using PostProcessManagerPtr  = std::shared_ptr<PostProcessManager>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(PostProcess)
+FWD_CLASS_SPTR(PostProcessManager)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief This class computes a min/max reduction from a texture: it means it computes the minimum
@@ -56,7 +53,7 @@ public:
   /**
    * @brief Activates the reduction computation.
    * When activated, the observers registered in onAfterReductionPerformed are
-   * called after the compuation is performed
+   * called after the computation is performed
    */
   virtual void activate();
 
