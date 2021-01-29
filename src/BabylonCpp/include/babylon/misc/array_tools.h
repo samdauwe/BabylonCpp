@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT ArrayTools {
 
   /**
    * @brief Returns an array of the given size filled with element built from the given constructor
-   * and the paramters.
+   * and the parameters.
    * @param size the number of element to construct and put in the array
    * @param itemBuilder a callback responsible for creating new instance of item. Called once per
    * array entry.
