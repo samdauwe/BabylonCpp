@@ -9,25 +9,21 @@
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
 struct _IAnimationState;
-class Animatable;
-class Animation;
 class IAnimatable;
 struct IAnimationKey;
-struct IEasingFunction;
-class Node;
-class RuntimeAnimation;
 class Scene;
-using AnimatablePtr       = std::shared_ptr<Animatable>;
-using AnimationPtr        = std::shared_ptr<Animation>;
-using IEasingFunctionPtr  = std::shared_ptr<IEasingFunction>;
-using NodePtr             = std::shared_ptr<Node>;
-using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
+FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(Animation)
+FWD_STRUCT_SPTR(IEasingFunction)
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(RuntimeAnimation)
 
 /**
  * @brief Class used to store any kind of animation.

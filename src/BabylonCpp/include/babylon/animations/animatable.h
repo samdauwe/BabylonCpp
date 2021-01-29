@@ -7,6 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
@@ -16,10 +17,10 @@ class Animation;
 class IAnimatable;
 class RuntimeAnimation;
 class Scene;
-using AnimatablePtr       = std::shared_ptr<Animatable>;
-using AnimationPtr        = std::shared_ptr<Animation>;
-using IAnimatablePtr      = std::shared_ptr<IAnimatable>;
-using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
+FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(Animation)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(RuntimeAnimation)
 
 /**
  * @brief Class used to store an actual running animation.
@@ -65,14 +66,14 @@ public:
 
   /**
    * @brief Gets the source animation for a specific property.
-   * @param property defines the propertyu to look for
+   * @param property defines the property to look for
    * @returns null or the source animation for the given property
    */
   [[nodiscard]] AnimationPtr getAnimationByTargetProperty(const std::string& property) const;
 
   /**
    * @brief Gets the runtime animation for a specific property.
-   * @param property defines the propertyu to look for
+   * @param property defines the property to look for
    * @returns null or the runtime animation for the given property
    */
   [[nodiscard]] RuntimeAnimationPtr

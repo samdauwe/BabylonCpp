@@ -7,19 +7,17 @@
 #include <babylon/animations/_ianimation_state.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class Animatable;
-class Animation;
 class AnimationEvent;
-class IAnimatable;
 struct IAnimationKey;
-class RuntimeAnimation;
 class Scene;
-using AnimationPtr        = std::shared_ptr<Animation>;
-using IAnimatablePtr      = std::shared_ptr<IAnimatable>;
-using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
+FWD_CLASS_SPTR(Animation)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(RuntimeAnimation)
 
 /**
  * @brief Defines a runtime animation.

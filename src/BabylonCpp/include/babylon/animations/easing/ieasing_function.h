@@ -15,7 +15,7 @@ struct BABYLON_SHARED_EXPORT IEasingFunction {
   virtual ~IEasingFunction() = default;
 
   /**
-   * @brief Given an input gradient between 0 and 1, this returns the corrseponding value
+   * @brief Given an input gradient between 0 and 1, this returns the corresponding value
    * of the easing function.
    * The link below provides some of the most common examples of easing functions.
    * @see https://easings.net/
