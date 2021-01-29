@@ -1592,7 +1592,8 @@ public:
    */
   ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture, int width, int height,
                                      int faceIndex = -1, int level = 0,
-                                     std::optional<ArrayBufferView> buffer = std::nullopt);
+                                     std::optional<ArrayBufferView> buffer = std::nullopt,
+                                     bool flushRenderer                    = true);
 
   //------------------------------------------------------------------------------------------------
   //                              Render Target Extension

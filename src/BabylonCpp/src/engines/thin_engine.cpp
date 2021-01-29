@@ -4068,7 +4068,8 @@ void ThinEngine::updateRawTexture2DArray(const InternalTexturePtr& texture,
 
 ArrayBufferView ThinEngine::_readTexturePixels(const InternalTexturePtr& texture, int width,
                                                int height, int faceIndex, int level,
-                                               std::optional<ArrayBufferView> buffer)
+                                               std::optional<ArrayBufferView> buffer,
+                                               bool /*flushRenderer*/)
 {
   return _readTextureExtension->_readTexturePixels(texture, width, height, faceIndex, level,
                                                    buffer);
