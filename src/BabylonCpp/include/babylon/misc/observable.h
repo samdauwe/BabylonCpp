@@ -294,11 +294,19 @@ public:
   void notifyObserver(const typename Observer<T>::Ptr& observer, T* eventData = nullptr,
                       int mask = -1)
   {
+    if (observer._willBeUnregistered) {
+      return;
+    }
+
     auto& state             = _eventState;
     state.mask              = mask;
     state.skipNextObservers = false;
 
     observer.callback(eventData, state);
+
+    if (observer.unregisterOnNextCall) {
+      _deferUnregister(observer);
+    }
   }
 
   /**
@@ -335,7 +343,7 @@ public:
   /**
    * @brief Does this observable handles observer registered with a given mask.
    * @param mask defines the mask to be tested
-   * @return whether or not one observer registered with the given mask is handeled
+   * @return whether or not one observer registered with the given mask is handled
    **/
   bool hasSpecificMask(int mask = -1)
   {
