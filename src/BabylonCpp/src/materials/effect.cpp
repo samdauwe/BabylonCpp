@@ -837,6 +837,13 @@ Effect& Effect::setInt(const std::string& uniformName, int value)
   return *this;
 }
 
+Effect& Effect::setInt2(const std::string& uniformName, int x, int y)
+{
+  setIntArray2(uniformName, {x, y});
+
+  return *this;
+}
+
 Effect& Effect::setIntArray(const std::string& uniformName, const Int32Array& array)
 {
   _valueCache.erase(uniformName);

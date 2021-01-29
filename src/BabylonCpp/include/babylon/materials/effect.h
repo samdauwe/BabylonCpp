@@ -292,6 +292,15 @@ public:
   Effect& setInt(const std::string& uniformName, int value);
 
   /**
+   * @brief Sets an int2 value on a uniform variable.
+   * @param uniformName Name of the variable.
+   * @param x First int in int2.
+   * @param y Second int in int2.
+   * @returns this effect.
+   */
+  Effect& setInt2(const std::string& uniformName, int x, int y);
+
+  /**
    * @brief Sets an int array on a uniform variable.
    * @param uniformName Name of the variable.
    * @param array array to be set.
