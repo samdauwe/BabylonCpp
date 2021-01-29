@@ -7,6 +7,7 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/misc/texture_tools.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 
@@ -99,6 +100,15 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
       internalTexture->isReady = true;
     });
   }
+}
+
+InternalTexturePtr RGBDTextureTools::EncodeTextureToRGBD(const InternalTexturePtr& internalTexture,
+                                                         Scene* scene,
+                                                         unsigned int outputTextureType)
+{
+  return TextureTools::ApplyPostProcess("rgbdEncode", internalTexture, scene, outputTextureType,
+                                        Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+                                        Constants::TEXTUREFORMAT_RGBA);
 }
 
 } // end of namespace BABYLON
