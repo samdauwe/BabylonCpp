@@ -69,4 +69,73 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
   return rtt;
 }
 
+InternalTexturePtr TextureTools::ApplyPostProcess(const std::string& postProcessName,
+                                                  const InternalTexturePtr& internalTexture,
+                                                  Scene* scene, const std::optional<int>& iType,
+                                                  const std::optional<unsigned int>& iSamplingMode,
+                                                  const std::optional<unsigned int>& iFormat)
+{
+  // Gets everything ready.
+  const auto engine = static_cast<Engine*>(internalTexture->getEngine());
+
+  internalTexture->isReady = false;
+
+  const auto samplingMode = iSamplingMode.value_or(internalTexture->samplingMode);
+  const auto type         = iType.has_value() ?
+                              (iType.value() == -1 ? Constants::TEXTURETYPE_UNSIGNED_BYTE :
+                                                     static_cast<unsigned int>(iType.value())) :
+                              internalTexture->type;
+  const auto format       = iFormat.value_or(internalTexture->format);
+
+  {
+    // Create the post process
+    const auto postProcess
+      = PostProcess::New("postprocess", postProcessName, {}, {}, 1.f, nullptr, samplingMode, engine,
+                         false, "", type, "", {}, false, format);
+
+    // Hold the output of the decoding.
+    RenderTargetSize size{
+      internalTexture->width, // width
+      internalTexture->height // height
+    };
+    IRenderTargetOptions options;
+    {
+      options.generateDepthBuffer   = false;
+      options.generateMipMaps       = false;
+      options.generateStencilBuffer = false;
+      options.samplingMode          = samplingMode;
+      options.type                  = type;
+      options.format                = format;
+    }
+    const auto encodedTexture = engine->createRenderTargetTexture(size, options);
+
+    postProcess->getEffect()->executeWhenCompiled([=](Effect* /*effect*/) -> void {
+      // PP Render Pass
+      postProcess->onApply = [=](Effect* effect, EventState& /*es*/) -> void {
+        effect->_bindTexture("textureSampler", internalTexture);
+        effect->setFloat2("scale", 1.f, 1.f);
+      };
+      scene->postProcessManager->directRender({postProcess}, encodedTexture, true);
+
+      // Cleanup
+      engine->restoreDefaultFramebuffer();
+      engine->_releaseTexture(internalTexture);
+      engine->_releaseFramebufferObjects(encodedTexture);
+      if (postProcess) {
+        postProcess->dispose();
+      }
+
+      // Internal Swap
+      encodedTexture->_swapAndDie(internalTexture);
+
+      // Ready to get rolling again.
+      internalTexture->type    = type;
+      internalTexture->format  = Constants::TEXTUREFORMAT_RGBA;
+      internalTexture->isReady = true;
+    });
+  }
+
+  return internalTexture;
+}
+
 } // end of namespace BABYLON
