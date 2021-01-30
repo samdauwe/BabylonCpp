@@ -70,7 +70,7 @@ void RecastJSPlugin::createNavMesh(const std::vector<MeshPtr>& meshes,
 
   Int32Array indices;
   Float32Array positions;
-  int offset = 0;
+  auto offset = 0;
   for (const auto& mesh : meshes) {
     if (mesh) {
       const auto meshIndices = mesh->getIndices();
@@ -82,21 +82,36 @@ void RecastJSPlugin::createNavMesh(const std::vector<MeshPtr>& meshes,
         continue;
       }
 
-      const auto wm = mesh->computeWorldMatrix(true);
+      std::vector<Matrix> worldMatrices;
+      const auto worldMatrix = mesh->computeWorldMatrix(true);
 
-      for (size_t tri = 0; tri < meshIndices.size(); ++tri) {
-        indices.emplace_back(static_cast<int>(meshIndices[tri]) + offset);
+      if (mesh->hasThinInstances()) {
+        auto thinMatrices = mesh->thinInstanceGetWorldMatrices();
+        for (auto& thinMatrix : thinMatrices) {
+          Matrix tmpMatrix;
+          thinMatrix.multiplyToRef(worldMatrix, tmpMatrix);
+          worldMatrices.emplace_back(tmpMatrix);
+        }
+      }
+      else {
+        worldMatrices.emplace_back(worldMatrix);
       }
 
-      auto transformed = Vector3::Zero();
-      auto position    = Vector3::Zero();
-      for (unsigned int pt = 0; pt < meshPositions.size(); pt += 3) {
-        Vector3::FromArrayToRef(meshPositions, pt, position);
-        Vector3::TransformCoordinatesToRef(position, wm, transformed);
-        stl_util::concat(positions, {transformed.x, transformed.y, transformed.z});
-      }
+      for (const auto& wm : worldMatrices) {
+        for (size_t tri = 0; tri < meshIndices.size(); ++tri) {
+          indices.emplace_back(static_cast<int>(meshIndices[tri]) + offset);
+        }
 
-      offset += static_cast<int>(meshPositions.size()) / 3;
+        auto transformed = Vector3::Zero();
+        auto position    = Vector3::Zero();
+        for (unsigned int pt = 0; pt < meshPositions.size(); pt += 3) {
+          Vector3::FromArrayToRef(meshPositions, pt, position);
+          Vector3::TransformCoordinatesToRef(position, wm, transformed);
+          stl_util::concat(positions, {transformed.x, transformed.y, transformed.z});
+        }
+
+        offset += static_cast<int>(meshPositions.size()) / 3;
+      }
     }
   }
 

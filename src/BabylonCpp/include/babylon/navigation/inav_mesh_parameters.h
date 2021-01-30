@@ -46,7 +46,7 @@ struct INavMeshParameters {
   int maxEdgeLen;
 
   /**
-   * The maximum distance a simplfied contour's border edges should deviate
+   * The maximum distance a simplified contour's border edges should deviate
    * the original raw contour. [Limit: >=0] [Units: vx]
    */
   float maxSimplificationError;

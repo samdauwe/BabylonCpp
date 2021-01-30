@@ -34,7 +34,7 @@ struct INavigationEnginePlugin {
 
   /**
    * @brief Creates a navigation mesh.
-   * @param meshes array of all the geometry used to compute the navigatio mesh
+   * @param meshes array of all the geometry used to compute the navigation mesh
    * @param parameters bunch of parameters used to filter geometry
    */
   virtual void createNavMesh(const std::vector<MeshPtr>& meshes,

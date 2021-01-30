@@ -39,7 +39,8 @@ struct IAgentParameters {
   float pathOptimizationRange = 0.f;
 
   /**
-   * How aggresive the agent manager should be at avoiding collisions with this agent. [Limit: >= 0]
+   * How aggressive the agent manager should be at avoiding collisions with this agent. [Limit: >=
+   * 0]
    */
   float separationWeight = -1.f;
 }; // end of struct IAgentParameters
