@@ -47,21 +47,18 @@ public:
     = 0;
 
   /**
-   * @brief Does this action manager handles actions of any of the given
-   * triggers.
+   * @brief Does this action manager handles actions of any of the given triggers.
    * @param triggers defines the triggers to be tested
-   * @return a boolean indicating whether one (or more) of the triggers is
-   * handled
+   * @return a boolean indicating whether one (or more) of the triggers is handled
    */
   [[nodiscard]] virtual bool hasSpecificTriggers(const Uint32Array& triggers) const = 0;
 
   /**
-   * @brief Does this action manager handles actions of any of the given
-   * triggers. This function takes two arguments for speed.
+   * @brief Does this action manager handles actions of any of the given triggers. This function
+   * takes two arguments for speed.
    * @param triggerA defines the trigger to be tested
    * @param triggerB defines the trigger to be tested
-   * @return a boolean indicating whether one (or more) of the triggers is
-   * handled
+   * @return a boolean indicating whether one (or more) of the triggers is handled
    */
   [[nodiscard]] virtual bool hasSpecificTriggers2(unsigned int triggerA,
                                                   unsigned int triggerB) const = 0;
@@ -69,8 +66,7 @@ public:
   /**
    * @brief Does this action manager handles actions of a given trigger.
    * @param trigger defines the trigger to be tested
-   * @param parameterPredicate defines an optional predicate to filter triggers
-   * by parameter
+   * @param parameterPredicate defines an optional predicate to filter triggers by parameter
    * @return whether the trigger is handled
    */
   virtual bool
@@ -110,11 +106,9 @@ public:
   static bool HasPickTriggers();
 
   /**
-   * @brief Does exist one action manager that handles actions of a given
-   *trigger.
+   * @brief Does exist one action manager that handles actions of a given trigger
    * @param trigger defines the trigger to be tested
-   * @return a boolean indicating whether the trigger is handeled by at least
-   *one action manager
+   * @return a boolean indicating whether the trigger is handled by at least one action manager
    **/
   static bool HasSpecificTrigger(unsigned int trigger);
 
@@ -140,8 +134,8 @@ public:
   std::vector<IActionPtr> actions;
 
   /**
-   * Gets or sets a boolean indicating that the manager is recursive meaning
-   * that it can trigger action from children
+   * Gets or sets a boolean indicating that the manager is recursive meaning that it can trigger
+   * action from children
    */
   bool isRecursive;
 

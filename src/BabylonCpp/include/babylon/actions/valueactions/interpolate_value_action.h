@@ -21,7 +21,7 @@ public:
    * @param target defines the object containing the value to interpolate
    * @param propertyPath defines the path to the property in the target object
    * @param value defines the target value at the end of the interpolation
-   * @param duration deines the time it will take for the property to interpolate to the value.
+   * @param duration defines the time it will take for the property to interpolate to the value.
    * @param condition defines the trigger related conditions
    * @param stopOtherAnimations defines if the other scene animations should be stopped when the
    * action has been triggered
