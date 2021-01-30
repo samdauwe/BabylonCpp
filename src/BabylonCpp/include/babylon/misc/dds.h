@@ -4,15 +4,15 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/maths/spherical_polynomial.h>
 
 namespace BABYLON {
 
 class DDSInfo;
-class InternalTexture;
 class ThinEngine;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 // Based on demo done by Brandon Jones - http://media.tojicode.com/webgl-samples/dds.html
 // All values and structures referenced from:

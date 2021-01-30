@@ -353,7 +353,11 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
   if (info.sphericalPolynomial) {
     hasSphericalPolynomialFaces = true;
   }
-  const auto ext = engine->getCaps().s3tc;
+  const auto ext = !!engine->getCaps().s3tc;
+
+  // TODO WEBGPU Once generateMipMaps is split into generateMipMaps + hasMipMaps in InternalTexture
+  // this line can be removed
+  texture->generateMipMaps = loadMipmaps;
 
   const auto dataBuffer = ToArrayBuffer(iArrayBuffer);
   const auto byteOffset = static_cast<int>(GetByteOffset(iArrayBuffer));
@@ -392,15 +396,15 @@ void DDSTools::UploadDDSLevels(ThinEngine* engine, const InternalTexturePtr& tex
     switch (fourCC) {
       case DDS::FOURCC_DXT1:
         blockBytes               = 8;
-        internalCompressedFormat = RGB_S3TC_DXT1_Format;
+        internalCompressedFormat = Constants::TEXTUREFORMAT_COMPRESSED_RGBA_S3TC_DXT1;
         break;
       case DDS::FOURCC_DXT3:
         blockBytes               = 16;
-        internalCompressedFormat = RGBA_S3TC_DXT3_Format;
+        internalCompressedFormat = Constants::TEXTUREFORMAT_COMPRESSED_RGBA_S3TC_DXT3;
         break;
       case DDS::FOURCC_DXT5:
         blockBytes               = 16;
-        internalCompressedFormat = RGBA_S3TC_DXT5_Format;
+        internalCompressedFormat = Constants::TEXTUREFORMAT_COMPRESSED_RGBA_S3TC_DXT5;
         break;
       case DDS::FOURCC_D3DFMT_R16G16B16A16F:
         computeFormats = true;
