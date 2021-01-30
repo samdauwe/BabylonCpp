@@ -45,8 +45,8 @@ public:
 
   /**
    * @brief Start the optimizer. By default it will try to reach a specific framerate
-   * but if the optimizer is set with improvementMode === true then it will run all optimiatiation
-   * while frame rate is above the target frame rate
+   * but if the optimizer is set with improvementMode === true then it will run all optimization
+   * while frame rate is above the target frame rate.
    */
   void start();
 

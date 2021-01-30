@@ -24,7 +24,7 @@ private:
 
 public:
   /**
-   * @brief Converts a panorma stored in RGB right to left up to down format into a cubemap (6
+   * @brief Converts a panorama stored in RGB right to left up to down format into a cubemap (6
    * faces).
    *
    * @param float32Array The source data.

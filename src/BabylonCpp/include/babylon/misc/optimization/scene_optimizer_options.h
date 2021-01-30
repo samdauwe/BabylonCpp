@@ -19,7 +19,7 @@ public:
   /**
    * @brief Creates a new list of options used by SceneOptimizer.
    * @param targetFrameRate defines the target frame rate to reach (60 by default)
-   * @param trackerDuration defines the interval between two checkes (2000ms by default)
+   * @param trackerDuration defines the interval between two checks (2000ms by default)
    */
   SceneOptimizerOptions(float targetFrameRate = 60.f, int trackerDuration = 2000);
   SceneOptimizerOptions(const SceneOptimizerOptions& other);
@@ -85,7 +85,7 @@ public:
   float targetFrameRate;
 
   /**
-   * Defines the interval between two checkes (2000ms by default)
+   * Defines the interval between two checks (2000ms by default)
    */
   int trackerDuration;
 
