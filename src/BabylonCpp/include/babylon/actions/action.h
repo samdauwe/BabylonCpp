@@ -52,6 +52,12 @@ public:
   std::string getTriggerParameter() const override;
 
   /**
+   * @brief Sets the trigger parameter.
+   * @param value defines the new trigger parameter
+   */
+  void setTriggerParameter(const std::string& value);
+
+  /**
    * @brief Internal only - executes current action event.
    */
   void _executeCurrent(const std::optional<IActionEvent>& evt) override;

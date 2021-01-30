@@ -37,6 +37,11 @@ std::string Action::getTriggerParameter() const
   return _triggerParameter;
 }
 
+void Action::setTriggerParameter(const std::string& value)
+{
+  _triggerParameter = value;
+}
+
 void Action::_executeCurrent(const std::optional<IActionEvent>& evt)
 {
   if (_nextActiveAction->_condition) {
