@@ -195,4 +195,28 @@ void Tools::DumpFramebuffer(int /*width*/, int /*height*/, Engine* /*engine*/)
 {
 }
 
+void Tools::StartPerformanceCounter(const std::string&)
+{
+}
+
+void Tools::StartPerformanceCounter(const std::string&, bool)
+{
+}
+
+void Tools::EndPerformanceCounter(const std::string&)
+{
+}
+
+void Tools::EndPerformanceCounter(const std::string&, bool)
+{
+}
+
+void Tools::ExitFullscreen()
+{
+}
+
+void Tools::RequestFullscreen(ICanvas*)
+{
+}
+
 } // end of namespace BABYLON

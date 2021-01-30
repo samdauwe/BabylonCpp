@@ -153,24 +153,28 @@ struct BABYLON_SHARED_EXPORT Tools {
    */
   static void DumpFramebuffer(int width, int height, Engine* engine);
 
-  static void StartPerformanceCounter(const std::string&)
-  {
-  }
-  static void StartPerformanceCounter(const std::string&, bool)
-  {
-  }
-  static void EndPerformanceCounter(const std::string&)
-  {
-  }
-  static void EndPerformanceCounter(const std::string&, bool)
-  {
-  }
-  static void ExitFullscreen()
-  {
-  }
-  static void RequestFullscreen(ICanvas*)
-  {
-  }
+  /**
+   * @brief Starts a performance counter.
+   */
+  static void StartPerformanceCounter(const std::string&);
+
+  /**
+   * @brief Starts a performance counter.
+   */
+  static void StartPerformanceCounter(const std::string&, bool);
+
+  /**
+   * @brief Ends a specific performance counter.
+   */
+  static void EndPerformanceCounter(const std::string&);
+
+  /**
+   * @brief Ends a specific performance counter.
+   */
+  static void EndPerformanceCounter(const std::string&, bool);
+
+  static void ExitFullscreen();
+  static void RequestFullscreen(ICanvas*);
 
 }; // end of struct Tools
 
