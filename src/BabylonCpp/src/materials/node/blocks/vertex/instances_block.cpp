@@ -1,5 +1,7 @@
 #include <babylon/materials/node/blocks/vertex/instances_block.h>
 
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -153,6 +155,8 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
+  const auto engine = state.sharedData->scene->getEngine();
+
   // Register for defines
   state.sharedData->blocksWithDefines.emplace_back(this);
 
@@ -176,7 +180,12 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
     "%s = %s * %s;\r\n", output()->associatedVariableName().c_str(),
     world()->associatedVariableName().c_str(), output()->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
-  state.compilationString += _declareOutput(iInstanceID, state) + " = float(gl_InstanceID);\r\n";
+  if (engine->_caps.canUseGLInstanceID) {
+    state.compilationString += _declareOutput(instanceID, state) + " = 0.0;\r\n";
+  }
+  else {
+    state.compilationString += _declareOutput(iInstanceID, state) + " = float(gl_InstanceID);\r\n";
+  }
   state.compilationString += "#else\r\n";
   state.compilationString
     += _declareOutput(iOutput, state)

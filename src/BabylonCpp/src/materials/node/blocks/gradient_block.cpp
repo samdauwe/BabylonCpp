@@ -154,6 +154,8 @@ std::string GradientBlock::_dumpPropertiesCode()
 {
   std::string codeString = "";
 
+  codeString += StringTools::printf("%s.colorSteps = {};\r\n", _codeVariableName.c_str());
+
   for (const auto& colorStep : colorSteps) {
     codeString += StringTools::printf(
       "%s.colorSteps.emplace_back(GradientBlockColorStep(%s, Color3(%f, %f, %f)));\r\n",

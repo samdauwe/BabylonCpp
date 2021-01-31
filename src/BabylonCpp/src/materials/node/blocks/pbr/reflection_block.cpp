@@ -432,7 +432,7 @@ std::string ReflectionBlock::_dumpPropertiesCode()
   auto codeString = ReflectionTextureBaseBlock::_dumpPropertiesCode();
 
   if (texture) {
-    codeString += StringTools::printf("%s.texture.gammaSpace = %s);\r\n", _codeVariableName.c_str(),
+    codeString += StringTools::printf("%s.texture.gammaSpace = %s;\r\n", _codeVariableName.c_str(),
                                       texture->gammaSpace() ? "true" : "false");
   }
   codeString += StringTools::printf("%s.useSphericalHarmonics = %s;\r\n", _codeVariableName.c_str(),
