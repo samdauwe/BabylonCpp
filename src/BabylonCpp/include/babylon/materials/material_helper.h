@@ -52,7 +52,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param variableName name of the shader variable that will hold the eye position
    */
   static void BindEyePosition(Effect* effect, Scene* scene,
-                              const std::string& variableName = "vEyePosition");
+                              const std::string& variableName = "vEyePosition",
+                              bool isVector3                  = false);
 
   /**
    * @brief Helps preparing the defines values about the UVs in used in the effect. UVs are shared

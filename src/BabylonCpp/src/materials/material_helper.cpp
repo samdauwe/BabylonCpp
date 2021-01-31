@@ -34,7 +34,8 @@ std::unique_ptr<MaterialDefines> MaterialHelper::_TmpMorphInfluencers
   = std::make_unique<MaterialDefines>();
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
 
-void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene, const std::string& variableName)
+void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene, const std::string& variableName,
+                                     bool)
 {
   if (scene->_forcedViewPosition) {
     effect->setVector3(variableName, *scene->_forcedViewPosition);
