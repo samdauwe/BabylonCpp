@@ -17,7 +17,7 @@
 namespace BABYLON {
 
 FogBlock::FogBlock(const std::string& iName)
-    : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment, true}
+    : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment, false}
     , worldPosition{this, &FogBlock::get_worldPosition}
     , view{this, &FogBlock::get_view}
     , input{this, &FogBlock::get_input}

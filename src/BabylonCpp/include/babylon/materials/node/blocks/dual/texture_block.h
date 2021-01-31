@@ -4,14 +4,13 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class Texture;
-class TextureBlock;
-using TexturePtr      = std::shared_ptr<Texture>;
-using TextureBlockPtr = std::shared_ptr<TextureBlock>;
+FWD_CLASS_SPTR(Texture)
+FWD_CLASS_SPTR(TextureBlock)
 
 /**
  * @brief Block used to read a texture from a sampler.

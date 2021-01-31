@@ -134,6 +134,11 @@ NodeMaterialBlockTargets& TextureBlock::get_target()
         || parent->target() == NodeMaterialBlockTargets::VertexAndFragment) {
       auto& parentBlock = parent->ownerBlock();
 
+      if (parentBlock->target() == NodeMaterialBlockTargets::Fragment) {
+        _currentTarget = NodeMaterialBlockTargets::Fragment;
+        return _currentTarget;
+      }
+
       parent = nullptr;
       for (const auto& input : parentBlock->inputs()) {
         if (input->connectedPoint()) {
@@ -380,7 +385,8 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  if (state.target == NodeMaterialBlockTargets::Vertex || _fragmentOnly) {
+  if (state.target == NodeMaterialBlockTargets::Vertex || _fragmentOnly
+      || (state.target == NodeMaterialBlockTargets::Fragment && _tempTextureRead == "")) {
     _tempTextureRead = state._getFreeVariableName("tempTextureRead");
   }
 

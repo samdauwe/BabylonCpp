@@ -207,11 +207,12 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
   // Declaration
   if (!light) { // Emit for all lights
-    state._emitFunctionFromInclude(
-      state.supportUniformBuffers ? "lightUboDeclaration" : "lightFragmentDeclaration", iComments,
-      EmitFunctionFromIncludeOptions{
-        "maxSimultaneousLights" // repeatKey
-      });
+    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightVxUboDeclaration" :
+                                                                 "lightVxFragmentDeclaration",
+                                   iComments,
+                                   EmitFunctionFromIncludeOptions{
+                                     "maxSimultaneousLights" // repeatKey
+                                   });
     _lightId = 0;
 
     state.sharedData->dynamicUniformBlocks.emplace_back(this);
@@ -229,8 +230,8 @@ void LightBlock::_injectVertexCode(NodeMaterialBuildState& state)
       "{X}",                   // search
       std::to_string(_lightId) // replace
     }};
-    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
-                                                                 "lightFragmentDeclaration",
+    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightVxUboDeclaration" :
+                                                                 "lightVxFragmentDeclaration",
                                    iComments, options, std::to_string(_lightId));
   }
 
