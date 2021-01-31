@@ -50,7 +50,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   int maxVertexUniformVectors;
   /** Maximum number of uniforms per fragment shader */
   int maxFragmentUniformVectors;
-  /** Defines if standard derivates (dx/dy) are supported */
+  /** Defines if standard derivatives (dx/dy) are supported */
   bool standardDerivatives;
   /** Defines if s3tc texture compression is supported */
   std::optional<GL::WEBGL_compressed_texture_s3tc> s3tc;
@@ -115,6 +115,9 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   unsigned int maxMSAASamples = 1;
   /** Defines if the blend min max extension is supported */
   bool blendMinMax;
+  /** In some iOS + WebGL1, gl_InstanceID (and gl_InstanceIDEXT) is undefined even if
+   * instancedArrays is true. So don't use gl_InstanceID in those cases */
+  bool canUseGLInstanceID;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON
