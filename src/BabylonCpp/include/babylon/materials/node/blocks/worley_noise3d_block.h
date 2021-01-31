@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_WORLEY_NOISE_3D_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class WorleyNoise3DBlock;
-using WorleyNoise3DBlockPtr = std::shared_ptr<WorleyNoise3DBlock>;
+FWD_CLASS_SPTR(WorleyNoise3DBlock)
 
 /**
  * @brief Block used to Generate a Worley Noise 3D Noise Pattern.
@@ -40,13 +40,12 @@ public:
   std::string _dumpPropertiesCode() override;
 
   /**
-   * @brief Serializes this block in a JSON representation.
-   * @returns the serialized block object
+   * @brief Exposes the properties to the Serialize?
    */
   json serialize() const override;
 
   /**
-   * @brief Hidden
+   * @brief Exposes the properties to the deserialize?
    */
   void _deserialize(const json& serializationObject, Scene* scene,
                     const std::string& rootUrl) override;

@@ -177,7 +177,7 @@ public:
 
   /**
    * This parameters will make the material used its opacity to control how much it is refracting
-   * aginst not. Materials half opaque for instance using refraction could benefit from this
+   * against not. Materials half opaque for instance using refraction could benefit from this
    * control.
    */
   // @editableInPropertyPage("Link refraction to transparency", PropertyTypeForEdition.Boolean,

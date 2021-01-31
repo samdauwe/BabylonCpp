@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_VERTEX_INSTANCES_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class InstancesBlock;
-using InstancesBlockPtr = std::shared_ptr<InstancesBlock>;
+FWD_CLASS_SPTR(InstancesBlock)
 
 /**
  * @brief Block used to add support for instances.
