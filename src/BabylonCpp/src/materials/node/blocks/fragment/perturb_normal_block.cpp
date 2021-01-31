@@ -168,7 +168,9 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
     emitFunctionFromIncludeOptions.replaceStrings
       = {{"vBumpInfos.y", replaceForBumpInfos},
          {"vTangentSpaceParams", _tangentSpaceParameterName},
-         {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"}};
+         {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
+         {"varying vec2 vBumpUV;", ""},
+         {R"(uniform sampler2D bumpSampler;[\s\S]*?\})", ""}};
     state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
                                    emitFunctionFromIncludeOptions);
   }

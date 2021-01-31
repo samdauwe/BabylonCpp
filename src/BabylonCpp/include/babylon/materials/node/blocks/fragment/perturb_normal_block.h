@@ -2,15 +2,15 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_FRAGMENT_PERTURB_NORMAL_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class PerturbNormalBlock;
-using PerturbNormalBlockPtr = std::shared_ptr<PerturbNormalBlock>;
+FWD_CLASS_SPTR(PerturbNormalBlock)
 
 /**
- * @brief Block used to pertub normals based on a normal map.
+ * @brief Block used to perturb normals based on a normal map.
  */
 class BABYLON_SHARED_EXPORT PerturbNormalBlock : public NodeMaterialBlock {
 
