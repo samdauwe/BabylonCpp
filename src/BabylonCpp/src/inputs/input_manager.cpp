@@ -358,18 +358,20 @@ void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
     auto& actionManager = _pickedUpMesh->actionManager;
     if (actionManager && !clickInfo.ignore()) {
       actionManager->processTrigger(Constants::ACTION_OnPickUpTrigger,
-                                    ActionEvent::CreateNew(_pickedUpMesh, evt));
+                                    ActionEvent::CreateNew(_pickedUpMesh, evt, pickResult));
 
       if (!clickInfo.hasSwiped() && clickInfo.singleClick()) {
-        actionManager->processTrigger(Constants::ACTION_OnPickTrigger,
-                                      ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+        actionManager->processTrigger(
+          Constants::ACTION_OnPickTrigger,
+          ActionEvent::CreateNew(pickResult->pickedMesh, evt, pickResult));
       }
 
       auto doubleClickActionManager
         = _pickedUpMesh->_getActionManagerForTrigger(Constants::ACTION_OnDoublePickTrigger);
       if (clickInfo.doubleClick() && doubleClickActionManager) {
-        doubleClickActionManager->processTrigger(Constants::ACTION_OnDoublePickTrigger,
-                                                 ActionEvent::CreateNew(_pickedUpMesh, evt));
+        doubleClickActionManager->processTrigger(
+          Constants::ACTION_OnDoublePickTrigger,
+          ActionEvent::CreateNew(_pickedUpMesh, evt, pickResult));
       }
     }
   }
@@ -921,6 +923,7 @@ void InputManager::detachControl()
   // Keyboard
   _alreadyAttachedTo->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
   _alreadyAttachedTo->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
+  _keyboardIsAttached = false;
 
   _alreadyAttached = false;
 }
