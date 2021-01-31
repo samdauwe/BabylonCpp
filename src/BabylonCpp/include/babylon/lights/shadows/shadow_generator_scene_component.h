@@ -2,6 +2,7 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_SCENE_COMPONENT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/iscene_serializable_component.h>
 #include <babylon/engines/scene_component_constants.h>
@@ -11,10 +12,8 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class AbstractScene;
-class ShadowGeneratorSceneComponent;
-class RenderTargetTexture;
-using ShadowGeneratorSceneComponentPtr = std::shared_ptr<ShadowGeneratorSceneComponent>;
-using RenderTargetTexturePtr           = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(ShadowGeneratorSceneComponent)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Defines the shadow generator component responsible to manage any shadow generators in a
@@ -24,7 +23,7 @@ class BABYLON_SHARED_EXPORT ShadowGeneratorSceneComponent : public ISceneSeriali
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene components.
+   * The component name helpful to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_SHADOWGENERATOR;
 

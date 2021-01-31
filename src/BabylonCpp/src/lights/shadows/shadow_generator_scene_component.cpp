@@ -58,8 +58,8 @@ void ShadowGeneratorSceneComponent::_gatherRenderTargets(
       auto shadowGenerator = light->getShadowGenerator();
 
       if (light->isEnabled() && light->shadowEnabled && shadowGenerator) {
-        auto shadowMap = shadowGenerator->getShadowMap();
-        auto it        = std::find_if(
+        const auto shadowMap = shadowGenerator->getShadowMap();
+        const auto it        = std::find_if(
           scene->textures.begin(), scene->textures.end(),
           [&shadowMap](const BaseTexturePtr& texture) { return texture == shadowMap; });
         if (it != scene->textures.end()) {
