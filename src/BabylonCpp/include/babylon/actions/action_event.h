@@ -3,6 +3,7 @@
 
 #include <babylon/actions/iaction_event.h>
 #include <babylon/babylon_api.h>
+#include <babylon/collisions/picking_info.h>
 
 namespace BABYLON {
 
@@ -23,7 +24,7 @@ public:
    */
   ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
               const AbstractMeshPtr& meshUnderPointer, const std::optional<Event>& sourceEvent,
-              const std::string& additionalData = "");
+              const std::optional<PickingInfo>& additionalData = std::nullopt);
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
   ActionEvent& operator=(const ActionEvent& other);
@@ -38,7 +39,8 @@ public:
    * @returns the new ActionEvent
    */
   static ActionEvent CreateNew(const AbstractMeshPtr& source,
-                               const std::optional<Event>& evt = std::nullopt);
+                               const std::optional<Event>& evt                  = std::nullopt,
+                               const std::optional<PickingInfo>& additionalData = std::nullopt);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a source sprite.
@@ -67,9 +69,9 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
-                                            const Event& evt,
-                                            const std::string& additionalData = "");
+  static ActionEvent
+  CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos, const Event& evt,
+                         const std::optional<PickingInfo>& additionalData = std::nullopt);
 
 }; // end of class ActionEvent
 

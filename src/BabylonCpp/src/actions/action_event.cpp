@@ -8,8 +8,9 @@ namespace BABYLON {
 ActionEvent::ActionEvent(const AbstractMeshPtr& iSource, int iPointerX, int iPointerY,
                          const AbstractMeshPtr& iMeshUnderPointer,
                          const std::optional<Event>& iSourceEvent,
-                         const std::string& iAdditionalData)
-    : IActionEvent{iSource, iPointerX, iPointerY, iMeshUnderPointer, iSourceEvent, iAdditionalData}
+                         const std::optional<PickingInfo>& /*iAdditionalData*/)
+    : IActionEvent{iSource,           iPointerX,    iPointerY,
+                   iMeshUnderPointer, iSourceEvent, /*iAdditionalData*/ ""}
 {
 }
 
@@ -23,10 +24,12 @@ ActionEvent& ActionEvent::operator=(ActionEvent&& other) = default;
 
 ActionEvent::~ActionEvent() = default;
 
-ActionEvent ActionEvent::CreateNew(const AbstractMeshPtr& iSource, const std::optional<Event>& evt)
+ActionEvent ActionEvent::CreateNew(const AbstractMeshPtr& iSource, const std::optional<Event>& evt,
+                                   const std::optional<PickingInfo>& iAdditionalData)
 {
   auto scene = iSource->getScene();
-  return ActionEvent(iSource, scene->pointerX(), scene->pointerY(), scene->meshUnderPointer(), evt);
+  return ActionEvent(iSource, scene->pointerX(), scene->pointerY(), scene->meshUnderPointer(), evt,
+                     iAdditionalData);
 }
 
 ActionEvent ActionEvent::CreateNewFromSprite(const SpritePtr& iSource, Scene* scene,
@@ -45,7 +48,7 @@ ActionEvent ActionEvent::CreateNewFromScene(Scene* scene, const Event& evt)
 
 ActionEvent ActionEvent::CreateNewFromPrimitive(const AbstractMeshPtr& prim,
                                                 const Vector2& pointerPos, const Event& evt,
-                                                const std::string& iAdditionalData)
+                                                const std::optional<PickingInfo>& iAdditionalData)
 {
   return ActionEvent(prim, static_cast<int>(pointerPos.x), static_cast<int>(pointerPos.y), nullptr,
                      evt, iAdditionalData);
