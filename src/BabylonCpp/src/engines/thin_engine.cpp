@@ -158,6 +158,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
 
   _isStencilEnable = options.stencil;
   _initGLContext();
+  _initFeatures();
 
   // Prepare buffer pointers
   for (unsigned int i = 0, ul = static_cast<unsigned>(_caps.maxVertexAttribs); i < ul; ++i) {
@@ -548,6 +549,27 @@ void ThinEngine::_initGLContext()
     _coreContextVAO = _gl->createVertexArray();
   }
 #endif
+}
+
+void ThinEngine::_initFeatures()
+{
+  _features.forceBitmapOverHTMLImageElement           = false;
+  _features.supportRenderAndCopyToLodForFloatTextures = _webGLVersion != 1.f;
+  _features.supportDepthStencilTexture                = _webGLVersion != 1.f;
+  _features.supportShadowSamplers                     = _webGLVersion != 1.f;
+  _features.uniformBufferHardCheckMatrix              = false;
+  _features.allowTexturePrefiltering                  = _webGLVersion != 1.f;
+  _features.trackUbosInFrame                          = false;
+  _features.supportCSM                                = _webGLVersion != 1.f;
+  _features.basisNeedsPOT                             = _webGLVersion == 1.f;
+  _features.support3DTextures                         = _webGLVersion != 1.f;
+  _features.needTypeSuffixInShaderConstants           = _webGLVersion != 1.f;
+  _features.supportMSAA                               = _webGLVersion != 1.f;
+  _features.supportSSAO2                              = _webGLVersion != 1.f;
+  _features.supportExtendedTextureFormats             = _webGLVersion != 1.f;
+  _features.supportSwitchCaseInShader                 = _webGLVersion != 1.f;
+  _features.supportSyncTextureRead                    = true;
+  _features._collectUbosUpdatedInFrame                = false;
 }
 
 float ThinEngine::get_webGLVersion() const

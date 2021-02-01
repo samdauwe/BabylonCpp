@@ -11,6 +11,7 @@
 #include <babylon/core/structs.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine_capabilities.h>
+#include <babylon/engines/engine_features.h>
 #include <babylon/engines/engine_options.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/vector4.h>
@@ -1802,6 +1803,7 @@ protected:
 
   virtual void _rebuildBuffers();
   void _initGLContext();
+  void _initFeatures();
   /** VBOs **/
   /** @hidden */
   void _resetVertexBufferBinding();
@@ -1950,6 +1952,8 @@ public:
 
   /** @hidden */
   EngineCapabilities _caps;
+  /** @hidden */
+  EngineFeatures _features;
 
   /** @hidden */
   bool _videoTextureSupported = false;
