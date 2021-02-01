@@ -22,7 +22,7 @@ public:
   /**
    * @brief Instantiates a ColorGradingTexture from the following parameters.
    *
-   * @param url The location of the color gradind data (currently only supporting 3dl)
+   * @param url The location of the color grading data (currently only supporting 3dl)
    * @param sceneOrEngine The scene or engine the texture will be used in
    * @param onLoad defines a callback triggered when the texture has been loaded
    */
@@ -39,7 +39,7 @@ public:
   Matrix* getTextureMatrix(int uBase = 1) override;
 
   /**
-   * @brief Clones the color gradind texture.
+   * @brief Clones the color grading texture.
    */
   std::unique_ptr<ColorGradingTexture> clone() const;
 
@@ -53,7 +53,7 @@ public:
    * @param parsedTexture The texture information being parsedTexture
    * @param scene The scene to load the texture in
    * @param rootUrl The root url of the data assets to load
-   * @return A color gradind texture
+   * @return A color grading texture
    */
   static std::unique_ptr<ColorGradingTexture> Parse(const json& parsedTexture, Scene* scene,
                                                     const std::string& rootUrl);

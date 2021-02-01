@@ -67,7 +67,8 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
 {
   const auto engine          = _getEngine();
   InternalTexturePtr texture = nullptr;
-  if (engine->webGLVersion() == 1.f) {
+
+  if (!engine->_features.support3DTextures) {
     texture = engine->createRawTexture(Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false,
                                        false, TextureConstants::BILINEAR_SAMPLINGMODE, "",
                                        Constants::TEXTURETYPE_UNSIGNED_INT);
@@ -78,13 +79,12 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
                                          Constants::TEXTURETYPE_UNSIGNED_INT);
   }
 
-  _texture = texture;
-
   _texture          = texture;
   _texture->isReady = false;
 
-  isCube                    = false;
-  is3D                      = engine->webGLVersion() > 1.f;
+  isCube = false;
+
+  is3D                      = engine->_features.support3DTextures;
   wrapU                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
   wrapV                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
   wrapR                     = Constants::TEXTURE_CLAMP_ADDRESSMODE;
