@@ -208,7 +208,7 @@ void HDRCubeTexture::loadTexture()
     return results;
   };
 
-  if (_getEngine()->webGLVersion() >= 2.f && _prefilterOnLoad) {
+  if (_getEngine()->_features.allowTexturePrefiltering && _prefilterOnLoad) {
     _onLoad = [this]() -> void {
       const auto previousOnLoad = _onLoad;
       HDRFiltering hdrFiltering(_getEngine());
