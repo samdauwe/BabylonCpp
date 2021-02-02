@@ -729,7 +729,7 @@ void RenderTargetTexture::renderToTarget(unsigned int faceIndex, bool useCameraP
 
   // Before Camera Draw
   for (const auto& step : scene->_beforeRenderTargetDrawStage) {
-    step.action(std::static_pointer_cast<RenderTargetTexture>(shared_from_this()));
+    step.action(std::static_pointer_cast<RenderTargetTexture>(shared_from_this()), -1, -1);
   }
 
   // Render
@@ -738,7 +738,7 @@ void RenderTargetTexture::renderToTarget(unsigned int faceIndex, bool useCameraP
 
   // After Camera Draw
   for (const auto& step : scene->_afterRenderTargetDrawStage) {
-    step.action(std::static_pointer_cast<RenderTargetTexture>(shared_from_this()));
+    step.action(std::static_pointer_cast<RenderTargetTexture>(shared_from_this()), -1, -1);
   }
 
   if (_postProcessManager) {

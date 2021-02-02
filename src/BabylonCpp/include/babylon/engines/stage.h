@@ -49,7 +49,8 @@ using CameraStageFrameBufferAction = std::function<bool(Camera* camera)>;
 /**
  * Strong typing of a Render Target related stage step action
  */
-using RenderTargetStageAction = std::function<void(const RenderTargetTexturePtr& renderTarget)>;
+using RenderTargetStageAction
+  = std::function<void(const RenderTargetTexturePtr& renderTarget, int faceIndex, int layer)>;
 
 /**
  * Strong typing of a RenderingGroup related stage step action

@@ -33,12 +33,12 @@ void LayerSceneComponent::_register()
 
   scene->_beforeRenderTargetDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERTARGETDRAW_LAYER, this,
-    [this](const RenderTargetTexturePtr& renderTarget) -> void {
+    [this](const RenderTargetTexturePtr& renderTarget, int /*faceIndex*/, int /*layer*/) -> void {
       _drawRenderTargetBackground(renderTarget);
     });
   scene->_afterRenderTargetDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERTARGETDRAW_LAYER, this,
-    [this](const RenderTargetTexturePtr& renderTarget) -> void {
+    [this](const RenderTargetTexturePtr& renderTarget, int /*faceIndex*/, int /*layer*/) -> void {
       _drawRenderTargetForeground(renderTarget);
     });
 }
