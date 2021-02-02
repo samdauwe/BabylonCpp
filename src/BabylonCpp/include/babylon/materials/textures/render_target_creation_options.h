@@ -12,6 +12,11 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT RenderTargetCreationOptions {
   /**
+   * Specifies if mipmaps must be created. If undefined, the value from generateMipMaps is taken
+   * instead
+   */
+  std::optional<bool> createMipMaps = std::nullopt;
+  /**
    * Specifies if mipmaps must be generated
    */
   std::optional<bool> generateMipMaps = std::nullopt;
@@ -37,6 +42,10 @@ struct BABYLON_SHARED_EXPORT RenderTargetCreationOptions {
    * Defines format (RGBA by default)
    */
   std::optional<unsigned int> format = std::nullopt;
+  /**
+   * Defines sample count (1 by default)
+   */
+  std::optional<unsigned int> samples = std::nullopt;
 }; // end of struct RenderTargetCreationOptions
 
 } // end of namespace BABYLON
