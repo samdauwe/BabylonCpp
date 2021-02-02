@@ -41,11 +41,12 @@ struct BABYLON_SHARED_EXPORT SceneComponentConstants {
 
   static constexpr unsigned int STEP_CAMERADRAWRENDERTARGET_EFFECTLAYER = 1;
 
-  static constexpr unsigned int STEP_BEFORECAMERADRAW_EFFECTLAYER = 0;
-  static constexpr unsigned int STEP_BEFORECAMERADRAW_LAYER       = 1;
-  static constexpr unsigned int STEP_BEFORECAMERADRAW_PREPASS     = 2;
+  static constexpr unsigned int STEP_BEFORECAMERADRAW_PREPASS     = 0;
+  static constexpr unsigned int STEP_BEFORECAMERADRAW_EFFECTLAYER = 1;
+  static constexpr unsigned int STEP_BEFORECAMERADRAW_LAYER       = 2;
 
-  static constexpr unsigned int STEP_BEFORERENDERTARGETDRAW_LAYER = 0;
+  static constexpr unsigned int STEP_BEFORERENDERTARGETDRAW_PREPASS = 0;
+  static constexpr unsigned int STEP_BEFORERENDERTARGETDRAW_LAYER   = 1;
 
   static constexpr unsigned int STEP_BEFORERENDERINGMESH_PREPASS = 0;
   static constexpr unsigned int STEP_BEFORERENDERINGMESH_OUTLINE = 1;
@@ -61,13 +62,14 @@ struct BABYLON_SHARED_EXPORT SceneComponentConstants {
 
   static constexpr unsigned int STEP_BEFORECLEAR_PROCEDURALTEXTURE = 0;
 
-  static constexpr unsigned int STEP_AFTERRENDERTARGETDRAW_LAYER = 0;
+  static constexpr unsigned int STEP_AFTERRENDERTARGETDRAW_PREPASS = 0;
+  static constexpr unsigned int STEP_AFTERRENDERTARGETDRAW_LAYER   = 1;
 
-  static constexpr unsigned int STEP_AFTERCAMERADRAW_EFFECTLAYER      = 0;
-  static constexpr unsigned int STEP_AFTERCAMERADRAW_LENSFLARESYSTEM  = 1;
-  static constexpr unsigned int STEP_AFTERCAMERADRAW_EFFECTLAYER_DRAW = 2;
-  static constexpr unsigned int STEP_AFTERCAMERADRAW_LAYER            = 3;
-  static constexpr unsigned int STEP_AFTERCAMERADRAW_PREPASS          = 4;
+  static constexpr unsigned int STEP_AFTERCAMERADRAW_PREPASS          = 0;
+  static constexpr unsigned int STEP_AFTERCAMERADRAW_EFFECTLAYER      = 1;
+  static constexpr unsigned int STEP_AFTERCAMERADRAW_LENSFLARESYSTEM  = 2;
+  static constexpr unsigned int STEP_AFTERCAMERADRAW_EFFECTLAYER_DRAW = 3;
+  static constexpr unsigned int STEP_AFTERCAMERADRAW_LAYER            = 4;
 
   static constexpr unsigned int STEP_AFTERRENDER_AUDIO = 0;
 
@@ -78,7 +80,8 @@ struct BABYLON_SHARED_EXPORT SceneComponentConstants {
 
   static constexpr unsigned int STEP_GATHERACTIVECAMERARENDERTARGETS_DEPTHRENDERER = 0;
 
-  static constexpr unsigned int STEP_BEFORECLEARSTAGE_PREPASS = 0;
+  static constexpr unsigned int STEP_BEFORECLEARSTAGE_PREPASS             = 0;
+  static constexpr unsigned int STEP_BEFORERENDERTARGETCLEARSTAGE_PREPASS = 0;
 
   static constexpr unsigned int STEP_POINTERMOVE_SPRITE = 0;
   static constexpr unsigned int STEP_POINTERDOWN_SPRITE = 0;
