@@ -7,14 +7,14 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/misc/dds_info.h>
 
 namespace BABYLON {
 
 class EventState;
-class InternalTexture;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 struct CubeTextureData {
   bool isDDS;
@@ -30,7 +30,7 @@ struct CubeTextureData {
 struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
   virtual ~IInternalTextureLoader() = default;
   /**
-   * @brief Defines wether the loader supports cascade loading the different faces.
+   * @brief Defines whether the loader supports cascade loading the different faces.
    */
   virtual bool supportCascades() const = 0;
 

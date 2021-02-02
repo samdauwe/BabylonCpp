@@ -48,7 +48,7 @@ public:
 
   /**
    * @brief Get the underlying lower level texture from Babylon.
-   * @returns the insternal texture
+   * @returns the internal texture
    */
   InternalTexturePtr& getInternalTexture();
 

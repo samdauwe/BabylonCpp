@@ -87,12 +87,12 @@ protected:
     = nullptr);
 
   /**
-   * @brief Sets wether or not the texture is blocking during loading.
+   * @brief Sets whether or not the texture is blocking during loading.
    */
   void set_isBlocking(bool value) override;
 
   /**
-   * @brief Gets wether or not the texture is blocking during loading.
+   * @brief Gets whether or not the texture is blocking during loading.
    */
   bool get_isBlocking() const override;
 
