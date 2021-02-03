@@ -27,19 +27,19 @@ public:
   ~PickingInfo(); // = default
 
   /**
-   * @brief Gets the normal corresponding to the face the pick collided with
-   * @param useWorldCoordinates If the resulting normal should be relative to
-   * the world (default: false)
-   * @param useVerticesNormals If the vertices normals should be used to
-   * calculate the normal instead of the normal map
+   * @brief Gets the normal corresponding to the face the pick collided with.
+   * @param useWorldCoordinates If the resulting normal should be relative to the world (default:
+   * false)
+   * @param useVerticesNormals If the vertices normals should be used to calculate the normal
+   * instead of the normal map
    * @returns The normal corresponding to the face the pick collided with
    */
   std::optional<Vector3> getNormal(bool useWorldCoordinates = false,
                                    bool useVerticesNormals  = true);
 
   /**
-   * @brief Gets the texture coordinates of where the pick occured.
-   * @returns the vector containing the coordnates of the texture
+   * @brief Gets the texture coordinates of where the pick occurred.
+   * @returns the vector containing the coordinates of the texture
    */
   std::optional<Vector2> getTextureCoordinates();
 
