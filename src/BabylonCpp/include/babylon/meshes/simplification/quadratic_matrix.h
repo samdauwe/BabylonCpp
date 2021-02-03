@@ -7,9 +7,6 @@
 
 namespace BABYLON {
 
-/**
- * @brief
- */
 class BABYLON_SHARED_EXPORT QuadraticMatrix {
 
 public:
@@ -30,8 +27,7 @@ public:
   QuadraticMatrix add(const QuadraticMatrix& matrix);
 
   static QuadraticMatrix FromData(float a, float b, float c, float d);
-  static std::array<float, 10> DataFromNumbers(float a, float b, float c,
-                                               float d);
+  static std::array<float, 10> DataFromNumbers(float a, float b, float c, float d);
 
 private:
   std::array<float, 10> data;

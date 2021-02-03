@@ -7,9 +7,6 @@
 
 namespace BABYLON {
 
-/**
- * @brief
- */
 class BABYLON_SHARED_EXPORT DecimationVertex {
 
 public:
