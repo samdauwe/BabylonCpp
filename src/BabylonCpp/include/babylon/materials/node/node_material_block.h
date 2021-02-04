@@ -372,8 +372,14 @@ public:
    */
   bool visibleInInspector;
 
+  /** Gets or sets a boolean indicating that this input can be edited from a collapsed frame*/
+  bool visibleOnFrame;
+
   /** Hidden */
   size_t _preparationId;
+
+  /** @hidden */
+  const bool _originalTargetIsNeutral;
 
   /**
    * Gets or sets the name of the block

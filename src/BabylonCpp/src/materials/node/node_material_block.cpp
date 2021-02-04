@@ -16,6 +16,8 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
                                      bool isFinalMerger, bool isInput)
     : inputsAreExclusive{false}
     , visibleInInspector{false}
+    , visibleOnFrame{false}
+    , _originalTargetIsNeutral{target == NodeMaterialBlockTargets::Neutral}
     , name{this, &NodeMaterialBlock::get_name, &NodeMaterialBlock::set_name}
     , isUnique{this, &NodeMaterialBlock::get_isUnique}
     , isFinalMerger{this, &NodeMaterialBlock::get_isFinalMerger}
@@ -510,8 +512,9 @@ std::string NodeMaterialBlock::_outputRename(const std::string& iName)
 std::string NodeMaterialBlock::_dumpPropertiesCode()
 {
   const auto& variableName = _codeVariableName;
-  return StringTools::printf("%s.visibleInInspector = %s;\r\n", variableName.c_str(),
-                             visibleInInspector ? "true" : "false");
+  return StringTools::printf("%s.visibleInInspector = %s;\r\n %s.visibleOnFrame = %s;\r\n",
+                             variableName.c_str(), visibleInInspector ? "true" : "false",
+                             variableName.c_str(), visibleOnFrame ? "true" : "false");
 }
 
 std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
