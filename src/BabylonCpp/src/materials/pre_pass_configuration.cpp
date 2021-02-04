@@ -29,7 +29,8 @@ void PrePassConfiguration::AddSamplers(std::vector<std::string>& /*samplers*/)
 void PrePassConfiguration::bindForSubMesh(const EffectPtr& effect, Scene* scene, Mesh* mesh,
                                           const Matrix& world, bool /*isFrozen*/)
 {
-  if (scene->prePassRenderer() && scene->prePassRenderer()->enabled()) {
+  if (scene->prePassRenderer() && scene->prePassRenderer()->enabled()
+      && scene->prePassRenderer()->currentRTisSceneRT()) {
     if (scene->prePassRenderer()->getIndex(Constants::PREPASS_VELOCITY_TEXTURE_TYPE) != -1) {
       if (!stl_util::contains(previousWorldMatrices, mesh->uniqueId)) {
         previousWorldMatrices[mesh->uniqueId] = Matrix::Identity();
