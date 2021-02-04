@@ -185,6 +185,7 @@ std::string DetailMapConfiguration::getClassName() const
 void DetailMapConfiguration::AddUniforms(std::vector<std::string>& uniforms)
 {
   uniforms.emplace_back("vDetailInfos");
+  uniforms.emplace_back("detailMatrix");
 }
 
 void DetailMapConfiguration::AddSamplers(std::vector<std::string>& samplers)
