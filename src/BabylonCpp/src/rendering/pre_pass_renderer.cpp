@@ -64,6 +64,8 @@ PrePassRenderer::PrePassRenderer(Scene* scene)
     , imageProcessingPostProcess{nullptr}
     , enabled{this, &PrePassRenderer::get_enabled}
     , samples{this, &PrePassRenderer::get_samples, &PrePassRenderer::set_samples}
+    , defaultRT{nullptr}
+    , currentRTisSceneRT{this, &PrePassRenderer::get_currentRTisSceneRT}
     , useGeometryBufferFallback{this, &PrePassRenderer::get_useGeometryBufferFallback,
                                 &PrePassRenderer::set_useGeometryBufferFallback}
     , disableGammaTransform{false}
@@ -72,6 +74,7 @@ PrePassRenderer::PrePassRenderer(Scene* scene)
     , _clearColor{Color4(0.f, 0.f, 0.f, 0.f)}
     , _enabled{false}
     , _geometryBuffer{nullptr}
+    , _currentTarget{nullptr}
     , _useGeometryBufferFallback{false}
 {
   _scene  = scene;
@@ -105,6 +108,11 @@ void PrePassRenderer::set_samples(unsigned int n)
   }
 
   prePassRT->samples = n;
+}
+
+bool PrePassRenderer::get_currentRTisSceneRT() const
+{
+  return _currentTarget == defaultRT;
 }
 
 bool PrePassRenderer::get_useGeometryBufferFallback() const

@@ -21,6 +21,7 @@ FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiRenderTarget)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
+FWD_STRUCT_SPTR(PrePassRenderTarget)
 FWD_CLASS_SPTR(SubSurfaceConfiguration)
 
 struct TextureFormatMapping {
@@ -123,6 +124,12 @@ protected:
   void set_samples(unsigned int n);
 
   /**
+   * @brief Returns true if the currently rendered prePassRenderTarget is the one associated with
+   * the scene.
+   */
+  bool get_currentRTisSceneRT() const;
+
+  /**
    * @brief Uses the geometry buffer renderer as a fallback for non prepass capable effects.
    */
   bool get_useGeometryBufferFallback() const;
@@ -197,6 +204,17 @@ public:
   Property<PrePassRenderer, unsigned int> samples;
 
   /**
+   * The render target where the scene is directly rendered
+   */
+  PrePassRenderTargetPtr defaultRT;
+
+  /**
+   * Returns true if the currently rendered prePassRenderTarget is the one associated with the
+   * scene.
+   */
+  ReadOnlyProperty<PrePassRenderer, bool> currentRTisSceneRT;
+
+  /**
    * Uses the geometry buffer renderer as a fallback for non prepass capable effects
    */
   Property<PrePassRenderer, bool> useGeometryBufferFallback;
@@ -236,6 +254,7 @@ private:
   std::vector<unsigned int> _mrtLayout;
   bool _enabled;
   GeometryBufferRendererPtr _geometryBuffer;
+  PrePassRenderTargetPtr _currentTarget;
   bool _useGeometryBufferFallback;
 
 }; // end of class PrePassRenderer
