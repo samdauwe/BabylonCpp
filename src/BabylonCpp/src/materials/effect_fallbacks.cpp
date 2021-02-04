@@ -121,6 +121,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
         StringTools::replaceInPlace(currentDefines, "#define " + currentFallback, "");
       }
     }
+
     ++_currentRank;
   }
 
