@@ -46,9 +46,9 @@ public:
   void _attachCameras(const std::vector<CameraPtr>& cameras);
 
   /**
-   * @brief Detatches the effect on cameras.
-   * @param cameras The camera to detatch from.
-   * Hidden
+   * @brief Detaches the effect on cameras.
+   * @param cameras The camera to detach from.
+   * @hidden
    */
   void _detachCameras(const std::vector<CameraPtr>& cameras);
 

@@ -173,7 +173,7 @@ void PostProcessRenderPipeline::_reset()
 
 bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(unsigned int sampleCount)
 {
-  if (engine->webGLVersion() == 1.f) {
+  if (!engine->_features.supportMSAA) {
     return false;
   }
 
