@@ -97,7 +97,7 @@ public:
   void disableEdgeBlur();
 
   /**
-   * @brief Sets the amout of grain.
+   * @brief Sets the amount of grain.
    * @param amount Amount of grain
    */
   void setGrainAmount(float amount);
@@ -190,10 +190,8 @@ public:
   void disableHighlights();
 
   /**
-   * @brief Removes the internal pipeline assets and detaches the pipeline from
-   * the scene cameras.
-   * @param disableDepthRender If the scens depth rendering should be disabled
-   * (default: false)
+   * @brief Removes the internal pipeline assets and detaches the pipeline from the scene cameras
+   * @param disableDepthRender If the scene's depth rendering should be disabled (default: false)
    */
   void dispose(bool disableDepthRender = false, bool disposeMaterialAndTextures = false) override;
 

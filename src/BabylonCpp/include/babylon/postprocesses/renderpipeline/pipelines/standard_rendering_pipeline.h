@@ -112,14 +112,14 @@ protected:
   void set_exposure(float value);
 
   /**
-   * @brief Gets wether or not the exposure of the overall pipeline should be automatically adjusted
-   * by the HDR post-process.
+   * @brief Gets whether or not the exposure of the overall pipeline should be automatically
+   * adjusted by the HDR post-process.
    */
   bool get_hdrAutoExposure() const;
 
   /**
-   * @brief Sets wether or not the exposure of the overall pipeline should be automatically adjusted
-   * by the HDR post-process.
+   * @brief Sets whether or not the exposure of the overall pipeline should be automatically
+   * adjusted by the HDR post-process.
    */
   void set_hdrAutoExposure(bool value);
 
@@ -136,92 +136,92 @@ protected:
   void set_motionStrength(float strength);
 
   /**
-   * @brief Gets wether or not the motion blur post-process is object based or screen based.
+   * @brief Gets whether or not the motion blur post-process is object based or screen based.
    */
   bool get_objectBasedMotionBlur() const;
 
   /**
-   * @brief Sets wether or not the motion blur post-process should be object based or screen based.
+   * @brief Sets whether or not the motion blur post-process should be object based or screen based.
    */
   void set_objectBasedMotionBlur(bool value);
 
   /**
-   * @brief Gets wether or not the bloom pipeline is enabled.
+   * @brief Gets whether or not the bloom pipeline is enabled.
    */
   bool get_bloomEnabled() const;
 
   /**
-   * @brief Sets wether or not the bloom pipeline is enabled.
+   * @brief Sets whether or not the bloom pipeline is enabled.
    */
   void set_bloomEnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the depth of field pipeline is enabled.
+   * @brief Gets whether or not the depth of field pipeline is enabled.
    */
   bool get_depthOfFieldEnabled() const;
 
   /**
-   * @brief Sets wether or not the depth of field pipeline is enabled.
+   * @brief Sets whether or not the depth of field pipeline is enabled.
    */
   void set_depthOfFieldEnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the lens flare pipeline is enabled.
+   * @brief Gets whether or not the lens flare pipeline is enabled.
    */
   bool get_lensFlareEnabled() const;
 
   /**
-   * @brief Sets wether or not the lens flare pipeline is enabled.
+   * @brief Sets whether or not the lens flare pipeline is enabled.
    */
   void set_lensFlareEnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the HDR pipeline is enabled.
+   * @brief Gets whether or not the HDR pipeline is enabled.
    */
   bool get_HDREnabled() const;
 
   /**
-   * @brief Sets wether or not the HDR pipeline is enabled.
+   * @brief Sets whether or not the HDR pipeline is enabled.
    */
   void set_HDREnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the volumetric lights scattering effect is enabled.
+   * @brief Gets whether or not the volumetric lights scattering effect is enabled.
    */
   bool get_VLSEnabled() const;
 
   /**
-   * @brief Sets wether or not the volumetric lights scattering effect is enabled.
+   * @brief Sets whether or not the volumetric lights scattering effect is enabled.
    */
   void set_VLSEnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the motion blur effect is enabled.
+   * @brief Gets whether or not the motion blur effect is enabled.
    */
   bool get_motionBlurEnabled() const;
 
   /**
-   * @brief Sets wether or not the motion blur effect is enabled.
+   * @brief Sets whether or not the motion blur effect is enabled.
    */
   void set_motionBlurEnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the anti-aliasing is enabled.
+   * @brief Gets whether or not the anti-aliasing is enabled.
    */
   bool get_fxaaEnabled() const;
 
   /**
-   * @brief Sets wether or not the anti-aliasing is enabled.
+   * @brief Sets whether or not the anti-aliasing is enabled.
    */
   void set_fxaaEnabled(bool enabled);
 
   /**
-   * @brief Gets wether or not the screen space reflections are enabled.
+   * @brief Gets whether or not the screen space reflections are enabled.
    */
   bool get_screenSpaceReflectionsEnabled() const;
 
   /**
-   * @brief Sets wether or not the screen space reflections are enabled.
+   * @brief Sets whether or not the screen space reflections are enabled.
    */
   void set_screenSpaceReflectionsEnabled(bool enabled);
 
@@ -384,7 +384,8 @@ public:
    */
   PostProcessPtr depthOfFieldPostProcess;
   /**
-   * The Fast Approximate Anti-Aliasing post process which attemps to remove aliasing from an image.
+   * The Fast Approximate Anti-Aliasing post process which attempts to remove aliasing from an
+   * image.
    */
   FxaaPostProcessPtr fxaaPostProcess;
   /**
@@ -416,7 +417,7 @@ public:
   Property<StandardRenderingPipeline, float> exposure;
 
   /**
-   * Wether or not the exposure of the overall pipeline should be automatically adjusted by the HDR
+   * Whether or not the exposure of the overall pipeline should be automatically adjusted by the HDR
    * post-process
    */
   Property<StandardRenderingPipeline, bool> hdrAutoExposure;
@@ -511,7 +512,7 @@ public:
   Property<StandardRenderingPipeline, float> motionStrength;
 
   /**
-   * Gets or sets wether or not the motion blur post-process is object based or screen based
+   * Gets or sets whether or not the motion blur post-process is object based or screen based
    */
   Property<StandardRenderingPipeline, bool> objectBasedMotionBlur;
 
@@ -526,12 +527,12 @@ public:
   Property<StandardRenderingPipeline, bool> bloomEnabled;
 
   /**
-   * Specifies if the depth of field pipeline is enabed
+   * Specifies if the depth of field pipeline is enabled
    */
   Property<StandardRenderingPipeline, bool> depthOfFieldEnabled;
 
   /**
-   * Specifies if the lens flare pipeline is enabed
+   * Specifies if the lens flare pipeline is enabled
    */
   Property<StandardRenderingPipeline, bool> lensFlareEnabled;
 
