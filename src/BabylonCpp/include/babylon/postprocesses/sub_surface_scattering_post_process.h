@@ -2,12 +2,12 @@
 #define BABYLON_POSTPROCESSES_SUB_SURFACE_SCATTERING_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class SubSurfaceScatteringPostProcess;
-using SubSurfaceScatteringPostProcessPtr = std::shared_ptr<SubSurfaceScatteringPostProcess>;
+FWD_CLASS_SPTR(SubSurfaceScatteringPostProcess)
 
 /**
  * @brief Sub surface scattering post process.

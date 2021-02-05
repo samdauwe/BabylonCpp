@@ -97,12 +97,14 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
         = prePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
       const auto roughnessIndex
         = prePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
-      const auto normalIndex = prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE);
+      const auto normalIndex = prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
 
-      effect->setTexture("normalSampler", prePassRenderer->prePassRT->textures()[normalIndex]);
-      effect->setTexture("positionSampler", prePassRenderer->prePassRT->textures()[positionIndex]);
+      effect->setTexture("normalSampler",
+                         prePassRenderer->getRenderTarget()->textures()[normalIndex]);
+      effect->setTexture("positionSampler",
+                         prePassRenderer->getRenderTarget()->textures()[positionIndex]);
       effect->setTexture("reflectivitySampler",
-                         prePassRenderer->prePassRT->textures()[roughnessIndex]);
+                         prePassRenderer->getRenderTarget()->textures()[roughnessIndex]);
     }
 
     // Uniforms
@@ -111,8 +113,8 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
       return;
     }
 
-    const auto& viewMatrix       = camera->getViewMatrix();
-    const auto& projectionMatrix = camera->getProjectionMatrix();
+    const auto& viewMatrix       = camera->getViewMatrix(true);
+    const auto& projectionMatrix = camera->getProjectionMatrix(true);
 
     effect->setMatrix("projection", projectionMatrix);
     effect->setMatrix("view", viewMatrix);
@@ -181,9 +183,6 @@ void ScreenSpaceReflectionPostProcess::_updateEffectDefines()
   std::vector<std::string> defines;
   if (_geometryBufferRenderer || _prePassRenderer) {
     defines.emplace_back("#define SSR_SUPPORTED");
-    if (_prePassRenderer) {
-      defines.emplace_back("#define PREPASS_LAYOUT");
-    }
   }
   if (_enableSmoothReflections) {
     defines.emplace_back("#define ENABLE_SMOOTH_REFLECTIONS");

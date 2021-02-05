@@ -13,8 +13,8 @@ namespace BABYLON {
 FWD_CLASS_SPTR(BlurPostProcess)
 
 /**
- * @brief  The Blur Post Process which blurs an image based on a kernel and direction.
- * Can be used twice in x and y directions to perform a guassian blur in two passes.
+ * @brief The Blur Post Process which blurs an image based on a kernel and direction.
+ * Can be used twice in x and y directions to perform a gaussian blur in two passes.
  */
 class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
@@ -154,7 +154,7 @@ public:
   Property<BlurPostProcess, float> kernel;
 
   /**
-   * Wether or not the blur needs to unpack/repack floats
+   * Whether or not the blur needs to unpack/repack floats
    */
   Property<BlurPostProcess, bool> packedFloat;
 

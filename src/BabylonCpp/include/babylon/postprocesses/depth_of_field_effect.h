@@ -33,7 +33,7 @@ public:
   ~DepthOfFieldEffect(); // = default
 
   /**
-   * @brief Get the current class name of the current effet.
+   * @brief Get the current class name of the current effect.
    * @returns "DepthOfFieldEffect"
    */
   std::string getClassName() const;
@@ -93,7 +93,7 @@ protected:
 
   /**
    * @brief Max lens size in scene units/1000 (eg. millimeter). Standard cameras are 50mm. (default:
-   * 50) The diamater of the resulting aperture can be computed by lensSize/fStop.
+   * 50) The diameter of the resulting aperture can be computed by lensSize/fStop.
    */
   void set_lensSize(float value);
   float get_lensSize() const;
@@ -133,7 +133,7 @@ public:
 
   /**
    * Max lens size in scene units/1000 (eg. millimeter). Standard cameras are 50mm. (default: 50)
-   * The diamater of the resulting aperture can be computed by lensSize/fStop.
+   * The diameter of the resulting aperture can be computed by lensSize/fStop.
    */
   Property<DepthOfFieldEffect, float> lensSize;
 

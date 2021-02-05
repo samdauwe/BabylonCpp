@@ -387,8 +387,10 @@ void ImageProcessingPostProcess::_updateParameters()
 
   std::vector<std::string> uniforms{"scale"};
 
-  ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
-  ImageProcessingConfiguration::PrepareUniforms(uniforms, _defines);
+  /* if (ImageProcessingConfiguration) */ {
+    ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
+    ImageProcessingConfiguration::PrepareUniforms(uniforms, _defines);
+  }
 
   updateEffect(defines, uniforms, samplers);
 }

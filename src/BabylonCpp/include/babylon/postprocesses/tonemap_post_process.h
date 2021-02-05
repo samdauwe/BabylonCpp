@@ -26,6 +26,7 @@ public:
    * by default)
    */
   TonemapPostProcess(const std::string& name, const TonemappingOperator& operator_,
+                     /** Defines the required exposure adjustment */
                      float exposureAdjustment, const CameraPtr& camera,
                      const std::optional<unsigned int>& samplingMode = std::nullopt,
                      Engine* engine                                  = nullptr,

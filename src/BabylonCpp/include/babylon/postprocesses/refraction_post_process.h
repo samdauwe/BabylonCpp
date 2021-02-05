@@ -2,18 +2,17 @@
 #define BABYLON_POSTPROCESSES_REFRACTION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class RefractionPostProcess;
-class Texture;
-using RefractionPostProcessPtr = std::shared_ptr<RefractionPostProcess>;
-using TexturePtr               = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(RefractionPostProcess)
+FWD_CLASS_SPTR(Texture)
 
 /**
- * @brief Post process which applies a refractin texture.
+ * @brief Post process which applies a refraction texture.
  * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses#refraction
  */
 class BABYLON_SHARED_EXPORT RefractionPostProcess : public PostProcess {

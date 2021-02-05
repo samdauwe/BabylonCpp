@@ -66,7 +66,7 @@ protected:
 
 public:
   /**
-   * The amount of seperation of rgb channels (default: 30)
+   * The amount of separation of rgb channels (default: 30)
    */
   float aberrationAmount;
 
@@ -76,14 +76,14 @@ public:
   float radialIntensity;
 
   /**
-   * The normilized direction in which the rgb channels should be seperated. If set to 0,0 radial
+   * The normalized direction in which the rgb channels should be separated. If set to 0,0 radial
    * direction will be used. (default: Vector2(0.707,0.707))
    */
   Vector2 direction;
 
   /**
    * The center position where the radialIntensity should be around. [0.5,0.5 is center of screen,
-   * 1,1 is top right corder] (default: Vector2(0.5 ,0.5))
+   * 1,1 is top right corner] (default: Vector2(0.5 ,0.5))
    */
   Vector2 centerPosition;
 

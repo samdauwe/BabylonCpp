@@ -2,13 +2,13 @@
 #define BABYLON_POSTPROCESSES_STEREOSCOPIC_INTERLACE_POST_PROCESS_I_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class StereoscopicInterlacePostProcessI;
-using StereoscopicInterlacePostProcessIPtr = std::shared_ptr<StereoscopicInterlacePostProcessI>;
+FWD_CLASS_SPTR(StereoscopicInterlacePostProcessI)
 
 /**
  * @brief StereoscopicInterlacePostProcessI used to render stereo views from a rigged camera with
@@ -38,7 +38,7 @@ protected:
   /**
    * @brief Initializes a StereoscopicInterlacePostProcessI.
    * @param name The name of the effect.
-   * @param rigCameras The rig cameras to be appled to the post process
+   * @param rigCameras The rig cameras to be applied to the post process
    * @param isStereoscopicHoriz If the rendered results are horizontal or vertical
    * @param isStereoscopicInterlaced If the rendered results are alternate line interlaced
    * @param samplingMode The sampling mode to be used when computing the pass. (default: 0)

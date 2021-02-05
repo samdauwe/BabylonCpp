@@ -41,7 +41,7 @@ ScreenSpaceCurvaturePostProcess::ScreenSpaceCurvaturePostProcess(
   }
   else {
     // Geometry buffer renderer is supported.
-    onApply = [this](Effect* effect, EventState & /*es*/) -> void {
+    onApply = [this](Effect* effect, EventState& /*es*/) -> void {
       effect->setFloat("curvature_ridge", 0.5f / std::max(ridge * ridge, 1e-4f));
       effect->setFloat("curvature_valley", 0.7f / std::max(valley * valley, 1e-4f));
 
@@ -65,7 +65,7 @@ bool ScreenSpaceCurvaturePostProcess::IsSupported()
     return false;
   }
 
-  return engine->webGLVersion() > 1.f || engine->getCaps().drawBuffersExtension;
+  return engine->getCaps().drawBuffersExtension;
 }
 
 ScreenSpaceCurvaturePostProcessPtr

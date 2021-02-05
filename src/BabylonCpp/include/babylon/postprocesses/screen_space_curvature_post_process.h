@@ -2,14 +2,13 @@
 #define BABYLON_POSTPROCESSES_SCREEN_SPACE_CURVATUTE_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class GeometryBufferRenderer;
-class ScreenSpaceCurvaturePostProcess;
-using GeometryBufferRendererPtr          = std::shared_ptr<GeometryBufferRenderer>;
-using ScreenSpaceCurvaturePostProcessPtr = std::shared_ptr<ScreenSpaceCurvaturePostProcess>;
+FWD_CLASS_SPTR(GeometryBufferRenderer)
+FWD_CLASS_SPTR(ScreenSpaceCurvaturePostProcess)
 
 /**
  * @brief The Screen Space curvature effect can help highlighting ridge and valley of a model.

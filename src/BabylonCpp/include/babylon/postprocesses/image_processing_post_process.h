@@ -2,19 +2,17 @@
 #define BABYLON_POSTPROCESSES_IMAGE_PROCESSING_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
-class BaseTexture;
 class ColorCurves;
-class ImageProcessingConfiguration;
-class ImageProcessingPostProcess;
-using BaseTexturePtr                  = std::shared_ptr<BaseTexture>;
-using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
-using ImageProcessingPostProcessPtr   = std::shared_ptr<ImageProcessingPostProcess>;
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(ImageProcessingConfiguration)
+FWD_CLASS_SPTR(ImageProcessingPostProcess)
 
 /**
  * @brief ImageProcessingPostProcess
@@ -88,12 +86,12 @@ protected:
   void set_colorCurves(const std::shared_ptr<ColorCurves>& value);
 
   /**
-   * @brief Gets wether the color curves effect is enabled.
+   * @brief Gets whether the color curves effect is enabled.
    */
   [[nodiscard]] bool get_colorCurvesEnabled() const;
 
   /**
-   * Sets wether the color curves effect is enabled.
+   * Sets whether the color curves effect is enabled.
    */
   void set_colorCurvesEnabled(bool value);
 
@@ -108,12 +106,12 @@ protected:
   void set_colorGradingTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief Gets wether the color grading effect is enabled.
+   * @brief Gets whether the color grading effect is enabled.
    */
   [[nodiscard]] bool get_colorGradingEnabled() const;
 
   /**
-   * @brief Gets wether the color grading effect is enabled.
+   * @brief Gets whether the color grading effect is enabled.
    */
   void set_colorGradingEnabled(bool value);
 
@@ -128,12 +126,12 @@ protected:
   void set_exposure(float value);
 
   /**
-   * @brief Gets wether tonemapping is enabled or not.
+   * @brief Gets whether tonemapping is enabled or not.
    */
   [[nodiscard]] bool get_toneMappingEnabled() const;
 
   /**
-   * @brief Sets wether tonemapping is enabled or not
+   * @brief Sets whether tonemapping is enabled or not
    */
   void set_toneMappingEnabled(bool value);
 
@@ -230,22 +228,22 @@ protected:
   void set_vignetteBlendMode(unsigned int value);
 
   /**
-   * @brief Gets wether the vignette effect is enabled.
+   * @brief Gets whether the vignette effect is enabled.
    */
   [[nodiscard]] bool get_vignetteEnabled() const;
 
   /**
-   * @brief Sets wether the vignette effect is enabled.
+   * @brief Sets whether the vignette effect is enabled.
    */
   void set_vignetteEnabled(bool value);
 
   /**
-   * @brief Gets wether the input of the processing is in Gamma or Linear Space.
+   * @brief Gets whether the input of the processing is in Gamma or Linear Space.
    */
   [[nodiscard]] bool get_fromLinearSpace() const;
 
   /**
-   * @brief Sets wether the input of the processing is in Gamma or Linear Space.
+   * @brief Sets whether the input of the processing is in Gamma or Linear Space.
    */
   void set_fromLinearSpace(bool value);
 
@@ -270,7 +268,7 @@ public:
   Property<ImageProcessingPostProcess, std::shared_ptr<ColorCurves>> colorCurves;
 
   /**
-   * Wether the color curves effect is enabled.
+   * whether the color curves effect is enabled.
    */
   Property<ImageProcessingPostProcess, bool> colorCurvesEnabled;
 
@@ -280,7 +278,7 @@ public:
   Property<ImageProcessingPostProcess, BaseTexturePtr> colorGradingTexture;
 
   /**
-   * Wether the color grading effect is enabled.
+   * whether the color grading effect is enabled.
    */
   Property<ImageProcessingPostProcess, bool> colorGradingEnabled;
 
@@ -290,7 +288,7 @@ public:
   Property<ImageProcessingPostProcess, float> exposure;
 
   /**
-   * Wether tonemapping is enabled or not.
+   * whether tonemapping is enabled or not.
    */
   Property<ImageProcessingPostProcess, bool> toneMappingEnabled;
 
@@ -341,12 +339,12 @@ public:
   Property<ImageProcessingPostProcess, unsigned int> vignetteBlendMode;
 
   /**
-   * Wether the vignette effect is enabled.
+   * whether the vignette effect is enabled.
    */
   Property<ImageProcessingPostProcess, bool> vignetteEnabled;
 
   /**
-   * Wether the input of the processing is in Gamma or Linear Space.
+   * whether the input of the processing is in Gamma or Linear Space.
    */
   Property<ImageProcessingPostProcess, bool> fromLinearSpace;
 

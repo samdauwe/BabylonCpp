@@ -7,6 +7,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
@@ -102,6 +103,8 @@ void PostProcessManager::directRender(const std::vector<PostProcessPtr>& postPro
       else if (!doNotBindFrambuffer) {
         engine->restoreDefaultFramebuffer();
       }
+      engine->_debugInsertMarker(
+        StringTools::printf("post process %s output", postProcesses[index]->name.c_str()));
     }
 
     auto pp     = postProcesses[index];
@@ -115,7 +118,7 @@ void PostProcessManager::directRender(const std::vector<PostProcessPtr>& postPro
       engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 
       // Draw order
-      engine->drawElementsType(Material::TriangleFillMode, 0, 6);
+      engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, 6);
 
       pp->onAfterRenderObservable.notifyObservers(effect.get());
     }
@@ -160,6 +163,8 @@ void PostProcessManager::_finalizeFrame(bool doNotPresent, const InternalTexture
         engine->restoreDefaultFramebuffer();
         pp->_outputTexture = nullptr;
       }
+      engine->_debugInsertMarker(
+        StringTools::printf("post process %s output", postProcesses[index]->name.c_str()));
     }
 
     if (doNotPresent) {
@@ -176,7 +181,7 @@ void PostProcessManager::_finalizeFrame(bool doNotPresent, const InternalTexture
       engine->bindBuffers(_vertexBuffers, _indexBuffer, effect);
 
       // Draw order
-      engine->drawElementsType(Material::TriangleFillMode, 0, 6);
+      engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, 6);
 
       pp->onAfterRenderObservable.notifyObservers(effect.get());
     }

@@ -59,7 +59,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene, RenderTargetTexture* iDepth
   auto ratio              = 1.f;
   for (int i = 0; i < blurCount; ++i) {
     auto blurY = DepthOfFieldBlurPostProcess::New(
-      "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize, ratio, nullptr,
+      "vertical blur", scene, Vector2(0.f, 1.f), adjustedKernelSize, ratio, nullptr,
       _depthOfFieldPass, i == 0 ? _circleOfConfusion : nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false, pipelineTextureType,
       blockCompilation);

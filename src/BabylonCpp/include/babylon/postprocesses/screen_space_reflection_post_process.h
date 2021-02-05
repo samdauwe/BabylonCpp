@@ -62,16 +62,16 @@ protected:
                                    const CameraPtr& camera, unsigned int samplingMode = 0,
                                    Engine* engine = nullptr, bool reusable = false,
                                    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
-                                   bool blockCompilation = false, bool forceGeometryBuffer = true);
+                                   bool blockCompilation = false, bool forceGeometryBuffer = false);
 
   /**
-   * @brief Gets wether or not smoothing reflections is enabled.
+   * @brief Gets whether or not smoothing reflections is enabled.
    * Enabling smoothing will require more GPU power and can generate a drop in FPS.
    */
   bool get_enableSmoothReflections() const;
 
   /**
-   * @brief Sets wether or not smoothing reflections is enabled.
+   * @brief Sets whether or not smoothing reflections is enabled.
    * Enabling smoothing will require more GPU power and can generate a drop in FPS.
    */
   void set_enableSmoothReflections(bool enabled);
@@ -137,7 +137,7 @@ public:
   float roughnessFactor;
 
   /**
-   * Gets or sets wether or not smoothing reflections is enabled.
+   * Gets or sets whether or not smoothing reflections is enabled.
    * Enabling smoothing will require more GPU power and can generate a drop in FPS.
    */
   Property<ScreenSpaceReflectionPostProcess, bool> enableSmoothReflections;

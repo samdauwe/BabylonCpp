@@ -37,16 +37,18 @@ SubSurfaceScatteringPostProcess::SubSurfaceScatteringPostProcess(
     effect->setFloat2("texelSize", iTexelSize.x, iTexelSize.y);
     effect->setTexture(
       "irradianceSampler",
-      _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
+      _scene->prePassRenderer()->getRenderTarget()->textures()[_scene->prePassRenderer()->getIndex(
         Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE)]);
     effect->setTexture(
       "depthSampler",
-      _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
-        Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
+      _scene->prePassRenderer()
+        ->getRenderTarget()
+        ->textures()[_scene->prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     effect->setTexture(
       "albedoSampler",
-      _scene->prePassRenderer()->prePassRT->textures()[_scene->prePassRenderer()->getIndex(
-        Constants::PREPASS_ALBEDO_TEXTURE_TYPE)]);
+      _scene->prePassRenderer()
+        ->getRenderTarget()
+        ->textures()[_scene->prePassRenderer()->getIndex(Constants::PREPASS_ALBEDO_TEXTURE_TYPE)]);
     effect->setFloat2("viewportSize",
                       std::tan(_scene->activeCamera()->fov / 2.f)
                         * _scene->getEngine()->getAspectRatio(*_scene->activeCamera(), true),
