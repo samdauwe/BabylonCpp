@@ -31,7 +31,7 @@ class BABYLON_SHARED_EXPORT PBRSheenConfiguration {
 
 public:
   /**
-   * @brief Instantiate a new istance of clear coat configuration.
+   * @brief Instantiate a new instance of clear coat configuration.
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
   PBRSheenConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
@@ -61,7 +61,7 @@ public:
    * @brief Binds the material data.
    * @param uniformBuffer defines the Uniform buffer to fill in.
    * @param scene defines the scene the material belongs to.
-   * @param isFrozen defines wether the material is frozen or not.
+   * @param isFrozen defines whether the material is frozen or not.
    * @param subMesh the submesh to bind data for
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, bool isFrozen,

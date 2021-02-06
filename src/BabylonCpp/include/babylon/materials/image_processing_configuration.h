@@ -125,12 +125,12 @@ public:
 
 protected:
   /**
-   * @brief Gets wether the color curves effect is enabled.
+   * @brief Gets whether the color curves effect is enabled.
    */
   bool get_colorCurvesEnabled() const;
 
   /**
-   * @brief Sets wether the color curves effect is enabled.
+   * @brief Sets whether the color curves effect is enabled.
    */
   void set_colorCurvesEnabled(bool value);
 
@@ -148,32 +148,32 @@ protected:
   void set_colorGradingTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief Gets wether the color grading effect is enabled.
+   * @brief Gets whether the color grading effect is enabled.
    */
   bool get_colorGradingEnabled() const;
 
   /**
-   * @brief Sets wether the color grading effect is enabled.
+   * @brief Sets whether the color grading effect is enabled.
    */
   void set_colorGradingEnabled(bool value);
 
   /**
-   * @brief Gets wether the color grading effect is using a green depth for the 3d Texture.
+   * @brief Gets whether the color grading effect is using a green depth for the 3d Texture.
    */
   bool get_colorGradingWithGreenDepth() const;
 
   /**
-   * @brief Sets wether the color grading effect is using a green depth for the 3d Texture.
+   * @brief Sets whether the color grading effect is using a green depth for the 3d Texture.
    */
   void set_colorGradingWithGreenDepth(bool value);
 
   /**
-   * @brief Gets wether the color grading texture contains BGR values.
+   * @brief Gets whether the color grading texture contains BGR values.
    */
   bool get_colorGradingBGR() const;
 
   /**
-   * @brief Sets wether the color grading texture contains BGR values.
+   * @brief Sets whether the color grading texture contains BGR values.
    */
   void set_colorGradingBGR(bool value);
 
@@ -188,12 +188,12 @@ protected:
   void set_exposure(float value);
 
   /**
-   * @brief Gets wether the tone mapping effect is enabled.
+   * @brief Gets whether the tone mapping effect is enabled.
    */
   bool get_toneMappingEnabled() const;
 
   /**
-   * @brief Sets wether the tone mapping effect is enabled.
+   * @brief Sets whether the tone mapping effect is enabled.
    */
   void set_toneMappingEnabled(bool value);
 
@@ -228,33 +228,33 @@ protected:
   void set_vignetteBlendMode(unsigned int value);
 
   /**
-   * @brief Gets wether the vignette effect is enabled.
+   * @brief Gets whether the vignette effect is enabled.
    */
   bool get_vignetteEnabled() const;
 
   /**
-   * @brief Sets wether the vignette effect is enabled.
+   * @brief Sets whether the vignette effect is enabled.
    */
   void set_vignetteEnabled(bool value);
 
   /**
-   * @brief Gets wether the image processing is applied through a post process
+   * @brief Gets whether the image processing is applied through a post process
    * or not.
    */
   bool get_applyByPostProcess() const;
 
   /**
-   * @brief Sets wether the image processing is applied through a post process
+   * @brief Sets whether the image processing is applied through a post process
    * or not.
    */
   void set_applyByPostProcess(bool value);
 
   /**
-   * @brief Gets wether the image processing is enabled or not.
+   * @brief Gets whether the image processing is enabled or not.
    */
   bool get_isEnabled() const;
   /**
-   * @brief Sets wether the image processing is enabled or not.
+   * @brief Sets whether the image processing is enabled or not.
    */
   void set_isEnabled(bool value);
 
@@ -266,22 +266,22 @@ protected:
 
 public:
   /**
-   * Wether the color curves effect is enabled.
+   * Whether the color curves effect is enabled.
    */
   Property<ImageProcessingConfiguration, bool> colorCurvesEnabled;
 
   /**
-   * Wether the color grading effect is enabled.
+   * Whether the color grading effect is enabled.
    */
   Property<ImageProcessingConfiguration, bool> colorGradingEnabled;
 
   /**
-   * Wether the color grading effect is using a green depth for the 3d Texture.
+   * Whether the color grading effect is using a green depth for the 3d Texture.
    */
   Property<ImageProcessingConfiguration, bool> colorGradingWithGreenDepth;
 
   /**
-   * Wether the color grading texture contains BGR values.
+   * Whether the color grading texture contains BGR values.
    */
   Property<ImageProcessingConfiguration, bool> colorGradingBGR;
 
@@ -291,7 +291,7 @@ public:
   Property<ImageProcessingConfiguration, float> exposure;
 
   /**
-   * Wether the tone mapping effect is enabled.
+   * Whether the tone mapping effect is enabled.
    */
   Property<ImageProcessingConfiguration, bool> toneMappingEnabled;
 
@@ -311,17 +311,17 @@ public:
   Property<ImageProcessingConfiguration, unsigned int> vignetteBlendMode;
 
   /**
-   *Wether the vignette effect is enabled.
+   * Whether the vignette effect is enabled.
    */
   Property<ImageProcessingConfiguration, bool> vignetteEnabled;
 
   /**
-   * Wether the image processing is applied through a post process or not.
+   * Whether the image processing is applied through a post process or not.
    */
   Property<ImageProcessingConfiguration, bool> applyByPostProcess;
 
   /**
-   * Wether the image processing is enabled or not.
+   * Whether the image processing is enabled or not.
    */
   Property<ImageProcessingConfiguration, bool> isEnabled;
 

@@ -6,22 +6,20 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector2.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class IAnimatable;
-class BaseTexture;
 class EffectFallbacks;
 struct MaterialDefines;
 class Scene;
 class UniformBuffer;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
-using BaseTexturePtr  = std::shared_ptr<BaseTexture>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(IAnimatable)
 
 /**
  * @brief Define the code related to the anisotropic parameters of the pbr material.
@@ -30,7 +28,7 @@ class BABYLON_SHARED_EXPORT PBRAnisotropicConfiguration {
 
 public:
   /**
-   * @brief Instantiate a new istance of anisotropy configuration.
+   * @brief Instantiate a new instance of anisotropy configuration.
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to dirty
    */
   PBRAnisotropicConfiguration(const std::function<void()>& markAllSubMeshesAsTexturesDirty);
@@ -61,7 +59,7 @@ public:
    * @brief Binds the material data.
    * @param uniformBuffer defines the Uniform buffer to fill in.
    * @param scene defines the scene the material belongs to.
-   * @param isFrozen defines wether the material is frozen or not.
+   * @param isFrozen defines whether the material is frozen or not.
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, bool isFrozen);
 
@@ -163,7 +161,7 @@ public:
 
   /**
    * Defines if the effect is along the tangents, bitangents or in between.
-   * By default, the effect is "strectching" the highlights along the tangents.
+   * By default, the effect is "stretching" the highlights along the tangents.
    */
   Vector2 direction;
 

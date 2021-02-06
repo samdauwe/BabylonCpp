@@ -50,7 +50,7 @@ public:
 
 public:
   /**
-   * @brief Instantiate a new istance of clear coat configuration.
+   * @brief Instantiate a new instance of clear coat configuration.
    * @param markAllSubMeshesAsMiscDirty Callback to flag the material to dirty
    */
   PBRBRDFConfiguration(const std::function<void()>& markAllSubMeshesAsMiscDirty);
