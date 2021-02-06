@@ -353,7 +353,7 @@ void ImageProcessingConfiguration::prepareDefines(IImageProcessingConfigurationD
 
 bool ImageProcessingConfiguration::isReady() const
 {
-  // Color Grading texure can not be none blocking.
+  // Color Grading texture can not be none blocking.
   return !colorGradingEnabled() || !_colorGradingTexture || _colorGradingTexture->isReady();
 }
 

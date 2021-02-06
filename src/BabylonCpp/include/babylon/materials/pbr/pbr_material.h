@@ -2,14 +2,13 @@
 #define BABYLON_MATERIALS_PBR_PBR_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/pbr/pbr_base_material.h>
 
 namespace BABYLON {
 
-class ColorCurves;
-class PBRMaterial;
-using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
-using PBRMaterialPtr = std::shared_ptr<PBRMaterial>;
+FWD_CLASS_SPTR(ColorCurves)
+FWD_CLASS_SPTR(PBRMaterial)
 
 /**
  * @brief The Physically based material of BJS.
@@ -117,7 +116,7 @@ protected:
 
   /**
    * Intensity of the environment e.g. how much the environment will light the object
-   * either through harmonics for rough material or through the refelction for shiny ones.
+   * either through harmonics for rough material or through the reflection for shiny ones.
    */
   [[nodiscard]] float get_environmentIntensity() const;
   void set_environmentIntensity(float value);
@@ -311,7 +310,7 @@ protected:
 
   /**
    * This parameters will make the material used its opacity to control how much it is refracting
-   * aginst not. Materials half opaque for instance using refraction could benefit from this
+   * against not. Materials half opaque for instance using refraction could benefit from this
    * control.
    */
   [[nodiscard]] bool get_linkRefractionWithTransparency() const;
@@ -344,7 +343,7 @@ protected:
 
   /**
    * Specifies that the material will keep the specular highlights over a transparent surface (only
-   * the most limunous ones). A car glass is a good exemple of that. When sun reflects on it you can
+   * the most luminous ones). A car glass is a good example of that. When sun reflects on it you can
    * not see what is behind.
    */
   [[nodiscard]] bool get_useSpecularOverAlpha() const;
@@ -396,18 +395,18 @@ protected:
   void set_useAutoMicroSurfaceFromReflectivityMap(bool value);
 
   /**
-   * @brief BJS is using an harcoded light falloff based on a manually sets up
-   * range. In PBR, one way to represents the fallof is to use the inverse
-   * squared root algorythm. This parameter can help you switch back to the BJS
-   * mode in order to create scenes using both materials.
+   * @brief BJS is using an hardcoded light falloff based on a manually sets up range.
+   * In PBR, one way to represents the falloff is to use the inverse squared root algorithm.
+   * This parameter can help you switch back to the BJS mode in order to create scenes using both
+   * materials.
    */
   [[nodiscard]] bool get_usePhysicalLightFalloff() const;
 
   /**
-   * @brief BJS is using an harcoded light falloff based on a manually sets up
-   * range. In PBR, one way to represents the fallof is to use the inverse
-   * squared root algorythm. This parameter can help you switch back to the BJS
-   * mode in order to create scenes using both materials.
+   * @brief BJS is using an hardcoded light falloff based on a manually sets up range.
+   * In PBR, one way to represents the falloff is to use the inverse squared root algorithm.
+   * This parameter can help you switch back to the BJS mode in order to create scenes using both
+   * materials.
    */
   void set_usePhysicalLightFalloff(bool value);
 
@@ -424,10 +423,9 @@ protected:
   void set_useGLTFLightFalloff(bool value);
 
   /**
-   * Specifies that the material will keeps the reflection highlights over a
-   * transparent surface (only the most limunous ones).
-   * A car glass is a good exemple of that. When the street lights reflects on
-   * it you can not see what is behind.
+   * Specifies that the material will keeps the reflection highlights over a transparent surface
+   * (only the most luminous ones). A car glass is a good example of that. When the street lights
+   * reflects on it you can not see what is behind.
    */
   [[nodiscard]] bool get_useRadianceOverAlpha() const;
   void set_useRadianceOverAlpha(bool value);
@@ -579,32 +577,32 @@ protected:
   void set_imageProcessingConfiguration(const ImageProcessingConfigurationPtr& value);
 
   /**
-   * @brief Gets wether the color curves effect is enabled.
+   * @brief Gets whether the color curves effect is enabled.
    */
   [[nodiscard]] bool get_cameraColorCurvesEnabled() const;
 
   /**
-   * @brief Sets wether the color curves effect is enabled.
+   * @brief Sets whether the color curves effect is enabled.
    */
   void set_cameraColorCurvesEnabled(bool value);
 
   /**
-   * @brief Gets wether the color grading effect is enabled.
+   * @brief Gets whether the color grading effect is enabled.
    */
   [[nodiscard]] bool get_cameraColorGradingEnabled() const;
 
   /**
-   * @brief Gets wether the color grading effect is enabled.
+   * @brief Gets whether the color grading effect is enabled.
    */
   void set_cameraColorGradingEnabled(bool value);
 
   /**
-   * @brief Gets wether tonemapping is enabled or not.
+   * @brief Gets whether tonemapping is enabled or not.
    */
   [[nodiscard]] bool get_cameraToneMappingEnabled() const;
 
   /**
-   * Sets wether tonemapping is enabled or not
+   * Sets whether tonemapping is enabled or not
    */
   void set_cameraToneMappingEnabled(bool value);
 
@@ -645,63 +643,49 @@ protected:
   void set_cameraColorGradingTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
+   * @brief The color grading curves provide additional color adjustment that is applied after any
+   * color grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
+   * adjustments, along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects. These are similar to controls found in many professional imaging or colorist
+   * software. The global controls are applied to the entire image. For advanced tuning, extra
+   * controls are provided to adjust the shadow, midtone and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas respectively.
    */
   ColorCurvesPtr& get_cameraColorCurves();
 
   /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
+   * @brief The color grading curves provide additional color adjustment that is applied after any
+   * color grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
+   * adjustments, along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects. These are similar to controls found in many professional imaging or colorist
+   * software. The global controls are applied to the entire image. For advanced tuning, extra
+   * controls are provided to adjust the shadow, midtone and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas respectively.
    */
   void set_cameraColorCurves(const ColorCurvesPtr& value);
 
 public:
   /**
-   * Intensity of the direct lights e.g. the four lights available in your
-   * scene.
+   * Intensity of the direct lights e.g. the four lights available in your scene.
    * This impacts both the direct diffuse and specular highlights.
    */
   Property<PBRMaterial, float> directIntensity;
 
   /**
    * Intensity of the emissive part of the material.
-   * This helps controlling the emissive effect without modifying the emissive
-   * color.
+   * This helps controlling the emissive effect without modifying the emissive color.
    */
   Property<PBRMaterial, float> emissiveIntensity;
 
   /**
-   * Intensity of the environment e.g. how much the environment will light the
-   * object
-   * either through harmonics for rough material or through the refelction for
-   * shiny ones.
+   * Intensity of the environment e.g. how much the environment will light the object
+   * either through harmonics for rough material or through the reflection for shiny ones.
    */
   Property<PBRMaterial, float> environmentIntensity;
 
   /**
-   * This is a special control allowing the reduction of the specular highlights
-   * coming from the
-   * four lights of the scene. Those highlights may not be needed in full
-   * environment lighting.
+   * This is a special control allowing the reduction of the specular highlights coming from the
+   * four lights of the scene. Those highlights may not be needed in full environment lighting.
    */
   Property<PBRMaterial, float> specularIntensity;
 
@@ -726,8 +710,8 @@ public:
   Property<PBRMaterial, float> ambientTextureStrength;
 
   /**
-   * Defines how much the AO map is occluding the analytical lights (point
-   * spot...). 1 means it completely occludes it 0 mean it has no impact
+   * Defines how much the AO map is occluding the analytical lights (point spot...). 1 means it
+   * completely occludes it 0 mean it has no impact
    */
   Property<PBRMaterial, unsigned int> ambientTextureImpactOnAnalyticalLights;
 
@@ -770,8 +754,8 @@ public:
 
   /**
    * Specifies the an F0 factor to help configuring the material F0.
-   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting
-   * to 0.5 the previously hard coded value stays the same.
+   * Instead of the default 4%, 8% * factor will be used. As the factor is defaulting to 0.5 the
+   * previously hard coded value stays the same.
    * Can also be used to scale the F0 values of the metallic texture.
    */
   Property<PBRMaterial, float> metallicF0Factor;
@@ -789,15 +773,14 @@ public:
   Property<PBRMaterial, Color3> metallicReflectanceColor;
 
   /**
-   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
-   * This is multiply against the scalar values defined in the material.
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A This is multiply
+   * against the scalar values defined in the material.
    */
   Property<PBRMaterial, BaseTexturePtr> metallicReflectanceTexture;
 
   /**
-   * Used to enable roughness/glossiness fetch from a separate channel depending
-   * on the current mode. Gray Scale represents roughness in metallic mode and
-   * glossiness in specular mode.
+   * Used to enable roughness/glossiness fetch from a separate channel depending on the current
+   * mode. Gray Scale represents roughness in metallic mode and glossiness in specular mode.
    */
   Property<PBRMaterial, BaseTexturePtr> microSurfaceTexture;
 
@@ -857,34 +840,30 @@ public:
   Property<PBRMaterial, float> indexOfRefraction;
 
   /**
-   * Controls if refraction needs to be inverted on Y. This could be useful for
-   * procedural texture.
+   * Controls if refraction needs to be inverted on Y. This could be useful for procedural texture.
    */
   Property<PBRMaterial, bool> invertRefractionY;
 
   /**
-   * This parameters will make the material used its opacity to control how much
-   * it is refracting aginst not.
-   * Materials half opaque for instance using refraction could benefit from this
+   * This parameters will make the material used its opacity to control how much it is refracting
+   * against not. Materials half opaque for instance using refraction could benefit from this
    * control.
    */
   Property<PBRMaterial, bool> linkRefractionWithTransparency;
 
   /**
-   * If true, the light map contains occlusion information instead of lighting
-   * info.
+   * If true, the light map contains occlusion information instead of lighting info.
    */
   Property<PBRMaterial, bool> useLightmapAsShadowmap;
 
   /**
-   * Specifies that the alpha is coming form the albedo channel alpha channel
-   * for alpha blending.
+   * Specifies that the alpha is coming form the albedo channel alpha channel for alpha blending.
    */
   Property<PBRMaterial, bool> useAlphaFromAlbedoTexture;
 
   /**
-   * Enforces alpha test in opaque or blend mode in order to improve the
-   * performances of some situations.
+   * Enforces alpha test in opaque or blend mode in order to improve the performances of some
+   * situations.
    */
   Property<PBRMaterial, bool> forceAlphaTest;
 
@@ -894,60 +873,55 @@ public:
   Property<PBRMaterial, float> alphaCutOff;
 
   /**
-   * Specifies that the material will keep the specular highlights over a
-   * transparent surface (only the most limunous ones). A car glass is a good
-   * exemple of that. When sun reflects on it you can not see what is behind.
+   * Specifies that the material will keep the specular highlights over a transparent surface (only
+   * the most luminous ones). A car glass is a good example of that. When sun reflects on it you can
+   * not see what is behind.
    */
   Property<PBRMaterial, bool> useSpecularOverAlpha;
 
   /**
-   * Specifies if the reflectivity texture contains the glossiness information
-   * in its alpha channel.
+   * Specifies if the reflectivity texture contains the glossiness information in its alpha channel.
    */
   Property<PBRMaterial, bool> useMicroSurfaceFromReflectivityMapAlpha;
 
   /**
-   * Specifies if the metallic texture contains the roughness information in its
-   * alpha channel.
+   * Specifies if the metallic texture contains the roughness information in its alpha channel.
    */
   Property<PBRMaterial, bool> useRoughnessFromMetallicTextureAlpha;
 
   /**
-   * Specifies if the metallic texture contains the roughness information in its
-   * green channel.
+   * Specifies if the metallic texture contains the roughness information in its green channel.
    */
   Property<PBRMaterial, bool> useRoughnessFromMetallicTextureGreen;
 
   /**
-   * Specifies if the metallic texture contains the metallness information in
-   * its blue channel.
+   * Specifies if the metallic texture contains the metallness information in its blue channel.
    */
   Property<PBRMaterial, bool> useMetallnessFromMetallicTextureBlue;
 
   /**
-   * Specifies if the metallic texture contains the ambient occlusion
-   * information in its red channel.
+   * Specifies if the metallic texture contains the ambient occlusion information in its red
+   * channel.
    */
   Property<PBRMaterial, bool> useAmbientOcclusionFromMetallicTextureRed;
 
   /**
-   * Specifies if the ambient texture contains the ambient occlusion information
-   * in its red channel only.
+   * Specifies if the ambient texture contains the ambient occlusion information in its red channel
+   * only.
    */
   Property<PBRMaterial, bool> useAmbientInGrayScale;
 
   /**
-   * In case the reflectivity map does not contain the microsurface information
-   * in its alpha channel,
-   * The material will try to infer what glossiness each pixel should be.
+   * In case the reflectivity map does not contain the microsurface information in its alpha
+   * channel, The material will try to infer what glossiness each pixel should be.
    */
   Property<PBRMaterial, bool> useAutoMicroSurfaceFromReflectivityMap;
 
   /**
-   * BJS is using an harcoded light falloff based on a manually sets up range.
-   * In PBR, one way to represents the fallof is to use the inverse squared root
-   * algorythm. This parameter can help you switch back to the BJS mode in order
-   * to create scenes using both materials.
+   * BJS is using an hardcoded light falloff based on a manually sets up range.
+   * In PBR, one way to represents the falloff is to use the inverse squared root algorithm.
+   * This parameter can help you switch back to the BJS mode in order to create scenes using both
+   * materials.
    */
   Property<PBRMaterial, bool> usePhysicalLightFalloff;
 
@@ -958,10 +932,9 @@ public:
   Property<PBRMaterial, bool> useGLTFLightFalloff;
 
   /**
-   * Specifies that the material will keeps the reflection highlights over a
-   * transparent surface (only the most limunous ones).
-   * A car glass is a good exemple of that. When the street lights reflects on
-   * it you can not see what is behind.
+   * Specifies that the material will keeps the reflection highlights over a transparent surface
+   * (only the most luminous ones). A car glass is a good example of that. When the street lights
+   * reflects on it you can not see what is behind.
    */
   Property<PBRMaterial, bool> useRadianceOverAlpha;
 
@@ -991,8 +964,7 @@ public:
   Property<PBRMaterial, bool> disableLighting;
 
   /**
-   * Force the shader to compute irradiance in the fragment shader in order to
-   * take bump in account.
+   * Force the shader to compute irradiance in the fragment shader in order to take bump in account.
    */
   Property<PBRMaterial, bool> forceIrradianceInFragment;
 
@@ -1012,32 +984,28 @@ public:
   Property<PBRMaterial, bool> invertNormalMapY;
 
   /**
-   * If sets to true and backfaceCulling is false, normals will be flipped on
-   * the backside.
+   * If sets to true and backfaceCulling is false, normals will be flipped on the backside.
    */
   Property<PBRMaterial, bool> twoSidedLighting;
 
   /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested.
-   * And/Or occlude the blended part. (alpha is converted to gamma to compute
-   * the fresnel)
+   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
+   * tested.
+   * And/Or occlude the blended part. (alpha is converted to gamma to compute the fresnel)
    */
   Property<PBRMaterial, bool> useAlphaFresnel;
 
   /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested.
-   * And/Or occlude the blended part. (alpha stays linear to compute the
-   * fresnel)
+   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
+   * tested.
+   * And/Or occlude the blended part. (alpha stays linear to compute the fresnel)
    */
   Property<PBRMaterial, bool> useLinearAlphaFresnel;
 
   /**
    * Let user defines the brdf lookup texture used for IBL.
    * A default 8bit version is embedded but you could point at :
-   * * Default texture:
-   * https://assets.babylonjs.com/environments/correlatedMSBRDF_RGBD.png
+   * * Default texture: https://assets.babylonjs.com/environments/correlatedMSBRDF_RGBD.png
    * * Default 16bit pixel depth texture:
    * https://assets.babylonjs.com/environments/correlatedMSBRDF.dds
    * * LEGACY Default None correlated
@@ -1060,17 +1028,14 @@ public:
   Property<PBRMaterial, bool> enableSpecularAntiAliasing;
 
   /**
-   * This parameters will enable/disable Horizon occlusion to prevent normal
-   * maps to look shiny when the normal
-   * makes the reflect vector face the model (under horizon).
+   * This parameters will enable/disable Horizon occlusion to prevent normal maps to look shiny when
+   * the normal makes the reflect vector face the model (under horizon).
    */
   Property<PBRMaterial, bool> useHorizonOcclusion;
 
   /**
-   * This parameters will enable/disable radiance occlusion by preventing the
-   * radiance to lit
-   * too much the area relying on ambient texture to define their ambient
-   * occlusion.
+   * This parameters will enable/disable radiance occlusion by preventing the radiance to lit too
+   * much the area relying on ambient texture to define their ambient occlusion.
    */
   Property<PBRMaterial, bool> useRadianceOcclusion;
 
@@ -1080,31 +1045,29 @@ public:
   Property<PBRMaterial, bool> unlit;
 
   /**
-   * The image processing configuration used either in this
-   * material.
+   * The image processing configuration used either in this material.
    */
   Property<PBRMaterial, ImageProcessingConfigurationPtr> imageProcessingConfiguration;
 
   /**
-   * Wether the color curves effect is enabled.
+   * Whether the color curves effect is enabled.
    */
   Property<PBRMaterial, bool> cameraColorCurvesEnabled;
 
   /**
-   * Wether the color grading effect is enabled.
+   * Whether the color grading effect is enabled.
    */
   Property<PBRMaterial, bool> cameraColorGradingEnabled;
 
   /**
-   * Wether tonemapping is enabled or not.
+   * Whether tonemapping is enabled or not.
    */
   Property<PBRMaterial, bool> cameraToneMappingEnabled;
 
   /**
    * The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
-   * This corresponds to a photographic exposure.
+   * This property is here and not in the camera to allow controlling exposure without full screen
+   * post process. This corresponds to a photographic exposure.
    */
   Property<PBRMaterial, float> cameraExposure;
 
@@ -1119,15 +1082,13 @@ public:
   Property<PBRMaterial, BaseTexturePtr> cameraColorGradingTexture;
 
   /**
-   * The color grading curves provide additional color adjustmnent that is
-   * applied after any color grading transform (3D LUT). They allow basic
-   * adjustment of saturation and small exposure adjustments, along with color
-   * filter tinting to provide white balance adjustment or more stylistic
-   * effects. These are similar to controls found in many professional imaging
-   * or colorist software. The global controls are applied to the entire image.
-   * For advanced tuning, extra controls are provided to adjust the shadow,
-   * midtone and highlight areas of the image; corresponding to low luminance,
-   * medium luminance, and high luminance areas respectively.
+   * The color grading curves provide additional color adjustment that is applied after any color
+   * grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
+   * adjustments, along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects. These are similar to controls found in many professional imaging or colorist
+   * software. The global controls are applied to the entire image. For advanced tuning, extra
+   * controls are provided to adjust the shadow, midtone and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas respectively.
    */
   Property<PBRMaterial, ColorCurvesPtr> cameraColorCurves;
 

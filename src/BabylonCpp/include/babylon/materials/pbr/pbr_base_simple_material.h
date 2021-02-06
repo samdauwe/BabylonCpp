@@ -72,7 +72,7 @@ public:
   Property<PBRBaseSimpleMaterial, BaseTexturePtr> emissiveTexture;
 
   /**
-   * Occlusion Channel Strenght.
+   * Occlusion Channel Strength.
    */
   Property<PBRBaseSimpleMaterial, float> occlusionStrength;
 
@@ -159,7 +159,7 @@ protected:
   void set_emissiveTexture(const BaseTexturePtr& value);
 
   /**
-   * Occlusion Channel Strenght.
+   * Occlusion Channel Strength.
    */
   [[nodiscard]] float get_occlusionStrength() const;
   void set_occlusionStrength(float value);

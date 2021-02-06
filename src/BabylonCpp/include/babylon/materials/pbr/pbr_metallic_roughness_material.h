@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_PBR_PBR_METALLIC_ROUGHNESS_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/pbr/pbr_base_simple_material.h>
 
 namespace BABYLON {
 
-class PBRMetallicRoughnessMaterial;
-using PBRMetallicRoughnessMaterialPtr = std::shared_ptr<PBRMetallicRoughnessMaterial>;
+FWD_CLASS_SPTR(PBRMetallicRoughnessMaterial)
 
 /**
  * @brief The PBR material of BJS following the metal roughness convention.
@@ -30,7 +30,7 @@ public:
   ~PBRMetallicRoughnessMaterial() override; // = default
 
   /**
-   * @brief Return the currrent class name of the material.
+   * @brief Return the current class name of the material.
    */
   [[nodiscard]] std::string getClassName() const override;
 
@@ -58,7 +58,7 @@ public:
   [[nodiscard]] json serialize() const;
 
   /**
-   * @brief Parses a JSON object correponding to the serialize function.
+   * @brief Parses a JSON object corresponding to the serialize function.
    */
   static PBRMetallicRoughnessMaterial* Parse(const json& source, Scene* scene,
                                              const std::string& rootUrl);
