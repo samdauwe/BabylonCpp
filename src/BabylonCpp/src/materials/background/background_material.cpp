@@ -659,13 +659,13 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
           return false;
         }
 
-        defines.boolDef["REFLECTION"]              = true;
-        defines.boolDef["GAMMAREFLECTION"]         = iReflectionTexture->gammaSpace;
-        defines.boolDef["RGBDREFLECTION"]          = iReflectionTexture->isRGBD();
-        defines.boolDef["REFLECTIONBLUR"]          = _reflectionBlur > 0.f;
-        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
-                                                       !iReflectionTexture->invertZ :
-                                                       iReflectionTexture->invertZ;
+        defines.boolDef["REFLECTION"]                     = true;
+        defines.boolDef["GAMMAREFLECTION"]                = iReflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]                 = iReflectionTexture->isRGBD();
+        defines.boolDef["REFLECTIONBLUR"]                 = _reflectionBlur > 0.f;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]        = getScene()->useRightHandedSystem() ?
+                                                              !iReflectionTexture->invertZ :
+                                                              iReflectionTexture->invertZ;
         defines.boolDef["LODINREFLECTIONALPHA"]           = iReflectionTexture->lodLevelInAlpha;
         defines.boolDef["EQUIRECTANGULAR_RELFECTION_FOV"] = useEquirectangularFOV;
         defines.boolDef["REFLECTIONBGR"]                  = switchToBGR;
@@ -872,7 +872,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
         onCompiled(effect);
       }
 
-      bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
+      MaterialHelper::BindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
     };
 
     auto join = defines.toString();
@@ -1115,9 +1115,9 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
     }
   }
 
-  _uniformBuffer->update();
-
   Material::_afterBind(mesh /*, _activeEffect*/);
+
+  _uniformBuffer->update();
 }
 
 bool BackgroundMaterial::hasTexture(const BaseTexturePtr& texture) const
