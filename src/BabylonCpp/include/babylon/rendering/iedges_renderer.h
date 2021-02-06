@@ -24,7 +24,7 @@ struct BABYLON_SHARED_EXPORT IEdgesRenderer : public IDisposable {
   virtual void render() = 0;
 
   /**
-   * @brief Checks wether or not the edges renderer is ready to render.
+   * @brief Checks whether or not the edges renderer is ready to render.
    * @return true if ready, otherwise false.
    */
   virtual bool isReady() = 0;

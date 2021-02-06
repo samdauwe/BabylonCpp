@@ -29,7 +29,7 @@ struct BABYLON_SHARED_EXPORT IEdgesRendererOptions {
 
   /**
    * During edges processing, the vertices are merged if they are close enough: epsilonVertexMerge
-   * is the limit whithin which vertices are considered to be equal. The default value is 1e-6 This
+   * is the limit within which vertices are considered to be equal. The default value is 1e-6 This
    * option is used only if useAlternateEdgeFinder = true
    */
   std::optional<float> epsilonVertexMerge = std::nullopt;

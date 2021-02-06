@@ -48,7 +48,7 @@ public:
   void _rebuild();
 
   /**
-   * @brief Checks wether or not the edges renderer is ready to render.
+   * @brief Checks whether or not the edges renderer is ready to render.
    * @return true if ready, otherwise false.
    */
   bool isReady() override;

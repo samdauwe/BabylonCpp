@@ -21,10 +21,9 @@ FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(SubMesh)
 
 /**
- * @brief This is the manager responsible of all the rendering for meshes
- * sprites and particles. It is enable to manage the different groups as well as
- * the different necessary sort functions. This should not be used directly
- * aside of the few static configurations
+ * @brief This is the manager responsible of all the rendering for meshes sprites and particles.
+ * It is enable to manage the different groups as well as the different necessary sort functions.
+ * This should not be used directly aside of the few static configurations
  */
 class BABYLON_SHARED_EXPORT RenderingManager {
 
@@ -53,9 +52,9 @@ public:
   ~RenderingManager(); // = default
 
   /**
-   * @brief Renders the entire managed groups. This is used by the scene or the
-   * different rennder targets.
-   * Hidden
+   * @brief Renders the entire managed groups. This is used by the scene or the different render
+   * targets.
+   * @hidden
    */
   void render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
                                  const std::vector<SubMesh*>& alphaTestSubMeshes,
@@ -68,13 +67,13 @@ public:
 
   /**
    * @brief Resets the different information of the group to prepare a new frame
-   * Hidden
+   * @hidden
    */
   void reset();
 
   /**
    * @brief Dispose and release the group and its associated resources.
-   * Hidden
+   * @hidden
    */
   void dispose();
 
@@ -85,15 +84,13 @@ public:
   void freeRenderingGroups();
 
   /**
-   * @brief Add a sprite manager to the rendering manager in order to render it
-   * this frame.
+   * @brief Add a sprite manager to the rendering manager in order to render it this frame.
    * @param spriteManager Define the sprite manager to render
    */
   void dispatchSprites(ISpriteManager* spriteManager);
 
   /**
-   * @brief Add a particle system to the rendering manager in order to render it
-   * this frame.
+   * @brief Add a particle system to the rendering manager in order to render it this frame.
    * @param particleSystem Define the particle system to render
    */
   void dispatchParticles(IParticleSystem* particleSystem);
@@ -101,27 +98,23 @@ public:
   /**
    * @brief Add a submesh to the manager in order to render it this frame.
    * @param subMesh The submesh to dispatch
-   * @param mesh Optional reference to the submeshes's mesh. Provide if you have
-   * an exiting reference to improve performance.
-   * @param material Optional reference to the submeshes's material. Provide if
-   * you have an exiting reference to improve performance.
+   * @param mesh Optional reference to the submeshes's mesh. Provide if you have an exiting
+   * reference to improve performance.
+   * @param material Optional reference to the submeshes's material. Provide if you have an exiting
+   * reference to improve performance.
    */
   void dispatch(SubMesh* subMesh, AbstractMesh* mesh = nullptr,
                 const MaterialPtr& material = nullptr);
 
   /**
-   * @brief Overrides the default sort function applied in the renderging group
-   * to prepare the meshes.
-   * This allowed control for front to back rendering or reversly depending of
-   * the special needs.
+   * @brief Overrides the default sort function applied in the rendering group to prepare the
+   * meshes. This allowed control for front to back rendering or reversely depending of the special
+   * needs.
    *
    * @param renderingGroupId The rendering group id corresponding to its index
-   * @param opaqueSortCompareFn The opaque queue comparison function use to
-   * sort.
-   * @param alphaTestSortCompareFn The alpha test queue comparison function use
-   * to sort.
-   * @param transparentSortCompareFn The transparent queue comparison function
-   * use to sort.
+   * @param opaqueSortCompareFn The opaque queue comparison function use to sort.
+   * @param alphaTestSortCompareFn The alpha test queue comparison function use to sort.
+   * @param transparentSortCompareFn The transparent queue comparison function use to sort.
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
@@ -131,23 +124,20 @@ public:
     = nullptr);
 
   /**
-   * @brief Specifies whether or not the stencil and depth buffer are cleared
-   * between two rendering groups.
+   * @brief Specifies whether or not the stencil and depth buffer are cleared between two rendering
+   * groups.
    *
    * @param renderingGroupId The rendering group id corresponding to its index
-   * @param autoClearDepthStencil Automatically clears depth and stencil between
-   * groups if true.
-   * @param depth Automatically clears depth between groups if true and
-   * autoClear is true.
-   * @param stencil Automatically clears stencil between groups if true and
-   * autoClear is true.
+   * @param autoClearDepthStencil Automatically clears depth and stencil between groups if true.
+   * @param depth Automatically clears depth between groups if true and autoClear is true.
+   * @param stencil Automatically clears stencil between groups if true and autoClear is true.
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId, bool autoClearDepthStencil,
                                          bool depth = true, bool stencil = true);
 
   /**
-   * @brief Gets the current auto clear configuration for one rendering group of
-   * the rendering manager.
+   * @brief Gets the current auto clear configuration for one rendering group of the rendering
+   * manager.
    * @param index the rendering group index to get the information for
    * @returns The auto clear setup for the requested rendering group
    */
@@ -159,7 +149,7 @@ private:
 
 public:
   /**
-   * Hidden
+   * @hidden
    */
   bool _useSceneAutoClearSetup;
 
