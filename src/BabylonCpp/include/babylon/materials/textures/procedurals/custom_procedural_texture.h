@@ -67,7 +67,7 @@ protected:
    * @see
    * https://doc.babylonjs.com/how_to/how_to_use_procedural_textures#creating-custom-procedural-textures
    * @param name Define the name of the texture
-   * @param texturePath Define the folder path containing all the cutom texture related files
+   * @param texturePath Define the folder path containing all the custom texture related files
    * (config, shaders...)
    * @param size Define the size of the texture to create
    * @param scene Define the scene the texture belongs to

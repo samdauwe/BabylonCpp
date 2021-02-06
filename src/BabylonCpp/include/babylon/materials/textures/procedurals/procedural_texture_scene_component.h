@@ -20,7 +20,7 @@ class BABYLON_SHARED_EXPORT ProceduralTextureSceneComponent : public ISceneCompo
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene components.
+   * The component name helpful to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_PROCEDURALTEXTURE;
 

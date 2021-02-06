@@ -205,7 +205,7 @@ public:
   ProceduralTexturePtr clone();
 
   /**
-   * @brief Dispose the texture and release its asoociated resources.
+   * @brief Dispose the texture and release its associated resources.
    */
   void dispose() override;
 
@@ -326,6 +326,7 @@ protected:
 
 private:
   RenderTargetTextureSize _size;
+  unsigned int _textureType;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _frameId;

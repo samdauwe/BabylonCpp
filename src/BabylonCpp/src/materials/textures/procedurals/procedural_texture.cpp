@@ -14,6 +14,7 @@
 #include <babylon/materials/textures/procedurals/procedural_texture_scene_component.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -30,6 +31,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
     , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
     , _fallbackTexture{nullptr}
+    , _textureType{0}
     , _currentRefreshId{-1}
     , _frameId{-1}
     , _refreshRate{1}
@@ -50,18 +52,19 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
   name           = iName;
   isRenderTarget = true;
   _size          = size;
+  _textureType   = textureType;
   setFragment(fragment);
 
   _fallbackTexture = fallbackTexture;
 
-  const auto width = std::holds_alternative<int>(size) ?
-                       std::get<int>(size) :
-                       std::holds_alternative<RenderTargetSize>(size) ?
-                       std::get<RenderTargetSize>(size).width :
-                       static_cast<int>(std::holds_alternative<float>(size));
+  const auto width  = std::holds_alternative<int>(size) ?
+                        std::get<int>(size) :
+                      std::holds_alternative<RenderTargetSize>(size) ?
+                        std::get<RenderTargetSize>(size).width :
+                        static_cast<int>(std::holds_alternative<float>(size));
   const auto height = std::holds_alternative<int>(size) ?
                         std::get<int>(size) :
-                        std::holds_alternative<RenderTargetSize>(size) ?
+                      std::holds_alternative<RenderTargetSize>(size) ?
                         std::get<RenderTargetSize>(size).height :
                         static_cast<int>(std::holds_alternative<float>(size));
 
@@ -101,10 +104,15 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
     : Texture("", scene, !generateMipMaps)
     , isEnabled{true}
     , autoClear{true}
+    , onGenerated{nullptr}
     , _generateMipMaps{generateMipMaps}
     , _isCube{iIsCube}
+    , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
+    , _fallbackTexture{nullptr}
+    , _textureType{0}
     , _currentRefreshId{-1}
+    , _frameId{-1}
     , _refreshRate{1}
     , _fallbackTextureUsed{false}
     , _cachedDefines{""}
@@ -122,19 +130,19 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
   name           = iName;
   isRenderTarget = true;
   _size          = size;
-
+  _textureType   = textureType;
   setFragment(fragment);
 
   _fallbackTexture = fallbackTexture;
 
-  const auto width = std::holds_alternative<int>(size) ?
-                       std::get<int>(size) :
-                       std::holds_alternative<RenderTargetSize>(size) ?
-                       std::get<RenderTargetSize>(size).width :
-                       static_cast<int>(std::holds_alternative<float>(size));
+  const auto width  = std::holds_alternative<int>(size) ?
+                        std::get<int>(size) :
+                      std::holds_alternative<RenderTargetSize>(size) ?
+                        std::get<RenderTargetSize>(size).width :
+                        static_cast<int>(std::holds_alternative<float>(size));
   const auto height = std::holds_alternative<int>(size) ?
                         std::get<int>(size) :
-                        std::holds_alternative<RenderTargetSize>(size) ?
+                      std::holds_alternative<RenderTargetSize>(size) ?
                         std::get<RenderTargetSize>(size).height :
                         static_cast<int>(std::holds_alternative<float>(size));
 
@@ -187,8 +195,14 @@ ArrayBufferView& ProceduralTexture::getContent()
     return _contentData;
   }
 
-  _contentData     = readPixels(0, 0, _contentData);
-  _contentUpdateId = _frameId;
+  if (_contentData) {
+    _contentData     = readPixels(0, 0, _contentData);
+    _contentUpdateId = _frameId;
+  }
+  else {
+    _contentData     = readPixels(0, 0);
+    _contentUpdateId = _frameId;
+  }
 
   return _contentData;
 }
@@ -268,28 +282,30 @@ bool ProceduralTexture::isReady()
     return false;
   }
 
-  _cachedDefines = defines;
+  if (_cachedDefines != defines) {
+    _cachedDefines = defines;
 
-  IEffectCreationOptions options;
-  options.attributes    = {VertexBuffer::PositionKind};
-  options.uniformsNames = _uniforms;
-  options.samplers      = _samplers;
-  options.defines       = defines;
-  options.onError       = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
-    releaseInternalTexture();
+    IEffectCreationOptions options;
+    options.attributes    = {VertexBuffer::PositionKind};
+    options.uniformsNames = _uniforms;
+    options.samplers      = _samplers;
+    options.defines       = defines;
+    options.onError       = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
+      releaseInternalTexture();
 
-    if (_fallbackTexture) {
-      _texture = _fallbackTexture->_texture;
+      if (_fallbackTexture) {
+        _texture = _fallbackTexture->_texture;
 
-      if (_texture) {
-        _texture->incrementReferences();
+        if (_texture) {
+          _texture->incrementReferences();
+        }
       }
-    }
 
-    _fallbackTextureUsed = true;
-  };
+      _fallbackTextureUsed = true;
+    };
 
-  _effect = engine->createEffect(shaders, options, getScene()->getEngine());
+    _effect = engine->createEffect(shaders, options, getScene()->getEngine());
+  }
 
   return _effect->isReady();
 }
@@ -367,7 +383,10 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
 
   releaseInternalTexture();
   IRenderTargetOptions options;
-  options.generateMipMaps = generateMipMaps;
+  options.generateMipMaps       = generateMipMaps;
+  options.generateDepthBuffer   = false;
+  options.generateStencilBuffer = false;
+  options.type                  = _textureType;
   _texture
     = _fullEngine->createRenderTargetTexture(RenderTargetSize{size.width, size.height}, options);
 
@@ -527,6 +546,9 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     return;
   }
 
+  engine->_debugPushGroup(StringTools::printf("procedural texture generation for %s", name.c_str()),
+                          1);
+
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
       engine->bindFramebuffer(_texture, face, std::nullopt, std::nullopt, true);
@@ -543,11 +565,6 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode, 0, 6);
-
-      // Mipmaps
-      if (face == 5) {
-        engine->generateMipMapsForCubemap(_texture);
-      }
     }
   }
   else {
@@ -567,6 +584,13 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
   // Unbind
   engine->unBindFramebuffer(_texture, isCube);
+
+  // Mipmaps
+  if (isCube) {
+    engine->generateMipMapsForCubemap(_texture);
+  }
+
+  engine->_debugPopGroup(1);
 
   if (onGenerated) {
     onGenerated();
