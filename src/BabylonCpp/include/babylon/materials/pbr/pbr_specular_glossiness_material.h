@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_PBR_PBR_SPECULAR_GLOSSINESS_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/pbr/pbr_base_simple_material.h>
 
 namespace BABYLON {
 
-class PBRSpecularGlossinessMaterial;
-using PBRSpecularGlossinessMaterialPtr = std::shared_ptr<PBRSpecularGlossinessMaterial>;
+FWD_CLASS_SPTR(PBRSpecularGlossinessMaterial)
 
 /**
  * @brief The PBR material of BJS following the metal roughness convention.
@@ -30,7 +30,7 @@ public:
   ~PBRSpecularGlossinessMaterial() override; // = default
 
   /**
-   * @brief Return the currrent class name of the material.
+   * @brief Return the current class name of the material.
    */
   [[nodiscard]] std::string getClassName() const override;
 
@@ -47,7 +47,7 @@ public:
   [[nodiscard]] json serialize() const;
 
   /**
-   * @brief Parses a JSON object correponding to the serialize function.
+   * @brief Parses a JSON object corresponding to the serialize function.
    */
   static PBRSpecularGlossinessMaterial* Parse(const json& source, Scene* scene,
                                               const std::string& rootUrl);
@@ -68,7 +68,7 @@ protected:
   void set_diffuseColor(const Color3& value);
 
   /**
-   * @brief Specifies the diffuse texture of the material. This can also contains the opcity value
+   * @brief Specifies the diffuse texture of the material. This can also contains the opacity value
    * in its alpha channel.
    */
   BaseTexturePtr& get_diffuseTexture();
@@ -93,6 +93,12 @@ protected:
   BaseTexturePtr& get_specularGlossinessTexture();
   void set_specularGlossinessTexture(const BaseTexturePtr& value);
 
+  /**
+   * @brief Specifies if the reflectivity texture contains the glossiness information in its alpha
+   * channel.
+   */
+  bool get_useMicroSurfaceFromReflectivityMapAlpha() const;
+
 public:
   /**
    * Specifies the diffuse color of the material.
@@ -100,7 +106,7 @@ public:
   Property<PBRSpecularGlossinessMaterial, Color3> diffuseColor;
 
   /**
-   * Specifies the diffuse texture of the material. This can also contains the opcity value in its
+   * Specifies the diffuse texture of the material. This can also contains the opacity value in its
    * alpha channel.
    */
   Property<PBRSpecularGlossinessMaterial, BaseTexturePtr> diffuseTexture;
@@ -120,6 +126,11 @@ public:
    * Specifies both the specular color RGB and the glossiness A of the material per pixels.
    */
   Property<PBRSpecularGlossinessMaterial, BaseTexturePtr> specularGlossinessTexture;
+
+  /**
+   * Specifies if the reflectivity texture contains the glossiness information in its alpha channel.
+   */
+  ReadOnlyProperty<PBRSpecularGlossinessMaterial, bool> useMicroSurfaceFromReflectivityMapAlpha;
 
 }; // end of class PBRSpecularGlossinessMaterial
 

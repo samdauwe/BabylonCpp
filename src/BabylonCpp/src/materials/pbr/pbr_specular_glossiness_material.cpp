@@ -18,6 +18,8 @@ PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(const std::string& 
                  &PBRSpecularGlossinessMaterial::set_glossiness}
     , specularGlossinessTexture{this, &PBRSpecularGlossinessMaterial::get_specularGlossinessTexture,
                                 &PBRSpecularGlossinessMaterial::set_specularGlossinessTexture}
+    , useMicroSurfaceFromReflectivityMapAlpha{
+        this, &PBRSpecularGlossinessMaterial::get_useMicroSurfaceFromReflectivityMapAlpha}
 {
   _useMicroSurfaceFromReflectivityMapAlpha = true;
 }
@@ -102,6 +104,11 @@ void PBRSpecularGlossinessMaterial::set_specularGlossinessTexture(const BaseText
 
   _reflectivityTexture = value;
   _markAllSubMeshesAsTexturesDirty();
+}
+
+bool PBRSpecularGlossinessMaterial::get_useMicroSurfaceFromReflectivityMapAlpha() const
+{
+  return _useMicroSurfaceFromReflectivityMapAlpha;
 }
 
 MaterialPtr PBRSpecularGlossinessMaterial::clone(const std::string& /*name*/,
