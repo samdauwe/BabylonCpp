@@ -52,8 +52,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
   auto engine = scene->getEngine();
 
   // Render target
-  const auto format = (isPacked || engine->webGLVersion() == 1.f) ? Constants::TEXTUREFORMAT_RGBA :
-                                                                    Constants::TEXTUREFORMAT_R;
+  const auto format = (isPacked || (engine && !engine->_features.supportExtendedTextureFormats)) ?
+                        Constants::TEXTUREFORMAT_RGBA :
+                        Constants::TEXTUREFORMAT_R;
   _depthMap         = RenderTargetTexture::New(
     "depthMap", RenderTargetSize{engine->getRenderWidth(), engine->getRenderHeight()}, _scene,
     false, true, type, false, TextureConstants::TRILINEAR_SAMPLINGMODE, true, false, false, format);
@@ -71,6 +72,16 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
   // set default depth value to 1.0 (far away)
   _depthMap->onClearObservable.add(
     [this](Engine* _engine, EventState&) { _engine->clear(_clearColor, true, true); });
+
+  _depthMap->onBeforeBindObservable.add(
+    [engine](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+      engine->_debugPushGroup("depth renderer", 1);
+    });
+
+  _depthMap->onAfterUnbindObservable.add(
+    [engine](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+      engine->_debugPopGroup(1);
+    });
 
   _depthMap->customRenderFunction
     = [this, engine](const std::vector<SubMesh*>& opaqueSubMeshes,
@@ -206,7 +217,8 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
 
   effectiveMesh->_internalAbstractMeshDataInfo._isActiveIntermediate = false;
 
-  if (!material || subMesh->verticesCount == 0 || subMesh->_renderId == scene->getRenderId()) {
+  if (!material || effectiveMesh->infiniteDistance() || material->disableDepthWrite
+      || subMesh->verticesCount == 0 || subMesh->_renderId == scene->getRenderId()) {
     return;
   }
 
