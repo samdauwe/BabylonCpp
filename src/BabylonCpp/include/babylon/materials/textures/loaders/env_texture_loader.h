@@ -14,7 +14,7 @@ struct BABYLON_SHARED_EXPORT _ENVTextureLoader : public IInternalTextureLoader {
   ~_ENVTextureLoader() override; // = default
 
   /**
-   * @brief Defines wether the loader supports cascade loading the different faces.
+   * @brief Defines whether the loader supports cascade loading the different faces.
    */
   bool supportCascades() const override;
 
