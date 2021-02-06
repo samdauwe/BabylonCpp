@@ -20,6 +20,7 @@ class Engine;
 struct MaterialDefines;
 class Scene;
 class UniformBuffer;
+class Vector4;
 FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(Light)
@@ -50,10 +51,26 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect to be bound
    * @param scene The scene the eyes position is used from
    * @param variableName name of the shader variable that will hold the eye position
+   * @param isVector3 true to indicates that variableName is a Vector3 and not a Vector4
+   * @return the computed eye position
    */
-  static void BindEyePosition(Effect* effect, Scene* scene,
-                              const std::string& variableName = "vEyePosition",
-                              bool isVector3                  = false);
+  static Vector4 BindEyePosition(Effect* effect, Scene* scene,
+                                 const std::string& variableName = "vEyePosition",
+                                 bool isVector3                  = false);
+
+  /**
+   * @brief Update the scene ubo before it can be used in rendering processing.
+   * @param scene the scene to retrieve the ubo from
+   * @returns the scene UniformBuffer
+   */
+  static UniformBuffer* FinalizeSceneUbo(Scene* scene);
+
+  /**
+   * @brief Binds the scene's uniform buffer to the effect.
+   * @param effect defines the effect to bind to the scene uniform buffer
+   * @param sceneUbo defines the uniform buffer storing scene data
+   */
+  static void BindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo);
 
   /**
    * @brief Helps preparing the defines values about the UVs in used in the effect. UVs are shared

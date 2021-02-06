@@ -34,18 +34,55 @@ std::unique_ptr<MaterialDefines> MaterialHelper::_TmpMorphInfluencers
   = std::make_unique<MaterialDefines>();
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
 
-void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene, const std::string& variableName,
-                                     bool)
+Vector4 MaterialHelper::BindEyePosition(Effect* effect, Scene* scene,
+                                        const std::string& variableName, bool isVector3)
 {
-  if (scene->_forcedViewPosition) {
-    effect->setVector3(variableName, *scene->_forcedViewPosition);
-    return;
-  }
-  const auto& globalPosition = scene->activeCamera()->globalPosition();
+  const auto eyePosition = scene->_forcedViewPosition     ? *scene->_forcedViewPosition :
+                           scene->_mirroredCameraPosition ? *scene->_mirroredCameraPosition :
+                           scene->activeCamera() ? scene->activeCamera()->globalPosition() :
+                                                   Vector3();
 
-  effect->setVector3(variableName, scene->_mirroredCameraPosition ?
-                                     *scene->_mirroredCameraPosition :
-                                     globalPosition);
+  const auto invertNormal
+    = (scene->useRightHandedSystem() == (scene->_mirroredCameraPosition != nullptr));
+
+  TmpVectors::Vector4Array[0].set(eyePosition.x, eyePosition.y, eyePosition.z,
+                                  invertNormal ? -1.f : 1.f);
+
+  if (effect) {
+    if (isVector3) {
+      effect->setFloat3(variableName, TmpVectors::Vector4Array[0].x, TmpVectors::Vector4Array[0].y,
+                        TmpVectors::Vector4Array[0].z);
+    }
+    else {
+      effect->setVector4(variableName, TmpVectors::Vector4Array[0]);
+    }
+  }
+
+  return TmpVectors::Vector4Array[0];
+}
+
+UniformBuffer* MaterialHelper::FinalizeSceneUbo(Scene* scene)
+{
+  const auto ubo         = scene->getSceneUniformBuffer();
+  const auto eyePosition = MaterialHelper::BindEyePosition(nullptr, scene);
+  ubo->updateFloat4("vEyePosition", //
+                    eyePosition.x,  //
+                    eyePosition.y,  //
+                    eyePosition.z,  //
+                    eyePosition.w,  //
+                    ""              //
+  );
+
+  ubo->update();
+
+  return ubo;
+}
+
+void MaterialHelper::BindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo)
+{
+  if (sceneUbo) {
+    sceneUbo->bindToEffect(effect, "Scene");
+  }
 }
 
 void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
