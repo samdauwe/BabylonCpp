@@ -37,6 +37,7 @@ InternalTexturePtr HDRFiltering::_createRenderTarget(int size)
   IRenderTargetOptions options;
   options.format                = Constants::TEXTUREFORMAT_RGBA;
   options.type                  = textureType;
+  options.createMipMaps         = true;
   options.generateMipMaps       = false;
   options.generateDepthBuffer   = false;
   options.generateStencilBuffer = false;
@@ -56,7 +57,7 @@ InternalTexturePtr HDRFiltering::_createRenderTarget(int size)
 BaseTexturePtr HDRFiltering::_prefilterInternal(const BaseTexturePtr& texture)
 {
   const auto width        = texture->getSize().width;
-  const auto mipmapsCount = std::round(Scalar::Log2(width)) + 1;
+  const auto mipmapsCount = std::round(Scalar::ILog2(width)) + 1;
 
   const auto effect        = _effectWrapper->effect;
   const auto outputTexture = _createRenderTarget(width);
@@ -155,7 +156,7 @@ bool HDRFiltering::isReady(const BaseTexturePtr& texture) const
 
 void HDRFiltering::prefilter(const BaseTexturePtr& texture, const std::function<void()>& onFinished)
 {
-  if (_engine->webGLVersion() == 1.f) {
+  if (!_engine->_features.allowTexturePrefiltering) {
     BABYLON_LOG_WARN(
       "HDRFiltering",
       "HDR prefiltering is not available in WebGL 1., you can use real time filtering instead.");

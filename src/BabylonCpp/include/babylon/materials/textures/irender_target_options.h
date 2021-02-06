@@ -9,6 +9,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT IRenderTargetOptions {
+  std::optional<bool> createMipMaps         = std::nullopt;
   std::optional<bool> generateMipMaps       = std::nullopt;
   std::optional<bool> generateDepthBuffer   = std::nullopt;
   std::optional<bool> generateStencilBuffer = std::nullopt;
