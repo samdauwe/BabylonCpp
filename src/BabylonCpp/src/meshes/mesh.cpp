@@ -113,6 +113,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _thinInstanceDataStorage{std::make_unique<_ThinInstanceDataStorage>()}
     , _userThinInstanceBuffersStorage{nullptr}
     , _effectiveMaterial{nullptr}
+    , _userInstancedBuffersStorage{std::nullopt}
     , _tessellation{0}
     , _arc{1.f}
 {
@@ -1638,13 +1639,62 @@ void Mesh::_renderWithThinInstances(SubMesh* subMesh, unsigned int fillMode,
   engine->unbindInstanceAttributes();
 }
 
-void Mesh::registerInstancedBuffer(const std::string& /*kind*/, size_t /*stride*/)
+void Mesh::registerInstancedBuffer(const std::string& kind, size_t stride)
 {
+  // Remove existing one
+  if (_userInstancedBuffersStorage
+      && stl_util::contains(_userInstancedBuffersStorage->vertexBuffers, kind)
+      && _userInstancedBuffersStorage->vertexBuffers[kind]) {
+    _userInstancedBuffersStorage->vertexBuffers[kind]->dispose();
+    _userInstancedBuffersStorage->vertexBuffers.erase(kind);
+  }
+
+  // Creates the instancedBuffer field if not present
+  if (!_userInstancedBuffersStorage) {
+    _userInstancedBuffersStorage = UserInstancedBuffersStorage{};
+    if (getEngine()->getCaps().vertexArrayObject) {
+      _userInstancedBuffersStorage->vertexArrayObjects
+        = std::unordered_map<std::string, WebGLVertexArrayObjectPtr>();
+    }
+    else {
+      _userInstancedBuffersStorage->vertexArrayObjects = std::nullopt;
+    }
+  }
+
+  // Creates an empty property for this kind
+  instancedBuffers[kind] = {0};
+
+  _userInstancedBuffersStorage->strides[kind] = stride;
+  _userInstancedBuffersStorage->sizes[kind]   = stride * 32; // Initial size
+  _userInstancedBuffersStorage->data[kind]
+    = Float32Array(_userInstancedBuffersStorage->sizes[kind]);
+  _userInstancedBuffersStorage->vertexBuffers[kind] = std::make_unique<VertexBuffer>(
+    getEngine(), _userInstancedBuffersStorage->data[kind], kind, true, false, stride, true);
+
+  for (const auto& instance : instances) {
+    instance->instancedBuffers[kind] = nullptr;
+  }
+
+  _invalidateInstanceVertexArrayObject();
 }
 
 void Mesh::_processInstancedBuffers(const std::vector<InstancedMesh*>& /*visibleInstances*/,
                                     bool /*renderSelf*/)
 {
+}
+
+void Mesh::_invalidateInstanceVertexArrayObject()
+{
+  if (!_userInstancedBuffersStorage
+      || !_userInstancedBuffersStorage->vertexArrayObjects.has_value()) {
+    return;
+  }
+
+  for (const auto& [kind, vaos] : *_userInstancedBuffersStorage->vertexArrayObjects) {
+    getEngine()->releaseVertexArrayObject(vaos);
+  }
+
+  _userInstancedBuffersStorage->vertexArrayObjects = {};
 }
 
 Mesh& Mesh::_processRendering(
@@ -2375,14 +2425,18 @@ void Mesh::_disposeInstanceSpecificData()
   for (const auto& instance : instances) {
     instance->dispose();
   }
+  instances.clear();
 
   for (const auto& item : instancedBuffers) {
     const auto& kind = item.first;
-    if (stl_util::contains(_userInstancedBuffersStorage.vertexBuffers, kind)
-        && _userInstancedBuffersStorage.vertexBuffers[kind]) {
-      _userInstancedBuffersStorage.vertexBuffers[kind]->dispose();
+    if (_userInstancedBuffersStorage
+        && stl_util::contains(_userInstancedBuffersStorage->vertexBuffers, kind)
+        && _userInstancedBuffersStorage->vertexBuffers[kind]) {
+      _userInstancedBuffersStorage->vertexBuffers[kind]->dispose();
     }
   }
+
+  _invalidateInstanceVertexArrayObject();
 
   instancedBuffers = {};
 }
