@@ -50,10 +50,13 @@ FWD_CLASS_SPTR(Skeleton)
 
 namespace GL {
 class IGLQuery;
+class IGLVertexArrayObject;
 } // end of namespace GL
 
-using WebGLQuery    = GL::IGLQuery;
-using WebGLQueryPtr = std::shared_ptr<WebGLQuery>;
+using WebGLQuery                = GL::IGLQuery;
+using WebGLVertexArrayObject    = GL::IGLVertexArrayObject;
+using WebGLQueryPtr             = std::shared_ptr<WebGLQuery>;
+using WebGLVertexArrayObjectPtr = std::shared_ptr<WebGLVertexArrayObject>;
 
 /**
  * @brief Represents a custom buffer that will be instanced.
@@ -63,6 +66,8 @@ struct UserInstancedBuffersStorage {
   std::unordered_map<std::string, size_t> sizes;
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> vertexBuffers;
   std::unordered_map<std::string, size_t> strides;
+  std::optional<std::unordered_map<std::string, WebGLVertexArrayObjectPtr>> vertexArrayObjects
+    = std::nullopt;
 }; // end of struct UserInstancedBuffersStorage
 
 using UserInstancedBuffersStoragePtr = std::shared_ptr<UserInstancedBuffersStorage>;
