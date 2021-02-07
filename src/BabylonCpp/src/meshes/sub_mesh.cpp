@@ -69,6 +69,22 @@ void SubMesh::set_materialDefines(const MaterialDefinesPtr& defines)
   _materialDefines = defines;
 }
 
+std::optional<ICustomEffect> SubMesh::_getCustomEffect(const std::string& name,
+                                                       bool createIfNotExisting)
+{
+  std::optional<ICustomEffect> customEffect = std::nullopt;
+  if (!stl_util::contains(_customEffects, name) && createIfNotExisting) {
+    _customEffects[name] = {};
+    customEffect         = _customEffects[name];
+  }
+  return customEffect;
+}
+
+void SubMesh::_removeCustomEffect(const std::string& name)
+{
+  _customEffects.erase(name);
+}
+
 EffectPtr& SubMesh::get_effect()
 {
   return _effectOverride ? _effectOverride : _materialEffect;

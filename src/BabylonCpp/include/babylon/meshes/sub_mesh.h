@@ -16,6 +16,12 @@ FWD_STRUCT_SPTR(MaterialDefines)
 FWD_CLASS_SPTR(SubMesh)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
+/** @hidden */
+struct BABYLON_SHARED_EXPORT ICustomEffect {
+  Effect* effect      = nullptr;
+  std::string defines = "";
+}; // end of struct ICustomEffect
+
 /**
  * @brief Defines a subdivision inside a mesh.
  */
@@ -47,7 +53,8 @@ public:
   bool isGlobal() const;
 
   /**
-   * @brief Returns the submesh BoudingInfo object.
+   * @brief Returns the submesh BoundingInfo object.
+   * @returns current bounding info (or mesh's one if the submesh is global)
    */
   BoundingInfoPtr& getBoundingInfo();
 
@@ -222,6 +229,17 @@ protected:
   void set_materialDefines(const MaterialDefinesPtr& defines);
 
   /**
+   * @brief Hidden
+   */
+  std::optional<ICustomEffect> _getCustomEffect(const std::string& name,
+                                                bool createIfNotExisting = true);
+
+  /**
+   * @brief Hidden
+   */
+  void _removeCustomEffect(const std::string& name);
+
+  /**
    * @brief Gets the associated effect.
    */
   EffectPtr& get_effect();
@@ -258,6 +276,8 @@ public:
   EffectPtr _materialEffect;
   /** @hidden */
   EffectPtr _effectOverride;
+
+  std::unordered_map<std::string, ICustomEffect> _customEffects;
 
   /**
    * Gets or sets material defines used by the effect associated to the sub mesh
