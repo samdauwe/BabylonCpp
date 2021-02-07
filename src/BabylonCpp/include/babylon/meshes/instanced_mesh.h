@@ -2,14 +2,13 @@
 #define BABYLON_MESHES_INSTANCED_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
-class InstancedMesh;
-class Mesh;
-using InstancedMeshPtr = std::shared_ptr<InstancedMesh>;
-using MeshPtr          = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(InstancedMesh)
+FWD_CLASS_SPTR(Mesh)
 
 /**
  * @brief Creates an instance based on a source mesh.
@@ -73,12 +72,12 @@ public:
   bool isReady(bool completeCheck = false, bool forceInstanceSupport = false) override;
 
   /**
-   * @brief Returns an array of integers or a typed array (Int32Array,
-   * Uint32Array, Uint16Array) populated with the mesh indices.
-   * @param kind kind of verticies to retreive (eg. positons, normals, uvs, etc.)
+   * @brief Returns an array of integers or a typed array (Int32Array, Uint32Array, Uint16Array)
+   * populated with the mesh indices.
+   * @param kind kind of verticies to retrieve (eg. positions, normals, uvs, etc.)
    * @param copyWhenShared If true (default false) and and if the mesh geometry is shared among some
    * other meshes, the returned array is a copy of the internal one.
-   * @returns a float array or a Float32Array of the requested kind of data : positons, normals,
+   * @returns a float array or a Float32Array of the requested kind of data : positions, normals,
    * uvs, etc.
    */
   Float32Array getVerticesData(const std::string& kind, bool copyWhenShared = false,
@@ -88,7 +87,7 @@ public:
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
    * If the mesh has no geometry, a new Geometry object is set to the mesh and then passed this
    * vertex data. The `data` are either a numeric array either a Float32Array. The parameter
-   * `updatable` is passed as is to the underlying Geometry object constructor (if initianilly none)
+   * `updatable` is passed as is to the underlying Geometry object constructor (if initially none)
    * or updater. The parameter `stride` is an optional positive integer, it is usually automatically
    * deducted from the `kind` (3 for positions or normals, 2 for UV, etc). Note that a new
    * underlying VertexBuffer object is created each call. If the `kind` is the `PositionKind`, the

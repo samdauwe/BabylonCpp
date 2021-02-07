@@ -196,7 +196,7 @@ public:
   TransformNode& unfreezeWorldMatrix();
 
   /**
-   * @brief Retuns the mesh absolute position in the World.
+   * @brief Returns the mesh absolute position in the World.
    * @returns a Vector3.
    */
   Vector3& getAbsolutePosition();
@@ -235,7 +235,7 @@ public:
    * @param yawCor optional yaw (y-axis) correction in radians
    * @param pitchCor optional pitch (x-axis) correction in radians
    * @param rollCor optional roll (z-axis) correction in radians
-   * @param space the choosen space of the target
+   * @param space the chosen space of the target
    * @returns the TransformNode.
    */
   TransformNode& lookAt(const Vector3& targetPoint, float yawCor = 0.f, float pitchCor = 0.f,
@@ -457,7 +457,7 @@ public:
   /**
    * @brief Returns a new TransformNode object parsed from the source provided.
    * @param parsedTransformNode is the source.
-   * @param scene the scne the object belongs to
+   * @param scene the scene the object belongs to
    * @param rootUrl is a string, it's the root URL to prefix the `delayLoadingFile` property with
    * @returns a new TransformNode object parsed from the source provided.
    */
