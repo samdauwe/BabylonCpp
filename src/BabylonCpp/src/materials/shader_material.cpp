@@ -22,6 +22,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
+#include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {
 
@@ -311,6 +312,11 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
 
+  auto& shaderName     = _shaderPath;
+  auto uniforms        = _options.uniforms;
+  auto& uniformBuffers = _options.uniformBuffers;
+  auto& samplers       = _options.samplers;
+
   // global multiview
   if (engine->getCaps().multiview && scene->activeCamera()
       && scene->activeCamera()->outputRenderTarget
@@ -345,8 +351,6 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Bones
-  auto numInfluencers = 0u;
-
   if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
@@ -357,9 +361,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
     const auto& skeleton = mesh->skeleton();
 
-    numInfluencers = mesh->numBoneInfluencers();
-
-    defines.emplace_back("#define NUM_BONE_INFLUENCERS " + std::to_string(numInfluencers));
+    defines.emplace_back("#define NUM_BONE_INFLUENCERS "
+                         + std::to_string(mesh->numBoneInfluencers()));
     fallbacks->addCPUSkinningFallback(0, mesh);
 
     if (skeleton->isUsingTextureForMatrices()) {
@@ -385,6 +388,54 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
+  // Morph
+  auto numInfluencers = 0u;
+  const MorphTargetManagerPtr manager
+    = mesh ? static_cast<Mesh*>(mesh)->morphTargetManager() : nullptr;
+  if (manager) {
+    const auto uv = manager->supportsUVs() && stl_util::index_of(defines, "#define UV1") != -1;
+    const auto tangent
+      = manager->supportsTangents() && stl_util::index_of(defines, "#define TANGENT") != -1;
+    const auto normal
+      = manager->supportsNormals() && stl_util::index_of(defines, "#define NORMAL") != -1;
+    numInfluencers = manager->numInfluencers();
+    if (uv) {
+      defines.emplace_back("#define MORPHTARGETS_UV");
+    }
+    if (tangent) {
+      defines.emplace_back("#define MORPHTARGETS_TANGENT");
+    }
+    if (normal) {
+      defines.emplace_back("#define MORPHTARGETS_NORMAL");
+    }
+    if (numInfluencers > 0u) {
+      defines.emplace_back("#define MORPHTARGETS");
+    }
+    defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numInfluencers));
+    for (unsigned int index = 0; index < numInfluencers; index++) {
+      const auto indexStr = std::to_string(index);
+      attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
+
+      if (normal) {
+        attribs.emplace_back(VertexBuffer::NormalKind + indexStr);
+      }
+
+      if (tangent) {
+        attribs.emplace_back(VertexBuffer::TangentKind + indexStr);
+      }
+
+      if (uv) {
+        attribs.emplace_back(StringTools::printf("%s_%s", VertexBuffer::UVKind, indexStr));
+      }
+    }
+    if (numInfluencers > 0) {
+      uniforms.emplace_back("morphTargetInfluences");
+    }
+  }
+  else {
+    defines.emplace_back("#define NUM_MORPH_INFLUENCERS 0");
+  }
+
   // Textures
   for (const auto& item : _textures) {
     if (!item.second->isReady()) {
@@ -396,11 +447,6 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   if (mesh && _shouldTurnAlphaTestOn(mesh)) {
     defines.emplace_back("#define ALPHATEST");
   }
-
-  auto shaderName     = _shaderPath;
-  auto uniforms       = _options.uniforms;
-  auto uniformBuffers = _options.uniformBuffers;
-  auto samplers       = _options.samplers;
 
   if (customShaderNameResolve) {
     shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, nullptr,
@@ -481,9 +527,11 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
   // Std values
   bindOnlyWorldMatrix(world, effectOverride);
 
-  auto effect = effectOverride ? effectOverride : _effect;
+  const auto effect = effectOverride ? effectOverride : _effect;
 
-  if (effect && getScene()->getCachedMaterial() != this) {
+  const auto mustRebind = getScene()->getCachedMaterial() != this;
+
+  if (effect && mustRebind) {
     if (stl_util::contains(_options.uniforms, "view")) {
       effect->setMatrix("view", getScene()->getViewMatrix());
     }
@@ -607,18 +655,26 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
     }
   }
 
+  if (effect && mesh && (mustRebind || !isFrozen())) {
+    // Morph targets
+    const auto manager = static_cast<Mesh*>(mesh)->morphTargetManager();
+    if (manager && manager->numInfluencers() > 0u) {
+      MaterialHelper::BindMorphTargetParameters(static_cast<Mesh*>(mesh), effect.get());
+    }
+  }
+
   const auto seffect = _effect;
 
   _effect = effect; // make sure the active effect is the right one if there are some observers for
                     // onBind that would need to get the current effect
-  _afterBind(mesh);
+  _afterBind(mesh, effect);
   _effect = seffect;
 }
 
-void ShaderMaterial::_afterBind(Mesh* mesh, const EffectPtr& /*effect*/)
+void ShaderMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
 {
-  Material::_afterBind(mesh);
-  getScene()->_cachedEffect = _effect;
+  Material::_afterBind(mesh, effect);
+  getScene()->_cachedEffect = effect;
 }
 
 std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
