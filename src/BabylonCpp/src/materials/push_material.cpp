@@ -77,7 +77,7 @@ void PushMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& /*effectOver
 
 void PushMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
 {
-  Material::_afterBind(mesh);
+  Material::_afterBind(mesh, effect);
   getScene()->_cachedEffect = effect;
 }
 
