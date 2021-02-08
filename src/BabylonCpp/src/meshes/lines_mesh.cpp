@@ -37,9 +37,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
 
   std::vector<std::string> defines;
   IShaderMaterialOptions options;
-  options.attributes
-    = {VertexBuffer::PositionKind, VertexBuffer::World0Kind, VertexBuffer::World1Kind,
-       VertexBuffer::World2Kind, VertexBuffer::World3Kind};
+  options.attributes        = {VertexBuffer::PositionKind};
   options.uniforms          = {"vClipPlane",  "vClipPlane2", "vClipPlane3", "vClipPlane4",
                       "vClipPlane5", "vClipPlane6", "world",       "viewProjection"};
   options.needAlphaBlending = true;
@@ -130,6 +128,11 @@ void LinesMesh::set_material(const MaterialPtr& /*material*/)
 bool LinesMesh::get_checkCollisions() const
 {
   return false;
+}
+
+void LinesMesh::set_checkCollisions()
+{
+  // Just ignore it
 }
 
 void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/, unsigned int /*fillMode*/)

@@ -124,6 +124,11 @@ protected:
    */
   bool get_checkCollisions() const override;
 
+  /**
+   * Hidden
+   */
+  void set_checkCollisions();
+
 private:
   void _addClipPlaneDefine(const std::string& label);
   void _removeClipPlaneDefine(const std::string& label);
