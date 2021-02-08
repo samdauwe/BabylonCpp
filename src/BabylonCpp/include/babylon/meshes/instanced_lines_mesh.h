@@ -2,14 +2,13 @@
 #define BABYLON_MESHES_INSTANCED_LINE_MESH_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/meshes/instanced_mesh.h>
 
 namespace BABYLON {
 
-class InstancedLinesMesh;
-class LinesMesh;
-using InstancedLinesMeshPtr = std::shared_ptr<InstancedLinesMesh>;
-using LinesMeshPtr          = std::shared_ptr<LinesMesh>;
+FWD_CLASS_SPTR(InstancedLinesMesh)
+FWD_CLASS_SPTR(LinesMesh)
 
 /**
  * @brief Creates an instance based on a source LinesMesh.
@@ -36,10 +35,9 @@ public:
   /**
    * @brief Enables the edge rendering mode on the mesh.
    * This mode makes the mesh edges visible
-   * @param epsilon defines the maximal distance between two angles to detect a
-   * face
-   * @param checkVerticesInsteadOfIndices indicates that we should check vertex
-   * list directly instead of faces
+   * @param epsilon defines the maximal distance between two angles to detect a face
+   * @param checkVerticesInsteadOfIndices indicates that we should check vertex list directly
+   * instead of faces
    * @returns the current InstancedLinesMesh
    * @see https://www.babylonjs-playground.com/#19O9TU#0
    */
@@ -48,6 +46,14 @@ public:
 
 protected:
   InstancedLinesMesh(const std::string& name, const LinesMeshPtr& source);
+
+public:
+  /**
+   * The intersection Threshold is the margin applied when intersection a segment of the LinesMesh
+   * with a Ray. This margin is expressed in world space coordinates, so its value may vary.
+   * Initialized with the intersectionThreshold value of the source LinesMesh
+   */
+  float intersectionThreshold;
 
 }; // end of class InstancedLinesMesh
 

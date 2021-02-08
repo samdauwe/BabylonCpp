@@ -8,6 +8,7 @@ InstancedLinesMesh::InstancedLinesMesh(const std::string& iName,
                                        const LinesMeshPtr& iSource)
     : InstancedMesh{iName, iSource}
 {
+  intersectionThreshold = iSource->intersectionThreshold;
 }
 
 InstancedLinesMesh::~InstancedLinesMesh() = default;
