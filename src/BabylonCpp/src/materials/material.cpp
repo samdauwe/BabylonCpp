@@ -6,6 +6,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -106,6 +107,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
+    , _needToBindSceneUbo{false}
     , _fillMode{Material::TriangleFillMode}
     , _cachedDepthWriteState{false}
     , _cachedColorWriteState{false}
@@ -537,6 +539,16 @@ void Material::bindViewProjection(const EffectPtr& effect)
   }
   else {
     bindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
+  }
+}
+
+void Material::bindEyePosition(Effect* effect, const std::string& variableName)
+{
+  if (!_useUBO) {
+    MaterialHelper::BindEyePosition(effect, _scene, variableName);
+  }
+  else {
+    _needToBindSceneUbo = true;
   }
 }
 

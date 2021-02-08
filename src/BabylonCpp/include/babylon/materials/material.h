@@ -369,6 +369,13 @@ public:
   void bindViewProjection(const EffectPtr& effect);
 
   /**
+   * @brief Binds the view matrix to the effect.
+   * @param effect defines the effect to bind the view matrix to
+   * @param variableName name of the shader variable that will hold the eye position
+   */
+  void bindEyePosition(Effect* effect, const std::string& variableName = "");
+
+  /**
    * @brief Unbinds the material from the mesh.
    */
   virtual void unbind();
@@ -1023,6 +1030,11 @@ private:
    * Stores a reference to the scene
    */
   Scene* _scene;
+
+  /**
+   * Hidden
+   */
+  bool _needToBindSceneUbo;
 
   /**
    * Stores the fill mode state
