@@ -28,7 +28,7 @@ struct BABYLON_SHARED_EXPORT IShaderMaterialOptions {
   std::vector<std::string> attributes = {"position", "normal", "uv"};
 
   /**
-   * The list of unifrom names used in the shader
+   * The list of uniform names used in the shader
    */
   std::vector<std::string> uniforms = {"worldViewProjection"};
 
