@@ -125,6 +125,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , imageProcessingConfiguration{this, &StandardMaterial::get_imageProcessingConfiguration,
                                    &StandardMaterial::set_imageProcessingConfiguration}
     , prePassConfiguration{nullptr}
+    , isPrePassCapable{this, &StandardMaterial::get_isPrePassCapable}
     , cameraColorCurvesEnabled{this, &StandardMaterial::get_cameraColorCurvesEnabled,
                                &StandardMaterial::set_cameraColorCurvesEnabled}
     , cameraColorGradingEnabled{this, &StandardMaterial::get_cameraColorGradingEnabled,
@@ -267,6 +268,7 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
                        &StandardMaterial::set_twoSidedLighting}
     , imageProcessingConfiguration{this, &StandardMaterial::get_imageProcessingConfiguration,
                                    &StandardMaterial::set_imageProcessingConfiguration}
+    , isPrePassCapable{this, &StandardMaterial::get_isPrePassCapable}
     , cameraColorCurvesEnabled{this, &StandardMaterial::get_cameraColorCurvesEnabled,
                                &StandardMaterial::set_cameraColorCurvesEnabled}
     , cameraColorGradingEnabled{this, &StandardMaterial::get_cameraColorGradingEnabled,
@@ -507,8 +509,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
           defines.boolDef["REFLECTIONOVERALPHA"] = _useReflectionOverAlpha;
           defines.boolDef["INVERTCUBICMAP"]
             = (_reflectionTexture->coordinatesMode() == TextureConstants::INVCUBIC_MODE);
-          defines.boolDef["REFLECTIONMAP_3D"] = _reflectionTexture->isCube();
-          defines.boolDef["RGBDREFLECTION"]   = _reflectionTexture->isRGBD();
+          defines.boolDef["REFLECTIONMAP_3D"]        = _reflectionTexture->isCube();
+          defines.boolDef["RGBDREFLECTION"]          = _reflectionTexture->isRGBD();
+          defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
+                                                         !_reflectionTexture->invertZ :
+                                                         _reflectionTexture->invertZ;
 
           switch (_reflectionTexture->coordinatesMode()) {
             case TextureConstants::EXPLICIT_MODE:
@@ -546,7 +551,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
         }
       }
       else {
-        defines.boolDef["REFLECTION"] = false;
+        defines.boolDef["REFLECTION"]              = false;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = false;
       }
 
       if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
@@ -590,7 +596,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && StandardMaterial::BumpTextureEnabled()) {
-        // Bump texure can not be not blocking.
+        // Bump texture can not be not blocking.
         if (!_bumpTexture->isReady()) {
           return false;
         }
@@ -877,7 +883,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
       "specularSampler",       "bumpSampler",         "lightmapSampler",
       "refractionCubeSampler", "refraction2DSampler", "boneSampler"};
-    std::vector<std::string> uniformBuffers{"Material", "Scene"};
+    std::vector<std::string> uniformBuffers{"Material", "Scene", "Mesh"};
 
     DetailMapConfiguration::AddUniforms(uniforms);
     DetailMapConfiguration::AddSamplers(samplers);
@@ -998,7 +1004,6 @@ void StandardMaterial::buildUniformLayout()
   ubo.addUniform("vRefractionInfos", 4);
   ubo.addUniform("vSpecularColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
-  ubo.addUniform("visibility", 1);
   ubo.addUniform("vDiffuseColor", 4);
 
   DetailMapConfiguration::PrepareUniformBuffer(ubo);
@@ -1044,10 +1049,9 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   }
   _activeEffect = effect;
 
-  // Matrices
-  if (!defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
-    bindOnlyWorldMatrix(world);
-  }
+  // Matrices Mesh.
+  mesh->getMeshUniformBuffer()->bindToEffect(effect.get(), "Mesh");
+  mesh->transferToEffect(world);
 
   // PrePass
   prePassConfiguration->bindForSubMesh(_activeEffect, scene, mesh, world, isFrozen());
@@ -1208,9 +1212,6 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
       ubo.updateColor4("vDiffuseColor", diffuseColor, alpha(), "");
     }
 
-    // Visibility
-    ubo.updateFloat("visibility", mesh->visibility());
-
     // Textures
     if (scene->texturesEnabled()) {
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
@@ -1269,7 +1270,8 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    MaterialHelper::BindEyePosition(effect.get(), scene);
+    bindEyePosition(effect.get());
+
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
@@ -1305,8 +1307,8 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     }
   }
 
-  ubo.update();
   _afterBind(mesh, _activeEffect);
+  ubo.update();
 }
 
 std::vector<IAnimatablePtr> StandardMaterial::getAnimatables()
@@ -2032,6 +2034,11 @@ void StandardMaterial::_attachImageProcessingConfiguration(
         _markAllSubMeshesAsImageProcessingDirty();
       });
   }
+}
+
+bool StandardMaterial::get_isPrePassCapable() const
+{
+  return true;
 }
 
 bool StandardMaterial::get_cameraColorCurvesEnabled() const
