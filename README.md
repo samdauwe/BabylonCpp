@@ -111,7 +111,9 @@ This code results in the following scene:
 Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
 
 # Status
-The master branch code is in sync with the last [Babylon.js v4.2.0](https://doc.babylonjs.com/whats-new) release of 2020/11/12. The upgrade to v4.2.0 caused some issues with some of the examples, these issues still need to be resolved.
+The <b>master</b> branch code is currently in <b>unstable state</b> due to the upgrade to Babylon.js v5.0.0-alpha.6 release of 2021/01/05.
+
+For a more <b>stable version</b> that is in sync with the last [Babylon.js v4.2.0](https://doc.babylonjs.com/whats-new) release of 2020/11/12, please revert to this [commit](https://github.com/samdauwe/BabylonCpp/commit/cc2b6d6b386cb998501d70ecfadfc4fd0a5eba31).
 
 The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working for [Babylon.js 4.0.0](https://doc.babylonjs.com/whats-new).
 
