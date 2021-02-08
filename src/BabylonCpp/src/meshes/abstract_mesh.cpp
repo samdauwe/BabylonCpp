@@ -21,6 +21,7 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/frustum.h>
 #include <babylon/maths/functions.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -148,6 +149,11 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _showBoundingBox{false}
 {
   _resyncLightSources();
+
+  // Mesh Uniform Buffer.
+  _uniformBuffer
+    = std::make_unique<UniformBuffer>(getScene()->getEngine(), Float32Array(), std::nullopt, iName);
+  _buildUniformLayout();
 }
 
 AbstractMesh::~AbstractMesh() = default;
@@ -528,6 +534,28 @@ void AbstractMesh::set_surroundingMeshes(const std::vector<AbstractMeshPtr>& mes
 std::vector<LightPtr>& AbstractMesh::get_lightSources()
 {
   return _lightSources;
+}
+
+void AbstractMesh::_buildUniformLayout()
+{
+  _uniformBuffer->addUniform("world", 16);
+  _uniformBuffer->addUniform("visibility", 1);
+  _uniformBuffer->create();
+}
+
+void AbstractMesh::transferToEffect(const Matrix& world)
+{
+  const auto& ubo = _uniformBuffer;
+
+  ubo->updateMatrix("world", world);
+  ubo->updateFloat("visibility", _internalAbstractMeshDataInfo._visibility);
+
+  ubo->update();
+}
+
+UniformBufferPtr& AbstractMesh::getMeshUniformBuffer()
+{
+  return _uniformBuffer;
 }
 
 std::string AbstractMesh::getClassName() const
@@ -1520,8 +1548,8 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
   if (intersectInfo) {
     // Get picked point
     auto world        = worldToUse.value_or((skeleton() && skeleton()->overrideMesh ?
-                                        skeleton()->overrideMesh->getWorldMatrix() :
-                                        getWorldMatrix()));
+                                               skeleton()->overrideMesh->getWorldMatrix() :
+                                               getWorldMatrix()));
     auto& worldOrigin = TmpVectors::Vector3Array[0];
     auto& direction   = TmpVectors::Vector3Array[1];
     Vector3::TransformCoordinatesToRef(ray.origin, world, worldOrigin);
@@ -1761,15 +1789,15 @@ AbstractMesh& AbstractMesh::updateFacetData()
     data.facetDepthSortOrigin = Vector3::Zero();
   }
 
-  data.bbSize.x = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
-                    bInfo.maximum().x - bInfo.minimum().x :
-                    Math::Epsilon;
-  data.bbSize.y = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
-                    bInfo.maximum().y - bInfo.minimum().y :
-                    Math::Epsilon;
-  data.bbSize.z = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
-                    bInfo.maximum().z - bInfo.minimum().z :
-                    Math::Epsilon;
+  data.bbSize.x   = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
+                      bInfo.maximum().x - bInfo.minimum().x :
+                      Math::Epsilon;
+  data.bbSize.y   = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
+                      bInfo.maximum().y - bInfo.minimum().y :
+                      Math::Epsilon;
+  data.bbSize.z   = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
+                      bInfo.maximum().z - bInfo.minimum().z :
+                      Math::Epsilon;
   auto bbSizeMax  = (data.bbSize.x > data.bbSize.y) ? data.bbSize.x : data.bbSize.y;
   bbSizeMax       = (bbSizeMax > data.bbSize.z) ? bbSizeMax : data.bbSize.z;
   data.subDiv.max = data.partitioningSubdivisions;

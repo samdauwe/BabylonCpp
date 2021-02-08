@@ -48,6 +48,9 @@ FWD_CLASS_SPTR(PhysicsImpostor)
 FWD_CLASS_SPTR(RawTexture)
 FWD_CLASS_SPTR(Skeleton)
 
+class UniformBuffer;
+using UniformBufferPtr = std::unique_ptr<UniformBuffer>;
+
 namespace GL {
 class IGLQuery;
 class IGLVertexArrayObject;
@@ -192,6 +195,18 @@ public:
    * @brief Hidden
    */
   bool _updateNonUniformScalingState(bool value) override;
+
+  /**
+   * @brief Transfer the mesh values to its UBO.
+   * @param world The world matrix associated with the mesh
+   */
+  void transferToEffect(const Matrix& world);
+
+  /**
+   * @brief Gets the mesh uniform buffer.
+   * @return the uniform buffer of the mesh.
+   */
+  UniformBufferPtr& getMeshUniformBuffer();
 
   /**
    * @brief Returns the string "AbstractMesh".
@@ -937,6 +952,11 @@ protected:
    * @param scene defines the hosting scene
    */
   AbstractMesh(const std::string& name, Scene* scene);
+
+  /**
+   * @brief Hidden
+   */
+  void _buildUniformLayout();
 
   /**
    * @brief Hidden
@@ -1876,6 +1896,12 @@ public:
    * An event triggered when the mesh is rebuilt.
    */
   Observable<AbstractMesh> onRebuildObservable;
+
+  /**
+   * The current mesh uniform buffer.
+   * @hidden Internal use only.
+   */
+  UniformBufferPtr _uniformBuffer;
 
   /**
    * Gets the edgesRenderer associated with the mesh
