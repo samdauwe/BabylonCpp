@@ -58,12 +58,12 @@ def fileComparisonToStr(fileComparisonDict):
 
 def main():
     # Versions to compare
-    current, previous = "4.1.0", "4.1.0-beta.23"
-    current, previous = "4.2.0", "4.2.0-beta.12"
+    current, previous = "5.0.0-alpha.6", "4.2.0"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.1.0"         : "4.1.0_2020_02_27",
         "4.2.0"         : "4.2.0_2020_11_12",
+        "5.0.0-alpha.6" : "5.0.0-alpha.6_2021_01_05",
     }
     # List containing the files to ignore
     whiteList = [
@@ -98,22 +98,31 @@ def main():
         # DeviceInput
         "deviceInputSystem.ts", "deviceSourceManager.ts", "deviceTypes.ts",
         # Engines
-        "nativeEngine.ts", "performanceConfigurator.ts",
+        "nativeEngine.ts", "performanceConfigurator.ts", "webgpuEngine.ts",
         # Engines / Extensions
         "engine.videoTexture.ts", "engine.views.ts", "engine.webVR.ts",
         # Engines / Native
         "nativeShaderProcessor.ts",
+        # Engines / WebGPU
+        "webgpuBufferManager.ts", "webgpuCacheRenderPipeline.ts",
+        "webgpuCacheSampler.ts", "webgpuConstants.ts",
+        "webgpuHardwareTexture.ts", "webgpuPipelineContext.ts",
+        "webgpuRenderPassWrapper.ts", "webgpuShaderManager.ts",
+        "webgpuShaderProcessingContext.ts", "webgpuShaderProcessors.ts",
+        "webgpuTextureHelper.ts",
         # Helpers
         "videoDome.ts",
         # LibDeclarations
-        "browser.d.ts", "webgl.d.ts", "webgl2.d.ts", "webvr.d.ts", "webxr.d.ts",
-        "webxr.nativeextensions.d.ts",
+        "browser.d.ts", "webgl.d.ts", "webgl2.d.ts", "webgpu.d.ts","webvr.d.ts",
+        "webxr.d.ts", "webxr.nativeextensions.d.ts",
         # Loading
         "loadingScreen.ts",
         # Materials / Textures
         "basisTextureLoader.ts", "htmlElementTexture.ts", "videoTexture.ts",
         # Materials / Textures / Packer
         "frame.ts", "packer.ts",
+        # Meshes
+        "WebGPU/webgpuDataBuffer.ts",
         # Meshes / Compression
         "dracoCompression.ts",
         # Misc
@@ -142,6 +151,7 @@ def main():
         "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
         "WebXRFeaturePointSystem.ts", "WebXRHandTracking.ts",
         "webXRHTCViveMotionController.ts", "webXRGenericMotionController.ts",
+        "WebXRImageTracking.ts", "WebXRMeshDetector.ts",
         "webXRMicrosoftMixedRealityController.ts",
         "webXRMotionControllerManager.ts",
         "webXROculusTouchMotionController.ts",
