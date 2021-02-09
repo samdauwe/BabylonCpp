@@ -838,6 +838,11 @@ size_t AbstractMesh::getTotalVertices() const
   return 0;
 }
 
+size_t AbstractMesh::getTotalIndices() const
+{
+  return 0;
+}
+
 Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/, bool /*forceCopy*/)
 {
   return Uint32Array();
@@ -1502,11 +1507,10 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
     if (!iMaterial) {
       continue;
     }
-    if (!getIndices().empty()
-        && (iMaterial->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
-            || iMaterial->fillMode() == Constants::MATERIAL_TriangleFillMode
-            || iMaterial->fillMode() == Constants::MATERIAL_WireFrameFillMode
-            || iMaterial->fillMode() == Constants::MATERIAL_PointFillMode)) {
+    if (iMaterial->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
+        || iMaterial->fillMode() == Constants::MATERIAL_TriangleFillMode
+        || iMaterial->fillMode() == Constants::MATERIAL_WireFrameFillMode
+        || iMaterial->fillMode() == Constants::MATERIAL_PointFillMode) {
       anySubmeshSupportIntersect = true;
       break;
     }
@@ -1949,7 +1953,7 @@ int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z, Vector
   closest = getClosestFacetAtLocalCoordinates(invVect.x, invVect.y, invVect.z, projected, checkFace,
                                               facing);
   if (projectedSet) {
-    // tranform the local computed projected vector to world coordinates
+    // transform the local computed projected vector to world coordinates
     Vector3::TransformCoordinatesFromFloatsToRef(projected.x, projected.y, projected.z, world,
                                                  projected);
   }

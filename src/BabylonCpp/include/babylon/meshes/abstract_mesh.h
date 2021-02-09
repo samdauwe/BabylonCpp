@@ -89,11 +89,11 @@ public:
 public:
   /** No occlusion */
   static constexpr unsigned int OCCLUSION_TYPE_NONE = 0;
-  /** Occlusion set to optimisitic */
+  /** Occlusion set to optimistic */
   static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC = 1;
   /** Occlusion set to strict */
   static constexpr unsigned int OCCLUSION_TYPE_STRICT = 2;
-  /** Use an accurante occlusion algorithm */
+  /** Use an accurate occlusion algorithm */
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE = 0;
   /** Use a conservative occlusion algorithm */
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
@@ -322,6 +322,12 @@ public:
    * @returns an integer
    */
   virtual size_t getTotalVertices() const;
+
+  /**
+   * @brief Returns a positive integer : the total number of indices in this mesh geometry.
+   * @returns the number of indices or zero if the mesh has no geometry.
+   */
+  virtual size_t getTotalIndices() const;
 
   /**
    * @brief Returns null by default. Implemented by child classes.
@@ -787,7 +793,7 @@ public:
   std::vector<Vector3>& getFacetLocalPositions();
 
   /**
-   * @brief Returns the facetLocalPartioning array.
+   * @brief Returns the facetLocalPartitioning array.
    * @returns an array of array of numbers
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
@@ -844,16 +850,14 @@ public:
   Uint32Array getFacetsAtLocalCoordinates(float x, float y, float z);
 
   /**
-   * @brief Returns the closest mesh facet index at (x,y,z) World coordinates,
-   * null if not found.
+   * @brief Returns the closest mesh facet index at (x,y,z) World coordinates, null if not found
    * @param projected sets as the (x,y,z) world projection on the facet
-   * @param checkFace if true (default false), only the facet "facing" to
-   * (x,y,z) or only the ones "turning their backs", according to the parameter
-   * "facing" are returned
-   * @param facing if facing and checkFace are true, only the facet "facing" to
-   * (x, y, z) are returned : positive dot (x, y, z) * facet position. If facing
-   * si false and checkFace is true, only the facet "turning their backs" to (x,
-   * y, z) are returned : negative dot (x, y, z) * facet position
+   * @param checkFace if true (default false), only the facet "facing" to (x,y,z) or only the ones
+   * "turning their backs", according to the parameter "facing" are returned
+   * @param facing if facing and checkFace are true, only the facet "facing" to (x, y, z) are
+   * returned : positive dot (x, y, z) * facet position. If facing si false and checkFace is true,
+   * only the facet "turning their backs" to (x, y, z) are returned : negative dot (x, y, z) * facet
+   * position
    * @param x defines x coordinate
    * @param y defines y coordinate
    * @param z defines z coordinate
@@ -971,27 +975,27 @@ protected:
   size_t get_facetNb() const;
 
   /**
-   * @brief Gets the number (integer) of subdivisions per axis in the partioning space.
+   * @brief Gets the number (integer) of subdivisions per axis in the partitioning space
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   unsigned int get_partitioningSubdivisions() const;
 
   /**
-   * @brief Set the number (integer) of subdivisions per axis in the partioning space.
+   * @brief Set the number (integer) of subdivisions per axis in the partitioning space
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   void set_partitioningSubdivisions(unsigned int nb);
 
   /**
-   * @brief Gets the ratio (float) to apply to the bouding box size to set to the partioning space.
-   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding box
+   * @brief Gets the ratio (float) to apply to the bounding box size to set to the partitioning
+   * space. Ex : 1.01 (default) the partitioning space is 1% bigger than the bounding box
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   float get_partitioningBBoxRatio() const;
 
   /**
-   * @brief Set the ratio (float) to apply to the bouding box size to set to the partioning space.
-   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding box
+   * @brief Set the ratio (float) to apply to the bounding box size to set to the partitioning
+   * space. Ex : 1.01 (default) the partitioning space is 1% bigger than the bounding box
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   void set_partitioningBBoxRatio(float ratio);
@@ -1306,13 +1310,13 @@ protected:
   virtual std::vector<Vector3>& get__positions();
 
   /**
-   * @brief Sets a skeleton to apply skining transformations.
+   * @brief Sets a skeleton to apply skinning transformations.
    * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   void set_skeleton(const SkeletonPtr& value);
 
   /**
-   * @brief Gets a skeleton to apply skining transformations.
+   * @brief Gets a skeleton to apply skinning transformations.
    * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   virtual SkeletonPtr& get_skeleton();
@@ -1462,13 +1466,15 @@ public:
   ReadOnlyProperty<AbstractMesh, size_t> facetNb;
 
   /**
-   * The number (integer) of subdivisions per axis in the partioning space
+   * The number (integer) of subdivisions per axis in the partitioning space
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   Property<AbstractMesh, unsigned int> partitioningSubdivisions;
 
   /**
-   * The ratio (float) to apply to the bouding box size to set to the partioning
-   * space.
+   * The ratio (float) to apply to the bounding box size to set to the partitioning space.
+   * Ex : 1.01 (default) the partitioning space is 1% bigger than the bounding box
+   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   Property<AbstractMesh, float> partitioningBBoxRatio;
 
@@ -1888,7 +1894,7 @@ public:
   RawTexturePtr _transformMatrixTexture;
 
   /**
-   * A skeleton to apply skining transformations
+   * A skeleton to apply skinning transformations
    */
   Property<AbstractMesh, SkeletonPtr> skeleton;
 
