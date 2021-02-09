@@ -23,9 +23,9 @@ struct BABYLON_SHARED_EXPORT _FacetDataStorage {
   std::vector<Uint32Array> facetPartitioning;
   // facet number
   size_t facetNb = 0;
-  // Number of subdivisions per axis in the partioning space
+  // Number of subdivisions per axis in the partitioning space
   unsigned int partitioningSubdivisions = 10;
-  // The partioning array space is by default 1% bigger than the bounding box
+  // The partitioning array space is by default 1% bigger than the bounding box
   float partitioningBBoxRatio = 1.01f;
   // Is the facet data feature enabled on this mesh ?
   bool facetDataEnabled = false;
@@ -50,8 +50,8 @@ struct BABYLON_SHARED_EXPORT _FacetDataStorage {
   // array of depth sorted facets
   std::vector<DepthSortedFacet> depthSortedFacets;
   // facet depth sort function
-  std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)>
-    facetDepthSortFunction = nullptr;
+  std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)> facetDepthSortFunction
+    = nullptr;
   // location where to depth sort from
   std::optional<Vector3> facetDepthSortFrom = std::nullopt;
   // same as facetDepthSortFrom but expressed in the mesh local space
