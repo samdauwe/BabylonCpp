@@ -19,7 +19,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 struct IActionEvent;
-FWD_CLASS_SPTR(IAction)
+FWD_STRUCT_SPTR(IAction)
 
 /**
  * @brief Abstract class used to decouple action Manager from scene and meshes.
