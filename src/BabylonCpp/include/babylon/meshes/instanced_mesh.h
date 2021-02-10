@@ -53,7 +53,7 @@ public:
    * @brief Returns a positive integer : the total number of indices in this mesh geometry.
    * @returns the numner of indices or zero if the mesh has no geometry.
    */
-  size_t getTotalIndices() const;
+  size_t getTotalIndices() const override;
 
   /**
    * @brief Creates a new InstancedMesh object from the mesh model.

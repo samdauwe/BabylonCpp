@@ -400,7 +400,7 @@ public:
    * mesh geometry.
    * @returns the numner of indices or zero if the mesh has no geometry.
    */
-  size_t getTotalIndices() const;
+  size_t getTotalIndices() const override;
 
   /**
    * @brief Returns an array of integers or a typed array (Int32Array,
