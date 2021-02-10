@@ -389,7 +389,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Morph
-  auto numInfluencers = 0u;
+  auto numInfluencers = 0ull;
   const MorphTargetManagerPtr manager
     = mesh ? static_cast<Mesh*>(mesh)->morphTargetManager() : nullptr;
   if (manager) {
@@ -408,11 +408,11 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     if (normal) {
       defines.emplace_back("#define MORPHTARGETS_NORMAL");
     }
-    if (numInfluencers > 0u) {
+    if (numInfluencers > 0ull) {
       defines.emplace_back("#define MORPHTARGETS");
     }
     defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numInfluencers));
-    for (unsigned int index = 0; index < numInfluencers; index++) {
+    for (size_t index = 0; index < numInfluencers; index++) {
       const auto indexStr = std::to_string(index);
       attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
 
@@ -425,10 +425,10 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       }
 
       if (uv) {
-        attribs.emplace_back(StringTools::printf("%s_%s", VertexBuffer::UVKind, indexStr));
+        attribs.emplace_back(StringTools::printf("%s_%s", VertexBuffer::UVKind, indexStr.c_str()));
       }
     }
-    if (numInfluencers > 0) {
+    if (numInfluencers > 0ull) {
       uniforms.emplace_back("morphTargetInfluences");
     }
   }
@@ -468,7 +468,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     options.fallbacks           = std::move(fallbacks);
     options.onCompiled          = onCompiled;
     options.onError             = onError;
-    options.indexParameters     = {{"maxSimultaneousMorphTargets", numInfluencers}};
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", static_cast<unsigned int>(numInfluencers)}};
 
     _effect = engine->createEffect(shaderName, options, engine);
 
