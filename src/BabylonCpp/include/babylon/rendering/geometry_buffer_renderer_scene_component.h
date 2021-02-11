@@ -14,15 +14,14 @@ FWD_CLASS_SPTR(GeometryBufferRendererSceneComponent)
 FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
- * @brief Defines the Geometry Buffer scene component responsible to manage a
- * G-Buffer useful in several rendering techniques.
+ * @brief Defines the Geometry Buffer scene component responsible to manage a G-Buffer useful in
+ * several rendering techniques.
  */
 class BABYLON_SHARED_EXPORT GeometryBufferRendererSceneComponent : public ISceneComponent {
 
 public:
   /**
-   * The component name helpful to identify the component in the list of scene
-   * components.
+   * The component name helpful to identify the component in the list of scene components.
    */
   static constexpr const char* name = SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER;
 
@@ -41,8 +40,7 @@ public:
   void _register() override;
 
   /**
-   * @brief Rebuilds the elements related to this component in case of
-   * context lost for instance.
+   * @brief Rebuilds the elements related to this component in case of context lost for instance.
    */
   void rebuild() override;
 
