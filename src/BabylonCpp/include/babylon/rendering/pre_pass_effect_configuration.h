@@ -2,6 +2,7 @@
 #define BABYLON_RENDERING_PRE_PASS_EFFECT_CONFIGURATION_H
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,10 @@ struct BABYLON_SHARED_EXPORT PrePassEffectConfiguration {
    * Is the effect enabled
    */
   bool enabled = false;
+  /**
+   * Does the output of this prepass need to go through imageprocessing
+   */
+  std::optional<bool> needsImageProcessing = std::nullopt;
   /**
    * @brief Disposes the effect configuration.
    */
