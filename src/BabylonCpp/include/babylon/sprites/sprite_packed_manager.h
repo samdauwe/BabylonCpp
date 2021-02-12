@@ -36,7 +36,7 @@ protected:
    * @param scene defines the hosting scene
    * @param spriteJSON null otherwise a JSON object defining sprite sheet data
    * @param epsilon defines the epsilon value to align texture (0.01 by default)
-   * @param samplingMode defines the smapling mode to use with spritesheet
+   * @param samplingMode defines the sampling mode to use with spritesheet
    * @param fromPacked set to true; do not alter
    */
   SpritePackedManager(const std::string& name, const std::string& imgUrl, unsigned int capacity,

@@ -102,7 +102,7 @@ public:
   /**
    * @brief Parses a JSON object to create a new sprite manager.
    * @param parsedManager The JSON object to parse
-   * @param scene The scene to create the sprite managerin
+   * @param scene The scene to create the sprite manager
    * @param rootUrl The root url to use to load external dependencies like texture
    * @returns the new sprite manager
    */
@@ -118,7 +118,7 @@ protected:
    * @param cellSize defines the size of a sprite cell
    * @param scene defines the hosting scene
    * @param epsilon defines the epsilon value to align texture (0.01 by default)
-   * @param samplingMode defines the smapling mode to use with spritesheet
+   * @param samplingMode defines the sampling mode to use with spritesheet
    * @param fromPacked set to false; do not alter
    * @param spriteJSON null otherwise a JSON object defining sprite sheet data; do not alter
    */

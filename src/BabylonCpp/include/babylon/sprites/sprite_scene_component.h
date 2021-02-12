@@ -5,19 +5,18 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 
-class Camera;
 class ICanvas;
 class PickingInfo;
 struct PointerEvent;
 class Sprite;
-class SpriteSceneComponent;
-using CameraPtr               = std::shared_ptr<Camera>;
-using SpriteSceneComponentPtr = std::shared_ptr<SpriteSceneComponent>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(SpriteSceneComponent)
 
 /**
  * @brief Defines the sprite scene component responsible to manage sprites in a given scene.
