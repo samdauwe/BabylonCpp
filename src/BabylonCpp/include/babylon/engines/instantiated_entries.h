@@ -5,15 +5,13 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class AnimationGroup;
-class Skeleton;
-class TransformNode;
-using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
-using SkeletonPtr       = std::shared_ptr<Skeleton>;
-using TransformNodePtr  = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(AnimationGroup)
+FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Class used to store the output of the AssetContainer.instantiateAllMeshesToScene function.
