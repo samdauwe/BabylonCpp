@@ -72,7 +72,8 @@ SpriteMap::SpriteMap(const std::string& iName, const ISpriteJSONAtlas& iAtlasJSO
   auto shaderString = Effect::ShadersStore()["spriteMapPixelShader"];
 
   std::string layerSampleString;
-  if (_scene->getEngine()->webGLVersion == 1.f) {
+
+  if (!scene->getEngine()->_features.supportSwitchCaseInShader) {
     layerSampleString = "";
     for (size_t i = 0; i < options.layerCount; ++i) {
       const auto iStr = std::to_string(i);
