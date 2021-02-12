@@ -74,7 +74,7 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
   std::unique_ptr<VertexBuffer> offsets = nullptr;
 
   if (_useInstancing) {
-    const Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
+    const Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f};
     _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
     offsets       = _spriteBuffer->createVertexBuffer("offsets", 0, 2);
   }
@@ -228,7 +228,7 @@ void SpriteRenderer::render(
     effect->setBool("alphaTest", true);
     engine->setColorWrite(false);
     if (_useInstancing) {
-      engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
+      engine->drawArraysType(Constants::MATERIAL_TriangleStripDrawMode, 0, 4, offset);
     }
     else {
       engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, (offset / 4) * 6);
@@ -239,7 +239,7 @@ void SpriteRenderer::render(
 
   engine->setAlphaMode(blendMode);
   if (_useInstancing) {
-    engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
+    engine->drawArraysType(Constants::MATERIAL_TriangleStripDrawMode, 0, 4, offset);
   }
   else {
     engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, (offset / 4) * 6);
