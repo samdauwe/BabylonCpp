@@ -1,6 +1,8 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 
+#include <optional>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
@@ -136,7 +138,6 @@ private:
 
   Matrix _transformMatrix;
   Matrix _mirrorMatrix;
-  Matrix _savedViewMatrix;
 
   BlurPostProcessPtr _blurX;
   BlurPostProcessPtr _blurY;
@@ -144,6 +145,8 @@ private:
   float _blurKernelX;
   float _blurKernelY;
   float _blurRatio;
+
+  std::optional<Plane> _saveClipPlane;
 
 }; // end of class MirrorTexture
 

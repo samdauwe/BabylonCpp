@@ -8,6 +8,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/image_processing_configuration.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 
 namespace BABYLON {
@@ -29,13 +30,13 @@ MirrorTexture::MirrorTexture(const std::string& iName,
     , _imageProcessingConfigChangeObserver{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
-    , _savedViewMatrix{Matrix::Zero()}
     , _blurX{nullptr}
     , _blurY{nullptr}
     , _adaptiveBlurKernel{0.f}
     , _blurKernelX{0.f}
     , _blurKernelY{0.f}
     , _blurRatio{1.f}
+    , _saveClipPlane{std::nullopt}
 
 {
   ignoreCameraViewport = true;
@@ -47,25 +48,40 @@ MirrorTexture::MirrorTexture(const std::string& iName,
         _updateGammaSpace();
       });
 
+  const auto engine = getScene()->getEngine();
+
+  onBeforeBindObservable.add(
+    [engine, name = this->name](RenderTargetTexture*, EventState&) -> void {
+      engine->_debugPushGroup(StringTools::printf("mirror generation for %s", name.c_str()), 1);
+    });
+
+  onAfterUnbindObservable.add(
+    [engine](RenderTargetTexture*, EventState&) -> void { engine->_debugPopGroup(1); });
+
   onBeforeRenderObservable.add([this](int*, EventState&) -> void {
     const auto scene_ = getScene();
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
-    _savedViewMatrix = scene_->getViewMatrix();
-    _mirrorMatrix.multiplyToRef(_savedViewMatrix, _transformMatrix);
+    _mirrorMatrix.multiplyToRef(scene->getViewMatrix(), _transformMatrix);
+
+    // Clone to not mark matrices as updated
     scene_->setTransformMatrix(_transformMatrix, scene_->getProjectionMatrix());
-    scene_->clipPlane                  = mirrorPlane;
+
+    _saveClipPlane    = scene->clipPlane;
+    scene_->clipPlane = mirrorPlane;
+
     scene_->getEngine()->cullBackFaces = false;
+
     scene_->setMirroredCameraPosition(
       Vector3::TransformCoordinates(scene_->activeCamera()->globalPosition(), _mirrorMatrix));
   });
 
   onAfterRenderObservable.add([this](int*, EventState&) -> void {
     const auto scene_ = getScene();
-    scene_->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
+    scene_->updateTransformMatrix();
     scene_->getEngine()->cullBackFaces = true;
-    scene_->_mirroredCameraPosition.reset(nullptr);
+    scene_->_mirroredCameraPosition    = nullptr;
 
-    scene_->clipPlane = std::nullopt;
+    scene_->clipPlane = _saveClipPlane;
   });
 }
 
