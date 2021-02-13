@@ -5544,10 +5544,13 @@ Scene::_loadFileAsync(const std::string& /*url*/, const std::optional<bool>& /*u
 
 void Scene::_createMultiviewUbo()
 {
-  _multiviewSceneUbo = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true);
+  _multiviewSceneUbo
+    = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true, "scene_multiview");
   _multiviewSceneUbo->addUniform("viewProjection", 16);
   _multiviewSceneUbo->addUniform("viewProjectionR", 16);
   _multiviewSceneUbo->addUniform("view", 16);
+  _multiviewSceneUbo->addUniform("projection", 16);
+  _multiviewSceneUbo->addUniform("viewPosition", 4);
 }
 
 void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR, std::optional<Matrix> projectionR)
@@ -5567,16 +5570,16 @@ void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR, std::optional<Matri
     _multiviewSceneUbo->updateMatrix("viewProjection", getTransformMatrix());
     _multiviewSceneUbo->updateMatrix("viewProjectionR", _transformMatrixR);
     _multiviewSceneUbo->updateMatrix("view", _viewMatrix);
-    _multiviewSceneUbo->update();
+    _multiviewSceneUbo->updateMatrix("projection", _projectionMatrix);
   }
 }
 
 void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
 {
   // Multiview is only able to be displayed directly for API's such as webXR
-  // This displays a multiview image by rendering to the multiview image and
-  // then copying the result into the sub cameras instead of rendering them and
-  // proceeding as normal from there
+  // This displays a multiview image by rendering to the multiview image and then
+  // copying the result into the sub cameras instead of rendering them and proceeding as normal from
+  // there
 
   // Render to a multiview texture
   camera->_resizeOrCreateMultiviewTexture(
