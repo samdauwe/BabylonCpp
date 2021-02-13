@@ -466,7 +466,7 @@ void BaseTexture::_markAllSubMeshesAsTexturesDirty()
 }
 
 ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
-                                        std::optional<ArrayBufferView> buffer)
+                                        std::optional<ArrayBufferView> buffer, bool flushRenderer)
 {
   if (!_texture) {
     return ArrayBufferView();
@@ -491,10 +491,43 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, width, height, static_cast<int>(faceIndex), iLevel,
-                                      buffer);
+                                      buffer, flushRenderer);
   }
 
-  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer);
+  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer, flushRenderer);
+}
+
+ArrayBufferView BaseTexture::_readPixelsSync(unsigned int faceIndex, int iLevel,
+                                             std::optional<ArrayBufferView> buffer,
+                                             bool flushRenderer)
+{
+  if (!_texture) {
+    return ArrayBufferView();
+  }
+
+  auto size   = getSize();
+  auto width  = size.width;
+  auto height = size.height;
+
+  const auto engine = _getEngine();
+  if (!engine) {
+    return ArrayBufferView();
+  }
+
+  if (iLevel != 0) {
+    width  = width / static_cast<int>(std::pow(2, iLevel));
+    height = height / static_cast<int>(std::pow(2, iLevel));
+
+    width  = static_cast<int>(std::round(width));
+    height = static_cast<int>(std::round(height));
+  }
+
+  if (_texture->isCube) {
+    return engine->_readTexturePixelsSync(_texture, width, height, static_cast<int>(faceIndex),
+                                          iLevel, buffer, flushRenderer);
+  }
+
+  return engine->_readTexturePixelsSync(_texture, width, height, -1, iLevel, buffer, flushRenderer);
 }
 
 SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()

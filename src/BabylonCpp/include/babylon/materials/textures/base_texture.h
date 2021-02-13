@@ -80,7 +80,7 @@ public:
   virtual bool checkTransformsAreIdentical(const BaseTexturePtr& texture) const;
 
   /**
-   * @brief Get the texture transform matrix used to offset tile the texture for istance.
+   * @brief Get the texture transform matrix used to offset tile the texture for instance.
    * @returns the transformation matrix
    */
   virtual Matrix* getTextureMatrix(int uBase = 1);
@@ -130,16 +130,26 @@ public:
   std::unique_ptr<BaseTexture> clone() const;
 
   /**
-   * @brief Reads the pixels stored in the webgl texture and returns them as an ArrayBuffer. This
-   * will returns an RGBA array buffer containing either in values (0-255) or float values (0-1)
-   * depending of the underlying buffer type.
+   * @brief Reads the pixels stored in the webgl texture and returns them as an ArrayBuffer.
+   * This will returns an RGBA array buffer containing either in values (0-255) or
+   * float values (0-1) depending of the underlying buffer type.
    * @param faceIndex defines the face of the texture to read (in case of cube texture)
    * @param level defines the LOD level of the texture to read (in case of Mip Maps)
    * @param buffer defines a user defined buffer to fill with data (can be null)
-   * @returns The Array buffer containing the pixels data.
+   * @param flushRenderer true to flush the renderer from the pending commands before reading the
+   * pixels
+   * @returns The Array buffer promise containing the pixels data.
    */
   ArrayBufferView readPixels(unsigned int faceIndex = 0, int level = 0,
-                             std::optional<ArrayBufferView> buffer = std::nullopt);
+                             std::optional<ArrayBufferView> buffer = std::nullopt,
+                             bool flushRenderer                    = true);
+
+  /**
+   * @brief Hidden
+   */
+  ArrayBufferView _readPixelsSync(unsigned int faceIndex = 0, int level = 0,
+                                  std::optional<ArrayBufferView> buffer = std::nullopt,
+                                  bool flushRenderer                    = true);
 
   /**
    * @brief Dispose the texture and release its associated resources.
@@ -166,7 +176,7 @@ protected:
    * Base class of all the textures in babylon.
    * It groups all the common properties the materials, post process, lights... might need
    * in order to make a correct use of the texture.
-   * @param sceneOrEngine Define the scene or engine the texture blongs to
+   * @param sceneOrEngine Define the scene or engine the texture belongs to
    */
   BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine);
 
@@ -264,7 +274,7 @@ public:
   float level;
 
   /**
-   * Define the UV chanel to use starting from 0 and defaulting to 0.
+   * Define the UV channel to use starting from 0 and defaulting to 0.
    * This is part of the texture as textures usually maps to one uv set.
    */
   unsigned int coordinatesIndex;
