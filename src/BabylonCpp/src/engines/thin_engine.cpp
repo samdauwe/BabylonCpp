@@ -4097,6 +4097,15 @@ ArrayBufferView ThinEngine::_readTexturePixels(const InternalTexturePtr& texture
                                                    buffer);
 }
 
+ArrayBufferView ThinEngine::_readTexturePixelsSync(const InternalTexturePtr& texture, int width,
+                                                   int height, int faceIndex, int level,
+                                                   std::optional<ArrayBufferView> buffer,
+                                                   bool /*flushRenderer*/)
+{
+  return _readTextureExtension->_readTexturePixels(texture, width, height, faceIndex, level,
+                                                   buffer);
+}
+
 //--------------------------------------------------------------------------------------------------
 //                              Render Target Extension
 //--------------------------------------------------------------------------------------------------
