@@ -115,8 +115,8 @@ public:
   TexturePtr clone() const;
 
   /**
-   * @brief Serialize the texture to a JSON representation we can easily use in the resepective
-   * Parse function.
+   * @brief Serialize the texture to a JSON representation we can easily use in the respective Parse
+   * function.
    * @returns The JSON representation of the texture
    */
   json serialize() const;
@@ -149,7 +149,7 @@ public:
    * @param scene Define the scene the texture should belong to
    * @param noMipmap Forces the texture to not create mip map information if true
    * @param invertY define if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode define the sampling mode we want for the texture while fectching from it
+   * @param samplingMode define the sampling mode we want for the texture while fetching from it
    * (Texture.NEAREST_SAMPLINGMODE...)
    * @param onLoad define a callback triggered when the texture has been loaded
    * @param onError define a callback triggered when an error occurred during the loading session
@@ -167,7 +167,7 @@ public:
 
   /**
    * @brief Creates a texture from its data: representation. (data: will be added in case only the
-   * payload has been passed in).
+   * payload has been passed in)
    * @param data Define the base64 payload without the data: prefix
    * @param name Define the name of the texture in the scene useful fo caching purpose for instance
    * @param buffer define the buffer to load the texture from in case the texture is loaded from a
@@ -177,7 +177,7 @@ public:
    * after load
    * @param noMipmap Forces the texture to not create mip map information if true
    * @param invertY define if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode define the sampling mode we want for the texture while fectching from it
+   * @param samplingMode define the sampling mode we want for the texture while fetching from it
    * (Texture.NEAREST_SAMPLINGMODE...)
    * @param onLoad define a callback triggered when the texture has been loaded
    * @param onError define a callback triggered when an error occurred during the loading session
@@ -196,30 +196,25 @@ public:
     unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
 protected:
-  //  clang-format off
+  // clang-format off
   /**
    * @brief Instantiates a new texture.
-   * This represents a texture in babylon. It can be easily loaded from a network, base64 or html
-   * input.
+   * This represents a texture in babylon. It can be easily loaded from a network, base64 or html input.
    * @see https://doc.babylonjs.com/babylon101/materials#texture
    * @param url defines the url of the picture to load as a texture
    * @param sceneOrEngine defines the scene or engine the texture will belong to
    * @param noMipmap defines if the texture will require mip maps or not
    * @param invertY defines if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode defines the sampling mode we want for the texture while fectching from it
-   * (Texture.NEAREST_SAMPLINGMODE...)
+   * @param samplingMode defines the sampling mode we want for the texture while fetching from it (Texture.NEAREST_SAMPLINGMODE...)
    * @param onLoad defines a callback triggered when the texture has been loaded
    * @param onError defines a callback triggered when an error occurred during the loading session
-   * @param buffer defines the buffer to load the texture from in case the texture is loaded from a
-   * buffer representation
-   * @param deleteBuffer defines if the buffer we are loading the texture from should be deleted
-   * after load
-   * @param format defines the format of the texture we are trying to load
-   * (Engine.TEXTUREFORMAT_RGBA...)
+   * @param buffer defines the buffer to load the texture from in case the texture is loaded from a buffer representation
+   * @param deleteBuffer defines if the buffer we are loading the texture from should be deleted after load
+   * @param format defines the format of the texture we are trying to load (Engine.TEXTUREFORMAT_RGBA...)
    * @param mimeType defines an optional mime type information
    * @param loaderOptions options to be passed to the loader
    */
-  //  clang-format on
+  // clang-format on
   Texture(
     const std::string& url, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
     bool noMipmap = false, const std::optional<bool>& invertY = true,

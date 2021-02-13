@@ -97,7 +97,7 @@ Texture::Texture(
         vOffset += 1.f;
       }
 
-      // Update texutre to match internal texture's wrapping
+      // Update texture to match internal texture's wrapping
       if (_texture->_cachedWrapU != -1) {
         wrapU                  = static_cast<unsigned>(_texture->_cachedWrapU);
         _texture->_cachedWrapU = -1;
