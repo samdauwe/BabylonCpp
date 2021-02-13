@@ -5,16 +5,17 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/meshes/abstract_mesh_constants.h>
 
 namespace BABYLON {
 
 class Engine;
-class InternalTexture;
-using WebGLQuery         = GL::IGLQuery;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
-using WebGLQueryPtr      = std::shared_ptr<WebGLQuery>;
+FWD_CLASS_SPTR(InternalTexture)
+
+using WebGLQuery    = GL::IGLQuery;
+using WebGLQueryPtr = std::shared_ptr<WebGLQuery>;
 
 /**
  * @brief Hidden
