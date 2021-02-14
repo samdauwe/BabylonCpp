@@ -58,8 +58,8 @@ public:
    * @param count new texture count
    * @param options Specifies texture types and sampling modes for new textures
    */
-  void updateCount(size_t count,
-                   const std::optional<IMultiRenderTargetOptions>& options = std::nullopt);
+  virtual void updateCount(size_t count,
+                           const std::optional<IMultiRenderTargetOptions>& options = std::nullopt);
 
   /**
    * @brief Dispose the render targets and their associated resources.
