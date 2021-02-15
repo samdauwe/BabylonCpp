@@ -5,16 +5,16 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/meshes/abstract_mesh_constants.h>
 
 namespace BABYLON {
 
 struct DepthTextureCreationOptions;
-class InternalTexture;
 struct IRenderTargetOptions;
 class ThinEngine;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * @brief Hidden
