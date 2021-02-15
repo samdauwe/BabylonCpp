@@ -174,7 +174,7 @@ InternalTexturePtr RawTextureExtension::createRawCubeTexture(
     gl.generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
 
-  auto filters = _this->_getSamplingParameters(samplingMode, generateMipMaps);
+  const auto filters = _this->_getSamplingParameters(samplingMode, generateMipMaps);
   gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
   gl.texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, filters.min);
 
@@ -183,6 +183,7 @@ InternalTexturePtr RawTextureExtension::createRawCubeTexture(
   _this->_bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 
   texture->generateMipMaps = generateMipMaps;
+  texture->samplingMode    = samplingMode;
 
   return texture;
 }
@@ -285,7 +286,7 @@ InternalTexturePtr RawTextureExtension::createRawCubeTextureFromUrl(
   };
 
   const auto internalCallback = [=](const std::variant<std::string, ArrayBufferView>& data,
-                                    const std::string & /*responseURL*/) -> void {
+                                    const std::string& /*responseURL*/) -> void {
     auto width = texture->width;
 
     if (!std::holds_alternative<ArrayBufferView>(data)) {
