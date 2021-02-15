@@ -52,12 +52,13 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _reflectivityIndex{-1}
     , _depthIndex{-1}
     , _normalIndex{-1}
-    , _depthNormalIndex{-1}
     , _linkedWithPrePass{false}
     , _prePassRenderer{nullptr}
+    , _useUbo{false}
 {
-  _scene = scene;
-  _ratio = ratio;
+  _scene  = scene;
+  _ratio  = ratio;
+  _useUbo = scene->getEngine()->supportsUniformBuffers;
 
   // Register the G Buffer component to the scene.
   auto component = std::static_pointer_cast<GeometryBufferRendererSceneComponent>(
@@ -224,7 +225,7 @@ float GeometryBufferRenderer::get_ratio() const
 
 bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
-  auto material = subMesh->getMaterial();
+  const auto material = subMesh->getMaterial();
 
   if (material && material->disableDepthWrite) {
     return false;
@@ -234,34 +235,44 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
   std::vector<std::string> attribs{VertexBuffer::PositionKind, VertexBuffer::NormalKind};
 
-  auto mesh = subMesh->getMesh();
+  const auto mesh = subMesh->getMesh();
 
   // Alpha test
   if (material) {
     auto needUv = false;
-    if (material->needAlphaTesting()) {
+    if (material->needAlphaTesting() && material->getAlphaTestTexture()) {
       defines.emplace_back("#define ALPHATEST");
+      defines.emplace_back(StringTools::printf(
+        "#define ALPHATEST_UV%u", material->getAlphaTestTexture()->coordinatesIndex + 1));
       needUv = true;
     }
 
-    auto asStandardMaterial = std::static_pointer_cast<StandardMaterial>(material);
-    auto asPBRMaterial      = std::static_pointer_cast<PBRMaterial>(material);
+    const auto asStandardMaterial = std::static_pointer_cast<StandardMaterial>(material);
+    const auto asPBRMaterial      = std::static_pointer_cast<PBRMaterial>(material);
 
     if (((asStandardMaterial && asStandardMaterial->bumpTexture())
          || (asPBRMaterial && asPBRMaterial->bumpTexture()))
         && StandardMaterial::BumpTextureEnabled()) {
       defines.emplace_back("#define BUMP");
-      defines.emplace_back("#define BUMPDIRECTUV 0");
+      const auto coordinatesIndex = asStandardMaterial ?
+                                      asStandardMaterial->bumpTexture()->coordinatesIndex :
+                                      asPBRMaterial->bumpTexture()->coordinatesIndex;
+      defines.emplace_back(StringTools::printf("#define BUMP_UV%u", coordinatesIndex + 1));
       needUv = true;
     }
 
     if (_enableReflectivity) {
       if (asStandardMaterial && asStandardMaterial->specularTexture()) {
         defines.emplace_back("#define HAS_SPECULAR");
+        defines.emplace_back(
+          StringTools::printf("#define REFLECTIVITY_UV%u",
+                              asStandardMaterial->specularTexture()->coordinatesIndex + 1));
         needUv = true;
       }
       else if (asPBRMaterial && asPBRMaterial->reflectivityTexture()) {
         defines.emplace_back("#define HAS_REFLECTIVITY");
+        defines.emplace_back(StringTools::printf(
+          "#define REFLECTIVITY_UV%u", asPBRMaterial->reflectivityTexture()->coordinatesIndex + 1));
         needUv = true;
       }
     }
@@ -282,9 +293,13 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   // PrePass
   if (_linkedWithPrePass) {
     defines.emplace_back("#define PREPASS");
-    if (_depthNormalIndex != -1) {
-      defines.emplace_back("#define DEPTHNORMAL_INDEX " + std::to_string(_depthNormalIndex));
-      defines.emplace_back("#define PREPASS_DEPTHNORMAL");
+    if (_depthIndex != -1) {
+      defines.emplace_back("#define DEPTH_INDEX " + std::to_string(_depthIndex));
+      defines.emplace_back("#define PREPASS_DEPTH");
+    }
+    if (_normalIndex != -1) {
+      defines.emplace_back("#define NORMAL_INDEX " + std::to_string(_normalIndex));
+      defines.emplace_back("#define PREPASS_NORMAL");
     }
   }
 
@@ -367,8 +382,8 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       {"buffersCount", _enablePosition ? 3u : 2u}};
 
     IEffectCreationOptions options;
-    options.attributes      = std::move(attribs);
-    options.uniformsNames   = {"world",
+    options.attributes          = std::move(attribs);
+    options.uniformsNames       = {"world",
                              "mBones",
                              "viewProjection",
                              "diffuseMatrix",
@@ -381,9 +396,12 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
                              "reflectivityMatrix",
                              "vTangentSpaceParams",
                              "vBumpInfos"};
-    options.samplers        = {"diffuseSampler", "bumpSampler", "reflectivitySampler"};
-    options.defines         = std::move(join);
-    options.indexParameters = std::move(indexParameters);
+    options.samplers            = {"diffuseSampler", "bumpSampler", "reflectivitySampler"};
+    options.defines             = std::move(join);
+    options.onCompiled          = nullptr;
+    options.fallbacks           = nullptr;
+    options.onError             = nullptr;
+    options.uniformBuffersNames = {"Scene"};
     options.indexParameters
       = {{"buffersCount", static_cast<unsigned>(_multiRenderTarget->textures().size() - 1)},
          {"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
@@ -507,6 +525,7 @@ void GeometryBufferRenderer::_createRenderTargets()
           renderSubMesh(opaqueSubMesh);
         }
 
+        engine->setDepthWrite(false);
         for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
           renderSubMesh(alphaTestSubMesh);
         }
@@ -516,6 +535,7 @@ void GeometryBufferRenderer::_createRenderTargets()
             renderSubMesh(transparentSubMesh);
           }
         }
+        engine->setDepthWrite(true);
       };
 }
 
@@ -567,13 +587,20 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     engine->enableEffect(_effect);
     renderingMesh->_bind(subMesh, _effect, material->fillMode());
 
-    _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
-    _effect->setMatrix("view", _scene->getViewMatrix());
+    if (!_useUbo) {
+      _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
+      _effect->setMatrix("view", _scene->getViewMatrix());
+    }
+    else {
+      MaterialHelper::FinalizeSceneUbo(_scene);
+      MaterialHelper::BindSceneUniformBuffer(_effect.get(), _scene->getSceneUniformBuffer());
+    }
 
     if (material) {
       std::optional<unsigned int> sideOrientation = std::nullopt;
       const auto effectiveMeshCasted              = std::static_pointer_cast<Mesh>(effectiveMesh);
-      const auto& instanceDataStorage             = effectiveMeshCasted->_instanceDataStorage;
+      const auto renderingMeshCasted              = std::static_pointer_cast<Mesh>(renderingMesh);
+      const auto& instanceDataStorage             = renderingMeshCasted->_instanceDataStorage;
 
       if (!instanceDataStorage->isFrozen
           && (material->backFaceCulling
