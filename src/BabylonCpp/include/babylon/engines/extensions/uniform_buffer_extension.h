@@ -60,8 +60,10 @@ public:
    * @brief Bind a buffer to the current webGL context at a given location.
    * @param buffer defines the buffer to bind
    * @param location defines the index where to bind the buffer
+   * @param name Name of the uniform variable to bind
    */
-  void bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location);
+  void bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location,
+                             const std::string& name);
 
   /**
    * @brief Bind a specific block at a given index in a specific shader program.
