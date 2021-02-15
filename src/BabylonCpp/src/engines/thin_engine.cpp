@@ -4164,9 +4164,10 @@ void ThinEngine::bindUniformBuffer(const WebGLDataBufferPtr& buffer)
   _uniformBufferExtension->bindUniformBuffer(buffer);
 }
 
-void ThinEngine::bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location)
+void ThinEngine::bindUniformBufferBase(const WebGLDataBufferPtr& buffer, unsigned int location,
+                                       const std::string& name)
 {
-  _uniformBufferExtension->bindUniformBufferBase(buffer, location);
+  _uniformBufferExtension->bindUniformBufferBase(buffer, location, name);
 }
 
 void ThinEngine::bindUniformBlock(const IPipelineContextPtr& pipelineContext,
