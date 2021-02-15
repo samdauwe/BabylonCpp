@@ -535,7 +535,9 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
                    true);
   defines.setValue("REALTIME_FILTERING", realTimeFiltering, true);
 
-  if (_scene->getEngine()->webGLVersion > 1) {
+  const auto scene = mesh->getScene();
+
+  if (scene->getEngine()->_features.needTypeSuffixInShaderConstants) {
     defines.setValue("NUM_SAMPLES", realTimeFilteringQuality, true);
   }
   else {
@@ -562,8 +564,6 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
   if (!defines._areLightsDirty) {
     return;
   }
-
-  const auto scene = mesh->getScene();
 
   if (!light) {
     // Lights
@@ -608,6 +608,18 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
       lightIndex, state.uniforms, state.samplers, uniformBuffers, true,
       defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr], onlyUpdateBuffersList);
   }
+}
+
+bool PBRMetallicRoughnessBlock::isReady(AbstractMesh* /*mesh*/,
+                                        const NodeMaterialPtr& /*nodeMaterial*/,
+                                        const NodeMaterialDefines& /*defines*/,
+                                        bool /*useInstances*/)
+{
+  if (_environmentBRDFTexture && !_environmentBRDFTexture->isReady()) {
+    return false;
+  }
+
+  return true;
 }
 
 void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
@@ -673,8 +685,8 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
   if (!light) { // Emit for all lights
     EmitFunctionFromIncludeOptions options;
     options.repeatKey = "maxSimultaneousLights";
-    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
-                                                                 "lightFragmentDeclaration",
+    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightVxUboDeclaration" :
+                                                                 "lightVxFragmentDeclaration",
                                    iComments, options);
     _lightId = 0;
 
@@ -688,8 +700,8 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
     EmitFunctionFromIncludeOptions options;
     options.replaceStrings = {{R"({X})", std::to_string(_lightId)}};
-    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
-                                                                 "lightFragmentDeclaration",
+    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightVxUboDeclaration" :
+                                                                 "lightVxFragmentDeclaration",
                                    iComments, options, std::to_string(_lightId));
   }
 
@@ -871,6 +883,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   // Fragment
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
+  state.sharedData->blockingBlocks.emplace_back(shared_from_this());
 
   const auto iComments       = StringTools::printf("//%s", name().c_str());
   const auto worldPosVarName = "v_" + worldPosition()->associatedVariableName();

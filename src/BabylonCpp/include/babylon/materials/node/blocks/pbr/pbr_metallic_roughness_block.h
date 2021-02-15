@@ -75,6 +75,17 @@ public:
                                 std::vector<std::string>& uniformBuffers) override;
 
   /**
+   * @brief Checks if the block is ready.
+   * @param mesh defines the mesh to be rendered
+   * @param nodeMaterial defines the node material requesting the update
+   * @param defines defines the material defines to update
+   * @param useInstances specifies that instances should be used
+   * @returns true if the block is ready
+   */
+  bool isReady(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
+               const NodeMaterialDefines& defines, bool useInstances = false) override;
+
+  /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
