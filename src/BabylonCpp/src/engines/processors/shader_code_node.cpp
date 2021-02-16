@@ -22,39 +22,43 @@ std::string ShaderCodeNode::process(std::unordered_map<std::string, std::string>
     if (processor) {
       // This must be done before other replacements to avoid mistakenly changing something that was
       // already changed.
-      /* if (processor->lineProcessor) */ {
-        value = processor->lineProcessor(value, options.isFragment);
+      if (processor->lineProcessor) {
+        value = processor->lineProcessor(value, options.isFragment, options.processingContext);
       }
 
-      if (/* processor->attributeProcessor && */ StringTools::startsWith(line, "attribute")) {
-        value = processor->attributeProcessor(line);
+      if (processor->attributeProcessor && StringTools::startsWith(line, "attribute")) {
+        value = processor->attributeProcessor(line, preprocessors, options.processingContext);
       }
-      else if (/* processor->varyingProcessor && */ StringTools::startsWith(line, "varying")) {
-        value = processor->varyingProcessor(line, options.isFragment);
+      else if (processor->varyingProcessor && StringTools::startsWith(line, "varying")) {
+        value = processor->varyingProcessor(line, options.isFragment, preprocessors,
+                                            options.processingContext);
       }
-      else if (/* (processor->uniformProcessor || processor->uniformBufferProcessor) && */
-               StringTools::startsWith(line, "uniform")) {
-        auto reSearch = "uniform (.+) (.+)";
+      else if ((processor->uniformProcessor || processor->uniformBufferProcessor)
+               && StringTools::startsWith(line, "uniform")
+               && !options.lookForClosingBracketForUniformBuffer) {
+        auto reSearch = R"(uniform\s+(?:(?:highp)?|(?:lowp)?)\s*(\S+)\s+(\S+)\s*;)";
         std::regex regex(reSearch, std::regex::optimize);
 
         if (std::regex_search(line, regex)) { // uniform
-          /* if (processor->uniformProcessor) */ {
-            value = processor->uniformProcessor(line, options.isFragment);
+          if (processor->uniformProcessor) {
+            value = processor->uniformProcessor(line, options.isFragment, preprocessors,
+                                                options.processingContext);
           }
         }
         else { // Uniform buffer
-          /* if (processor.uniformBufferProcessor) */ {
-            value = processor->uniformBufferProcessor(line, options.isFragment);
+          if (processor->uniformBufferProcessor) {
+            value = processor->uniformBufferProcessor(line, options.isFragment,
+                                                      options.processingContext);
             options.lookForClosingBracketForUniformBuffer = true;
           }
         }
       }
 
-      /* if (processor->endOfUniformBufferProcessor) */ {
-        if (options.lookForClosingBracketForUniformBuffer
-            && StringTools::indexOf(line, "}") != -1) {
-          options.lookForClosingBracketForUniformBuffer = false;
-          value = processor->endOfUniformBufferProcessor(line, options.isFragment);
+      if (options.lookForClosingBracketForUniformBuffer && StringTools::indexOf(line, "}") != -1) {
+        options.lookForClosingBracketForUniformBuffer = false;
+        if (processor->endOfUniformBufferProcessor) {
+          value = processor->endOfUniformBufferProcessor(line, options.isFragment,
+                                                         options.processingContext);
         }
       }
     }

@@ -7,12 +7,12 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 struct ProcessingOptions;
-struct ShaderCodeNode;
-using ShaderCodeNodePtr = std::shared_ptr<ShaderCodeNode>;
+FWD_STRUCT_SPTR(ShaderCodeNode)
 
 /**
  * @brief Hidden
