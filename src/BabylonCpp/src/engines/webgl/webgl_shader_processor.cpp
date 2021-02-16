@@ -5,11 +5,18 @@
 
 namespace BABYLON {
 
-WebGLShaderProcessor::~WebGLShaderProcessor() = default;
+WebGLShaderProcessor::WebGLShaderProcessor() : IShaderProcessor{}
+{
+  postProcessor = [this](const std::string& code, const std::vector<std::string>& defines,
+                         bool isFragment, const ShaderProcessingContextPtr& processingContext,
+                         ThinEngine* engine) -> std::string {
+    return _postProcessor(code, defines, isFragment, processingContext, engine);
+  };
+}
 
-std::string WebGLShaderProcessor::postProcessor(std::string code,
-                                                const std::vector<std::string>& /*defines*/,
-                                                bool /*isFragment*/, ThinEngine* engine)
+std::string WebGLShaderProcessor::_postProcessor(
+  std::string code, const std::vector<std::string>& /*defines*/, bool /*isFragment*/,
+  const ShaderProcessingContextPtr& /*processingContext*/, ThinEngine* engine)
 {
   // Remove extensions
   if (!engine->getCaps().drawBuffersExtension) {
