@@ -179,8 +179,8 @@ void ShaderCodeInliner::_collectFunctions()
     // remove the function from the source code
     const auto partBefore = inlineTokenIndex > 0 ? _sourceCode.substr(0, inlineTokenIndex) : "";
     const auto partAfter  = funcBodyEndIndex + 1 < static_cast<int>(_sourceCode.size()) - 1 ?
-                             _sourceCode.substr(funcBodyEndIndex + 1) :
-                             "";
+                              _sourceCode.substr(funcBodyEndIndex + 1) :
+                              "";
 
     _sourceCode = partBefore + partAfter;
 
@@ -287,6 +287,15 @@ size_t ShaderCodeInliner::_skipWhitespaces(const std::string& s, size_t index)
   return index;
 }
 
+bool ShaderCodeInliner::_isIdentifierChar(const std::string& c) const
+{
+  const int v = static_cast<int>(c[0]);
+  return (v >= 48 && v <= 57) ||  // 0-9
+         (v >= 65 && v <= 90) ||  // A-Z
+         (v >= 97 && v <= 122) || // a-z
+         (v == 95);               // _
+}
+
 std::string ShaderCodeInliner::_removeComments(const std::string& block)
 {
   auto currPos            = 0ull;
@@ -373,6 +382,13 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
         break;
       }
 
+      // Make sure "name" is not part of a bigger string
+      if (functionCallIndex == 0
+          || _isIdentifierChar(std::to_string(_sourceCode[functionCallIndex - 1]))) {
+        startIndex = functionCallIndex + name.size();
+        continue;
+      }
+
       // Find the opening parenthesis
       const auto callParamsStartIndex
         = _skipWhitespaces(_sourceCode, functionCallIndex + name.size());
@@ -398,7 +414,47 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
       const auto callParams = _sourceCode.substr(callParamsStartIndex + 1, callParamsEndIndex);
 
       // process the parameter call: extract each names
-      auto params = StringTools::split(_removeComments(callParams), ",");
+
+      // this function split the parameter list used in the function call at ',' boundaries by
+      // taking care of potential parenthesis like in:
+      //      myfunc(a, vec2(1., 0.), 4.)
+      const auto splitParameterCall = [this](const std::string& s) -> std::vector<std::string> {
+        std::vector<std::string> parameters;
+        auto curIdx = 0ull, startParamIdx = 0ull;
+        while (curIdx < s.size()) {
+          if (s[curIdx] == '(') {
+            const auto idx2 = _extractBetweenMarkers('(', ')', s, curIdx);
+            if (idx2 < 0) {
+              return parameters;
+            }
+            curIdx = idx2;
+          }
+          else if (s[curIdx] == ',') {
+            parameters.emplace_back(s.substr(startParamIdx, curIdx));
+            startParamIdx = curIdx + 1;
+          }
+          ++curIdx;
+        }
+        if (startParamIdx < curIdx) {
+          parameters.emplace_back(s.substr(startParamIdx, curIdx));
+        }
+        return parameters;
+      };
+
+      auto params = splitParameterCall(_removeComments(callParams));
+
+      if (params.empty()) {
+        if (debug) {
+          BABYLON_LOGF_WARN(
+            "ShaderCodeInliner",
+            "Invalid function call: can't extract the parameters of the function call. Function "
+            "'%s' (type=%s). callParamsStartIndex=%lu, callParams=%s",
+            name.c_str(), type.c_str(), callParamsStartIndex, callParams.c_str());
+        }
+        startIndex = functionCallIndex + name.size();
+        continue;
+      }
+
       std::vector<std::string> paramNames{};
 
       for (size_t p = 0; p < params.size(); ++p) {
@@ -432,8 +488,8 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
 
       auto partBefore = functionCallIndex > 0 ? _sourceCode.substr(0, functionCallIndex) : "";
       auto partAfter  = callParamsEndIndex + 1 < static_cast<int>(_sourceCode.size()) - 1 ?
-                         _sourceCode.substr(callParamsEndIndex + 1) :
-                         "";
+                          _sourceCode.substr(callParamsEndIndex + 1) :
+                          "";
 
       if (!retParamName.empty()) {
         // case where the function returns a value. We generate:
@@ -449,10 +505,11 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
                       + retParamName + partAfter;
 
         if (debug) {
-          BABYLON_LOGF_DEBUG(
-            "ShaderCodeInliner",
-            "Replace function call by code. Function '%s' (type=%s). injectDeclarationIndex=%d",
-            name.c_str(), type.c_str(), injectDeclarationIndex);
+          BABYLON_LOGF_DEBUG("ShaderCodeInliner",
+                             "Replace function call by code. Function '%s' (type=%s). "
+                             "injectDeclarationIndex=%d, call parameters=%s",
+                             name.c_str(), type.c_str(), injectDeclarationIndex,
+                             StringTools::join(paramNames, ',').c_str());
         }
       }
       else {
@@ -462,10 +519,11 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
         startIndex += funcBody.size() - (callParamsEndIndex + 1 - functionCallIndex);
 
         if (debug) {
-          BABYLON_LOGF_DEBUG(
-            "ShaderCodeInliner",
-            "Replace function call by code. Function '%s' (type=%s). functionCallIndex=%d",
-            name.c_str(), type.c_str(), functionCallIndex);
+          BABYLON_LOGF_DEBUG("ShaderCodeInliner",
+                             "Replace function call by code. Function '%s' (type=%s). "
+                             "functionCallIndex=%d, call parameters=%s",
+                             name.c_str(), type.c_str(), functionCallIndex,
+                             StringTools::join(paramNames, ',').c_str());
         }
       }
 
@@ -494,7 +552,8 @@ std::string ShaderCodeInliner::_replaceNames(std::string iCode,
                                              const std::vector<std::string>& sources,
                                              const std::vector<std::string>& destinations) const
 {
-
+  // TODO: Make sure "source" is not part of a bigger identifier (for eg, if source=view and we
+  // matched it with viewDirection)
   for (size_t i = 0; i < sources.size(); ++i) {
     const auto source       = _escapeRegExp(sources[i]);
     const auto& destination = destinations[i];
