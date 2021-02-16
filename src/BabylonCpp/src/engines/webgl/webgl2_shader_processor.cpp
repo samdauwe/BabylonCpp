@@ -5,21 +5,42 @@
 
 namespace BABYLON {
 
-WebGL2ShaderProcessor::~WebGL2ShaderProcessor() = default;
+WebGL2ShaderProcessor::WebGL2ShaderProcessor()
+{
+  attributeProcessor
+    = [this](const std::string& attribute,
+             const std::unordered_map<std::string, std::string>& /*preProcessors*/,
+             const ShaderProcessingContextPtr& /*processingContext*/) -> std::string {
+    return _attributeProcessor(attribute);
+  };
 
-std::string WebGL2ShaderProcessor::attributeProcessor(const std::string& attribute)
+  varyingProcessor
+    = [this](const std::string& varying, bool isFragment,
+             const std::unordered_map<std::string, std::string>& /*preProcessors*/,
+             const ShaderProcessingContextPtr& /*processingContext*/) -> std::string {
+    return _varyingProcessor(varying, isFragment);
+  };
+
+  postProcessor = [this](const std::string& code, const std::vector<std::string>& defines,
+                         bool isFragment, const ShaderProcessingContextPtr& processingContext,
+                         ThinEngine* engine) -> std::string {
+    return _postProcessor(code, defines, isFragment, processingContext, engine);
+  };
+}
+
+std::string WebGL2ShaderProcessor::_attributeProcessor(const std::string& attribute)
 {
   return StringTools::replace(attribute, "attribute", "in");
 }
 
-std::string WebGL2ShaderProcessor::varyingProcessor(const std::string& varying, bool isFragment)
+std::string WebGL2ShaderProcessor::_varyingProcessor(const std::string& varying, bool isFragment)
 {
   return StringTools::replace(varying, "varying", isFragment ? "in" : "out");
 }
 
-std::string WebGL2ShaderProcessor::postProcessor(std::string code,
-                                                 const std::vector<std::string>& defines,
-                                                 bool isFragment, ThinEngine* /*engine*/)
+std::string WebGL2ShaderProcessor::_postProcessor(
+  std::string code, const std::vector<std::string>& defines, bool isFragment,
+  const ShaderProcessingContextPtr& /*processingContext*/, ThinEngine* /*engine*/)
 {
   const auto hasDrawBuffersExtension
     = StringTools::contains(code, "#extension.+GL_EXT_draw_buffers.+require");
