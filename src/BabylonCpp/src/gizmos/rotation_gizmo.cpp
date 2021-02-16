@@ -3,6 +3,7 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/gizmos/gizmo_manager.h>
 #include <babylon/gizmos/plane_rotation_gizmo.h>
 #include <babylon/gizmos/position_gizmo.h>
@@ -10,7 +11,6 @@
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/gizmos/bounding_box_gizmo.h>
 
 namespace BABYLON {
 
@@ -99,7 +99,8 @@ void RotationGizmo::_checkBillboardTransform()
 {
   if (_nodeAttached && std::static_pointer_cast<TransformNode>(_nodeAttached)
       && std::static_pointer_cast<TransformNode>(_nodeAttached)->billboardMode()) {
-    BABYLON_LOG_ERROR("Rotation Gizmo will not work with transforms in billboard mode.");
+    BABYLON_LOG_ERROR("RotationGizmo",
+                      "Rotation Gizmo will not work with transforms in billboard mode.");
   }
 }
 
