@@ -21,7 +21,7 @@ FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiRenderTarget)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
-FWD_STRUCT_SPTR(PrePassRenderTarget)
+FWD_CLASS_SPTR(PrePassRenderTarget)
 FWD_CLASS_SPTR(SubSurfaceConfiguration)
 
 struct TextureFormatMapping {
