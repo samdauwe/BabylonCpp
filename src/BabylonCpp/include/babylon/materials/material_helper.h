@@ -73,8 +73,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void BindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo);
 
   /**
-   * @brief Helps preparing the defines values about the UVs in used in the effect. UVs are shared
-   * as much as we can accross channels in the shaders.
+   * @brief Helps preparing the defines values about the UVs in used in the effect.
+   * UVs are shared as much as we can across channels in the shaders.
    * @param texture The texture we are preparing the UVs for
    * @param defines The defines to update
    * @param key The channel key "diffuse", "specular"... used in the shader
@@ -83,9 +83,9 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                         const std::string& key);
 
   /**
-   * @brief Binds a texture matrix value to its corrsponding uniform
+   * @brief Binds a texture matrix value to its corresponding uniform.
    * @param texture The texture to bind the matrix for
-   * @param uniformBuffer The uniform buffer receivin the data
+   * @param uniformBuffer The uniform buffer receiving the data
    * @param key The channel key "diffuse", "specular"... used in the shader
    */
   static void BindTextureMatrix(BaseTexture& texture, UniformBuffer& uniformBuffer,
@@ -175,14 +175,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void PrepareDefinesForPrePass(Scene* scene, MaterialDefines& defines, bool canRenderToMRT);
 
   /**
-   * @brief Prepares the defines related to the light information passed in parameter
+   * @brief Prepares the defines related to the light information passed in parameter.
    * @param scene The scene we are intending to draw
    * @param mesh The mesh the effect is compiling for
-   * @param light The light the effect is compiling for
-   * @param lightIndex The index of the light
    * @param defines The defines to update
    * @param specularSupported Specifies whether specular is supported or not (override lights data)
-   * @param state Defines the current state regarding what is needed (normals, etc...)
+   * @param maxSimultaneousLights Specifies how manuy lights can be added to the effect at max
+   * @param disableLighting Specifies whether the lighting is disabled (override scene and light)
+   * @returns true if normals will be required for the rest of the effect
    */
   static void PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh, const LightPtr& light,
                                      unsigned int lightIndex, MaterialDefines& defines,
@@ -241,7 +241,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * containing the list and extra information
    * @param samplersList The sampler list
    * @param defines The defines helping in the list generation
-   * @param maxSimultaneousLights The maximum number of simultanous light allowed in the effect
+   * @param maxSimultaneousLights The maximum number of simultaneous light allowed in the effect
    */
   static void PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
                                              std::vector<std::string>& samplersList,
@@ -299,7 +299,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param attribs The current list of supported attribs
    * @param mesh The mesh to prepare the bones attributes for
    * @param defines The current Defines of the effect
-   * @param fallbacks The current efffect fallback strategy
+   * @param fallbacks The current effect fallback strategy
    */
   static void PrepareAttributesForBones(std::vector<std::string>& attribs, AbstractMesh* mesh,
                                         MaterialDefines& defines, EffectFallbacks& fallbacks);
