@@ -28,7 +28,7 @@ public:
    * @see https://doc.babylonjs.com/how_to/customizing_camera_inputs
    */
   BaseCameraMouseWheelInput();
-  ~BaseCameraMouseWheelInput(); // = default
+  virtual ~BaseCameraMouseWheelInput(); // = default
 
   /**
    * @brief Attach the mouse control to the HTML DOM element.

@@ -27,7 +27,7 @@ public:
    * @param internalTexture Define the internalTexture to wrap
    */
   ThinTexture(const InternalTexturePtr& internalTexture);
-  ~ThinTexture(); // = default
+  virtual ~ThinTexture(); // = default
 
   /**
    * @brief Get the class name of the texture.

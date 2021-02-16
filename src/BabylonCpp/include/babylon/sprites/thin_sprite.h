@@ -22,7 +22,7 @@ public:
    * @brief Creates a new Thin Sprite.
    */
   ThinSprite();
-  ~ThinSprite(); // = default
+  virtual ~ThinSprite(); // = default
 
   /**
    * @brief Starts an animation.
