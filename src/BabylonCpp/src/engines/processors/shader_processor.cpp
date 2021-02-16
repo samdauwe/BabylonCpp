@@ -17,6 +17,13 @@
 
 namespace BABYLON {
 
+void ShaderProcessor::Initialize(ProcessingOptions& options)
+{
+  if (options.processor && options.processor->initializeShaders) {
+    options.processor->initializeShaders(options.processingContext);
+  }
+}
+
 void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
                               const std::function<void(const std::string& migratedCode)>& callback,
                               ThinEngine* engine)
@@ -27,6 +34,17 @@ void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& 
                        = _ProcessShaderConversion(codeWithIncludes, options, engine);
                      callback(migratedCode);
                    });
+}
+
+std::unordered_map<std::string, std::string>
+ShaderProcessor::Finalize(const std::string& vertexCode, const std::string& fragmentCode,
+                          ProcessingOptions& options)
+{
+  if (!options.processor || !options.processor->finalizeShaders) {
+    return {{"vertexCode", vertexCode}, {"fragmentCode", fragmentCode}};
+  }
+
+  return options.processor->finalizeShaders(vertexCode, fragmentCode, options.processingContext);
 }
 
 std::string ShaderProcessor::_ProcessPrecision(std::string source, const ProcessingOptions& options)
@@ -376,17 +394,17 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
   auto preprocessors = _PreparePreProcessors(options);
 
   // General pre processing
-  /* if (options.processor->preProcessor) */ {
-    preparedSourceCode
-      = options.processor->preProcessor(preparedSourceCode, defines, options.isFragment);
+  if (options.processor->preProcessor) {
+    preparedSourceCode = options.processor->preProcessor(
+      preparedSourceCode, defines, options.isFragment, options.processingContext);
   }
 
   preparedSourceCode = _EvaluatePreProcessors(preparedSourceCode, preprocessors, options);
 
   // Post processing
-  /* if (options.processor->postProcessor) */ {
-    preparedSourceCode
-      = options.processor->postProcessor(preparedSourceCode, defines, options.isFragment, engine);
+  if (options.processor->postProcessor) {
+    preparedSourceCode = options.processor->postProcessor(
+      preparedSourceCode, defines, options.isFragment, options.processingContext, engine);
   }
 
   return preparedSourceCode;
@@ -395,9 +413,9 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
 void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, ProcessingOptions& options,
                                        const std::function<void(const std::string& data)>& callback)
 {
-  static std::string reStr = R"(#include<(.+)>(\((.*)\))*(\[(.*)\])*)";
-  static std::regex regex(reStr, std::regex::optimize);
-  auto regexBegin = std::sregex_iterator(sourceCode.begin(), sourceCode.end(), regex);
+  static const auto regexShaderIncludeStr = R"(#include\s?<(.+)>(\((.*)\))*(\[(.*)\])*)";
+  static std::regex regexShaderInclude(regexShaderIncludeStr, std::regex::optimize);
+  auto regexBegin = std::sregex_iterator(sourceCode.begin(), sourceCode.end(), regexShaderInclude);
   auto regexEnd   = std::sregex_iterator();
 
   auto returnValue    = sourceCode;
@@ -436,11 +454,11 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
 
         if (StringTools::indexOf(indexString, "..") != -1) {
           StringTools::replaceInPlace(indexString, "..", "@");
-          auto indexSplits = StringTools::split(indexString, '@');
-          auto minIndex    = StringTools::toNumber<int>(indexSplits[0]);
-          auto maxIndex    = StringTools::isDigit(indexSplits[1]) ?
-                            StringTools::toNumber<int>(indexSplits[1]) :
-                            -1;
+          auto indexSplits          = StringTools::split(indexString, '@');
+          auto minIndex             = StringTools::toNumber<int>(indexSplits[0]);
+          auto maxIndex             = StringTools::isDigit(indexSplits[1]) ?
+                                        StringTools::toNumber<int>(indexSplits[1]) :
+                                        -1;
           auto sourceIncludeContent = StringTools::slice(includeContent, 0);
           includeContent            = "";
 
@@ -474,7 +492,9 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
       // Replace
       returnValue = StringTools::replace(returnValue, match[0].str(), includeContent);
 
-      keepProcessing = keepProcessing || StringTools::indexOf(includeContent, "#include<") >= 0;
+      keepProcessing = keepProcessing                                            //
+                       || StringTools::indexOf(includeContent, "#include<") >= 0 //
+                       || StringTools::indexOf(includeContent, "#include <") >= 0;
     }
     else {
       auto includeShaderUrl = options.shadersRepository + "ShadersInclude/" + includeFile + ".fx";
@@ -483,7 +503,7 @@ void ShaderProcessor::_ProcessIncludes(const std::string& sourceCode, Processing
         includeShaderUrl,
         [&options, includeFile, returnValue,
          callback](const std::variant<std::string, ArrayBufferView>& fileContent,
-                   const std::string & /*responseURL*/) -> void {
+                   const std::string& /*responseURL*/) -> void {
           if (std::holds_alternative<std::string>(fileContent)) {
             options.includesShadersStore[includeFile] = std::get<std::string>(fileContent);
             _ProcessIncludes(returnValue, options, callback);

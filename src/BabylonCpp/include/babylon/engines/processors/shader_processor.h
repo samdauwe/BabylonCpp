@@ -35,9 +35,13 @@ public:
   static constexpr const char* regexSERevert = R"(defined\s*?\[(.+?)\])";
 
 public:
+  static void Initialize(ProcessingOptions& options);
   static void Process(const std::string& sourceCode, ProcessingOptions& options,
                       const std::function<void(const std::string& migratedCode)>& callback,
                       ThinEngine* engine);
+  static std::unordered_map<std::string, std::string> Finalize(const std::string& vertexCode,
+                                                               const std::string& fragmentCode,
+                                                               ProcessingOptions& options);
 
   /**
    * @brief Loads a file from a url.
