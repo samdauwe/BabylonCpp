@@ -10,13 +10,14 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-struct IShaderProcessor;
-using IShaderProcessorPtr = std::shared_ptr<IShaderProcessor>;
+FWD_STRUCT_SPTR(IShaderProcessor)
+FWD_STRUCT_SPTR(ShaderProcessingContext)
 
 /**
  * @brief Hidden
@@ -33,6 +34,7 @@ struct BABYLON_SHARED_EXPORT ProcessingOptions {
   std::string version{""};
   std::string platformName{""};
   std::optional<bool> lookForClosingBracketForUniformBuffer{std::nullopt};
+  ShaderProcessingContextPtr processingContext{nullptr};
 }; // end of struct ProcessingOptions
 
 } // end of namespace BABYLON
