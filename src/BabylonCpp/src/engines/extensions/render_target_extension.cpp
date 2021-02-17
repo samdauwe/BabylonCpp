@@ -47,23 +47,21 @@ InternalTexturePtr RenderTargetExtension::createRenderTargetTexture(
       "Float textures are not supported. Render target forced to TEXTURETYPE_UNSIGNED_BYTE type")
   }
 
-  auto& gl     = *_this->_gl;
-  auto texture = InternalTexture::New(_this, InternalTextureSource::RenderTarget);
-  const auto width
-    = std::holds_alternative<RenderTargetSize>(size) ?
-        std::get<RenderTargetSize>(size).width :
-        std::holds_alternative<int>(size) ?
-        std::get<int>(size) :
-        std::holds_alternative<float>(size) ? static_cast<int>(std::get<float>(size)) : 0;
+  auto& gl         = *_this->_gl;
+  auto texture     = InternalTexture::New(_this, InternalTextureSource::RenderTarget);
+  const auto width = std::holds_alternative<RenderTargetSize>(size) ?
+                                                           std::get<RenderTargetSize>(size).width :
+                     std::holds_alternative<int>(size)   ? std::get<int>(size) :
+                     std::holds_alternative<float>(size) ? static_cast<int>(std::get<float>(size)) :
+                                                           0;
   const auto height
-    = std::holds_alternative<RenderTargetSize>(size) ?
-        std::get<RenderTargetSize>(size).height :
-        std::holds_alternative<int>(size) ?
-        std::get<int>(size) :
-        std::holds_alternative<float>(size) ? static_cast<int>(std::get<float>(size)) : 0;
-  const auto layers = std::holds_alternative<RenderTargetSize>(size) ?
-                        std::get<RenderTargetSize>(size).layers.value_or(0) :
-                        0;
+    = std::holds_alternative<RenderTargetSize>(size) ? std::get<RenderTargetSize>(size).height :
+      std::holds_alternative<int>(size)              ? std::get<int>(size) :
+      std::holds_alternative<float>(size)            ? static_cast<int>(std::get<float>(size)) :
+                                                       0;
+  const auto layers      = std::holds_alternative<RenderTargetSize>(size) ?
+                             std::get<RenderTargetSize>(size).layers.value_or(0) :
+                             0;
   const auto filters     = _this->_getSamplingParameters(*fullOptions.samplingMode,
                                                      fullOptions.generateMipMaps.value_or(false));
   const auto target      = layers != 0 ? GL::TEXTURE_2D_ARRAY : GL::TEXTURE_2D;
@@ -106,8 +104,10 @@ InternalTexturePtr RenderTargetExtension::createRenderTargetTexture(
 
   // No need to rebind on every frame
   if (!texture->is2DArray) {
-    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::TEXTURE_2D,
-                            texture->_webGLTexture.get(), 0);
+    gl.framebufferTexture2D(
+      GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::TEXTURE_2D,
+      texture->_hardwareTexture ? texture->_hardwareTexture->underlyingResource().get() : nullptr,
+      0);
   }
 
   _this->_bindUnboundFramebuffer(currentFrameBuffer);
@@ -136,11 +136,11 @@ RenderTargetExtension::createDepthStencilTexture(const RenderTargetTextureSize& 
                                                  const DepthTextureCreationOptions& options)
 {
   if (options.isCube.value_or(false)) {
-    auto width = std::holds_alternative<int>(size) ?
-                   std::get<int>(size) :
-                   std::holds_alternative<RenderTargetSize>(size) ?
-                   std::get<RenderTargetSize>(size).width :
-                   static_cast<int>(std::holds_alternative<float>(size));
+    const auto width = std::holds_alternative<int>(size) ?
+                         std::get<int>(size) :
+                       std::holds_alternative<RenderTargetSize>(size) ?
+                         std::get<RenderTargetSize>(size).width :
+                         static_cast<int>(std::holds_alternative<float>(size));
     return _this->_createDepthStencilCubeTexture(width, options);
   }
   else {
@@ -152,10 +152,10 @@ InternalTexturePtr
 RenderTargetExtension::_createDepthStencilTexture(const RenderTargetTextureSize& size,
                                                   const DepthTextureCreationOptions& options)
 {
-  auto& gl          = *_this->_gl;
-  const auto layers = std::holds_alternative<RenderTargetSize>(size) ?
-                        std::get<RenderTargetSize>(size).layers.value_or(0) :
-                        0;
+  auto& gl             = *_this->_gl;
+  const auto layers    = std::holds_alternative<RenderTargetSize>(size) ?
+                           std::get<RenderTargetSize>(size).layers.value_or(0) :
+                           0;
   const auto target    = layers != 0 ? GL::TEXTURE_2D_ARRAY : GL::TEXTURE_2D;
   auto internalTexture = InternalTexture::New(_this, InternalTextureSource::Depth);
 
