@@ -4,13 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 
 namespace BABYLON {
 
-class InternalTexture;
 class ThinEngine;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * @brief Hidden
@@ -26,7 +26,16 @@ public:
    */
   ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture, int width, int height,
                                      int faceIndex = -1, int level = 0,
-                                     std::optional<ArrayBufferView> buffer = std::nullopt);
+                                     std::optional<ArrayBufferView> buffer = std::nullopt,
+                                     bool flushRenderer                    = true);
+
+  /**
+   * @brief Hidden
+   */
+  ArrayBufferView _readTexturePixelsSync(const InternalTexturePtr& texture, int width, int height,
+                                         int faceIndex = -1, int level = 0,
+                                         std::optional<ArrayBufferView> buffer = std::nullopt,
+                                         bool flushRenderer                    = true);
 
 private:
   ThinEngine* _this;
