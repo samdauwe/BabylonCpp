@@ -48,7 +48,7 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
     for (size_t i = 0; i < count; i++) {
       const auto iStr = std::to_string(i);
       attachments[i]  = gl[_this->webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
-                                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+                                                         "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
     }
     gl.drawBuffers(attachments);
   }
@@ -73,9 +73,8 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
   _this->_bindUnboundFramebuffer(nullptr);
 }
 
-std::vector<InternalTexturePtr>
-MultiRenderExtension::createMultipleRenderTarget(ISize size,
-                                                 const IMultiRenderTargetOptions& options)
+std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget(
+  ISize size, const IMultiRenderTargetOptions& options, bool initializeBuffers)
 {
   auto generateMipMaps       = options.generateMipMaps.value_or(false);
   auto generateDepthBuffer   = options.generateDepthBuffer.value_or(true);
@@ -134,7 +133,9 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
     attachments.emplace_back(attachment);
 
     gl.activeTexture(gl["TEXTURE" + iStr]);
-    gl.bindTexture(GL::TEXTURE_2D, texture->_webGLTexture.get());
+    gl.bindTexture(GL::TEXTURE_2D, texture->_hardwareTexture ?
+                                     texture->_hardwareTexture->underlyingResource().get() :
+                                     nullptr);
 
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
@@ -145,8 +146,10 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
                   static_cast<int>(_this->_getRGBABufferInternalSizedFormat(type)), width, height,
                   0, GL::RGBA, _this->_getWebGLTextureType(type), nullptr);
 
-    gl.framebufferTexture2D(GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
-                            texture->_webGLTexture.get(), 0);
+    gl.framebufferTexture2D(
+      GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
+      texture->_hardwareTexture ? texture->_hardwareTexture->underlyingResource().get() : nullptr,
+      0);
 
     if (generateMipMaps) {
       gl.generateMipmap(GL::TEXTURE_2D);
@@ -177,9 +180,13 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
   if (generateDepthTexture && _this->_caps.depthTextureExtension) {
     // Depth texture
     auto depthTexture = InternalTexture::New(_this, InternalTextureSource::MultiRenderTarget);
+    GL::IGLTexture* depthTextureHardwareTexture
+      = depthTexture->_hardwareTexture ?
+          depthTexture->_hardwareTexture->underlyingResource().get() :
+          nullptr;
 
     gl.activeTexture(GL::TEXTURE0);
-    gl.bindTexture(GL::TEXTURE_2D, depthTexture->_webGLTexture.get());
+    gl.bindTexture(GL::TEXTURE_2D, depthTextureHardwareTexture);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
@@ -195,11 +202,11 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
                   nullptr                                                                    //
     );
 
-    gl.framebufferTexture2D(GL::FRAMEBUFFER,                   //
-                            GL::DEPTH_ATTACHMENT,              //
-                            GL::TEXTURE_2D,                    //
-                            depthTexture->_webGLTexture.get(), //
-                            0                                  //
+    gl.framebufferTexture2D(GL::FRAMEBUFFER,             //
+                            GL::DEPTH_ATTACHMENT,        //
+                            GL::TEXTURE_2D,              //
+                            depthTextureHardwareTexture, //
+                            0                            //
     );
 
     depthTexture->_framebuffer           = std::move(framebuffer);
@@ -218,7 +225,10 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
     _this->_internalTexturesCache.emplace_back(depthTexture);
   }
 
-  gl.drawBuffers(attachments);
+  if (initializeBuffers) {
+    gl.drawBuffers(attachments);
+  }
+
   _this->_bindUnboundFramebuffer(nullptr);
 
   _this->resetTextureCache();
@@ -227,7 +237,7 @@ MultiRenderExtension::createMultipleRenderTarget(ISize size,
 }
 
 unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
-  const std::vector<InternalTexturePtr>& textures, unsigned int samples)
+  const std::vector<InternalTexturePtr>& textures, unsigned int samples, bool initializeBuffers)
 {
   if (_this->webGLVersion() < 2.f || textures.empty()) {
     return 1;
@@ -308,7 +318,9 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
       gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
       attachments.emplace_back(attachment);
     }
-    gl.drawBuffers(attachments);
+    if (initializeBuffers) {
+      gl.drawBuffers(attachments);
+    }
   }
   else {
     _this->_bindUnboundFramebuffer(textures[0]->_framebuffer);
@@ -324,11 +336,6 @@ void MultiRenderExtension::bindAttachments(const std::vector<unsigned int>& atta
   auto& gl = *_this->_gl;
 
   gl.drawBuffers(attachments);
-}
-
-void MultiRenderExtension::restoreSingleAttachment()
-{
-  bindAttachments({GL::BACK});
 }
 
 std::vector<unsigned int>
@@ -348,6 +355,39 @@ MultiRenderExtension::buildTextureLayout(const std::vector<bool>& textureStatus)
   }
 
   return result;
+}
+
+void MultiRenderExtension::restoreSingleAttachment()
+{
+  bindAttachments({GL::BACK});
+}
+
+void MultiRenderExtension::restoreSingleAttachmentForRenderTarget()
+{
+  bindAttachments({GL::COLOR_ATTACHMENT0});
+}
+
+void MultiRenderExtension::clearAttachments(Uint32Array& attachments,
+                                            const std::optional<Color4>& colorMain,
+                                            const std::optional<Color4>& colorOthers,
+                                            bool clearDepth, bool clearStencil)
+{
+  if (attachments.empty()) {
+    return;
+  }
+
+  auto& gl = *_this->_gl;
+
+  gl.drawBuffers({attachments[0]});
+  _this->clear(colorMain, colorMain.has_value(), clearDepth, clearStencil);
+
+  const auto saveVal = attachments[0];
+  attachments[0]     = GL::NONE;
+
+  gl.drawBuffers(attachments);
+  _this->clear(colorOthers, colorOthers.has_value(), false, false);
+
+  attachments[0] = saveVal;
 }
 
 } // end of namespace BABYLON
