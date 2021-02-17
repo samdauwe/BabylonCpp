@@ -65,6 +65,7 @@ InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource sourc
     , _linearSpecularLOD{false}
     , _irradianceTexture{nullptr}
     , _webGLTexture{nullptr}
+    , _hardwareTexture{nullptr}
     , _references{1}
     , _gammaSpace{std::nullopt}
     , _engine{engine}

@@ -8,6 +8,7 @@
 #include <babylon/babylon_fwd.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
+#include <babylon/materials/textures/hardware_texture_wrapper.h>
 #include <babylon/materials/textures/iinternal_texture_tracker.h>
 #include <babylon/misc/observable.h>
 
@@ -328,6 +329,9 @@ public:
   BaseTexturePtr _irradianceTexture;
 
   WebGLTexturePtr _webGLTexture;
+
+  std::unique_ptr<HardwareTextureWrapper<WebGLTexturePtr>> _hardwareTexture;
+
   int _references;
 
   /** @hidden */
