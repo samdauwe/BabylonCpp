@@ -90,7 +90,7 @@ public:
   void _rebuild() override;
 
   /**
-   * @brief Removes the internal pipeline assets and detatches the pipeline from the scene cameras.
+   * @brief Removes the internal pipeline assets and detaches the pipeline from the scene cameras.
    */
   void dispose(bool disableGeometryBufferRenderer = false,
                bool disposeMaterialAndTextures    = false) override;
@@ -114,7 +114,7 @@ public:
 protected:
   /**
    * @brief Constructor
-   * @param name The rendering pipeline name.
+   * @param name The rendering pipeline name
    * @param scene The scene linked to this pipeline
    * @param ratio The size of the postprocesses. Can be a number shared between passes or an object
    * for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
@@ -122,9 +122,9 @@ protected:
    * @param forceGeometryBuffer Set to true if you want to use the legacy geometry buffer renderer
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = true);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = true);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
 
 private:
   void set_samples(unsigned int n);
@@ -252,6 +252,9 @@ private:
   PrePassRendererPtr _prePassRenderer;
 
   Uint32Array _bits;
+
+  static const Float32Array ORTHO_DEPTH_PROJECTION;
+  static const Float32Array PERSPECTIVE_DEPTH_PROJECTION;
 
 }; // end of class SSAORenderingPipeline
 
