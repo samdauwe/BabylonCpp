@@ -3962,15 +3962,17 @@ void ThinEngine::unBindMultiColorAttachmentFramebuffer(
 }
 
 std::vector<InternalTexturePtr>
-ThinEngine::createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options)
+ThinEngine::createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options,
+                                       bool initializeBuffers)
 {
-  return _multiRenderExtension->createMultipleRenderTarget(size, options);
+  return _multiRenderExtension->createMultipleRenderTarget(size, options, initializeBuffers);
 }
 
 unsigned int ThinEngine::updateMultipleRenderTargetTextureSampleCount(
-  const std::vector<InternalTexturePtr>& textures, unsigned int samples)
+  const std::vector<InternalTexturePtr>& textures, unsigned int samples, bool initializeBuffers)
 {
-  return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples);
+  return _multiRenderExtension->updateMultipleRenderTargetTextureSampleCount(textures, samples,
+                                                                             initializeBuffers);
 }
 
 void ThinEngine::bindAttachments(const std::vector<unsigned int>& attachments)
@@ -3987,6 +3989,19 @@ ThinEngine::buildTextureLayout(const std::vector<bool>& textureStatus) const
 void ThinEngine::restoreSingleAttachment()
 {
   return _multiRenderExtension->restoreSingleAttachment();
+}
+
+void ThinEngine::restoreSingleAttachmentForRenderTarget()
+{
+  _multiRenderExtension->restoreSingleAttachmentForRenderTarget();
+}
+
+void ThinEngine::clearAttachments(Uint32Array& attachments, const std::optional<Color4>& colorMain,
+                                  const std::optional<Color4>& colorOthers, bool clearDepth,
+                                  bool clearStencil)
+{
+  _multiRenderExtension->clearAttachments(attachments, colorMain, colorOthers, clearDepth,
+                                          clearStencil);
 }
 
 //--------------------------------------------------------------------------------------------------
