@@ -39,6 +39,8 @@
 
 namespace BABYLON {
 
+size_t ShadowGenerator::_Counter = 0;
+
 ShadowGenerator::ShadowGenerator(int mapSize, const IShadowLightPtr& light, bool usefulFloatFirst)
     : ShadowGenerator(ISize{mapSize, mapSize}, light, usefulFloatFirst)
 {
@@ -94,10 +96,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , _transparencyShadow{false}
     , _shadowMap{nullptr}
     , _shadowMap2{nullptr}
-    , _light{light}
-    , _scene{light->getScene()}
     , _lightDirection{Vector3::Zero()}
-    , _effect{nullptr}
     , _viewMatrix{Matrix::Zero()}
     , _projectionMatrix{Matrix::Zero()}
     , _transformMatrix{Matrix::Zero()}
@@ -109,7 +108,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , _boxBlurPostprocess{nullptr}
     , _kernelBlurXPostprocess{nullptr}
     , _kernelBlurYPostprocess{nullptr}
-    , _mapSize{RenderTargetSize{mapSize.width, mapSize.height}}
     , _currentFaceIndex{0}
     , _currentFaceIndexCache{0}
     , _useFullFloat{true}
@@ -117,13 +115,19 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
     , _defaultTextureMatrix{Matrix::Identity()}
     , _storedUniqueId{std::nullopt}
 {
+  _mapSize = RenderTargetSize{mapSize.width, mapSize.height};
+  _light   = light;
+  _scene   = light->getScene();
+  id       = light->id;
+
+  _nameForCustomEffect = StringTools::printf(
+    "%s%ull", Constants::CUSTOMEFFECT_PREFIX_SHADOWGENERATOR, ShadowGenerator::_Counter++);
+
   auto component = _scene->_getComponent(SceneComponentConstants::NAME_SHADOWGENERATOR);
   if (!component) {
     component = ShadowGeneratorSceneComponent::New(_scene);
     _scene->_addComponent(component);
   }
-
-  id = light->id;
 
   // Texture type fallback from float to int if not supported.
   const auto& caps = _scene->getEngine()->getCaps();
@@ -283,9 +287,9 @@ void ShadowGenerator::set_filter(unsigned int value)
     }
   }
 
-  // Weblg 1 fallback for PCF.
+  // WebGL fallback for PCF.
   if (value == ShadowGenerator::FILTER_PCF || value == ShadowGenerator::FILTER_PCSS) {
-    if (_scene->getEngine()->webGLVersion() == 1.f) {
+    if (!_scene->getEngine()->_features.supportShadowSamplers) {
       usePoissonSampling = true;
       return;
     }
@@ -569,8 +573,7 @@ void ShadowGenerator::_initializeGenerator()
 
 void ShadowGenerator::_createTargetRenderTexture()
 {
-  auto engine = _scene->getEngine();
-  if (engine->webGLVersion() > 1.f) {
+  if (_scene->getEngine()->_features.supportDepthStencilTexture) {
     _shadowMap = RenderTargetTexture::New(_light->name + "_shadowMap", _mapSize, _scene, false,
                                           true, _textureType, _light->needCube(),
                                           TextureConstants::TRILINEAR_SAMPLINGMODE, false, false);
@@ -610,10 +613,15 @@ void ShadowGenerator::_initializeShadowMap()
                         depthOnlySubMeshes);
   };
 
-  // Force the mesh is ready funcion to true as we are double checking it
+  // Force the mesh is ready function to true as we are double checking it
   // in the custom render function. Also it prevents side effects and useless
   // shader variations in DEPTHPREPASS mode.
   _shadowMap->customIsReadyFunction = [](AbstractMesh* /*m*/, int /*r*/) -> bool { return true; };
+
+  _shadowMap->onBeforeBindObservable.add([this](RenderTargetTexture* /*rt*/, EventState&) -> void {
+    _scene->getEngine()->_debugPushGroup(
+      StringTools::printf("shadow map generation for %s", _nameForCustomEffect.c_str()), 1);
+  });
 
   // Record Face Index before render.
   _shadowMap->onBeforeRenderObservable.add([this](const int* faceIndex, EventState&) {
@@ -621,28 +629,20 @@ void ShadowGenerator::_initializeShadowMap()
     if (_filter == ShadowGenerator::FILTER_PCF) {
       _scene->getEngine()->setColorWrite(false);
     }
-    if (_scene->getSceneUniformBuffer()->useUbo()) {
-      const auto sceneUBO = _scene->getSceneUniformBuffer();
-      sceneUBO->updateMatrix("viewProjection", getTransformMatrix());
-      sceneUBO->updateMatrix("view", _viewMatrix);
-      sceneUBO->update();
-    }
+    getTransformMatrix(); // generate the view/projection matrix
+    _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
   });
 
-  // Blur if required afer render.
+  // Blur if required after render.
   _shadowMap->onAfterUnbindObservable.add([this](RenderTargetTexture*, EventState&) {
-    auto engine = _scene->getEngine();
-    if (_scene->getSceneUniformBuffer()->useUbo()) {
-      const auto sceneUBO = _scene->getSceneUniformBuffer();
-      sceneUBO->updateMatrix("viewProjection", _scene->getTransformMatrix());
-      sceneUBO->updateMatrix("view", _scene->getViewMatrix());
-      sceneUBO->update();
-    }
+    const auto engine = _scene->getEngine();
+    _scene->updateTransformMatrix(); // restore the view/projection matrices of the active camera
 
     if (_filter == ShadowGenerator::FILTER_PCF) {
       engine->setColorWrite(true);
     }
     if (!useBlurExponentialShadowMap() && !useBlurCloseExponentialShadowMap()) {
+      engine->_debugPopGroup(1);
       return;
     }
     auto shadowMap = getShadowMapForRendering();
@@ -651,6 +651,7 @@ void ShadowGenerator::_initializeShadowMap()
       const auto texture = shadowMap->getInternalTexture();
       _scene->postProcessManager->directRender(_blurPostProcesses, texture, true);
       engine->unBindFramebuffer(texture, true);
+      engine->_debugPopGroup(1);
     }
   });
 
@@ -691,9 +692,9 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   auto targetSize = static_cast<int>(_mapSize.width / blurScale());
 
   if (!useKernelBlur() || blurScale() != 1.f) {
-    _shadowMap2        = RenderTargetTexture::New(_light->name + "_shadowMap2",
-                                           RenderTargetSize{targetSize, targetSize}, _scene, false,
-                                           true, _textureType);
+    _shadowMap2 = RenderTargetTexture::New(
+      _light->name + "_shadowMap2", RenderTargetSize{targetSize, targetSize}, _scene, false, true,
+      _textureType, false, TextureConstants::TRILINEAR_SAMPLINGMODE, false);
     _shadowMap2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
     _shadowMap2->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
     _shadowMap2->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
@@ -846,12 +847,14 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
   if (isReady(subMesh, hardwareInstancedRendering, isTransparent)) {
     subMesh->_renderId = scene->getRenderId();
 
-    const auto shadowDepthWrapper
-      = renderingMesh->material() ? renderingMesh->material()->shadowDepthWrapper : nullptr;
+    const auto shadowDepthWrapper = material->shadowDepthWrapper;
 
-    auto iEffect = (shadowDepthWrapper && shadowDepthWrapper->getEffect(subMesh, this)) ?
-                     shadowDepthWrapper->getEffect(subMesh, this) :
-                     _effect;
+    const auto iEffect = (shadowDepthWrapper && shadowDepthWrapper->getEffect(subMesh, this)) ?
+                           subMesh->_getCustomEffect(_nameForCustomEffect, false)->effect :
+                           nullptr;
+    if (!iEffect) {
+      return;
+    }
 
     engine->enableEffect(iEffect);
 
@@ -875,7 +878,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     }
 
     if (isTransparent && enableSoftTransparentShadow) {
-      iEffect->setFloat("softTransparentShadowSM", effectiveMesh->visibility());
+      iEffect->setFloat("softTransparentShadowSM", effectiveMesh->visibility() * material->alpha());
     }
 
     if (shadowDepthWrapper) {
@@ -1091,6 +1094,11 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
 
   _prepareShadowDefines(subMesh, useInstances, defines, isTransparent);
 
+  auto subMeshEffect = subMesh->_getCustomEffect(_nameForCustomEffect);
+
+  auto effect        = subMeshEffect->effect;
+  auto cachedDefines = subMeshEffect->defines;
+
   if (shadowDepthWrapper) {
     if (!shadowDepthWrapper->isReadyForSubMesh(subMesh, defines, this, useInstances)) {
       return false;
@@ -1216,8 +1224,8 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
 
     // Get correct effect
     auto join = StringTools::join(defines, '\n');
-    if (_cachedDefines != join) {
-      _cachedDefines = join;
+    if (cachedDefines != join) {
+      cachedDefines = join;
 
       std::string shaderName = "shadowMap";
       std::vector<std::string> uniforms{"world",
@@ -1267,18 +1275,25 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
         }
       }
 
+      const auto engine = _scene->getEngine();
+
       IEffectCreationOptions options;
       options.attributes      = std::move(attribs);
       options.uniformsNames   = std::move(uniforms);
       options.samplers        = std::move(samplers);
       options.defines         = std::move(join);
       options.fallbacks       = std::move(fallbacks);
+      options.onCompiled      = nullptr;
+      options.onError         = nullptr;
       options.indexParameters = {{"maxSimultaneousMorphTargets", morphInfluencers}};
 
-      _effect = _scene->getEngine()->createEffect(shaderName, options, _scene->getEngine());
+      effect = engine->createEffect(shaderName, options, _scene->getEngine());
+
+      subMeshEffect->effect  = effect;
+      subMeshEffect->defines = cachedDefines;
     }
 
-    if (!_effect->isReady()) {
+    if (!effect->isReady()) {
       return false;
     }
   }
@@ -1304,8 +1319,8 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
 
 void ShadowGenerator::prepareDefines(MaterialDefines& defines, unsigned int lightIndex)
 {
-  auto scene = _scene;
-  auto light = _light;
+  const auto scene = _scene;
+  const auto light = _light;
 
   if (!scene->shadowsEnabled() || !light->shadowEnabled) {
     return;
@@ -1417,7 +1432,6 @@ Matrix ShadowGenerator::getTransformMatrix()
   }
 
   Vector3::NormalizeToRef(_light->getShadowDirection(_currentFaceIndex), _lightDirection);
-
   if (stl_util::almost_equal(std::abs(Vector3::Dot(_lightDirection, Vector3::Up())), 1.f)) {
     // Required to avoid perfectly perpendicular light
     _lightDirection.z = 0.0000000000001f;

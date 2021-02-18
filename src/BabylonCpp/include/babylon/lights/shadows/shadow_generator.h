@@ -30,6 +30,9 @@ FWD_CLASS_SPTR(SubMesh)
  */
 class BABYLON_SHARED_EXPORT ShadowGenerator : public IShadowGenerator {
 
+private:
+  static size_t _Counter;
+
 public:
   /**
    * Name of the shadow generator class
@@ -188,19 +191,19 @@ public:
   IShadowLightPtr& getLight();
 
   /**
-   * @brief Forces all the attached effect to compile to enable rendering only once ready vs. lazyly
+   * @brief Forces all the attached effect to compile to enable rendering only once ready vs. lazily
    * compiling effects.
+   * @param onCompiled Callback triggered at the and of the effects compilation
    * @param options Sets of optional options forcing the compilation with different modes
-   * @returns A promise that resolves when the compilation completes
    */
   void forceCompilationSync(const std::function<void(IShadowGenerator* generator)>& onCompiled,
                             const ShadowGeneratorCompileOptions& options) override;
 
   /**
-   * @brief Determine wheter the shadow generator is ready or not (mainly all effects and related
+   * @brief Determine whether the shadow generator is ready or not (mainly all effects and related
    * post processes needs to be ready).
    * @param subMesh The submesh we want to render in the shadow map
-   * @param useInstances Defines wether will draw in the map using instances
+   * @param useInstances Defines whether will draw in the map using instances
    * @param isTransparent Indicates that isReady is called for a transparent subMesh
    * @returns true if ready otherwise, false
    */
@@ -219,13 +222,13 @@ public:
    * darkness... defined in the generator but impacting the effect).
    * @param lightIndex Index of the light in the enabled light list of the material owning the
    * effect
-   * @param effect The effect we are binfing the information for
+   * @param effect The effect we are binding the information for
    */
   void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the map from the light
-   * point of view. (eq to shadow prjection matrix * light transform matrix)
+   * point of view. (eq to shadow projection matrix * light transform matrix)
    * @returns The transform matrix used to create the shadow map
    */
   Matrix getTransformMatrix() override;
@@ -289,13 +292,13 @@ protected:
 
   /**
    * @brief Gets the normalBias: offset applied on the depth preventing acnea (along side the normal
-   * direction and proportinal to the light/normal angle).
+   * direction and proportional to the light/normal angle).
    */
   [[nodiscard]] float get_normalBias() const;
 
   /**
    * @brief Sets the normalBias: offset applied on the depth preventing acnea (along side the normal
-   * direction and proportinal to the light/normal angle).
+   * direction and proportional to the light/normal angle).
    */
   void set_normalBias(float normalBias);
 
@@ -585,7 +588,7 @@ public:
 
   /**
    * The normalBias: offset applied on the depth preventing acnea (along side the normal direction
-   * and proportinal to the light/normal angle)
+   * and proportional to the light/normal angle).
    */
   Property<ShadowGenerator, float> normalBias;
 
@@ -729,7 +732,6 @@ protected:
   IShadowLightPtr _light;
   Scene* _scene;
   Vector3 _lightDirection;
-  EffectPtr _effect;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   Matrix _transformMatrix;
@@ -749,6 +751,7 @@ protected:
   unsigned int _textureType;
   Matrix _defaultTextureMatrix;
   std::optional<size_t> _storedUniqueId;
+  std::string _nameForCustomEffect;
   Matrix tmpMatrix, tmpMatrix2;
 
 }; // end of class ShadowGenerator
