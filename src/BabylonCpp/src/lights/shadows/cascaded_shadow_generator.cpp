@@ -15,6 +15,7 @@
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/depth_reducer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/rendering/depth_renderer.h>
 
 namespace BABYLON {
@@ -63,7 +64,8 @@ CascadedShadowGenerator::CascadedShadowGenerator(int mapSize, const DirectionalL
     , _depthReducer{nullptr}
 {
   if (!CascadedShadowGenerator::IsSupported()) {
-    BABYLON_LOG_ERROR("CascadedShadowGenerator", "CascadedShadowMap needs WebGL 2 support.")
+    BABYLON_LOG_ERROR("CascadedShadowGenerator",
+                      "CascadedShadowMap is not supported by the current engine.")
     return;
   }
 
@@ -363,7 +365,7 @@ void CascadedShadowGenerator::set_autoCalcDepthBounds(bool value)
   if (!_depthReducer) {
     _depthReducer = std::make_shared<DepthReducer>(camera);
     _depthReducer->onAfterReductionPerformed.add(
-      [this](MinMaxFloats* minmax, EventState & /*es*/) -> void {
+      [this](MinMaxFloats* minmax, EventState& /*es*/) -> void {
         auto min = minmax->min, max = minmax->max;
         if (min >= max) {
           min = 0.f;
@@ -416,8 +418,8 @@ void CascadedShadowGenerator::_splitFrustum()
     cameraRange   = far - near,   //
     iMinDistance  = _minDistance, //
     iMaxDistance  = _shadowMaxZ < far && _shadowMaxZ >= near ?
-                     std::min((_shadowMaxZ - near) / (far - near), _maxDistance) :
-                     _maxDistance;
+                      std::min((_shadowMaxZ - near) / (far - near), _maxDistance) :
+                      _maxDistance;
 
   const auto minZ = near + iMinDistance * cameraRange, //
     maxZ          = near + iMaxDistance * cameraRange;
@@ -629,7 +631,7 @@ bool CascadedShadowGenerator::IsSupported()
   if (!engine) {
     return false;
   }
-  return engine->webGLVersion != 1.f;
+  return engine->_features.supportCSM;
 }
 
 void CascadedShadowGenerator::_initializeGenerator()
@@ -701,18 +703,26 @@ void CascadedShadowGenerator::_createTargetRenderTexture()
     }
   }
 
-  _shadowMap->onBeforeRenderObservable.add([this](int* layer, EventState & /*es*/) -> void {
+  _shadowMap->onBeforeBindObservable.clear();
+  _shadowMap->onBeforeRenderObservable.clear();
+
+  _shadowMap->onBeforeRenderObservable.add([this](int* layer, EventState& /*es*/) -> void {
     _currentLayer = *layer;
-    if (_scene->getSceneUniformBuffer()->useUbo()) {
-      const auto sceneUBO = _scene->getSceneUniformBuffer();
-      // sceneUBO->updateMatrix("viewProjection", getCascadeTransformMatrix(*layer));
-      // sceneUBO->updateMatrix("view", getCascadeViewMatrix(*layer));
-      sceneUBO->update();
+    if (_filter == ShadowGenerator::FILTER_PCF) {
+      _scene->getEngine()->setColorWrite(false);
+    }
+    auto viewL       = getCascadeViewMatrix(*layer);
+    auto projectionL = getCascadeProjectionMatrix(*layer);
+    if (viewL && projectionL) {
+      _scene->setTransformMatrix(*viewL, *projectionL);
     }
   });
 
   _shadowMap->onBeforeBindObservable.add(
-    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
+    [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
+      _scene->getEngine()->_debugPushGroup(
+        StringTools::printf("cascaded shadow map generation for %s", _nameForCustomEffect.c_str()),
+        1);
       if (_breaksAreDirty) {
         _splitFrustum();
       }

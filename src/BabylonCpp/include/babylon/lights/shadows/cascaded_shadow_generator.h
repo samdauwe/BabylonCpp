@@ -2,6 +2,7 @@
 #define BABYLON_LIGHTS_SHADOWS_CASCADED_SHADOW_GENERATOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 
@@ -12,14 +13,10 @@ struct ICascade {
   float breakDistance     = 0.f;
 }; // end of sruct ICascade
 
-class CascadedShadowGenerator;
-class DepthReducer;
-class DepthRenderer;
-class DirectionalLight;
-using CascadedShadowGeneratorPtr = std::shared_ptr<CascadedShadowGenerator>;
-using DepthReducerPtr            = std::shared_ptr<DepthReducer>;
-using DepthRendererPtr           = std::shared_ptr<DepthRenderer>;
-using DirectionalLightPtr        = std::shared_ptr<DirectionalLight>;
+FWD_CLASS_SPTR(CascadedShadowGenerator)
+FWD_CLASS_SPTR(DepthReducer)
+FWD_CLASS_SPTR(DepthRenderer)
+FWD_CLASS_SPTR(DirectionalLight)
 
 /**
  * @brief A CSM implementation allowing casting shadows on large scenes.
