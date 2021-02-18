@@ -410,11 +410,14 @@ public:
    * @param vertexBuffers defines the list of vertex buffers to store
    * @param indexBuffer defines the index buffer to store
    * @param effect defines the effect to store
+   * @param overrideVertexBuffers defines optional list of avertex buffers that overrides the
+   * entries in vertexBuffers
    * @returns the new vertex array object
    */
-  WebGLVertexArrayObjectPtr
-  recordVertexArrayObject(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                          const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect);
+  WebGLVertexArrayObjectPtr recordVertexArrayObject(
+    const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
+    const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
+    const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers = {});
 
   /**
    * @brief Bind a specific vertex array object.
@@ -443,9 +446,13 @@ public:
    * @param vertexBuffers defines the list of vertex buffers to bind
    * @param indexBuffer defines the index buffer to bind
    * @param effect defines the effect associated with the vertex buffers
+   * @param overrideVertexBuffers defines optional list of avertex buffers that overrides the
+   * entries in vertexBuffers
    */
-  virtual void bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                           const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect);
+  virtual void
+  bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
+              const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
+              const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers = {});
 
   /**
    * @brief Unbind all instance attributes.

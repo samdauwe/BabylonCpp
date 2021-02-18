@@ -325,15 +325,17 @@ public:
   void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false) override;
 
   /**
-   * @brief Bind webGl buffers directly to the webGL context.
-   * @param vertexBuffers defines the vertex buffer to bind
+   * @brief Bind a list of vertex buffers to the webGL context.
+   * @param vertexBuffers defines the list of vertex buffers to bind
    * @param indexBuffer defines the index buffer to bind
-   * @param vertexDeclaration defines the vertex declaration to use with the vertex buffer
-   * @param vertexStrideSize defines the vertex stride of the vertex buffer
-   * @param effect defines the effect associated with the vertex buffer
+   * @param effect defines the effect associated with the vertex buffers
+   * @param overrideVertexBuffers defines optional list of avertex buffers that overrides the
+   * entries in vertexBuffers
    */
   void bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                   const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect) override;
+                   const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
+                   const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers
+                   = {}) override;
 
   /**
    * @brief Force the entire cache to be cleared.

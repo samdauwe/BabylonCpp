@@ -303,7 +303,8 @@ void NullEngine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
 
 void NullEngine::bindBuffers(
   const std::unordered_map<std::string, VertexBufferPtr>& /*vertexBuffers*/,
-  const WebGLDataBufferPtr& /*indexBuffer*/, const EffectPtr& /*effect*/)
+  const WebGLDataBufferPtr& /*indexBuffer*/, const EffectPtr& /*effect*/,
+  const std::unordered_map<std::string, VertexBufferPtr>& /*overrideVertexBuffers*/)
 {
 }
 

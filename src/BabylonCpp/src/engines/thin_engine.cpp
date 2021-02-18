@@ -1229,7 +1229,8 @@ void ThinEngine::_bindVertexBuffersAttributes(
 
 WebGLVertexArrayObjectPtr ThinEngine::recordVertexArrayObject(
   const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-  const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect)
+  const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
+  const std::unordered_map<std::string, VertexBufferPtr>& /*overrideVertexBuffers*/)
 {
   auto vao = _gl->createVertexArray();
 
@@ -1317,8 +1318,10 @@ void ThinEngine::_unbindVertexArrayObject()
 #endif
 }
 
-void ThinEngine::bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                             const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect)
+void ThinEngine::bindBuffers(
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
+  const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
+  const std::unordered_map<std::string, VertexBufferPtr>& /*overrideVertexBuffers*/)
 {
   if (_cachedVertexBuffersMap != vertexBuffers || _cachedEffectForVertexBuffers != effect) {
     _cachedVertexBuffersMap       = vertexBuffers;
