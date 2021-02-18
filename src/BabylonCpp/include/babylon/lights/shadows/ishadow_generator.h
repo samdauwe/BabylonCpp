@@ -4,23 +4,23 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class Effect;
 struct MaterialDefines;
 class Matrix;
-class RenderTargetTexture;
 class ShadowGenerator;
 class SubMesh;
-using EffectPtr              = std::shared_ptr<Effect>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 struct ShadowGeneratorCompileOptions {
   bool useInstances = false;
@@ -46,10 +46,10 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
   virtual RenderTargetTexturePtr getShadowMap() = 0;
 
   /**
-   * @brief Determine wheter the shadow generator is ready or not (mainly all effects and related
+   * @brief Determine whether the shadow generator is ready or not (mainly all effects and related
    * post processes needs to be ready).
    * @param subMesh The submesh we want to render in the shadow map
-   * @param useInstances Defines wether will draw in the map using instances
+   * @param useInstances Defines whether will draw in the map using instances
    * @param isTransparent Indicates that isReady is called for a transparent subMesh
    * @returns true if ready otherwise, false
    */
@@ -65,17 +65,17 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
 
   /**
    * @brief Binds the shadow related information inside of an effect (information like near, far,
-   * darkness... defined in the generator but impacting the effect). It implies the unifroms
+   * darkness... defined in the generator but impacting the effect). It implies the uniforms
    * available on the materials are the standard BJS ones.
    * @param lightIndex Index of the light in the enabled light list of the material owning the
    * effect
-   * @param effect The effect we are binfing the information for
+   * @param effect The effect we are binding the information for
    */
   virtual void bindShadowLight(const std::string& lightIndex, Effect* effect) = 0;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the map from the light
-   * point of view. (eq to shadow prjection matrix * light transform matrix)
+   * point of view. (eq to shadow projection matrix * light transform matrix)
    * @returns The transform matrix used to create the shadow map
    */
   virtual Matrix getTransformMatrix() = 0;
@@ -87,10 +87,10 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
   virtual void recreateShadowMap() = 0;
 
   /**
-   * @brief Forces all the attached effect to compile to enable rendering only once ready vs. lazyly
+   * @brief Forces all the attached effect to compile to enable rendering only once ready vs. lazily
    * compiling effects.
+   * @param onCompiled Callback triggered at the and of the effects compilation
    * @param options Sets of optional options forcing the compilation with different modes
-   * @returns A promise that resolves when the compilation completes
    */
   virtual void
   forceCompilationSync(const std::function<void(IShadowGenerator* generator)>& onCompiled,
