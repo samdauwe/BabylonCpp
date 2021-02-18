@@ -154,7 +154,7 @@ void Geometry::_rebuild()
 
   // Index buffer
   if (!_meshes.empty()) {
-    _indexBuffer = _engine->createIndexBuffer(_indices);
+    _indexBuffer = _engine->createIndexBuffer(_indices, _updatable);
   }
 
   // Vertex buffers
@@ -186,6 +186,10 @@ void Geometry::removeVerticesData(const std::string& kind)
     _vertexBuffers[kind]->dispose();
     _vertexBuffers[kind] = nullptr;
     _vertexBuffers.erase(kind);
+  }
+
+  if (!_vertexArrayObjects.empty()) {
+    _disposeVertexArrayObjects();
   }
 }
 
@@ -219,6 +223,7 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
       mesh->_boundingInfo = std::make_unique<BoundingInfo>(extend().min, extend().max);
       mesh->_createGlobalSubMesh(false);
       mesh->computeWorldMatrix(true);
+      mesh->synchronizeInstances();
     }
   }
 
@@ -226,8 +231,6 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
 
   if (!_vertexArrayObjects.empty()) {
     _disposeVertexArrayObjects();
-    // Will trigger a rebuild of the VAO if supported
-    _vertexArrayObjects.clear();
   }
 }
 
@@ -289,6 +292,16 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
 
 void Geometry::_bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind)
 {
+  std::unordered_map<std::string, VertexBufferPtr> overrideVertexBuffers{};
+  std::unordered_map<std::string, WebGLVertexArrayObjectPtr> overrideVertexArrayObjects{};
+  _bind(effect, indexToBind, overrideVertexBuffers, overrideVertexArrayObjects);
+}
+
+void Geometry::_bind(
+  const EffectPtr& effect, WebGLDataBufferPtr indexToBind,
+  const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers,
+  std::unordered_map<std::string, WebGLVertexArrayObjectPtr>& overrideVertexArrayObjects)
+{
   if (!effect) {
     return;
   }
@@ -303,17 +316,22 @@ void Geometry::_bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind)
     return;
   }
 
-  if (indexToBind != _indexBuffer /*|| _vertexArrayObjects.empty()*/) {
-    _engine->bindBuffers(vbs, indexToBind, effect);
+  if (indexToBind != _indexBuffer
+      || (_vertexArrayObjects.empty() && overrideVertexArrayObjects.empty())) {
+    _engine->bindBuffers(vbs, indexToBind, effect, overrideVertexBuffers);
     return;
   }
 
+  auto& vaos
+    = !overrideVertexArrayObjects.empty() ? overrideVertexArrayObjects : _vertexArrayObjects;
+
   // Using VAO
-  if (!stl_util::contains(_vertexArrayObjects, effect->key())) {
-    _vertexArrayObjects[effect->key()] = _engine->recordVertexArrayObject(vbs, indexToBind, effect);
+  if (!stl_util::contains(vaos, effect->key()) || !vaos[effect->key()]) {
+    vaos[effect->key()]
+      = _engine->recordVertexArrayObject(vbs, indexToBind, effect, overrideVertexBuffers);
   }
 
-  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()], indexToBind);
+  _engine->bindVertexArrayObject(vaos[effect->key()], indexToBind);
 }
 
 size_t Geometry::getTotalVertices() const
@@ -332,27 +350,8 @@ Float32Array Geometry::getVerticesData(const std::string& kind, bool copyWhenSha
     return Float32Array();
   }
 
-  auto data = vertexBuffer->getData();
-  if (data.empty()) {
-    return Float32Array();
-  }
-
-  const auto tightlyPackedByteStride
-    = vertexBuffer->getSize() * VertexBuffer::GetTypeByteLength(vertexBuffer->type);
-  const auto count = _totalVertices * vertexBuffer->getSize();
-
-  if (vertexBuffer->type != VertexBuffer::FLOAT
-      || vertexBuffer->byteStride != tightlyPackedByteStride) {
-    Float32Array copy(count);
-    vertexBuffer->forEach(count, [&](float value, size_t index) { copy[index] = value; });
-    return copy;
-  }
-
-  if (forceCopy || (copyWhenShared && _meshes.size() != 1)) {
-    return data;
-  }
-
-  return data;
+  return vertexBuffer->getFloatData(_totalVertices,
+                                    forceCopy || (copyWhenShared && _meshes.size() != 1));
 }
 
 bool Geometry::isVertexBufferUpdatable(const std::string& kind) const
@@ -441,8 +440,6 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
     _engine->_releaseBuffer(_indexBuffer);
   }
 
-  _disposeVertexArrayObjects();
-
   _indices                = indices;
   _indexBufferIsUpdatable = updatable;
   if (!_meshes.empty()) {
@@ -456,6 +453,7 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
 
   for (const auto& mesh : _meshes) {
     mesh->_createGlobalSubMesh(true);
+    mesh->synchronizeInstances();
   }
 
   notifyUpdate();
@@ -515,6 +513,10 @@ void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 
   _meshes.erase(it);
 
+  if (!_vertexArrayObjects.empty()) {
+    mesh->_invalidateInstanceVertexArrayObject();
+  }
+
   mesh->_geometry = nullptr;
 
   if (_meshes.empty() && shouldDispose) {
@@ -531,6 +533,10 @@ void Geometry::applyToMesh(Mesh* mesh)
   auto previousGeometry = mesh->geometry();
   if (previousGeometry) {
     previousGeometry->releaseForMesh(mesh);
+  }
+
+  if (!_vertexArrayObjects.empty()) {
+    mesh->_invalidateInstanceVertexArrayObject();
   }
 
   // must be done before setting vertexBuffers because of
@@ -591,15 +597,14 @@ void Geometry::_applyToMesh(Mesh* mesh)
 
       mesh->_createGlobalSubMesh(false);
 
-      // bounding info was just created again, world matrix should be applied
-      // again.
+      // bounding info was just created again, world matrix should be applied again.
       mesh->_updateBoundingInfo();
     }
   }
 
   // indexBuffer
   if (numOfMeshes == 1 && !_indices.empty()) {
-    _indexBuffer = _engine->createIndexBuffer(_indices);
+    _indexBuffer = _engine->createIndexBuffer(_indices, _updatable);
   }
   if (_indexBuffer) {
     _indexBuffer->references = numOfMeshes;
@@ -726,7 +731,12 @@ void Geometry::_disposeVertexArrayObjects()
     for (const auto& item : _vertexArrayObjects) {
       _engine->releaseVertexArrayObject(item.second);
     }
-    _vertexArrayObjects.clear();
+
+    _vertexArrayObjects = {}; // Will trigger a rebuild of the VAO if supported
+
+    for (const auto& mesh : _meshes) {
+      mesh->_invalidateInstanceVertexArrayObject();
+    }
   }
 }
 

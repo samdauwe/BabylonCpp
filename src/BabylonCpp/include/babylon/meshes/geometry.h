@@ -154,6 +154,14 @@ public:
   void _bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind = nullptr);
 
   /**
+   * @brief Hidden
+   */
+  void
+  _bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind,
+        const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers,
+        std::unordered_map<std::string, WebGLVertexArrayObjectPtr>& overrideVertexArrayObjects);
+
+  /**
    * @brief Gets total number of vertices.
    * @returns the total number of vertices
    */
@@ -314,7 +322,7 @@ public:
   [[nodiscard]] json serialize() const;
 
   /**
-   * @brief Serialize all vertices data into a JSON oject.
+   * @brief Serialize all vertices data into a JSON object.
    * @returns a JSON representation of the current geometry data
    */
   [[nodiscard]] json serializeVerticeData() const;
@@ -470,9 +478,9 @@ public:
   std::vector<Vector3> centroids;
 
   /**
-   * If set to true (false by defaut), the bounding info applied to the meshes sharing this geometry
-   * will be the bounding info defined at the class level and won't be computed based on the vertex
-   * positions (which is what we get when useBoundingInfoFromGeometry = false)
+   * If set to true (false by default), the bounding info applied to the meshes sharing this
+   * geometry will be the bounding info defined at the class level and won't be computed based on
+   * the vertex positions (which is what we get when useBoundingInfoFromGeometry = false)
    */
   bool useBoundingInfoFromGeometry;
 
