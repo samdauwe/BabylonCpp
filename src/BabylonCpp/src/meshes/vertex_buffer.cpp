@@ -116,6 +116,29 @@ Float32Array& VertexBuffer::getData()
   return _getBuffer()->getData();
 }
 
+Float32Array VertexBuffer::getFloatData(size_t totalVertices, const std::optional<bool>& forceCopy)
+{
+  auto data = getData();
+  if (data.empty()) {
+    return Float32Array();
+  }
+
+  const auto tightlyPackedByteStride = getSize() * VertexBuffer::GetTypeByteLength(type);
+  const auto count                   = totalVertices * getSize();
+
+  if (type != VertexBuffer::FLOAT || byteStride != tightlyPackedByteStride) {
+    Float32Array copy(count);
+    forEach(count, [&](float value, size_t index) { copy[index] = value; });
+    return copy;
+  }
+
+  if (forceCopy.value_or(false)) {
+    return Float32Array(data);
+  }
+
+  return data;
+}
+
 WebGLDataBufferPtr& VertexBuffer::getBuffer()
 {
   return _getBuffer()->getBuffer();

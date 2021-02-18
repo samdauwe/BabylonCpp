@@ -205,6 +205,16 @@ public:
   Float32Array& getData();
 
   /**
+   * @brief Gets current buffer's data as a float array. Float data is constructed if the vertex
+   * buffer data cannot be returned directly.
+   * @param totalVertices number of vertices in the buffer to take into account
+   * @param forceCopy defines a boolean indicating that the returned array must be cloned upon
+   * returning it
+   * @returns a float array containing vertex data
+   */
+  Float32Array getFloatData(size_t totalVertices, const std::optional<bool>& forceCopy);
+
+  /**
    * @brief Gets underlying native buffer.
    * @returns underlying native buffer
    */
