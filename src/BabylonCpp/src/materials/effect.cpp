@@ -482,12 +482,14 @@ void Effect::_prepareEffect()
           }
         }
 
-        auto uniforms = engine->getUniforms(_pipelineContext, _uniformsNames);
+#if 0
+        auto uniforms = engine->getUniforms(_pipelineContext.get(), _uniformsNames);
         for (auto& [uniformsName, uniformLocation] : uniforms) {
           _uniforms[uniformsName] = std::move(uniformLocation);
         }
+#endif
 
-        _attributes = engine->getAttributes(_pipelineContext, attributesNames);
+        _attributes = engine->getAttributes(_pipelineContext.get(), attributesNames);
         if (!attributesNames.empty()) {
           for (size_t i = 0; i < attributesNames.size(); ++i) {
             _attributeLocationByName[attributesNames[i]] = _attributes[i];
