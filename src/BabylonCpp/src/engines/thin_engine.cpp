@@ -1855,26 +1855,26 @@ void ThinEngine::_executeWhenRenderingStateIsCompiled(const IPipelineContextPtr&
   }
 }
 
-std::unordered_map<std::string, WebGLUniformLocationPtr>
-ThinEngine::getUniforms(const IPipelineContextPtr& pipelineContext,
+std::vector<WebGLUniformLocationPtr>
+ThinEngine::getUniforms(IPipelineContext* pipelineContext,
                         const std::vector<std::string>& uniformsNames)
 {
-  std::unordered_map<std::string, WebGLUniformLocationPtr> results;
-  auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+  std::vector<WebGLUniformLocationPtr> results;
+  auto webGLPipelineContext = static_cast<WebGLPipelineContext*>(pipelineContext);
 
   for (const auto& uniformsName : uniformsNames) {
-    results[uniformsName]
-      = _gl->getUniformLocation(webGLPipelineContext->program.get(), uniformsName);
+    results.emplace_back(
+      _gl->getUniformLocation(webGLPipelineContext->program.get(), uniformsName));
   }
 
   return results;
 }
 
-Int32Array ThinEngine::getAttributes(const IPipelineContextPtr& pipelineContext,
+Int32Array ThinEngine::getAttributes(IPipelineContext* pipelineContext,
                                      const std::vector<std::string>& attributesNames)
 {
   Int32Array results;
-  auto webGLPipelineContext = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
+  auto webGLPipelineContext = static_cast<WebGLPipelineContext*>(pipelineContext);
 
   for (const auto& attributesName : attributesNames) {
     try {
@@ -1913,6 +1913,39 @@ bool ThinEngine::setInt(const WebGLUniformLocationPtr& uniform, int value)
   }
 
   _gl->uniform1i(uniform.get(), value);
+
+  return true;
+}
+
+bool ThinEngine::setInt2(const WebGLUniformLocationPtr& uniform, int x, int y)
+{
+  if (!uniform) {
+    return false;
+  }
+
+  _gl->uniform2i(uniform.get(), x, y);
+
+  return true;
+}
+
+bool ThinEngine::setInt3(const WebGLUniformLocationPtr& uniform, int x, int y, int z)
+{
+  if (!uniform) {
+    return false;
+  }
+
+  _gl->uniform3i(uniform.get(), x, y, z);
+
+  return true;
+}
+
+bool ThinEngine::setInt4(const WebGLUniformLocationPtr& uniform, int x, int y, int z, int w)
+{
+  if (!uniform) {
+    return false;
+  }
+
+  _gl->uniform4i(uniform.get(), x, y, z, w);
 
   return true;
 }

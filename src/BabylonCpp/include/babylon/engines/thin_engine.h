@@ -654,14 +654,13 @@ public:
 
   /**
    * @brief Gets the list of webGL uniform locations associated with a specific program based on a
-   * list of uniform names.
+   * list of uniform names
    * @param pipelineContext defines the pipeline context to use
    * @param uniformsNames defines the list of uniform names
    * @returns an array of webGL uniform locations
    */
-  virtual std::unordered_map<std::string, WebGLUniformLocationPtr>
-  getUniforms(const IPipelineContextPtr& pipelineContext,
-              const std::vector<std::string>& uniformsNames);
+  virtual std::vector<WebGLUniformLocationPtr>
+  getUniforms(IPipelineContext* pipelineContext, const std::vector<std::string>& uniformsNames);
 
   /**
    * @brief Gets the lsit of active attributes for a given webGL program.
@@ -669,7 +668,7 @@ public:
    * @param attributesNames defines the list of attribute names to get
    * @returns an array of indices indicating the offset of each attribute
    */
-  virtual Int32Array getAttributes(const IPipelineContextPtr& pipelineContext,
+  virtual Int32Array getAttributes(IPipelineContext* pipelineContext,
                                    const std::vector<std::string>& attributesNames);
 
   /**
@@ -679,12 +678,42 @@ public:
   virtual void enableEffect(const EffectPtr& effect);
 
   /**
-   * @brief Set the value of an uniform to a number (int)
+   * @brief Set the value of an uniform to a number (int).
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the int number to store
    * @returns true if the value was set
    */
   virtual bool setInt(const WebGLUniformLocationPtr& uniform, int value);
+
+  /**
+   * @brief Set the value of an uniform to a int2.
+   * @param uniform defines the webGL uniform location where to store the value
+   * @param x defines the 1st component of the value
+   * @param y defines the 2nd component of the value
+   * @returns true if the value was set
+   */
+  virtual bool setInt2(const WebGLUniformLocationPtr& uniform, int x, int y);
+
+  /**
+   * @brief Set the value of an uniform to a int3.
+   * @param uniform defines the webGL uniform location where to store the value
+   * @param x defines the 1st component of the value
+   * @param y defines the 2nd component of the value
+   * @param z defines the 3rd component of the value
+   * @returns true if the value was set
+   */
+  virtual bool setInt3(const WebGLUniformLocationPtr& uniform, int x, int y, int z);
+
+  /**
+   * @brief Set the value of an uniform to a int4.
+   * @param uniform defines the webGL uniform location where to store the value
+   * @param x defines the 1st component of the value
+   * @param y defines the 2nd component of the value
+   * @param z defines the 3rd component of the value
+   * @param w defines the 4th component of the value
+   * @returns true if the value was set
+   */
+  virtual bool setInt4(const WebGLUniformLocationPtr& uniform, int x, int y, int z, int w);
 
   /**
    * @brief Set the value of an uniform to an array of int32.
