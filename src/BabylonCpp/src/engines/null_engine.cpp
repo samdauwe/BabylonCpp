@@ -137,14 +137,14 @@ NullEngine::createShaderProgram(const IPipelineContextPtr& /*pipelineContext*/,
   return program;
 }
 
-std::unordered_map<std::string, WebGLUniformLocationPtr>
-NullEngine::getUniforms(const IPipelineContextPtr& /*pipelineContext*/,
+std::vector<WebGLUniformLocationPtr>
+NullEngine::getUniforms(IPipelineContext* /*pipelineContext*/,
                         const std::vector<std::string>& /*uniformsNames*/)
 {
   return {};
 }
 
-Int32Array NullEngine::getAttributes(const IPipelineContextPtr& /*pipelineContext*/,
+Int32Array NullEngine::getAttributes(IPipelineContext* /*pipelineContext*/,
                                      const std::vector<std::string>& /*attributesNames*/)
 {
   return {};

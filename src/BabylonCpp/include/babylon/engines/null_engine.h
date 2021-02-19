@@ -107,22 +107,22 @@ public:
 
   /**
    * @brief Gets the list of webGL uniform locations associated with a specific program based on a
-   * list of uniform names.
+   * list of uniform names
    * @param pipelineContext defines the pipeline context to use
    * @param uniformsNames defines the list of uniform names
    * @returns an array of webGL uniform locations
    */
-  std::unordered_map<std::string, WebGLUniformLocationPtr>
-  getUniforms(const IPipelineContextPtr& pipelineContext,
+  std::vector<WebGLUniformLocationPtr>
+  getUniforms(IPipelineContext* pipelineContext,
               const std::vector<std::string>& uniformsNames) override;
 
   /**
-   * @brief Gets the lsit of active attributes for a given webGL program
+   * @brief Gets the lsit of active attributes for a given webGL program.
    * @param pipelineContext defines the pipeline context to use
    * @param attributesNames defines the list of attribute names to get
    * @returns an array of indices indicating the offset of each attribute
    */
-  Int32Array getAttributes(const IPipelineContextPtr& pipelineContext,
+  Int32Array getAttributes(IPipelineContext* pipelineContext,
                            const std::vector<std::string>& attributesNames) override;
 
   /**
