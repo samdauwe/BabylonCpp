@@ -13,8 +13,7 @@
 namespace BABYLON {
 namespace stl_util {
 
-// Determines if the given floating point number arg is a not-a-number (NaN)
-// value.
+// Determines if the given floating point number arg is a not-a-number (NaN) value.
 #ifndef isNan
 #define isNan(a) ((a) != (a))
 #endif
@@ -169,9 +168,9 @@ std::vector<C> cast_array_elements(const std::vector<T> buffer)
 // Compares two strings in compile time constant fashion
 constexpr int c_strcmp(char const* lhs, char const* rhs)
 {
-  return (('\0' == lhs[0]) && ('\0' == rhs[0])) ?
-           0 :
-           (lhs[0] != rhs[0]) ? (lhs[0] - rhs[0]) : c_strcmp(lhs + 1, rhs + 1);
+  return (('\0' == lhs[0]) && ('\0' == rhs[0])) ? 0 :
+         (lhs[0] != rhs[0])                     ? (lhs[0] - rhs[0]) :
+                                                  c_strcmp(lhs + 1, rhs + 1);
 }
 
 // -- Helper Templates --
@@ -182,8 +181,8 @@ template <class T>
 constexpr typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
 almost_equal(T x, T y, int ulp = 4)
 {
-  // the machine epsilon has to be scaled to the magnitude of the values used
-  // and multiplied by the desired precision in ULPs (units in the last place)
+  // the machine epsilon has to be scaled to the magnitude of the values used and multiplied by the
+  // desired precision in ULPs (units in the last place)
   return std::abs(x - y) < std::numeric_limits<T>::epsilon() * std::abs(x + y) * static_cast<T>(ulp)
          // unless the result is subnormal
          || std::abs(x - y) < std::numeric_limits<T>::min();
@@ -218,10 +217,9 @@ auto max(Ts... ts) -> typename std::common_type<Ts...>::type
 /**
  * @brief Combined Comparison (Spaceship) Operator.
  *
- * Operator (expr) <=> (expr) implementation, it returns 0 if both operands are
- * equal, 1 if the left is greater, and -1 if the right is greater. It uses
- * exactly the same comparison rules as used by our existing comparison
- * operators: <, <=, ==, >= and >.
+ * Operator (expr) <=> (expr) implementation, it returns 0 if both operands are equal, 1 if the left
+ * is greater, and -1 if the right is greater. It uses exactly the same comparison rules as used by
+ * our existing comparison operators: <, <=, ==, >= and >.
  *
  * @param lhs Left hand side operand.
  * @param rhs Right hand side operand.
@@ -247,14 +245,12 @@ inline int spaceship(const std::string& lhs, const std::string& rhs)
 // Container functions
 
 /**
- * @brief Stores multiple values in the typed array, reading input values from a
- * specified array.
+ * @brief Stores multiple values in the typed array, reading input values from a specified array.
  * @param dst The array from which to copy values.
  * @param src The source array
- * @param offset The offset into the target array at which to begin writing
- * values from the source array. If you omit this value, 0 is assumed (that is,
- * the source array will overwrite values in the target array starting at index
- * 0).
+ * @param offset The offset into the target array at which to begin writing values from the source
+ * array. If you omit this value, 0 is assumed (that is, the source array will overwrite values in
+ * the target array starting at index 0).
  */
 template <typename T>
 constexpr void array_set(std::vector<T>& dst, const std::vector<T>& src, int offset = 0)
@@ -267,14 +263,13 @@ constexpr void array_set(std::vector<T>& dst, const std::vector<T>& src, int off
 }
 
 /**
- * @brief Creates a new sub vector using the specified range. The begin offset
- * is inclusive and the end offset is exclusive.
+ * @brief Creates a new sub vector using the specified range. The begin offset is inclusive and the
+ * end offset is exclusive.
  * @param src The source array
- * @param begin Element to begin at. The offset is inclusive. The whole array
- * will be included in the new view if this value is not specified.
- * @param end Element to end at. The offset is exclusive. If not specified, all
- * elements from the one specified by begin to the end of the array are included
- * in the new view.
+ * @param begin Element to begin at. The offset is inclusive. The whole array will be included in
+ * the new view if this value is not specified.
+ * @param end Element to end at. The offset is exclusive. If not specified, all elements from the
+ * one specified by begin to the end of the array are included in the new view.
  * @param A new vector
  */
 template <typename T>
@@ -326,8 +321,8 @@ inline std::unordered_map<K, V*> to_raw_ptr_map(const std::unordered_map<K, std:
 
 /**
  * @brief The concat() method is used to join two or more arrays.
- * Note: This method changes the existing arrays, returning the array a,
- * containing the values of the joined arrays.
+ * Note: This method changes the existing arrays, returning the array a, containing the values of
+ * the joined arrays.
  * @param a Required. The first array to be joined.
  * @param b Required. The first array to be joined.
  * @return An Array object, representing the joined array.
@@ -454,14 +449,13 @@ std::vector<T> remove_duplicates(const std::vector<T>& v)
 /**
  * @brief Searches the array for the specified item, and returns its position.
  * Returns -1 if the item is not found.
- * If the item is present more than once, the indexOf method returns the
- * position of the first occurence.
+ * If the item is present more than once, the indexOf method returns the position of the first
+ * occurence.
  * @param c Required. The container to search in.
  * @param elem Required. The item to search for.
- * @param start Optional. Where to start the search. Negative values will start
- * at the given position counting from the end, and search to the end.
- * @return A Number, representing the position of the specified item, otherwise
- * -1
+ * @param start Optional. Where to start the search. Negative values will start at the given
+ * position counting from the end, and search to the end.
+ * @return A Number, representing the position of the specified item, otherwise -1
  */
 template <typename C, typename T>
 inline int index_of(C& c, const T& elem, int start = 0)
@@ -476,12 +470,11 @@ inline int index_of(C& c, const T& elem, int start = 0)
 /**
  * Searches the array for the specified item, and returns its position.
  * Returns -1 if the item is not found.
- * If the item is present more than once, the indexOf method returns the
- * position of the first occurence.
+ * If the item is present more than once, the indexOf method returns the position of the first
+ * occurence.
  * @param c Required. The container to search in.
  * @param elem Required. The item to search for.
- * @return A Number, representing the position of the specified item, otherwise
- * -1
+ * @return A Number, representing the position of the specified item, otherwise -1
  */
 template <typename C, typename T>
 inline int index_of_raw_ptr(C& c, T* elem)
@@ -497,12 +490,11 @@ inline int index_of_raw_ptr(C& c, T* elem)
 /**
  * Searches the array for the specified item, and returns its position.
  * Returns -1 if the item is not found.
- * If the item is present more than once, the indexOf method returns the
- * position of the first occurence.
+ * If the item is present more than once, the indexOf method returns the position of the first
+ * occurence.
  * @param c Required. The container to search in.
  * @param elem Required. The item to search for.
- * @return A Number, representing the position of the specified item, otherwise
- * -1
+ * @return A Number, representing the position of the specified item, otherwise -1
  */
 template <typename C, typename T>
 inline int index_of_ptr(const std::vector<std::shared_ptr<C>>& c, T* elem)
@@ -544,8 +536,8 @@ inline std::vector<T> flatten(const std::vector<std::vector<T>>& orig)
 }
 
 /**
- * @brief Applies an operation sequentially to the elements of the input vector
- * using the mapping function.
+ * @brief Applies an operation sequentially to the elements of the input vector using the mapping
+ * function.
  * @param original Vector to map.
  * @param mappingFunction Unary mapping function.
  * @return A vector, containing the mapped values.
@@ -559,10 +551,9 @@ inline std::vector<T> map(const std::vector<T>& original, UnaryOperation mapping
 }
 
 /**
- * @brief Removes the last element from an array and returns that element. This
- * method changes the length of the array.
- * @return The removed element from the array; std::nullopt if the array is
- * empty.
+ * @brief Removes the last element from an array and returns that element. This method changes the
+ * length of the array.
+ * @return The removed element from the array; std::nullopt if the array is empty.
  */
 template <typename T>
 inline std::optional<T> pop(std::vector<T>& arr)
@@ -588,16 +579,14 @@ inline std::vector<T>& push_front(std::vector<T>& arr, const T& elem)
 
 /**
  * Returns the selected elements in an array, as a new array object.
- * The slice() method selects the elements starting at the given start argument,
- * and ends at, but does not include, the given end argument.
- * Note: The original array will not be changed.
+ * The slice() method selects the elements starting at the given start argument, and ends at, but
+ * does not include, the given end argument. Note: The original array will not be changed.
  * @param start Optional. An integer that specifies where to start the selection
- * (The first element has an index of 0). Use negative numbers to select from
- * the end of an array. If omitted, it acts like 0.
- * @param end   Optional. An integer that specifies where to end the
- * selection. If omitted, all elements from the start position and to the end of
- * the array will be selected. Use negative numbers to select from the end of an
- * array.
+ * (The first element has an index of 0). Use negative numbers to select from the end of an array.
+ * If omitted, it acts like 0.
+ * @param end Optional. An integer that specifies where to end the selection. If omitted, all
+ * elements from the start position and to the end of the array will be selected. Use negative
+ * numbers to select from the end of an array.
  * @return A new Array, containing the selected elements.
  */
 template <typename T>
@@ -615,16 +604,14 @@ inline std::vector<T> slice(const std::vector<T>& v, int start = 0, int end = -1
 }
 
 /**
- * Selects the elements starting at the given start argument, and ends at, but
- * does not include, the given end argument.The original array will not be
- * changed by the selected array.
+ * Selects the elements starting at the given start argument, and ends at, but does not include, the
+ * given end argument.The original array will not be changed by the selected array.
  * @param start Optional. An integer that specifies where to start the selection
- * (The first element has an index of 0). Use negative numbers to select from
- * the end of an array. If omitted, it acts like 0.
- * @param end   Optional. An integer that specifies where to end the
- * selection. If omitted, all elements from the start position and to the end of
- * the array will be selected. Use negative numbers to select from the end of an
- * array.
+ * (The first element has an index of 0). Use negative numbers to select from the end of an array.
+ * If omitted, it acts like 0.
+ * @param end Optional. An integer that specifies where to end the selection. If omitted, all
+ * elements from the start position and to the end of the array will be selected. Use negative
+ * numbers to select from the end of an array.
  * @return Nothing.
  */
 template <typename T>
@@ -643,11 +630,10 @@ inline void slice_in_place(std::vector<T>& v, int start = 0, int end = -1)
 
 /**
  * Adds/removes items to/from an array, and returns the removed item(s).
- * @param index  Required. An integer that specifies at what position to
- * add/remove items, Use negative values to specify the position from the end of
- * the array.
- * @param howmany  Required. The number of items to be removed. If set to 0, no
- * items will be removed.
+ * @param index  Required. An integer that specifies at what position to add/remove items, Use
+ * negative values to specify the position from the end of the array.
+ * @param howmany  Required. The number of items to be removed. If set to 0, no items will be
+ * removed.
  * @param itemsToAdd  Optional. The new item(s) to be added to the array
  * @return A new Array, containing the removed items (if any)
  */
