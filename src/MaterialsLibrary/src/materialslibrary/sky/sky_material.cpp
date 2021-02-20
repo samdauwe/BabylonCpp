@@ -33,6 +33,7 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
     , sunPosition{Vector3(0.f, 100.f, 0.f)}
     , useSunPosition{false}
     , cameraOffset{Vector3::Zero()}
+    , up{Vector3::Up()}
     , _cameraPosition{Vector3::Zero()}
 {
   // Vertex shader
@@ -111,11 +112,13 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
 
     const std::string shaderName{"sky"};
     auto join = defines.toString();
-    const std::vector<std::string> uniforms{
-      "world",          "viewProjection",  "view",        "vFogInfos",      "vFogColor",
-      "pointSize",      "vClipPlane",      "vClipPlane2", "vClipPlane3",    "vClipPlane4",
-      "vClipPlane5",    "vClipPlane6",     "luminance",   "turbidity",      "rayleigh",
-      "mieCoefficient", "mieDirectionalG", "sunPosition", "cameraPosition", "cameraOffset"};
+    const std::vector<std::string> uniforms{"world",          "viewProjection",  "view",
+                                            "vFogInfos",      "vFogColor",       "pointSize",
+                                            "vClipPlane",     "vClipPlane2",     "vClipPlane3",
+                                            "vClipPlane4",    "vClipPlane5",     "vClipPlane6",
+                                            "luminance",      "turbidity",       "rayleigh",
+                                            "mieCoefficient", "mieDirectionalG", "sunPosition",
+                                            "cameraPosition", "cameraOffset",    "up"};
     const std::vector<std::string> samplers{};
     const std::vector<std::string> uniformBuffers{};
 
@@ -192,6 +195,8 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   _activeEffect->setVector3("cameraOffset", cameraOffset);
 
+  _activeEffect->setVector3("up", up);
+
   if (luminance > 0.f) {
     _activeEffect->setFloat("luminance", luminance);
   }
@@ -208,6 +213,9 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     sunPosition.x = distance * std::cos(phi);
     sunPosition.y = distance * std::sin(phi) * std::sin(theta);
     sunPosition.z = distance * std::sin(phi) * std::cos(theta);
+
+    Quaternion::FromUnitVectorsToRef(Vector3::UpReadOnly(), up, _skyOrientation);
+    sunPosition.rotateByQuaternionToRef(_skyOrientation, sunPosition);
   }
 
   _activeEffect->setVector3("sunPosition", sunPosition);

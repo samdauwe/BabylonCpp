@@ -2,19 +2,18 @@
 #define BABYLON_MATERIALS_LIBRARY_SKY_SKY_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/sky/sky_material_defines.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class IAnimatable;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(IAnimatable)
 
 namespace MaterialsLibrary {
 
-class SkyMaterial;
-using SkyMaterialPtr = std::shared_ptr<SkyMaterial>;
+FWD_CLASS_SPTR(SkyMaterial)
 
 /**
  * @brief This is the sky material which allows to create dynamic and texture free effects for
@@ -187,8 +186,16 @@ public:
    */
   Vector3 cameraOffset;
 
+  /**
+   * Defines the vector the skyMaterial should consider as up. (default is Vector3(0, 1, 0) as
+   * returned by Vector3.Up())
+   */
+  Vector3 up;
+
 private:
+  // Private members
   Vector3 _cameraPosition;
+  Quaternion _skyOrientation;
 
 }; // end of class SkyMaterial
 
