@@ -48,6 +48,15 @@ void NormalMapProceduralTexture::resize(const Size& size, bool generateMipMaps)
   updateShaderUniforms();
 }
 
+bool NormalMapProceduralTexture::isReady()
+{
+  if (!_baseTexture || !_baseTexture->isReady()) {
+    return false;
+  }
+
+  return ProceduralTexture::isReady();
+}
+
 TexturePtr& NormalMapProceduralTexture::get_baseTexture()
 {
   return _baseTexture;

@@ -2,13 +2,13 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_NORMAL_MAP_NORMAL_MAP_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class NormalMapProceduralTexture;
-using NormalMapProceduralTexturePtr = std::shared_ptr<NormalMapProceduralTexture>;
+FWD_CLASS_SPTR(NormalMapProceduralTexture)
 
 class BABYLON_SHARED_EXPORT NormalMapProceduralTexture : public ProceduralTexture {
 
@@ -27,6 +27,7 @@ public:
   void updateShaderUniforms();
   void render(bool useCameraPostProcess = false) override;
   void resize(const Size& size, bool generateMipMaps = false);
+  bool isReady() override;
 
   /**
    * @brief Serializes this normal map procedural texture.
