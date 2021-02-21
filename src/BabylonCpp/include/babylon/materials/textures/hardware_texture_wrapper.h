@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/materials/textures/internal_texture_source.h>
 
 namespace BABYLON {
 
@@ -20,8 +21,8 @@ struct BABYLON_SHARED_EXPORT HardwareTextureWrapper {
   virtual T& underlyingResource() = 0;
 
   virtual void set(const T& /*hardwareTexture*/) = 0;
-  virtual void setUsage(int /*textureSource*/, bool /*generateMipMaps*/, bool /*isCube*/,
-                        int /*width*/, int /*height*/)
+  virtual void setUsage(const InternalTextureSource& /*textureSource*/, bool /*generateMipMaps*/,
+                        bool /*isCube*/, int /*width*/, int /*height*/)
     = 0;
   virtual void reset()   = 0;
   virtual void release() = 0;

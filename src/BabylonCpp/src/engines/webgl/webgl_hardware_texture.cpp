@@ -26,8 +26,9 @@ WebGLTexturePtr& WebGLHardwareTexture::underlyingResource()
   return _webGLTexture;
 }
 
-void WebGLHardwareTexture::setUsage(int /*textureSource*/, bool /*generateMipMaps*/,
-                                    bool /*isCube*/, int /*width*/, int /*height*/)
+void WebGLHardwareTexture::setUsage(const InternalTextureSource& /*textureSource*/,
+                                    bool /*generateMipMaps*/, bool /*isCube*/, int /*width*/,
+                                    int /*height*/)
 {
 }
 

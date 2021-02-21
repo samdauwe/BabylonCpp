@@ -32,8 +32,8 @@ public:
    */
   WebGLTexturePtr& underlyingResource() override;
 
-  void setUsage(int textureSource, bool generateMipMaps, bool isCube, int width,
-                int height) override;
+  void setUsage(const InternalTextureSource& textureSource, bool generateMipMaps, bool isCube,
+                int width, int height) override;
 
   void set(const WebGLTexturePtr& hardwareTexture) override;
 
