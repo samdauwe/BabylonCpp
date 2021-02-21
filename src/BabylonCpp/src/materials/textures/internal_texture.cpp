@@ -14,6 +14,8 @@
 
 namespace BABYLON {
 
+size_t InternalTexture::_Counter = 0;
+
 InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource source,
                                  bool delayAllocation)
     : isReady{false}
@@ -53,6 +55,7 @@ InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource sourc
     , _generateDepthBuffer{false}
     , _comparisonFunction{0}
     , _sphericalPolynomial{nullptr}
+    , _sphericalPolynomialComputed{false}
     , _lodGenerationScale{0}
     , _lodGenerationOffset{0}
     , _depthStencilTexture{nullptr}
@@ -64,21 +67,26 @@ InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource sourc
     , _isRGBD{false}
     , _linearSpecularLOD{false}
     , _irradianceTexture{nullptr}
-    , _webGLTexture{nullptr}
     , _hardwareTexture{nullptr}
     , _references{1}
     , _gammaSpace{std::nullopt}
     , _engine{engine}
 {
-  previous = nullptr;
-  next     = nullptr;
+  previous  = nullptr;
+  next      = nullptr;
+  _uniqueId = InternalTexture::_Counter++;
 
   if (!delayAllocation) {
-    _webGLTexture = engine->_createTexture();
+    _hardwareTexture = engine->_createHardwareTexture();
   }
 }
 
 InternalTexture::~InternalTexture() = default;
+
+size_t InternalTexture::uniqueId() const
+{
+  return _uniqueId;
+}
 
 ThinEngine* InternalTexture::getEngine()
 {
@@ -97,6 +105,8 @@ void InternalTexture::incrementReferences()
 
 void InternalTexture::updateSize(int iWidth, int iHeight, int iDepth)
 {
+  _engine->updateTextureDimensions(this, iWidth, iHeight, iDepth);
+
   width  = iWidth;
   height = iHeight;
   depth  = iDepth;
@@ -197,6 +207,7 @@ void InternalTexture::_rebuild()
       depthTextureOptions.comparisonFunction = _comparisonFunction;
       depthTextureOptions.generateStencil    = _generateStencilBuffer;
       depthTextureOptions.isCube             = isCube;
+      depthTextureOptions.samples            = samples;
 
       std::optional<int> layers = std::nullopt;
       if (is2DArray) {
@@ -263,8 +274,12 @@ void InternalTexture::_rebuild()
 
 void InternalTexture::_swapAndDie(const InternalTexturePtr& target)
 {
-  target->_webGLTexture = _webGLTexture;
-  target->_isRGBD       = _isRGBD;
+  // TODO what about refcount on target?
+
+  _hardwareTexture->setUsage(target->_source, generateMipMaps, isCube, width, height);
+
+  target->_hardwareTexture = _hardwareTexture;
+  target->_isRGBD          = _isRGBD;
 
   if (_framebuffer) {
     target->_framebuffer = _framebuffer;
@@ -315,14 +330,10 @@ void InternalTexture::_swapAndDie(const InternalTexturePtr& target)
 
 void InternalTexture::dispose()
 {
-  if (!_webGLTexture) {
-    return;
-  }
-
   --_references;
   if (_references == 0) {
     _engine->_releaseTexture(shared_from_this());
-    _webGLTexture = nullptr;
+    _hardwareTexture = nullptr;
   }
 }
 
