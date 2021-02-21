@@ -13,6 +13,7 @@
 #include <babylon/engines/engine_capabilities.h>
 #include <babylon/engines/engine_features.h>
 #include <babylon/engines/engine_options.h>
+#include <babylon/materials/textures/hardware_texture_wrapper.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/vector4.h>
 #include <babylon/maths/viewport.h>
@@ -889,6 +890,11 @@ public:
   virtual WebGLTexturePtr _createTexture();
 
   /**
+   * @brief Hidden
+   */
+  std::unique_ptr<HardwareTextureWrapper<WebGLTexturePtr>> _createHardwareTexture();
+
+  /**
    * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
    * @param url defines a value which contains one of the following:
@@ -1012,6 +1018,16 @@ public:
   virtual void updateTextureSamplingMode(unsigned int samplingMode,
                                          const InternalTexturePtr& texture,
                                          bool generateMipMaps = false);
+
+  /**
+   * @brief Update the dimensions of a texture.
+   * @param texture texture to update
+   * @param width new width of the texture
+   * @param height new height of the texture
+   * @param depth new depth of the texture
+   */
+  virtual void updateTextureDimensions(InternalTexture* texture, int width, int height,
+                                       int depth = 1);
 
   /**
    * @brief Update the sampling mode of a given texture.

@@ -17,6 +17,7 @@
 #include <babylon/engines/instancing_attribute_info.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/webgl/webgl2_shader_processor.h>
+#include <babylon/engines/webgl/webgl_hardware_texture.h>
 #include <babylon/engines/webgl/webgl_pipeline_context.h>
 #include <babylon/engines/webgl/webgl_shader_processor.h>
 #include <babylon/interfaces/icanvas.h>
@@ -849,13 +850,20 @@ void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture, unsigned int
 
   auto& gl = *_gl;
   if (texture->is2DArray) {
-    gl.framebufferTextureLayer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, texture->_webGLTexture.get(),
+    gl.framebufferTextureLayer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                               texture->_hardwareTexture
+                                   && texture->_hardwareTexture->underlyingResource().get() ?
+                                 texture->_hardwareTexture->underlyingResource().get() :
+                                 nullptr,
                                lodLevel, layer);
   }
   else if (texture->isCube) {
-    gl.framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                            GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
-                            texture->_webGLTexture.get(), lodLevel);
+    gl.framebufferTexture2D(
+      GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0, GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+      texture->_hardwareTexture && texture->_hardwareTexture->underlyingResource().get() ?
+        texture->_hardwareTexture->underlyingResource().get() :
+        nullptr,
+      lodLevel);
   }
 
   const auto& depthStencilTexture = texture->_depthStencilTexture;
@@ -864,17 +872,31 @@ void ThinEngine::bindFramebuffer(const InternalTexturePtr& texture, unsigned int
                               GL::DEPTH_STENCIL_ATTACHMENT :
                               GL::DEPTH_ATTACHMENT;
     if (texture->is2DArray) {
-      gl.framebufferTextureLayer(GL::FRAMEBUFFER, attachment,
-                                 depthStencilTexture->_webGLTexture.get(), lodLevel, layer);
+      gl.framebufferTextureLayer(
+        GL::FRAMEBUFFER, attachment,
+        depthStencilTexture->_hardwareTexture
+            && depthStencilTexture->_hardwareTexture->underlyingResource().get() ?
+          depthStencilTexture->_hardwareTexture->underlyingResource().get() :
+          nullptr,
+        lodLevel, layer);
     }
     else if (texture->isCube) {
-      gl.framebufferTexture2D(GL::FRAMEBUFFER, attachment,
-                              GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
-                              depthStencilTexture->_webGLTexture.get(), lodLevel);
+      gl.framebufferTexture2D(
+        GL::FRAMEBUFFER, attachment, GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+        depthStencilTexture->_hardwareTexture
+            && depthStencilTexture->_hardwareTexture->underlyingResource().get() ?
+          depthStencilTexture->_hardwareTexture->underlyingResource().get() :
+          nullptr,
+        lodLevel);
     }
     else {
-      gl.framebufferTexture2D(GL::FRAMEBUFFER, attachment, GL::TEXTURE_2D,
-                              depthStencilTexture->_webGLTexture.get(), lodLevel);
+      gl.framebufferTexture2D(
+        GL::FRAMEBUFFER, attachment, GL::TEXTURE_2D,
+        depthStencilTexture->_hardwareTexture
+            && depthStencilTexture->_hardwareTexture->underlyingResource().get() ?
+          depthStencilTexture->_hardwareTexture->underlyingResource().get() :
+          nullptr,
+        lodLevel);
     }
   }
 
@@ -2311,6 +2333,11 @@ WebGLTexturePtr ThinEngine::_createTexture()
   return texture;
 }
 
+std::unique_ptr<HardwareTextureWrapper<WebGLTexturePtr>> ThinEngine::_createHardwareTexture()
+{
+  return std::make_unique<WebGLHardwareTexture>(_createTexture(), _gl);
+}
+
 InternalTexturePtr ThinEngine::createTexture(
   std::string url, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
@@ -2705,6 +2732,11 @@ void ThinEngine::updateTextureSamplingMode(unsigned int samplingMode,
   texture->samplingMode = samplingMode;
 }
 
+void ThinEngine::updateTextureDimensions(InternalTexture* /*texture*/, int /*width*/,
+                                         int /*height*/, int /*depth*/)
+{
+}
+
 void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
                                            std::optional<unsigned int> wrapU,
                                            std::optional<unsigned int> wrapV,
@@ -2909,7 +2941,7 @@ void ThinEngine::_prepareWebGLTexture(
     return;
   }
 
-  if (!texture->_webGLTexture) {
+  if (!texture->_hardwareTexture) {
     // resetTextureCache();
     if (scene) {
       scene->_removePendingData(texture);
@@ -3018,7 +3050,9 @@ void ThinEngine::_releaseTexture(const InternalTexturePtr& texture)
 {
   _releaseFramebufferObjects(texture);
 
-  _deleteTexture(texture->_webGLTexture);
+  if (texture && texture->_hardwareTexture && texture->_hardwareTexture->underlyingResource()) {
+    _deleteTexture(texture->_hardwareTexture->underlyingResource());
+  }
 
   // Unbind channels
   unbindAllTextures();
@@ -3102,7 +3136,10 @@ bool ThinEngine::_bindTextureDirectly(unsigned int target, const InternalTexture
       _gl->bindTexture(target, texture ? texture->_colorTextureArray.get() : nullptr);
     }
     else {
-      _gl->bindTexture(target, texture ? texture->_webGLTexture.get() : nullptr);
+      _gl->bindTexture(target, texture && texture->_hardwareTexture
+                                   && texture->_hardwareTexture->underlyingResource() ?
+                                 texture->_hardwareTexture->underlyingResource().get() :
+                                 nullptr);
     }
 
     _boundTexturesCache[_activeChannel] = texture;
