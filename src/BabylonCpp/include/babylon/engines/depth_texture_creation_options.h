@@ -20,6 +20,8 @@ struct BABYLON_SHARED_EXPORT DepthTextureCreationOptions {
   std::optional<int> comparisonFunction = std::nullopt;
   /** Specifies if the created texture is a cube texture */
   std::optional<bool> isCube = std::nullopt;
+  /** Specifies the sample count of the depth/stencil texture texture */
+  std::optional<unsigned int> samples = std::nullopt;
 }; // end of struct DepthTextureCreationOptions
 
 } // end of namespace BABYLON
