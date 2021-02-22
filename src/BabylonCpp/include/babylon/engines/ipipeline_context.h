@@ -52,11 +52,6 @@ public:
   /**
    * @brief Hidden
    */
-  virtual std::string _name() const;
-
-  /**
-   * @brief Hidden
-   */
   virtual std::string _getVertexShaderCode() const = 0;
 
   /**
@@ -289,6 +284,10 @@ public:
    * @param color4 defines the value to be set
    */
   virtual void setDirectColor4(const std::string& uniformName, const Color4& color4) = 0;
+
+public:
+  /** @hidden */
+  std::string _name;
 
 private:
   bool _isAsync;

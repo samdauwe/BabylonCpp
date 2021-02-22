@@ -19,9 +19,4 @@ bool IPipelineContext::isReady()
   return _isReady;
 }
 
-std::string IPipelineContext::_name() const
-{
-  return "";
-}
-
 } // end of namespace BABYLON
