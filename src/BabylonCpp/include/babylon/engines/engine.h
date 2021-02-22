@@ -670,21 +670,23 @@ public:
    * @param texture The render target texture containing the depth stencil texture to apply
    */
   void setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                              const RenderTargetTexturePtr& texture);
+                              const RenderTargetTexturePtr& texture, const std::string& name = "");
 
   /**
    * @brief Sets a texture to the webGL context from a postprocess.
    * @param channel defines the channel to use
    * @param postProcess defines the source postprocess
    */
-  void setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess);
+  void setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess,
+                                 const std::string& name);
 
   /**
    * @brief Binds the output of the passed in post process to the texture channel specified.
    * @param channel The channel the texture should be bound to
    * @param postProcess The post process which's output should be bound
    */
-  void setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess);
+  void setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess,
+                                       const std::string& name);
 
   /**
    * @brief Hidden

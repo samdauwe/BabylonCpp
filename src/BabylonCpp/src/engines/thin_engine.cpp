@@ -107,6 +107,8 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , emptyTexture3D{this, &ThinEngine::get_emptyTexture3D}
     , emptyTexture2DArray{this, &ThinEngine::get_emptyTexture2DArray}
     , emptyCubeTexture{this, &ThinEngine::get_emptyCubeTexture}
+    , isWebGPU{this, &ThinEngine::get_isWebGPU}
+    , shaderPlatformName{this, &ThinEngine::get_shaderPlatformName}
     , webGLVersion{this, &ThinEngine::get_webGLVersion}
     , isStencilEnable{this, &ThinEngine::get_isStencilEnable}
     , depthCullingState{this, &ThinEngine::get_depthCullingState}
@@ -115,6 +117,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , _depthCullingState{std::make_unique<DepthCullingState>()}
     , _stencilState{std::make_unique<StencilState>()}
     , _supportsHardwareTextureRescaling{this, &ThinEngine::get__supportsHardwareTextureRescaling}
+    , _isWebGPU{false}
     , _alphaExtension{std::make_unique<AlphaExtension>(this)}
     , _cubeTextureExtension{std::make_unique<CubeTextureExtension>(this)}
     , _dynamicBufferExtension{std::make_unique<DynamicBufferExtension>(this)}
@@ -136,7 +139,8 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
   if (!options.disableWebGL2Support) {
     _gl = canvas->getContext3d(options);
     if (_gl) {
-      _webGLVersion = 2.f;
+      _webGLVersion       = 2.f;
+      _shaderPlatformName = "WEBGL2";
     }
   }
 
@@ -275,6 +279,16 @@ InternalTexturePtr& ThinEngine::get_emptyCubeTexture()
   return _emptyCubeTexture;
 }
 
+bool ThinEngine::get_isWebGPU() const
+{
+  return _isWebGPU;
+}
+
+std::string ThinEngine::get_shaderPlatformName() const
+{
+  return _shaderPlatformName;
+}
+
 void ThinEngine::_debugPushGroup(const std::string& /*groupName*/,
                                  const std::optional<int> /*targetObject*/)
 {
@@ -287,6 +301,11 @@ void ThinEngine::_debugPopGroup(const std::optional<int> /*targetObject*/)
 void ThinEngine::_debugInsertMarker(const std::string& /*text*/,
                                     const std::optional<int> /*targetObject*/)
 {
+}
+
+ShaderProcessingContextPtr ThinEngine::_getShaderProcessingContext() const
+{
+  return nullptr;
 }
 
 void ThinEngine::_rebuildInternalTextures()
@@ -1722,7 +1741,8 @@ ThinEngine::createShaderProgram(const IPipelineContextPtr& pipelineContext,
                               vertexShader, fragmentShader, context, transformFeedbackVaryings);
 }
 
-IPipelineContextPtr ThinEngine::createPipelineContext()
+IPipelineContextPtr
+ThinEngine::createPipelineContext(const ShaderProcessingContextPtr& /*shaderProcessingContext*/)
 {
   auto pipelineContext    = std::make_shared<WebGLPipelineContext>();
   pipelineContext->engine = this;
@@ -1824,8 +1844,11 @@ void ThinEngine::_finalizePipelineContext(WebGLPipelineContext* pipelineContext)
 void ThinEngine::_preparePipelineContext(const IPipelineContextPtr& pipelineContext,
                                          const std::string& vertexSourceCode,
                                          const std::string& fragmentSourceCode, bool createAsRaw,
+                                         const std::string& /*rawVertexSourceCode*/,
+                                         const std::string& /*rawFragmentSourceCode*/,
                                          bool /*rebuildRebind*/, const std::string& defines,
-                                         const std::vector<std::string>& transformFeedbackVaryings)
+                                         const std::vector<std::string>& transformFeedbackVaryings,
+                                         const std::string& /*key*/)
 {
   auto webGLRenderingState = std::static_pointer_cast<WebGLPipelineContext>(pipelineContext);
 
@@ -3160,7 +3183,8 @@ bool ThinEngine::_bindTextureDirectly(unsigned int target, const InternalTexture
   return wasPreviouslyBound;
 }
 
-void ThinEngine::_bindTexture(int channel, const InternalTexturePtr& texture)
+void ThinEngine::_bindTexture(int channel, const InternalTexturePtr& texture,
+                              const std::string& /*name*/)
 {
   if (channel < 0) {
     return;
@@ -3189,7 +3213,7 @@ void ThinEngine::unbindAllTextures()
 }
 
 void ThinEngine::setTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                            const ThinTexturePtr& texture)
+                            const ThinTexturePtr& texture, const std::string& /*name*/)
 {
   if (channel < 0) {
     return;
@@ -3338,7 +3362,8 @@ bool ThinEngine::_setTexture(int channel, const ThinTexturePtr& texture, bool is
 }
 
 void ThinEngine::setTextureArray(int channel, const WebGLUniformLocationPtr& uniform,
-                                 const std::vector<ThinTexturePtr>& textures)
+                                 const std::vector<ThinTexturePtr>& textures,
+                                 const std::string& /*name*/)
 {
   if (channel < 0 || !uniform) {
     return;

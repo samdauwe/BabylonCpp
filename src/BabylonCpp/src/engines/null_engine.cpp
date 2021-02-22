@@ -537,7 +537,8 @@ bool NullEngine::_bindTextureDirectly(unsigned int /*target*/, const InternalTex
   return false;
 }
 
-void NullEngine::_bindTexture(int channel, const InternalTexturePtr& texture)
+void NullEngine::_bindTexture(int channel, const InternalTexturePtr& texture,
+                              const std::string& /*name*/)
 {
   if (channel < 0) {
     return;

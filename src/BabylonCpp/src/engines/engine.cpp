@@ -476,7 +476,8 @@ std::string Engine::getFragmentShaderSource(const WebGLProgramPtr& program)
 }
 
 void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                                    const RenderTargetTexturePtr& texture)
+                                    const RenderTargetTexturePtr& texture,
+                                    const std::string& /*name*/)
 {
   if (channel < 0) {
     return;
@@ -494,15 +495,17 @@ void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& 
   }
 }
 
-void Engine::setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess)
+void Engine::setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess,
+                                       const std::string& name)
 {
   const auto _ind = static_cast<size_t>(postProcess->_currentRenderTextureInd);
-  _bindTexture(channel, postProcess ? postProcess->_textures[_ind] : nullptr);
+  _bindTexture(channel, postProcess ? postProcess->_textures[_ind] : nullptr, name);
 }
 
-void Engine::setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess)
+void Engine::setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess,
+                                             const std::string& name)
 {
-  _bindTexture(channel, postProcess ? postProcess->_outputTexture : nullptr);
+  _bindTexture(channel, postProcess ? postProcess->_outputTexture : nullptr, name);
 }
 
 void Engine::_rebuildBuffers()

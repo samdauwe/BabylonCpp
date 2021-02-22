@@ -58,6 +58,7 @@ FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(IPipelineContext)
 FWD_STRUCT_SPTR(IShaderProcessor)
 FWD_STRUCT_SPTR(LoaderOptions)
+FWD_STRUCT_SPTR(ShaderProcessingContext)
 FWD_CLASS_SPTR(ThinTexture)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
@@ -166,6 +167,11 @@ public:
    */
   virtual void _debugInsertMarker(const std::string& text,
                                   const std::optional<int> targetObject = std::nullopt);
+
+  /**
+   * @brief Hidden
+   */
+  virtual ShaderProcessingContextPtr _getShaderProcessingContext() const;
 
   /**
    * @brief Gets a boolean indicating if all created effects are ready.
@@ -631,16 +637,17 @@ public:
    * @brief Creates a new pipeline context
    * @returns the new pipeline
    */
-  IPipelineContextPtr createPipelineContext();
+  IPipelineContextPtr
+  createPipelineContext(const ShaderProcessingContextPtr& shaderProcessingContext);
 
   /**
    * @brief Hidden
    */
-  void _preparePipelineContext(const IPipelineContextPtr& pipelineContext,
-                               const std::string& vertexSourceCode,
-                               const std::string& fragmentSourceCode, bool createAsRaw,
-                               bool rebuildRebind, const std::string& defines,
-                               const std::vector<std::string>& transformFeedbackVaryings);
+  void _preparePipelineContext(
+    const IPipelineContextPtr& pipelineContext, const std::string& vertexSourceCode,
+    const std::string& fragmentSourceCode, bool createAsRaw, const std::string& rawVertexSourceCode,
+    const std::string& rawFragmentSourceCode, bool rebuildRebind, const std::string& defines,
+    const std::vector<std::string>& transformFeedbackVaryings, const std::string& key);
 
   /**
    * @brief Hidden
@@ -1119,7 +1126,8 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _bindTexture(int channel, const InternalTexturePtr& texture);
+  virtual void _bindTexture(int channel, const InternalTexturePtr& texture,
+                            const std::string& name);
 
   /**
    * @brief Unbind all textures from the webGL context.
@@ -1133,7 +1141,7 @@ public:
    * @param texture The texture to apply
    */
   void setTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                  const ThinTexturePtr& texture);
+                  const ThinTexturePtr& texture, const std::string& name);
 
   /**
    * @brief Sets an array of texture to the webGL context
@@ -1142,7 +1150,7 @@ public:
    * @param textures defines the array of textures to bind
    */
   void setTextureArray(int channel, const WebGLUniformLocationPtr& uniform,
-                       const std::vector<ThinTexturePtr>& textures);
+                       const std::vector<ThinTexturePtr>& textures, const std::string& name);
 
   /**
    * @brief Hidden
@@ -1862,6 +1870,16 @@ protected:
   InternalTexturePtr& get_emptyCubeTexture();
 
   /**
+   * @brief Gets a boolean indicating if the engine runs in WebGPU or not.
+   */
+  bool get_isWebGPU() const;
+
+  /**
+   * @brief Gets the shader platfrom name used by the effects.
+   */
+  std::string get_shaderPlatformName() const;
+
+  /**
    * @brief Gets version of the current webGL context.
    */
   float get_webGLVersion() const;
@@ -2147,6 +2165,16 @@ public:
   Observable<Texture> onBeforeTextureInitObservable;
 
   /**
+   * Gets a boolean indicating if the engine runs in WebGPU or not
+   */
+  ReadOnlyProperty<ThinEngine, bool> isWebGPU;
+
+  /**
+   * Gets the shader platfrom name used by the effects
+   */
+  ReadOnlyProperty<ThinEngine, std::string> shaderPlatformName;
+
+  /**
    * Gets version of the current webGL context
    */
   ReadOnlyProperty<ThinEngine, float> webGLVersion;
@@ -2231,6 +2259,10 @@ protected:
   std::unordered_map<int, WebGLDataBufferPtr> _currentBoundBuffer;
   /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
+  /** @hidden */
+  bool _isWebGPU;
+  /** @hidden */
+  std::string _shaderPlatformName;
 
   /** @hidden */
   std::unordered_map<int, WebGLUniformLocationPtr> _boundUniforms;

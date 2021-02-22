@@ -537,7 +537,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _bindTexture(int channel, const InternalTexturePtr& texture) override;
+  void _bindTexture(int channel, const InternalTexturePtr& texture,
+                    const std::string& name) override;
 
   /**
    * @brief Force the engine to release all cached effects. This means that next effect compilation
