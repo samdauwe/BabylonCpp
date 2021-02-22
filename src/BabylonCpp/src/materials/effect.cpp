@@ -59,6 +59,9 @@ Effect::Effect(
     , _allFallbacksProcessed{false}
 
 {
+  name = baseName;
+  _key = options.key;
+
   std::function<std::string(const std::string& shaderType, const std::string& code)>
     processFinalCode = nullptr;
 
@@ -120,6 +123,9 @@ Effect::Effect(
     fragmentSource = std::get<std::string>(baseName);
   }
 
+  _processingContext
+    = std::static_pointer_cast<ShaderProcessingContext>(_engine->_getShaderProcessingContext());
+
   ProcessingOptions processorOptions;
   processorOptions.defines                      = StringTools::split(defines, '\n');
   processorOptions.indexParameters              = _indexParameters;
@@ -129,42 +135,56 @@ Effect::Effect(
   processorOptions.supportsUniformBuffers       = _engine->supportsUniformBuffers();
   processorOptions.shadersRepository            = Effect::ShadersRepository;
   processorOptions.includesShadersStore         = Effect::IncludesShadersStore();
-  processorOptions.version      = std::to_string(static_cast<int>(_engine->webGLVersion() * 100));
-  processorOptions.platformName = _engine->webGLVersion() >= 2 ? "WEBGL2" : "WEBGL1";
+  processorOptions.version           = std::to_string(static_cast<int>(_engine->version() * 100));
+  processorOptions.platformName      = _engine->shaderPlatformName();
+  processorOptions.processingContext = _processingContext;
 
+  std::string shaderCodes[2] = {"", ""};
+  auto shadersLoaded
+    = [this, &shaderCodes, &processorOptions, &processFinalCode, &baseName]() -> void {
+    if (!shaderCodes[0].empty() && !shaderCodes[1].empty()) {
+      processorOptions.isFragment    = true;
+      const auto& migratedVertexCode = shaderCodes[0];
+      const auto& fragmentCode       = shaderCodes[1];
+      ShaderProcessor::Process(
+        fragmentCode, processorOptions,
+        [&](const std::string& iMigratedFragmentCode) -> void {
+          auto migratedFragmentCode = iMigratedFragmentCode;
+          if (processFinalCode) {
+            migratedFragmentCode = processFinalCode("fragment", migratedFragmentCode);
+          }
+          auto finalShaders
+            = ShaderProcessor::Finalize(migratedVertexCode, migratedFragmentCode, processorOptions);
+          _useFinalCode(finalShaders["vertexCode"], finalShaders["fragmentCode"], baseName);
+        },
+        _engine);
+    }
+  };
   _loadShader(vertexSource, "Vertex", "",
-              [this, &fragmentSource, &processorOptions, &baseName,
-               &processFinalCode](const std::string& vertexCode) -> void {
-                _rawVertexSourceCode = vertexCode;
-                _loadShader(
-                  fragmentSource, "Fragment", "Pixel",
-                  [this, &vertexCode, &processorOptions, &baseName,
-                   &processFinalCode](const std::string& fragmentCode) -> void {
-                    _rawFragmentSourceCode = fragmentCode;
-                    ShaderProcessor::Process(
-                      vertexCode, processorOptions,
-                      [this, &fragmentCode, &processorOptions, &baseName,
-                       &processFinalCode](std::string migratedVertexCode) -> void {
-                        if (processFinalCode) {
-                          migratedVertexCode = processFinalCode("vertex", migratedVertexCode);
-                        }
-                        processorOptions.isFragment = true;
-                        ShaderProcessor::Process(
-                          fragmentCode, processorOptions,
-                          [this, &migratedVertexCode, &baseName,
-                           &processFinalCode](std::string migratedFragmentCode) -> void {
-                            if (processFinalCode) {
-                              migratedFragmentCode
-                                = processFinalCode("fragment", migratedFragmentCode);
-                            }
-                            _useFinalCode(migratedVertexCode, migratedFragmentCode, baseName);
-                          },
-                          _engine);
-                      },
-                      _engine);
-                  });
+              [this, &processorOptions, &processFinalCode, &shaderCodes,
+               &shadersLoaded](const std::string& vertexCode) -> void {
+                ShaderProcessor::Initialize(processorOptions);
+                ShaderProcessor::Process(
+                  vertexCode, processorOptions,
+                  [this, &vertexCode, &processFinalCode, &shaderCodes,
+                   &shadersLoaded](const std::string& iMigratedVertexCode) -> void {
+                    _rawVertexSourceCode    = vertexCode;
+                    auto migratedVertexCode = iMigratedVertexCode;
+                    if (processFinalCode) {
+                      migratedVertexCode = processFinalCode("vertex", migratedVertexCode);
+                    }
+                    shaderCodes[0] = migratedVertexCode;
+                    shadersLoaded();
+                  },
+                  _engine);
               });
-} // namespace BABYLON
+  _loadShader(fragmentSource, "Fragment", "Pixel",
+              [this, &shaderCodes, &shadersLoaded](const std::string& fragmentCode) -> void {
+                _rawFragmentSourceCode = fragmentCode;
+                shaderCodes[1]         = fragmentCode;
+                shadersLoaded();
+              });
+}
 
 Effect::~Effect() = default;
 
@@ -400,14 +420,18 @@ std::string Effect::get_vertexSourceCode() const
 {
   return !_vertexSourceCodeOverride.empty() && !_fragmentSourceCodeOverride.empty() ?
            _vertexSourceCodeOverride :
-           _vertexSourceCode;
+           (_pipelineContext && !_pipelineContext->_getVertexShaderCode().empty() ?
+              _pipelineContext->_getVertexShaderCode() :
+              _vertexSourceCode);
 }
 
 std::string Effect::get_fragmentSourceCode() const
 {
   return !_vertexSourceCodeOverride.empty() && !_fragmentSourceCodeOverride.empty() ?
            _fragmentSourceCodeOverride :
-           _fragmentSourceCode;
+           (_pipelineContext && !_pipelineContext->_getFragmentShaderCode().empty() ?
+              _pipelineContext->_getFragmentShaderCode() :
+              _fragmentSourceCode);
 }
 
 std::string Effect::get_rawVertexSourceCode() const
@@ -452,61 +476,48 @@ void Effect::_rebuildProgram(
 
 void Effect::_prepareEffect()
 {
-  _valueCache.clear();
-
   auto previousPipelineContext = _pipelineContext;
 
   try {
     auto engine = _engine;
 
-    _pipelineContext = engine->createPipelineContext();
+    _pipelineContext        = engine->createPipelineContext(_processingContext);
+    _pipelineContext->_name = _key;
 
     auto rebuildRebind = false; // _rebuildProgram.bind(this);
     if (!_vertexSourceCodeOverride.empty() && !_fragmentSourceCodeOverride.empty()) {
       engine->_preparePipelineContext(_pipelineContext, _vertexSourceCodeOverride,
-                                      _fragmentSourceCodeOverride, true, rebuildRebind, nullptr,
-                                      _transformFeedbackVaryings);
+                                      _fragmentSourceCodeOverride, true, _rawVertexSourceCode,
+                                      _rawFragmentSourceCode, rebuildRebind, nullptr,
+                                      _transformFeedbackVaryings, _key);
     }
     else {
       engine->_preparePipelineContext(_pipelineContext, _vertexSourceCode, _fragmentSourceCode,
-                                      false, rebuildRebind, defines, _transformFeedbackVaryings);
+                                      false, _rawVertexSourceCode, _rawFragmentSourceCode,
+                                      rebuildRebind, defines, _transformFeedbackVaryings, _key);
     }
 
     engine->_executeWhenRenderingStateIsCompiled(
       _pipelineContext, [this, previousPipelineContext]() -> void {
         auto attributesNames = _attributesNames;
         auto engine          = _engine;
-        if (engine->supportsUniformBuffers()) {
-          for (const auto& [uniformBuffersName, value] : _uniformBuffersNames) {
-            bindUniformBlock(uniformBuffersName, value);
-          }
-        }
 
-#if 0
-        auto uniforms = engine->getUniforms(_pipelineContext.get(), _uniformsNames);
-        for (auto& [uniformsName, uniformLocation] : uniforms) {
-          _uniforms[uniformsName] = std::move(uniformLocation);
-        }
-#endif
+        _attributes = {};
+        _pipelineContext->_fillEffectInformation(this,                 // effect
+                                                 _uniformBuffersNames, // uniformBuffersNames
+                                                 _uniformsNames,       // uniformsNames
+                                                 _uniforms,            // uniforms
+                                                 _samplerList,         // samplerList
+                                                 _samplers,            // samplers
+                                                 attributesNames,      // attributesNames
+                                                 _attributes           // attributes
+        );
 
-        _attributes = engine->getAttributes(_pipelineContext.get(), attributesNames);
+        // Caches attribute locations.
         if (!attributesNames.empty()) {
           for (size_t i = 0; i < attributesNames.size(); ++i) {
             _attributeLocationByName[attributesNames[i]] = _attributes[i];
           }
-        }
-
-        for (unsigned int index = 0; index < _samplerList.size(); ++index) {
-          auto sampler = getUniform(_samplerList[index]);
-
-          if (!sampler) {
-            stl_util::splice(_samplerList, static_cast<int>(index), 1);
-            --index;
-          }
-        }
-
-        for (unsigned int index = 0; index < _samplerList.size(); ++index) {
-          _samplers[_samplerList[index]] = static_cast<int>(index);
         }
 
         engine->bindSamplers(*this);
@@ -652,12 +663,12 @@ int Effect::_getChannel(const std::string& channel)
 
 void Effect::_bindTexture(const std::string& channel, const InternalTexturePtr& texture)
 {
-  _engine->_bindTexture(_getChannel(channel), texture);
+  _engine->_bindTexture(_getChannel(channel), texture, channel);
 }
 
 void Effect::setTexture(const std::string& channel, const ThinTexturePtr& texture)
 {
-  _engine->setTexture(_getChannel(channel), getUniform(channel), texture);
+  _engine->setTexture(_getChannel(channel), getUniform(channel), texture, channel);
 }
 
 void Effect::setDepthStencilTexture(const std::string& channel,
@@ -665,7 +676,7 @@ void Effect::setDepthStencilTexture(const std::string& channel,
 {
   auto engine = static_cast<Engine*>(_engine);
   if (engine) {
-    engine->setDepthStencilTexture(_getChannel(channel), getUniform(channel), texture);
+    engine->setDepthStencilTexture(_getChannel(channel), getUniform(channel), texture, channel);
   }
 }
 
@@ -688,7 +699,7 @@ void Effect::setTextureArray(const std::string& channel,
     }
   }
 
-  _engine->setTextureArray(_samplers[channel], getUniform(channel), textures);
+  _engine->setTextureArray(_samplers[channel], getUniform(channel), textures, channel);
 }
 
 void Effect::setTextureFromPostProcess(const std::string& channel,
@@ -696,7 +707,7 @@ void Effect::setTextureFromPostProcess(const std::string& channel,
 {
   auto engine = static_cast<Engine*>(_engine);
   if (engine) {
-    engine->setTextureFromPostProcess(_getChannel(channel), postProcess);
+    engine->setTextureFromPostProcess(_getChannel(channel), postProcess, channel);
   }
 }
 
@@ -705,101 +716,8 @@ void Effect::setTextureFromPostProcessOutput(const std::string& channel,
 {
   auto engine = static_cast<Engine*>(_engine);
   if (engine) {
-    engine->setTextureFromPostProcessOutput(_getChannel(channel), postProcess);
+    engine->setTextureFromPostProcessOutput(_getChannel(channel), postProcess, channel);
   }
-}
-
-bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
-{
-  auto flag = matrix.updateFlag;
-  if (stl_util::contains(_valueCache, uniformName) && !_valueCache[uniformName].empty()
-      && static_cast<int>(_valueCache[uniformName][0]) == flag) {
-    return false;
-  }
-
-  if (_valueCache[uniformName].empty()) {
-    _valueCache[uniformName].emplace_back(static_cast<float>(flag));
-  }
-  else {
-    _valueCache[uniformName][0] = static_cast<float>(flag);
-  }
-
-  return true;
-}
-
-bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
-{
-  if (!stl_util::contains(_valueCache, uniformName) || _valueCache[uniformName].size() != 2) {
-    _valueCache[uniformName] = {x, y};
-    return true;
-  }
-
-  auto changed = false;
-  auto& cache  = _valueCache[uniformName];
-  if (!stl_util::almost_equal(cache[0], x)) {
-    cache[0] = x;
-    changed  = true;
-  }
-  if (!stl_util::almost_equal(cache[1], y)) {
-    cache[1] = y;
-    changed  = true;
-  }
-
-  return changed;
-}
-
-bool Effect::_cacheFloat3(const std::string& uniformName, float x, float y, float z)
-{
-  if (!stl_util::contains(_valueCache, uniformName) || _valueCache[uniformName].size() != 3) {
-    _valueCache[uniformName] = {x, y, z};
-    return true;
-  }
-
-  auto changed = false;
-  auto& cache  = _valueCache[uniformName];
-  if (!stl_util::almost_equal(cache[0], x)) {
-    cache[0] = x;
-    changed  = true;
-  }
-  if (!stl_util::almost_equal(cache[1], y)) {
-    cache[1] = y;
-    changed  = true;
-  }
-  if (!stl_util::almost_equal(cache[2], z)) {
-    cache[2] = z;
-    changed  = true;
-  }
-
-  return changed;
-}
-
-bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y, float z, float w)
-{
-  if (!stl_util::contains(_valueCache, uniformName) || _valueCache[uniformName].size() != 4) {
-    _valueCache[uniformName] = {x, y, z, w};
-    return true;
-  }
-
-  auto changed = false;
-  auto& cache  = _valueCache[uniformName];
-  if (!stl_util::almost_equal(cache[0], x)) {
-    cache[0] = x;
-    changed  = true;
-  }
-  if (!stl_util::almost_equal(cache[1], y)) {
-    cache[1] = y;
-    changed  = true;
-  }
-  if (!stl_util::almost_equal(cache[2], z)) {
-    cache[2] = z;
-    changed  = true;
-  }
-  if (!stl_util::almost_equal(cache[3], w)) {
-    cache[3] = w;
-    changed  = true;
-  }
-
-  return changed;
 }
 
 void Effect::bindUniformBuffer(const WebGLDataBufferPtr& buffer, const std::string& iName)
@@ -817,7 +735,7 @@ void Effect::bindUniformBuffer(const WebGLDataBufferPtr& buffer, const std::stri
 
   const auto& bufferName         = _uniformBuffersNames[iName];
   Effect::_baseCache[bufferName] = buffer;
-  _engine->bindUniformBufferBase(buffer, bufferName);
+  _engine->bindUniformBufferBase(buffer, bufferName, iName);
 }
 
 void Effect::bindUniformBlock(const std::string& blockName, unsigned index)
@@ -827,289 +745,257 @@ void Effect::bindUniformBlock(const std::string& blockName, unsigned index)
 
 Effect& Effect::setInt(const std::string& uniformName, int value)
 {
-  Float32Array _value{static_cast<float>(value)};
-  if (stl_util::contains(_valueCache, uniformName) && (_valueCache[uniformName] == _value)) {
-    return *this;
+  if (_pipelineContext) {
+    _pipelineContext->setInt(uniformName, value);
   }
-
-  if (_engine->setInt(getUniform(uniformName), value)) {
-    _valueCache[uniformName] = _value;
-  }
-
   return *this;
 }
 
 Effect& Effect::setInt2(const std::string& uniformName, int x, int y)
 {
-  setIntArray2(uniformName, {x, y});
+  if (_pipelineContext) {
+    _pipelineContext->setInt2(uniformName, x, y);
+  }
+  return *this;
+}
 
+Effect& Effect::setInt3(const std::string& uniformName, int x, int y, int z)
+{
+  if (_pipelineContext) {
+    _pipelineContext->setInt3(uniformName, x, y, z);
+  }
+  return *this;
+}
+
+Effect& Effect::setInt4(const std::string& uniformName, int x, int y, int z, int w)
+{
+  if (_pipelineContext) {
+    _pipelineContext->setInt4(uniformName, x, y, z, w);
+  }
   return *this;
 }
 
 Effect& Effect::setIntArray(const std::string& uniformName, const Int32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setIntArray(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setIntArray(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setIntArray2(const std::string& uniformName, const Int32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setIntArray2(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setIntArray2(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setIntArray3(const std::string& uniformName, const Int32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setIntArray3(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setIntArray3(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setIntArray4(const std::string& uniformName, const Int32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setIntArray4(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setIntArray4(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setFloatArray(const std::string& uniformName, const Float32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setFloatArray2(const std::string& uniformName, const Float32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray2(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray2(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setFloatArray3(const std::string& uniformName, const Float32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray3(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray3(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setFloatArray4(const std::string& uniformName, const Float32Array& array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray4(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray4(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setArray(const std::string& uniformName, Float32Array array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setArray2(const std::string& uniformName, Float32Array array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray2(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray2(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setArray3(const std::string& uniformName, Float32Array array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray3(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray3(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setArray4(const std::string& uniformName, Float32Array array)
 {
-  _valueCache.erase(uniformName);
-  _engine->setArray4(getUniform(uniformName), array);
-
+  if (_pipelineContext) {
+    _pipelineContext->setArray4(uniformName, array);
+  }
   return *this;
 }
 
 Effect& Effect::setMatrices(const std::string& uniformName, Float32Array matrices)
 {
-  if (matrices.empty()) {
-    return *this;
+  if (_pipelineContext) {
+    _pipelineContext->setMatrices(uniformName, matrices);
   }
-
-  _valueCache.erase(uniformName);
-  _engine->setMatrices(getUniform(uniformName), matrices);
-
   return *this;
 }
 
 Effect& Effect::setMatrix(const std::string& uniformName, const Matrix& matrix)
 {
-  if (_cacheMatrix(uniformName, matrix)) {
-    if (!_engine->setMatrices(getUniform(uniformName), matrix.toArray())) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setMatrix(uniformName, matrix);
   }
-
   return *this;
 }
 
 Effect& Effect::setMatrix3x3(const std::string& uniformName, const Float32Array& matrix)
 {
-  _valueCache.erase(uniformName);
-  _engine->setMatrix3x3(getUniform(uniformName), matrix);
-
+  if (_pipelineContext) {
+    _pipelineContext->setMatrix3x3(uniformName, matrix);
+  }
   return *this;
 }
 
 Effect& Effect::setMatrix2x2(const std::string& uniformName, const Float32Array& matrix)
 {
-  _valueCache.erase(uniformName);
-  _engine->setMatrix2x2(getUniform(uniformName), matrix);
-
+  if (_pipelineContext) {
+    _pipelineContext->setMatrix2x2(uniformName, matrix);
+  }
   return *this;
 }
 
 Effect& Effect::setFloat(const std::string& uniformName, float value)
 {
-  if (stl_util::contains(_valueCache, uniformName)
-      && stl_util::almost_equal(_valueCache[uniformName][0], value)) {
-    return *this;
+  if (_pipelineContext) {
+    _pipelineContext->setFloat(uniformName, value);
   }
-
-  if (_engine->setFloat(getUniform(uniformName), value)) {
-    _valueCache[uniformName] = {value};
-  }
-
   return *this;
 }
 
 Effect& Effect::setBool(const std::string& uniformName, bool _bool)
 {
-  if (stl_util::contains(_valueCache, uniformName)
-      && stl_util::almost_equal(_valueCache[uniformName][0], _bool ? 1.f : 0.f)) {
-    return *this;
+  if (_pipelineContext) {
+    _pipelineContext->setInt(uniformName, _bool ? 1 : 0);
   }
-
-  if (_engine->setInt(getUniform(uniformName), _bool ? 1 : 0)) {
-    _valueCache[uniformName] = {_bool ? 1.f : 0.f};
-  }
-
   return *this;
 }
 
 Effect& Effect::setVector2(const std::string& uniformName, const Vector2& vector2)
 {
-  if (_cacheFloat2(uniformName, vector2.x, vector2.y)) {
-    if (!_engine->setFloat2(getUniform(uniformName), vector2.x, vector2.y)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setVector2(uniformName, vector2);
   }
-
   return *this;
 }
 
 Effect& Effect::setFloat2(const std::string& uniformName, float x, float y)
 {
-  if (_cacheFloat2(uniformName, x, y)) {
-    if (!_engine->setFloat2(getUniform(uniformName), x, y)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setFloat2(uniformName, x, y);
   }
-
   return *this;
 }
 
 Effect& Effect::setVector3(const std::string& uniformName, const Vector3& vector3)
 {
-  if (_cacheFloat3(uniformName, vector3.x, vector3.y, vector3.z)) {
-    if (!_engine->setFloat3(getUniform(uniformName), vector3.x, vector3.y, vector3.z)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setVector3(uniformName, vector3);
   }
-
   return *this;
 }
 
 Effect& Effect::setFloat3(const std::string& uniformName, float x, float y, float z)
 {
-  if (_cacheFloat3(uniformName, x, y, z)) {
-    if (!_engine->setFloat3(getUniform(uniformName), x, y, z)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setFloat3(uniformName, x, y, z);
   }
-
   return *this;
 }
 
 Effect& Effect::setVector4(const std::string& uniformName, const Vector4& vector4)
 {
-  if (_cacheFloat4(uniformName, vector4.x, vector4.y, vector4.z, vector4.w)) {
-    if (!_engine->setFloat4(getUniform(uniformName), vector4.x, vector4.y, vector4.z, vector4.w)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setVector4(uniformName, vector4);
   }
-
   return *this;
 }
 
 Effect& Effect::setFloat4(const std::string& uniformName, float x, float y, float z, float w)
 {
-  if (_cacheFloat4(uniformName, x, y, z, w)) {
-    if (!_engine->setFloat4(getUniform(uniformName), x, y, z, w)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setFloat4(uniformName, x, y, z, w);
   }
-
   return *this;
 }
 
 Effect& Effect::setColor3(const std::string& uniformName, const Color3& color3)
 {
-  if (_cacheFloat3(uniformName, color3.r, color3.g, color3.b)) {
-    if (!_engine->setFloat3(getUniform(uniformName), color3.r, color3.g, color3.b)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setColor3(uniformName, color3);
   }
-
   return *this;
 }
 
 Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3, float alpha)
 {
-  if (_cacheFloat4(uniformName, color3.r, color3.g, color3.b, alpha)) {
-    if (!_engine->setFloat4(getUniform(uniformName), color3.r, color3.g, color3.b, alpha)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setColor4(uniformName, color3, alpha);
   }
-
   return *this;
 }
 
 Effect& Effect::setDirectColor4(const std::string& uniformName, const Color4& color4)
 {
-  if (_cacheFloat4(uniformName, color4.r, color4.g, color4.b, color4.a)) {
-    if (!_engine->setFloat4(getUniform(uniformName), color4.r, color4.g, color4.b, color4.a)) {
-      _valueCache.erase(uniformName);
-    }
+  if (_pipelineContext) {
+    _pipelineContext->setDirectColor4(uniformName, color4);
   }
-
   return *this;
 }
 
 void Effect::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
+  if (_pipelineContext) {
+    _pipelineContext->dispose();
+  }
   _engine->_releaseEffect(this);
 }
 
