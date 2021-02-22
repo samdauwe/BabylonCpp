@@ -247,6 +247,8 @@ public:
   /** @hidden */
   SphericalPolynomialPtr _sphericalPolynomial;
   /** @hidden */
+  std::function<SphericalPolynomialPtr()> _sphericalPolynomialPromise;
+  /** @hidden */
   bool _sphericalPolynomialComputed;
   /** @hidden */
   float _lodGenerationScale;

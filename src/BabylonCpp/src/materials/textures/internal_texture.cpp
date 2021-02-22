@@ -55,6 +55,7 @@ InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource sourc
     , _generateDepthBuffer{false}
     , _comparisonFunction{0}
     , _sphericalPolynomial{nullptr}
+    , _sphericalPolynomialPromise{nullptr}
     , _sphericalPolynomialComputed{false}
     , _lodGenerationScale{0}
     , _lodGenerationOffset{0}
