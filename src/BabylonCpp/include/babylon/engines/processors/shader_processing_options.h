@@ -22,6 +22,12 @@ FWD_STRUCT_SPTR(ShaderProcessingContext)
 /**
  * @brief Hidden
  */
+struct BABYLON_SHARED_EXPORT ShaderProcessingContext {
+}; // end of struct ShaderProcessingContext
+
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT ProcessingOptions {
   std::vector<std::string> defines{};
   json indexParameters;
