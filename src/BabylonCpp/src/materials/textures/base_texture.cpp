@@ -533,14 +533,28 @@ ArrayBufferView BaseTexture::_readPixelsSync(unsigned int faceIndex, int iLevel,
 SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
 {
   if (_texture) {
-    if (_texture->_sphericalPolynomial) {
+    if (_texture->_sphericalPolynomial || _texture->_sphericalPolynomialComputed) {
       return _texture->_sphericalPolynomial;
     }
 
     if (_texture->isReady) {
-      _texture->_sphericalPolynomial
-        = CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(*this);
-      return _texture->_sphericalPolynomial;
+      if (!_texture->_sphericalPolynomialPromise) {
+        _texture->_sphericalPolynomialPromise = [this]() -> SphericalPolynomialPtr {
+          return CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
+            *this);
+        };
+        if (_texture->_sphericalPolynomialPromise == nullptr) {
+          _texture->_sphericalPolynomialComputed = true;
+        }
+        else {
+          _texture->_sphericalPolynomial         = _texture->_sphericalPolynomialPromise();
+          _texture->_sphericalPolynomialComputed = true;
+
+          return _texture->_sphericalPolynomial;
+        }
+      }
+
+      return _nullSphericalPolynomial;
     }
   }
 
