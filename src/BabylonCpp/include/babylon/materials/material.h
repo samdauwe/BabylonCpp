@@ -350,26 +350,19 @@ public:
   virtual void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr);
 
   /**
-   * @brief Binds the scene's uniform buffer to the effect.
-   * @param effect defines the effect to bind to the scene uniform buffer
-   * @param sceneUbo defines the uniform buffer storing scene data
-   */
-  void bindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo);
-
-  /**
    * @brief Binds the view matrix to the effect.
    * @param effect defines the effect to bind the view matrix to
    */
   void bindView(Effect* effect);
 
   /**
-   * @brief Binds the view projection matrix to the effect.
-   * @param effect defines the effect to bind the view projection matrix to
+   * @brief Binds the view projection and projection matrices to the effect.
+   * @param effect defines the effect to bind the view projection and projection matrices to
    */
   void bindViewProjection(const EffectPtr& effect);
 
   /**
-   * @brief Binds the view matrix to the effect.
+   * @brief  Binds the view matrix to the effect.
    * @param effect defines the effect to bind the view matrix to
    * @param variableName name of the shader variable that will hold the eye position
    */
@@ -585,12 +578,17 @@ protected:
   [[nodiscard]] bool get_needDepthPrePass() const;
 
   /**
-   * @brief Sets the state for enabling fog.
+   * @brief Can this material render to prepass.
+   */
+  virtual bool get_isPrePassCapable() const;
+
+  /**
+   * @brief Sets the state specifying if fog should be enabled.
    */
   void set_fogEnabled(bool value);
 
   /**
-   * @brief Gets the value of the fog enabled state.
+   * @brief Gets the state specifying if fog should be enabled.
    */
   [[nodiscard]] bool get_fogEnabled() const;
 
@@ -873,6 +871,11 @@ public:
   Property<Material, bool> needDepthPrePass;
 
   /**
+   * Can this material render to prepass
+   */
+  ReadOnlyProperty<Material, bool> isPrePassCapable;
+
+  /**
    * Specifies if depth writing should be disabled
    */
   bool disableDepthWrite;
@@ -1017,7 +1020,7 @@ private:
   bool _needDepthPrePass;
 
   /**
-   * Stores the state specifing if fog should be enabled
+   * Stores the state specifying if fog should be enabled
    */
   bool _fogEnabled;
 

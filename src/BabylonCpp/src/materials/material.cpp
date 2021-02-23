@@ -79,6 +79,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , onEffectCreatedObservable{this, &Material::get_onEffectCreatedObservable}
     , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
     , needDepthPrePass{this, &Material::get_needDepthPrePass, &Material::set_needDepthPrePass}
+    , isPrePassCapable{this, &Material::get_isPrePassCapable}
     , disableDepthWrite{false}
     , disableColorWrite{false}
     , forceDepthWrite{false}
@@ -97,7 +98,6 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
-    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
     , _forceAlphaTest{false}
     , _transparencyMode{std::nullopt}
     , _disableAlphaBlending{this, &Material::get__disableAlphaBlending}
@@ -113,14 +113,10 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _cachedColorWriteState{false}
     , _cachedDepthFunctionState{0}
 {
-  name             = iName;
-  auto idSubscript = 1u;
-  _scene           = scene ? scene : Engine::LastCreatedScene();
+  name   = iName;
+  _scene = scene ? scene : Engine::LastCreatedScene();
 
   id = !iName.empty() ? iName : GUID::RandomId();
-  while (_scene->getMaterialByID(id)) {
-    id = name + " " + std::to_string(idSubscript++);
-  }
 
   uniqueId = _scene->getUniqueId();
 
@@ -131,6 +127,8 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     sideOrientation = Material::CounterClockWiseSideOrientation;
   }
 
+  _uniformBuffer
+    = std::make_unique<UniformBuffer>(scene->getEngine(), Float32Array(), std::nullopt, name);
   _useUBO = getScene()->getEngine()->supportsUniformBuffers();
 
   if (!doNotAdd) {
@@ -238,6 +236,11 @@ void Material::set_needDepthPrePass(bool value)
   if (_needDepthPrePass) {
     checkReadyOnEveryCall = true;
   }
+}
+
+bool Material::get_isPrePassCapable() const
+{
+  return false;
 }
 
 bool Material::get_fogEnabled() const
@@ -517,18 +520,13 @@ void Material::bindOnlyWorldMatrix(Matrix& /*world*/, const EffectPtr& /*effectO
 {
 }
 
-void Material::bindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo)
-{
-  sceneUbo->bindToEffect(effect, "Scene");
-}
-
 void Material::bindView(Effect* effect)
 {
   if (!_useUBO) {
     effect->setMatrix("view", getScene()->getViewMatrix());
   }
   else {
-    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
+    _needToBindSceneUbo = true;
   }
 }
 
@@ -536,9 +534,10 @@ void Material::bindViewProjection(const EffectPtr& effect)
 {
   if (!_useUBO) {
     effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
+    effect->setMatrix("projection", getScene()->getProjectionMatrix());
   }
   else {
-    bindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
+    _needToBindSceneUbo = true;
   }
 }
 
@@ -552,9 +551,16 @@ void Material::bindEyePosition(Effect* effect, const std::string& variableName)
   }
 }
 
-void Material::_afterBind(Mesh* mesh, const EffectPtr& /*effect*/)
+void Material::_afterBind(Mesh* mesh, const EffectPtr& effect)
 {
   _scene->_cachedMaterial = this;
+  if (_needToBindSceneUbo) {
+    if (effect) {
+      _needToBindSceneUbo = false;
+      MaterialHelper::FinalizeSceneUbo(getScene());
+      MaterialHelper::BindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
+    }
+  }
   if (mesh) {
     _scene->_cachedVisibility = mesh->visibility();
   }
