@@ -63,7 +63,7 @@ public:
   static constexpr unsigned int SUMMARY_LOGGING = Constants::SCENELOADER_SUMMARY_LOGGING;
 
   /**
-   * Detailled logging while loading
+   * Detailed logging while loading
    */
   static constexpr unsigned int DETAILED_LOGGING = Constants::SCENELOADER_DETAILED_LOGGING;
 

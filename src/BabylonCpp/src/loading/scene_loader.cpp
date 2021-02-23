@@ -159,12 +159,12 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_Lo
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::function<void()>& /*onDispose*/, const std::string& pluginExtension)
 {
-  auto directLoad = SceneLoader::_GetDirectLoad(fileInfo.name);
+  auto directLoad = SceneLoader::_GetDirectLoad(fileInfo.url);
   auto registeredPlugin
     = (!pluginExtension.empty()) ?
         SceneLoader::_GetPluginForExtension(pluginExtension) :
-        (!directLoad.empty() ? SceneLoader::_GetPluginForDirectLoad(fileInfo.name) :
-                               SceneLoader::_GetPluginForFilename(fileInfo.name));
+        (!directLoad.empty() ? SceneLoader::_GetPluginForDirectLoad(fileInfo.url) :
+                               SceneLoader::_GetPluginForFilename(fileInfo.url));
 
   std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> plugin;
   ISceneLoaderPluginPtr syncedPlugin       = nullptr;
@@ -182,8 +182,6 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_Lo
       "use before.");
   }
 
-  auto& useArrayBuffer = registeredPlugin.isBinary;
-
   if (syncedPlugin) {
     SceneLoader::OnPluginActivatedObservable.notifyObservers(syncedPlugin.get());
   }
@@ -191,18 +189,21 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_Lo
     SceneLoader::OnPluginAsyncActivatedObservable.notifyObservers(asyncedPlugin.get());
   }
 
+  auto& useArrayBuffer = registeredPlugin.isBinary;
+
   const auto dataCallback
     = [scene, onError, onSuccess, plugin](const std::variant<std::string, ArrayBufferView>& data,
-                                          const std::string& responseURL) {
-        if (scene->isDisposed()) {
-          onError("Scene has been disposed", "");
-          return;
-        }
+                                          const std::string& responseURL) -> void {
+    if (scene->isDisposed()) {
+      onError("Scene has been disposed", "");
+      return;
+    }
 
-        onSuccess(plugin, std::get<std::string>(data), responseURL);
-      };
+    onSuccess(plugin, std::get<std::string>(data), responseURL);
+  };
 
-  const auto manifestChecked = [fileInfo, dataCallback, useArrayBuffer, onError, onProgress]() {
+  const auto manifestChecked
+    = [fileInfo, dataCallback, useArrayBuffer, onError, onProgress]() -> void {
     std::function<void(const ProgressEvent& event)> progressCallback = nullptr;
     if (onProgress) {
       progressCallback = [onProgress](const ProgressEvent& event) {
@@ -244,6 +245,10 @@ std::shared_ptr<IFileInfo> SceneLoader::_GetFileInfo(std::string rootUrl,
     url     = rootUrl;
     name    = Tools::GetFilename(rootUrl);
     rootUrl = Tools::GetFolderPath(rootUrl);
+  }
+  else if (Tools::IsBase64(sceneFilename)) {
+    url  = rootUrl + sceneFilename;
+    name = "";
   }
   else {
     if (sceneFilename.substr(0, 1) == "/") {
