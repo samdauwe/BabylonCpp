@@ -7,6 +7,8 @@
 
 namespace BABYLON {
 
+size_t VertexBuffer::_Counter = 0;
+
 VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, BufferPtr>& data,
                            const std::string& kind, bool updatable,
                            const std::optional<bool>& postponeInternalCreation,
@@ -34,7 +36,8 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
     _ownsBuffer = true;
   }
 
-  _kind = kind;
+  uniqueId = VertexBuffer::_Counter++;
+  _kind    = kind;
 
   if (!iType.has_value()) {
     type = VertexBuffer::FLOAT;

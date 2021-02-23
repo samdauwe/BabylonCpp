@@ -388,7 +388,13 @@ public:
    */
   unsigned int type;
 
+  /**
+   * Gets the unique id of this vertex buffer
+   */
+  size_t uniqueId;
+
 private:
+  static size_t _Counter;
   std::string _kind;
   size_t _size;
   bool _ownsBuffer;
