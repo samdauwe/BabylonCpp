@@ -130,8 +130,7 @@ public:
 
   /**
    * @brief Specifies if the material uses metallic roughness workflow.
-   * @returns boolean specifiying if the material uses metallic roughness
-   * workflow.
+   * @returns boolean specifying if the material uses metallic roughness workflow.
    */
   bool isMetallicWorkflow() const;
 
@@ -228,10 +227,14 @@ protected:
   bool get_canRenderToMRT() const override;
 
   /**
-   * @brief Gets a boolean indicating that current material needs to register
-   * RTT.
+   * @brief Gets a boolean indicating that current material needs to register RTT.
    */
   bool get_hasRenderTargetTextures() const override;
+
+  /**
+   * @brief Can this material render to prepass
+   */
+  bool get_isPrePassCapable() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide
@@ -324,7 +327,7 @@ public:
   PBRSubSurfaceConfigurationPtr subSurface;
 
   /**
-   * Defines additionnal PrePass parameters for the material.
+   * Defines additional PrePass parameters for the material.
    */
   PrePassConfigurationPtr prePassConfiguration;
 
@@ -335,30 +338,26 @@ public:
 
 protected:
   /**
-   * Intensity of the direct lights e.g. the four lights available in your
-   * scene.
+   * Intensity of the direct lights e.g. the four lights available in your scene.
    * This impacts both the direct diffuse and specular highlights.
    */
   float _directIntensity;
 
   /**
    * Intensity of the emissive part of the material.
-   * This helps controlling the emissive effect without modifying the emissive
-   * color.
+   * This helps controlling the emissive effect without modifying the emissive color.
    */
   float _emissiveIntensity;
 
   /**
-   * Intensity of the environment e.g. how much the environment will light the
-   * object either through harmonics for rough material or through the
-   * refelction for shiny ones.
+   * Intensity of the environment e.g. how much the environment will light the object
+   * either through harmonics for rough material or through the reflection for shiny ones.
    */
   float _environmentIntensity;
 
   /**
-   * This is a special control allowing the reduction of the specular highlights
-   * coming from the four lights of the scene. Those highlights may not be
-   * needed in full environment lighting.
+   * This is a special control allowing the reduction of the specular highlights coming from the
+   * four lights of the scene. Those highlights may not be needed in full environment lighting.
    */
   float _specularIntensity;
 
@@ -529,10 +528,9 @@ protected:
   bool _useAlphaFromAlbedoTexture;
 
   /**
-   * Specifies that the material will keeps the specular highlights over a
-   * transparent surface (only the most limunous ones).
-   * A car glass is a good exemple of that. When sun reflects on it you can not
-   * see what is behind.
+   * Specifies that the material will keeps the specular highlights over a transparent surface (only
+   * the most luminous ones). A car glass is a good example of that. When sun reflects on it you can
+   * not see what is behind.
    */
   bool _useSpecularOverAlpha;
 
@@ -586,10 +584,9 @@ protected:
   unsigned int _lightFalloff;
 
   /**
-   * Specifies that the material will keeps the reflection highlights over a
-   * transparent surface (only the most limunous ones).
-   * A car glass is a good exemple of that. When the street lights reflects on
-   * it you can not see what is behind.
+   * Specifies that the material will keeps the reflection highlights over a transparent surface
+   * (only the most luminous ones). A car glass is a good example of that. When the street lights
+   * reflects on it you can not see what is behind.
    */
   bool _useRadianceOverAlpha;
 
@@ -630,14 +627,12 @@ protected:
   bool _invertNormalMapX;
 
   /**
-   * If sets to true, y component of normal map value will be inverted
-   * (y = 1.0 - y).
+   * If sets to true, y component of normal map value will be inverted (y = 1.0 - y).
    */
   bool _invertNormalMapY;
 
   /**
-   * If sets to true and backfaceCulling is false, normals will be flipped on
-   * the backside.
+   * If sets to true and backfaceCulling is false, normals will be flipped on the backside.
    */
   bool _twoSidedLighting;
 
@@ -647,30 +642,26 @@ protected:
   float _alphaCutOff;
 
   /**
-   * Enforces alpha test in opaque or blend mode in order to improve the
-   * performances of some situations.
+   * Enforces alpha test in opaque or blend mode in order to improve the performances of some
+   * situations.
    */
   bool _forceAlphaTest;
 
   /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested.
-   * And/Or occlude the blended part. (alpha is converted to gamma to compute
-   * the fresnel)
+   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
+   * tested. And/Or occlude the blended part. (alpha is converted to gamma to compute the fresnel)
    */
   bool _useAlphaFresnel;
 
   /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested. And/Or occlude the blended part. (alpha stays
-   * linear to compute the fresnel)
+   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
+   * tested. And/Or occlude the blended part. (alpha stays linear to compute the fresnel)
    */
   bool _useLinearAlphaFresnel;
 
   /**
-   * Specifies the environment BRDF texture used to comput the scale and offset
-   * roughness values
-   * from cos thetav and roughness:
+   * Specifies the environment BRDF texture used to compute the scale and offset roughness values
+   * from cos theta and roughness:
    * http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
    */
   BaseTexturePtr _environmentBRDFTexture;

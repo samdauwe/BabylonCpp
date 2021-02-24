@@ -243,6 +243,11 @@ bool PBRBaseMaterial::get_hasRenderTargetTextures() const
   return subSurface->hasRenderTargetTextures();
 }
 
+bool PBRBaseMaterial::get_isPrePassCapable() const
+{
+  return true;
+}
+
 std::string PBRBaseMaterial::getClassName() const
 {
   return "PBRBaseMaterial";
@@ -475,10 +480,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 bool PBRBaseMaterial::isMetallicWorkflow() const
 {
   return (_metallic.has_value() && _metallic.value() != 0.f)
-
-         || (_roughness.has_value() && _roughness.value() != 0.f)
-
-         || _metallicTexture;
+         || (_roughness.has_value() && _roughness.value() != 0.f) || _metallicTexture;
 }
 
 EffectPtr PBRBaseMaterial::_prepareEffect(
@@ -691,7 +693,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     "reflectionSamplerHigh",  "irradianceSampler",   "microSurfaceSampler",
     "environmentBrdfSampler", "boneSampler",         "metallicReflectanceSampler"};
 
-  std::vector<std::string> uniformBuffers{"Material", "Scene"};
+  std::vector<std::string> uniformBuffers{"Material", "Scene", "Mesh"};
 
   DetailMapConfiguration::AddUniforms(uniforms);
   DetailMapConfiguration::AddSamplers(samplers);
@@ -804,18 +806,18 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
       auto reflectionTexture = _getReflectionTexture();
       if (reflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
-        defines.boolDef["REFLECTION"]              = true;
-        defines.boolDef["GAMMAREFLECTION"]         = reflectionTexture->gammaSpace;
-        defines.boolDef["RGBDREFLECTION"]          = reflectionTexture->isRGBD;
-        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
-                                                       !reflectionTexture->invertZ :
-                                                       reflectionTexture->invertZ;
+        defines.boolDef["REFLECTION"]               = true;
+        defines.boolDef["GAMMAREFLECTION"]          = reflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]           = reflectionTexture->isRGBD;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]  = getScene()->useRightHandedSystem() ?
+                                                        !reflectionTexture->invertZ :
+                                                        reflectionTexture->invertZ;
         defines.boolDef["LODINREFLECTIONALPHA"]     = reflectionTexture->lodLevelInAlpha;
         defines.boolDef["LINEARSPECULARREFLECTION"] = reflectionTexture->linearSpecularLOD();
 
         if (realTimeFiltering && realTimeFilteringQuality() > 0) {
           defines.intDef["NUM_SAMPLES"] = realTimeFilteringQuality;
-          if (engine->webGLVersion > 1.f) {
+          if (engine->_features.needTypeSuffixInShaderConstants) {
             defines.intDef["NUM_SAMPLES"] = defines.intDef["NUM_SAMPLES"];
           }
           defines.boolDef["REALTIME_FILTERING"] = true;
@@ -991,8 +993,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
       }
 
       if (_environmentBRDFTexture && MaterialFlags::ReflectionTextureEnabled()) {
-        defines.boolDef["ENVIRONMENTBRDF"] = true;
-        // Not actual true RGBD, only the B chanel is encoded as RGBD for sheen.
+        defines.boolDef["ENVIRONMENTBRDF"]      = true;
         defines.boolDef["ENVIRONMENTBRDF_RGBD"] = _environmentBRDFTexture->isRGBD();
       }
       else {
@@ -1148,7 +1149,10 @@ void PBRBaseMaterial::buildUniformLayout()
   ubo.addUniform("pointSize", 1);
   ubo.addUniform("vReflectivityColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
-  ubo.addUniform("visibility", 1);
+  ubo.addUniform("vAmbientColor", 3);
+
+  ubo.addUniform("vDebugMode", 2);
+
   ubo.addUniform("vMetallicReflectanceFactors", 4);
   ubo.addUniform("vMetallicReflectanceInfos", 2);
   ubo.addUniform("metallicReflectanceMatrix", 16);
@@ -1158,6 +1162,26 @@ void PBRBaseMaterial::buildUniformLayout()
   PBRSheenConfiguration::PrepareUniformBuffer(ubo);
   PBRSubSurfaceConfiguration::PrepareUniformBuffer(ubo);
   DetailMapConfiguration::PrepareUniformBuffer(ubo);
+
+  ubo.addUniform("vSphericalL00", 3);
+  ubo.addUniform("vSphericalL1_1", 3);
+  ubo.addUniform("vSphericalL10", 3);
+  ubo.addUniform("vSphericalL11", 3);
+  ubo.addUniform("vSphericalL2_2", 3);
+  ubo.addUniform("vSphericalL2_1", 3);
+  ubo.addUniform("vSphericalL20", 3);
+  ubo.addUniform("vSphericalL21", 3);
+  ubo.addUniform("vSphericalL22", 3);
+
+  ubo.addUniform("vSphericalX", 3);
+  ubo.addUniform("vSphericalY", 3);
+  ubo.addUniform("vSphericalZ", 3);
+  ubo.addUniform("vSphericalXX_ZZ", 3);
+  ubo.addUniform("vSphericalYY_ZZ", 3);
+  ubo.addUniform("vSphericalZZ", 3);
+  ubo.addUniform("vSphericalXY", 3);
+  ubo.addUniform("vSphericalYZ", 3);
+  ubo.addUniform("vSphericalZX", 3);
 
   ubo.create();
 }
@@ -1194,16 +1218,16 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   auto defines = *definesTmp;
 
   auto effect = subMesh->effect();
+
   if (!effect) {
     return;
   }
 
   _activeEffect = effect;
 
-  // Matrices
-  if (!defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
-    bindOnlyWorldMatrix(world);
-  }
+  // Matrices Mesh.
+  mesh->getMeshUniformBuffer()->bindToEffect(effect.get(), "Mesh");
+  mesh->transferToEffect(world);
 
   // PrePass
   prePassConfiguration->bindForSubMesh(_activeEffect, scene, mesh, world, isFrozen());
@@ -1274,37 +1298,37 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
               auto polynomials = *_polynomials;
               if (defines["SPHERICAL_HARMONICS"]) {
                 auto& preScaledHarmonics = polynomials.preScaledHarmonics();
-                _activeEffect->setVector3("vSphericalL00", preScaledHarmonics.l00);
-                _activeEffect->setVector3("vSphericalL1_1", preScaledHarmonics.l1_1);
-                _activeEffect->setVector3("vSphericalL10", preScaledHarmonics.l10);
-                _activeEffect->setVector3("vSphericalL11", preScaledHarmonics.l11);
-                _activeEffect->setVector3("vSphericalL2_2", preScaledHarmonics.l2_2);
-                _activeEffect->setVector3("vSphericalL2_1", preScaledHarmonics.l2_1);
-                _activeEffect->setVector3("vSphericalL20", preScaledHarmonics.l20);
-                _activeEffect->setVector3("vSphericalL21", preScaledHarmonics.l21);
-                _activeEffect->setVector3("vSphericalL22", preScaledHarmonics.l22);
+                ubo.updateVector3("vSphericalL00", preScaledHarmonics.l00);
+                ubo.updateVector3("vSphericalL1_1", preScaledHarmonics.l1_1);
+                ubo.updateVector3("vSphericalL10", preScaledHarmonics.l10);
+                ubo.updateVector3("vSphericalL11", preScaledHarmonics.l11);
+                ubo.updateVector3("vSphericalL2_2", preScaledHarmonics.l2_2);
+                ubo.updateVector3("vSphericalL2_1", preScaledHarmonics.l2_1);
+                ubo.updateVector3("vSphericalL20", preScaledHarmonics.l20);
+                ubo.updateVector3("vSphericalL21", preScaledHarmonics.l21);
+                ubo.updateVector3("vSphericalL22", preScaledHarmonics.l22);
               }
               else {
-                _activeEffect->setFloat3("vSphericalX", polynomials.x.x, polynomials.x.y,
-                                         polynomials.x.z);
-                _activeEffect->setFloat3("vSphericalY", polynomials.y.x, polynomials.y.y,
-                                         polynomials.y.z);
-                _activeEffect->setFloat3("vSphericalZ", polynomials.z.x, polynomials.z.y,
-                                         polynomials.z.z);
-                _activeEffect->setFloat3("vSphericalXX_ZZ", polynomials.xx.x - polynomials.zz.x,
-                                         polynomials.xx.y - polynomials.zz.y,
-                                         polynomials.xx.z - polynomials.zz.z);
-                _activeEffect->setFloat3("vSphericalYY_ZZ", polynomials.yy.x - polynomials.zz.x,
-                                         polynomials.yy.y - polynomials.zz.y,
-                                         polynomials.yy.z - polynomials.zz.z);
-                _activeEffect->setFloat3("vSphericalZZ", polynomials.zz.x, polynomials.zz.y,
-                                         polynomials.zz.z);
-                _activeEffect->setFloat3("vSphericalXY", polynomials.xy.x, polynomials.xy.y,
-                                         polynomials.xy.z);
-                _activeEffect->setFloat3("vSphericalYZ", polynomials.yz.x, polynomials.yz.y,
-                                         polynomials.yz.z);
-                _activeEffect->setFloat3("vSphericalZX", polynomials.zx.x, polynomials.zx.y,
-                                         polynomials.zx.z);
+                ubo.updateFloat3("vSphericalX", polynomials.x.x, polynomials.x.y, polynomials.x.z,
+                                 "");
+                ubo.updateFloat3("vSphericalY", polynomials.y.x, polynomials.y.y, polynomials.y.z,
+                                 "");
+                ubo.updateFloat3("vSphericalZ", polynomials.z.x, polynomials.z.y, polynomials.z.z,
+                                 "");
+                ubo.updateFloat3("vSphericalXX_ZZ", polynomials.xx.x - polynomials.zz.x,
+                                 polynomials.xx.y - polynomials.zz.y,
+                                 polynomials.xx.z - polynomials.zz.z, "");
+                ubo.updateFloat3("vSphericalYY_ZZ", polynomials.yy.x - polynomials.zz.x,
+                                 polynomials.yy.y - polynomials.zz.y,
+                                 polynomials.yy.z - polynomials.zz.z, "");
+                ubo.updateFloat3("vSphericalZZ", polynomials.zz.x, polynomials.zz.y,
+                                 polynomials.zz.z, "");
+                ubo.updateFloat3("vSphericalXY", polynomials.xy.x, polynomials.xy.y,
+                                 polynomials.xy.z, "");
+                ubo.updateFloat3("vSphericalYZ", polynomials.yz.x, polynomials.yz.y,
+                                 polynomials.yz.z, "");
+                ubo.updateFloat3("vSphericalZX", polynomials.zx.x, polynomials.zx.y,
+                                 polynomials.zx.z, "");
               }
             }
           }
@@ -1386,7 +1410,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
 
         const auto ior = subSurface->indexOfRefraction();
         const auto outside_ior
-          = 1.f; // consider air as clear coat and other layaers would remap in the shader.
+          = 1.f; // consider air as clear coat and other layers would remap in the shader.
 
         // We are here deriving our default reflectance from a common value for none metallic
         // surface. Based of the schlick fresnel approximation model for dielectrics.
@@ -1421,10 +1445,14 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       _lightingInfos.w = _specularIntensity;
 
       ubo.updateVector4("vLightingIntensity", _lightingInfos);
-    }
 
-    // Visibility
-    ubo.updateFloat("visibility", mesh->visibility());
+      // Colors
+      scene->ambientColor.multiplyToRef(_ambientColor, _globalAmbientColor);
+
+      ubo.updateColor3("vAmbientColor", _globalAmbientColor, "");
+
+      ubo.updateFloat2("vDebugMode", debugLimit, debugFactor, "");
+    }
 
     // Textures
     if (scene->texturesEnabled()) {
@@ -1507,20 +1535,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
 
-    // Colors
-    scene->ambientColor.multiplyToRef(_ambientColor, _globalAmbientColor);
-
-    auto eyePosition = scene->_forcedViewPosition ?
-                         *scene->_forcedViewPosition :
-                         (scene->_mirroredCameraPosition ? *scene->_mirroredCameraPosition :
-                                                           scene->activeCamera()->globalPosition());
-    auto invertNormal
-      = (scene->useRightHandedSystem() == (scene->_mirroredCameraPosition != nullptr));
-    effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y, eyePosition.z,
-                      invertNormal ? -1.f : 1.f);
-    effect->setColor3("vAmbientColor", _globalAmbientColor);
-
-    effect->setFloat2("vDebugMode", debugLimit, debugFactor);
+    bindEyePosition(effect.get());
   }
 
   if (mustRebind || !isFrozen()) {
@@ -1551,9 +1566,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     MaterialHelper::BindLogDepth(defines, _activeEffect.get(), scene);
   }
 
-  ubo.update();
-
   _afterBind(mesh, _activeEffect);
+
+  ubo.update();
 }
 
 std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables()
