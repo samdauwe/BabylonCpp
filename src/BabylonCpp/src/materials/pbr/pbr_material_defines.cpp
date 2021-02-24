@@ -103,7 +103,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"PREPASS", false},              //
     {"PREPASS_IRRADIANCE", false},   //
     {"PREPASS_ALBEDO", false},       //
-    {"PREPASS_DEPTHNORMAL", false},  //
+    {"PREPASS_DEPTH", false},        //
+    {"PREPASS_NORMAL", false},       //
     {"PREPASS_POSITION", false},     //
     {"PREPASS_VELOCITY", false},     //
     {"PREPASS_REFLECTIVITY", false}, //
@@ -219,7 +220,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"BonesPerMesh", 0},                        //
     {"PREPASS_IRRADIANCE_INDEX", -1},           //
     {"PREPASS_ALBEDO_INDEX", -1},               //
-    {"PREPASS_DEPTHNORMAL_INDEX", -1},          //
+    {"PREPASS_DEPTH_INDEX", -1},                //
+    {"PREPASS_NORMAL_INDEX", -1},               //
     {"PREPASS_POSITION_INDEX", -1},             //
     {"PREPASS_VELOCITY_INDEX", -1},             //
     {"PREPASS_REFLECTIVITY_INDEX", -1},         //
