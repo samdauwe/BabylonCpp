@@ -57,6 +57,11 @@ struct BABYLON_SHARED_EXPORT IMultiRenderTargetOptions {
    */
   std::optional<unsigned int> defaultType = std::nullopt;
 
+  /**
+   * Define the default type of the buffers we are creating
+   */
+  std::optional<bool> drawOnlyOnFirstAttachmentByDefault = std::nullopt;
+
 }; // end of struct IMultiRenderTargetOptions
 
 } // end of namespace BABYLON
