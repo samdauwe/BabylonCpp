@@ -154,6 +154,7 @@ private:
   std::vector<TexturePtr> _textures;
   IMultiRenderTargetOptions _multiRenderTargetOptions;
   size_t _count;
+  bool _drawOnlyOnFirstAttachmentByDefault;
   TexturePtr _nullTexture;
 
 }; // end of class MultiRenderTarget

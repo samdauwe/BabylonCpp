@@ -10,16 +10,28 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
                                      const std::variant<int, RenderTargetSize, float>& size,
                                      std::size_t count, Scene* scene,
                                      const std::optional<IMultiRenderTargetOptions>& options)
-    : RenderTargetTexture{iName, size, scene,
+    : RenderTargetTexture{iName, // name
+                          size,  // size
+                          scene, // scene
                           options && (*options).generateMipMaps ? *(*options).generateMipMaps :
-                                                                  false,
+                                                                  false, // generateMipMaps
                           options && (*options).doNotChangeAspectRatio ?
                             *(*options).doNotChangeAspectRatio :
-                            true}
+                            true, // doNotChangeAspectRatio
+                          std::nullopt, // type
+                          std::nullopt, // isCube
+                          std::nullopt, // samplingMode
+                          std::nullopt, // generateDepthBuffer
+                          std::nullopt, // generateStencilBuffer
+                          std::nullopt, // isMulti
+                          std::nullopt, // format
+                          true // delayAllocation
+    }
     , isSupported{this, &MultiRenderTarget::get_isSupported}
     , textures{this, &MultiRenderTarget::get_textures}
     , count{this, &MultiRenderTarget::get_count}
     , depthTexture{this, &MultiRenderTarget::get_depthTexture}
+    , _drawOnlyOnFirstAttachmentByDefault{false}
     , _nullTexture{nullptr}
 {
   auto generateMipMaps
@@ -28,6 +40,10 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
     = options && (*options).generateDepthTexture ? *(*options).generateDepthTexture : false;
   auto doNotChangeAspectRatio
     = options && (*options).doNotChangeAspectRatio ? *(*options).doNotChangeAspectRatio : true;
+  auto drawOnlyOnFirstAttachmentByDefault
+    = options && (*options).drawOnlyOnFirstAttachmentByDefault ?
+        *(*options).drawOnlyOnFirstAttachmentByDefault :
+        false;
 
   if (!isSupported()) {
     dispose();
@@ -57,17 +73,20 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
     Constants::TEXTURETYPE_UNSIGNED_INT // defaultType
   };
 
-  _count = count;
+  _count                              = count;
+  _drawOnlyOnFirstAttachmentByDefault = drawOnlyOnFirstAttachmentByDefault;
 
-  _createInternalTextures();
-  _createInternalTextures();
+  if (count > 0) {
+    _createInternalTextures();
+    _createInternalTextures();
+  }
 }
 
 MultiRenderTarget::~MultiRenderTarget() = default;
 
 bool MultiRenderTarget::get_isSupported() const
 {
-  return (_getEngine()->webGLVersion() > 1.f) || (_getEngine()->getCaps().drawBuffersExtension);
+  return _engine ? _engine->getCaps().drawBuffersExtension : false;
 }
 
 std::vector<TexturePtr>& MultiRenderTarget::get_textures()
@@ -127,6 +146,10 @@ void MultiRenderTarget::_initTypes(size_t iCount, std::vector<unsigned int>& typ
 
 void MultiRenderTarget::_rebuild(bool forceFullRebuild)
 {
+  if (_count < 1) {
+    return;
+  }
+
   releaseInternalTextures();
   _createInternalTextures();
 
@@ -139,19 +162,20 @@ void MultiRenderTarget::_rebuild(bool forceFullRebuild)
     texture->_texture   = _internalTextures[i];
   }
 
-  // Keeps references to frame buffer and stencil/depth buffer
-  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
-
   if (samples() != 1) {
-    _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, samples());
+    _getEngine()->updateMultipleRenderTargetTextureSampleCount(
+      _internalTextures, samples(), !_drawOnlyOnFirstAttachmentByDefault);
   }
 }
 
 void MultiRenderTarget::_createInternalTextures()
 {
+  _internalTextures = _getEngine()->createMultipleRenderTarget(
+    ISize{_size.width, _size.height}, _multiRenderTargetOptions,
+    !_drawOnlyOnFirstAttachmentByDefault);
 
-  _internalTextures = _getEngine()->createMultipleRenderTarget(ISize{_size.width, _size.height},
-                                                               _multiRenderTargetOptions);
+  // Keeps references to frame buffer and stencil/depth buffer
+  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
 }
 
 void MultiRenderTarget::_createTextures()
@@ -162,9 +186,6 @@ void MultiRenderTarget::_createTextures()
     texture->_texture = internalTexture;
     _textures.emplace_back(texture);
   }
-
-  // Keeps references to frame buffer and stencil/depth buffer
-  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
 }
 
 void MultiRenderTarget::replaceTexture(const TexturePtr& texture, unsigned int index)
@@ -175,6 +196,9 @@ void MultiRenderTarget::replaceTexture(const TexturePtr& texture, unsigned int i
     }
     _textures[index]         = texture;
     _internalTextures[index] = texture->_texture;
+    if (index == 0) {
+      _texture = _internalTextures[index];
+    }
   }
 }
 
@@ -189,7 +213,13 @@ void MultiRenderTarget::set_samples(unsigned int value)
     return;
   }
 
-  _samples = _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
+  if (!_internalTextures.empty()) {
+    _samples = _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
+  }
+  else {
+    // In case samples are set with 0 textures created, we must save the desired samples value
+    _samples = value;
+  }
 }
 
 void MultiRenderTarget::resize(Size size)
