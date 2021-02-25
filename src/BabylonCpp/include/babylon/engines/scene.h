@@ -3374,6 +3374,12 @@ public:
   Stage<SimpleStageAction> _beforeClearStage;
 
   /**
+   * Defines the actions happening before clear the canvas.
+   * Hidden
+   */
+  Stage<RenderTargetStageAction> _beforeRenderTargetClearStage;
+
+  /**
    * Defines the actions happening before camera updates.
    * Hidden
    */
