@@ -22,8 +22,8 @@ bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
   const std::string& iUrl, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
-  bool iNoMipmap, const std::optional<bool>& invertY, unsigned int samplingMode,
-  const std::function<void()>& onLoad,
+  bool iNoMipmap, const std::optional<bool>& invertY,
+  const std::optional<unsigned int>& iSamplingMode, const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType,
@@ -69,6 +69,8 @@ Texture::Texture(
     , _delayedOnError{nullptr}
     , _onLoad{onLoad}
 {
+  const auto samplingMode = iSamplingMode.value_or(TextureConstants::TRILINEAR_SAMPLINGMODE);
+
   name                 = iUrl;
   url                  = iUrl;
   _noMipmap            = iNoMipmap;
