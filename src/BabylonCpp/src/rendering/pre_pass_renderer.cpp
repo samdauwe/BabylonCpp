@@ -146,9 +146,20 @@ void PrePassRenderer::set_useGeometryBufferFallback(bool value)
   }
 }
 
+PrePassRenderTargetPtr
+PrePassRenderer::_createRenderTarget(const std::string& /*name*/,
+                                     const RenderTargetTexturePtr& /*renderTargetTexture*/)
+{
+  return nullptr;
+}
+
 MultiRenderTargetPtr& PrePassRenderer::getRenderTarget()
 {
   return prePassRT;
+}
+
+void PrePassRenderer::_setRenderTarget(const PrePassRenderTargetPtr& /*prePassRenderTarget*/)
+{
 }
 
 void PrePassRenderer::_initializeAttachments()
@@ -228,6 +239,10 @@ void PrePassRenderer::restoreAttachments()
   }
 }
 
+void PrePassRenderer::_beforeDraw(Camera* /*camera*/, int /*faceIndex*/, int /*layer*/)
+{
+}
+
 void PrePassRenderer::_beforeCameraDraw()
 {
   if (_isDirty) {
@@ -283,6 +298,10 @@ void PrePassRenderer::_bindFrameBuffer()
   }
 }
 
+void PrePassRenderer::_afterDraw(int /*faceIndex*/, int /*layer*/)
+{
+}
+
 void PrePassRenderer::clear()
 {
   if (_enabled) {
@@ -298,6 +317,10 @@ void PrePassRenderer::clear()
     _engine->clear(_clearColor, true, false, false);
     _engine->bindAttachments(_defaultAttachments);
   }
+}
+
+void PrePassRenderer::_clear()
+{
 }
 
 void PrePassRenderer::_setState(bool iEnabled)

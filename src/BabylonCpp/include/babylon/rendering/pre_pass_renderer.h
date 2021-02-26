@@ -10,6 +10,7 @@
 
 namespace BABYLON {
 
+class Camera;
 class Effect;
 class Engine;
 class Scene;
@@ -22,6 +23,7 @@ FWD_CLASS_SPTR(MultiRenderTarget)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
 FWD_CLASS_SPTR(PrePassRenderTarget)
+FWD_CLASS_SPTR(RenderTargetTexture)
 FWD_CLASS_SPTR(SubSurfaceConfiguration)
 
 struct TextureFormatMapping {
@@ -46,11 +48,30 @@ public:
   ~PrePassRenderer() = default;
 
   /**
+   * @brief Creates a new PrePassRenderTarget.
+   * This should be the only way to instanciate a `PrePassRenderTarget`
+   * @param name Name of the `PrePassRenderTarget`
+   * @param renderTargetTexture RenderTarget the `PrePassRenderTarget` will be attached to.
+   * Can be `null` if the created `PrePassRenderTarget` is attached to the scene (default
+   * framebuffer).
+   * @hidden
+   */
+  PrePassRenderTargetPtr _createRenderTarget(const std::string& name,
+                                             const RenderTargetTexturePtr& renderTargetTexture);
+
+  /**
    * @return the prepass render target for the rendering pass.
    * If we are currently rendering a render target, it returns the PrePassRenderTarget
    * associated with that render target. Otherwise, it returns the scene default PrePassRenderTarget
    */
   MultiRenderTargetPtr& getRenderTarget();
+
+  /**
+   * @hidden
+   * @brief Managed by the scene component
+   * @param prePassRenderTarget
+   */
+  void _setRenderTarget(const PrePassRenderTargetPtr& prePassRenderTarget);
 
   /**
    * @brief Sets the proper output textures to draw in the engine.
@@ -65,6 +86,11 @@ public:
   void restoreAttachments();
 
   /**
+   * @hidden
+   */
+  void _beforeDraw(Camera* camera, int faceIndex = -1, int layer = -1);
+
+  /**
    * @brief Hidden
    */
   void _beforeCameraDraw();
@@ -75,10 +101,16 @@ public:
   void _afterCameraDraw();
 
   /**
+   * @brief Hidden
+   */
+  void _afterDraw(int faceIndex = -1, int layer = -1);
+
+  /**
    * @brief Clears the scene render target (in the sense of settings pixels to the scene clear color
    * value).
    */
   void clear();
+  void _clear();
 
   /**
    * @brief Adds an effect configuration to the prepass.
