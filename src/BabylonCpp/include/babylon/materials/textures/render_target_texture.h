@@ -498,6 +498,9 @@ public:
    */
   Property<RenderTargetTexture, int> refreshRate;
 
+  /** @hidden */
+  PrePassRenderTargetPtr _prePassRenderTarget;
+
 protected:
   IRenderTargetOptions _renderTargetOptions;
   RenderTargetSize _size;
@@ -515,7 +518,6 @@ private:
   std::unique_ptr<PostProcessManager> _postProcessManager;
   std::vector<PostProcessPtr> _postProcesses;
   Observer<Engine>::Ptr _resizeObserver;
-  PrePassRenderTargetPtr _prePassRenderTarget;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
   Observer<int>::Ptr _onBeforeRenderObserver;

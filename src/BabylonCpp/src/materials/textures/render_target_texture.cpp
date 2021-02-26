@@ -53,6 +53,7 @@ RenderTargetTexture::RenderTargetTexture(
     , samples{this, &RenderTargetTexture::get_samples, &RenderTargetTexture::set_samples}
     , refreshRate{this, &RenderTargetTexture::get_refreshRate,
                   &RenderTargetTexture::set_refreshRate}
+    , _prePassRenderTarget{nullptr}
     , _sizeRatio{0.f}
     , _currentRefreshId{-1}
     , _refreshRate{1}
