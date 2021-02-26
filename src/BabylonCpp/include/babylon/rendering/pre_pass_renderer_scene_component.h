@@ -9,12 +9,14 @@
 namespace BABYLON {
 
 struct _InstancesBatch;
+class Camera;
 class Effect;
 class AbstractMesh;
 class AbstractScene;
 class SubMesh;
 FWD_STRUCT_SPTR(_InstancesBatch)
 FWD_CLASS_SPTR(PrePassRendererSceneComponent)
+FWD_CLASS_SPTR(RenderTargetTexture)
 
 /**
  * @brief Defines the Geometry Buffer scene component responsible to manage a G-Buffer useful
@@ -60,8 +62,13 @@ protected:
   PrePassRendererSceneComponent(Scene* scene);
 
 private:
-  void _beforeCameraDraw();
-  void _afterCameraDraw();
+  void _beforeRenderTargetDraw(const RenderTargetTexturePtr& renderTarget, int faceIndex,
+                               int layer);
+  void _afterRenderTargetDraw(const RenderTargetTexturePtr& renderTarget, int faceIndex, int layer);
+  void _beforeRenderTargetClearStage(const RenderTargetTexturePtr& renderTarget, int faceIndex,
+                                     int layer);
+  void _beforeCameraDraw(Camera* camera);
+  void _afterCameraDraw(Camera* camera);
   void _beforeClearStage();
   void _beforeRenderingMeshStage(AbstractMesh* mesh, SubMesh* subMesh,
                                  const _InstancesBatchPtr& batch, Effect* effect);
