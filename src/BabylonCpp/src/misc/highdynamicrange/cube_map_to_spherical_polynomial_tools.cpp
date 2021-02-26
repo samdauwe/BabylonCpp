@@ -1,6 +1,8 @@
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
 
 #include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/scalar.h>
@@ -27,23 +29,27 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(Ba
     return nullptr;
   }
 
+  if (texture.getScene() && texture.getScene()->getEngine()) {
+    texture.getScene()->getEngine()->flushFramebuffer();
+  }
+
   const auto size  = static_cast<std::size_t>(texture.getSize().width);
-  const auto right = texture.readPixels(0);
-  const auto left  = texture.readPixels(1);
+  const auto right = texture.readPixels(0, 0, std::nullopt, false);
+  const auto left  = texture.readPixels(1, 0, std::nullopt, false);
 
   ArrayBufferView up;
   ArrayBufferView down;
   if (texture.isRenderTarget) {
-    up   = texture.readPixels(3);
-    down = texture.readPixels(2);
+    up   = texture.readPixels(3, 0, std::nullopt, false);
+    down = texture.readPixels(2, 0, std::nullopt, false);
   }
   else {
-    up   = texture.readPixels(2);
-    down = texture.readPixels(3);
+    up   = texture.readPixels(2, 0, std::nullopt, false);
+    down = texture.readPixels(3, 0, std::nullopt, false);
   }
 
-  const auto front = texture.readPixels(4);
-  const auto back  = texture.readPixels(5);
+  const auto front = texture.readPixels(4, 0, std::nullopt, false);
+  const auto back  = texture.readPixels(5, 0, std::nullopt, false);
 
   const auto gammaSpace = texture.gammaSpace();
   // Always read as RGBA.
