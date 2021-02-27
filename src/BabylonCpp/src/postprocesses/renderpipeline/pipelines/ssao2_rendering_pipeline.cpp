@@ -415,6 +415,14 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
     if (_forceGeometryBuffer) {
+      if (_scene->enableGeometryBufferRenderer()) {
+        effect->setTexture("depthSampler",
+                           _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
+        effect->setTexture("normalSampler",
+                           _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[1]);
+      }
+    }
+    else {
       effect->setTexture(
         "depthSampler",
         _prePassRenderer->getRenderTarget()
@@ -423,12 +431,6 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
         "normalSampler",
         _prePassRenderer->getRenderTarget()
           ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE)]);
-    }
-    else {
-      effect->setTexture(
-        "depthNormalSampler",
-        _prePassRenderer->getRenderTarget()
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
   };
