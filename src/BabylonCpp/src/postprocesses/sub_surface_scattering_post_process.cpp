@@ -6,6 +6,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/multi_render_target.h>
+#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>
 
