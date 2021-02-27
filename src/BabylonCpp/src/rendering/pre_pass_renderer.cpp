@@ -10,6 +10,7 @@
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/multi_render_target.h>
+#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/postprocesses/image_processing_post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
@@ -60,22 +61,19 @@ std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats = {
 
 PrePassRenderer::PrePassRenderer(Scene* scene)
     : mrtCount{0}
-    , prePassRT{nullptr}
-    , imageProcessingPostProcess{nullptr}
-    , enabled{this, &PrePassRenderer::get_enabled}
     , samples{this, &PrePassRenderer::get_samples, &PrePassRenderer::set_samples}
     , defaultRT{nullptr}
     , currentRTisSceneRT{this, &PrePassRenderer::get_currentRTisSceneRT}
-    , useGeometryBufferFallback{this, &PrePassRenderer::get_useGeometryBufferFallback,
-                                &PrePassRenderer::set_useGeometryBufferFallback}
+    , doNotUseGeometryRendererFallback{false}
+    , enabled{this, &PrePassRenderer::get_enabled}
     , disableGammaTransform{false}
     , isSupported{this, &PrePassRenderer::get_isSupported}
     , _isDirty{false}
-    , _clearColor{Color4(0.f, 0.f, 0.f, 0.f)}
-    , _enabled{false}
     , _geometryBuffer{nullptr}
     , _currentTarget{nullptr}
-    , _useGeometryBufferFallback{false}
+    , _clearColor{Color4(0.f, 0.f, 0.f, 0.f)}
+    , _enabled{false}
+    , _needsCompositionForThisPass{false}
 {
   _scene  = scene;
   _engine = scene->getEngine();
@@ -87,27 +85,38 @@ PrePassRenderer::PrePassRenderer(Scene* scene)
     component = PrePassRendererSceneComponent::New(scene);
     scene->_addComponent(component);
   }
-
-  _resetLayout();
+  defaultRT = _createRenderTarget("sceneprePassRT", nullptr);
+  _setRenderTarget(nullptr);
 }
 
-bool PrePassRenderer::get_enabled() const
+int PrePassRenderer::getIndex(unsigned int type)
 {
-  return _enabled;
+  return stl_util::contains(_textureIndices, type) ? _textureIndices[type] : -1;
 }
 
 unsigned int PrePassRenderer::get_samples() const
 {
-  return prePassRT->samples();
+  return defaultRT->samples();
 }
 
 void PrePassRenderer::set_samples(unsigned int n)
 {
-  if (!imageProcessingPostProcess) {
-    _createCompositionEffect();
-  }
+  defaultRT->samples = n;
+}
 
-  prePassRT->samples = n;
+PrePassRenderTargetPtr& PrePassRenderer::getRenderTarget()
+{
+  return _currentTarget;
+}
+
+void PrePassRenderer::_setRenderTarget(const PrePassRenderTargetPtr& prePassRenderTarget)
+{
+  if (prePassRenderTarget) {
+    _currentTarget = prePassRenderTarget;
+  }
+  else {
+    _currentTarget = defaultRT;
+  }
 }
 
 bool PrePassRenderer::get_currentRTisSceneRT() const
@@ -115,27 +124,18 @@ bool PrePassRenderer::get_currentRTisSceneRT() const
   return _currentTarget == defaultRT;
 }
 
-bool PrePassRenderer::get_useGeometryBufferFallback() const
+void PrePassRenderer::_refreshGeometryBufferRendererLink()
 {
-  return _useGeometryBufferFallback;
-}
-
-void PrePassRenderer::set_useGeometryBufferFallback(bool value)
-{
-  _useGeometryBufferFallback = value;
-
-  if (value) {
+  if (!doNotUseGeometryRendererFallback) {
     _geometryBuffer = _scene->enableGeometryBufferRenderer();
 
     if (!_geometryBuffer) {
       // Not supported
-      _useGeometryBufferFallback = false;
+      doNotUseGeometryRendererFallback = true;
       return;
     }
 
-    _geometryBuffer->renderList = {};
     _geometryBuffer->_linkPrePassRenderer(shared_from_this());
-    _updateGeometryBufferLayout();
   }
   else {
     if (_geometryBuffer) {
@@ -146,27 +146,64 @@ void PrePassRenderer::set_useGeometryBufferFallback(bool value)
   }
 }
 
+bool PrePassRenderer::get_enabled() const
+{
+  return _enabled;
+}
+
 PrePassRenderTargetPtr
-PrePassRenderer::_createRenderTarget(const std::string& /*name*/,
-                                     const RenderTargetTexturePtr& /*renderTargetTexture*/)
+PrePassRenderer::_createRenderTarget(const std::string& name,
+                                     const RenderTargetTexturePtr& renderTargetTexture)
 {
-  return nullptr;
+  IMultiRenderTargetOptions options;
+  options.generateMipMaps                    = false;
+  options.generateStencilBuffer              = _engine->isStencilEnable();
+  options.defaultType                        = Constants::TEXTURETYPE_UNSIGNED_INT;
+  options.types                              = {};
+  options.drawOnlyOnFirstAttachmentByDefault = true;
+
+  const auto rt = std::make_shared<PrePassRenderTarget>(name, renderTargetTexture,
+                                                        RenderTargetSize{
+                                                          _engine->getRenderWidth(), // width
+                                                          _engine->getRenderHeight() // height
+                                                        },
+                                                        0ull, _scene, options);
+
+  renderTargets.emplace_back(rt);
+
+  return rt;
 }
 
-MultiRenderTargetPtr& PrePassRenderer::getRenderTarget()
+bool PrePassRenderer::get_isSupported() const
 {
-  return prePassRT;
+  return _scene->getEngine()->getCaps().drawBuffersExtension;
 }
 
-void PrePassRenderer::_setRenderTarget(const PrePassRenderTargetPtr& /*prePassRenderTarget*/)
+void PrePassRenderer::bindAttachmentsForEffect(Effect& effect, SubMesh* subMesh)
 {
+  if (enabled() && _currentTarget->enabled) {
+    if (effect._multiTarget) {
+      _engine->bindAttachments(_multiRenderAttachments);
+    }
+    else {
+      _engine->bindAttachments(_defaultAttachments);
+
+      if (_geometryBuffer && currentRTisSceneRT()) {
+        const auto material = subMesh->getMaterial();
+        if (material && !material->isPrePassCapable()
+            && stl_util::index_of(excludedMaterials, material) == -1) {
+          _geometryBuffer->renderList().emplace_back(subMesh->getRenderingMesh().get());
+        }
+      }
+    }
+  }
 }
 
-void PrePassRenderer::_initializeAttachments()
+void PrePassRenderer::_reinitializeAttachments()
 {
-  std::vector<bool> multiRenderLayout;
-  std::vector<bool> clearLayout   = {false};
-  std::vector<bool> defaultLayout = {true};
+  std::vector<bool> multiRenderLayout = {};
+  std::vector<bool> clearLayout       = {false};
+  std::vector<bool> defaultLayout     = {true};
 
   for (size_t i = 0; i < mrtCount; ++i) {
     multiRenderLayout.emplace_back(true);
@@ -182,169 +219,34 @@ void PrePassRenderer::_initializeAttachments()
   _defaultAttachments     = _engine->buildTextureLayout(defaultLayout);
 }
 
-void PrePassRenderer::_createCompositionEffect()
+void PrePassRenderer::_resetLayout()
 {
-  IMultiRenderTargetOptions options;
-  options.generateMipMaps      = false;
-  options.generateDepthTexture = true;
-  options.defaultType          = Constants::TEXTURETYPE_UNSIGNED_INT;
-  options.types                = _mrtFormats;
-  prePassRT                    = std::make_shared<MultiRenderTarget>("sceneprePassRT",
-                                                  RenderTargetSize{
-                                                    _engine->getRenderWidth(), // width
-                                                    _engine->getRenderHeight() // height
-                                                  },
-                                                  mrtCount, _scene, options);
-  prePassRT->samples           = 1;
+  _textureIndices.resize(PrePassRenderer::_textureFormats.back().type + 1);
 
-  _initializeAttachments();
-  if (_useGeometryBufferFallback && !_geometryBuffer) {
-    // Initializes the link with geometry buffer
-    useGeometryBufferFallback = true;
+  for (const auto& textureFormat : PrePassRenderer::_textureFormats) {
+    _textureIndices[textureFormat.type] = -1;
   }
 
-  imageProcessingPostProcess
-    = ImageProcessingPostProcess::New("sceneCompositionPass", 1.f, nullptr, std::nullopt, _engine);
-  imageProcessingPostProcess->autoClear = false;
-}
-
-bool PrePassRenderer::get_isSupported() const
-{
-  return _engine->webGLVersion() > 1.f || _scene->getEngine()->getCaps().drawBuffersExtension;
-}
-
-void PrePassRenderer::bindAttachmentsForEffect(Effect& effect, SubMesh* subMesh)
-{
-  if (enabled()) {
-    if (effect._multiTarget) {
-      _engine->bindAttachments(_multiRenderAttachments);
-    }
-    else {
-      _engine->bindAttachments(_defaultAttachments);
-
-      if (_geometryBuffer) {
-        const auto material = subMesh->getMaterial();
-        if (material && stl_util::index_of(excludedMaterials, material) == -1) {
-          _geometryBuffer->renderList().emplace_back(subMesh->getRenderingMesh().get());
-        }
-      }
-    }
-  }
-}
-
-void PrePassRenderer::restoreAttachments()
-{
-  if (enabled() && !_defaultAttachments.empty()) {
-    _engine->bindAttachments(_defaultAttachments);
-  }
-}
-
-void PrePassRenderer::_beforeDraw(Camera* /*camera*/, int /*faceIndex*/, int /*layer*/)
-{
-}
-
-void PrePassRenderer::_beforeCameraDraw()
-{
-  if (_isDirty) {
-    _update();
-  }
-
-  if (_geometryBuffer) {
-    _geometryBuffer->renderList().clear();
-  }
-
-  _bindFrameBuffer();
-}
-
-void PrePassRenderer::_afterCameraDraw()
-{
-  if (_enabled) {
-    const PostProcessPtr firstCameraPP
-      = _scene->activeCamera() ? _scene->activeCamera()->_getFirstPostProcess() : nullptr;
-    if (firstCameraPP && !_postProcesses.empty()) {
-      _scene->postProcessManager->_prepareFrame();
-    }
-    _scene->postProcessManager->directRender(
-      _postProcesses, firstCameraPP ? firstCameraPP->inputTexture() : nullptr);
-  }
-}
-
-void PrePassRenderer::_checkRTSize()
-{
-  const auto requiredWidth  = _engine->getRenderWidth(true);
-  const auto requiredHeight = _engine->getRenderHeight(true);
-  const auto width          = prePassRT->getRenderWidth();
-  const auto height         = prePassRT->getRenderHeight();
-
-  if (width != requiredWidth || height != requiredHeight) {
-    prePassRT->resize(Size{
-      requiredWidth,  // width
-      requiredHeight, // height
-    });
-
-    _updateGeometryBufferLayout();
-    _bindPostProcessChain();
-  }
-}
-
-void PrePassRenderer::_bindFrameBuffer()
-{
-  if (_enabled) {
-    _checkRTSize();
-    const auto internalTexture = prePassRT->getInternalTexture();
-    if (internalTexture) {
-      _engine->bindFramebuffer(internalTexture);
-    }
-  }
-}
-
-void PrePassRenderer::_afterDraw(int /*faceIndex*/, int /*layer*/)
-{
-}
-
-void PrePassRenderer::clear()
-{
-  if (_enabled) {
-    _bindFrameBuffer();
-
-    // Regular clear color with the scene clear color of the 1st attachment
-    _engine->clear(_scene->clearColor,
-                   _scene->autoClear || _scene->forceWireframe() || _scene->forcePointsCloud(),
-                   _scene->autoClearDepthAndStencil, _scene->autoClearDepthAndStencil);
-
-    // Clearing other attachment with 0 on all other attachments
-    _engine->bindAttachments(_clearAttachments);
-    _engine->clear(_clearColor, true, false, false);
-    _engine->bindAttachments(_defaultAttachments);
-  }
-}
-
-void PrePassRenderer::_clear()
-{
-}
-
-void PrePassRenderer::_setState(bool iEnabled)
-{
-  _enabled        = iEnabled;
-  _scene->prePass = iEnabled;
-
-  if (imageProcessingPostProcess) {
-    imageProcessingPostProcess->imageProcessingConfiguration()->applyByPostProcess = iEnabled;
-  }
+  _textureIndices[Constants::PREPASS_COLOR_TEXTURE_TYPE] = 0;
+  _mrtLayout                                             = {Constants::PREPASS_COLOR_TEXTURE_TYPE};
+  _mrtFormats                                            = {Constants::TEXTURETYPE_HALF_FLOAT};
+  mrtCount                                               = 1;
 }
 
 void PrePassRenderer::_updateGeometryBufferLayout()
 {
+  _refreshGeometryBufferRendererLink();
+
   if (_geometryBuffer) {
     _geometryBuffer->_resetLayout();
 
-    std::vector<bool> texturesActivated;
+    std::vector<bool> texturesActivated{};
 
     for (size_t i = 0; i < _mrtLayout.size(); ++i) {
       texturesActivated.emplace_back(false);
     }
 
-    _geometryBuffer->_linkInternalTexture(prePassRT->getInternalTexture());
+    _geometryBuffer->_linkInternalTexture(defaultRT->getInternalTexture());
 
     struct ReplaceTextureFormatMapping {
       unsigned int prePassConstant        = 0;
@@ -387,6 +289,117 @@ void PrePassRenderer::_updateGeometryBufferLayout()
   }
 }
 
+void PrePassRenderer::restoreAttachments()
+{
+  if (enabled() && _currentTarget->enabled && !_defaultAttachments.empty()) {
+    _engine->bindAttachments(_defaultAttachments);
+  }
+}
+
+void PrePassRenderer::_beforeDraw(Camera* camera, int /*faceIndex*/, int /*layer*/)
+{
+  // const previousEnabled = _enabled && _currentTarget.enabled;
+
+  if (_isDirty) {
+    _update();
+  }
+
+  if (!_enabled || !_currentTarget->enabled) {
+    return;
+  }
+
+  if (_geometryBuffer) {
+    _geometryBuffer->renderList = {};
+  }
+
+  _setupOutputForThisPass(_currentTarget, camera);
+}
+
+void PrePassRenderer::_prepareFrame(const PrePassRenderTargetPtr& prePassRenderTarget,
+                                    int faceIndex, int layer)
+{
+  if (prePassRenderTarget->renderTargetTexture) {
+    prePassRenderTarget->renderTargetTexture->_prepareFrame(
+      _scene, faceIndex, layer,
+      prePassRenderTarget->renderTargetTexture->useCameraPostProcesses.value_or(false));
+  }
+  else if (!_postProcessesSourceForThisPass.empty()) {
+    _scene->postProcessManager->_prepareFrame();
+  }
+  else {
+    _engine->restoreDefaultFramebuffer();
+  }
+}
+
+void PrePassRenderer::_renderPostProcesses(const PrePassRenderTargetPtr& prePassRenderTarget,
+                                           int faceIndex)
+{
+  const auto firstPP
+    = !_postProcessesSourceForThisPass.empty() ? _postProcessesSourceForThisPass[0] : nullptr;
+  auto outputTexture = firstPP ? firstPP->inputTexture :
+                                 (prePassRenderTarget->renderTargetTexture ?
+                                    prePassRenderTarget->renderTargetTexture->getInternalTexture() :
+                                    nullptr);
+
+  // Build post process chain for this prepass post draw
+  auto& postProcessChain = _currentTarget->_beforeCompositionPostProcesses;
+
+  if (_needsCompositionForThisPass) {
+    postProcessChain
+      = stl_util::concat(postProcessChain, {_currentTarget->imageProcessingPostProcess});
+  }
+
+  // Activates and renders the chain
+  if (!postProcessChain.empty()) {
+    _scene->postProcessManager->_prepareFrame(_currentTarget->getInternalTexture(),
+                                              postProcessChain);
+    _scene->postProcessManager->directRender(postProcessChain, outputTexture, false, faceIndex);
+  }
+}
+
+void PrePassRenderer::_afterDraw(int faceIndex, int layer)
+{
+  if (_enabled && _currentTarget->enabled) {
+    _prepareFrame(_currentTarget, faceIndex, layer);
+    _renderPostProcesses(_currentTarget, faceIndex);
+  }
+}
+
+void PrePassRenderer::_clear()
+{
+  if (_enabled && _currentTarget->enabled) {
+    _bindFrameBuffer(_currentTarget);
+
+    // Clearing other attachment with 0 on all other attachments
+    _engine->bindAttachments(_clearAttachments);
+    _engine->clear(_clearColor, true, false, false);
+    // Regular clear color with the scene clear color of the 1st attachment
+    _engine->bindAttachments(_defaultAttachments);
+  }
+}
+
+void PrePassRenderer::_bindFrameBuffer(const PrePassRenderTargetPtr& /*prePassRenderTarget*/)
+{
+  if (_enabled && _currentTarget->enabled) {
+    _currentTarget->_checkSize();
+    const auto internalTexture = _currentTarget->getInternalTexture();
+    if (internalTexture) {
+      _engine->bindFramebuffer(internalTexture);
+    }
+  }
+}
+
+void PrePassRenderer::_setEnabled(bool enabled)
+{
+  _enabled = enabled;
+}
+
+void PrePassRenderer::_setRenderTargetEnabled(const PrePassRenderTargetPtr& prePassRenderTarget,
+                                              bool enabled)
+{
+  prePassRenderTarget->enabled = enabled;
+}
+
 PrePassEffectConfigurationPtr
 PrePassRenderer::addEffectConfiguration(const PrePassEffectConfigurationPtr& cfg)
 {
@@ -402,11 +415,6 @@ PrePassRenderer::addEffectConfiguration(const PrePassEffectConfigurationPtr& cfg
   return cfg;
 }
 
-int PrePassRenderer::getIndex(unsigned int type)
-{
-  return stl_util::contains(_textureIndices, type) ? _textureIndices[type] : -1;
-}
-
 void PrePassRenderer::_enable()
 {
   const auto previousMrtCount = mrtCount;
@@ -417,51 +425,46 @@ void PrePassRenderer::_enable()
     }
   }
 
-  if (prePassRT && mrtCount != previousMrtCount) {
-    IMultiRenderTargetOptions option;
-    option.types = _mrtFormats;
-    prePassRT->updateCount(mrtCount, option);
+  for (const auto& renderTarget : renderTargets) {
+    if (mrtCount != previousMrtCount) {
+      IMultiRenderTargetOptions options;
+      options.types = _mrtFormats;
+      renderTarget->updateCount(mrtCount, options);
+    }
+
+    renderTarget->_resetPostProcessChain();
+
+    for (const auto& effectConfiguration : _effectConfigurations) {
+      if (effectConfiguration->enabled) {
+        // TODO : subsurface scattering has 1 scene-wide effect configuration
+        // solution : do not stock postProcess on effectConfiguration, but in the
+        // prepassRenderTarget (hashmap configuration => postProcess) And call createPostProcess
+        // whenever the post process does not exist in the RT
+        if (!effectConfiguration->postProcess) {
+          effectConfiguration->createPostProcess();
+        }
+
+        if (effectConfiguration->postProcess) {
+          renderTarget->_beforeCompositionPostProcesses.emplace_back(
+            effectConfiguration->postProcess);
+        }
+      }
+    }
   }
 
+  _reinitializeAttachments();
+  _setEnabled(true);
   _updateGeometryBufferLayout();
-  _resetPostProcessChain();
-
-  for (const auto& effectConfiguration : _effectConfigurations) {
-    if (effectConfiguration->enabled) {
-      if (!effectConfiguration->postProcess && effectConfiguration->createPostProcess()) {
-        effectConfiguration->createPostProcess();
-      }
-
-      if (effectConfiguration->postProcess) {
-        _postProcesses.emplace_back(effectConfiguration->postProcess);
-      }
-    }
-  }
-
-  _initializeAttachments();
-
-  if (!imageProcessingPostProcess) {
-    _createCompositionEffect();
-  }
-  auto isIPPAlreadyPresent = false;
-  if (_scene->activeCamera() && !_scene->activeCamera()->_postProcesses.empty()) {
-    for (const auto& postProcess : _scene->activeCamera()->_postProcesses) {
-      if (postProcess && postProcess->getClassName() == "ImageProcessingPostProcess") {
-        isIPPAlreadyPresent = true;
-      }
-    }
-  }
-
-  if (!isIPPAlreadyPresent && !disableGammaTransform) {
-    _postProcesses.emplace_back(imageProcessingPostProcess);
-  }
-  _bindPostProcessChain();
-  _setState(true);
 }
 
 void PrePassRenderer::_disable()
 {
-  _setState(false);
+  _setEnabled(false);
+
+  for (const auto& renderTarget : renderTargets) {
+    _setRenderTargetEnabled(renderTarget, false);
+  }
+
   _resetLayout();
 
   for (const auto& effectConfiguration : _effectConfigurations) {
@@ -469,46 +472,138 @@ void PrePassRenderer::_disable()
   }
 }
 
-void PrePassRenderer::_resetLayout()
+std::vector<PostProcessPtr>
+PrePassRenderer::_getPostProcessesSource(const PrePassRenderTargetPtr& prePassRenderTarget,
+                                         Camera* camera)
 {
-  _textureIndices.resize(_textureFormats.back().type + 1);
-
-  for (const auto& textureFormat : _textureFormats) {
-    _textureIndices[textureFormat.type] = -1;
+  if (camera) {
+    return camera->_postProcesses;
   }
-
-  _textureIndices[Constants::PREPASS_COLOR_TEXTURE_TYPE] = 0;
-  _mrtLayout                                             = {Constants::PREPASS_COLOR_TEXTURE_TYPE};
-  _mrtFormats                                            = {Constants::TEXTURETYPE_HALF_FLOAT};
-  mrtCount                                               = 1;
-}
-
-void PrePassRenderer::_resetPostProcessChain()
-{
-  _postProcesses = {};
-  if (imageProcessingPostProcess) {
-    imageProcessingPostProcess->restoreDefaultInputTexture();
-  }
-
-  for (const auto& effectConfiguration : _effectConfigurations) {
-    if (effectConfiguration->postProcess) {
-      effectConfiguration->postProcess->restoreDefaultInputTexture();
+  else if (prePassRenderTarget->renderTargetTexture) {
+    if (prePassRenderTarget->renderTargetTexture->useCameraPostProcesses) {
+      const auto camera = prePassRenderTarget->renderTargetTexture->activeCamera ?
+                            prePassRenderTarget->renderTargetTexture->activeCamera :
+                            _scene->activeCamera();
+      return camera ? camera->_postProcesses : std::vector<PostProcessPtr>();
     }
-  }
-}
-
-void PrePassRenderer::_bindPostProcessChain()
-{
-  if (!_postProcesses.empty()) {
-    _postProcesses[0]->inputTexture = prePassRT->getInternalTexture();
+    else if (!prePassRenderTarget->renderTargetTexture->postProcesses().empty()) {
+      return prePassRenderTarget->renderTargetTexture->postProcesses();
+    }
+    else {
+      return std::vector<PostProcessPtr>();
+    }
   }
   else {
-    const PostProcessPtr pp
-      = _scene->activeCamera() ? _scene->activeCamera()->_getFirstPostProcess() : nullptr;
-    if (pp && prePassRT->getInternalTexture()) {
-      pp->inputTexture = prePassRT->getInternalTexture();
+    return _scene->activeCamera() ? _scene->activeCamera()->_postProcesses :
+                                    std::vector<PostProcessPtr>();
+  }
+}
+
+void PrePassRenderer::_setupOutputForThisPass(const PrePassRenderTargetPtr& prePassRenderTarget,
+                                              Camera* camera)
+{
+  // Order is : draw ===> prePassRenderTarget._postProcesses ==> ipp ==> camera._postProcesses
+  const auto secondaryCamera
+    = camera && !_scene->activeCameras.empty()
+      && ((std::find_if(_scene->activeCameras.begin(), _scene->activeCameras.end(),
+                        [camera](const CameraPtr& cam) { return cam.get() == camera; })
+           != _scene->activeCameras.end())
+          && _scene->activeCameras[0].get() != camera);
+  _postProcessesSourceForThisPass = _getPostProcessesSource(prePassRenderTarget, camera);
+  stl_util::erase_remove_if(_postProcessesSourceForThisPass,
+                            [](const PostProcessPtr& pp) { return pp == nullptr; });
+  _scene->autoClear = true;
+
+  const auto cameraHasImageProcessing = _hasImageProcessing(_postProcessesSourceForThisPass);
+  _needsCompositionForThisPass        = !cameraHasImageProcessing && !disableGammaTransform
+                                 && _needsImageProcessing() && !secondaryCamera;
+
+  const auto firstCameraPP  = _getFirstPostProcess(_postProcessesSourceForThisPass);
+  const auto firstPrePassPP = !prePassRenderTarget->_beforeCompositionPostProcesses.empty() ?
+                                prePassRenderTarget->_beforeCompositionPostProcesses[0] :
+                                nullptr;
+  PostProcessPtr firstPP    = nullptr;
+
+  // Setting the scene-wide post process configuration
+  _scene->imageProcessingConfiguration()->applyByPostProcess
+    = _needsCompositionForThisPass || cameraHasImageProcessing;
+
+  // Create composition effect if needed
+  if (_needsCompositionForThisPass && !prePassRenderTarget->imageProcessingPostProcess) {
+    prePassRenderTarget->_createCompositionEffect();
+  }
+
+  // Setting the prePassRenderTarget as input texture of the first PP
+  if (firstPrePassPP) {
+    firstPP = firstPrePassPP;
+  }
+  else if (_needsCompositionForThisPass) {
+    firstPP = prePassRenderTarget->imageProcessingPostProcess;
+  }
+  else if (firstCameraPP) {
+    firstPP = firstCameraPP;
+  }
+
+  _bindFrameBuffer(prePassRenderTarget);
+  _linkInternalTexture(prePassRenderTarget, firstPP);
+}
+
+void PrePassRenderer::_linkInternalTexture(const PrePassRenderTargetPtr& prePassRenderTarget,
+                                           const PostProcessPtr& postProcess)
+{
+  if (postProcess) {
+    postProcess->autoClear    = false;
+    postProcess->inputTexture = prePassRenderTarget->getInternalTexture();
+  }
+
+  if (prePassRenderTarget->_outputPostProcess != postProcess) {
+    if (prePassRenderTarget->_outputPostProcess) {
+      prePassRenderTarget->_outputPostProcess->restoreDefaultInputTexture();
+    }
+    prePassRenderTarget->_outputPostProcess = postProcess;
+  }
+
+  if (prePassRenderTarget->_internalTextureDirty) {
+    _updateGeometryBufferLayout();
+    prePassRenderTarget->_internalTextureDirty = false;
+  }
+}
+
+bool PrePassRenderer::_needsImageProcessing() const
+{
+  for (const auto& effectConfiguration : _effectConfigurations) {
+    if (effectConfiguration->enabled && effectConfiguration->needsImageProcessing.value_or(false)) {
+      return true;
     }
   }
+
+  return false;
+}
+
+bool PrePassRenderer::_hasImageProcessing(const std::vector<PostProcessPtr>& postProcesses) const
+{
+  auto isIPPAlreadyPresent = false;
+  if (!postProcesses.empty()) {
+    for (const auto& postProcess : postProcesses) {
+      if (postProcess && postProcess->getClassName() == "ImageProcessingPostProcess") {
+        isIPPAlreadyPresent = true;
+        break;
+      }
+    }
+  }
+
+  return isIPPAlreadyPresent;
+}
+
+PostProcessPtr
+PrePassRenderer::_getFirstPostProcess(const std::vector<PostProcessPtr>& postProcesses)
+{
+  for (const auto& postProcess : postProcesses) {
+    if (postProcess != nullptr) {
+      return postProcess;
+    }
+  }
+  return nullptr;
 }
 
 void PrePassRenderer::markAsDirty()
@@ -532,28 +627,51 @@ void PrePassRenderer::_enableTextures(const std::vector<unsigned int>& types)
 void PrePassRenderer::_update()
 {
   _disable();
-  auto enablePrePass = false;
+  auto enablePrePass                                         = false;
+  _scene->imageProcessingConfiguration()->applyByPostProcess = false;
 
-  // Subsurface scattering
   for (const auto& material : _scene->materials) {
     if (material->setPrePassRenderer(shared_from_this())) {
       enablePrePass = true;
     }
   }
 
-  const auto camera = _scene->activeCamera();
-  if (!camera) {
-    return;
+  if (enablePrePass) {
+    _setRenderTargetEnabled(defaultRT, true);
   }
 
   std::vector<PostProcessPtr> postProcesses;
-  copy_if(camera->_postProcesses.begin(), camera->_postProcesses.end(),
-          back_inserter(postProcesses), [](const PostProcessPtr& pp) { return pp != nullptr; });
 
-  if (!postProcesses.empty()) {
-    for (const auto& postProcess : postProcesses) {
-      if (postProcess->setPrePassRenderer(shared_from_this())) {
-        enablePrePass = true;
+  for (const auto& renderTarget : renderTargets) {
+    if (renderTarget->renderTargetTexture) {
+      postProcesses = _getPostProcessesSource(renderTarget);
+    }
+    else {
+      const auto camera = _scene->activeCamera();
+      if (!camera) {
+        continue;
+      }
+
+      postProcesses = camera->_postProcesses;
+    }
+
+    if (postProcesses.empty()) {
+      continue;
+    }
+
+    stl_util::erase_remove_if(postProcesses,
+                              [](const PostProcessPtr& pp) { return pp == nullptr; });
+
+    if (!postProcesses.empty()) {
+      for (const auto& postProcess : postProcesses) {
+        if (postProcess->setPrePassRenderer(shared_from_this())) {
+          _setRenderTargetEnabled(renderTarget, true);
+          enablePrePass = true;
+        }
+      }
+
+      if (_hasImageProcessing(postProcesses)) {
+        _scene->imageProcessingConfiguration()->applyByPostProcess = true;
       }
     }
   }
@@ -563,12 +681,6 @@ void PrePassRenderer::_update()
 
   if (enablePrePass) {
     _enable();
-  }
-
-  if (!enabled()) {
-    // Prepass disabled, we render only on 1 color attachment
-    _engine->restoreDefaultFramebuffer();
-    _engine->restoreSingleAttachment();
   }
 }
 
@@ -583,15 +695,17 @@ void PrePassRenderer::_markAllMaterialsAsPrePassDirty()
 
 void PrePassRenderer::dispose()
 {
+  for (size_t i = renderTargets.size(); i-- > 0;) {
+    renderTargets[i]->dispose();
+  }
+  renderTargets.clear();
+
   for (const auto& effectConfiguration : _effectConfigurations) {
     if (effectConfiguration) {
       effectConfiguration->dispose();
     }
   }
   _effectConfigurations.clear();
-
-  imageProcessingPostProcess->dispose();
-  prePassRT->dispose();
 }
 
 } // end of namespace BABYLON
