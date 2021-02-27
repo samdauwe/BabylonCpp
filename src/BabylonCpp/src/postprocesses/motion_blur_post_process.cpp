@@ -5,6 +5,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/multi_render_target.h>
+#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/string_tools.h>
@@ -252,12 +253,12 @@ void MotionBlurPostProcess::_onApplyScreenBased(Effect* effect)
   }
   else if (_prePassRenderer) {
     const auto depthIndex = _prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE);
-    effect->setTexture("depthSampler",
-                       depthIndex >= 0
-                           && depthIndex
-                                < static_cast<int>(_prePassRenderer->prePassRT->textures().size()) ?
-                         _prePassRenderer->getRenderTarget()->textures()[depthIndex] :
-                         nullptr);
+    effect->setTexture(
+      "depthSampler",
+      depthIndex >= 0
+          && depthIndex < static_cast<int>(_prePassRenderer->getRenderTarget()->textures().size()) ?
+        _prePassRenderer->getRenderTarget()->textures()[depthIndex] :
+        nullptr);
   }
 }
 

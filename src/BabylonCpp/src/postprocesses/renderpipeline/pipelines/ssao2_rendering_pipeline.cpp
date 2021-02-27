@@ -12,6 +12,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/dynamic_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
+#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -426,7 +427,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     else {
       effect->setTexture(
         "depthNormalSampler",
-        _prePassRenderer->prePassRT
+        _prePassRenderer->getRenderTarget()
           ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
