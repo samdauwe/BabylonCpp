@@ -1800,6 +1800,11 @@ protected:
   ThinEngine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
 
   /**
+   * @brief Gets the current frame id
+   */
+  size_t get_frameId() const;
+
+  /**
    * @brief Gets a boolean indicating that the engine supports uniform buffers.
    * @see https://doc.babylonjs.com/features/webgl2#uniform-buffer-objets
    */
@@ -2022,6 +2027,11 @@ public:
    * supported
    */
   bool disableUniformBuffers = false;
+
+  /**
+   * Gets the current frame id
+   */
+  ReadOnlyProperty<ThinEngine, size_t> frameId;
 
   /** @hidden */
   std::vector<UniformBuffer*> _uniformBuffers;
@@ -2270,6 +2280,8 @@ protected:
 private:
   float _hardwareScalingLevel = 1.f;
   bool _isStencilEnable       = false;
+
+  size_t _frameId = 0;
 
   std::string _glVersion;
   std::string _glRenderer;

@@ -95,7 +95,8 @@ void ThinEngine::setShadersRepository(const std::string& value)
 }
 
 ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
-    : supportsUniformBuffers{this, &ThinEngine::get_supportsUniformBuffers}
+    : frameId{this, &ThinEngine::get_frameId}
+    , supportsUniformBuffers{this, &ThinEngine::get_supportsUniformBuffers}
     , _shouldUseHighPrecisionShader{this, &ThinEngine::get__shouldUseHighPrecisionShader}
     , needPOTTextures{this, &ThinEngine::get_needPOTTextures}
     , doNotHandleContextLost{this, &ThinEngine::get_doNotHandleContextLost,
@@ -191,6 +192,11 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
 
 ThinEngine::~ThinEngine()
 {
+}
+
+size_t ThinEngine::get_frameId() const
+{
+  return _frameId;
 }
 
 bool ThinEngine::get_supportsUniformBuffers() const
