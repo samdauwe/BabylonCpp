@@ -21,6 +21,8 @@ namespace BABYLON {
 
 class Animation;
 class Engine;
+struct IRenderTargetOptions;
+struct RenderTargetSize;
 class Scene;
 FWD_CLASS_SPTR(Camera)
 FWD_CLASS_SPTR(Effect)
@@ -29,6 +31,15 @@ FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
 FWD_CLASS_SPTR(PrePassRenderer)
+
+/**
+ * @brief Represents a TextureCache item.
+ */
+struct TextureCache {
+  InternalTexturePtr texture      = nullptr;
+  unsigned int postProcessChannel = 0;
+  int lastUsedRenderId            = -1;
+}; // end of struct TextureCache
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has been rendered
@@ -204,6 +215,12 @@ public:
   json serialize() const;
 
   /**
+   * @brief Clones this post process.
+   * @returns a new post process similar to this one
+   */
+  PostProcessPtr clone() const;
+
+  /**
    * @brief Creates a material from parsed material data.
    * @param parsedPostProcess defines parsed post process data
    * @param scene defines the hosting scene
@@ -307,6 +324,15 @@ protected:
    * @brief The aspect ratio of the output texture.
    */
   float get_aspectRatio() const;
+
+private:
+  InternalTexturePtr _createRenderTargetTexture(const RenderTargetSize& textureSize,
+                                                const IRenderTargetOptions& textureOptions,
+                                                unsigned int channel = 0);
+  void _flushTextureCache();
+  void _resize(int width, int height, Camera* camera, bool needMipMaps,
+               bool forceDepthStencil = false);
+  void _disposeTextureCache();
 
 public:
   /**
@@ -481,6 +507,11 @@ public:
   std::vector<InternalTexturePtr> _textures;
 
   /**
+   * Hidden
+   */
+  InternalTexturePtr _forcedOutputTexture;
+
+  /**
    * The index in _textures that corresponds to the output texture.
    * Hidden
    */
@@ -521,6 +552,7 @@ public:
 
 protected:
   Scene* _scene;
+  std::string _postProcessDefines;
   std::unordered_map<std::string, unsigned int> _indexParameters;
 
 private:
@@ -530,8 +562,16 @@ private:
   float _renderRatio;
   std::variant<float, PostProcessOptions> _options;
   bool _reusable;
+  size_t _renderId;
   unsigned int _textureType;
   unsigned int _textureFormat;
+
+  /**
+   * Smart array of input and output textures for the post process.
+   * @hidden
+   */
+  std::vector<TextureCache> _textureCache;
+
   EffectPtr _effect;
   std::vector<std::string> _samplers;
   std::string _fragmentUrl;
@@ -540,7 +580,6 @@ private:
   Vector2 _scaleRatio;
   PostProcessPtr _shareOutputWithPostProcess;
   Vector2 _texelSize;
-  InternalTexturePtr _forcedOutputTexture;
   bool _blockCompilation;
   std::string _defines;
   // Events
