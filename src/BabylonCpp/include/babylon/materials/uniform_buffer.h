@@ -21,17 +21,26 @@ FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
+struct ArraySizes {
+  size_t strideSize = 0;
+  size_t arraySize  = 0;
+}; // end of struct ArraySizes
+
 /**
  * @brief Uniform buffer objects.
  *
  * Handles blocks of uniform on the GPU.
  *
- * If WebGL 2 is not available, this class falls back on traditionnal setUniformXXX calls.
+ * If WebGL 2 is not available, this class falls back on traditional setUniformXXX calls.
  *
  * For more information, please refer to :
  * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
  */
 class BABYLON_SHARED_EXPORT UniformBuffer {
+
+public:
+  /** @hidden */
+  static std::unordered_map<std::string, unsigned int> _updatedUbosInFrame;
 
 public:
   /**
@@ -54,17 +63,6 @@ public:
   ~UniformBuffer(); // = default
 
   // Properties
-  /**
-   * @brief Indicates if the buffer is using the WebGL2 UBO implementation, or just falling back on
-   * setUniformXXX calls.
-   */
-  bool useUbo() const;
-
-  /**
-   * @brief Indicates if the WebGL underlying uniform buffer is in sync with the javascript cache
-   * data.
-   */
-  bool isSync() const;
 
   /**
    * @brief Indicates if the WebGL underlying uniform buffer is dynamic.
@@ -92,8 +90,10 @@ public:
    * shader for the layout to be correct !
    * @param name Name of the uniform, as used in the uniform block in the shader.
    * @param size Data size, or data directly.
+   * @param arraySize The number of elements in the array, 0 if not an array.
    */
-  void addUniform(const std::string& name, const std::variant<int, Float32Array>& size);
+  void addUniform(const std::string& name, const std::variant<int, Float32Array>& size,
+                  size_t arraySize = 0);
 
   /**
    * @brief Adds a Matrix 4x4 to the uniform buffer.
@@ -181,6 +181,15 @@ public:
   void updateUniform(const std::string& uniformName, const Float32Array& data, size_t size);
 
   /**
+   * @brief Updates the value of an uniform. The `update` method must be called afterwards to make
+   * it effective in the GPU.
+   * @param uniformName Define the name of the uniform, as used in the uniform block in the shader.
+   * @param data Define the flattened data
+   * @param size Define the size of the data.
+   */
+  void updateUniformArray(const std::string& uniformName, const Float32Array& data, size_t size);
+
+  /**
    * @brief Sets a sampler uniform on the effect.
    * @param name Define the name of the sampler.
    * @param texture Define the texture to set in the sampler
@@ -206,7 +215,38 @@ public:
    */
   void dispose();
 
+protected:
+  /**
+   * @brief Indicates if the buffer is using the WebGL2 UBO implementation, or just falling back on
+   * setUniformXXX calls.
+   */
+  bool get_useUbo() const;
+
+  /**
+   * @brief Indicates if the WebGL underlying uniform buffer is in sync with the javascript cache
+   * data.
+   */
+  bool get_isSync() const;
+
+  /**
+   * @brief Hidden
+   */
+  size_t get__numBuffers() const;
+
+  /**
+   * @brief Hidden
+   */
+  int get__indexBuffer() const;
+
+  /**
+   * @brief Gets the name of this buffer
+   */
+  std::string get_name() const;
+
 private:
+  void _createNewBuffer();
+  void _checkNewFrame();
+
   /**
    * @brief std140 layout specifies how to align data within an UBO structure.
    * @see https://khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159 for specs.
@@ -232,8 +272,16 @@ private:
   void _updateFloat4ForEffect(const std::string& name, float x, float y, float z, float w,
                               const std::string& suffix = "");
   void _updateFloat4ForUniform(const std::string& name, float x, float y, float z, float w);
+  void _updateFloatArrayForEffect(const std::string& name, const Float32Array& array);
+  void _updateFloatArrayForUniform(const std::string& name, const Float32Array& array);
+  void _updateArrayForEffect(const std::string& name, const Float32Array& array);
+  void _updateArrayForUniform(const std::string& name, const Float32Array& array);
+  void _updateIntArrayForEffect(const std::string& name, const Int32Array& array);
+  void _updateIntArrayForUniform(const std::string& name, const Int32Array& array);
   void _updateMatrixForEffect(const std::string& name, const Matrix& mat);
   void _updateMatrixForUniform(const std::string& name, const Matrix& mat);
+  void _updateMatricesForEffect(const std::string& name, const Float32Array& mat);
+  void _updateMatricesForUniform(const std::string& name, const Float32Array& mat);
   void _updateVector3ForEffect(const std::string& name, const Vector3& vector);
   void _updateVector3ForUniform(const std::string& name, const Vector3& vector);
   void _updateVector4ForEffect(const std::string& name, const Vector4& vector);
@@ -244,6 +292,16 @@ private:
   void _updateColor4ForEffect(const std::string& name, const Color3& color, float alpha,
                               const std::string& suffix = "");
   void _updateColor4ForUniform(const std::string& name, const Color3& color, float alpha);
+  void _updateIntForEffect(const std::string& name, int x, const std::string& suffix = "");
+  void _updateIntForUniform(const std::string& name, int x);
+  void _updateInt2ForEffect(const std::string& name, int x, int y, const std::string& suffix = "");
+  void _updateInt2ForUniform(const std::string& name, int x, int y);
+  void _updateInt3ForEffect(const std::string& name, int x, int y, int z,
+                            const std::string& suffix = "");
+  void _updateInt3ForUniform(const std::string& name, int x, int y, int z);
+  void _updateInt4ForEffect(const std::string& name, int x, int y, int z, int w,
+                            const std::string& suffix = "");
+  void _updateInt4ForUniform(const std::string& name, int x, int y, int z, int w);
 
 public:
   /**
@@ -298,11 +356,39 @@ public:
     updateFloat4;
 
   /**
+   * Lambda to Update an array of float in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, const Float32Array& array)> updateFloatArray;
+
+  /**
+   * Lambda to Update an array of number in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, const Float32Array& array)> updateArray;
+
+  /**
+   * Lambda to Update an array of number in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, const Int32Array& array)> updateIntArray;
+
+  /**
    * Lambda to Update a 4x4 Matrix in a uniform buffer.
    * This is dynamic to allow compat with webgl 1 and 2.
    * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Matrix& mat)> updateMatrix;
+
+  /**
+   * Lambda to Update an array of 4x4 Matrix in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, const Float32Array& mat)> updateMatrices;
 
   /**
    * Lambda to Update vec3 of float from a Vector in a uniform buffer.
@@ -335,19 +421,82 @@ public:
                      const std::string& suffix)>
     updateColor4;
 
+  /**
+   * Lambda to Update a int a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, int x, const std::string& suffix)> updateInt;
+
+  /**
+   * Lambda to Update a vec2 of int in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, int x, int y, const std::string& suffix)> updateInt2;
+
+  /**
+   * Lambda to Update a vec3 of int in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, int x, int y, int z, const std::string& suffix)>
+    updateInt3;
+
+  /**
+   * Lambda to Update a vec4 of int in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, int x, int y, int z, int w,
+                     const std::string& suffix)>
+    updateInt4;
+
+  /**
+   * Indicates if the buffer is using the WebGL2 UBO implementation, or just falling back on
+   * setUniformXXX calls.
+   */
+  ReadOnlyProperty<UniformBuffer, bool> useUbo;
+
+  /**
+   * Indicates if the WebGL underlying uniform buffer is in sync with the javascript cache data.
+   */
+  ReadOnlyProperty<UniformBuffer, bool> isSync;
+
+  /**
+   * Hidden
+   */
+  ReadOnlyProperty<UniformBuffer, size_t> _numBuffers;
+
+  /**
+   * Hidden
+   */
+  ReadOnlyProperty<UniformBuffer, int> _indexBuffer;
+
+  /**
+   * Gets the name of this buffer
+   */
+  ReadOnlyProperty<UniformBuffer, std::string> name;
+
 private:
   Engine* _engine;
   WebGLDataBufferPtr _buffer;
+  std::vector<WebGLDataBufferPtr> _buffers;
+  int _bufferIndex;
+  bool _createBufferOnWrite;
   Float32Array _data;
   Float32Array _bufferData;
   bool _dynamic;
   std::unordered_map<std::string, size_t> _uniformLocations;
   std::unordered_map<std::string, size_t> _uniformSizes;
+  std::unordered_map<std::string, ArraySizes> _uniformArraySizes;
   size_t _uniformLocationPointer;
   bool _needSync;
   bool _noUBO;
   Effect* _currentEffect;
+  std::string _currentEffectName;
   std::string _name;
+  size_t _currentFrameId;
 
   // Matrix cache
   std::unordered_map<std::string, int> _valueCache;
@@ -356,7 +505,7 @@ private:
   static constexpr unsigned int _MAX_UNIFORM_SIZE = 256;
   static Float32Array _tempBuffer;
 
-}; // end of struct UniformBuffer
+}; // end of class UniformBuffer
 
 } // end of namespace BABYLON
 
