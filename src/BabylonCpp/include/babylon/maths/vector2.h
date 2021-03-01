@@ -283,12 +283,14 @@ public:
 
   /**
    * @brief Gets a new Vector2 from current Vector2 floored values.
+   * eg (1.2, 2.31) returns (1, 2)
    * @returns a new Vector2
    */
   [[nodiscard]] Vector2 floor() const;
 
   /**
-   * @brief  Gets a new Vector2 from current Vector2 floored values.
+   * @brief Gets a new Vector2 from current Vector2 fractional values.
+   * eg (1.2, 2.31) returns (0.2, 0.31)
    * @returns a new Vector2
    */
   [[nodiscard]] Vector2 fract() const;
