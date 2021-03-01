@@ -476,6 +476,44 @@ public:
                                               Quaternion& ref);
 
   /**
+   * @brief Creates a new rotation value to orient an object to look towards the given forward
+   * direction, the up direction being oriented like "up". This function works in left handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @returns A new quaternion oriented toward the specified forward and up.
+   */
+  static Quaternion FromLookDirectionLH(const Vector3& forward, const Vector3& up);
+
+  /**
+   * @brief Creates a new rotation value to orient an object to look towards the given forward
+   * direction with the up direction being oriented like "up", and stores it in the target
+   * quaternion. This function works in left handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @param ref defines the target quaternion.
+   */
+  static void FromLookDirectionLHToRef(const Vector3& forward, const Vector3& up, Quaternion& ref);
+
+  /**
+   * @brief Creates a new rotation value to orient an object to look towards the given forward
+   * direction, the up direction being oriented like "up". This function works in right handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @returns A new quaternion oriented toward the specified forward and up.
+   */
+  static Quaternion FromLookDirectionRH(const Vector3& forward, const Vector3& up);
+
+  /**
+   * @brief Creates a new rotation value to orient an object to look towards the given forward
+   * direction with the up direction being oriented like "up", and stores it in the target
+   * quaternion. This function works in right handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @param ref defines the target quaternion.
+   */
+  static void FromLookDirectionRHToRef(const Vector3& forward, const Vector3& up, Quaternion& ref);
+
+  /**
    * @brief Interpolates between two quaternions.
    * @param left defines first quaternion
    * @param right defines second quaternion

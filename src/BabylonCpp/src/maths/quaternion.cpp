@@ -558,6 +558,36 @@ void Quaternion::RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
   Quaternion::FromRotationMatrixToRef(rotMat, ref);
 }
 
+Quaternion Quaternion::FromLookDirectionLH(const Vector3& forward, const Vector3& up)
+{
+  Quaternion quat;
+  Quaternion::FromLookDirectionLHToRef(forward, up, quat);
+  return quat;
+}
+
+void Quaternion::FromLookDirectionLHToRef(const Vector3& forward, const Vector3& up,
+                                          Quaternion& ref)
+{
+  auto& rotMat = MathTmp::MatrixArray[0];
+  Matrix::LookDirectionLHToRef(forward, up, rotMat);
+  Quaternion::FromRotationMatrixToRef(rotMat, ref);
+}
+
+Quaternion Quaternion::FromLookDirectionRH(const Vector3& forward, const Vector3& up)
+{
+  Quaternion quat;
+  Quaternion::FromLookDirectionRHToRef(forward, up, quat);
+  return quat;
+}
+
+void Quaternion::FromLookDirectionRHToRef(const Vector3& forward, const Vector3& up,
+                                          Quaternion& ref)
+{
+  auto& rotMat = MathTmp::MatrixArray[0];
+  Matrix::LookDirectionRHToRef(forward, up, rotMat);
+  return Quaternion::FromRotationMatrixToRef(rotMat, ref);
+}
+
 Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, float amount)
 {
   Quaternion result = Quaternion::Identity();
