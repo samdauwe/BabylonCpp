@@ -231,8 +231,7 @@ public:
 
   /**
    * @brief Compute the Color3 hexadecimal code as a string.
-   * @returns a string containing the hexadecimal representation of the Color3
-   * object
+   * @returns a string containing the hexadecimal representation of the Color3 object
    */
   [[nodiscard]] std::string toHexString() const;
 

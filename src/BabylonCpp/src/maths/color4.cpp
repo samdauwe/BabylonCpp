@@ -237,9 +237,9 @@ Color4& Color4::set(float red, float green, float blue, float alpha)
 
 std::string Color4::toHexString(bool returnAsColor3) const
 {
-  const int intR = static_cast<int>(r * 255) | 0;
-  const int intG = static_cast<int>(g * 255) | 0;
-  const int intB = static_cast<int>(b * 255) | 0;
+  const int intR = static_cast<int>(round(r * 255)) | 0;
+  const int intG = static_cast<int>(round(g * 255)) | 0;
+  const int intB = static_cast<int>(round(b * 255)) | 0;
 
   if (returnAsColor3) {
     std::ostringstream ostream;
@@ -247,7 +247,7 @@ std::string Color4::toHexString(bool returnAsColor3) const
     return ostream.str();
   }
 
-  const int intA = static_cast<int>(a * 255) | 0;
+  const int intA = static_cast<int>(round(a * 255)) | 0;
   std::ostringstream ostream;
   ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG) << Scalar::ToHex(intB)
           << Scalar::ToHex(intA);
