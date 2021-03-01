@@ -783,6 +783,46 @@ public:
                             Matrix& result);
 
   /**
+   * @brief Gets a new rotation matrix used to rotate an entity so as it looks in the direction
+   * specified by forward from the eye position, the up direction being oriented like "up". This
+   * function works in left handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @returns the new matrix
+   */
+  static Matrix LookDirectionLH(const Vector3& forward, const Vector3& up);
+
+  /**
+   * @brief Sets the given "result" Matrix to a rotation matrix used to rotate an entity so that it
+   * looks in the direction of forward, the up direction being oriented like "up". This function
+   * works in left handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @param result defines the target matrix
+   */
+  static void LookDirectionLHToRef(const Vector3& forward, const Vector3& up, Matrix& result);
+
+  /**
+   * @brief Gets a new rotation matrix used to rotate an entity so as it looks in the direction
+   * specified by forward from the eye position, the up Vector3 being oriented like "up". This
+   * function works in right handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @returns the new matrix
+   */
+  static Matrix LookDirectionRH(const Vector3& forward, const Vector3& up);
+
+  /**
+   * @brief Sets the given "result" Matrix to a rotation matrix used to rotate an entity so that it
+   * looks in the direction of forward, the up vector3 being oriented like "up". This function works
+   * in right handed mode
+   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
+   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
+   * @param result defines the target matrix
+   */
+  static void LookDirectionRHToRef(const Vector3& forward, const Vector3& up, Matrix& result);
+
+  /**
    * @brief Create a left-handed orthographic projection matrix.
    * @param width defines the viewport width
    * @param height defines the viewport height

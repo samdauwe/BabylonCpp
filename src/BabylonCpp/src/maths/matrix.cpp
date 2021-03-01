@@ -1271,6 +1271,51 @@ void Matrix::LookAtRHToRef(const Vector3& eye, const Vector3& target, const Vect
                           result);
 }
 
+Matrix Matrix::LookDirectionLH(const Vector3& forward, const Vector3& up)
+{
+  Matrix result;
+  Matrix::LookDirectionLHToRef(forward, up, result);
+  return result;
+}
+
+void Matrix::LookDirectionLHToRef(const Vector3& forward, const Vector3& up, Matrix& result)
+{
+  auto& back = MathTmp::Vector3Array[0];
+  back.copyFrom(forward);
+  back.scaleInPlace(-1.f);
+  auto& left = MathTmp::Vector3Array[1];
+  Vector3::CrossToRef(up, back, left);
+
+  // Generate the rotation matrix.
+  Matrix::FromValuesToRef(left.x, left.y, left.z, 0.f, //
+                          up.x, up.y, up.z, 0.f,       //
+                          back.x, back.y, back.z, 0.f, //
+                          0.f, 0.f, 0.f, 1.f,          //
+                          result                       //
+  );
+}
+
+Matrix Matrix::LookDirectionRH(const Vector3& forward, const Vector3& up)
+{
+  Matrix result;
+  Matrix::LookDirectionRHToRef(forward, up, result);
+  return result;
+}
+
+void Matrix::LookDirectionRHToRef(const Vector3& forward, const Vector3& up, Matrix& result)
+{
+  auto& right = MathTmp::Vector3Array[2];
+  Vector3::CrossToRef(up, forward, right);
+
+  // Generate the rotation matrix.
+  Matrix::FromValuesToRef(right.x, right.y, right.z, 0.f,       //
+                          up.x, up.y, up.z, 0.f,                //
+                          forward.x, forward.y, forward.z, 0.f, //
+                          0.f, 0.f, 0.f, 1.f,                   //
+                          result                                //
+  );
+}
+
 Matrix Matrix::OrthoLH(float width, float height, float znear, float zfar)
 {
   Matrix matrix;
