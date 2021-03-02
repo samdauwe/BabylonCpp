@@ -1,12 +1,16 @@
 #ifndef BABYLON_HELPERS_TEXTURE_DOME_OPTIONS_H
 #define BABYLON_HELPERS_TEXTURE_DOME_OPTIONS_H
 
+#include <memory>
 #include <optional>
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
+
+FWD_CLASS_SPTR(Mesh)
 
 struct BABYLON_SHARED_EXPORT TextureDomeOptions {
   std::optional<unsigned int> resolution = std::nullopt;
@@ -20,6 +24,7 @@ struct BABYLON_SHARED_EXPORT TextureDomeOptions {
   std::optional<bool> halfDomeMode       = std::nullopt;
   std::optional<bool> crossEyeMode       = std::nullopt;
   std::optional<bool> generateMipMaps    = std::nullopt;
+  MeshPtr mesh                           = nullptr;
 }; // end of struct TextureDomeOptions
 
 } // end of namespace BABYLON

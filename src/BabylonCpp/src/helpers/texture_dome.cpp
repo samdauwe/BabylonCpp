@@ -65,8 +65,13 @@ void TextureDome::initializeTextureDome(const std::string& iName,
   }
 
   _setReady(false);
-  _mesh = Mesh::CreateSphere(name + "_mesh", *options.resolution, *options.size, scene, false,
-                             Mesh::BACKSIDE);
+  if (!options.mesh) {
+    _mesh = Mesh::CreateSphere(name + "_mesh", *options.resolution, *options.size, scene, false,
+                               Mesh::BACKSIDE);
+  }
+  else {
+    _mesh = options.mesh;
+  }
   // configure material
   auto backgroundMaterial = (_material = BackgroundMaterial::New(name + "_material", scene));
   backgroundMaterial->useEquirectangularFOV = true;
@@ -265,6 +270,7 @@ void TextureDome::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   _scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
   onLoadErrorObservable.clear();
+  onLoadObservable.clear();
 
   TransformNode::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
