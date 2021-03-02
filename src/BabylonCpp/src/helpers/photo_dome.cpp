@@ -39,16 +39,18 @@ void PhotoDome::set_imageMode(unsigned int value)
 TexturePtr PhotoDome::_initTexture(const std::string& urlsOrElement, Scene* scene,
                                    const TextureDomeOptions& options)
 {
-  return Texture::New(urlsOrElement, scene, !options.generateMipMaps.value_or(false),
-                      !_useDirectMapping, TextureConstants::TRILINEAR_SAMPLINGMODE, nullptr,
-                      [this](const std::string& message, const std::string& exception) -> void {
-                        auto iMessage = !message.empty() ? message : "Unknown error occured";
-                        onLoadErrorObservable.notifyObservers(&iMessage);
+  return Texture::New(
+    urlsOrElement, scene, !options.generateMipMaps.value_or(false), !_useDirectMapping,
+    TextureConstants::TRILINEAR_SAMPLINGMODE,
+    [this]() -> void { onLoadObservable.notifyObservers(); },
+    [this](const std::string& message, const std::string& exception) -> void {
+      auto iMessage = !message.empty() ? message : "Unknown error occured";
+      onLoadErrorObservable.notifyObservers(&iMessage);
 
-                        if (onError) {
-                          onError(message, exception);
-                        }
-                      });
+      if (onError) {
+        onError(message, exception);
+      }
+    });
 }
 
 } // end of namespace BABYLON
