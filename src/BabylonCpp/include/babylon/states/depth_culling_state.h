@@ -16,7 +16,7 @@ public:
   /**
    * @brief Initializes the state.
    */
-  DepthCullingState();
+  DepthCullingState(bool reset = true);
   ~DepthCullingState(); // = default
 
   void reset();
@@ -49,7 +49,7 @@ public:
   Property<DepthCullingState, bool> depthTest;
   Property<DepthCullingState, std::optional<unsigned int>> frontFace;
 
-private:
+protected:
   bool _isDepthTestDirty;
   bool _isDepthMaskDirty;
   bool _isDepthFuncDirty;

@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-DepthCullingState::DepthCullingState()
+DepthCullingState::DepthCullingState(bool iReset)
     : isDirty{this, &DepthCullingState::get_isDirty}
     , zOffset{this, &DepthCullingState::get_zOffset, &DepthCullingState::set_zOffset}
     , cullFace{this, &DepthCullingState::get_cullFace, &DepthCullingState::set_cullFace}
@@ -27,7 +27,9 @@ DepthCullingState::DepthCullingState()
     , _zOffset{0.f}
     , _frontFace{std::nullopt}
 {
-  reset();
+  if (iReset) {
+    reset();
+  }
 }
 
 DepthCullingState::~DepthCullingState() = default;

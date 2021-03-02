@@ -32,7 +32,7 @@ public:
   /**
    * Initializes the state.
    */
-  StencilState();
+  StencilState(bool reset = true);
   ~StencilState(); // = default
 
   void reset();
@@ -68,7 +68,7 @@ public:
   Property<StencilState, unsigned int> stencilMask;
   Property<StencilState, bool> stencilTest;
 
-private:
+protected:
   bool _isStencilTestDirty;
   bool _isStencilMaskDirty;
   bool _isStencilFuncDirty;

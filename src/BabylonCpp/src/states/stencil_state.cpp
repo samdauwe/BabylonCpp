@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-StencilState::StencilState()
+StencilState::StencilState(bool iReset)
     : isDirty{this, &StencilState::get_isDirty}
     , stencilFunc{this, &StencilState::get_stencilFunc, &StencilState::set_stencilFunc}
     , stencilFuncRef{this, &StencilState::get_stencilFuncRef, &StencilState::set_stencilFuncRef}
@@ -23,7 +23,9 @@ StencilState::StencilState()
     , _isStencilFuncDirty{false}
     , _isStencilOpDirty{false}
 {
-  reset();
+  if (iReset) {
+    reset();
+  }
 }
 
 StencilState::~StencilState() = default;
