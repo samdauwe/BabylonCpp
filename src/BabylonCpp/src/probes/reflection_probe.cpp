@@ -6,6 +6,7 @@
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/string_tools.h>
@@ -13,13 +14,14 @@
 namespace BABYLON {
 
 ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Scene* scene,
-                                 bool generateMipMaps, bool useFloat)
+                                 bool generateMipMaps, bool useFloat, bool iLinearSpace)
     : name{iName}
     , position{Vector3::Zero()}
     , samples{this, &ReflectionProbe::get_samples, &ReflectionProbe::set_samples}
     , refreshRate{this, &ReflectionProbe::get_refreshRate, &ReflectionProbe::set_refreshRate}
     , cubeTexture{this, &ReflectionProbe::get_cubeTexture}
     , renderList{this, &ReflectionProbe::get_renderList}
+    , linearSpace{iLinearSpace}
     , _scene{scene}
     , _renderTargetTexture{nullptr}
     , _viewMatrix{Matrix::Identity()}
@@ -27,6 +29,7 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
     , _add{Vector3::Zero()}
     , _attachedMesh{nullptr}
     , _invertYAxis{false}
+    , _currentApplyByPostProcess{false}
 {
   auto textureType = Constants::TEXTURETYPE_UNSIGNED_BYTE;
   if (useFloat) {
@@ -40,6 +43,7 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
   }
   _renderTargetTexture = RenderTargetTexture::New(iName, RenderTargetSize{size.width, size.height},
                                                   scene, generateMipMaps, true, textureType, true);
+  _renderTargetTexture->gammaSpace = !iLinearSpace;
 
   _renderTargetTexture->onBeforeRenderObservable.add([scene, this](const int* faceIndex,
                                                                    EventState&) {
@@ -98,11 +102,16 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
     [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
       _scene->getEngine()->_debugPushGroup(
         StringTools::printf("reflection probe generation for %s", name.c_str()), 1);
+      _currentApplyByPostProcess = _scene->imageProcessingConfiguration()->applyByPostProcess();
+      if (linearSpace) {
+        _scene->imageProcessingConfiguration()->applyByPostProcess = true;
+      }
     });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
-      _scene->_forcedViewPosition = nullptr;
+      _scene->imageProcessingConfiguration()->applyByPostProcess = _currentApplyByPostProcess;
+      _scene->_forcedViewPosition                                = nullptr;
       _scene->updateTransformMatrix(true);
       _scene->getEngine()->_debugPopGroup(1);
     });

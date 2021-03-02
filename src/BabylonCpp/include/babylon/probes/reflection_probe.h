@@ -105,9 +105,11 @@ protected:
    * @param generateMipMaps defines if mip maps should be generated automatically (true by default)
    * @param useFloat defines if HDR data (float data) should be used to store colors (false by
    * default)
+   * @param linearSpace defines if the probe should be generated in linear space or not (false by
+   * default)
    */
   ReflectionProbe(const std::string& name, const ISize& size, Scene* scene,
-                  bool generateMipMaps = true, bool useFloat = false);
+                  bool generateMipMaps = true, bool useFloat = false, bool linearSpace = false);
 
   /**
    * @brief Gets the number of samples to use for multi-sampling (0 by default). Required WebGL2.
@@ -167,6 +169,11 @@ public:
    */
   ReadOnlyProperty<ReflectionProbe, std::vector<AbstractMesh*>> renderList;
 
+  /**
+   * Defines if the probe should be generated in linear space or not (false by default)
+   */
+  bool linearSpace;
+
 private:
   Scene* _scene;
   RenderTargetTexturePtr _renderTargetTexture;
@@ -176,6 +183,7 @@ private:
   Vector3 _add;
   AbstractMesh* _attachedMesh;
   bool _invertYAxis;
+  bool _currentApplyByPostProcess;
 
 }; // end of class ReflectionProbe
 
