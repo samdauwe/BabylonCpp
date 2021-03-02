@@ -355,6 +355,9 @@ public:
   /** Overwrite for the bottom capSubdivisions. */
   std::optional<unsigned int> bottomCapSubdivisions;
 
+  /** Internal geometry is supposed to change once created. */
+  std::optional<bool> updatable;
+
 }; // end of class IcoSphereOptions
 
 //--------------------------------------------------------------------------------------------------

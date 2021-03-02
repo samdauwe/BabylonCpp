@@ -227,6 +227,7 @@ ICreateCapsuleOptions::ICreateCapsuleOptions()
     , radiusBottom{std::nullopt}
     , topCapSubdivisions{std::nullopt}
     , bottomCapSubdivisions{std::nullopt}
+    , updatable{std::nullopt}
 {
 }
 
