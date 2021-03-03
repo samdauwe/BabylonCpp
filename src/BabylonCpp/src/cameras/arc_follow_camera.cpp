@@ -24,9 +24,8 @@ ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha, float i
     , beta{iBeta}
     , radius{iRadius}
     , _cartesianCoordinates{Vector3::Zero()}
-    , _meshTarget{iTarget}
 {
-  _follow();
+  setMeshTarget(iTarget);
 }
 
 ArcFollowCamera::~ArcFollowCamera() = default;
@@ -34,6 +33,12 @@ ArcFollowCamera::~ArcFollowCamera() = default;
 Type ArcFollowCamera::type() const
 {
   return Type::ARCFOLLOWCAMERA;
+}
+
+void ArcFollowCamera::setMeshTarget(AbstractMesh* iTarget)
+{
+  _meshTarget = iTarget;
+  _follow();
 }
 
 void ArcFollowCamera::_follow()

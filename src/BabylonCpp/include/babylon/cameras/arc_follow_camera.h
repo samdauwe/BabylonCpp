@@ -34,6 +34,12 @@ public:
   Type type() const override;
 
   /**
+   * @brief Sets the mesh to follow with this camera.
+   * @param target the target to follow
+   */
+  void setMeshTarget(AbstractMesh* target);
+
+  /**
    * @brief Hidden
    */
   void _checkInputs() override;
