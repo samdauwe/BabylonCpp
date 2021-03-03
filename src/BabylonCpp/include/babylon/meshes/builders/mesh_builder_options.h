@@ -127,6 +127,7 @@ public:
   std::optional<Vector3> normal;
   std::optional<Vector3> size;
   std::optional<float> angle;
+  std::optional<bool> captureUVS;
 
 }; // end of class DecalOptions
 

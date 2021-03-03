@@ -82,7 +82,11 @@ DashedLinesOptions::~DashedLinesOptions() = default;
 //--------------------------------------------------------------------------------------------------
 
 DecalOptions::DecalOptions()
-    : position{std::nullopt}, normal{std::nullopt}, size{std::nullopt}, angle{std::nullopt}
+    : position{std::nullopt}
+    , normal{std::nullopt}
+    , size{std::nullopt}
+    , angle{std::nullopt}
+    , captureUVS{std::nullopt}
 {
 }
 
