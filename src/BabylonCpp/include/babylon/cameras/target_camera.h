@@ -88,9 +88,11 @@ public:
    */
   float _computeLocalCameraSpeed();
 
+  // Target
+
   /**
    * @brief Defines the target the camera should look at.
-   * @param target Defines the new target as a Vector or a mesh
+   * @param target Defines the new target as a Vector
    */
   void setTarget(const Vector3& target);
 
