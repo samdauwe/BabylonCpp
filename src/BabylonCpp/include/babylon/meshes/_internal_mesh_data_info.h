@@ -6,15 +6,15 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
 class Mesh;
-class MeshLODLevel;
-class MorphTargetManager;
-using MeshLODLevelPtr       = std::shared_ptr<MeshLODLevel>;
-using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
+class SubMesh;
+FWD_CLASS_SPTR(MeshLODLevel)
+FWD_CLASS_SPTR(MorphTargetManager)
 
 /**
  * @brief Hidden
@@ -25,6 +25,7 @@ struct BABYLON_SHARED_EXPORT _InternalMeshDataInfo {
   Observable<Mesh> _onBeforeBindObservable;
   Observable<Mesh> _onAfterRenderObservable;
   Observable<Mesh> _onBeforeDrawObservable;
+  Observable<SubMesh> _onBetweenPassObservable;
 
   // Will be used by ribbons mainly
   bool _areNormalsFrozen = false;
