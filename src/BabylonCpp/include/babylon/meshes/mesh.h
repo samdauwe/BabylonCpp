@@ -1882,6 +1882,11 @@ protected:
   Observable<Mesh>& get_onAfterRenderObservable();
 
   /**
+   * @brief An event triggeredbetween rendering pass when using separateCullingPass = true
+   */
+  Observable<SubMesh>& get_onBetweenPassObservable();
+
+  /**
    * @brief An event triggered before drawing the mesh.
    */
   Observable<Mesh>& get_onBeforeDrawObservable();
@@ -2040,6 +2045,11 @@ public:
    * An event triggered after rendering the mesh
    */
   ReadOnlyProperty<Mesh, Observable<Mesh>> onAfterRenderObservable;
+
+  /**
+   * An event triggeredbetween rendering pass when using separateCullingPass = true
+   */
+  ReadOnlyProperty<Mesh, Observable<SubMesh>> onBetweenPassObservable;
 
   /**
    * An event triggered before drawing the mesh

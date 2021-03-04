@@ -81,6 +81,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , onBeforeRenderObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeBindObservable{this, &Mesh::get_onBeforeBindObservable}
     , onAfterRenderObservable{this, &Mesh::get_onAfterRenderObservable}
+    , onBetweenPassObservable{this, &Mesh::get_onBetweenPassObservable}
     , onBeforeDrawObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeDraw{this, &Mesh::set_onBeforeDraw}
     , delayLoadState{Constants::DELAYLOADSTATE_NONE}
@@ -360,6 +361,11 @@ Observable<Mesh>& Mesh::get_onBeforeBindObservable()
 Observable<Mesh>& Mesh::get_onAfterRenderObservable()
 {
   return _internalMeshDataInfo->_onAfterRenderObservable;
+}
+
+Observable<SubMesh>& Mesh::get_onBetweenPassObservable()
+{
+  return _internalMeshDataInfo->_onBetweenPassObservable;
 }
 
 Observable<Mesh>& Mesh::get_onBeforeDrawObservable()
@@ -1081,6 +1087,11 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMod
   }
 
   auto engine = getScene()->getEngine();
+
+  // Morph targets
+  if (morphTargetManager() && morphTargetManager()->isUsingTextureForTargets()) {
+    morphTargetManager()->_bind(effect);
+  }
 
   // Wireframe
   WebGLDataBufferPtr indexToBind = nullptr;
@@ -1926,6 +1937,10 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
       },
       _effectiveMaterial.get());
     engine->setState(true, _effectiveMaterial->zOffset, false, reverse);
+
+    if (_internalMeshDataInfo->_onBetweenPassObservable) {
+      _internalMeshDataInfo->_onBetweenPassObservable.notifyObservers(subMesh);
+    }
   }
 
   // Draw
@@ -2372,9 +2387,25 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   auto& internalDataInfo = *_internalMeshDataInfo;
 
-  internalDataInfo._onBeforeDrawObservable.clear();
-  internalDataInfo._onBeforeRenderObservable.clear();
-  internalDataInfo._onAfterRenderObservable.clear();
+  if (internalDataInfo._onBeforeDrawObservable) {
+    internalDataInfo._onBeforeDrawObservable.clear();
+  }
+
+  if (internalDataInfo._onBeforeBindObservable) {
+    internalDataInfo._onBeforeBindObservable.clear();
+  }
+
+  if (internalDataInfo._onBeforeRenderObservable) {
+    internalDataInfo._onBeforeRenderObservable.clear();
+  }
+
+  if (internalDataInfo._onAfterRenderObservable) {
+    internalDataInfo._onAfterRenderObservable.clear();
+  }
+
+  if (internalDataInfo._onBetweenPassObservable) {
+    internalDataInfo._onBetweenPassObservable.clear();
+  }
 
   // Sources
   if (_scene->useClonedMeshMap) {
@@ -2732,6 +2763,10 @@ void Mesh::increaseVertices(size_t numberPerEdge)
     BABYLON_LOG_WARN("Mesh", "VertexData contains null entries")
   }
   else {
+    vertex_data->indices   = currentIndices;
+    vertex_data->positions = positions;
+    vertex_data->normals   = normals;
+
     auto segments
       = numberPerEdge + 1; // segments per current facet edge, become sides of new facets
     std::vector<Uint32Array> tempIndices;
@@ -3060,6 +3095,10 @@ void Mesh::_syncGeometryWithMorphTargetManager()
                         "Mesh is incompatible with morph targets. Targets and "
                         "mesh must all have the same vertices count.")
       iMorphTargetManager = nullptr;
+      return;
+    }
+
+    if (iMorphTargetManager->isUsingTextureForTargets()) {
       return;
     }
 
