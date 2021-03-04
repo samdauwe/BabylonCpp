@@ -950,7 +950,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
   // Parent
   if (iParent) {
     if (force) {
-      iParent->computeWorldMatrix();
+      iParent->computeWorldMatrix(force);
     }
     if (useBillboardPath) {
       if (_transformToBoneReferal) {
