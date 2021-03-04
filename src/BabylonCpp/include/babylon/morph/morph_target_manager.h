@@ -8,6 +8,7 @@
 
 namespace BABYLON {
 
+FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(MorphTargetManager)
 
 /**
@@ -76,6 +77,10 @@ public:
 
   // Statics
   static MorphTargetManagerPtr Parse(const json& serializationObject, Scene* scene);
+
+  //
+  void _bind(const EffectPtr& /*effect*/) { }
+  bool isUsingTextureForTargets() const { return false; }
 
 protected:
   /**
