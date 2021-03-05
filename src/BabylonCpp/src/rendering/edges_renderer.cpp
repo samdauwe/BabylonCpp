@@ -25,6 +25,7 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
     , linesPositions{this, &EdgesRenderer::get_linesPositions}
     , linesNormals{this, &EdgesRenderer::get_linesNormals}
     , linesIndices{this, &EdgesRenderer::get_linesIndices}
+    , lineShader{this, &EdgesRenderer::get_lineShader, &EdgesRenderer::set_lineShader}
     , _lineShader{nullptr}
     , _ib{nullptr}
     , _options{std::nullopt}
@@ -70,6 +71,16 @@ Float32Array& EdgesRenderer::get_linesNormals()
 IndicesArray& EdgesRenderer::get_linesIndices()
 {
   return _linesIndices;
+}
+
+ShaderMaterialPtr& EdgesRenderer::get_lineShader()
+{
+  return _lineShader;
+}
+
+void EdgesRenderer::set_lineShader(const ShaderMaterialPtr& shader)
+{
+  _lineShader = shader;
 }
 
 ShaderMaterialPtr EdgesRenderer::GetShader(Scene* scene)
