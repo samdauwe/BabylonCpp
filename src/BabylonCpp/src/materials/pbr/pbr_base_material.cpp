@@ -684,14 +684,26 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "vReflectionMicrosurfaceInfos",
                                     "vTangentSpaceParams",
                                     "boneTextureWidth",
-                                    "vDebugMode"};
+                                    "vDebugMode",
+                                    "morphTargetTextureInfo",
+                                    "morphTargetTextureIndices"};
 
-  std::vector<std::string> samplers{
-    "albedoSampler",          "reflectivitySampler", "ambientSampler",
-    "emissiveSampler",        "bumpSampler",         "lightmapSampler",
-    "opacitySampler",         "reflectionSampler",   "reflectionSamplerLow",
-    "reflectionSamplerHigh",  "irradianceSampler",   "microSurfaceSampler",
-    "environmentBrdfSampler", "boneSampler",         "metallicReflectanceSampler"};
+  std::vector<std::string> samplers{"albedoSampler",
+                                    "reflectivitySampler",
+                                    "ambientSampler",
+                                    "emissiveSampler",
+                                    "bumpSampler",
+                                    "lightmapSampler",
+                                    "opacitySampler",
+                                    "reflectionSampler",
+                                    "reflectionSamplerLow",
+                                    "reflectionSamplerHigh",
+                                    "irradianceSampler",
+                                    "microSurfaceSampler",
+                                    "environmentBrdfSampler",
+                                    "boneSampler",
+                                    "metallicReflectanceSampler",
+                                    "morphTargets"};
 
   std::vector<std::string> uniformBuffers{"Material", "Scene", "Mesh"};
 
