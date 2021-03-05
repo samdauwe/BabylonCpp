@@ -490,6 +490,13 @@ public:
   [[nodiscard]] AnimationValue _getKeyValue(const AnimationValue& value) const;
 
   /**
+   * @brief Evaluate the animation value at a given frame.
+   * @param currentFrame defines the frame where we want to evaluate the animation
+   * @returns the animation value
+   */
+  AnimationValue evaluate(float currentFrame);
+
+  /**
    * @brief Hidden Internal use only.
    */
   AnimationValue _interpolate(float currentFrame, _IAnimationState& state);
