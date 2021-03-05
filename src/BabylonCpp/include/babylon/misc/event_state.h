@@ -42,8 +42,8 @@ public:
    * @param currentTarget defines the current target of the state
    * @returns the current event state
    */
-  EventState& initalize(int mask, bool skipNextObservers = false, any* target = nullptr,
-                        any* currentTarget = nullptr);
+  EventState& initialize(int mask, bool skipNextObservers = false, any* target = nullptr,
+                         any* currentTarget = nullptr);
 
 public:
   /**
