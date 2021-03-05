@@ -108,6 +108,8 @@ private:
   Vector3 _normalizedVelocity;
   float _nearestDistance;
   int _collisionMask;
+  float _velocitySquaredLength;
+  float _nearestDistanceSquared;
 
 }; // end of class Collider
 
