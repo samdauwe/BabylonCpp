@@ -118,6 +118,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"MORPHTARGETS_NORMAL", false},  //
     {"MORPHTARGETS_TANGENT", false}, //
     {"MORPHTARGETS_UV", false},      //
+    {"MORPHTARGETS_TEXTURE", false}, //
 
     {"IMAGEPROCESSING", false},            //
     {"VIGNETTE", false},                   //
