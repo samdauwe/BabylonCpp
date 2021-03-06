@@ -55,6 +55,7 @@ CubeTexture::CubeTexture(
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
     , noMipmap{this, &CubeTexture::get_noMipmap}
+    , forcedExtension{this, &CubeTexture::get_forcedExtension}
     , _delayedOnLoad{nullptr}
     , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
@@ -195,6 +196,11 @@ float CubeTexture::get_rotationY() const
 bool CubeTexture::get_noMipmap() const
 {
   return _noMipmap;
+}
+
+std::string CubeTexture::get_forcedExtension() const
+{
+  return _forcedExtension;
 }
 
 std::string CubeTexture::getClassName() const

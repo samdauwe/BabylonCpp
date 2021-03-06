@@ -172,6 +172,11 @@ protected:
    */
   bool get_noMipmap() const override;
 
+  /**
+   * @brief Gets the forced extension (if any).
+   */
+  std::string get_forcedExtension() const;
+
 public:
   /**
    * Observable triggered once the texture has been loaded.
@@ -199,6 +204,11 @@ public:
    * Are mip maps generated for this texture or not
    */
   ReadOnlyProperty<CubeTexture, bool> noMipmap;
+
+  /**
+   * Gets the forced extension (if any)
+   */
+  ReadOnlyProperty<CubeTexture, std::string> forcedExtension;
 
 protected:
   std::string _forcedExtension;
