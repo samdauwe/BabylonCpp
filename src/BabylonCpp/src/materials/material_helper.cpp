@@ -253,6 +253,8 @@ void MaterialHelper::PrepareDefinesForMorphTargets(AbstractMesh* mesh, MaterialD
     defines.boolDef["MORPHTARGETS_NORMAL"]  = manager->supportsNormals() && defines["NORMAL"];
     defines.boolDef["MORPHTARGETS"]         = (manager->numInfluencers() > 0);
     defines.intDef["NUM_MORPH_INFLUENCERS"] = static_cast<unsigned int>(manager->numInfluencers());
+
+    defines.boolDef["MORPHTARGETS_TEXTURE"] = manager->isUsingTextureForTargets();
   }
   else {
     defines.boolDef["MORPHTARGETS_UV"]      = false;
@@ -739,9 +741,12 @@ void MaterialHelper::PrepareAttributesForMorphTargets(std::vector<std::string>& 
   if (influencers > 0 && engine && _mesh) {
     auto maxAttributesCount = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
     auto manager            = _mesh->morphTargetManager();
-    auto normal             = manager && manager->supportsNormals() && defines["NORMAL"];
-    auto tangent            = manager && manager->supportsNormals() && defines["TANGENT"];
-    auto uv                 = manager && manager->supportsUVs() && defines["UV1"];
+    if (manager && manager->isUsingTextureForTargets()) {
+      return;
+    }
+    auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
+    auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
+    auto uv      = manager && manager->supportsUVs() && defines["UV1"];
     for (auto index = 0u; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
       attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
