@@ -19,6 +19,7 @@ NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
     {"MORPHTARGETS_NORMAL", false},  //
     {"MORPHTARGETS_TANGENT", false}, //
     {"MORPHTARGETS_UV", false},      //
+    {"MORPHTARGETS_TEXTURE", false}, //
 
     /** IMAGE PROCESSING */
     {"IMAGEPROCESSING", false},            //
