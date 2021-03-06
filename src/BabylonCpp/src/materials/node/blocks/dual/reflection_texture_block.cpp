@@ -143,7 +143,7 @@ ReflectionTextureBlock& ReflectionTextureBlock::_buildBlock(NodeMaterialBuildSta
 {
   ReflectionTextureBaseBlock::_buildBlock(state);
 
-  if (!texture) {
+  if (!texture()) {
     state.compilationString += writeOutputs(state, "vec3(0.)");
     return *this;
   }

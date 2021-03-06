@@ -1049,7 +1049,7 @@ bool NodeMaterial::hasTexture(const BaseTexturePtr& texture) const
       return true;
     }
     else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
-             && std::get<ReflectionTextureBlockPtr>(t)->texture == texture) {
+             && std::get<ReflectionTextureBlockPtr>(t)->texture() == texture) {
       return true;
     }
   }
@@ -1068,7 +1068,7 @@ void NodeMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures, b
         }
       }
       else if (std::holds_alternative<ReflectionTextureBlockPtr>(tb)) {
-        auto texture = std::get<ReflectionTextureBlockPtr>(tb)->texture;
+        auto texture = std::get<ReflectionTextureBlockPtr>(tb)->texture();
         if (texture) {
           texture->dispose();
         }

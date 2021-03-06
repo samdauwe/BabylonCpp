@@ -2,6 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -10,23 +12,55 @@
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 ReflectionTextureBaseBlock::ReflectionTextureBaseBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment}
-    , texture{nullptr}
+    , texture{this, &ReflectionTextureBaseBlock::get_texture,
+              &ReflectionTextureBaseBlock::set_texture}
     , position{this, &ReflectionTextureBaseBlock::get_position}
     , worldPosition{this, &ReflectionTextureBaseBlock::get_worldPosition}
     , worldNormal{this, &ReflectionTextureBaseBlock::get_worldNormal}
     , world{this, &ReflectionTextureBaseBlock::get_world}
     , cameraPosition{this, &ReflectionTextureBaseBlock::get_cameraPosition}
     , view{this, &ReflectionTextureBaseBlock::get_view}
+    , _texture{nullptr}
 {
 }
 
 ReflectionTextureBaseBlock::~ReflectionTextureBaseBlock() = default;
+
+BaseTexturePtr& ReflectionTextureBaseBlock::get_texture()
+{
+  return _texture;
+}
+
+void ReflectionTextureBaseBlock::set_texture(const BaseTexturePtr& texture)
+{
+  if (_texture == texture) {
+    return;
+  }
+
+  const auto scene
+    = texture && texture->getScene() ? texture->getScene() : Engine::LastCreatedScene();
+
+  if (!texture && scene) {
+    scene->markAllMaterialsAsDirty(
+      Constants::MATERIAL_TextureDirtyFlag,
+      [this](Material* mat) -> bool { return _texture && mat->hasTexture(_texture); });
+  }
+
+  _texture = texture;
+
+  if (texture && scene) {
+    scene->markAllMaterialsAsDirty(
+      Constants::MATERIAL_TextureDirtyFlag,
+      [texture](Material* mat) -> bool { return mat->hasTexture(texture); });
+  }
+}
 
 std::string ReflectionTextureBaseBlock::getClassName() const
 {
@@ -430,22 +464,32 @@ ReflectionTextureBaseBlock& ReflectionTextureBaseBlock::_buildBlock(NodeMaterial
 
 std::string ReflectionTextureBaseBlock::_dumpPropertiesCode()
 {
-  if (!texture) {
+  if (!texture()) {
     return "";
   }
+  const auto iTexture = texture();
 
   std::string codeString;
 
-  if (texture->isCube()) {
-    codeString = StringTools::printf("%s.texture = CubeTexture::New(\"%s\");\r\n",
-                                     _codeVariableName.c_str(), texture->name.c_str());
+  if (iTexture->isCube()) {
+    const auto iCubeTexture = std::static_pointer_cast<CubeTexture>(iTexture);
+    if (iCubeTexture) {
+      const auto forcedExtension = iCubeTexture->forcedExtension();
+      codeString                 = StringTools::printf(
+        "%s.texture = CubeTexture::New(\"%s\", std::nullopt, {}, %s, {}, nullptr, nullptr, "
+        "Constants::TEXTUREFORMAT_RGBA, %s, %s);\r\n",
+        _codeVariableName.c_str(), iTexture->name.c_str(), iTexture->noMipmap() ? "true" : "false",
+        iTexture->_prefiltered ? "true" : "false",
+        !forcedExtension.empty() ? StringTools::printf("\"%s\"", forcedExtension.c_str()).c_str() :
+                                                   "");
+    }
   }
   else {
-    codeString = StringTools::printf("%s.texture = Texture::New(\"%s\");\r\n",
-                                     _codeVariableName.c_str(), texture->name.c_str());
+    codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", std::nullopt);\r\n",
+                                     _codeVariableName.c_str(), iTexture->name.c_str());
   }
   codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
-                                    _codeVariableName.c_str(), texture->coordinatesMode());
+                                    _codeVariableName.c_str(), iTexture->coordinatesMode());
 
   return codeString;
 }

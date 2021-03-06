@@ -4,12 +4,12 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+FWD_CLASS_SPTR(BaseTexture)
 
 /**
  * @brief Base block used to read a reflection texture from a sampler.
@@ -126,6 +126,16 @@ protected:
   ReflectionTextureBaseBlock(const std::string& name);
 
   /**
+   * @brief Gets the texture associated with the node.
+   */
+  BaseTexturePtr& get_texture();
+
+  /**
+   * @brief Sets the texture associated with the node.
+   */
+  void set_texture(const BaseTexturePtr& texture);
+
+  /**
    * @brief Gets the world position input component.
    */
   virtual NodeMaterialConnectionPointPtr& get_position() = 0;
@@ -212,7 +222,7 @@ public:
   /**
    * Gets or sets the texture associated with the node
    */
-  BaseTexturePtr texture;
+  Property<ReflectionTextureBaseBlock, BaseTexturePtr> texture;
 
   /**
    * Gets the world position input component
@@ -249,6 +259,7 @@ protected:
   std::string _directionWName;
   std::string _reflectionVectorName;
   std::string _reflectionColorName;
+  BaseTexturePtr _texture;
 
 }; // end of class ReflectionTextureBaseBlock
 

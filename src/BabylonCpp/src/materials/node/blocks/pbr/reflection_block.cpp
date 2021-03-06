@@ -111,8 +111,8 @@ std::string ReflectionBlock::get_reflectionColor() const
 
 BaseTexturePtr ReflectionBlock::_getTexture() const
 {
-  if (texture) {
-    return texture;
+  if (texture()) {
+    return texture();
   }
 
   return _scene->environmentTexture();
@@ -431,9 +431,9 @@ std::string ReflectionBlock::_dumpPropertiesCode()
 {
   auto codeString = ReflectionTextureBaseBlock::_dumpPropertiesCode();
 
-  if (texture) {
+  if (texture()) {
     codeString += StringTools::printf("%s.texture.gammaSpace = %s;\r\n", _codeVariableName.c_str(),
-                                      texture->gammaSpace() ? "true" : "false");
+                                      texture()->gammaSpace() ? "true" : "false");
   }
   codeString += StringTools::printf("%s.useSphericalHarmonics = %s;\r\n", _codeVariableName.c_str(),
                                     useSphericalHarmonics ? "true" : "false");
