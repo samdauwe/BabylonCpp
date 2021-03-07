@@ -32,7 +32,7 @@ public:
   /**
    * @brief Execute the action toggle the boolean value.
    */
-  void execute(const std::optional<IActionEvent>& evt) override;
+  void execute(const IActionEventPtr& evt) override;
 
   /**
    * @brief Serializes the actions and its related information.

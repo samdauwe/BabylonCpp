@@ -35,7 +35,7 @@ public:
   /**
    * @brief Execute the action and set the targeted property to the desired value.
    */
-  void execute(const std::optional<IActionEvent>& evt) override;
+  void execute(const IActionEventPtr& evt) override;
 
   /**
    * @brief Serializes the actions and its related information.

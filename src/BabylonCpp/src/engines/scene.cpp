@@ -5214,7 +5214,7 @@ void Scene::setPointerOverSprite(const SpritePtr& sprite)
   if (_pointerOverSprite == sprite) {
     return;
   }
-
+#if 0
   if (_pointerOverSprite && _pointerOverSprite->actionManager) {
     Event evt;
     _pointerOverSprite->actionManager->processTrigger(
@@ -5229,6 +5229,7 @@ void Scene::setPointerOverSprite(const SpritePtr& sprite)
       Constants::ACTION_OnPointerOverTrigger,
       ActionEvent::CreateNewFromSprite(_pointerOverSprite, this, evt));
   }
+#endif
 }
 
 SpritePtr& Scene::getPointerOverSprite()

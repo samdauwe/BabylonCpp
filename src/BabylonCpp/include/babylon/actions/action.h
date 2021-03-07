@@ -60,13 +60,13 @@ public:
   /**
    * @brief Internal only - executes current action event.
    */
-  void _executeCurrent(const std::optional<IActionEvent>& evt) override;
+  void _executeCurrent(const IActionEventPtr& evt) override;
 
   /**
    * @brief Execute placeholder for child classes.
    * @param evt optional action event
    */
-  virtual void execute(const std::optional<IActionEvent>& evt);
+  virtual void execute(const IActionEventPtr& evt);
 
   /**
    * @brief Skips to next active action.

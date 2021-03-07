@@ -226,18 +226,19 @@ void InputManager::simulatePointerDown(std::optional<PickingInfo>& pickResult)
     return;
   }
 
-  _processPointerDown(pickResult, evt);
+  // _processPointerDown(pickResult, evt);
 }
 
 void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
-                                       const PointerEvent& evt)
+                                       const IPointerEventPtr& /*evt*/)
 {
-  auto& scene = *_scene;
+  // auto& scene = *_scene;
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
     _pickedDownMesh     = (*pickResult).pickedMesh;
     auto iActionManager = _pickedDownMesh->_getActionManagerForTrigger();
     if (iActionManager) {
       if (iActionManager->hasPickTriggers()) {
+#if 0
         iActionManager->processTrigger(Constants::ACTION_OnPickDownTrigger,
                                        ActionEvent::CreateNew(_pickedDownMesh, evt));
         switch (evt.button) {
@@ -256,6 +257,7 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
           default:
             break;
         }
+#endif
       }
 
       if (iActionManager->hasSpecificTrigger(Constants::ACTION_OnLongPressTrigger)) {
@@ -289,6 +291,7 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
       }
     }
   }
+#if 0
   else {
     for (auto& step : scene._pointerDownStage) {
       pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
@@ -308,6 +311,7 @@ void InputManager::_processPointerDown(std::optional<PickingInfo>& pickResult,
       scene.onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
     }
   }
+#endif
 }
 
 bool InputManager::_isPointerSwiping() const
@@ -332,12 +336,13 @@ void InputManager::simulatePointerUp(std::optional<PickingInfo>& pickResult, boo
   if (_checkPrePointerObservable(pickResult, evt, PointerEventTypes::POINTERUP)) {
     return;
   }
-
+#if 0
   _processPointerUp(pickResult, evt, clickInfo);
+#endif
 }
 
 void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
-                                     const PointerEvent& evt, const ClickInfo& clickInfo)
+                                     const IPointerEventPtr& /*evt*/, const ClickInfo& clickInfo)
 {
   auto& scene = *_scene;
   if (pickResult && pickResult && (*pickResult).pickedMesh) {
@@ -345,41 +350,53 @@ void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
     _pickedUpMesh           = _pickResult.pickedMesh;
     if (_pickedDownMesh == _pickedUpMesh) {
       if (scene.onPointerPick) {
+#if 0
         scene.onPointerPick(evt, pickResult);
+#endif
       }
       if (clickInfo.singleClick() && !clickInfo.ignore()
           && scene.onPointerObservable.hasObservers()) {
+#if 0
         const auto type = PointerEventTypes::POINTERPICK;
         PointerInfo pi(type, evt, *pickResult);
         _setRayOnPointerInfo(pi);
         scene.onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
       }
     }
     auto& actionManager = _pickedUpMesh->actionManager;
     if (actionManager && !clickInfo.ignore()) {
+#if 0
       actionManager->processTrigger(Constants::ACTION_OnPickUpTrigger,
                                     ActionEvent::CreateNew(_pickedUpMesh, evt, pickResult));
+#endif
 
       if (!clickInfo.hasSwiped() && clickInfo.singleClick()) {
+#if 0
         actionManager->processTrigger(
           Constants::ACTION_OnPickTrigger,
           ActionEvent::CreateNew(pickResult->pickedMesh, evt, pickResult));
+#endif
       }
 
       auto doubleClickActionManager
         = _pickedUpMesh->_getActionManagerForTrigger(Constants::ACTION_OnDoublePickTrigger);
       if (clickInfo.doubleClick() && doubleClickActionManager) {
+#if 0
         doubleClickActionManager->processTrigger(
           Constants::ACTION_OnDoublePickTrigger,
           ActionEvent::CreateNew(_pickedUpMesh, evt, pickResult));
+#endif
       }
     }
   }
   else {
     if (!clickInfo.ignore()) {
+#if 0
       for (auto& step : scene._pointerUpStage) {
         pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
       }
+#endif
     }
   }
 
@@ -387,8 +404,10 @@ void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
     auto pickedDownActionManager
       = _pickedDownMesh->_getActionManagerForTrigger(Constants::ACTION_OnPickOutTrigger);
     if (pickedDownActionManager) {
+#if 0
       pickedDownActionManager->processTrigger(Constants::ACTION_OnPickOutTrigger,
                                               ActionEvent::CreateNew(_pickedDownMesh, evt));
+#endif
     }
   }
 
@@ -406,23 +425,28 @@ void InputManager::_processPointerUp(std::optional<PickingInfo>& pickResult,
         type = PointerEventTypes::POINTERDOUBLETAP;
       }
       if (static_cast<int>(type) != 0) {
+#if 0
         PointerInfo pi(type, evt, *pickResult);
         _setRayOnPointerInfo(pi);
         scene.onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
       }
     }
 
     if (!clickInfo.ignore()) {
       type = PointerEventTypes::POINTERUP;
-
+#if 0
       PointerInfo pi(type, evt, *pickResult);
       _setRayOnPointerInfo(pi);
       scene.onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
     }
   }
 
   if (scene.onPointerUp && !clickInfo.ignore()) {
+#if 0
     scene.onPointerUp(evt, pickResult, type);
+#endif
   }
 }
 
@@ -716,7 +740,9 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     auto pickResult = scene.pick(_unTranslatedPointerX, _unTranslatedPointerY,
                                  scene.pointerDownPredicate, false, scene.cameraToUseForPointers);
 
+#if 0
     _processPointerDown(pickResult, evt);
+#endif
   };
 
   _onPointerUp = [this, elementToAttachTo](PointerEvent&& evt) {
@@ -812,7 +838,7 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
           pickResult = *_currentPickResult;
         }
 
-        _processPointerUp(pickResult, evt, clickInfo);
+        // _processPointerUp(pickResult, evt, clickInfo);
 
         _previousPickResult = _currentPickResult;
       });
@@ -835,8 +861,10 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     }
 
     if (scene.actionManager) {
+#if 0
       scene.actionManager->processTrigger(Constants::ACTION_OnKeyDownTrigger,
                                           ActionEvent::CreateNewFromScene(_scene, evt));
+#endif
     }
   };
 
@@ -857,8 +885,10 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     }
 
     if (scene.actionManager) {
+#if 0
       scene.actionManager->processTrigger(Constants::ACTION_OnKeyUpTrigger,
                                           ActionEvent::CreateNewFromScene(_scene, evt));
+#endif
     }
   };
 
@@ -948,8 +978,10 @@ void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh, int pointerId
     actionManager
       = underPointerMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOutTrigger);
     if (actionManager) {
+#if 0
       actionManager->processTrigger(Constants::ACTION_OnPointerOutTrigger,
                                     ActionEvent::CreateNew(_pointerOverMesh));
+#endif
     }
   }
 
@@ -965,8 +997,10 @@ void InputManager::setPointerOverMesh(const AbstractMeshPtr& mesh, int pointerId
     actionManager
       = underPointerMesh->_getActionManagerForTrigger(Constants::ACTION_OnPointerOverTrigger);
     if (actionManager) {
+#if 0
       actionManager->processTrigger(Constants::ACTION_OnPointerOverTrigger,
                                     ActionEvent::CreateNew(_pointerOverMesh));
+#endif
     }
   }
 }

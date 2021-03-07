@@ -25,7 +25,7 @@ void IncrementValueAction::_prepare()
   _property        = _getProperty(propertyPath);
 }
 
-void IncrementValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
+void IncrementValueAction::execute(const IActionEventPtr& /*evt*/)
 {
   // _effectiveTarget[_property] = value;
 

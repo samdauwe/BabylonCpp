@@ -31,7 +31,7 @@ public:
   /**
    * @brief Execute the action and executes all the aggregated actions.
    */
-  void execute(const std::optional<IActionEvent>& evt) override;
+  void execute(const IActionEventPtr& evt) override;
 
   /**
    * @brief Serializes the actions and its related information.

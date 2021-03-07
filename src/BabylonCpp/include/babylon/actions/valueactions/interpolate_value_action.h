@@ -43,7 +43,7 @@ public:
   /**
    * @brief Execute the action starts the value interpolation.
    */
-  void execute(const std::optional<IActionEvent>& evt) override;
+  void execute(const IActionEventPtr& evt) override;
 
   /**
    * @brief Serializes the actions and its related information.

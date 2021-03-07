@@ -25,7 +25,7 @@ void SetValueAction::_prepare()
   _property        = _getProperty(propertyPath);
 }
 
-void SetValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
+void SetValueAction::execute(const IActionEventPtr& /*evt*/)
 {
   // _effectiveTarget[_property] = value;
 

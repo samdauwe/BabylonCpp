@@ -113,7 +113,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerMove(int unTranslatedPo
 std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPointerX,
                                                               int unTranslatedPointerY,
                                                               std::optional<PickingInfo> pickResult,
-                                                              const PointerEvent& evt)
+                                                              const PointerEvent& /*evt*/)
 {
   scene->_pickedDownSprite = nullptr;
   if (!scene->spriteManagers.empty()) {
@@ -121,6 +121,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPo
                                    false, scene->cameraToUseForPointers);
 
     if (pickResult && pickResult->hit && pickResult->pickedSprite) {
+#if 0
       if (pickResult->pickedSprite->actionManager) {
         scene->_pickedDownSprite = pickResult->pickedSprite;
         switch (evt.button) {
@@ -148,6 +149,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPo
             ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene, evt));
         }
       }
+#endif
     }
   }
 
@@ -157,7 +159,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPo
 std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(int unTranslatedPointerX,
                                                             int unTranslatedPointerY,
                                                             std::optional<PickingInfo> pickResult,
-                                                            const PointerEvent& evt)
+                                                            const PointerEvent& /*evt*/)
 {
   if (!scene->spriteManagers.empty()) {
     auto spritePickResult
@@ -167,9 +169,9 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(int unTranslatedPoin
     if (spritePickResult) {
       if (spritePickResult->hit && spritePickResult->pickedSprite) {
         if (spritePickResult->pickedSprite->actionManager) {
-          spritePickResult->pickedSprite->actionManager->processTrigger(
+          /*spritePickResult->pickedSprite->actionManager->processTrigger(
             Constants::ACTION_OnPickUpTrigger,
-            ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite, scene, evt));
+            ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite, scene, evt));*/
           if (spritePickResult->pickedSprite->actionManager) {
             /*if (!scene->_isPointerSwiping()) {
               spritePickResult->pickedSprite->actionManager->processTrigger(
@@ -182,9 +184,9 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(int unTranslatedPoin
       }
       if (scene->_pickedDownSprite && scene->_pickedDownSprite->actionManager
           && scene->_pickedDownSprite != spritePickResult->pickedSprite) {
-        scene->_pickedDownSprite->actionManager->processTrigger(
+        /*scene->_pickedDownSprite->actionManager->processTrigger(
           Constants::ACTION_OnPickOutTrigger,
-          ActionEvent::CreateNewFromSprite(scene->_pickedDownSprite, scene, evt));
+          ActionEvent::CreateNewFromSprite(scene->_pickedDownSprite, scene, evt));*/
       }
     }
   }

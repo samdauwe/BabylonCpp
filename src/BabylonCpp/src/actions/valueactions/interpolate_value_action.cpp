@@ -38,7 +38,7 @@ void InterpolateValueAction::_prepare()
   _property        = _getProperty(propertyPath);
 }
 
-void InterpolateValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
+void InterpolateValueAction::execute(const IActionEventPtr& /*evt*/)
 {
   auto scene = _actionManager->getScene();
   std::vector<IAnimationKey> keys{IAnimationKey(0, _effectiveTarget->getProperty({_property})), //

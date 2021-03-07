@@ -4,8 +4,7 @@
 
 namespace BABYLON {
 
-CombineAction::CombineAction(unsigned int iTriggerOptions,
-                             const std::vector<Action*>& iChildren,
+CombineAction::CombineAction(unsigned int iTriggerOptions, const std::vector<Action*>& iChildren,
                              Condition* condition)
     : Action(iTriggerOptions, condition), children{iChildren}
 {
@@ -21,9 +20,9 @@ void CombineAction::_prepare()
   }
 }
 
-void CombineAction::execute(const std::optional<IActionEvent>& evt)
+void CombineAction::execute(const IActionEventPtr& evt)
 {
-  for (auto& child : children) {
+  for (const auto& child : children) {
     child->execute(evt);
   }
 }

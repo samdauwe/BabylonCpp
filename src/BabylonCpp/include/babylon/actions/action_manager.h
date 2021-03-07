@@ -206,8 +206,7 @@ public:
    * @param trigger defines the trigger to process
    * @param evt defines the event details to be processed
    */
-  void processTrigger(unsigned int trigger,
-                      const std::optional<IActionEvent>& evt = std::nullopt) override;
+  void processTrigger(unsigned int trigger, const IActionEventPtr& evt = nullptr) override;
 
   /** hidden */
   [[nodiscard]] IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,

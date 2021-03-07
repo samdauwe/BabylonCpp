@@ -6,8 +6,7 @@
 namespace BABYLON {
 
 ActionEvent::ActionEvent(const AbstractMeshPtr& iSource, int iPointerX, int iPointerY,
-                         const AbstractMeshPtr& iMeshUnderPointer,
-                         const std::optional<Event>& iSourceEvent,
+                         const AbstractMeshPtr& iMeshUnderPointer, const IEventPtr& iSourceEvent,
                          const std::optional<PickingInfo>& /*iAdditionalData*/)
     : IActionEvent{iSource,           iPointerX,    iPointerY,
                    iMeshUnderPointer, iSourceEvent, /*iAdditionalData*/ ""}
@@ -24,7 +23,7 @@ ActionEvent& ActionEvent::operator=(ActionEvent&& other) = default;
 
 ActionEvent::~ActionEvent() = default;
 
-ActionEvent ActionEvent::CreateNew(const AbstractMeshPtr& iSource, const std::optional<Event>& evt,
+ActionEvent ActionEvent::CreateNew(const AbstractMeshPtr& iSource, const IEventPtr& evt,
                                    const std::optional<PickingInfo>& iAdditionalData)
 {
   auto scene = iSource->getScene();
@@ -33,7 +32,7 @@ ActionEvent ActionEvent::CreateNew(const AbstractMeshPtr& iSource, const std::op
 }
 
 ActionEvent ActionEvent::CreateNewFromSprite(const SpritePtr& iSource, Scene* scene,
-                                             const Event& evt)
+                                             const IEventPtr& evt)
 {
   ActionEvent actionEvent(nullptr, scene->pointerX(), scene->pointerY(), scene->meshUnderPointer(),
                           evt);
@@ -41,13 +40,13 @@ ActionEvent ActionEvent::CreateNewFromSprite(const SpritePtr& iSource, Scene* sc
   return actionEvent;
 }
 
-ActionEvent ActionEvent::CreateNewFromScene(Scene* scene, const Event& evt)
+ActionEvent ActionEvent::CreateNewFromScene(Scene* scene, const IEventPtr& evt)
 {
   return ActionEvent(nullptr, scene->pointerX(), scene->pointerY(), scene->meshUnderPointer(), evt);
 }
 
 ActionEvent ActionEvent::CreateNewFromPrimitive(const AbstractMeshPtr& prim,
-                                                const Vector2& pointerPos, const Event& evt,
+                                                const Vector2& pointerPos, const IEventPtr& evt,
                                                 const std::optional<PickingInfo>& iAdditionalData)
 {
   return ActionEvent(prim, static_cast<int>(pointerPos.x), static_cast<int>(pointerPos.y), nullptr,

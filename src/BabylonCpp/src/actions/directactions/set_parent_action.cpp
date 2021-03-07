@@ -18,7 +18,7 @@ void SetParentAction::_prepare()
 {
 }
 
-void SetParentAction::execute(const std::optional<IActionEvent>& /*evt*/)
+void SetParentAction::execute(const IActionEventPtr& /*evt*/)
 {
   // if (_target->parent() == _parent) {
   //  return;

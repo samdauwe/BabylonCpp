@@ -20,20 +20,20 @@ public:
    * @param condition defines the trigger related conditions
    */
   ExecuteCodeAction(unsigned int triggerOptions,
-                    const std::function<void(const std::optional<IActionEvent>& evt)>& func,
+                    const std::function<void(const IActionEventPtr& evt)>& func,
                     Condition* condition = nullptr);
   ~ExecuteCodeAction() override; // = default
 
   /**
    * @brief Execute the action and run the attached code.
    */
-  void execute(const std::optional<IActionEvent>& evt) override;
+  void execute(const IActionEventPtr& evt) override;
 
 public:
   /**
    * The callback function to run.
    */
-  std::function<void(const std::optional<IActionEvent>& evt)> func;
+  std::function<void(const IActionEventPtr& evt)> func;
 
 }; // end of class ExecuteCodeAction
 

@@ -35,7 +35,7 @@ public:
   /**
    * @brief Execute the action and increment the target of the value amount.
    */
-  void execute(const std::optional<IActionEvent>& evt) override;
+  void execute(const IActionEventPtr& evt) override;
 
   /**
    * @brief Serializes the actions and its related information.

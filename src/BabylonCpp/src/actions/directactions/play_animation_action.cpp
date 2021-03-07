@@ -22,7 +22,7 @@ void PlayAnimationAction::_prepare()
 {
 }
 
-void PlayAnimationAction::execute(const std::optional<IActionEvent>& /*evt*/)
+void PlayAnimationAction::execute(const IActionEventPtr& /*evt*/)
 {
   auto scene = _actionManager->getScene();
   scene->beginAnimation(_target, from, to, loop);

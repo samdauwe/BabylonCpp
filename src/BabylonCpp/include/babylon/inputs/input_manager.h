@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/events/pointer_info_pre.h>
@@ -14,10 +15,10 @@
 
 namespace BABYLON {
 
-class AbstractActionManager;
 class Engine;
 class Scene;
-using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
+FWD_CLASS_SPTR(AbstractActionManager)
+FWD_STRUCT_SPTR(IPointerEvent)
 
 /**
  * @brief Class used to manage all inputs for the scene.
@@ -172,8 +173,8 @@ private:
   void _setRayOnPointerInfo(PointerInfo& pointerInfo);
   bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt, PointerEventTypes type);
-  void _processPointerDown(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
-  void _processPointerUp(std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
+  void _processPointerDown(std::optional<PickingInfo>& pickResult, const IPointerEventPtr& evt);
+  void _processPointerUp(std::optional<PickingInfo>& pickResult, const IPointerEventPtr& evt,
                          const ClickInfo& clickInfo);
 
 public:

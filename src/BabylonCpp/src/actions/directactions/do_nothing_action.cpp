@@ -11,7 +11,7 @@ DoNothingAction::DoNothingAction(unsigned int iTtriggerOptions, Condition* condi
 
 DoNothingAction::~DoNothingAction() = default;
 
-void DoNothingAction::execute(const std::optional<IActionEvent>& /*evt*/)
+void DoNothingAction::execute(const IActionEventPtr& /*evt*/)
 {
 }
 

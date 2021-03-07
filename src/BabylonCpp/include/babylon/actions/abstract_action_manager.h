@@ -18,8 +18,8 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-struct IActionEvent;
 FWD_STRUCT_SPTR(IAction)
+FWD_STRUCT_SPTR(IActionEvent)
 
 /**
  * @brief Abstract class used to decouple action Manager from scene and meshes.
@@ -42,9 +42,7 @@ public:
    * @param trigger defines the trigger to process
    * @param evt defines the event details to be processed
    */
-  virtual void processTrigger(unsigned int trigger,
-                              const std::optional<IActionEvent>& evt = std::nullopt)
-    = 0;
+  virtual void processTrigger(unsigned int trigger, const IActionEventPtr& evt = nullptr) = 0;
 
   /**
    * @brief Does this action manager handles actions of any of the given triggers.

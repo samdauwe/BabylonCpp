@@ -7,6 +7,8 @@
 
 namespace BABYLON {
 
+struct IEvent;
+
 /**
  * @brief ActionEvent is the event being sent when an action is triggered.
  */
@@ -23,7 +25,7 @@ public:
    * @param additionalData additional data for the event
    */
   ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-              const AbstractMeshPtr& meshUnderPointer, const std::optional<Event>& sourceEvent,
+              const AbstractMeshPtr& meshUnderPointer, const IEventPtr& sourceEvent,
               const std::optional<PickingInfo>& additionalData = std::nullopt);
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
@@ -38,8 +40,7 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNew(const AbstractMeshPtr& source,
-                               const std::optional<Event>& evt                  = std::nullopt,
+  static ActionEvent CreateNew(const AbstractMeshPtr& source, const IEventPtr& evt = nullptr,
                                const std::optional<PickingInfo>& additionalData = std::nullopt);
 
   /**
@@ -50,7 +51,8 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNewFromSprite(const SpritePtr& source, Scene* scene, const Event& evt);
+  static ActionEvent CreateNewFromSprite(const SpritePtr& source, Scene* scene,
+                                         const IEventPtr& evt = nullptr);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a scene. If triggered by a mesh use
@@ -59,7 +61,7 @@ public:
    * @param evt The original (browser) event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNewFromScene(Scene* scene, const Event& evt);
+  static ActionEvent CreateNewFromScene(Scene* scene, const IEventPtr& evt);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a primitive.
@@ -69,9 +71,10 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent
-  CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos, const Event& evt,
-                         const std::optional<PickingInfo>& additionalData = std::nullopt);
+  static ActionEvent CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
+                                            const IEventPtr& evt,
+                                            const std::optional<PickingInfo>& additionalData
+                                            = std::nullopt);
 
 }; // end of class ActionEvent
 

@@ -42,7 +42,7 @@ void Action::setTriggerParameter(const std::string& value)
   _triggerParameter = value;
 }
 
-void Action::_executeCurrent(const std::optional<IActionEvent>& evt)
+void Action::_executeCurrent(const IActionEventPtr& evt)
 {
   if (_nextActiveAction->_condition) {
     auto condition       = _nextActiveAction->_condition;
@@ -72,7 +72,7 @@ void Action::_executeCurrent(const std::optional<IActionEvent>& evt)
   skipToNextActiveAction();
 }
 
-void Action::execute(const std::optional<IActionEvent>& /*evt*/)
+void Action::execute(const IActionEventPtr& /*evt*/)
 {
 }
 
