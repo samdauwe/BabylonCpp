@@ -1593,7 +1593,7 @@ public:
   /**
    * @brief Enables physics to the current scene.
    * @param gravity defines the scene's gravity for the physics engine
-   * @param plugin defines the physics engine to be used. defaults to OimoJS.
+   * @param plugin defines the physics engine to be used. defaults to CannonJS.
    * @return a boolean indicating if the physics engine was initialized
    */
   bool enablePhysics(const std::optional<Vector3>& gravity = std::nullopt,
