@@ -34,11 +34,12 @@ void FreeCameraMouseInput::attachControl(bool noPreventDefault)
     _pointerInput = [this](PointerInfo* p, EventState&) -> void {
       auto& evt = p->pointerEvent;
 
-      if (!touchEnabled && evt.pointerType == PointerType::TOUCH) {
+      if (!touchEnabled && evt.pointerType == "touch") {
         return;
       }
 
-      if (p->type != PointerEventTypes::POINTERMOVE && evt.button == MouseButtonType::UNDEFINED) {
+      if (p->type != PointerEventTypes::POINTERMOVE
+          && evt.button == static_cast<int>(MouseButtonType::UNDEFINED)) {
         return;
       }
 
@@ -115,7 +116,7 @@ void FreeCameraMouseInput::attachControl(bool noPreventDefault)
     };
   }
 
-  _onMouseMove = [this](MouseEvent& evt) -> void {
+  _onMouseMove = [this](IMouseEvent& evt) -> void {
     if (!_engine->isPointerLock) {
       return;
     }

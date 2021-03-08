@@ -292,7 +292,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
 // Controls
 void Camera::attachControl(bool /*noPreventDefault*/, bool /*useCtrlForPanning*/,
-                           MouseButtonType /*panningMouseButton*/)
+                           int /*panningMouseButton*/)
 {
 }
 

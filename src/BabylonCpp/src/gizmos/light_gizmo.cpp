@@ -43,7 +43,7 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
 
       const auto childMeshes = _rootMesh->getChildMeshes();
       _isHovered = (stl_util::index_of(childMeshes, pointerInfo->pickInfo.pickedMesh) != -1);
-      if (_isHovered && pointerInfo->pointerEvent.button == MouseButtonType::LEFT) {
+      if (_isHovered && pointerInfo->pointerEvent.button == 0) {
         onClickedObservable.notifyObservers(_light.get());
       }
     },

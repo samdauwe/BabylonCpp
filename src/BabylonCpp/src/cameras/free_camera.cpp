@@ -229,7 +229,7 @@ void FreeCamera::set_keysRight(const Int32Array& value)
 
 /** Controls **/
 void FreeCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
-                               MouseButtonType /*panningMouseButton*/)
+                               int /*panningMouseButton*/)
 {
   inputs->attachElement(noPreventDefault);
 }

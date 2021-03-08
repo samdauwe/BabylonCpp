@@ -43,7 +43,7 @@ public:
    * (https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)
    */
   void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
+                     int panningMouseButton = 2) override;
 
   /**
    * @brief Detach the current controls from the specified dom element.

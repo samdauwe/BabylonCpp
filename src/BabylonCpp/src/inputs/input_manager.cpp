@@ -168,9 +168,11 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
     }
 
     if (scene.onPointerObservable.hasObservers()) {
+#if 0
       PointerInfo pi(type, *static_cast<MouseWheelEvent const*>(&evt), *pickResult);
       _setRayOnPointerInfo(pi);
       scene.onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
     }
   }
 }
@@ -195,9 +197,11 @@ void InputManager::_setRayOnPointerInfo(PointerInfo& pointerInfo)
   }
 }
 
-bool InputManager::_checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
-                                              const PointerEvent& evt, PointerEventTypes type)
+bool InputManager::_checkPrePointerObservable(const std::optional<PickingInfo>& /*pickResult*/,
+                                              const PointerEvent& /*evt*/,
+                                              PointerEventTypes /*type*/)
 {
+#if 0
   auto& scene = *_scene;
   PointerInfoPre pi(type, evt, static_cast<float>(_unTranslatedPointerX),
                     static_cast<float>(_unTranslatedPointerY));
@@ -206,6 +210,9 @@ bool InputManager::_checkPrePointerObservable(const std::optional<PickingInfo>& 
   }
   scene.onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
   return pi.skipOnPointerObservable;
+#else
+  return false;
+#endif
 }
 
 void InputManager::simulatePointerMove(std::optional<PickingInfo>& pickResult)

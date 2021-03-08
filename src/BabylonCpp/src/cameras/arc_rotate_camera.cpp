@@ -296,7 +296,7 @@ bool ArcRotateCamera::_isSynchronizedViewMatrix()
 }
 
 void ArcRotateCamera::attachControl(bool noPreventDefault, bool useCtrlForPanning,
-                                    MouseButtonType panningMouseButton)
+                                    int panningMouseButton)
 {
   _useCtrlForPanning  = useCtrlForPanning;
   _panningMouseButton = panningMouseButton;

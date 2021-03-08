@@ -86,7 +86,7 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
 }
 
 void FollowCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
-                                 MouseButtonType /*panningMouseButton*/
+                                 int /*panningMouseButton*/
 )
 {
   inputs->attachElement(noPreventDefault);

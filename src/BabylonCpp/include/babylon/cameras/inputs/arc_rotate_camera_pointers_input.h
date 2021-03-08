@@ -53,13 +53,13 @@ public:
    * @brief Called each time a new POINTERDOWN event occurs. Ie, for each button press.
    * Override this method to provide functionality.
    */
-  void onButtonDown(PointerEvent& evt) override;
+  void onButtonDown(IPointerEvent& evt) override;
 
   /**
    * @brief Called each time a new POINTERUP event occurs. Ie, for each button release.
    * Override this method to provide functionality.
    */
-  void onButtonUp(PointerEvent& evt) override;
+  void onButtonUp(IPointerEvent& evt) override;
 
   /**
    * @brief Called when window becomes inactive.

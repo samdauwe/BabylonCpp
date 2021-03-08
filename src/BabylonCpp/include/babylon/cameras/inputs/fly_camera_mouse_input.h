@@ -84,7 +84,7 @@ public:
   /**
    * Defines the buttons associated with the input to handle camera move.
    */
-  std::array<MouseButtonType, 3> buttons;
+  std::array<int, 3> buttons;
 
   /**
    * Assign buttons for Yaw control.

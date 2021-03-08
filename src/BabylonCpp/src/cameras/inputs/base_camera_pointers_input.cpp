@@ -10,7 +10,7 @@ namespace BABYLON {
 
 template <class TCamera>
 BaseCameraPointersInput<TCamera>::BaseCameraPointersInput()
-    : buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE, MouseButtonType::RIGHT}}
+    : buttons{{0, 1, 2}}
     , _altKey{false}
     , _ctrlKey{false}
     , _metaKey{false}
@@ -59,11 +59,11 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
   _ctrlKey        = false;
   _metaKey        = false;
   _shiftKey       = false;
-  _buttonsPressed = MouseButtonType::LEFT;
+  _buttonsPressed = 0;
 
   _pointerInput = [this](PointerInfo* p, EventState& /*es*/) -> void {
     auto& evt    = p->pointerEvent;
-    auto isTouch = evt.pointerType == PointerType::TOUCH;
+    auto isTouch = evt.pointerType == "touch";
 
     if (p->type != PointerEventTypes::POINTERMOVE
         && (std::find(buttons.begin(), buttons.end(), evt.button) == buttons.end())) {
@@ -76,11 +76,11 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
     _ctrlKey        = evt.ctrlKey;
     _metaKey        = evt.metaKey;
     _shiftKey       = evt.shiftKey;
-    _buttonsPressed = evt.button;
+    _buttonsPressed = evt.buttons;
 
     if (_engine->isPointerLock) {
-      auto offsetX = evt.movementX;
-      auto offsetY = evt.movementY;
+      const auto offsetX = evt.movementX;
+      const auto offsetY = evt.movementY;
 
       onTouch(std::nullopt, offsetX, offsetY);
       pointA = std::nullopt;
@@ -177,8 +177,8 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
 
       // One button down
       if (pointA && !pointB) {
-        auto offsetX = evt.clientX - pointA->x;
-        auto offsetY = evt.clientY - pointA->y;
+        const auto offsetX = evt.clientX - pointA->x;
+        const auto offsetY = evt.clientY - pointA->y;
         onTouch(pointA, offsetX, offsetY);
 
         pointA->x = evt.clientX;
@@ -252,7 +252,7 @@ void BaseCameraPointersInput<TCamera>::detachControl(ICanvas* /*ignored*/)
   _ctrlKey        = false;
   _metaKey        = false;
   _shiftKey       = false;
-  _buttonsPressed = MouseButtonType::LEFT;
+  _buttonsPressed = 0;
 }
 
 template <class TCamera>
@@ -287,12 +287,12 @@ void BaseCameraPointersInput<TCamera>::onContextMenu(PointerEvent& evt)
 }
 
 template <class TCamera>
-void BaseCameraPointersInput<TCamera>::onButtonDown(PointerEvent& /*evt*/)
+void BaseCameraPointersInput<TCamera>::onButtonDown(IPointerEvent& /*evt*/)
 {
 }
 
 template <class TCamera>
-void BaseCameraPointersInput<TCamera>::onButtonUp(PointerEvent& /*evt*/)
+void BaseCameraPointersInput<TCamera>::onButtonUp(IPointerEvent& /*evt*/)
 {
 }
 

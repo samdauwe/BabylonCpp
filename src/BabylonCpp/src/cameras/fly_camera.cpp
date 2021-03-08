@@ -206,7 +206,7 @@ void FlyCamera::set_keysRight(const Int32Array& value)
 }
 
 void FlyCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
-                              MouseButtonType /*panningMouseButton*/)
+                              int /*panningMouseButton*/)
 {
   inputs->attachElement(noPreventDefault);
 }

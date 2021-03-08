@@ -35,7 +35,7 @@ void FreeCameraTouchInput::attachControl(bool iNoPreventDefault)
     _pointerInput = [this](PointerInfo* p, EventState& /*es*/) -> void {
       auto& evt = p->pointerEvent;
 
-      if (!allowMouse && evt.pointerType == PointerType::MOUSE) {
+      if (!allowMouse && evt.pointerType == "mouse") {
         return;
       }
 

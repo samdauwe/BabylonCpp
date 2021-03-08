@@ -10,6 +10,7 @@
 
 namespace BABYLON {
 
+struct IPointerEvent;
 class PickingInfo;
 class PointerInfo;
 class PointerInfoPre;
@@ -87,7 +88,7 @@ protected:
 
 private:
   void _notifyObservers(const PointerInfoPre& prePointerInfo, const PickingInfo& pickInfo,
-                        const PointerEvent& pointerEvent);
+                        const IPointerEvent& pointerEvent);
   void _updateCamera();
 
 public:

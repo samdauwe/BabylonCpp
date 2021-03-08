@@ -142,7 +142,7 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
             && pointerId != PointerDragBehavior::_AnyMouseID) {
           const auto& evt = pointerInfo->pointerEvent;
           const auto isMouseEvent
-            = evt.pointerType == PointerType::MOUSE
+            = evt.pointerType == "mouse"
               || (!_scene->getEngine()->hostInformation.isMobile /* && evt instanceof MouseEvent*/);
           if (isMouseEvent) {
             if (stl_util::contains(_lastPointerRay, currentDraggingPointerID)) {

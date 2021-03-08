@@ -91,7 +91,7 @@ public:
    * @param panningMouseButton Defines whether panning is allowed through mouse click button
    */
   void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
-                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
+                     int panningMouseButton = 2) override;
 
   /**
    * @brief Detach the current controls from the specified dom element.
@@ -403,7 +403,7 @@ public:
   /**
    * Hidden
    */
-  MouseButtonType _panningMouseButton;
+  int _panningMouseButton;
 
   /**
    * Defines the input associated to the camera.

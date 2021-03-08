@@ -1136,12 +1136,13 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const 
     }
 
     if (onPointerObservable.hasObservers()) {
+#if 0
       auto iType = evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL ?
                      PointerEventTypes::POINTERWHEEL :
                      PointerEventTypes::POINTERMOVE;
 
       if (iType == PointerEventTypes::POINTERWHEEL) {
-        PointerInfo pi(iType, *static_cast<MouseWheelEvent const*>(&evt), *pickResult);
+        PointerInfo pi(iType, *static_cast<IMouseWheelEvent const*>(&evt), *pickResult);
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
@@ -1150,15 +1151,17 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const 
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
+#endif
     }
   }
 
   return *this;
 }
 
-bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
-                                       const PointerEvent& evt, PointerEventTypes type)
+bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& /*pickResult*/,
+                                       const PointerEvent& /*evt*/, PointerEventTypes /*type*/)
 {
+#if 0
   PointerInfoPre pi(type, evt, static_cast<float>(_unTranslatedPointerX),
                     static_cast<float>(_unTranslatedPointerY));
   if (pickResult) {
@@ -1166,6 +1169,9 @@ bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& pickRes
   }
   onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
   return pi.skipOnPointerObservable;
+#else
+  return false;
+#endif
 }
 
 Scene& Scene::simulatePointerDown(std::optional<PickingInfo>& pickResult)
@@ -1257,9 +1263,11 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult, const 
     }
 
     if (onPointerObservable.hasObservers()) {
+#if 0
       PointerInfo pi(type, evt, *pickResult);
       _setRayOnPointerInfo(pi);
       onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
     }
   }
 
@@ -1291,10 +1299,12 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         onPointerPick(evt, pickResult);
       }
       if (clickInfo.singleClick() && !clickInfo.ignore() && onPointerObservable.hasObservers()) {
+#if 0
         auto type = PointerEventTypes::POINTERPICK;
         PointerInfo pi(type, evt, *pickResult);
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
       }
     }
     if (_pickedUpMesh->actionManager) {
@@ -1337,7 +1347,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       ActionEvent::CreateNew(_pickedDownMesh, evt));
 #endif
   }
-
+#if 0
   auto type = PointerEventTypes::POINTERUP;
   if (onPointerObservable.hasObservers()) {
     if (!clickInfo.ignore()) {
@@ -1371,7 +1381,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
   if (onPointerUp) {
     onPointerUp(evt, pickResult, type);
   }
-
+#endif
   return *this;
 }
 
@@ -5579,8 +5589,8 @@ void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
 {
   // Multiview is only able to be displayed directly for API's such as webXR
   // This displays a multiview image by rendering to the multiview image and then
-  // copying the result into the sub cameras instead of rendering them and proceeding as normal from
-  // there
+  // copying the result into the sub cameras instead of rendering them and proceeding as normal
+  // from there
 
   // Render to a multiview texture
   camera->_resizeOrCreateMultiviewTexture(

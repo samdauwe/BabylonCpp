@@ -264,7 +264,7 @@ HemisphericLightPtr& UtilityLayerRenderer::_getSharedGizmoLight()
 
 void UtilityLayerRenderer::_notifyObservers(const PointerInfoPre& prePointerInfo,
                                             const PickingInfo& pickInfo,
-                                            const PointerEvent& pointerEvent)
+                                            const IPointerEvent& pointerEvent)
 {
   if (!prePointerInfo.skipOnPointerObservable) {
     PointerInfo pointerInfo(prePointerInfo.type, prePointerInfo.pointerEvent, pickInfo);

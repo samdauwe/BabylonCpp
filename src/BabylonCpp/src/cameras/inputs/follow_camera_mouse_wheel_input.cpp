@@ -34,7 +34,7 @@ void FollowCameraMouseWheelInput::attachControl(bool noPreventDefault)
     // Chrome, Safari: event.deltaY
     // IE: event.wheelDelta
     // Firefox: event.detail (inverted)
-    auto wheelDelta = std::max(-1.f, std::min(1.f, event.wheelDelta));
+    auto wheelDelta = std::max(-1.f, std::min(1.f, static_cast<float>(event.deltaY)));
     if (wheelDeltaPercentage != 0.f) {
       if (axisControlRadius) {
         delta = wheelDelta * 0.01f * wheelDeltaPercentage * camera->radius;

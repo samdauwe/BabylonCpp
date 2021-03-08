@@ -134,12 +134,12 @@ void ArcRotateCameraPointersInput::onMultiTouch(
   }
 }
 
-void ArcRotateCameraPointersInput::onButtonDown(PointerEvent& evt)
+void ArcRotateCameraPointersInput::onButtonDown(IPointerEvent& evt)
 {
   _isPanClick = evt.button == camera->_panningMouseButton;
 }
 
-void ArcRotateCameraPointersInput::onButtonUp(PointerEvent& /*evt*/)
+void ArcRotateCameraPointersInput::onButtonUp(IPointerEvent& /*evt*/)
 {
   _twoFingerActivityCount = 0;
   _isPinching             = false;

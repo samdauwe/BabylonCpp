@@ -98,7 +98,7 @@ private:
   ICanvas* _canvas;
   Engine* _engine;
   std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
-  std::function<void(MouseEvent& e)> _onMouseMove;
+  std::function<void(IMouseEvent& e)> _onMouseMove;
   Observer<PointerInfo>::Ptr _observer;
   std::optional<PositionCoord> previousPosition;
   bool _noPreventDefault;
