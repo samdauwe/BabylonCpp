@@ -24,8 +24,8 @@ public:
    * @param event Defines the related dom event
    * @param pickInfo Defines the picking info associated to the info (if any)\
    */
-  PointerInfo(PointerEventTypes type, const PointerEvent& event, const PickingInfo& pickInfo);
-  PointerInfo(PointerEventTypes type, const MouseWheelEvent& event, const PickingInfo& pickInfo);
+  PointerInfo(PointerEventTypes type, const IPointerEvent& event, const PickingInfo& pickInfo);
+  PointerInfo(PointerEventTypes type, const IWheelEvent& event, const PickingInfo& pickInfo);
   ~PointerInfo(); // = default
 
 public:

@@ -2,7 +2,7 @@
 #define BABYLON_EVENTS_POINTER_INFO_BASE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/structs.h>
+#include <babylon/events/device_input_events.h>
 #include <babylon/events/pointer_event_types.h>
 
 namespace BABYLON {
@@ -18,8 +18,8 @@ public:
    * @param type Defines the type of event (PointerEventTypes)
    * @param event Defines the related dom event
    */
-  PointerInfoBase(PointerEventTypes type, const PointerEvent& event);
-  PointerInfoBase(PointerEventTypes type, const MouseWheelEvent& event);
+  PointerInfoBase(PointerEventTypes type, const IPointerEvent& event);
+  PointerInfoBase(PointerEventTypes type, const IWheelEvent& event);
   ~PointerInfoBase(); // = default
 
 public:
@@ -31,12 +31,12 @@ public:
   /**
    * Defines the related pointer event
    */
-  PointerEvent pointerEvent;
+  IPointerEvent pointerEvent;
 
   /**
    * Defines the related mouse event
    */
-  MouseWheelEvent mouseWheelEvent;
+  IWheelEvent mouseWheelEvent;
 
 }; // end of class PointerInfoBase
 

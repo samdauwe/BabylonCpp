@@ -5,6 +5,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info_base.h>
+#include <babylon/maths/vector2.h>
 
 namespace BABYLON {
 
@@ -24,8 +25,8 @@ public:
    * @param localX Defines the local x coordinates of the pointer when the event occured
    * @param localY Defines the local y coordinates of the pointer when the event occured
    */
-  PointerInfoPre(PointerEventTypes type, const PointerEvent& event, float localX, float localY);
-  PointerInfoPre(PointerEventTypes type, const MouseWheelEvent& event, float localX, float localY);
+  PointerInfoPre(PointerEventTypes type, const IPointerEvent& event, float localX, float localY);
+  PointerInfoPre(PointerEventTypes type, const IWheelEvent& event, float localX, float localY);
   ~PointerInfoPre(); // = default
 
 public:
