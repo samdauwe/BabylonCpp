@@ -273,7 +273,7 @@ struct PointerTouch {
   int x                   = 0;
   int y                   = 0;
   int pointerId           = 0;
-  PointerType pointerType = PointerType::UNDEFINED;
+  std::string pointerType = "";
   bool isPaning           = false;
   bool isPinching         = false;
 }; // end of struct PointerTouch
