@@ -31,6 +31,9 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
     , fixedDragMeshBoundsSize{false}
     , fixedDragMeshScreenSizeDistanceFactor{10.f}
     , scalePivot{std::nullopt}
+    , axisFactor{this, &BoundingBoxGizmo::get_axisFactor, &BoundingBoxGizmo::set_axisFactor}
+    , scaleDragSpeed{this, &BoundingBoxGizmo::get_scaleDragSpeed,
+                     &BoundingBoxGizmo::set_scaleDragSpeed}
     , _lineBoundingBox{nullptr}
     , _rotateSpheresParent{nullptr}
     , _scaleBoxesParent{nullptr}
@@ -39,6 +42,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
     , _pointerObserver{nullptr}
     , _scaleDragSpeed{0.2f}
     , _tmpVector{Vector3{0.f, 0.f, 0.f}}
+    , _axisFactor{Vector3(1.f, 1.f, 1.f)}
     , _anchorMesh{nullptr}
     , _dragMesh{nullptr}
     , pointerDragBehavior{std::make_unique<PointerDragBehavior>()}
@@ -259,6 +263,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
               deltaScale.z *= std::abs(dragAxis.z);
             }
             deltaScale.scaleInPlace(_scaleDragSpeed);
+            deltaScale.multiplyInPlace(_axisFactor);
             updateBoundingBox();
             if (scalePivot) {
               attachedMesh()->getWorldMatrix().getRotationMatrixToRef(_tmpRotationMatrix);
@@ -358,6 +363,45 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
 }
 
 BoundingBoxGizmo::~BoundingBoxGizmo() = default;
+
+void BoundingBoxGizmo::set_axisFactor(const Vector3& factor)
+{
+  _axisFactor = factor;
+  // update scale cube visibility
+  const auto scaleBoxes = _scaleBoxesParent->getChildMeshes();
+  size_t index          = 0;
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < 3; ++j) {
+      for (size_t k = 0; k < 3; ++k) {
+        auto zeroAxisCount = ((i == 1) ? 1 : 0) + ((j == 1) ? 1 : 0) + ((k == 1) ? 1 : 0);
+        if (zeroAxisCount == 1 || zeroAxisCount == 3) {
+          continue;
+        }
+        if (index < scaleBoxes.size() && scaleBoxes[index]) {
+          Vector3 dragAxis(i - 1, j - 1, k - 1);
+          dragAxis.multiplyInPlace(_axisFactor);
+          scaleBoxes[index]->setEnabled(dragAxis.lengthSquared() > Math::Epsilon);
+        }
+        ++index;
+      }
+    }
+  }
+}
+
+Vector3& BoundingBoxGizmo::get_axisFactor()
+{
+  return _axisFactor;
+}
+
+void BoundingBoxGizmo::set_scaleDragSpeed(float value)
+{
+  _scaleDragSpeed = value;
+}
+
+float BoundingBoxGizmo::get_scaleDragSpeed() const
+{
+  return _scaleDragSpeed;
+}
 
 void BoundingBoxGizmo::setColor(const Color3& color)
 {

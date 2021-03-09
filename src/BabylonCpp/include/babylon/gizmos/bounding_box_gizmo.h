@@ -153,6 +153,39 @@ public:
    * from the opposite corner. 0.5,0.5,0.5 for center and 0.5,0,0.5 for bottom (Default: null)
    */
   std::optional<Vector3> scalePivot;
+  /**
+   * Gets or sets the axis factor
+   */
+  Property<BoundingBoxGizmo, Vector3> axisFactor;
+  /**
+   * Gets or sets the scale drag speed
+   */
+  Property<BoundingBoxGizmo, float> scaleDragSpeed;
+
+protected:
+  /**
+   * @brief Sets the axis factor.
+   * @param factor the Vector3 value
+   */
+  void set_axisFactor(const Vector3& factor);
+
+  /**
+   * @brief Gets the axis factor.
+   * @returns the Vector3 factor value
+   */
+  Vector3& get_axisFactor();
+
+  /**
+   * @brief Gets the scale drag speed
+   * @returns the scale speed number
+   */
+  float get_scaleDragSpeed() const;
+
+  /**
+   * @brief Sets the scale drag speed value.
+   * @param value the new speed value
+   */
+  void set_scaleDragSpeed(float value);
 
 private:
   AbstractMeshPtr _lineBoundingBox;
@@ -166,6 +199,11 @@ private:
   Quaternion _tmpQuaternion;
   Vector3 _tmpVector;
   Matrix _tmpRotationMatrix;
+
+  /**
+   * Scale factor used for masking some axis
+   */
+  Vector3 _axisFactor;
 
   /**
    * Mesh used as a pivot to rotate the attached node
