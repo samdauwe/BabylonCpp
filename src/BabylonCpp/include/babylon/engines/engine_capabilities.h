@@ -118,6 +118,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /** In some iOS + WebGL1, gl_InstanceID (and gl_InstanceIDEXT) is undefined even if
    * instancedArrays is true. So don't use gl_InstanceID in those cases */
   bool canUseGLInstanceID;
+  /** Defines if gl_vertexID is available */
+  bool canUseGLVertexID;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON
