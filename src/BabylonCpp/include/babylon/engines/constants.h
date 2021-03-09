@@ -573,6 +573,36 @@ struct BABYLON_SHARED_EXPORT Constants {
    * Prefixes used by the engine for custom effects
    */
   static constexpr const char* CUSTOMEFFECT_PREFIX_SHADOWGENERATOR = "bjs_shadowgenerator_";
+
+  /**
+   * Constant used as key code for Alt key
+   */
+  static constexpr unsigned int INPUT_ALT_KEY = 18;
+
+  /**
+   * Constant used as key code for Ctrl key
+   */
+  static constexpr unsigned int INPUT_CTRL_KEY = 17;
+
+  /**
+   * Constant used as key code for Meta key (Left Win, Left Cmd)
+   */
+  static constexpr unsigned int INPUT_META_KEY1 = 91;
+
+  /**
+   * Constant used as key code for Meta key (Right Win)
+   */
+  static constexpr unsigned int INPUT_META_KEY2 = 92;
+
+  /**
+   * Constant used as key code for Meta key (Right Win, Right Cmd)
+   */
+  static constexpr unsigned int INPUT_META_KEY3 = 93;
+
+  /**
+   * Constant used as key code for Shift key
+   */
+  static constexpr unsigned int INPUT_SHIFT_KEY = 16;
 }; // end of struct Constants
 
 } // end of namespace BABYLON
