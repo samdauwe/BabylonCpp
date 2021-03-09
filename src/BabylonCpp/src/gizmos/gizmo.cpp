@@ -209,6 +209,7 @@ void Gizmo::_matrixChanged()
       targetCamera->rotation = _tempQuaternion->toEulerAngles();
       if (targetCamera->rotationQuaternion) {
         targetCamera->rotationQuaternion->copyFrom(*_tempQuaternion);
+        targetCamera->rotationQuaternion->normalize();
       }
     }
 
@@ -239,10 +240,10 @@ void Gizmo::_matrixChanged()
       transform->scaling  = *iScaling;
       transform->position = *iPosition;
     }
-
     if (!transform->billboardMode()) {
       if (transform->rotationQuaternion()) {
         transform->rotationQuaternion()->copyFrom(*_tempQuaternion);
+        transform->rotationQuaternion()->normalize();
       }
       else {
         transform->rotation = _tempQuaternion->toEulerAngles();
