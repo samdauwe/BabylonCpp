@@ -1,6 +1,8 @@
 #ifndef BABYLON_GIZMOS_GIZMO_H
 #define BABYLON_GIZMOS_GIZMO_H
 
+#include <unordered_map>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/events/pointer_info.h>
