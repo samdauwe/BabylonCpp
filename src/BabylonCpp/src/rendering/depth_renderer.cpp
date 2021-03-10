@@ -9,6 +9,7 @@
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/color4.h>
@@ -163,6 +164,10 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
       defines.emplace_back("#define MORPHTARGETS");
       defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numMorphInfluencers));
 
+      if (morphTargetManager->isUsingTextureForTargets()) {
+        defines.emplace_back("#define MORPHTARGETS_TEXTURE");
+      }
+
       MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
         attribs, mesh.get(), static_cast<unsigned>(numMorphInfluencers));
     }
@@ -194,9 +199,15 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
     IEffectCreationOptions options;
     options.attributes    = std::move(attribs);
-    options.uniformsNames = {"world",         "mBones",      "viewProjection",
-                             "diffuseMatrix", "depthValues", "morphTargetInfluences"};
-    options.samplers      = {"diffuseSampler"};
+    options.uniformsNames = {"world",
+                             "mBones",
+                             "viewProjection",
+                             "diffuseMatrix",
+                             "depthValues",
+                             "morphTargetInfluences",
+                             "morphTargetTextureInfo",
+                             "morphTargetTextureIndices"};
+    options.samplers      = {"diffuseSampler", "morphTargets"};
     options.defines       = std::move(join);
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
@@ -239,7 +250,7 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
            && !batch->visibleInstances[subMesh->_id].empty()))
       || renderingMesh->hasThinInstances();
 
-  auto camera = (!_camera) ? _camera : scene->activeCamera;
+  auto camera = (!_camera) ? _camera : scene->activeCamera();
   if (isReady(subMesh, hardwareInstancedRendering) && camera) {
     subMesh->_renderId = scene->getRenderId();
 
@@ -247,6 +258,7 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
     renderingMesh->_bind(subMesh, _effect, material->fillMode());
 
     _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
+    _effect->setMatrix("world", effectiveMesh->getWorldMatrix());
 
     _effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
 
@@ -262,12 +274,28 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
     // Bones
     if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
         && renderingMesh->skeleton()) {
-      _effect->setMatrices("mBones",
-                           renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
+      const auto& skeleton = renderingMesh->skeleton();
+
+      if (skeleton->isUsingTextureForMatrices()) {
+        const auto boneTexture = skeleton->getTransformMatrixTexture(renderingMesh.get());
+        if (!boneTexture) {
+          return;
+        }
+
+        _effect->setTexture("boneSampler", boneTexture);
+        _effect->setFloat("boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
+      }
+      else {
+        _effect->setMatrices("mBones", skeleton->getTransformMatrices(renderingMesh.get()));
+      }
     }
 
     // Morph targets
     MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
+    if (renderingMesh->morphTargetManager()
+        && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
+      renderingMesh->morphTargetManager()->_bind(_effect);
+    }
 
     // Draw
     renderingMesh->_processRendering(

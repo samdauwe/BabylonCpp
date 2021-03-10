@@ -928,6 +928,11 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
       // Morph targets
       MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), iEffect.get());
 
+      if (renderingMesh->morphTargetManager()
+          && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
+        renderingMesh->morphTargetManager()->_bind(iEffect);
+      }
+
       // Clip planes
       MaterialHelper::BindClipPlane(iEffect, scene);
     }
@@ -1177,6 +1182,9 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
         defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(morphInfluencers));
         MaterialDefines iDefines;
         iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
+        if (manager->isUsingTextureForTargets()) {
+          defines.emplace_back("#define MORPHTARGETS_TEXTURE");
+        }
         MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(attribs, mesh.get(),
                                                                     morphInfluencers);
       }
@@ -1243,8 +1251,10 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
                                         "vClipPlane4",
                                         "vClipPlane5",
                                         "vClipPlane6",
-                                        "softTransparentShadowSM"};
-      std::vector<std::string> samplers{"diffuseSampler", "boneSampler"};
+                                        "softTransparentShadowSM",
+                                        "morphTargetTextureInfo",
+                                        "morphTargetTextureIndices"};
+      std::vector<std::string> samplers{"diffuseSampler", "boneSampler", "morphTargets"};
 
       // Custom shader?
       if (customShaderOptions) {

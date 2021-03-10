@@ -430,6 +430,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     }
     if (numInfluencers > 0ull) {
       uniforms.emplace_back("morphTargetInfluences");
+      uniforms.emplace_back("morphTargetTextureInfo");
+      uniforms.emplace_back("morphTargetTextureIndices");
     }
   }
   else {

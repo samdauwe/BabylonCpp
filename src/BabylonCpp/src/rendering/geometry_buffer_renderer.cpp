@@ -350,6 +350,9 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       defines.emplace_back("#define MORPHTARGETS");
       defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numMorphInfluencers));
 
+      if (morphTargetManager->isUsingTextureForTargets()) {
+        defines.emplace_back("#define MORPHTARGETS_TEXTURE");
+      }
       MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
         attribs, mesh.get(), static_cast<unsigned int>(numMorphInfluencers));
     }
@@ -382,8 +385,8 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       {"buffersCount", _enablePosition ? 3u : 2u}};
 
     IEffectCreationOptions options;
-    options.attributes          = std::move(attribs);
-    options.uniformsNames       = {"world",
+    options.attributes    = std::move(attribs);
+    options.uniformsNames = {"world",
                              "mBones",
                              "viewProjection",
                              "diffuseMatrix",
@@ -391,16 +394,18 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
                              "previousWorld",
                              "previousViewProjection",
                              "mPreviousBones",
-                             "morphTargetInfluences",
                              "bumpMatrix",
                              "reflectivityMatrix",
                              "vTangentSpaceParams",
-                             "vBumpInfos"};
-    options.samplers            = {"diffuseSampler", "bumpSampler", "reflectivitySampler"};
-    options.defines             = std::move(join);
-    options.onCompiled          = nullptr;
-    options.fallbacks           = nullptr;
-    options.onError             = nullptr;
+                             "vBumpInfos",
+                             "morphTargetInfluences",
+                             "morphTargetTextureInfo",
+                             "morphTargetTextureIndices"};
+    options.samplers   = {"diffuseSampler", "bumpSampler", "reflectivitySampler", "morphTargets"};
+    options.defines    = std::move(join);
+    options.onCompiled = nullptr;
+    options.fallbacks  = nullptr;
+    options.onError    = nullptr;
     options.uniformBuffersNames = {"Scene"};
     options.indexParameters
       = {{"buffersCount", static_cast<unsigned>(_multiRenderTarget->textures().size() - 1)},
@@ -694,6 +699,10 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
     // Morph targets
     MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
+    if (renderingMesh->morphTargetManager()
+        && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
+      renderingMesh->morphTargetManager()->_bind(_effect);
+    }
 
     // Velocity
     if (_enableVelocity) {

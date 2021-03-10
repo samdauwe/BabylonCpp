@@ -105,6 +105,11 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
                          renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
   }
 
+  if (renderingMesh->morphTargetManager()
+      && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
+    renderingMesh->morphTargetManager()->_bind(_effect);
+  }
+
   // Morph targets
   MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
 
@@ -185,6 +190,10 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
       defines.emplace_back("#define MORPHTARGETS");
       defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numMorphInfluencers));
 
+      if (morphTargetManager->isUsingTextureForTargets()) {
+        defines.emplace_back("#define MORPHTARGETS_TEXTURE");
+      }
+
       MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(
         attribs, mesh.get(), static_cast<unsigned int>(numMorphInfluencers));
     }
@@ -205,12 +214,19 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     IEffectCreationOptions options;
-    options.attributes = std::move(attribs);
-    options.uniformsNames
-      = {"world",  "mBones", "viewProjection",           "diffuseMatrix",
-         "offset", "color",  "logarithmicDepthConstant", "morphTargetInfluences"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
+    options.attributes    = std::move(attribs);
+    options.uniformsNames = {"world",
+                             "mBones",
+                             "viewProjection",
+                             "diffuseMatrix",
+                             "offset",
+                             "color",
+                             "logarithmicDepthConstant",
+                             "morphTargetInfluences",
+                             "morphTargetTextureInfo",
+                             "morphTargetTextureIndices"};
+    options.samplers      = {"diffuseSampler", "morphTargets"};
+    options.defines       = std::move(join);
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
