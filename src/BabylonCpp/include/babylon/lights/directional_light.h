@@ -104,6 +104,70 @@ protected:
   DirectionalLight(const std::string& name, const Vector3& direction, Scene* scene);
 
   /**
+   * @brief Fix frustum size for the shadow generation. This is disabled if the value is 0.
+   */
+  float get_shadowFrustumSize() const;
+
+  /**
+   * @brief Specifies a fix frustum size for the shadow generation.
+   */
+  void set_shadowFrustumSize(float value);
+
+  /**
+   * @brief Gets the shadow projection scale against the optimal computed one.
+   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
+   * This does not impact in fixed frustum size (shadowFrustumSize being set)
+   */
+  float get_shadowOrthoScale() const;
+
+  /**
+   * @brief Sets the shadow projection scale against the optimal computed one.
+   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
+   * This does not impact in fixed frustum size (shadowFrustumSize being set)
+   */
+  void set_shadowOrthoScale(float value);
+
+  /**
+   * @brief Gets the orthoLeft property used to build the light frustum.
+   */
+  float get_orthoLeft() const;
+
+  /**
+   * @brief Sets the orthoLeft property used to build the light frustum.
+   */
+  void set_orthoLeft(float left);
+
+  /**
+   * @brief Gets the orthoRight property used to build the light frustum.
+   */
+  float get_orthoRight() const;
+
+  /**
+   * @brief Sets the orthoRight property used to build the light frustum.
+   */
+  void set_orthoRight(float right);
+
+  /**
+   * @brief Gets the orthoTop property used to build the light frustum.
+   */
+  float get_orthoTop() const;
+
+  /**
+   * @brief Sets the orthoTop property used to build the light frustum.
+   */
+  void set_orthoTop(float top);
+
+  /**
+   * @brief Gets the orthoBottom property used to build the light frustum.
+   */
+  float get_orthoBottom() const;
+
+  /**
+   * @brief Sets the orthoBottom property used to build the light frustum.
+   */
+  void set_orthoBottom(float bottom);
+
+  /**
    * @brief Sets the passed matrix "matrix" as projection matrix for the shadows cast by the light
    * according to the passed view matrix.
    * @returns The DirectionalLight Shadow projection matrix.
@@ -128,31 +192,6 @@ protected:
 
   void _buildUniformLayout() override;
 
-private:
-  /**
-   * @brief Fix frustum size for the shadow generation. This is disabled if the value is 0.
-   */
-  float get_shadowFrustumSize() const;
-
-  /**
-   * @brief Specifies a fix frustum size for the shadow generation.
-   */
-  void set_shadowFrustumSize(float value);
-
-  /**
-   * @brief Gets the shadow projection scale against the optimal computed one.
-   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
-   * This does not impact in fixed frustum size (shadowFrustumSize being set)
-   */
-  float get_shadowOrthoScale() const;
-
-  /**
-   * @brief Sets the shadow projection scale against the optimal computed one.
-   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
-   * This does not impact in fixed frustum size (shadowFrustumSize being set)
-   */
-  void set_shadowOrthoScale(float value);
-
 public:
   /**
    * Frustum size for the shadow generation.
@@ -176,6 +215,26 @@ public:
    * work
    */
   bool autoCalcShadowZBounds;
+
+  /**
+   * Gets or sets the orthoLeft property used to build the light frustum
+   */
+  Property<DirectionalLight, float> orthoLeft;
+
+  /**
+   * Gets or sets the orthoRight property used to build the light frustum
+   */
+  Property<DirectionalLight, float> orthoRight;
+
+  /**
+   * Gets or sets the orthoTop property used to build the light frustum
+   */
+  Property<DirectionalLight, float> orthoTop;
+
+  /**
+   * Gets or sets the orthoBottom property used to build the light frustum
+   */
+  Property<DirectionalLight, float> orthoBottom;
 
 private:
   float _shadowFrustumSize;

@@ -32,6 +32,10 @@ DirectionalLight::DirectionalLight(const std::string& iName, const Vector3& iDir
                        &DirectionalLight::set_shadowOrthoScale}
     , autoUpdateExtends{true}
     , autoCalcShadowZBounds{false}
+    , orthoLeft{this, &DirectionalLight::get_orthoLeft, &DirectionalLight::set_orthoLeft}
+    , orthoRight{this, &DirectionalLight::get_orthoRight, &DirectionalLight::set_orthoRight}
+    , orthoTop{this, &DirectionalLight::get_orthoTop, &DirectionalLight::set_orthoTop}
+    , orthoBottom{this, &DirectionalLight::get_orthoBottom, &DirectionalLight::set_orthoBottom}
     , _shadowFrustumSize{0.f}
     , _shadowOrthoScale{0.1f}
     , _orthoLeft{std::numeric_limits<float>::max()}
@@ -80,6 +84,46 @@ void DirectionalLight::set_shadowOrthoScale(float value)
 {
   _shadowOrthoScale = value;
   forceProjectionMatrixCompute();
+}
+
+float DirectionalLight::get_orthoLeft() const
+{
+  return _orthoLeft;
+}
+
+void DirectionalLight::set_orthoLeft(float left)
+{
+  _orthoLeft = left;
+}
+
+float DirectionalLight::get_orthoRight() const
+{
+  return _orthoRight;
+}
+
+void DirectionalLight::set_orthoRight(float right)
+{
+  _orthoRight = right;
+}
+
+float DirectionalLight::get_orthoTop() const
+{
+  return _orthoTop;
+}
+
+void DirectionalLight::set_orthoTop(float top)
+{
+  _orthoTop = top;
+}
+
+float DirectionalLight::get_orthoBottom() const
+{
+  return _orthoBottom;
+}
+
+void DirectionalLight::set_orthoBottom(float bottom)
+{
+  _orthoBottom = bottom;
 }
 
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
