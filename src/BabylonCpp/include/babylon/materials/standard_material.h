@@ -321,7 +321,7 @@ protected:
   /**
    * @brief Can this material render to prepass.
    */
-  bool get_isPrePassCapable() const;
+  bool get_isPrePassCapable() const override;
 
   /**
    * @brief Gets whether the color curves effect is enabled.
