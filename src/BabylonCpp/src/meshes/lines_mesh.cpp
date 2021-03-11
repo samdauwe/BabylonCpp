@@ -1,6 +1,7 @@
 #include <babylon/meshes/lines_mesh.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>
@@ -202,6 +203,20 @@ LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent, bool do
 InstancedLinesMeshPtr LinesMesh::createInstance(const std::string& iName)
 {
   return InstancedLinesMesh::New(iName, shared_from_base<LinesMesh>());
+}
+
+void LinesMesh::serialize(json& /*serializationObject*/) const
+{
+}
+
+LinesMeshPtr LinesMesh::Parse(const json& parsedMesh, Scene* scene)
+{
+  auto result = LinesMesh::New(json_util::get_string(parsedMesh, "name"), scene);
+
+  result->color = Color3::FromArray(json_util::get_array<float>(parsedMesh, "color"));
+  result->alpha = json_util::get_number<float>(parsedMesh, "alpha");
+
+  return result;
 }
 
 AbstractMeshPtr LinesMesh::enableEdgesRendering(const AbstractMeshPtr& iSource, float epsilon,

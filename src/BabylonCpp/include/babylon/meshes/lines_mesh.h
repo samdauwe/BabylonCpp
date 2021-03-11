@@ -81,6 +81,20 @@ public:
   InstancedLinesMeshPtr createInstance(const std::string& name);
 
   /**
+   * @brief Serializes this lines mesh.
+   * @param serializationObject object to write serialization to
+   */
+  void serialize(json& serializationObject) const override;
+
+  /**
+   * @brief Parses a serialized lines mesh.
+   * @param parsedMesh the serialized mesh
+   * @param scene the scene to create the ground mesh in
+   * @returns the created lines mesh
+   */
+  static LinesMeshPtr Parse(const json& parsedMesh, Scene* scene);
+
+  /**
    * @brief Enables the edge rendering mode on the mesh.
    * This mode makes the mesh edges visible
    * @param epsilon defines the maximal distance between two angles to detect a face
