@@ -206,13 +206,14 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
 
   if (kind == VertexBuffer::PositionKind) {
     auto& data = buffer->getData();
-
     if (totalVertices.has_value()) {
       _totalVertices = *totalVertices;
     }
     else {
       if (!data.empty()) {
-        _totalVertices = data.size() / (buffer->byteStride / 4);
+        _totalVertices
+          = data.size()
+            / (buffer->type == VertexBuffer::BYTE ? buffer->byteStride : buffer->byteStride / 4);
       }
     }
 
@@ -228,10 +229,6 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
   }
 
   notifyUpdate(kind);
-
-  if (!_vertexArrayObjects.empty()) {
-    _disposeVertexArrayObjects();
-  }
 }
 
 void Geometry::updateVerticesDataDirectly(const std::string& kind, const Float32Array& data,
@@ -621,6 +618,10 @@ void Geometry::notifyUpdate(const std::string& kind)
 {
   if (onGeometryUpdated) {
     onGeometryUpdated(this, kind);
+  }
+
+  if (!_vertexArrayObjects.empty()) {
+    _disposeVertexArrayObjects();
   }
 
   for (const auto& mesh : _meshes) {
