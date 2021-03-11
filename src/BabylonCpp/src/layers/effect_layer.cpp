@@ -346,7 +346,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   }
 
   // Morph targets
-  unsigned int morphInfluencers = 0;
+  auto morphInfluencers = 0u;
   if (auto _mesh = std::static_pointer_cast<Mesh>(mesh)) {
     auto manager = _mesh->morphTargetManager();
     if (manager) {
@@ -356,6 +356,9 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
         defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(morphInfluencers));
         MaterialDefines iDefines;
         iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
+        if (manager->isUsingTextureForTargets()) {
+          defines.emplace_back("#define MORPHTARGETS_TEXTURE");
+        }
         MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(attribs, mesh.get(),
                                                                     morphInfluencers);
       }
@@ -392,9 +395,11 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
                                            "diffuseMatrix",
                                            "emissiveMatrix",
                                            "opacityMatrix",
-                                           "opacityIntensity"};
+                                           "opacityIntensity",
+                                           "morphTargetTextureInfo",
+                                           "morphTargetTextureIndices"};
     effectCreationOptions.samplers
-      = {"diffuseSampler", "emissiveSampler", "opacitySampler", "boneSampler"};
+      = {"diffuseSampler", "emissiveSampler", "opacitySampler", "boneSampler", "morphTargets"};
 
     _effectLayerMapGenerationEffect = _scene->getEngine()->createEffect(
       "glowMapGeneration", effectCreationOptions, _scene->getEngine());
@@ -620,6 +625,10 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     // Morph targets
     MaterialHelper::BindMorphTargetParameters(renderingMesh.get(),
                                               _effectLayerMapGenerationEffect.get());
+    if (renderingMesh->morphTargetManager()
+        && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
+      renderingMesh->morphTargetManager()->_bind(_effectLayerMapGenerationEffect);
+    }
 
     // Alpha mode
     if (enableAlphaMode) {
