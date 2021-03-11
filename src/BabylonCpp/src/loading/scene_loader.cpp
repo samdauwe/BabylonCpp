@@ -250,6 +250,10 @@ std::shared_ptr<IFileInfo> SceneLoader::_GetFileInfo(std::string rootUrl,
     url  = rootUrl + sceneFilename;
     name = "";
   }
+  else if (StringTools::startsWith(sceneFilename, "data:")) {
+    url  = sceneFilename;
+    name = "";
+  }
   else {
     if (sceneFilename.substr(0, 1) == "/") {
       BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter")
