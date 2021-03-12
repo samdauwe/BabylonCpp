@@ -117,6 +117,11 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
   _pointerObserver = _scene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
       if (!enabled) {
+        // If behavior is disabled before releaseDrag is ever called, call it now.
+        if (_attachedToElement) {
+          releaseDrag();
+        }
+
         return;
       }
 
@@ -265,7 +270,7 @@ void PointerDragBehavior::_startDrag(int pointerId, const std::optional<Ray>& fr
     dragStartOrEndEvent.pointerId      = currentDraggingPointerID;
 
     onDragStartObservable.notifyObservers(&dragStartOrEndEvent);
-    _targetPosition.copyFrom(std::dynamic_pointer_cast<Mesh>(attachedNode)->absolutePosition());
+    _targetPosition.copyFrom(std::dynamic_pointer_cast<Mesh>(attachedNode)->getAbsolutePosition());
 
     // Detach camera controls
     if (detachCameraControls && _scene->activeCamera() && !_scene->activeCamera()->leftCamera()) {
@@ -429,7 +434,7 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
   }
   // Update the position of the drag plane so it doesn't get out of sync with the node (eg. when
   // moving back and forth quickly)
-  _dragPlane->position().copyFrom(attachedNode->absolutePosition());
+  _dragPlane->position().copyFrom(attachedNode->getAbsolutePosition());
 
   _dragPlane->computeWorldMatrix(true);
 }
