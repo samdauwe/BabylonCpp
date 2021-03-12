@@ -1029,6 +1029,18 @@ protected:
   void set_facetDepthSortFrom(const Vector3& location);
 
   /**
+   * @brief Gets the number of collision detection tries. Change this value if not all colisions are
+   * detected and handled properly.
+   */
+  unsigned int get_collisionRetryCount() const;
+
+  /**
+   * @brief Sets the number of collision detection tries. Change this value if not all colisions are
+   * detected and handled properly.
+   */
+  void set_collisionRetryCount(unsigned int retryCount);
+
+  /**
    * @brief Gets a boolean indicating if facetData is enabled.
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
    */
@@ -1491,6 +1503,12 @@ public:
    * enabled
    */
   Property<AbstractMesh, Vector3> facetDepthSortFrom;
+
+  /**
+   * Number of collision detection tries. Change this value if not all colisions are detected and
+   * handled properly
+   */
+  Property<AbstractMesh, unsigned int> collisionRetryCount;
 
   /**
    * A boolean indicating if facetData is enabled

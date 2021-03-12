@@ -54,6 +54,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
                           &AbstractMesh::set_mustDepthSortFacets}
     , facetDepthSortFrom{this, &AbstractMesh::get_facetDepthSortFrom,
                          &AbstractMesh::set_facetDepthSortFrom}
+    , collisionRetryCount{this, &AbstractMesh::get_collisionRetryCount,
+                          &AbstractMesh::set_collisionRetryCount}
     , isFacetDataEnabled{this, &AbstractMesh::get_isFacetDataEnabled}
     , onCollide{this, &AbstractMesh::set_onCollide}
     , onCollisionPositionChange{this, &AbstractMesh::set_onCollisionPositionChange}
@@ -219,6 +221,16 @@ Vector3& AbstractMesh::get_facetDepthSortFrom()
 void AbstractMesh::set_facetDepthSortFrom(const Vector3& location)
 {
   _internalAbstractMeshDataInfo._facetData.facetDepthSortFrom = location;
+}
+
+unsigned int AbstractMesh::get_collisionRetryCount() const
+{
+  return _internalAbstractMeshDataInfo._collisionRetryCount;
+}
+
+void AbstractMesh::set_collisionRetryCount(unsigned int retryCount)
+{
+  _internalAbstractMeshDataInfo._collisionRetryCount = retryCount;
 }
 
 bool AbstractMesh::get_isFacetDataEnabled() const
@@ -1330,8 +1342,8 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   _meshCollisionData._collider->_radius = ellipsoid;
 
   coordinator->getNewPosition(
-    _meshCollisionData._oldPositionForCollisions, displacement, _meshCollisionData._collider, 3,
-    shared_from_base<AbstractMesh>(),
+    _meshCollisionData._oldPositionForCollisions, displacement, _meshCollisionData._collider,
+    collisionRetryCount(), shared_from_base<AbstractMesh>(),
     [this](size_t collisionId, Vector3& newPosition, const AbstractMeshPtr& collidedMesh) {
       _onCollisionPositionChange(static_cast<int>(collisionId), newPosition, collidedMesh);
     },

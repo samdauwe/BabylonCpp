@@ -33,6 +33,7 @@ struct BABYLON_SHARED_EXPORT _InternalAbstractMeshDataInfo {
   bool _actAsRegularMesh             = false;
   AbstractMesh* _currentLOD          = nullptr;
   bool _currentLODIsUpToDate         = false;
+  unsigned int _collisionRetryCount  = 3;
 }; // end of struct _InternalAbstractMeshDataInfo
 
 } // end of namespace BABYLON
