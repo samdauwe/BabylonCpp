@@ -348,6 +348,8 @@ private:
 
   Buffer* _getBuffer() const;
 
+  void _computeHashCode();
+
   static float _GetFloatValue(const DataView& dataView, unsigned int type, size_t byteOffset,
                               bool normalized);
 
@@ -392,6 +394,12 @@ public:
    * Gets the unique id of this vertex buffer
    */
   size_t uniqueId;
+
+  /**
+   * Gets a hash code representing the format (type, normalized, size, instanced, stride) of this
+   * buffer All buffers with the same format will have the same hash code
+   */
+  size_t hashCode;
 
 private:
   static size_t _Counter;

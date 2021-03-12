@@ -70,6 +70,8 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
 
   _instanced       = instanced.has_value() ? *instanced : false;
   _instanceDivisor = _instanced ? divisor : 0;
+
+  _computeHashCode();
 }
 
 VertexBuffer::~VertexBuffer() = default;
@@ -83,6 +85,18 @@ void VertexBuffer::set_instanceDivisor(unsigned int value)
 {
   _instanceDivisor = value;
   _instanced       = value != 0;
+  _computeHashCode();
+}
+
+void VertexBuffer::_computeHashCode()
+{
+  hashCode = (((type - 5120) << 0) +        //
+              ((normalized ? 1 : 0) << 3) + //
+              (_size << 4) +                //
+              ((_instanced ? 1 : 0) << 6) + //
+              /* keep 5 bits free */
+              (byteStride << 12) //
+  );
 }
 
 void VertexBuffer::_rebuild()
