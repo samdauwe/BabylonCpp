@@ -877,12 +877,15 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
                                       "logarithmicDepthConstant",
                                       "vTangentSpaceParams",
                                       "alphaCutOff",
-                                      "boneTextureWidth"};
+                                      "boneTextureWidth",
+                                      "morphTargetTextureInfo",
+                                      "morphTargetTextureIndices"};
     std::vector<std::string> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
       "specularSampler",       "bumpSampler",         "lightmapSampler",
-      "refractionCubeSampler", "refraction2DSampler", "boneSampler"};
+      "refractionCubeSampler", "refraction2DSampler", "boneSampler",
+      "morphTargets"};
     std::vector<std::string> uniformBuffers{"Material", "Scene", "Mesh"};
 
     DetailMapConfiguration::AddUniforms(uniforms);
