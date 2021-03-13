@@ -38,14 +38,21 @@ void _ENVTextureLoader::loadCubeData(
     texture->width  = info->width;
     texture->height = info->width;
 
-    EnvironmentTextureTools::UploadEnvSpherical(texture, *info);
-    EnvironmentTextureTools::UploadEnvLevelsSync(texture, data, *info);
-    {
-      texture->isReady = true;
-      texture->onLoadedObservable.notifyObservers(texture.get());
-      texture->onLoadedObservable.clear();
-      if (onLoad) {
-        onLoad(std::nullopt);
+    try {
+      EnvironmentTextureTools::UploadEnvSpherical(texture, *info);
+      EnvironmentTextureTools::UploadEnvLevelsSync(texture, data, *info);
+      {
+        texture->isReady = true;
+        texture->onLoadedObservable.notifyObservers(texture.get());
+        texture->onLoadedObservable.clear();
+        if (onLoad) {
+          onLoad(std::nullopt);
+        }
+      }
+    }
+    catch (const std::exception& e) {
+      if (onError) {
+        onError("Can not upload environment file", e.what());
       }
     }
   }
