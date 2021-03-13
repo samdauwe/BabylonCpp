@@ -13,10 +13,10 @@ class AbstractMesh;
 class Camera;
 class Effect;
 class ICanvas;
+struct IPointerEvent;
 struct ISceneComponent;
 class Mesh;
 class PickingInfo;
-struct PointerEvent;
 class SubMesh;
 FWD_STRUCT_SPTR(_InstancesBatch)
 FWD_CLASS_SPTR(RenderTargetTexture)
@@ -86,7 +86,7 @@ using PointerMoveStageAction = std::function<std::optional<PickingInfo>(
  */
 using PointerUpDownStageAction = std::function<std::optional<PickingInfo>(
   int unTranslatedPointerX, int unTranslatedPointerY, std::optional<PickingInfo> pickResult,
-  const PointerEvent& evt)>;
+  const IPointerEvent& evt)>;
 
 /**
  * @brief Representation of a step.
