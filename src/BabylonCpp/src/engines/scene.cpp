@@ -1250,9 +1250,11 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult, const 
     }
   }
   else {
+#if 0
     for (const auto& step : _pointerDownStage) {
       pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
     }
+#endif
   }
 
   if (pickResult) {
@@ -1332,9 +1334,11 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
   }
   else {
     if (!clickInfo.ignore) {
+#if 0
       for (const auto& step : _pointerUpStage) {
         pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
       }
+#endif
     }
   }
 

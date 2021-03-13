@@ -36,6 +36,7 @@ void SpriteSceneComponent::_register()
       return _pointerMove(unTranslatedPointerX, unTranslatedPointerY, pickResult, isMeshPicked,
                           canvas);
     });
+#if 0
   scene->_pointerDownStage.registerStep(
     SceneComponentConstants::STEP_POINTERDOWN_SPRITE, this,
     [this](int unTranslatedPointerX, int unTranslatedPointerY,
@@ -50,6 +51,7 @@ void SpriteSceneComponent::_register()
            const PointerEvent& evt) -> std::optional<PickingInfo> {
       return _pointerUp(unTranslatedPointerX, unTranslatedPointerY, pickResult, evt);
     });
+#endif
 }
 
 void SpriteSceneComponent::rebuild()
