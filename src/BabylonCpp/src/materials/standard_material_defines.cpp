@@ -80,6 +80,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"MORPHTARGETS_NORMAL", false},                         //
     {"MORPHTARGETS_TANGENT", false},                        //
     {"MORPHTARGETS_UV", false},                             //
+    {"MORPHTARGETS_TEXTURE", false},                        //
     {"NONUNIFORMSCALING", false},                   // https://playground.babylonjs.com#V6DWIH
     {"PREMULTIPLYALPHA", false},                    // https://playground.babylonjs.com#LNVJJ7
     {"ALPHATEST_AFTERALLALPHACOMPUTATIONS", false}, //
