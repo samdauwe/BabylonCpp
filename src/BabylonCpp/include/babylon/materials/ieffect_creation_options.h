@@ -18,6 +18,10 @@ FWD_CLASS_SPTR(Effect)
  */
 struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
   /**
+   * Name of the effect
+   */
+  std::string name{};
+  /**
    * Key identifying uniquely compiled shader variants
    */
   std::string key{};
