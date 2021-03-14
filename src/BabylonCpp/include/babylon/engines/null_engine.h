@@ -132,7 +132,7 @@ public:
   void bindSamplers(Effect& effect) override;
 
   /**
-   * @brief Activates an effect, mkaing it the current one (ie. the one used for rendering).
+   * @brief Activates an effect, making it the current one (ie. the one used for rendering)
    * @param effect defines the effect to activate
    */
   void enableEffect(const EffectPtr& effect) override;
@@ -378,11 +378,6 @@ public:
   /**
    * @brief Hidden
    */
-  WebGLTexturePtr _createTexture() override;
-
-  /**
-   * @brief Hidden
-   */
   void _releaseTexture(const InternalTexturePtr& texture) override;
 
   /**
@@ -587,6 +582,11 @@ public:
 
 protected:
   NullEngine(const NullEngineOptions& options = NullEngineOptions{});
+
+  /**
+   * @brief Hidden
+   */
+  WebGLTexturePtr _createTexture() override;
 
   void _deleteBuffer(GL::IGLBuffer* buffer);
 

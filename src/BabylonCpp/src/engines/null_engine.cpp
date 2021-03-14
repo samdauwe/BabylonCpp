@@ -38,42 +38,65 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
   // Init caps
   // We consider we are on a webgl1 capable device
 
-  _caps                                 = EngineCapabilities();
-  _caps.maxTexturesImageUnits           = 16;
-  _caps.maxVertexTextureImageUnits      = 16;
-  _caps.maxCombinedTexturesImageUnits   = 32;
-  _caps.maxTextureSize                  = 512;
-  _caps.maxCubemapTextureSize           = 512;
-  _caps.maxRenderTextureSize            = 512;
-  _caps.maxVertexAttribs                = 16;
-  _caps.maxVaryingVectors               = 16;
-  _caps.maxFragmentUniformVectors       = 16;
-  _caps.maxVertexUniformVectors         = 16;
-  _caps.standardDerivatives             = false;
-  _caps.astc                            = nullptr;
-  _caps.pvrtc                           = nullptr;
-  _caps.etc1                            = nullptr;
-  _caps.etc2                            = nullptr;
-  _caps.bptc                            = nullptr;
-  _caps.maxAnisotropy                   = 0;
-  _caps.uintIndices                     = false;
-  _caps.fragmentDepthSupported          = false;
-  _caps.highPrecisionShaderSupported    = true;
-  _caps.colorBufferFloat                = false;
-  _caps.textureFloat                    = false;
-  _caps.textureFloatLinearFiltering     = false;
-  _caps.textureFloatRender              = false;
-  _caps.textureHalfFloat                = false;
-  _caps.textureHalfFloatLinearFiltering = false;
-  _caps.textureHalfFloatRender          = false;
-  _caps.textureLOD                      = false;
-  _caps.drawBuffersExtension            = false;
-  _caps.depthTextureExtension           = false;
-  _caps.vertexArrayObject               = false;
-  _caps.instancedArrays                 = false;
-  _caps.canUseTimestampForTimerQuery    = false;
-  _caps.maxMSAASamples                  = 1;
-  _caps.blendMinMax                     = false;
+  {
+    _caps                                 = EngineCapabilities();
+    _caps.maxTexturesImageUnits           = 16;
+    _caps.maxVertexTextureImageUnits      = 16;
+    _caps.maxCombinedTexturesImageUnits   = 32;
+    _caps.maxTextureSize                  = 512;
+    _caps.maxCubemapTextureSize           = 512;
+    _caps.maxRenderTextureSize            = 512;
+    _caps.maxVertexAttribs                = 16;
+    _caps.maxVaryingVectors               = 16;
+    _caps.maxFragmentUniformVectors       = 16;
+    _caps.maxVertexUniformVectors         = 16;
+    _caps.standardDerivatives             = false;
+    _caps.astc                            = nullptr;
+    _caps.pvrtc                           = nullptr;
+    _caps.etc1                            = nullptr;
+    _caps.etc2                            = nullptr;
+    _caps.bptc                            = nullptr;
+    _caps.maxAnisotropy                   = 0;
+    _caps.uintIndices                     = false;
+    _caps.fragmentDepthSupported          = false;
+    _caps.highPrecisionShaderSupported    = true;
+    _caps.colorBufferFloat                = false;
+    _caps.textureFloat                    = false;
+    _caps.textureFloatLinearFiltering     = false;
+    _caps.textureFloatRender              = false;
+    _caps.textureHalfFloat                = false;
+    _caps.textureHalfFloatLinearFiltering = false;
+    _caps.textureHalfFloatRender          = false;
+    _caps.textureLOD                      = false;
+    _caps.drawBuffersExtension            = false;
+    _caps.depthTextureExtension           = false;
+    _caps.vertexArrayObject               = false;
+    _caps.instancedArrays                 = false;
+    _caps.canUseTimestampForTimerQuery    = false;
+    _caps.maxMSAASamples                  = 1;
+    _caps.blendMinMax                     = false;
+    _caps.canUseGLInstanceID              = false;
+  }
+
+  {
+    _features.forceBitmapOverHTMLImageElement           = false;
+    _features.supportRenderAndCopyToLodForFloatTextures = false;
+    _features.supportDepthStencilTexture                = false;
+    _features.supportShadowSamplers                     = false;
+    _features.uniformBufferHardCheckMatrix              = false;
+    _features.allowTexturePrefiltering                  = false;
+    _features.trackUbosInFrame                          = false;
+    _features.supportCSM                                = false;
+    _features.basisNeedsPOT                             = false;
+    _features.support3DTextures                         = false;
+    _features.needTypeSuffixInShaderConstants           = false;
+    _features.supportMSAA                               = false;
+    _features.supportSSAO2                              = false;
+    _features.supportExtendedTextureFormats             = false;
+    _features.supportSwitchCaseInShader                 = false;
+    _features.supportSyncTextureRead                    = false;
+    _features._collectUbosUpdatedInFrame                = false;
+  }
 
   BABYLON_LOGF_INFO("Engine", "Babylon.js v%s - Null engine", Engine::Version().c_str())
 }
