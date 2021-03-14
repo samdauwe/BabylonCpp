@@ -618,7 +618,7 @@ void Engine::endFrame()
   onEndFrameObservable.notifyObservers(this);
 }
 
-void Engine::resize()
+void Engine::resize(bool /*forceSetSize*/)
 {
   // We're not resizing the size of the canvas while in VR mode & presenting
   if (isVRPresenting()) {
@@ -628,7 +628,7 @@ void Engine::resize()
   ThinEngine::resize();
 }
 
-bool Engine::setSize(int width, int height)
+bool Engine::setSize(int width, int height, bool /*forceSetSize*/)
 {
   if (!_renderingCanvas) {
     return false;

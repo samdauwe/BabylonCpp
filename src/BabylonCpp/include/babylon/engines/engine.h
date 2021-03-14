@@ -743,7 +743,7 @@ public:
   /**
    * @brief Resize the view according to the canvas' size.
    */
-  void resize() override;
+  void resize(bool forceSetSize = false) override;
 
   /**
    * @brief Force a specific size of the canvas.
@@ -751,7 +751,7 @@ public:
    * @param height defines the new canvas' height
    * @returns true if the size was changed
    */
-  bool setSize(int width = 0, int height = 0) override;
+  bool setSize(int width = 0, int height = 0, bool forceSetSize = false) override;
 
   /**
    * @brief Hidden
