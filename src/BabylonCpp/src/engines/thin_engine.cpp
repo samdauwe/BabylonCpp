@@ -63,7 +63,7 @@ std::string ThinEngine::Version()
 std::string ThinEngine::description() const
 {
   std::ostringstream description;
-  description << "WebGL" << webGLVersion();
+  description << name() << webGLVersion();
 
   if (_caps.parallelShaderCompile) {
     description << " - Parallel shader compilation";
@@ -118,7 +118,6 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , _depthCullingState{std::make_unique<DepthCullingState>()}
     , _stencilState{std::make_unique<StencilState>()}
     , _supportsHardwareTextureRescaling{this, &ThinEngine::get__supportsHardwareTextureRescaling}
-    , _isWebGPU{false}
     , _alphaExtension{std::make_unique<AlphaExtension>(this)}
     , _cubeTextureExtension{std::make_unique<CubeTextureExtension>(this)}
     , _dynamicBufferExtension{std::make_unique<DynamicBufferExtension>(this)}
@@ -172,12 +171,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
   }
 
   // Shader processor
-  if (webGLVersion() > 1.f) {
-    _shaderProcessor = std::make_shared<WebGL2ShaderProcessor>();
-  }
-  else {
-    _shaderProcessor = std::make_shared<WebGLShaderProcessor>();
-  }
+  _shaderProcessor = _getShaderProcessor();
 
   // Detect if we are running on a faulty buggy OS.
   _badOS = false;
@@ -309,6 +303,23 @@ void ThinEngine::_debugInsertMarker(const std::string& /*text*/,
 {
 }
 
+void ThinEngine::_sharedInit(ICanvas* canvas, bool /*doNotHandleTouchAction*/, bool /*audioEngine*/)
+{
+  _renderingCanvas = canvas;
+}
+
+IShaderProcessorPtr ThinEngine::_getShaderProcessor() const
+{
+  IShaderProcessorPtr shaderProcessor = nullptr;
+  if (webGLVersion() > 1.f) {
+    shaderProcessor = std::make_shared<WebGL2ShaderProcessor>();
+  }
+  else {
+    shaderProcessor = std::make_shared<WebGLShaderProcessor>();
+  }
+  return shaderProcessor;
+}
+
 ShaderProcessingContextPtr ThinEngine::_getShaderProcessingContext() const
 {
   return nullptr;
@@ -430,6 +441,7 @@ void ThinEngine::_initGLContext()
   _caps.multiview             = _gl->getExtension("OVR_multiview2");
   _caps.oculusMultiview       = _gl->getExtension("OCULUS_multiview");
   _caps.depthTextureExtension = false;
+  _caps.canUseGLInstanceID    = !(_badOS && _webGLVersion <= 1.f);
 
   // Those parameters cannot always be reliably queried
   // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels desktop opengl driver)
@@ -833,24 +845,25 @@ void ThinEngine::endFrame()
   if (_badOS) {
     flushFramebuffer();
   }
+  _frameId++;
 }
 
-void ThinEngine::resize()
+void ThinEngine::resize(bool forceSetSize)
 {
   const auto width  = _renderingCanvas ? _renderingCanvas->clientWidth : 0;
   const auto height = _renderingCanvas ? _renderingCanvas->clientHeight : 0;
 
   setSize(static_cast<int>(width / _hardwareScalingLevel),
-          static_cast<int>(height / _hardwareScalingLevel));
+          static_cast<int>(height / _hardwareScalingLevel), forceSetSize);
 }
 
-bool ThinEngine::setSize(int width, int height)
+bool ThinEngine::setSize(int width, int height, bool forceSetSize)
 {
   if (!_renderingCanvas) {
     return false;
   }
 
-  if (_renderingCanvas->width == width && _renderingCanvas->height == height) {
+  if (!forceSetSize && _renderingCanvas->width == width && _renderingCanvas->height == height) {
     return false;
   }
 
@@ -1224,7 +1237,8 @@ void ThinEngine::_bindIndexBufferWithCache(const WebGLDataBufferPtr& indexBuffer
 }
 
 void ThinEngine::_bindVertexBuffersAttributes(
-  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect)
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect,
+  const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers)
 {
   auto attributes = effect->getAttributesNames();
 
@@ -1239,13 +1253,19 @@ void ThinEngine::_bindVertexBuffersAttributes(
     auto order = effect->getAttributeLocation(index);
 
     if (order >= 0) {
-      _order = static_cast<unsigned int>(order);
+      _order                       = static_cast<unsigned int>(order);
+      auto ai                      = attributes[index];
+      VertexBufferPtr vertexBuffer = nullptr;
 
-      if (!stl_util::contains(vertexBuffers, attributes[index])) {
+      if (stl_util::contains(overrideVertexBuffers, ai)) {
+        vertexBuffer = overrideVertexBuffers.at(ai);
+      }
+
+      if (!vertexBuffer && !stl_util::contains(vertexBuffers, ai)) {
         continue;
       }
 
-      const auto& vertexBuffer = vertexBuffers.at(attributes[index]);
+      vertexBuffer = vertexBuffers.at(ai);
       if (!vertexBuffer) {
         continue;
       }
@@ -1277,7 +1297,7 @@ void ThinEngine::_bindVertexBuffersAttributes(
 WebGLVertexArrayObjectPtr ThinEngine::recordVertexArrayObject(
   const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
   const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
-  const std::unordered_map<std::string, VertexBufferPtr>& /*overrideVertexBuffers*/)
+  const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers)
 {
   auto vao = _gl->createVertexArray();
 
@@ -1286,7 +1306,7 @@ WebGLVertexArrayObjectPtr ThinEngine::recordVertexArrayObject(
   _gl->bindVertexArray(vao.get());
 
   _mustWipeVertexAttributes = true;
-  _bindVertexBuffersAttributes(vertexBuffers, effect);
+  _bindVertexBuffersAttributes(vertexBuffers, effect, overrideVertexBuffers);
 
   bindIndexBuffer(indexBuffer);
 
@@ -1368,13 +1388,13 @@ void ThinEngine::_unbindVertexArrayObject()
 void ThinEngine::bindBuffers(
   const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
   const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
-  const std::unordered_map<std::string, VertexBufferPtr>& /*overrideVertexBuffers*/)
+  const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers)
 {
   if (_cachedVertexBuffersMap != vertexBuffers || _cachedEffectForVertexBuffers != effect) {
     _cachedVertexBuffersMap       = vertexBuffers;
     _cachedEffectForVertexBuffers = effect;
 
-    _bindVertexBuffersAttributes(vertexBuffers, effect);
+    _bindVertexBuffersAttributes(vertexBuffers, effect, overrideVertexBuffers);
   }
 
   _bindIndexBufferWithCache(indexBuffer);
@@ -1671,8 +1691,9 @@ EffectPtr ThinEngine::createEffect(
     }
     return compiledEffect;
   }
-  auto effect            = Effect::New(baseName, options, engine);
-  effect->_key           = name;
+  options.name = name;
+  auto effect  = Effect::New(baseName, options, engine);
+
   _compiledEffects[name] = effect;
 
   return effect;
@@ -1697,7 +1718,11 @@ WebGLShaderPtr ThinEngine::_compileRawShader(const std::string& source, const st
   auto shader = gl.createShader(type == "vertex" ? GL::VERTEX_SHADER : GL::FRAGMENT_SHADER);
 
   if (!shader) {
-    throw std::runtime_error("Something went wrong while compile the shader.");
+    throw std::runtime_error(
+      StringTools::printf("Something went wrong while creating a gl %s shader object. gl error=%u, "
+                          "gl isContextLost=%s, _contextWasLost=%s",
+                          type.c_str(), gl.getError(), /* gl.isContextLost() */ "false",
+                          _contextWasLost ? "true" : "false"));
   }
 
   gl.shaderSource(shader.get(), source);
@@ -2367,7 +2392,7 @@ std::unique_ptr<HardwareTextureWrapper<WebGLTexturePtr>> ThinEngine::_createHard
   return std::make_unique<WebGLHardwareTexture>(_createTexture(), _gl);
 }
 
-InternalTexturePtr ThinEngine::createTexture(
+InternalTexturePtr ThinEngine::_createTextureBase(
   std::string url, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
@@ -2586,6 +2611,19 @@ InternalTexturePtr ThinEngine::createTexture(
   return texture;
 }
 
+InternalTexturePtr ThinEngine::createTexture(
+  std::string url, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
+  const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& onError,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
+  const InternalTexturePtr& fallback, const std::optional<unsigned int>& format,
+  const std::string& forcedExtension, const std::string& mimeType,
+  const LoaderOptionsPtr& loaderOptions)
+{
+  return _createTextureBase(url, noMipmap, invertY, scene, samplingMode, onLoad, onError, buffer,
+                            fallback, format, forcedExtension, mimeType, loaderOptions);
+}
+
 InternalTexturePtr ThinEngine::createPrefilteredCubeTexture(
   const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
@@ -2795,7 +2833,7 @@ void ThinEngine::updateTextureWrappingMode(const InternalTexturePtr& texture,
 void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
                                            const RenderTargetTextureSize& size,
                                            bool generateStencil, bool bilinearFiltering,
-                                           int comparisonFunction)
+                                           int comparisonFunction, unsigned int samples)
 {
   auto width                              = std::holds_alternative<int>(size) ?
                                               std::get<int>(size) :
@@ -2812,7 +2850,7 @@ void ThinEngine::_setupDepthStencilTexture(const InternalTexturePtr& internalTex
   internalTexture->width                  = width;
   internalTexture->height                 = height;
   internalTexture->isReady                = true;
-  internalTexture->samples                = 1;
+  internalTexture->samples                = samples;
   internalTexture->generateMipMaps        = false;
   internalTexture->_generateDepthBuffer   = true;
   internalTexture->_generateStencilBuffer = generateStencil;
@@ -3103,11 +3141,17 @@ void ThinEngine::_releaseTexture(const InternalTexturePtr& texture)
   if (texture->_irradianceTexture) {
     texture->_irradianceTexture->dispose();
   }
+
+  if (texture->_depthStencilTexture) {
+    texture->_depthStencilTexture->dispose();
+  }
 }
 
 void ThinEngine::_deleteTexture(const WebGLTexturePtr& texture)
 {
-  _gl->deleteTexture(texture.get());
+  if (texture) {
+    _gl->deleteTexture(texture.get());
+  }
 }
 
 void ThinEngine::_setProgram(const WebGLProgramPtr& program)
@@ -3260,7 +3304,7 @@ unsigned int ThinEngine::_getTextureWrapMode(unsigned int mode) const
 }
 
 bool ThinEngine::_setTexture(int channel, const ThinTexturePtr& texture, bool isPartOfTextureArray,
-                             bool depthStencilTexture)
+                             bool depthStencilTexture, const std::string& /*name*/)
 {
   // Not ready?
   if (!texture) {
@@ -3889,12 +3933,17 @@ IFileRequest ThinEngine::_loadFile(
   return IFileRequest();
 }
 
-Uint8Array ThinEngine::readPixels(int x, int y, int width, int height, bool hasAlpha)
+Uint8Array ThinEngine::readPixels(int x, int y, int width, int height, bool hasAlpha,
+                                  bool flushRenderer)
 {
   const auto numChannels = hasAlpha ? 4 : 3;
   const auto format      = hasAlpha ? GL::RGBA : GL::RGB;
   Uint8Array data(static_cast<size_t>(height * width * numChannels));
+  if (flushRenderer) {
+    flushFramebuffer();
+  }
   _gl->readPixels(x, y, width, height, format, GL::UNSIGNED_BYTE, data);
+
   return data;
 }
 

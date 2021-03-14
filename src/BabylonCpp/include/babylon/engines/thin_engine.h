@@ -196,8 +196,8 @@ public:
   void resetTextureCache();
 
   /**
-   * @brief Gets an object containing information about the current webGL context.
-   * @returns an object containing the vender, the renderer and the version of the current webGL
+   * @brief Gets an object containing information about the current webGL context
+   * @returns an object containing the vendor, the renderer and the version of the current webGL
    * context
    */
   GL::GLInfo getGlInfo();
@@ -320,16 +320,18 @@ public:
 
   /**
    * @brief Resize the view according to the canvas' size.
+   * @param forceSetSize true to force setting the sizes of the underlying canvas
    */
-  virtual void resize();
+  virtual void resize(bool forceSetSize = false);
 
   /**
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
+   * @param forceSetSize true to force setting the sizes of the underlying canvas
    * @returns true if the size was changed
    */
-  virtual bool setSize(int width = 0, int height = 0);
+  virtual bool setSize(int width = 0, int height = 0, bool forceSetSize = false);
 
   /**
    * @brief Binds the frame buffer to the specified texture.
@@ -478,8 +480,8 @@ public:
   bool _releaseBuffer(const WebGLDataBufferPtr& buffer);
 
   /**
-   * @brief Update the content of a webGL buffer used with instanciation and bind it to the webGL
-   * context
+   * @brief Update the content of a webGL buffer used with instantiation and bind it to the webGL
+   * context.
    * @param instancesBuffer defines the webGL buffer to update and bind
    * @param data defines the data to store in the buffer
    * @param offsetLocations defines the offsets or attributes information used to determine where
@@ -523,7 +525,7 @@ public:
    * @param useTriangles defines if triangles must be used to draw (else wireframe will be used)
    * @param indexStart defines the starting index
    * @param indexCount defines the number of index to draw
-   * @param instancesCount defines the number of instances to draw (if instanciation is enabled)
+   * @param instancesCount defines the number of instances to draw (if instantiation is enabled)
    */
   virtual void draw(bool useTriangles, int indexStart, int indexCount, int instancesCount = 0);
 
@@ -531,7 +533,7 @@ public:
    * @brief Draw a list of points.
    * @param verticesStart defines the index of first vertex to draw
    * @param verticesCount defines the count of vertices to draw
-   * @param instancesCount defines the number of instances to draw (if instanciation is enabled)
+   * @param instancesCount defines the number of instances to draw (if instantiation is enabled)
    */
   void drawPointClouds(int verticesStart, int verticesCount, int instancesCount = 0);
 
@@ -540,7 +542,7 @@ public:
    * @param useTriangles defines if triangles must be used to draw (else wireframe will be used)
    * @param verticesStart defines the index of first vertex to draw
    * @param verticesCount defines the count of vertices to draw
-   * @param instancesCount defines the number of instances to draw (if instanciation is enabled)
+   * @param instancesCount defines the number of instances to draw (if instantiation is enabled)
    */
   void drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
                      int instancesCount = 0);
@@ -550,7 +552,7 @@ public:
    * @param fillMode defines the primitive to use
    * @param indexStart defines the starting index
    * @param indexCount defines the number of index to draw
-   * @param instancesCount defines the number of instances to draw (if instanciation is enabled)
+   * @param instancesCount defines the number of instances to draw (if instantiation is enabled)
    */
   virtual void drawElementsType(unsigned int fillMode, int indexStart, int indexCount,
                                 int instancesCount = 0);
@@ -560,7 +562,7 @@ public:
    * @param fillMode defines the primitive to use
    * @param verticesStart defines the index of first vertex to draw
    * @param verticesCount defines the count of vertices to draw
-   * @param instancesCount defines the number of instances to draw (if instanciation is enabled)
+   * @param instancesCount defines the number of instances to draw (if instantiation is enabled)
    */
   virtual void drawArraysType(unsigned int fillMode, int verticesStart, int verticesCount,
                               int instancesCount = 0);
@@ -586,7 +588,7 @@ public:
    * @param uniformsNamesOrEngine defines either a list of uniform names or the engine to use
    * @param samplers defines an array of string used to represent textures
    * @param defines defines the string containing the defines to use to compile the shaders
-   * @param fallbacks defines the list of potential fallbacks to use if shader conmpilation fails
+   * @param fallbacks defines the list of potential fallbacks to use if shader compilation fails
    * @param onCompiled defines a function to call when the effect creation is successful
    * @param onError defines a function to call when the effect creation has failed
    * @param indexParameters defines an object containing the index values to use to compile shaders
@@ -634,7 +636,9 @@ public:
                       const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
-   * @brief Creates a new pipeline context
+   * @brief Creates a new pipeline context.
+   * @param shaderProcessingContext defines the shader processing context used during the processing
+   * if available
    * @returns the new pipeline
    */
   IPipelineContextPtr
@@ -671,7 +675,7 @@ public:
   getUniforms(IPipelineContext* pipelineContext, const std::vector<std::string>& uniformsNames);
 
   /**
-   * @brief Gets the lsit of active attributes for a given webGL program.
+   * @brief Gets the list of active attributes for a given webGL program.
    * @param pipelineContext defines the pipeline context to use
    * @param attributesNames defines the list of attribute names to get
    * @returns an array of indices indicating the offset of each attribute
@@ -680,7 +684,7 @@ public:
                                    const std::vector<std::string>& attributesNames);
 
   /**
-   * @brief Activates an effect, mkaing it the current one (ie. the one used for rendering).
+   * @brief Activates an effect, making it the current one (ie. the one used for rendering).
    * @param effect defines the effect to activate
    */
   virtual void enableEffect(const EffectPtr& effect);
@@ -815,7 +819,7 @@ public:
    * @brief Set the value of an uniform to a number (float).
    * @param uniform defines the webGL uniform location where to store the value
    * @param value defines the float number to store
-   * @returns true if the value was transfered
+   * @returns true if the value was transferred
    */
   virtual bool setFloat(const WebGLUniformLocationPtr& uniform, float value);
 
@@ -890,11 +894,6 @@ public:
    * @brief Hidden
    */
   SamplingParameters _getSamplingParameters(unsigned int samplingMode, bool generateMipMaps);
-
-  /**
-   * @brief Hidden
-   */
-  virtual WebGLTexturePtr _createTexture();
 
   /**
    * @brief Hidden
@@ -1053,7 +1052,8 @@ public:
    */
   void _setupDepthStencilTexture(const InternalTexturePtr& internalTexture,
                                  const RenderTargetTextureSize& size, bool generateStencil,
-                                 bool bilinearFiltering, int comparisonFunction);
+                                 bool bilinearFiltering, int comparisonFunction,
+                                 unsigned samples = 1);
 
   /**
    * @brief Hidden
@@ -1139,15 +1139,17 @@ public:
    * @param channel The texture channel
    * @param uniform The uniform to set
    * @param texture The texture to apply
+   * @param name The name of the uniform in the effect
    */
   void setTexture(int channel, const WebGLUniformLocationPtr& uniform,
                   const ThinTexturePtr& texture, const std::string& name);
 
   /**
-   * @brief Sets an array of texture to the webGL context
+   * @brief Sets an array of texture to the webGL context.
    * @param channel defines the channel where the texture array must be set
    * @param uniform defines the associated uniform location
    * @param textures defines the array of textures to bind
+   * @param name name of the channel
    */
   void setTextureArray(int channel, const WebGLUniformLocationPtr& uniform,
                        const std::vector<ThinTexturePtr>& textures, const std::string& name);
@@ -1216,22 +1218,26 @@ public:
     = nullptr);
 
   /**
-   * @brief Reads pixels from the current frame buffer. Please note that this function can be slow.
+   * @brief Reads pixels from the current frame buffer. Please note that this function can be slow
    * @param x defines the x coordinate of the rectangle where pixels must be read
    * @param y defines the y coordinate of the rectangle where pixels must be read
    * @param width defines the width of the rectangle where pixels must be read
    * @param height defines the height of the rectangle where pixels must be read
    * @param hasAlpha defines whether the output should have alpha or not (defaults to true)
-   * @returns a Uint8Array containing RGBA colors
+   * @param flushRenderer true to flush the renderer from the pending commands before reading the
+   * pixels
+   * @returns a ArrayBufferView promise (Uint8Array) containing RGBA colors
    */
-  Uint8Array readPixels(int x, int y, int width, int height, bool hasAlpha = true);
+  Uint8Array readPixels(int x, int y, int width, int height, bool hasAlpha = true,
+                        bool flushRenderer = true);
 
   // Statics
 
   /**
-   * @brief Gets a boolean indicating if the engine can be instanciated (ie. if a webGL context can
-   * be found)
+   * @brief Gets a boolean indicating if the engine can be instantiated (ie. if a webGL context can
+   * be found).
    * @returns true if the engine can be created
+   * @ignorenaming
    */
   static bool isSupported();
 
@@ -1886,6 +1892,7 @@ protected:
 
   /**
    * @brief Gets version of the current webGL context.
+   * Keep it for back compat - use version instead
    */
   float get_webGLVersion() const;
 
@@ -1910,6 +1917,21 @@ protected:
    */
   std::unique_ptr<StencilState>& get_stencilState();
 
+  /**
+   * @brief Shared initialization across engines types.
+   * @param canvas The canvas associated with this instance of the engine.
+   * @param doNotHandleTouchAction Defines that engine should ignore modifying touch action
+   * attribute and style
+   * @param audioEngine Defines if an audio engine should be created by default
+   */
+  virtual void _sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool audioEngine);
+
+  /**
+   * @brief Gets a shader processor implementation fitting with the current engine type.
+   * @returns The shader processor implementation.
+   */
+  virtual IShaderProcessorPtr _getShaderProcessor() const;
+
   virtual void _rebuildBuffers();
   void _initGLContext();
   void _initFeatures();
@@ -1931,13 +1953,27 @@ protected:
                        WebGLRenderingContext* context,
                        const std::vector<std::string>& transformFeedbackVaryings = {});
   void _finalizePipelineContext(WebGLPipelineContext* pipelineContext);
+  /** @hidden */
+  virtual WebGLTexturePtr _createTexture();
+  InternalTexturePtr _createTextureBase(
+    std::string url, bool noMipmap, bool invertY, Scene* scene,
+    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void(const std::string& message, const std::string& exception)>& onError
+    = nullptr,
+    const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
+    = std::nullopt,
+    const InternalTexturePtr& fallBack        = nullptr,
+    const std::optional<unsigned int>& format = std::nullopt,
+    const std::string& forcedExtension = "", const std::string& mimeType = "",
+    const LoaderOptionsPtr& loaderOptions = nullptr);
   void _prepareWebGLTextureContinuation(const InternalTexturePtr& texture, Scene* scene,
                                         bool noMipmap, bool isCompressed,
                                         unsigned int samplingMode);
   void _deleteTexture(const WebGLTexturePtr& texture);
   void _setProgram(const WebGLProgramPtr& program);
   bool _setTexture(int channel, const ThinTexturePtr& texture, bool isPartOfTextureArray = false,
-                   bool depthStencilTexture = false);
+                   bool depthStencilTexture = false, const std::string& name = "");
 
 private:
   void _rebuildInternalTextures();
@@ -1948,7 +1984,8 @@ private:
   void _vertexAttribPointer(const WebGLDataBufferPtr& buffer, unsigned int indx, int size,
                             unsigned int type, bool normalized, int stride, int offset);
   void _bindVertexBuffersAttributes(
-    const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect);
+    const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers, const EffectPtr& effect,
+    const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers = {});
   void _unbindVertexArrayObject();
   unsigned int _drawMode(unsigned int fillMode) const;
   WebGLShaderPtr _compileShader(const std::string& source, const std::string& type,
@@ -2167,7 +2204,7 @@ public:
   /**
    * Defines whether the engine has been created with the premultipliedAlpha option on or not.
    */
-  const bool premultipliedAlpha = true;
+  bool premultipliedAlpha = true;
 
   /**
    * Observable event triggered before each texture is initialized
@@ -2234,6 +2271,8 @@ protected:
   EngineOptions _creationOptions;
 
   bool _highPrecisionShadersAllowed = true;
+  float _hardwareScalingLevel       = 1.f;
+  bool _isStencilEnable             = false;
   bool _renderingQueueLaunched      = false;
   std::vector<SA::delegate<void()>> _activeRenderLoops;
   bool _contextWasLost = false;
@@ -2255,6 +2294,7 @@ protected:
   EffectPtr _currentEffect = nullptr;
   /** @hidden */
   WebGLProgramPtr _currentProgram = nullptr;
+  std::unordered_map<std::string, EffectPtr> _compiledEffects;
   /** @hidden */
   std::optional<Viewport> _cachedViewport = std::nullopt;
   /** @hidden */
@@ -2270,17 +2310,15 @@ protected:
   /** @hidden */
   ReadOnlyProperty<ThinEngine, bool> _supportsHardwareTextureRescaling;
   /** @hidden */
-  bool _isWebGPU;
+  bool _isWebGPU = false;
   /** @hidden */
   std::string _shaderPlatformName;
-
+  /** @hidden */
+  Vector4 _viewportCached;
   /** @hidden */
   std::unordered_map<int, WebGLUniformLocationPtr> _boundUniforms;
 
 private:
-  float _hardwareScalingLevel = 1.f;
-  bool _isStencilEnable       = false;
-
   size_t _frameId = 0;
 
   std::string _glVersion;
@@ -2292,7 +2330,6 @@ private:
 
   int _currentTextureChannel = -1;
 
-  std::unordered_map<std::string, EffectPtr> _compiledEffects;
   std::unordered_map<unsigned int, bool> _vertexAttribArraysEnabled;
   WebGLVertexArrayObjectPtr _cachedVertexArrayObject = nullptr;
   bool _uintIndicesCurrentlySet                      = false;
@@ -2314,8 +2351,6 @@ private:
   unsigned int _maxSimultaneousTextures = 0;
 
   std::optional<FramebufferDimensionsObject> _framebufferDimensionsObject = std::nullopt;
-
-  Vector4 _viewportCached;
 
   std::optional<bool> _unpackFlipYCached = std::nullopt;
 
