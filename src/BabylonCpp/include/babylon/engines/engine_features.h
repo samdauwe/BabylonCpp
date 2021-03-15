@@ -61,6 +61,10 @@ struct BABYLON_SHARED_EXPORT EngineFeatures {
   /** Indicates that synchronous texture reading is supported */
   bool supportSyncTextureRead;
 
+  /** Indicates that y should be inverted when dealing with bitmaps (notably in environment tools)
+   */
+  bool needsInvertingBitmap;
+
   /** @hidden */
   bool _collectUbosUpdatedInFrame;
 }; // end of struct EngineFeatures
