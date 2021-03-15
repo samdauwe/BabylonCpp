@@ -76,6 +76,7 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
     _caps.maxMSAASamples                  = 1;
     _caps.blendMinMax                     = false;
     _caps.canUseGLInstanceID              = false;
+    _caps.canUseGLVertexID                = false;
   }
 
   {
@@ -95,6 +96,7 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
     _features.supportExtendedTextureFormats             = false;
     _features.supportSwitchCaseInShader                 = false;
     _features.supportSyncTextureRead                    = false;
+    _features.needsInvertingBitmap                      = false;
     _features._collectUbosUpdatedInFrame                = false;
   }
 
