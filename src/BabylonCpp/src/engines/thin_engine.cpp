@@ -99,6 +99,7 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , supportsUniformBuffers{this, &ThinEngine::get_supportsUniformBuffers}
     , _shouldUseHighPrecisionShader{this, &ThinEngine::get__shouldUseHighPrecisionShader}
     , needPOTTextures{this, &ThinEngine::get_needPOTTextures}
+    , activeRenderLoops{this, &ThinEngine::get_activeRenderLoops}
     , doNotHandleContextLost{this, &ThinEngine::get_doNotHandleContextLost,
                              &ThinEngine::set_doNotHandleContextLost}
     , _alphaState{std::make_unique<AlphaState>()}
@@ -206,6 +207,11 @@ bool ThinEngine::get__shouldUseHighPrecisionShader() const
 bool ThinEngine::get_needPOTTextures() const
 {
   return _webGLVersion < 2.f || forcePOTTextures;
+}
+
+std::vector<SA::delegate<void()>>& ThinEngine::get_activeRenderLoops()
+{
+  return _activeRenderLoops;
 }
 
 bool ThinEngine::get_doNotHandleContextLost() const
@@ -442,6 +448,7 @@ void ThinEngine::_initGLContext()
   _caps.oculusMultiview       = _gl->getExtension("OCULUS_multiview");
   _caps.depthTextureExtension = false;
   _caps.canUseGLInstanceID    = !(_badOS && _webGLVersion <= 1.f);
+  _caps.canUseGLVertexID      = _webGLVersion > 1.f;
 
   // Those parameters cannot always be reliably queried
   // (GlGetError returns INVALID_ENUM under windows 10 (VM with parallels desktop opengl driver)
@@ -607,6 +614,7 @@ void ThinEngine::_initFeatures()
   _features.supportExtendedTextureFormats             = _webGLVersion != 1.f;
   _features.supportSwitchCaseInShader                 = _webGLVersion != 1.f;
   _features.supportSyncTextureRead                    = true;
+  _features.needsInvertingBitmap                      = true;
   _features._collectUbosUpdatedInFrame                = false;
 }
 
@@ -2073,6 +2081,9 @@ bool ThinEngine::setArray(const WebGLUniformLocationPtr& uniform, const Float32A
     return false;
   }
 
+  if (array.empty()) {
+    return false;
+  }
   _gl->uniform1fv(uniform.get(), array);
   return true;
 }
@@ -3552,6 +3563,9 @@ void ThinEngine::dispose()
   _currentProgram        = nullptr;
 
   Effect::ResetCache();
+
+  onDisposeObservable.notifyObservers(this);
+  onDisposeObservable.clear();
 }
 
 unsigned int ThinEngine::getError() const

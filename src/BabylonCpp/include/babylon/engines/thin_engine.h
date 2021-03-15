@@ -1829,6 +1829,12 @@ protected:
   bool get_needPOTTextures() const;
 
   /**
+   * @brief Gets the list of current active render loop functions.
+   * @returns an array with the current render loop functions
+   */
+  std::vector<SA::delegate<void()>>& get_activeRenderLoops();
+
+  /**
    * @brief Gets a boolean indicating if resources should be retained to be able to handle context
    * lost events.
    * @see https://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
@@ -2066,6 +2072,11 @@ public:
   bool disableUniformBuffers = false;
 
   /**
+   * An event triggered when the engine is disposed.
+   */
+  Observable<ThinEngine> onDisposeObservable;
+
+  /**
    * Gets the current frame id
    */
   ReadOnlyProperty<ThinEngine, size_t> frameId;
@@ -2108,6 +2119,12 @@ public:
 
   /** @hidden */
   bool _videoTextureSupported = false;
+
+  /**
+   * Gets the list of current active render loop functions
+   * @returns an array with the current render loop functions
+   */
+  ReadOnlyProperty<ThinEngine, std::vector<SA::delegate<void()>>> activeRenderLoops;
 
   // Lost context
   /**
