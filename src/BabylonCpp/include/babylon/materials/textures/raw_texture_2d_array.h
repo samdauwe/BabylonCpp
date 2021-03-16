@@ -42,11 +42,44 @@ public:
    */
   void update(const ArrayBufferView& data);
 
+  /**
+   * @brief Creates a RGBA texture from some data.
+   * @param data Define the texture data
+   * @param width Define the width of the texture
+   * @param height Define the height of the texture
+   * @param depth defines the number of layers of the texture
+   * @param scene defines the scene the texture will belong to
+   * @param generateMipMaps Define whether or not to create mip maps for the texture
+   * @param invertY define if the data should be flipped on Y when uploaded to the GPU
+   * @param samplingMode define the texture sampling mode (Texture.xxx_SAMPLINGMODE)
+   * @param type define the format of the data (int, float... Engine.TEXTURETYPE_xxx)
+   * @returns the RGBA texture
+   */
+  static std::unique_ptr<RawTexture2DArray>
+  CreateRGBATexture(const ArrayBufferView& data, int width, int height, int depth, Scene* scene,
+                    bool generateMipMaps = true, bool invertY = false,
+                    unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                    unsigned int type         = Constants::TEXTURETYPE_UNSIGNED_INT);
+
+protected:
+  /**
+   * @brief Gets the number of layers of the texture.
+   */
+  int get_depth() const;
+
 public:
   /**
    * Gets or sets the texture format to use
    */
   unsigned int format;
+
+  /**
+   * Gets the number of layers of the texture
+   */
+  ReadOnlyProperty<RawTexture2DArray, int> depth;
+
+private:
+  int _depth;
 
 }; // end of struct of class RawTexture2DArray
 
