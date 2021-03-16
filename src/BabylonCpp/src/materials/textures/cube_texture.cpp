@@ -86,8 +86,8 @@ CubeTexture::CubeTexture(
         forcedExtension :
         (lastDot > -1 ? StringTools::toLowerCase(rootUrl.substr(static_cast<size_t>(lastDot))) :
                         "");
-  const auto isDDS = (extension == ".dds");
-  const auto isEnv = (extension == ".env");
+  const auto isDDS = (StringTools::indexOf(extension, ".dds") == 0);
+  const auto isEnv = (StringTools::indexOf(extension, ".env") == 0);
 
   if (isEnv) {
     gammaSpace                = false;
