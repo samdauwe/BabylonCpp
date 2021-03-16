@@ -63,7 +63,6 @@ MirrorTexture::MirrorTexture(const std::string& iName,
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
     _mirrorMatrix.multiplyToRef(scene->getViewMatrix(), _transformMatrix);
 
-    // Clone to not mark matrices as updated
     scene_->setTransformMatrix(_transformMatrix, scene_->getProjectionMatrix());
 
     _saveClipPlane    = scene->clipPlane;
