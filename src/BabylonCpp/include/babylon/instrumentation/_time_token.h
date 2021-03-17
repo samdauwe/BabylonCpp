@@ -4,12 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 namespace GL {
-class IGLQuery;
-using IGLQueryPtr = std::shared_ptr<IGLQuery>;
+FWD_CLASS_SPTR(IGLQuery)
 } // end of namespace GL
 
 struct BABYLON_SHARED_EXPORT _TimeToken {
