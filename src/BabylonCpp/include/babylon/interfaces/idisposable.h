@@ -9,7 +9,9 @@ namespace BABYLON {
  * @brief Define an interface for all classes that will hold resources.
  */
 struct BABYLON_SHARED_EXPORT IDisposable {
+
   virtual ~IDisposable() = default;
+
   /**
    * @brief Releases resources associated with this node.
    * @param doNotRecurse Set to true to not recurse into each children (recurse into each children
