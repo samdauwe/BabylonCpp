@@ -4,13 +4,13 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class BaseTexture;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+FWD_CLASS_SPTR(BaseTexture)
 
 /**
  * @brief Represents the different options available during the creation of a Environment helper.
