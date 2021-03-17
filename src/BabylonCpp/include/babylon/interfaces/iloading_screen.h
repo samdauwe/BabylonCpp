@@ -10,13 +10,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ILoadingScreen {
 
 public:
-  virtual ~ILoadingScreen() = default;
+  virtual ~ILoadingScreen()       = default;
   virtual void displayLoadingUI() = 0;
   virtual void hideLoadingUI()    = 0;
 
 public:
   std::string loadingUIBackgroundColor;
   std::string loadingUIText;
+
 }; // end of class ILoadingScreen
 
 } // end of namespace BABYLON
