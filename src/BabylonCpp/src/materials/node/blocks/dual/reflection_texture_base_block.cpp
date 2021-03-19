@@ -38,27 +38,27 @@ BaseTexturePtr& ReflectionTextureBaseBlock::get_texture()
   return _texture;
 }
 
-void ReflectionTextureBaseBlock::set_texture(const BaseTexturePtr& texture)
+void ReflectionTextureBaseBlock::set_texture(const BaseTexturePtr& iTexture)
 {
-  if (_texture == texture) {
+  if (_texture == iTexture) {
     return;
   }
 
   const auto scene
-    = texture && texture->getScene() ? texture->getScene() : Engine::LastCreatedScene();
+    = iTexture && iTexture->getScene() ? iTexture->getScene() : Engine::LastCreatedScene();
 
-  if (!texture && scene) {
+  if (!iTexture && scene) {
     scene->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag,
       [this](Material* mat) -> bool { return _texture && mat->hasTexture(_texture); });
   }
 
-  _texture = texture;
+  _texture = iTexture;
 
-  if (texture && scene) {
+  if (iTexture && scene) {
     scene->markAllMaterialsAsDirty(
       Constants::MATERIAL_TextureDirtyFlag,
-      [texture](Material* mat) -> bool { return mat->hasTexture(texture); });
+      [iTexture](Material* mat) -> bool { return mat->hasTexture(iTexture); });
   }
 }
 
@@ -481,7 +481,7 @@ std::string ReflectionTextureBaseBlock::_dumpPropertiesCode()
         _codeVariableName.c_str(), iTexture->name.c_str(), iTexture->noMipmap() ? "true" : "false",
         iTexture->_prefiltered ? "true" : "false",
         !forcedExtension.empty() ? StringTools::printf("\"%s\"", forcedExtension.c_str()).c_str() :
-                                                   "");
+                                   "");
     }
   }
   else {
