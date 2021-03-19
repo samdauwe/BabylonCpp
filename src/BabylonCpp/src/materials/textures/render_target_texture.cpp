@@ -218,7 +218,7 @@ IRenderTargetOptions& RenderTargetTexture::get_renderTargetOptions()
 }
 
 void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction, bool bilinearFiltering,
-                                                    bool generateStencil, unsigned int samples)
+                                                    bool generateStencil, unsigned int iSamples)
 {
   auto internalTexture = getInternalTexture();
   if (!getScene() || !internalTexture) {
@@ -235,7 +235,7 @@ void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction, bool
   options.comparisonFunction            = comparisonFunction;
   options.generateStencil               = generateStencil;
   options.isCube                        = isCube;
-  options.samples                       = samples;
+  options.samples                       = iSamples;
   internalTexture->_depthStencilTexture = engine->createDepthStencilTexture(_size, options);
 }
 

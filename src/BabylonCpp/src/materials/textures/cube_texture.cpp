@@ -144,7 +144,7 @@ CubeTexture::CubeTexture(
                                                    lodScale, lodOffset, nullptr, loaderOptions);
       }
       _texture->onLoadedObservable.add(
-        [this](InternalTexture* /*internalTexture*/, EventState& /*es*/) -> void {
+        [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
           onLoadObservable.notifyObservers(this);
         });
     }
@@ -157,8 +157,10 @@ CubeTexture::CubeTexture(
       Tools::SetImmediate([this]() { _onLoadProcessing(); });
     }
     else {
-      _texture->onLoadedObservable.add([this](InternalTexture* /*internalTexture*/,
-                                              EventState& /*es*/) -> void { _onLoadProcessing(); });
+      _texture->onLoadedObservable.add(
+        [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
+          _onLoadProcessing();
+        });
     }
   }
 }
@@ -209,7 +211,7 @@ std::string CubeTexture::getClassName() const
 }
 
 void CubeTexture::updateURL(
-  const std::string& iUrl, const std::string& forcedExtension,
+  const std::string& iUrl, const std::string& iForcedExtension,
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad, bool prefiltered)
 {
   if (!url.empty()) {
@@ -227,16 +229,16 @@ void CubeTexture::updateURL(
     gammaSpace                = false;
     anisotropicFilteringLevel = 1;
   }
-  _forcedExtension = forcedExtension;
+  _forcedExtension = iForcedExtension;
 
   if (onLoad) {
     _delayedOnLoad = onLoad;
   }
 
-  delayLoad(forcedExtension);
+  delayLoad(iForcedExtension);
 }
 
-void CubeTexture::delayLoad(const std::string& forcedExtension)
+void CubeTexture::delayLoad(const std::string& iForcedExtension)
 {
   if (delayLoadState != Constants::DELAYLOADSTATE_NOTLOADED) {
     return;
@@ -250,15 +252,15 @@ void CubeTexture::delayLoad(const std::string& forcedExtension)
     if (_prefiltered) {
       _texture
         = _getEngine()->createPrefilteredCubeTexture(url, scene, 0.8f, 0.f, _delayedOnLoad, nullptr,
-                                                     _format, forcedExtension, _createPolynomials);
+                                                     _format, iForcedExtension, _createPolynomials);
     }
     else {
       _texture = _getEngine()->createCubeTexture(url, scene, _files, _noMipmap, _delayedOnLoad,
-                                                 nullptr, _format, forcedExtension, false, 0, 0,
+                                                 nullptr, _format, iForcedExtension, false, 0, 0,
                                                  nullptr, _loaderOptions);
     }
     _texture->onLoadedObservable.add(
-      [this](InternalTexture* /*internalTexture*/, EventState& /*es*/) -> void {
+      [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
         onLoadObservable.notifyObservers(this);
       });
   }

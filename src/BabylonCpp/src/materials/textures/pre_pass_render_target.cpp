@@ -52,10 +52,10 @@ void PrePassRenderTarget::_checkSize()
   }
 }
 
-void PrePassRenderTarget::updateCount(size_t count,
+void PrePassRenderTarget::updateCount(size_t iCount,
                                       const std::optional<IMultiRenderTargetOptions>& options)
 {
-  MultiRenderTarget::updateCount(count, options);
+  MultiRenderTarget::updateCount(iCount, options);
   _internalTextureDirty = true;
 }
 

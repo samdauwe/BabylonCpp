@@ -69,13 +69,13 @@ Texture::Texture(
     , _delayedOnError{nullptr}
     , _onLoad{onLoad}
 {
-  const auto samplingMode = iSamplingMode.value_or(TextureConstants::TRILINEAR_SAMPLINGMODE);
+  const auto _samplingMode = iSamplingMode.value_or(TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   name                 = iUrl;
   url                  = iUrl;
   _noMipmap            = iNoMipmap;
   _invertY             = invertY.value_or(true);
-  _initialSamplingMode = samplingMode;
+  _initialSamplingMode = _samplingMode;
   _buffer              = buffer;
   _deleteBuffer        = deleteBuffer;
   _mimeType            = mimeType;
@@ -133,12 +133,13 @@ Texture::Texture(
     return;
   }
 
-  _texture = _getFromCache(url, noMipmap, samplingMode, invertY);
+  _texture = _getFromCache(url, noMipmap, _samplingMode, invertY);
 
   if (!_texture) {
     if (!scene || !scene->useDelayedTextureLoading) {
-      _texture = engine->createTexture(url, noMipmap, _invertY, scene, samplingMode, _load, onError,
-                                       _buffer, nullptr, _format, "", mimeType, loaderOptions);
+      _texture
+        = engine->createTexture(url, noMipmap, _invertY, scene, _samplingMode, _load, onError,
+                                _buffer, nullptr, _format, "", mimeType, loaderOptions);
       if (deleteBuffer) {
         _buffer = std::nullopt;
       }

@@ -389,15 +389,15 @@ void PrePassRenderer::_bindFrameBuffer(const PrePassRenderTargetPtr& /*prePassRe
   }
 }
 
-void PrePassRenderer::_setEnabled(bool enabled)
+void PrePassRenderer::_setEnabled(bool iEnabled)
 {
-  _enabled = enabled;
+  _enabled = iEnabled;
 }
 
 void PrePassRenderer::_setRenderTargetEnabled(const PrePassRenderTargetPtr& prePassRenderTarget,
-                                              bool enabled)
+                                              bool iEnabled)
 {
-  prePassRenderTarget->enabled = enabled;
+  prePassRenderTarget->enabled = iEnabled;
 }
 
 PrePassEffectConfigurationPtr
@@ -481,10 +481,10 @@ PrePassRenderer::_getPostProcessesSource(const PrePassRenderTargetPtr& prePassRe
   }
   else if (prePassRenderTarget->renderTargetTexture) {
     if (prePassRenderTarget->renderTargetTexture->useCameraPostProcesses) {
-      const auto camera = prePassRenderTarget->renderTargetTexture->activeCamera ?
-                            prePassRenderTarget->renderTargetTexture->activeCamera :
-                            _scene->activeCamera();
-      return camera ? camera->_postProcesses : std::vector<PostProcessPtr>();
+      const auto iCamera = prePassRenderTarget->renderTargetTexture->activeCamera ?
+                             prePassRenderTarget->renderTargetTexture->activeCamera :
+                             _scene->activeCamera();
+      return iCamera ? iCamera->_postProcesses : std::vector<PostProcessPtr>();
     }
     else if (!prePassRenderTarget->renderTargetTexture->postProcesses().empty()) {
       return prePassRenderTarget->renderTargetTexture->postProcesses();
@@ -522,7 +522,7 @@ void PrePassRenderer::_setupOutputForThisPass(const PrePassRenderTargetPtr& preP
   const auto firstPrePassPP = !prePassRenderTarget->_beforeCompositionPostProcesses.empty() ?
                                 prePassRenderTarget->_beforeCompositionPostProcesses[0] :
                                 nullptr;
-  PostProcessPtr firstPP    = nullptr;
+  PostProcessPtr firstPP = nullptr;
 
   // Setting the scene-wide post process configuration
   _scene->imageProcessingConfiguration()->applyByPostProcess
