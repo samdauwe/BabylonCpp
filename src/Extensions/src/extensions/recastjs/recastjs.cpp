@@ -149,8 +149,9 @@ int NavMesh::rasterizeTileLayers(const int tx, const int ty, const rcConfig& cfg
     const int* ctris                = &chunkyMesh->tris[node.i * 3];
     const int ntris                 = node.n;
 
-    if (!rcRasterizeTriangles(&ctx, verts.data(), verts.size(), ctris, triareas.data(), ntris,
-                              *tileIntermediates.m_solid, tcfg.walkableClimb)) {
+    if (!rcRasterizeTriangles(&ctx, verts.data(), static_cast<int>(verts.size()), ctris,
+                              triareas.data(), ntris, *tileIntermediates.m_solid,
+                              tcfg.walkableClimb)) {
       return 0;
     }
   }
@@ -263,9 +264,9 @@ bool NavMesh::computeTiledNavMesh(const std::vector<float>& verts, const std::ve
   tcparams.ch                     = cfg.ch;
   tcparams.width                  = cfg.tileSize;
   tcparams.height                 = cfg.tileSize;
-  tcparams.walkableHeight         = cfg.walkableHeight;
-  tcparams.walkableRadius         = cfg.walkableRadius;
-  tcparams.walkableClimb          = cfg.walkableClimb;
+  tcparams.walkableHeight         = static_cast<float>(cfg.walkableHeight);
+  tcparams.walkableRadius         = static_cast<float>(cfg.walkableRadius);
+  tcparams.walkableClimb          = static_cast<float>(cfg.walkableClimb);
   tcparams.maxSimplificationError = cfg.maxSimplificationError;
   tcparams.maxTiles               = tw * th * EXPECTED_LAYERS_PER_TILE;
   tcparams.maxObstacles           = 128;
@@ -308,7 +309,7 @@ bool NavMesh::computeTiledNavMesh(const std::vector<float>& verts, const std::ve
   }
 
   intermediates.m_chunkyMesh = new rcChunkyTriMesh;
-  if (!rcCreateChunkyTriMesh(verts.data(), tris.data(), tris.size() / 3, 256,
+  if (!rcCreateChunkyTriMesh(verts.data(), tris.data(), static_cast<int>(tris.size() / 3), 256,
                              intermediates.m_chunkyMesh)) {
     Log("Unable to create chunky trimesh.");
     return false;
@@ -380,17 +381,17 @@ void NavMesh::build(const float* positions, const int /*positionCount*/, const i
 
   std::vector<float> verts;
   verts.resize(triangleIndices.size() * 3);
-  int nverts = triangleIndices.size();
+  int nverts = static_cast<int>(triangleIndices.size());
   for (unsigned int i = 0; i < triangleIndices.size(); i++) {
     verts[i * 3 + 0] = triangleIndices[i].x;
     verts[i * 3 + 1] = triangleIndices[i].y;
     verts[i * 3 + 2] = triangleIndices[i].z;
   }
-  int ntris = triangleIndices.size() / 3;
+  int ntris = static_cast<int>(triangleIndices.size() / 3);
   std::vector<int> tris;
   tris.resize(triangleIndices.size());
   for (unsigned int i = 0; i < triangleIndices.size(); i++) {
-    tris[i] = triangleIndices.size() - i - 1;
+    tris[i] = static_cast<int>(triangleIndices.size() - i - 1);
   }
 
   // Allocate array that can hold triangle area types.
@@ -605,9 +606,9 @@ void NavMesh::build(const float* positions, const int /*positionCount*/, const i
       params.offMeshConFlags  = 0; // geom->getOffMeshConnectionFlags();
       params.offMeshConUserID = 0; // geom->getOffMeshConnectionId();
       params.offMeshConCount  = 0; // geom->getOffMeshConnectionCount();
-      params.walkableHeight   = config.walkableHeight;
-      params.walkableRadius   = config.walkableRadius;
-      params.walkableClimb    = config.walkableClimb;
+      params.walkableHeight   = static_cast<float>(config.walkableHeight);
+      params.walkableRadius   = static_cast<float>(config.walkableRadius);
+      params.walkableClimb    = static_cast<float>(config.walkableClimb);
       rcVcopy(params.bmin, pmesh->bmin);
       rcVcopy(params.bmax, pmesh->bmax);
       params.cs          = cfg.cs;
@@ -697,9 +698,9 @@ void NavMesh::buildFromNavmeshData(NavmeshData* navmeshData)
 
   if (recastHeader.magic == NAVMESHSET_MAGIC) {
     NavMeshSetHeader header;
-    size_t readLen = sizeof(NavMeshSetHeader);
-    memcpy(&header, bits, readLen);
-    bits += readLen;
+    size_t iReadLen = sizeof(NavMeshSetHeader);
+    memcpy(&header, bits, iReadLen);
+    bits += iReadLen;
 
     if (recastHeader.version != NAVMESHSET_VERSION) {
       return;
@@ -717,9 +718,9 @@ void NavMesh::buildFromNavmeshData(NavmeshData* navmeshData)
     // Read tiles.
     for (int i = 0; i < recastHeader.numTiles; ++i) {
       NavMeshTileHeader tileHeader;
-      readLen = sizeof(tileHeader);
-      memcpy(&tileHeader, bits, readLen);
-      bits += readLen;
+      iReadLen = sizeof(tileHeader);
+      memcpy(&tileHeader, bits, iReadLen);
+      bits += iReadLen;
 
       if (!tileHeader.tileRef || !tileHeader.dataSize) {
         break;
@@ -730,9 +731,9 @@ void NavMesh::buildFromNavmeshData(NavmeshData* navmeshData)
         break;
       }
 
-      readLen = tileHeader.dataSize;
-      memcpy(data, bits, readLen);
-      bits += readLen;
+      iReadLen = tileHeader.dataSize;
+      memcpy(data, bits, iReadLen);
+      bits += iReadLen;
 
       mesh->addTile(data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0);
     }
@@ -745,9 +746,9 @@ void NavMesh::buildFromNavmeshData(NavmeshData* navmeshData)
     }
 
     TileCacheSetHeader header;
-    size_t readLen = sizeof(TileCacheSetHeader);
-    memcpy(&header, bits, readLen);
-    bits += readLen;
+    size_t iReadLen = sizeof(TileCacheSetHeader);
+    memcpy(&header, bits, iReadLen);
+    bits += iReadLen;
 
     m_navMesh = dtAllocNavMesh();
     if (!m_navMesh) {
@@ -770,9 +771,9 @@ void NavMesh::buildFromNavmeshData(NavmeshData* navmeshData)
     // Read tiles.
     for (int i = 0; i < recastHeader.numTiles; ++i) {
       TileCacheTileHeader tileHeader;
-      size_t readLen = sizeof(tileHeader);
-      memcpy(&tileHeader, bits, readLen);
-      bits += readLen;
+      iReadLen = sizeof(tileHeader);
+      memcpy(&tileHeader, bits, iReadLen);
+      bits += iReadLen;
 
       if (!tileHeader.tileRef || !tileHeader.dataSize) {
         break;
@@ -785,9 +786,9 @@ void NavMesh::buildFromNavmeshData(NavmeshData* navmeshData)
 
       memset(data, 0, tileHeader.dataSize);
 
-      readLen = tileHeader.dataSize;
-      memcpy(data, bits, readLen);
-      bits += readLen;
+      iReadLen = tileHeader.dataSize;
+      memcpy(data, bits, iReadLen);
+      bits += iReadLen;
 
       dtCompressedTileRef tile = 0;
       dtStatus addTileStatus
@@ -1119,7 +1120,7 @@ NavPath NavMesh::computePath(const Vec3& start, const Vec3& end) const
 
 dtObstacleRef NavMesh::addCylinderObstacle(const Vec3& position, float radius, float height)
 {
-  dtObstacleRef ref(-1);
+  dtObstacleRef ref(0);
   if (!m_tileCache) {
     return ref;
   }
@@ -1130,7 +1131,7 @@ dtObstacleRef NavMesh::addCylinderObstacle(const Vec3& position, float radius, f
 
 dtObstacleRef NavMesh::addBoxObstacle(const Vec3& position, const Vec3& extent, float angle)
 {
-  dtObstacleRef ref(-1);
+  dtObstacleRef ref(0);
   if (!m_tileCache) {
     return ref;
   }

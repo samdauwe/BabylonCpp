@@ -1,5 +1,8 @@
 #pragma once
+#include <algorithm>
 #include <iostream>
+#include <vector>
+
 #include <recastnavigation/Detour/Include/DetourCommon.h>
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
@@ -7,14 +10,13 @@
 #include <recastnavigation/DetourTileCache/Include/DetourTileCache.h>
 #include <recastnavigation/DetourTileCache/Include/DetourTileCacheBuilder.h>
 #include <recastnavigation/RecastDemo/Contrib/fastlz/fastlz.h>
-#include <vector>
 
 class dtNavMeshQuery;
 class dtNavMesh;
 class MeshLoader;
 class NavMesh;
 struct rcPolyMesh;
-class rcPolyMeshDetail;
+struct rcPolyMeshDetail;
 struct rcConfig;
 struct NavMeshintermediates;
 struct TileCacheData;
@@ -110,8 +112,7 @@ struct RecastFastLZCompressor : public dtTileCacheCompressor {
                             unsigned char* compressed, const int /*maxCompressedSize*/,
                             int* compressedSize)
   {
-    *compressedSize
-      = fastlz_compress(static_cast<const void*>(buffer), bufferSize, compressed);
+    *compressedSize = fastlz_compress(static_cast<const void*>(buffer), bufferSize, compressed);
     return DT_SUCCESS;
   }
 
