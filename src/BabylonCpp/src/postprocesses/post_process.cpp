@@ -392,9 +392,9 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
                                                           _engine->getRenderingCanvas()->height)
                        * _renderRatio);
 
-  auto desiredWidth  = std::holds_alternative<PostProcessOptions>(_options) ?
-                         std::get<PostProcessOptions>(_options).width :
-                         requiredWidth;
+  auto desiredWidth = std::holds_alternative<PostProcessOptions>(_options) ?
+                        std::get<PostProcessOptions>(_options).width :
+                        requiredWidth;
   auto desiredHeight = std::holds_alternative<PostProcessOptions>(_options) ?
                          std::get<PostProcessOptions>(_options).height :
                          requiredHeight;
@@ -464,7 +464,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
     }
 
     if (cache) {
-      cache->lastUsedRenderId = _renderId;
+      cache->lastUsedRenderId = static_cast<int>(_renderId);
     }
   }
 
