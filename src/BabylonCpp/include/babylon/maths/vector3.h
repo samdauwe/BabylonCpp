@@ -652,6 +652,12 @@ public:
   static Vector3 Zero();
 
   /**
+   * @brief Returns a new Vector3 set to (0.0, 0.0, 0.0).
+   * @returns a new empty Vector3
+   */
+  static Vector3 ZeroReadOnly();
+
+  /**
    * @brief Returns a new Vector3 set to (1.0, 1.0, 1.0).
    * @returns a new unit Vector3
    */

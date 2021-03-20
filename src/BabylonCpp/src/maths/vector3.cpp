@@ -663,6 +663,11 @@ Vector3 Vector3::Zero()
   return Vector3(0.f, 0.f, 0.f);
 }
 
+Vector3 Vector3::ZeroReadOnly()
+{
+  return Vector3(0.f, 0.f, 0.f);
+}
+
 Vector3 Vector3::One()
 {
   return Vector3(1.f, 1.f, 1.f);
