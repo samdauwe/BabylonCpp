@@ -1236,6 +1236,12 @@ public:
   /**
    * @brief Gets a boolean indicating if the engine can be instantiated (ie. if a webGL context can
    * be found).
+   */
+  static bool IsSupported();
+
+  /**
+   * @brief Gets a boolean indicating if the engine can be instantiated (ie. if a webGL context can
+   * be found).
    * @returns true if the engine can be created
    * @ignorenaming
    */

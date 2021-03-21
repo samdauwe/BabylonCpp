@@ -3961,6 +3961,11 @@ Uint8Array ThinEngine::readPixels(int x, int y, int width, int height, bool hasA
   return data;
 }
 
+bool ThinEngine::IsSupported()
+{
+  return ThinEngine::isSupported(); // Backward compat
+}
+
 bool ThinEngine::isSupported()
 {
   return true;
