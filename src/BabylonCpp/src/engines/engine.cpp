@@ -79,9 +79,25 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     return;
   }
 
-  _onCanvasFocus = [this]() { onCanvasFocusObservable.notifyObservers(this); };
+  _sharedInit(canvas, !!options.doNotHandleTouchAction, options.audioEngine);
 
-  _onCanvasBlur = [this]() { onCanvasBlurObservable.notifyObservers(this); };
+  _deterministicLockstep = options.deterministicLockstep;
+  _lockstepMaxSteps      = options.lockstepMaxSteps;
+  _timeStep              = options.timeStep.value_or(1.f / 60.f);
+}
+
+Engine::~Engine()
+{
+  stl_util::remove_vector_elements_equal(EngineStore::Instances, this);
+}
+
+void Engine::_sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool audioEngine)
+{
+  ThinEngine::_sharedInit(canvas, doNotHandleTouchAction, audioEngine);
+
+  _onCanvasFocus = [this]() -> void { onCanvasFocusObservable.notifyObservers(this); };
+
+  _onCanvasBlur = [this]() -> void { onCanvasBlurObservable.notifyObservers(this); };
 
   _onBlur = [this]() -> void {
     if (disablePerformanceMonitorInBackground) {
@@ -100,14 +116,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   _onCanvasPointerOut
     = [this](PointerEvent* ev) -> void { onCanvasPointerOutObservable.notifyObservers(ev); };
 
-  _deterministicLockstep = options.deterministicLockstep;
-  _lockstepMaxSteps      = options.lockstepMaxSteps;
-  _timeStep              = options.timeStep.value_or(1.f / 60.f);
-}
-
-Engine::~Engine()
-{
-  stl_util::remove_vector_elements_equal(EngineStore::Instances, this);
+  if (!doNotHandleTouchAction) {
+    _disableTouchAction();
+  }
 }
 
 bool Engine::get__supportsHardwareTextureRescaling() const
@@ -215,6 +226,11 @@ void Engine::setZOffset(float value)
 float Engine::getZOffset() const
 {
   return _depthCullingState->zOffset();
+}
+
+bool Engine::getDepthBuffer() const
+{
+  return _depthCullingState->depthTest();
 }
 
 void Engine::setDepthBuffer(bool enable)
@@ -476,8 +492,7 @@ std::string Engine::getFragmentShaderSource(const WebGLProgramPtr& program)
 }
 
 void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                                    const RenderTargetTexturePtr& texture,
-                                    const std::string& /*name*/)
+                                    const RenderTargetTexturePtr& texture, const std::string& name)
 {
   if (channel < 0) {
     return;
@@ -488,18 +503,28 @@ void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& 
   }
 
   if (!texture || !texture->depthStencilTexture()) {
-    _setTexture(channel, nullptr);
+    _setTexture(channel, nullptr, false, false, name);
   }
   else {
-    _setTexture(channel, std::static_pointer_cast<BaseTexture>(texture), false, true);
+    _setTexture(channel, std::static_pointer_cast<BaseTexture>(texture), false, true, name);
   }
 }
 
 void Engine::setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess,
                                        const std::string& name)
 {
-  const auto _ind = static_cast<size_t>(postProcess->_currentRenderTextureInd);
-  _bindTexture(channel, postProcess ? postProcess->_textures[_ind] : nullptr, name);
+  InternalTexturePtr postProcessInput = nullptr;
+  if (postProcess) {
+    if (postProcess->_currentRenderTextureInd < postProcess->_textures.size()
+        && postProcess->_textures[postProcess->_currentRenderTextureInd]) {
+      postProcessInput = postProcess->_textures[postProcess->_currentRenderTextureInd];
+    }
+    else if (postProcess->_forcedOutputTexture) {
+      postProcessInput = postProcess->_forcedOutputTexture;
+    }
+  }
+
+  _bindTexture(channel, postProcessInput, name);
 }
 
 void Engine::setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess,
@@ -618,23 +643,23 @@ void Engine::endFrame()
   onEndFrameObservable.notifyObservers(this);
 }
 
-void Engine::resize(bool /*forceSetSize*/)
+void Engine::resize(bool forceSetSize)
 {
   // We're not resizing the size of the canvas while in VR mode & presenting
   if (isVRPresenting()) {
     return;
   }
 
-  ThinEngine::resize();
+  ThinEngine::resize(forceSetSize);
 }
 
-bool Engine::setSize(int width, int height, bool /*forceSetSize*/)
+bool Engine::setSize(int width, int height, bool forceSetSize)
 {
   if (!_renderingCanvas) {
     return false;
   }
 
-  if (!ThinEngine::setSize(width, height)) {
+  if (!ThinEngine::setSize(width, height, forceSetSize)) {
     return false;
   }
 

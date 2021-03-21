@@ -67,13 +67,13 @@ public:
    */
   static constexpr unsigned int ALPHA_SCREENMODE = Constants::ALPHA_SCREENMODE;
 
-  /** Defines that the ressource is not delayed*/
+  /** Defines that the resource is not delayed */
   static constexpr unsigned int DELAYLOADSTATE_NONE = Constants::DELAYLOADSTATE_NONE;
-  /** Defines that the ressource was successfully delay loaded */
+  /** Defines that the resource was successfully delay loaded */
   static constexpr unsigned int DELAYLOADSTATE_LOADED = Constants::DELAYLOADSTATE_LOADED;
-  /** Defines that the ressource is currently delay loading */
+  /** Defines that the resource is currently delay loading */
   static constexpr unsigned int DELAYLOADSTATE_LOADING = Constants::DELAYLOADSTATE_LOADING;
-  /** Defines that the ressource is delayed and has not started loading */
+  /** Defines that the resource is delayed and has not started loading */
   static constexpr unsigned int DELAYLOADSTATE_NOTLOADED = Constants::DELAYLOADSTATE_NOTLOADED;
 
   // Depht or Stencil test Constants::
@@ -197,7 +197,7 @@ public:
   static constexpr unsigned int TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV
     = Constants::TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV;
 
-  /** nearest is mag = nearest and min = nearest and mip = linear */
+  /** nearest is mag = nearest and min = nearest and mip = none */
   static constexpr unsigned int TEXTURE_NEAREST_SAMPLINGMODE
     = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   /** Bilinear is mag = linear and min = linear and mip = nearest */
@@ -299,7 +299,7 @@ public:
 
   /**
    * @brief Method called to create the default loading screen.
-   * This can be overriden in your own app.
+   * This can be overridden in your own app.
    * @param canvas The rendering canvas element
    * @returns The loading screen
    */
@@ -343,13 +343,13 @@ public:
 
   /**
    * @brief Gets the client rect of the HTML canvas attached with the current webGL context.
-   * @returns a client rectanglee
+   * @returns a client rectangle
    */
   std::optional<ClientRect> getRenderingCanvasClientRect();
 
   /**
    * @brief Gets the client rect of the HTML element used for events.
-   * @returns a client rectanglee
+   * @returns a client rectangle
    */
   std::optional<ClientRect> getInputElementClientRect();
 
@@ -404,6 +404,12 @@ public:
    * @returns the current zOffset state
    */
   float getZOffset() const;
+
+  /**
+   * @brief Gets a boolean indicating if depth testing is enabled.
+   * @returns the current state
+   */
+  bool getDepthBuffer() const;
 
   /**
    * @brief Enable or disable depth buffering.
@@ -668,6 +674,7 @@ public:
    * @param channel The texture channel
    * @param uniform The uniform to set
    * @param texture The render target texture containing the depth stencil texture to apply
+   * @param name The texture name
    */
   void setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& uniform,
                               const RenderTargetTexturePtr& texture, const std::string& name = "");
@@ -676,6 +683,7 @@ public:
    * @brief Sets a texture to the webGL context from a postprocess.
    * @param channel defines the channel to use
    * @param postProcess defines the source postprocess
+   * @param name name of the channel
    */
   void setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess,
                                  const std::string& name);
@@ -684,6 +692,7 @@ public:
    * @brief Binds the output of the passed in post process to the texture channel specified.
    * @param channel The channel the texture should be bound to
    * @param postProcess The post process which's output should be bound
+   * @param name name of the channel
    */
   void setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess,
                                        const std::string& name);
@@ -742,6 +751,7 @@ public:
 
   /**
    * @brief Resize the view according to the canvas' size.
+   * @param forceSetSize true to force setting the sizes of the underlying canvas
    */
   void resize(bool forceSetSize = false) override;
 
@@ -749,6 +759,7 @@ public:
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
+   * @param forceSetSize true to force setting the sizes of the underlying canvas
    * @returns true if the size was changed
    */
   bool setSize(int width = 0, int height = 0, bool forceSetSize = false) override;
@@ -781,7 +792,7 @@ public:
 
   /**
    * @brief Rescales a texture.
-   * @param source input texutre
+   * @param source input texture
    * @param destination destination texture
    * @param scene scene to use to render the resize
    * @param internalFormat format to use when resizing
@@ -854,14 +865,14 @@ public:
     const IParticleSystemPtr& particleSystem                                      = nullptr);
 
   /**
-   * @brief Creates a webGL buffer to use with instanciation.
+   * @brief Creates a webGL buffer to use with instantiation.
    * @param capacity defines the size of the buffer
    * @returns the webGL buffer
    */
   WebGLDataBufferPtr createInstancesBuffer(unsigned int capacity);
 
   /**
-   * @brief Delete a webGL buffer used with instanciation.
+   * @brief Delete a webGL buffer used with instantiation.
    * @param buffer defines the webGL buffer to delete
    */
   void deleteInstancesBuffer(const WebGLDataBufferPtr& buffer);
@@ -1069,7 +1080,7 @@ protected:
    * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you provide
    * a WebGL context, Babylon.js will not hook events on the canvas (like pointers, keyboards,
    * etc...) so no event observables will be available. This is mostly used when Babylon.js is used
-   * as a plugin on a system which alreay used the WebGL context
+   * as a plugin on a system which already used the WebGL context
    * @param antialias defines enable antialiasing (default: false)
    * @param options defines further options to be sent to the getContext() function
    * @param adaptToDeviceRatio defines whether to adapt to the device's viewport characteristics
@@ -1111,6 +1122,15 @@ protected:
    * @see https://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
   void set_loadingUIBackgroundColor(std::string color);
+
+  /**
+   * @brief Shared initialization across engines types.
+   * @param canvas The canvas associated with this instance of the engine.
+   * @param doNotHandleTouchAction Defines that engine should ignore modifying touch action
+   * attribute and style
+   * @param audioEngine Defines if an audio engine should be created by default
+   */
+  void _sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool audioEngine) override;
 
   void _reportDrawCall() override;
   void _rebuildBuffers() override;
@@ -1196,7 +1216,7 @@ public:
   Observable<Engine> onBeforeShaderCompilationObservable;
 
   /**
-   * Observable raised when the engine has jsut compiled a shader
+   * Observable raised when the engine has just compiled a shader
    */
   Observable<Engine> onAfterShaderCompilationObservable;
 
@@ -1245,15 +1265,16 @@ public:
    */
   WriteOnlyProperty<Engine, std::string> loadingUIBackgroundColor;
 
-private:
-  ILoadingScreenPtr _loadingScreen = nullptr;
-  bool _pointerLockRequested       = false;
-  PostProcessPtr _rescalePostProcess;
-
+protected:
   // Deterministic lockstepMaxSteps
   bool _deterministicLockstep    = false;
   unsigned int _lockstepMaxSteps = 4;
   float _timeStep                = 1.f / 60.f;
+
+private:
+  ILoadingScreenPtr _loadingScreen = nullptr;
+  bool _pointerLockRequested       = false;
+  PostProcessPtr _rescalePostProcess;
 
   // FPS
   float _fps                                              = 60.f;
