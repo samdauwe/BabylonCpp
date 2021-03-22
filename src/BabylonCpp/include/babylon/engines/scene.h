@@ -2081,6 +2081,11 @@ protected:
   unsigned int get_fogMode() const;
 
   /**
+   * @brief Flag indicating that the frame buffer binding is handled by another component.
+   */
+  bool get_prePass() const;
+
+  /**
    * @brief Sets a boolean indicating if shadows are enabled on this scene.
    */
   void set_shadowsEnabled(bool value);
@@ -2943,7 +2948,7 @@ public:
   /**
    * Flag indicating that the frame buffer binding is handled by another component
    */
-  bool prePass;
+  ReadOnlyProperty<Scene, bool> prePass;
 
   // Lights
 
@@ -3212,6 +3217,12 @@ public:
 
   /** Hidden */
   std::vector<AnimatablePtr> _activeAnimatables;
+
+  /** Hidden */
+  Matrix _viewMatrix;
+
+  /** Hidden */
+  Matrix _projectionMatrix;
 
   /** Hidden */
   std::unique_ptr<Vector3> _forcedViewPosition;
@@ -3724,8 +3735,6 @@ private:
 
   /** Hidden */
   OutlineRendererPtr _outlineRenderer;
-  Matrix _viewMatrix;
-  Matrix _projectionMatrix;
   Matrix _alternateViewMatrix;
   Matrix _alternateProjectionMatrix;
   std::unique_ptr<Matrix> _alternateTransformMatrix;

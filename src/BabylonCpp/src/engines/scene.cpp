@@ -52,6 +52,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
+#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -140,7 +141,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , fogDensity{0.1f}
     , fogStart{0.f}
     , fogEnd{1000.f}
-    , prePass{false}
+    , prePass{this, &Scene::get_prePass}
     , shadowsEnabled{this, &Scene::get_shadowsEnabled, &Scene::set_shadowsEnabled}
     , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
     , _activeCamera{nullptr}
@@ -635,6 +636,11 @@ unsigned int Scene::get_fogMode() const
   return _fogMode;
 }
 
+bool Scene::get_prePass() const
+{
+  return !!prePassRenderer() && prePassRenderer()->defaultRT->enabled;
+}
+
 void Scene::set_shadowsEnabled(bool value)
 {
   if (_shadowsEnabled == value) {
@@ -1037,9 +1043,11 @@ void Scene::_updatePointerPosition(const PointerEvent& evt)
 
 void Scene::_createUbo()
 {
-  _sceneUbo = std::make_unique<UniformBuffer>(_engine, Float32Array(), true);
+  _sceneUbo = std::make_unique<UniformBuffer>(_engine, Float32Array(), false, "scene");
   _sceneUbo->addUniform("viewProjection", 16);
   _sceneUbo->addUniform("view", 16);
+  _sceneUbo->addUniform("projection", 16);
+  _sceneUbo->addUniform("vEyePosition", 4);
 }
 
 void Scene::_createAlternateUbo()
@@ -2402,7 +2410,7 @@ void Scene::setTransformMatrix(Matrix& viewL, Matrix& projectionL,
   else if (_sceneUbo->useUbo()) {
     _sceneUbo->updateMatrix("viewProjection", _transformMatrix);
     _sceneUbo->updateMatrix("view", _viewMatrix);
-    _sceneUbo->update();
+    _sceneUbo->updateMatrix("projection", _projectionMatrix);
   }
 }
 
@@ -4177,7 +4185,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   }
 
   // Clear
-  if ((autoClearDepthAndStencil || autoClear) && !prePass) {
+  if (autoClearDepthAndStencil || autoClear) {
     _engine->clear(clearColor, autoClear || forceWireframe() || forcePointsCloud(),
                    autoClearDepthAndStencil, autoClearDepthAndStencil);
   }
