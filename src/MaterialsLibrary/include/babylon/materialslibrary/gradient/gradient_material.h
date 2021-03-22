@@ -8,13 +8,11 @@
 
 namespace BABYLON {
 
-class IAnimatable;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(IAnimatable)
 
 namespace MaterialsLibrary {
 
-class GradientMaterial;
-using GradientMaterialPtr = std::shared_ptr<GradientMaterial>;
+FWD_CLASS_SPTR(GradientMaterial)
 
 class BABYLON_SHARED_EXPORT GradientMaterial : public PushMaterial {
 

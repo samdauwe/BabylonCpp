@@ -2,25 +2,21 @@
 #define BABYLON_MATERIALS_LIBRARY_TRI_PLANAR_TRI_PLANAR_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/triplanar/tri_planar_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-class IAnimatable;
-class Mesh;
-class Texture;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
-using MeshPtr         = std::shared_ptr<Mesh>;
-using TexturePtr      = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(Texture)
 
 namespace MaterialsLibrary {
 
-class TriPlanarMaterial;
-using TriPlanarMaterialPtr = std::shared_ptr<TriPlanarMaterial>;
+FWD_CLASS_SPTR(TriPlanarMaterial)
 
 class BABYLON_SHARED_EXPORT TriPlanarMaterial : public PushMaterial {
 

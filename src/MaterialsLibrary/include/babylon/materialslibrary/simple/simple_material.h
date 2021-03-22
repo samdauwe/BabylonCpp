@@ -2,21 +2,19 @@
 #define BABYLON_MATERIALS_LIBRARY_SIMPLE_SIMPLE_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/simple/simple_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class IAnimatable;
-class Texture;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-using TexturePtr     = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(Texture)
 
 namespace MaterialsLibrary {
 
-class SimpleMaterial;
-using SimpleMaterialPtr = std::shared_ptr<SimpleMaterial>;
+FWD_CLASS_SPTR(SimpleMaterial)
 
 class BABYLON_SHARED_EXPORT SimpleMaterial : public PushMaterial {
 

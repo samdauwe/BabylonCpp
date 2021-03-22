@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_FUR_FUR_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fur/fur_material_defines.h>
 #include <babylon/maths/color3.h>
@@ -9,19 +10,14 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class DynamicTexture;
-class IAnimatable;
-class Mesh;
-using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
-using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
-using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
-using MeshPtr           = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(DynamicTexture)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(Mesh)
 
 namespace MaterialsLibrary {
 
-class FurMaterial;
-using FurMaterialPtr = std::shared_ptr<FurMaterial>;
+FWD_CLASS_SPTR(FurMaterial)
 
 class BABYLON_SHARED_EXPORT FurMaterial : public PushMaterial {
 

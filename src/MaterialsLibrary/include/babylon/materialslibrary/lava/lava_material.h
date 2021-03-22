@@ -2,19 +2,18 @@
 #define BABYLON_MATERIALS_LIBRARY_LAVA_LAVA_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/lava/lava_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class IAnimatable;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(IAnimatable)
 
 namespace MaterialsLibrary {
 
-class LavaMaterial;
-using LavaMaterialPtr = std::shared_ptr<LavaMaterial>;
+FWD_CLASS_SPTR(LavaMaterial)
 
 class BABYLON_SHARED_EXPORT LavaMaterial : public PushMaterial {
 

@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/custom/shader_special_parts.h>
 #include <babylon/maths/vector4.h>
@@ -9,8 +10,7 @@
 
 namespace BABYLON {
 
-class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(Texture)
 
 namespace MaterialsLibrary {
 

@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_GRID_GRID_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/grid/grid_material_defines.h>
 #include <babylon/maths/color3.h>
@@ -10,8 +11,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-class GridMaterial;
-using GridMaterialPtr = std::shared_ptr<GridMaterial>;
+FWD_CLASS_SPTR(GridMaterial)
 
 /**
  * @brief The grid materials allows you to wrap any shape with a grid.

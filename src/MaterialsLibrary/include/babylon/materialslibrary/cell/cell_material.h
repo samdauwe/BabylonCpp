@@ -2,21 +2,19 @@
 #define BABYLON_MATERIALS_LIBRARY_CELL_CELL_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/cell/cell_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class IAnimatable;
-class Texture;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-using TexturePtr     = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(Texture)
 
 namespace MaterialsLibrary {
 
-class CellMaterial;
-using CellMaterialPtr = std::shared_ptr<CellMaterial>;
+FWD_CLASS_SPTR(CellMaterial)
 
 class BABYLON_SHARED_EXPORT CellMaterial : public PushMaterial {
 

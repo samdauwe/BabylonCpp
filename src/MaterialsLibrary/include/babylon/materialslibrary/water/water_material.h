@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_WATER_WATER_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/water/water_material_defines.h>
 #include <babylon/maths/color3.h>
@@ -11,19 +12,14 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class IAnimatable;
-class ImageProcessingConfiguration;
-class Mesh;
-using AbstractMeshPtr                 = std::shared_ptr<AbstractMesh>;
-using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
-using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
-using MeshPtr                         = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(IAnimatable)
+FWD_CLASS_SPTR(ImageProcessingConfiguration)
+FWD_CLASS_SPTR(Mesh)
 
 namespace MaterialsLibrary {
 
-class WaterMaterial;
-using WaterMaterialPtr = std::shared_ptr<WaterMaterial>;
+FWD_CLASS_SPTR(WaterMaterial)
 
 class BABYLON_SHARED_EXPORT WaterMaterial : public PushMaterial {
 

@@ -2,19 +2,18 @@
 #define ABYLON_MATERIALS_LIBRARY_SHADOW_ONLY_SHADOW_ONLY_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class IShadowLight;
-using IShadowLightPtr = std::shared_ptr<IShadowLight>;
+FWD_CLASS_SPTR(IShadowLight)
 
 namespace MaterialsLibrary {
 
-class ShadowOnlyMaterial;
-using ShadowOnlyMaterialPtr = std::shared_ptr<ShadowOnlyMaterial>;
+FWD_CLASS_SPTR(ShadowOnlyMaterial)
 
 class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
 

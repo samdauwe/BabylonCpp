@@ -2,19 +2,18 @@
 #define BABYLON_MATERIALS_LIBRARY_NORMAL_NORMAL_MATERIAL_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/normal/normal_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-class IAnimatable;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+FWD_CLASS_SPTR(IAnimatable)
 
 namespace MaterialsLibrary {
 
-class NormalMaterial;
-using NormalMaterialPtr = std::shared_ptr<NormalMaterial>;
+FWD_CLASS_SPTR(NormalMaterial)
 
 class BABYLON_SHARED_EXPORT NormalMaterial : public PushMaterial {
 
