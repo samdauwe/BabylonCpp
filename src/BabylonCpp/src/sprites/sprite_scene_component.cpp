@@ -115,7 +115,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerMove(int unTranslatedPo
 std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPointerX,
                                                               int unTranslatedPointerY,
                                                               std::optional<PickingInfo> pickResult,
-                                                              const PointerEvent& /*evt*/)
+                                                              const IPointerEvent& /*evt*/)
 {
   scene->_pickedDownSprite = nullptr;
   if (!scene->spriteManagers.empty()) {
@@ -161,7 +161,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(int unTranslatedPo
 std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(int unTranslatedPointerX,
                                                             int unTranslatedPointerY,
                                                             std::optional<PickingInfo> pickResult,
-                                                            const PointerEvent& /*evt*/)
+                                                            const IPointerEvent& /*evt*/)
 {
   if (!scene->spriteManagers.empty()) {
     auto spritePickResult

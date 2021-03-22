@@ -8,6 +8,7 @@
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
+#include <babylon/events/device_input_events.h>
 
 namespace BABYLON {
 
@@ -69,10 +70,10 @@ private:
                                           ICanvas* element);
   std::optional<PickingInfo> _pointerDown(int unTranslatedPointerX, int unTranslatedPointerY,
                                           std::optional<PickingInfo> pickResult,
-                                          const PointerEvent& evt);
+                                          const IPointerEvent& evt);
   std::optional<PickingInfo> _pointerUp(int unTranslatedPointerX, int unTranslatedPointerY,
                                         std::optional<PickingInfo> pickResult,
-                                        const PointerEvent& evt);
+                                        const IPointerEvent& evt);
 
 private:
   /** Hidden */
