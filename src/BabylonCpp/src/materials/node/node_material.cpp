@@ -191,7 +191,7 @@ std::vector<InputBlockPtr> NodeMaterial::getInputBlocks() const
 
 NodeMaterial& NodeMaterial::registerOptimizer(const NodeMaterialOptimizerPtr& optimizer)
 {
-  auto index = stl_util::index_of(_optimizers, optimizer);
+  const auto index = stl_util::index_of(_optimizers, optimizer);
 
   if (index > -1) {
     return *this;
@@ -204,7 +204,7 @@ NodeMaterial& NodeMaterial::registerOptimizer(const NodeMaterialOptimizerPtr& op
 
 NodeMaterial& NodeMaterial::unregisterOptimizer(const NodeMaterialOptimizerPtr& optimizer)
 {
-  auto index = stl_util::index_of(_optimizers, optimizer);
+  const auto index = stl_util::index_of(_optimizers, optimizer);
 
   if (index == -1) {
     return *this;
@@ -289,7 +289,7 @@ NodeMaterial& NodeMaterial::_addFragmentOutputNode(const NodeMaterialBlockPtr& n
 
 NodeMaterial& NodeMaterial::_removeFragmentOutputNode(const NodeMaterialBlockPtr& node)
 {
-  auto index = stl_util::index_of(_fragmentOutputNodes, node);
+  const auto index = stl_util::index_of(_fragmentOutputNodes, node);
   if (index == -1) {
     return *this;
   }
@@ -378,7 +378,7 @@ void NodeMaterial::_resetDualBlocks(const NodeMaterialBlockPtr& node, size_t iId
 
 void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
 {
-  auto attachedBlockIndex = stl_util::index_of(attachedBlocks, block);
+  const auto attachedBlockIndex = stl_util::index_of(attachedBlocks, block);
   if (attachedBlockIndex > -1) {
     stl_util::splice(attachedBlocks, attachedBlockIndex, 1);
   }
@@ -391,7 +391,7 @@ void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
 void NodeMaterial::build(bool verbose)
 {
   _buildWasSuccessful = false;
-  auto engine         = getScene()->getEngine();
+  const auto engine   = getScene()->getEngine();
 
   const auto allowEmptyVertexProgram = _mode == NodeMaterialModes::Particle;
 
