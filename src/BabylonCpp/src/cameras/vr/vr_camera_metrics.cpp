@@ -36,15 +36,12 @@ VRCameraMetrics::~VRCameraMetrics() = default;
 
 float VRCameraMetrics::aspectRatio() const
 {
-  return static_cast<float>(hResolution)
-         / (2.f * static_cast<float>(vResolution));
+  return static_cast<float>(hResolution) / (2.f * static_cast<float>(vResolution));
 }
 
 float VRCameraMetrics::aspectRatioFov() const
 {
-  return (2.f
-          * std::atan((postProcessScaleFactor * vScreenSize)
-                      / (2.f * eyeToScreenDistance)));
+  return (2.f * std::atan((postProcessScaleFactor * vScreenSize) / (2.f * eyeToScreenDistance)));
 }
 
 Matrix VRCameraMetrics::leftHMatrix() const
@@ -57,8 +54,8 @@ Matrix VRCameraMetrics::leftHMatrix() const
 
 Matrix VRCameraMetrics::rightHMatrix() const
 {
-  float meters = (hScreenSize / 4.f) - (lensSeparationDistance / 2.f);
-  float h      = (4.f * meters) / hScreenSize;
+  const auto meters = (hScreenSize / 4.f) - (lensSeparationDistance / 2.f);
+  const auto h      = (4.f * meters) / hScreenSize;
 
   return Matrix::Translation(-h, 0.f, 0.f);
 }
