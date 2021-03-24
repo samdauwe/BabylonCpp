@@ -48,6 +48,7 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     : _ownerBlock{nullptr}
     , _connectedPoint{nullptr}
     , _typeConnectionSource{nullptr}
+    , _defaultConnectionPointType{std::nullopt}
     , _linkedConnectionSource{nullptr}
     , _acceptedConnectionPointType{nullptr}
     , _enforceAssociatedVariableName{false}
@@ -138,8 +139,16 @@ NodeMaterialBlockConnectionPointTypes& NodeMaterialConnectionPoint::get_type()
     }
   }
 
-  if (_type == NodeMaterialBlockConnectionPointTypes::BasedOnInput && _typeConnectionSource) {
-    return _typeConnectionSource->type();
+  if (_type == NodeMaterialBlockConnectionPointTypes::BasedOnInput) {
+    if (_typeConnectionSource) {
+      if (!_typeConnectionSource->isConnected() && _defaultConnectionPointType) {
+        return *_defaultConnectionPointType;
+      }
+      return _typeConnectionSource->type();
+    }
+    else if (_defaultConnectionPointType) {
+      return *_defaultConnectionPointType;
+    }
   }
 
   return _type;
@@ -321,10 +330,10 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
   const NodeMaterialConnectionPoint& connectionPoint)
 {
   const auto& iOwnerBlock = _ownerBlock;
+  const auto& otherBlock  = connectionPoint.ownerBlock();
 
   if (iOwnerBlock->target() == NodeMaterialBlockTargets::Fragment) {
     // Let's check we are not going reverse
-    const auto& otherBlock = connectionPoint.ownerBlock();
 
     if (otherBlock->target() == NodeMaterialBlockTargets::Vertex) {
       return NodeMaterialConnectionPointCompatibilityStates::TargetIncompatible;
@@ -361,6 +370,18 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
   if ((!connectionPoint.excludedConnectionPointTypes.empty()
        && stl_util::contains(connectionPoint.excludedConnectionPointTypes, type))) {
     return NodeMaterialConnectionPointCompatibilityStates::TypeIncompatible;
+  }
+
+  // Check hierarchy
+  auto targetBlock = otherBlock;
+  auto sourceBlock = ownerBlock();
+  if (direction == NodeMaterialConnectionPointDirection::Input) {
+    targetBlock = ownerBlock();
+    sourceBlock = otherBlock;
+  }
+
+  if (targetBlock->isAnAncestorOf(sourceBlock)) {
+    return NodeMaterialConnectionPointCompatibilityStates::HierarchyIssue;
   }
 
   return NodeMaterialConnectionPointCompatibilityStates::Compatible;

@@ -29,7 +29,9 @@ enum class BABYLON_SHARED_EXPORT NodeMaterialConnectionPointCompatibilityStates 
   /** Points are incompatible because of their types */
   TypeIncompatible,
   /** Points are incompatible because of their targets (vertex vs fragment) */
-  TargetIncompatible
+  TargetIncompatible,
+  /** Points are incompatible because they are in the same hierarchy **/
+  HierarchyIssue
 }; // end of enum class NodeMaterialConnectionPointCompatibilityStates
 
 /**
@@ -241,6 +243,9 @@ public:
 
   /** Hidden */
   NodeMaterialConnectionPointPtr _typeConnectionSource;
+
+  /** @hidden */
+  std::optional<NodeMaterialBlockConnectionPointTypes> _defaultConnectionPointType;
 
   /** Hidden */
   NodeMaterialConnectionPointPtr _linkedConnectionSource;
