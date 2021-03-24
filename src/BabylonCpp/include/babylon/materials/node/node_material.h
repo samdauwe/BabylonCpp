@@ -400,6 +400,11 @@ protected:
   NodeMaterialModes& get_mode();
 
   /**
+   * @brief Sets the mode property.
+   */
+  void set_mode(const NodeMaterialModes& value);
+
+  /**
    * @brief Attaches a new image processing configuration to the Standard Material.
    * @param configuration
    */
@@ -495,9 +500,9 @@ public:
   NodeMaterialModes _mode;
 
   /**
-   * Gets the mode property
+   * Gets or sets the mode property
    */
-  ReadOnlyProperty<NodeMaterial, NodeMaterialModes> mode;
+  Property<NodeMaterial, NodeMaterialModes> mode;
 
   /**
    * A free comment about the material

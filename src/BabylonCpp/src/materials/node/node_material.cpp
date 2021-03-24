@@ -53,7 +53,7 @@ NodeMaterial::NodeMaterial(const std::string& iName, Scene* iScene,
     , imageProcessingConfiguration{this, &NodeMaterial::get_imageProcessingConfiguration,
                                    &NodeMaterial::set_imageProcessingConfiguration}
     , _mode{NodeMaterialModes::Material}
-    , mode(this, &NodeMaterial::get_mode)
+    , mode(this, &NodeMaterial::get_mode, &NodeMaterial::set_mode)
     , _imageProcessingConfiguration{nullptr}
     , _options{nullptr}
     , _vertexCompilationState{nullptr}
@@ -98,6 +98,11 @@ void NodeMaterial::set_imageProcessingConfiguration(const ImageProcessingConfigu
 NodeMaterialModes& NodeMaterial::get_mode()
 {
   return _mode;
+}
+
+void NodeMaterial::set_mode(const NodeMaterialModes& value)
+{
+  _mode = value;
 }
 
 std::string NodeMaterial::getClassName() const
@@ -854,7 +859,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<NodeMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<NodeMaterialDefines>();
   }
 
   auto defines = std::static_pointer_cast<NodeMaterialDefines>(subMesh->_materialDefines);
