@@ -248,6 +248,26 @@ NodeMaterialBlock::getSiblingOutput(const NodeMaterialConnectionPointPtr& curren
   return _outputs[static_cast<size_t>(index + 1)];
 }
 
+bool NodeMaterialBlock::isAnAncestorOf(const NodeMaterialBlockPtr& block) const
+{
+  for (const auto& output : _outputs) {
+    if (!output->hasEndpoints()) {
+      continue;
+    }
+
+    for (const auto& endpoint : output->endpoints()) {
+      if (endpoint->ownerBlock() == block) {
+        return true;
+      }
+      if (endpoint->ownerBlock()->isAnAncestorOf(block)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 NodeMaterialBlock&
 NodeMaterialBlock::connectTo(const NodeMaterialBlockPtr& other,
                              const std::optional<NodeMaterialBlockConnectionOptions>& options)

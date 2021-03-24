@@ -139,6 +139,13 @@ public:
   NodeMaterialConnectionPointPtr getSiblingOutput(const NodeMaterialConnectionPointPtr& current);
 
   /**
+   * @brief Checks if the current block is an ancestor of a given block.
+   * @param block defines the potential descendant block to check
+   * @returns true if block is a descendant
+   */
+  bool isAnAncestorOf(const NodeMaterialBlockPtr& block) const;
+
+  /**
    * @brief Connect current block with another block.
    * @param other defines the block to connect with
    * @param options define the various options to help pick the right connections
