@@ -73,6 +73,11 @@ protected:
   /**
    * @brief Hidden
    */
+  std::string _inputRename(const std::string& name) override;
+
+  /**
+   * @brief Hidden
+   */
   ColorMergerBlock& _buildBlock(NodeMaterialBuildState& state) override;
 
 public:
