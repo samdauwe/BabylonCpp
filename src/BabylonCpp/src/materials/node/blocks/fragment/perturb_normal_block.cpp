@@ -25,6 +25,8 @@ PerturbNormalBlock::PerturbNormalBlock(const std::string& iName)
     , strength{this, &PerturbNormalBlock::get_strength}
     , output{this, &PerturbNormalBlock::get_output}
 {
+  _isUnique = true;
+
   // Vertex
   registerInput("worldPosition", NodeMaterialBlockConnectionPointTypes::Vector4, false);
   registerInput("worldNormal", NodeMaterialBlockConnectionPointTypes::Vector4, false);
@@ -137,8 +139,11 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 
   const auto replaceForBumpInfos
     = strength()->isConnectedToInputBlock() && strength()->connectInputBlock()->isConstant ?
-        state._emitFloat(1.f / strength()->connectInputBlock()->value()->get<float>()).c_str() :
-        StringTools::printf("1.0 / %s", strength()->associatedVariableName().c_str());
+        StringTools::printf(
+          "\r\n#if !defined(NORMALXYSCALE)\r\n1.0/\r\n#endif\r\n%s",
+          state._emitFloat(strength()->connectInputBlock()->value()->get<float>())) :
+        StringTools::printf("\r\n#if !defined(NORMALXYSCALE)\r\n1.0/\r\n#endif\r\n%s",
+                            strength()->associatedVariableName().c_str());
 
   state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
 
