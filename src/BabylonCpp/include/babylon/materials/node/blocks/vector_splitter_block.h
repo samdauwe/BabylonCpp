@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_VECTOR_SPLITTER_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class VectorSplitterBlock;
-using VectorSplitterBlockPtr = std::shared_ptr<VectorSplitterBlock>;
+FWD_CLASS_SPTR(VectorSplitterBlock)
 
 /**
  * @brief Block used to expand a Vector3/4 into 4 outputs (one for each component).
@@ -59,6 +59,11 @@ protected:
    * @brief Gets the xy component (output).
    */
   NodeMaterialConnectionPointPtr& get_xyOut();
+
+  /**
+   * @brief Gets the zw component (output).
+   */
+  NodeMaterialConnectionPointPtr& get_zw();
 
   /**
    * @brief Gets the x component (output).
@@ -120,6 +125,11 @@ public:
    * Gets the xy component (output)
    */
   ReadOnlyProperty<VectorSplitterBlock, NodeMaterialConnectionPointPtr> xyOut;
+
+  /**
+   * Gets the zw component (output)
+   */
+  ReadOnlyProperty<VectorSplitterBlock, NodeMaterialConnectionPointPtr> zw;
 
   /**
    * Gets the x component (output)
