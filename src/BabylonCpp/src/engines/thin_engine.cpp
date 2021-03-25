@@ -2692,8 +2692,10 @@ InternalTexturePtr ThinEngine::createPrefilteredCubeTexture(
       glTextureFromLod->format = texture->format;
       glTextureFromLod->width  = static_cast<int>(
         std::pow(2.f, std::max(static_cast<float>(Scalar::Log2(width) - mipmapIndex), 0.f)));
-      glTextureFromLod->height = glTextureFromLod->width;
-      glTextureFromLod->isCube = true;
+      glTextureFromLod->height       = glTextureFromLod->width;
+      glTextureFromLod->isCube       = true;
+      glTextureFromLod->_cachedWrapU = Constants::TEXTURE_CLAMP_ADDRESSMODE;
+      glTextureFromLod->_cachedWrapV = Constants::TEXTURE_CLAMP_ADDRESSMODE;
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, glTextureFromLod, true);
 
       glTextureFromLod->samplingMode = Constants::TEXTURE_LINEAR_LINEAR;
