@@ -72,7 +72,7 @@ void WebGLPipelineContext::_fillEffectInformation(
   });
 
   for (size_t index = 0; index < samplerList.size(); ++index) {
-    samplers[samplerList[index]] = index;
+    samplers[samplerList[index]] = static_cast<int>(index);
   }
 
   for (const auto& attr : engine->getAttributes(this, attributesNames)) {

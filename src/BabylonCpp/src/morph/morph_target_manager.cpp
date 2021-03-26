@@ -197,7 +197,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
     }
 
     _activeTargets.emplace_back(target);
-    _morphTargetTextureIndices[influenceCount] = targetIndex;
+    _morphTargetTextureIndices[influenceCount] = static_cast<float>(targetIndex);
     _tempInfluences.emplace_back(target->influence());
     ++influenceCount;
 
@@ -250,12 +250,12 @@ void MorphTargetManager::synchronize()
       _textureVertexStride++;
     }
 
-    _textureWidth  = _vertexCount * _textureVertexStride;
+    _textureWidth  = static_cast<int>(_vertexCount * _textureVertexStride);
     _textureHeight = 1;
 
     const auto maxTextureSize = _scene->getEngine()->getCaps().maxTextureSize;
     if (_textureWidth > maxTextureSize) {
-      _textureHeight = std::ceil(_textureWidth / maxTextureSize);
+      _textureHeight = static_cast<int>(std::ceil(_textureWidth / maxTextureSize));
       _textureWidth  = maxTextureSize;
     }
 
@@ -293,7 +293,7 @@ void MorphTargetManager::synchronize()
           return;
         }
 
-        offset = index * _textureWidth * _textureHeight * 4;
+        offset = static_cast<int>(index * _textureWidth * _textureHeight * 4);
         for (size_t vertex = 0; vertex < _vertexCount; vertex++) {
           data[offset]     = positions[vertex * 3];
           data[offset + 1] = positions[vertex * 3 + 1];
@@ -324,7 +324,7 @@ void MorphTargetManager::synchronize()
       }
 
       _targetStoreTexture = RawTexture2DArray::CreateRGBATexture(
-        data, _textureWidth, _textureHeight, targetCount, _scene, false, false,
+        data, _textureWidth, _textureHeight, static_cast<int>(targetCount), _scene, false, false,
         Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
     }
   }
