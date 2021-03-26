@@ -68,12 +68,12 @@ NodeMaterialConnectionPointPtr& ColorMergerBlock::get_rgbOut()
   return _outputs[1];
 }
 
-std::string ColorMergerBlock::_inputRename(const std::string& name)
+std::string ColorMergerBlock::_inputRename(const std::string& iName)
 {
-  if (name == "rgb ") {
+  if (iName == "rgb ") {
     return "rgbIn";
   }
-  return name;
+  return iName;
 }
 
 ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)

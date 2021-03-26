@@ -96,18 +96,18 @@ NodeMaterialConnectionPointPtr& VectorMergerBlock::get_zwOut()
   return _outputs[3];
 }
 
-std::string VectorMergerBlock::_inputRename(const std::string& name)
+std::string VectorMergerBlock::_inputRename(const std::string& iName)
 {
-  if (name == "xyz ") {
+  if (iName == "xyz ") {
     return "xyzIn";
   }
-  if (name == "xy ") {
+  if (iName == "xy ") {
     return "xyIn";
   }
-  if (name == "zw ") {
+  if (iName == "zw ") {
     return "zwIn";
   }
-  return name;
+  return iName;
 }
 
 VectorMergerBlock& VectorMergerBlock::_buildBlock(NodeMaterialBuildState& state)

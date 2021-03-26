@@ -358,7 +358,7 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
          && stl_util::contains(connectionPoint.acceptedConnectionPointTypes, type))
         || (connectionPoint._acceptedConnectionPointType
             && NodeMaterialConnectionPoint::AreEquivalentTypes(
-              connectionPoint._acceptedConnectionPointType->type, type))) {
+                 connectionPoint._acceptedConnectionPointType->type, type))) {
       return NodeMaterialConnectionPointCompatibilityStates::Compatible;
     }
     else {
@@ -373,14 +373,14 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
   }
 
   // Check hierarchy
-  auto targetBlock = otherBlock;
-  auto sourceBlock = ownerBlock();
-  if (direction == NodeMaterialConnectionPointDirection::Input) {
-    targetBlock = ownerBlock();
-    sourceBlock = otherBlock;
+  auto targetBlock  = otherBlock;
+  auto iSourceBlock = ownerBlock();
+  if (direction() == NodeMaterialConnectionPointDirection::Input) {
+    targetBlock  = ownerBlock();
+    iSourceBlock = otherBlock;
   }
 
-  if (targetBlock->isAnAncestorOf(sourceBlock)) {
+  if (targetBlock->isAnAncestorOf(iSourceBlock)) {
     return NodeMaterialConnectionPointCompatibilityStates::HierarchyIssue;
   }
 

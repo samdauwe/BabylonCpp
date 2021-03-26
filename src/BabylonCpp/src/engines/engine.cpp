@@ -91,9 +91,9 @@ Engine::~Engine()
   stl_util::remove_vector_elements_equal(EngineStore::Instances, this);
 }
 
-void Engine::_sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool audioEngine)
+void Engine::_sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool iAudioEngine)
 {
-  ThinEngine::_sharedInit(canvas, doNotHandleTouchAction, audioEngine);
+  ThinEngine::_sharedInit(canvas, doNotHandleTouchAction, iAudioEngine);
 
   _onCanvasFocus = [this]() -> void { onCanvasFocusObservable.notifyObservers(this); };
 

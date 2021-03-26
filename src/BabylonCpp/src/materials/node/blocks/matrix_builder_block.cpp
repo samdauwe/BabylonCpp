@@ -85,13 +85,13 @@ MatrixBuilderBlock& MatrixBuilderBlock::_buildBlock(NodeMaterialBuildState& stat
 {
   NodeMaterialBlock::_buildBlock(state);
 
-  const auto& output = _outputs[0];
-  const auto& iRow0  = row0();
-  const auto& iRow1  = row1();
-  const auto& iRow2  = row2();
-  const auto& iRow3  = row3();
+  const auto& iOutput = _outputs[0];
+  const auto& iRow0   = row0();
+  const auto& iRow1   = row1();
+  const auto& iRow2   = row2();
+  const auto& iRow3   = row3();
 
-  state.compilationString += _declareOutput(output, state)
+  state.compilationString += _declareOutput(iOutput, state)
                              + StringTools::printf(" = mat4(%s, %s, %s, %s);\r\n",
                                                    iRow0->associatedVariableName().c_str(),
                                                    iRow1->associatedVariableName().c_str(),
