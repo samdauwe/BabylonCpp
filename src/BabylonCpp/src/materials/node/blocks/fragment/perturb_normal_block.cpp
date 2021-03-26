@@ -141,7 +141,7 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
     = strength()->isConnectedToInputBlock() && strength()->connectInputBlock()->isConstant ?
         StringTools::printf(
           "\r\n#if !defined(NORMALXYSCALE)\r\n1.0/\r\n#endif\r\n%s",
-          state._emitFloat(strength()->connectInputBlock()->value()->get<float>())) :
+          state._emitFloat(strength()->connectInputBlock()->value()->get<float>()).c_str()) :
         StringTools::printf("\r\n#if !defined(NORMALXYSCALE)\r\n1.0/\r\n#endif\r\n%s",
                             strength()->associatedVariableName().c_str());
 
