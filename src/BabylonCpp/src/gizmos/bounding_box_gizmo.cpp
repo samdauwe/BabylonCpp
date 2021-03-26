@@ -378,7 +378,8 @@ void BoundingBoxGizmo::set_axisFactor(const Vector3& factor)
           continue;
         }
         if (index < scaleBoxes.size() && scaleBoxes[index]) {
-          Vector3 dragAxis(i - 1, j - 1, k - 1);
+          Vector3 dragAxis(static_cast<float>(i - 1), static_cast<float>(j - 1),
+                           static_cast<float>(k - 1));
           dragAxis.multiplyInPlace(_axisFactor);
           scaleBoxes[index]->setEnabled(dragAxis.lengthSquared() > Math::Epsilon);
         }
