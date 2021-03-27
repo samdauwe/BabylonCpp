@@ -198,11 +198,13 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
                 #endif
             #endif
         #endif
+        #if defined(SS_REFRACTION) || defined(SS_TRANSLUCENCY)
+            surfaceAlbedo,
+        #endif
         #ifdef SS_REFRACTION
             %s.xyz,
             viewDirectionW,
             %s,
-            surfaceAlbedo,
             %s,
             %s,
             %s,
@@ -215,9 +217,8 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
             #endif
             #ifdef %s
                 roughness,
-            #else
-                alphaG,
             #endif
+            alphaG,
             #ifdef %s
                 %s,
             #else
@@ -237,6 +238,10 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
             #endif
             #ifdef REALTIME_FILTERING
                 %s,
+            #endif
+            #ifdef SS_USE_LOCAL_REFRACTIONMAP_CUBIC
+                vRefractionPosition,
+                vRefractionSize,
             #endif
         #endif
         #ifdef SS_TRANSLUCENCY
