@@ -215,6 +215,10 @@ public:
   /** @hidden */
   std::string _2DSamplerName;
   /** @hidden */
+  std::string _reflectionPositionName;
+  /** @hidden */
+  std::string _reflectionSizeName;
+  /** @hidden */
   std::string _reflectionCoordsName;
   /** @hidden */
   std::string _reflectionMatrixName;

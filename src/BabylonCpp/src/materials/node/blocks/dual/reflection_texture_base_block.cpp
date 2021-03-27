@@ -184,6 +184,12 @@ void ReflectionTextureBaseBlock::bind(Effect* effect, const NodeMaterialPtr& /*n
   else {
     effect->setTexture(_2DSamplerName, iTexture);
   }
+
+  if (iTexture->boundingBoxSize()) {
+    const auto cubeTexture = std::static_pointer_cast<CubeTexture>(iTexture);
+    effect->setVector3(_reflectionPositionName, cubeTexture->boundingBoxPosition);
+    effect->setVector3(_reflectionSizeName, *cubeTexture->boundingBoxSize());
+  }
 }
 
 std::string ReflectionTextureBaseBlock::handleVertexSide(NodeMaterialBuildState& state)
@@ -268,6 +274,7 @@ void ReflectionTextureBaseBlock::handleFragmentSideInits(NodeMaterialBuildState&
 
   const auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunction("ReciprocalPI", "#define RECIPROCAL_PI2 0.15915494", "");
+  state._emitFunctionFromInclude("helperFunctions", iComments);
   EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
   emitFunctionFromIncludeOptions.replaceStrings
     = {{"vec3 computeReflectionCoords", "void DUMMYFUNC"}};
@@ -276,6 +283,12 @@ void ReflectionTextureBaseBlock::handleFragmentSideInits(NodeMaterialBuildState&
   _reflectionColorName  = state._getFreeVariableName("reflectionColor");
   _reflectionVectorName = state._getFreeVariableName("reflectionUVW");
   _reflectionCoordsName = state._getFreeVariableName("reflectionCoords");
+
+  _reflectionPositionName = state._getFreeVariableName("vReflectionPosition");
+  state._emitUniformFromString(_reflectionPositionName, "vec3");
+
+  _reflectionSizeName = state._getFreeVariableName("vReflectionPosition");
+  state._emitUniformFromString(_reflectionSizeName, "vec3");
 }
 
 std::string ReflectionTextureBaseBlock::handleFragmentSideCodeReflectionCoords(
@@ -316,7 +329,7 @@ std::string ReflectionTextureBaseBlock::handleFragmentSideCodeReflectionCoords(
 
       #ifdef %s
           #ifdef %s
-              vec3 %s = computeCubicLocalCoords(%s, %s, %s.xyz, %s, vReflectionSize, vReflectionPosition);
+              vec3 %s = computeCubicLocalCoords(%s, %s, %s.xyz, %s, %s, %s);
           #else
           vec3 %s = computeCubicCoords(%s, %s, %s.xyz, %s);
           #endif
@@ -356,7 +369,8 @@ std::string ReflectionTextureBaseBlock::handleFragmentSideCodeReflectionCoords(
     _defineCubicName.c_str(),                       //
     _defineLocalCubicName.c_str(),                  //
     _reflectionVectorName.c_str(), worldPos.c_str(), worldNormalVarName.c_str(),
-    vEyePosition.c_str(), reflectionMatrix.c_str(), //
+    vEyePosition.c_str(), reflectionMatrix.c_str(), _reflectionSizeName.c_str(),
+    _reflectionPositionName.c_str(), //
     _reflectionVectorName.c_str(), worldPos.c_str(), worldNormalVarName.c_str(),
     vEyePosition.c_str(), reflectionMatrix.c_str(),                                           //
     _defineProjectionName.c_str(),                                                            //
@@ -481,7 +495,7 @@ std::string ReflectionTextureBaseBlock::_dumpPropertiesCode()
         _codeVariableName.c_str(), iTexture->name.c_str(), iTexture->noMipmap() ? "true" : "false",
         iTexture->_prefiltered ? "true" : "false",
         !forcedExtension.empty() ? StringTools::printf("\"%s\"", forcedExtension.c_str()).c_str() :
-                                   "");
+                                                   "");
     }
   }
   else {
