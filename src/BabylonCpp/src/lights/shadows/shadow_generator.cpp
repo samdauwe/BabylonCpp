@@ -120,9 +120,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
   _scene   = light->getScene();
   id       = light->id;
 
-  _nameForCustomEffect = StringTools::printf(
-    "%s%ull", Constants::CUSTOMEFFECT_PREFIX_SHADOWGENERATOR, ShadowGenerator::_Counter++);
-
   auto component = _scene->_getComponent(SceneComponentConstants::NAME_SHADOWGENERATOR);
   if (!component) {
     component = ShadowGeneratorSceneComponent::New(_scene);

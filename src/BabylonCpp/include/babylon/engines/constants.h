@@ -570,9 +570,17 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int PREPASS_ALBEDO_TEXTURE_TYPE = 7;
 
   /**
-   * Prefixes used by the engine for custom effects
+   * Prefixes used by the engine for sub mesh draw wrappers
    */
-  static constexpr const char* CUSTOMEFFECT_PREFIX_SHADOWGENERATOR = "bjs_shadowgenerator_";
+
+  /** @hidden */
+  static constexpr const char* SUBMESH_DRAWWRAPPER_MAINPASS = "bjs_mainpass";
+  /** @hidden */
+  static constexpr const char* SUBMESH_DRAWWRAPPER_SHADOWGENERATOR_PREFIX = "bjs_shadowgenerator_";
+  /** @hidden */
+  static constexpr const char* SUBMESH_DRAWWRAPPER_DEPTHRENDERER_PREFIX = "bjs_depthrenderer_";
+  /** @hidden */
+  static constexpr const char* SUBMESH_DRAWWRAPPER_OUTLINERENDERER_PREFIX = "bjs_outlinerenderer_";
 
   /**
    * Constant used as key code for Alt key
