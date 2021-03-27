@@ -33,6 +33,12 @@ public:
   static void RegisterConnections(const RefractionBlockPtr& refractionBlock);
 
   /**
+   * @brief Initialize the block and prepare the context for build.
+   * @param state defines the state that will be used for the build
+   */
+  void initialize(NodeMaterialBuildState& state) override;
+
+  /**
    * @brief Gets the current class name.
    * @returns the class name
    */

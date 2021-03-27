@@ -11,6 +11,7 @@
 #include <babylon/materials/node/node_material_connection_point_custom_object.h>
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/misc/string_tools.h>
 
@@ -48,6 +49,12 @@ void RefractionBlock::RegisterConnections(const RefractionBlockPtr& refractionBl
       "refraction", refractionBlock, NodeMaterialConnectionPointDirection::Output,
       [](const std::string& iName) -> RefractionBlockPtr { return RefractionBlock::New(iName); },
       "RefractionBlock"));
+}
+
+void RefractionBlock::initialize(NodeMaterialBuildState& state)
+{
+  state._excludeVariableName("vRefractionPosition");
+  state._excludeVariableName("vRefractionSize");
 }
 
 std::string RefractionBlock::getClassName() const
@@ -138,6 +145,8 @@ void RefractionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   defines.setValue("SS_LINKREFRACTIONTOTRANSPARENCY", linkRefractionWithTransparency, true);
   defines.setValue("SS_GAMMAREFRACTION", refractionTexture->gammaSpace(), true);
   defines.setValue("SS_RGBDREFRACTION", refractionTexture->isRGBD(), true);
+  defines.setValue("SS_USE_LOCAL_REFRACTIONMAP_CUBIC",
+                   refractionTexture->boundingBoxSize() ? true : false, true);
 }
 
 bool RefractionBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
@@ -195,6 +204,12 @@ void RefractionBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, 
   const auto width = static_cast<float>(refractionTexture->getSize().width);
 
   effect->setFloat2(_vRefractionFilteringInfoName, width, Scalar::Log2(width));
+
+  if (refractionTexture->boundingBoxSize()) {
+    const auto cubeTexture = std::static_pointer_cast<CubeTexture>(refractionTexture);
+    effect->setVector3("vRefractionPosition", cubeTexture->boundingBoxPosition);
+    effect->setVector3("vRefractionSize", *cubeTexture->boundingBoxSize());
+  }
 }
 
 std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
@@ -271,6 +286,9 @@ std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
   _vRefractionFilteringInfoName = state._getFreeVariableName("vRefractionFilteringInfo");
 
   state._emitUniformFromString(_vRefractionFilteringInfoName, "vec2");
+
+  state._emitUniformFromString("vRefractionPosition", "vec3");
+  state._emitUniformFromString("vRefractionSize", "vec3");
 
   return code;
 }
