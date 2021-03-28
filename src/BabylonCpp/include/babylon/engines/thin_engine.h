@@ -53,7 +53,9 @@ class UniformBufferExtension;
 using ArrayBufferViewArray = std::vector<ArrayBufferView>;
 FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(IDrawContext)
 FWD_STRUCT_SPTR(IInternalTextureLoader)
+FWD_STRUCT_SPTR(IMaterialContext)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(IPipelineContext)
 FWD_STRUCT_SPTR(IShaderProcessor)
@@ -643,6 +645,18 @@ public:
    */
   IPipelineContextPtr
   createPipelineContext(const ShaderProcessingContextPtr& shaderProcessingContext);
+
+  /**
+   * @brief Creates a new material context.
+   * @returns the new context
+   */
+  virtual IMaterialContextPtr createMaterialContext();
+
+  /**
+   * @brief Creates a new draw context.
+   * @returns the new context
+   */
+  virtual IDrawContextPtr createDrawContext();
 
   /**
    * @brief Hidden

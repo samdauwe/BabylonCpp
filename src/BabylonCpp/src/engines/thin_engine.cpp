@@ -1793,6 +1793,16 @@ ThinEngine::createPipelineContext(const ShaderProcessingContextPtr& /*shaderProc
   return std::static_pointer_cast<IPipelineContext>(pipelineContext);
 }
 
+IMaterialContextPtr ThinEngine::createMaterialContext()
+{
+  return nullptr;
+}
+
+IDrawContextPtr ThinEngine::createDrawContext()
+{
+  return nullptr;
+}
+
 WebGLProgramPtr ThinEngine::_createShaderProgram(
   const WebGLPipelineContextPtr& pipelineContext, const WebGLShaderPtr& vertexShader,
   const WebGLShaderPtr& fragmentShader, WebGLRenderingContext* context,
