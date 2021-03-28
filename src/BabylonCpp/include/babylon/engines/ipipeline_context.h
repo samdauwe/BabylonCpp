@@ -296,4 +296,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_ENGINES_IPIPELINE_CONTEXT_H}
+#endif // end of BABYLON_ENGINES_IPIPELINE_CONTEXT_H
