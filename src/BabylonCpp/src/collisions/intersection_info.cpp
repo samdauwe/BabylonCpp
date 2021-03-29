@@ -8,11 +8,7 @@ IntersectionInfo::IntersectionInfo()
 }
 
 IntersectionInfo::IntersectionInfo(float _distance)
-    : bu{std::nullopt}
-    , bv{std::nullopt}
-    , distance{_distance}
-    , faceId{0}
-    , subMeshId{0}
+    : bu{std::nullopt}, bv{std::nullopt}, distance{_distance}, faceId{0}, subMeshId{0}
 {
 }
 
