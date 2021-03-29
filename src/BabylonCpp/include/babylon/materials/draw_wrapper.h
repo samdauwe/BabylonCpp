@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_DRAW_WRAPPER_H
 
 #include <memory>
+#include <optional>
 #include <variant>
 
 #include <babylon/babylon_api.h>
