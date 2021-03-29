@@ -70,20 +70,20 @@ public:
   AbstractMeshPtr pickedMesh;
 
   /**
-   * (See getTextureCoordinates) The barycentric U coordinate that is used when
-   * calculating the texture coordinates of the collision.
+   * (See getTextureCoordinates) The barycentric U coordinate that is used when calculating the
+   * texture coordinates of the collision.
    */
   float bu;
 
   /**
-   * (See getTextureCoordinates) The barycentric V coordinate that is used when
-   * calculating the texture coordinates of the collision.
+   * (See getTextureCoordinates) The barycentric V coordinate that is used when calculating the
+   * texture coordinates of the collision.
    */
   float bv;
 
   /**
-   * The index of the face on the mesh that was picked, or the index of the Line
-   * if the picked Mesh is a LinesMesh
+   * The index of the face on the mesh that was picked, or the index of the Line if the picked Mesh
+   * is a LinesMesh
    */
   int faceId;
 
@@ -109,8 +109,7 @@ public:
   int thinInstanceIndex;
 
   /**
-   * If a mesh was used to do the picking (eg. 6dof controller) this will be
-   * populated.
+   * If a mesh was used to do the picking (eg. 6dof controller) this will be populated.
    */
   AbstractMeshPtr originMesh;
 
