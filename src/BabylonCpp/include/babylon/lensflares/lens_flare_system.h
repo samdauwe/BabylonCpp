@@ -21,6 +21,7 @@ class VertexBuffer;
 class Viewport;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Camera)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(IShadowLight)
 FWD_CLASS_SPTR(LensFlare)
@@ -186,7 +187,7 @@ private:
   // int _vertexStrideSize;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
-  EffectPtr _effect;
+  DrawWrapperPtr _drawWrapper;
   float _positionX;
   float _positionY;
   bool _isEnabled;

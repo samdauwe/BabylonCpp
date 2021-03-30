@@ -11,6 +11,7 @@
 #include <babylon/lensflares/lens_flare.h>
 #include <babylon/lensflares/lens_flare_system_scene_component.h>
 #include <babylon/lights/ishadow_light.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -32,6 +33,7 @@ LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitter
     , layerMask{0x0FFFFFFF}
     , isEnabled{this, &LensFlareSystem::get_isEnabled, &LensFlareSystem::set_isEnabled}
     , _indexBuffer{nullptr}
+    , _drawWrapper{nullptr}
     , _isEnabled{true}
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
@@ -52,6 +54,8 @@ LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitter
   };
 
   auto engine = scene->getEngine();
+
+  _drawWrapper = std::make_shared<DrawWrapper>(engine);
 
   // VBO
   Float32Array vertices = {1.f,  1.f,  //
@@ -79,7 +83,7 @@ LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitter
   effectCreationOptions.uniformsNames = {"color", "viewportMatrix"};
   effectCreationOptions.samplers      = {"textureSampler"};
 
-  _effect
+  _drawWrapper->effect
     = _scene->getEngine()->createEffect("lensFlare", effectCreationOptions, _scene->getEngine());
 }
 
@@ -190,7 +194,7 @@ bool LensFlareSystem::_isVisible()
 
 bool LensFlareSystem::render()
 {
-  if (!_effect->isReady() || !_scene->activeCamera()) {
+  if (!_drawWrapper->effect || !_drawWrapper->effect->isReady() || !_scene->activeCamera()) {
     return false;
   }
 
@@ -270,13 +274,13 @@ bool LensFlareSystem::render()
   auto distY   = centerY - _positionY;
 
   // Effects
-  engine->enableEffect(_effect);
+  engine->enableEffect(_drawWrapper);
   engine->setState(false);
   engine->setDepthBuffer(false);
   engine->setAlphaMode(Constants::ALPHA_ONEONE);
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer, _effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, _drawWrapper->effect);
 
   // Flares
   for (const auto& flare : lensFlares) {
@@ -300,14 +304,14 @@ bool LensFlareSystem::render()
                                              cx, cy, 0.f, 1.f         //
     );
 
-    _effect->setMatrix("viewportMatrix", viewportMatrix);
+    _drawWrapper->effect->setMatrix("viewportMatrix", viewportMatrix);
 
     // Texture
-    _effect->setTexture("textureSampler", flare->texture);
+    _drawWrapper->effect->setTexture("textureSampler", flare->texture);
 
     // Color
-    _effect->setFloat4("color", flare->color.r * intensity, flare->color.g * intensity,
-                       flare->color.b * intensity, 1.f);
+    _drawWrapper->effect->setFloat4("color", flare->color.r * intensity, flare->color.g * intensity,
+                                    flare->color.b * intensity, 1.f);
 
     // Draw order
     engine->drawElementsType(Material::TriangleFillMode, 0, 6);
