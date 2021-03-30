@@ -4,6 +4,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/thin_engine.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/thin_texture.h>
@@ -30,17 +31,19 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
     , _buffer{nullptr}
     , _spriteBuffer{nullptr}
     , _indexBuffer{nullptr}
-    , _effectBase{nullptr}
-    , _effectFog{nullptr}
+    , _drawWrapperBase{nullptr}
+    , _drawWrapperFog{nullptr}
     , _vertexArrayObject{nullptr}
 {
   _capacity = capacity;
   _epsilon  = epsilon;
 
-  _engine        = engine;
-  _useInstancing = engine->getCaps().instancedArrays;
-  _useVAO        = engine->getCaps().vertexArrayObject && !engine->disableVertexArrayObjects;
-  _scene         = scene;
+  _engine          = engine;
+  _useInstancing   = engine->getCaps().instancedArrays;
+  _useVAO          = engine->getCaps().vertexArrayObject && !engine->disableVertexArrayObjects;
+  _scene           = scene;
+  _drawWrapperBase = std::make_shared<DrawWrapper>(engine);
+  _drawWrapperFog  = std::make_shared<DrawWrapper>(engine);
 
   if (!_useInstancing) {
     IndicesArray indices;
@@ -107,7 +110,7 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
     spriteOptions.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
     spriteOptions.samplers      = {"diffuseSampler"};
 
-    _effectBase = _engine->createEffect("sprites", spriteOptions, _scene->getEngine());
+    _drawWrapperBase->effect = _engine->createEffect("sprites", spriteOptions, _scene->getEngine());
   }
 
   if (_scene) {
@@ -120,7 +123,8 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
     spriteOptions.samplers = {"diffuseSampler"};
     spriteOptions.defines  = "#define FOG";
 
-    _effectFog = _scene->getEngine()->createEffect("sprites", spriteOptions, _scene->getEngine());
+    _drawWrapperFog->effect
+      = _scene->getEngine()->createEffect("sprites", spriteOptions, _scene->getEngine());
   }
 }
 
@@ -140,15 +144,17 @@ void SpriteRenderer::render(
     return;
   }
 
-  auto effect          = _effectBase;
+  auto drawWrapper     = _drawWrapperBase;
   auto shouldRenderFog = false;
   if (fogEnabled && _scene && _scene->fogEnabled() && _scene->fogMode() != 0) {
-    effect          = _effectFog;
+    drawWrapper     = _drawWrapperFog;
     shouldRenderFog = true;
   }
 
+  const auto& effect = drawWrapper->effect;
+
   // Check
-  if (!effect->isReady()) {
+  if (!effect || !effect->isReady()) {
     return;
   }
   auto engine                     = _scene->getEngine();
@@ -195,7 +201,7 @@ void SpriteRenderer::render(
   }
 
   // Render
-  engine->enableEffect(effect);
+  engine->enableEffect(drawWrapper);
 
   effect->setTexture("diffuseSampler", texture);
   effect->setMatrix("view", viewMatrix);

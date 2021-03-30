@@ -20,6 +20,7 @@ struct ISize;
 class Matrix;
 class Scene;
 class ThinEngine;
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(ThinSprite)
 FWD_CLASS_SPTR(ThinTexture)
@@ -139,8 +140,8 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<Buffer> _spriteBuffer;
   WebGLDataBufferPtr _indexBuffer;
-  EffectPtr _effectBase;
-  EffectPtr _effectFog;
+  DrawWrapperPtr _drawWrapperBase;
+  DrawWrapperPtr _drawWrapperFog;
   WebGLVertexArrayObjectPtr _vertexArrayObject;
 
 }; // end of class SpriteRenderer
