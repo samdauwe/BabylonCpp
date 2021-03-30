@@ -258,6 +258,12 @@ public:
   bool useAlbedoToTintRefraction;
 
   /**
+   * When enabled, translucent surfaces will be tinted with the albedo colour (independent of
+   * thickness)
+   */
+  bool useAlbedoToTintTranslucency;
+
+  /**
    * Stores the average thickness of a mesh in a texture (The texture is holding the values
    * linearly). The red channel of the texture should contain the thickness remapped between 0
    * and 1. 0 would mean minimumThickness 1 would mean maximumThickness The other channels might be

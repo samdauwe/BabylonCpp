@@ -9,6 +9,7 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/pbr/imaterial_sub_surface_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/scalar.h>
@@ -31,6 +32,7 @@ PBRSubSurfaceConfiguration::PBRSubSurfaceConfiguration(
     , refractionIntensity{1.f}
     , translucencyIntensity{1.f}
     , useAlbedoToTintRefraction{false}
+    , useAlbedoToTintTranslucency{false}
     , thicknessTexture{this, &PBRSubSurfaceConfiguration::get_thicknessTexture,
                        &PBRSubSurfaceConfiguration::set_thicknessTexture}
     , refractionTexture{this, &PBRSubSurfaceConfiguration::get_refractionTexture,
@@ -338,6 +340,8 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
     defines.boolDef["SS_LODINREFRACTIONALPHA"]             = false;
     defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"]     = false;
     defines.boolDef["SS_ALBEDOFORREFRACTIONTINT"]          = false;
+    defines.boolDef["SS_ALBEDOFORTRANSLUCENCYTINT"]        = false;
+    defines.boolDef["SS_USE_LOCAL_REFRACTIONMAP_CUBIC"]    = false;
 
     if (_isRefractionEnabled || _isTranslucencyEnabled || _isScatteringEnabled) {
       defines.boolDef["SUBSURFACE"] = true;
@@ -368,8 +372,14 @@ void PBRSubSurfaceConfiguration::prepareDefines(MaterialDefines& defines, Scene*
           defines.boolDef["SS_LODINREFRACTIONALPHA"]         = refractTexture->lodLevelInAlpha;
           defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"] = _linkRefractionWithTransparency;
           defines.boolDef["SS_ALBEDOFORREFRACTIONTINT"]      = useAlbedoToTintRefraction;
+          defines.boolDef["SS_USE_LOCAL_REFRACTIONMAP_CUBIC"]
+            = refractionTexture()->isCube() && refractionTexture()->boundingBoxSize();
         }
       }
+    }
+
+    if (_isTranslucencyEnabled) {
+      defines.boolDef["SS_ALBEDOFORTRANSLUCENCYTINT"] = useAlbedoToTintTranslucency;
     }
   }
 }
@@ -415,6 +425,13 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sc
 
       if (realTimeFiltering) {
         uniformBuffer.updateFloat2("vRefractionFilteringInfo", width, Scalar::Log2(width), "");
+      }
+
+      if (refractionTexture()->boundingBoxSize()) {
+        const auto cubeTexture = std::static_pointer_cast<CubeTexture>(refractionTexture());
+
+        uniformBuffer.updateVector3("vRefractionPosition", cubeTexture->boundingBoxPosition);
+        uniformBuffer.updateVector3("vRefractionSize", *cubeTexture->boundingBoxSize());
       }
     }
 
@@ -568,10 +585,11 @@ unsigned int PBRSubSurfaceConfiguration::AddFallbacks(const MaterialDefines& def
 
 void PBRSubSurfaceConfiguration::AddUniforms(std::vector<std::string>& uniforms)
 {
-  stl_util::concat(uniforms, {"vDiffusionDistance", "vTintColor", "vSubSurfaceIntensity",
-                              "vRefractionMicrosurfaceInfos", "vRefractionFilteringInfo",
-                              "vRefractionInfos", "vThicknessInfos", "vThicknessParam",
-                              "refractionMatrix", "thicknessMatrix", "scatteringDiffusionProfile"});
+  stl_util::concat(uniforms,
+                   {"vDiffusionDistance", "vTintColor", "vSubSurfaceIntensity",
+                    "vRefractionMicrosurfaceInfos", "vRefractionFilteringInfo", "vRefractionInfos",
+                    "vThicknessInfos", "vThicknessParam", "vRefractionPosition", "vRefractionSize",
+                    "refractionMatrix", "thicknessMatrix", "scatteringDiffusionProfile"});
 }
 
 void PBRSubSurfaceConfiguration::AddSamplers(std::vector<std::string>& samplers)
@@ -592,6 +610,8 @@ void PBRSubSurfaceConfiguration::PrepareUniformBuffer(UniformBuffer& uniformBuff
   uniformBuffer.addUniform("vDiffusionDistance", 3);
   uniformBuffer.addUniform("vTintColor", 4);
   uniformBuffer.addUniform("vSubSurfaceIntensity", 3);
+  uniformBuffer.addUniform("vRefractionPosition", 3);
+  uniformBuffer.addUniform("vRefractionSize", 3);
   uniformBuffer.addUniform("scatteringDiffusionProfile", 1);
 }
 
