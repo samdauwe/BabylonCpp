@@ -52,6 +52,7 @@ class UniformBuffer;
 class UniformBufferExtension;
 using ArrayBufferViewArray = std::vector<ArrayBufferView>;
 FWD_CLASS_SPTR(BaseTexture)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_STRUCT_SPTR(IDrawContext)
 FWD_STRUCT_SPTR(IInternalTextureLoader)
@@ -702,6 +703,7 @@ public:
    * @param effect defines the effect to activate
    */
   virtual void enableEffect(const EffectPtr& effect);
+  virtual void enableEffect(const DrawWrapperPtr& /*effect*/) {}
 
   /**
    * @brief Set the value of an uniform to a number (int).
