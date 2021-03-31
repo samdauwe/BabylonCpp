@@ -12,6 +12,7 @@ namespace BABYLON {
 
 class IntersectionInfo;
 class WebGLDataBuffer;
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_STRUCT_SPTR(MaterialDefines)
 FWD_CLASS_SPTR(SubMesh)
 FWD_CLASS_SPTR(WebGLDataBuffer)
@@ -240,9 +241,14 @@ protected:
   void set_materialDefines(const MaterialDefinesPtr& defines);
 
   /**
-   * @brief Gets the associated effect.
+   * @brief Gets associated (main) effect (possibly the effect override if defined)
    */
   EffectPtr& get_effect();
+
+  /**
+   * @brief Hidden
+   */
+  DrawWrapperPtr& get__drawWrapper();
 
 private:
   /** @hidden */
@@ -289,6 +295,11 @@ public:
    */
   ReadOnlyProperty<SubMesh, EffectPtr> effect;
 
+  /**
+   * Hidden
+   */
+  ReadOnlyProperty<SubMesh, DrawWrapperPtr> _drawWrapper;
+
   /** the material index to use */
   unsigned int materialIndex;
   /** vertex index start */
@@ -317,6 +328,11 @@ public:
   size_t _id;
 
 private:
+  std::unordered_map<std::string, DrawWrapperPtr> _drawWrappers;
+  DrawWrapperPtr
+    _mainDrawWrapper; // same thing than _drawWrappers[Constants.SUBMESHEFFECT_MAINMATERIAL] but
+                      // faster access
+  DrawWrapperPtr _mainDrawWrapperOverride;
   AbstractMeshPtr _mesh;
   MeshPtr _renderingMesh;
   BoundingInfoPtr _boundingInfo;

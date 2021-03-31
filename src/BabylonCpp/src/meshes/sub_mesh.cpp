@@ -7,6 +7,7 @@
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/standard_material_defines.h>
@@ -30,6 +31,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
     , _effectOverride{nullptr}
     , materialDefines{this, &SubMesh::get_materialDefines, &SubMesh::set_materialDefines}
     , effect{this, &SubMesh::get_effect}
+    , _drawWrapper{this, &SubMesh::get__drawWrapper}
     , materialIndex{iMaterialIndex}
     , verticesStart{iVerticesStart}
     , verticesCount{iVerticesCount}
@@ -41,6 +43,8 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
     , _renderId{0}
     , _alphaIndex{0}
     , _distanceToCamera{0.f}
+    , _mainDrawWrapper{nullptr}
+    , _mainDrawWrapperOverride{nullptr}
     , _boundingInfo{nullptr}
     , _linesIndexBuffer{nullptr}
     , _currentMaterial{nullptr}
@@ -88,6 +92,11 @@ void SubMesh::_removeCustomEffect(const std::string& name)
 EffectPtr& SubMesh::get_effect()
 {
   return _effectOverride ? _effectOverride : _materialEffect;
+}
+
+DrawWrapperPtr& SubMesh::get__drawWrapper()
+{
+  return _mainDrawWrapperOverride ? _mainDrawWrapperOverride : _mainDrawWrapper;
 }
 
 void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines)
