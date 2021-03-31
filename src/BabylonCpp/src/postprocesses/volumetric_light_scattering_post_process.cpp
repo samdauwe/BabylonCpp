@@ -8,6 +8,7 @@
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -54,9 +55,10 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   _viewPort = Viewport(0, 0, 1, 1).toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
 
   // Configure mesh
-  mesh = (iMesh != nullptr) ? iMesh :
-                              VolumetricLightScatteringPostProcess::CreateDefaultMesh(
+  mesh                           = (iMesh != nullptr) ? iMesh :
+                                                        VolumetricLightScatteringPostProcess::CreateDefaultMesh(
                                 "VolumetricLightScatteringMesh", scene);
+  _volumetricLightScatteringPass = std::make_shared<DrawWrapper>(engine);
 
   // Configure
   _createPass(scene, ratio);
@@ -152,11 +154,11 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
     options.defines         = std::move(join);
     options.indexParameters = {{"maxSimultaneousMorphTargets", mesh->numBoneInfluencers()}};
 
-    _volumetricLightScatteringPass = mesh->getScene()->getEngine()->createEffect(
+    _volumetricLightScatteringPass->effect = mesh->getScene()->getEngine()->createEffect(
       "volumetricLightScatteringPass", options, mesh->getScene()->getEngine());
   }
 
-  return _volumetricLightScatteringPass->isReady();
+  return _volumetricLightScatteringPass->effect->isReady();
 }
 
 void VolumetricLightScatteringPostProcess::setCustomMeshPosition(const Vector3& position)
@@ -216,7 +218,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
   }
 
   // Custom render function for submeshes
-  auto renderSubMesh = [this](SubMesh* subMesh) {
+  const auto renderSubMesh = [this](SubMesh* subMesh) {
     auto renderingMesh = subMesh->getRenderingMesh();
     auto effectiveMesh = subMesh->getEffectiveMesh();
     if (_meshExcluded(renderingMesh)) {
@@ -252,46 +254,51 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
             || renderingMesh->hasThinInstances());
 
     if (_isReady(subMesh, hardwareInstancedRendering)) {
-      auto effect = _volumetricLightScatteringPass;
+      auto drawWrapper = _volumetricLightScatteringPass;
       if (renderingMesh == mesh) {
-        effect = material->getEffect();
+        if (subMesh->effect()) {
+          drawWrapper = subMesh->_drawWrapper();
+        }
+        else {
+          drawWrapper = material->_getDrawWrapper();
+        }
       }
 
-      engine_->enableEffect(effect);
+      const auto effect = drawWrapper->effect;
+
+      engine_->enableEffect(drawWrapper);
       renderingMesh->_bind(subMesh, effect, material->fillMode());
 
       if (renderingMesh == mesh) {
         material->bind(effectiveMesh->getWorldMatrix(), renderingMesh.get());
       }
       else {
-        auto iMterial = subMesh->getMaterial();
-
-        _volumetricLightScatteringPass->setMatrix("viewProjection", scene_->getTransformMatrix());
+        effect->setMatrix("viewProjection", scene_->getTransformMatrix());
 
         // Alpha test
-        if (iMterial && iMterial->needAlphaTesting()) {
-          auto alphaTexture = iMterial->getAlphaTestTexture();
+        auto iMaterial = subMesh->getMaterial();
+        if (iMaterial && iMaterial->needAlphaTesting()) {
+          auto alphaTexture = iMaterial->getAlphaTestTexture();
 
-          _volumetricLightScatteringPass->setTexture("diffuseSampler", alphaTexture);
+          effect->setTexture("diffuseSampler", alphaTexture);
 
           if (alphaTexture) {
-            _volumetricLightScatteringPass->setMatrix("diffuseMatrix",
-                                                      *alphaTexture->getTextureMatrix());
+            effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
           }
         }
 
         // Bones
         if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
             && renderingMesh->skeleton()) {
-          _volumetricLightScatteringPass->setMatrices(
-            "mBones", renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
+          effect->setMatrices("mBones",
+                              renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
         }
       }
 
       // Draw
       renderingMesh->_processRendering(
-        effectiveMesh.get(), subMesh, _volumetricLightScatteringPass, Material::TriangleFillMode,
-        batch, hardwareInstancedRendering,
+        effectiveMesh.get(), subMesh, effect, Material::TriangleFillMode, batch,
+        hardwareInstancedRendering,
         [effect](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) -> void {
           effect->setMatrix("world", world);
         });
