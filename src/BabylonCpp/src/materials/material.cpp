@@ -98,6 +98,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
+    , _drawWrapper{nullptr}
     , _forceAlphaTest{false}
     , _transparencyMode{std::nullopt}
     , _disableAlphaBlending{this, &Material::get__disableAlphaBlending}
@@ -351,6 +352,11 @@ void Material::set_fillMode(unsigned int value)
 unsigned int Material::get_fillMode() const
 {
   return _fillMode;
+}
+
+DrawWrapperPtr& Material::_getDrawWrapper()
+{
+  return _drawWrapper;
 }
 
 std::string Material::toString(bool fullDetails) const

@@ -26,6 +26,7 @@ class SubMesh;
 class UniformBuffer;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(BaseTexture)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiMaterial)
@@ -213,6 +214,11 @@ public:
    */
   void setProperty(const std::vector<std::string>& targetPropertyPath,
                    const AnimationValue& value) override;
+
+  /**
+   * @brief Hidden
+   */
+  DrawWrapperPtr& _getDrawWrapper();
 
   /**
    * @param Returns a string representation of the current material.
@@ -971,6 +977,8 @@ protected:
    * An event triggered when the effect is (re)created
    */
   Observable<OnCreatedEffectParameters> _onEffectCreatedObservable;
+
+  DrawWrapperPtr _drawWrapper;
 
   /**
    * Stores the uniform buffer
