@@ -12,9 +12,8 @@ BloomMergePostProcess::BloomMergePostProcess(const std::string& iName,
                                              const std::optional<unsigned int>& samplingMode,
                                              Engine* engine, bool reusable,
                                              unsigned int textureType, bool blockCompilation)
-    : PostProcess(iName, "bloomMerge", {"bloomWeight"},
-                  {"circleOfConfusionSampler", "blurStep0", "blurStep1", "blurStep2", "bloomBlur"},
-                  options, camera, samplingMode, engine, reusable, "", textureType, "", {}, true)
+    : PostProcess(iName, "bloomMerge", {"bloomWeight"}, {"bloomBlur"}, options, camera,
+                  samplingMode, engine, reusable, "", textureType, "", {}, true)
     , originalFromInput{iOriginalFromInput}
     , blurred{iBlurred}
 {
