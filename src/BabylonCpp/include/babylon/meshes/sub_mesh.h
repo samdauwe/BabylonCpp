@@ -300,6 +300,8 @@ public:
    */
   ReadOnlyProperty<SubMesh, DrawWrapperPtr> _drawWrapper;
 
+  DrawWrapperPtr _drawWrapperOverride;
+
   /** the material index to use */
   unsigned int materialIndex;
   /** vertex index start */
