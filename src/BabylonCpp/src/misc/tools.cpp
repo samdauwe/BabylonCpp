@@ -7,6 +7,7 @@
 #include <babylon/maths/color4.h>
 #include <babylon/maths/isize.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/misc/guid.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/utils/base64.h>
 
@@ -159,6 +160,11 @@ Image Tools::CreateNoiseImage(unsigned int size)
 std::string Tools::DecodeURIComponent(const std::string& s)
 {
   return s;
+}
+
+std::string Tools::RandomId()
+{
+  return GUID::RandomId();
 }
 
 bool Tools::IsBase64(const std::string& uri)
