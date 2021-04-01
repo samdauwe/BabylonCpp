@@ -5,6 +5,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -275,23 +276,24 @@ bool ShaderMaterial::_checkCache(AbstractMesh* mesh, bool useInstances)
     return true;
   }
 
-  if (_effect
-      && (_effect->defines.find("#define INSTANCES") != std::string::npos) != useInstances) {
+  const auto effect = getEffect();
+  if (effect && (effect->defines.find("#define INSTANCES") != std::string::npos) != useInstances) {
     return false;
   }
 
   return true;
 }
 
-bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* /*subMesh*/, bool useInstances)
+bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
 {
-  return isReady(mesh, useInstances);
+  return isReady(mesh, useInstances, subMesh);
 }
 
-bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
+bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* subMesh)
 {
-  if (_effect && isFrozen()) {
-    if (_effect->_wasPreviouslyReady) {
+  auto effect = getEffect();
+  if (effect && isFrozen()) {
+    if (effect->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -455,7 +457,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
                                          &defines, attribs, nullptr);
   }
 
-  auto previousEffect = _effect;
+  auto previousEffect = effect;
   auto join           = StringTools::join(defines, '\n');
 
   if (_cachedDefines != join) {
@@ -473,24 +475,29 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned int>(numInfluencers)}};
 
-    _effect = engine->createEffect(shaderName, options, engine);
+    effect = engine->createEffect(shaderName, options, engine);
+
+    _drawWrapper->effect = effect;
 
     /* if (_onEffectCreatedObservable()) */ {
-      onCreatedEffectParameters.effect = _effect.get();
+      onCreatedEffectParameters.effect = effect.get();
+      onCreatedEffectParameters.subMesh
+        = subMesh ? subMesh :
+                    ((mesh && !mesh->subMeshes.empty()) ? mesh->subMeshes[0].get() : nullptr);
       _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
     }
   }
 
-  if (!_effect->isReady()) {
+  if (!effect->isReady()) {
     return false;
   }
 
-  if (previousEffect != _effect) {
+  if (previousEffect != effect) {
     scene->resetCachedMaterial();
   }
 
-  _renderId                    = scene->getRenderId();
-  _effect->_wasPreviouslyReady = true;
+  _renderId                   = scene->getRenderId();
+  effect->_wasPreviouslyReady = true;
 
   return true;
 }
@@ -499,7 +506,7 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectO
 {
   auto scene = getScene();
 
-  auto effect = effectOverride ? effectOverride : _effect;
+  auto effect = effectOverride ? effectOverride : getEffect();
 
   if (!effect) {
     return;
@@ -522,7 +529,7 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectO
 
 void ShaderMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  bind(world, mesh, subMesh->_effectOverride);
+  bind(world, mesh, subMesh->_drawWrapperOverride->effect);
 }
 
 void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOverride)
@@ -530,7 +537,7 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
   // Std values
   bindOnlyWorldMatrix(world, effectOverride);
 
-  const auto effect = effectOverride ? effectOverride : _effect;
+  const auto effect = effectOverride ? effectOverride : getEffect();
 
   const auto mustRebind = getScene()->getCachedMaterial() != this;
 
@@ -666,12 +673,12 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
     }
   }
 
-  const auto seffect = _effect;
+  const auto seffect = getEffect();
 
-  _effect = effect; // make sure the active effect is the right one if there are some observers for
-                    // onBind that would need to get the current effect
+  _drawWrapper->effect = effect; // make sure the active effect is the right one if there are some
+                                 // observers for onBind that would need to get the current effect
   _afterBind(mesh, effect);
-  _effect = seffect;
+  _drawWrapper->effect = seffect;
 }
 
 void ShaderMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)

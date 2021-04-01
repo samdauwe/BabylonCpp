@@ -243,9 +243,11 @@ public:
    * @brief Checks if the material is ready to render the requested mesh.
    * @param mesh Define the mesh to render
    * @param useInstances Define whether or not the material is used with instances
+   * @param subMesh defines which submesh to render
    * @returns true if ready, otherwise false
    */
-  bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false) override;
+  bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false,
+               SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Binds the world matrix to the material.

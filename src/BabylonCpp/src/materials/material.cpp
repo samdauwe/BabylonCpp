@@ -393,7 +393,7 @@ void Material::unfreeze()
   checkReadyOnlyOnce = false;
 }
 
-bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
+bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/, SubMesh* /*subMesh*/)
 {
   return true;
 }

@@ -780,7 +780,7 @@ void EdgesRenderer::render()
   }
 
   auto engine = scene->getEngine();
-  _lineShader->_preBind();
+  _lineShader->_preBind(EffectPtr{nullptr});
 
   if (_source->edgesColor.a != 1.f) {
     engine->setAlphaMode(Constants::ALPHA_COMBINE);

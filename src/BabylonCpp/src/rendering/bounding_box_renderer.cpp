@@ -131,7 +131,7 @@ void BoundingBoxRenderer::render(int renderingGroupId)
 
   auto engine = scene->getEngine();
   engine->setDepthWrite(false);
-  _colorShader->_preBind();
+  _colorShader->_preBind(EffectPtr{nullptr});
 
   for (auto& boundingBox : renderList) {
     if (boundingBox._tag != renderingGroupId) {
@@ -194,7 +194,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
 
   engine->setDepthWrite(false);
   engine->setColorWrite(false);
-  _colorShader->_preBind();
+  _colorShader->_preBind(EffectPtr{nullptr});
 
   auto& boundingBox = mesh->_boundingInfo->boundingBox;
   auto min          = boundingBox.minimum;

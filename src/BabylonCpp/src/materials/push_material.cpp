@@ -31,7 +31,7 @@ EffectPtr& PushMaterial::getEffect()
   return _activeEffect;
 }
 
-bool PushMaterial::isReady(AbstractMesh* mesh, bool useInstances)
+bool PushMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* /*subMesh*/)
 {
   if (!mesh) {
     return false;

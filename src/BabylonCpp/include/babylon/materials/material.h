@@ -254,9 +254,11 @@ public:
    * @brief Specifies if the material is ready to be used.
    * @param mesh defines the mesh to check
    * @param useInstances specifies if instances should be used
+   * @param subMesh defines which submesh to render
    * @returns a boolean indicating if the material is ready to be used
    */
-  virtual bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false);
+  virtual bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false,
+                       SubMesh* subMesh = nullptr);
 
   /**
    * @brief Specifies that the submesh is ready to be used.

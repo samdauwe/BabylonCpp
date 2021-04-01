@@ -35,7 +35,8 @@ public:
   Type type() const override;
 
   EffectPtr& getEffect();
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
+  bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false,
+               SubMesh* subMesh = nullptr) override;
 
   /**
    * @brief Binds the given world matrix to the active effect.
