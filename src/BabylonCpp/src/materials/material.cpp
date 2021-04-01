@@ -4,6 +4,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/material_helper.h>
@@ -15,7 +16,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/misc/guid.h>
+#include <babylon/misc/tools.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>
 
@@ -91,13 +92,13 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , wireframe{this, &Material::get_wireframe, &Material::set_wireframe}
     , pointsCloud{this, &Material::get_pointsCloud, &Material::set_pointsCloud}
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
-    , _effect{nullptr}
     , _indexInSceneMaterialArray{-1}
     , transparencyMode{this, &Material::get_transparencyMode, &Material::set_transparencyMode}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
+    , _materialContext{nullptr}
     , _drawWrapper{nullptr}
     , _forceAlphaTest{false}
     , _transparencyMode{std::nullopt}
@@ -117,9 +118,11 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
   name   = iName;
   _scene = scene ? scene : Engine::LastCreatedScene();
 
-  id = !iName.empty() ? iName : GUID::RandomId();
-
-  uniqueId = _scene->getUniqueId();
+  id                            = !iName.empty() ? iName : Tools::RandomId();
+  uniqueId                      = _scene->getUniqueId();
+  _materialContext              = _scene->getEngine()->createMaterialContext();
+  _drawWrapper                  = std::make_shared<DrawWrapper>(_scene->getEngine(), false);
+  _drawWrapper->materialContext = _materialContext;
 
   if (_scene->useRightHandedSystem()) {
     sideOrientation = Material::ClockWiseSideOrientation;
@@ -403,7 +406,7 @@ bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, SubMesh* /*subMesh*/,
 
 EffectPtr& Material::getEffect()
 {
-  return _effect;
+  return _drawWrapper->effect;
 }
 
 Scene* Material::getScene() const
@@ -508,7 +511,26 @@ bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> ove
   const auto orientation = overrideOrientation.value_or(static_cast<unsigned>(sideOrientation));
   const auto reverse     = orientation == Material::ClockWiseSideOrientation;
 
-  engine->enableEffect(effect ? effect : _effect);
+  if (effect) {
+    engine->enableEffect(effect);
+  }
+  else {
+    engine->enableEffect(_getDrawWrapper());
+  }
+  engine->setState(backFaceCulling(), zOffset, false, reverse);
+
+  return reverse;
+}
+
+bool Material::_preBind(const DrawWrapperPtr& effect,
+                        std::optional<unsigned int> overrideOrientation)
+{
+  auto engine = _scene->getEngine();
+
+  const auto orientation = overrideOrientation.value_or(static_cast<unsigned>(sideOrientation));
+  const auto reverse     = orientation == Material::ClockWiseSideOrientation;
+
+  engine->enableEffect(effect ? effect : _getDrawWrapper());
   engine->setState(backFaceCulling(), zOffset, false, reverse);
 
   return reverse;
@@ -906,12 +928,12 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, b
 
   // Shader are kept in cache for further use but we can get rid of this by
   // using forceDisposeEffect
-  if (forceDisposeEffect && _effect) {
+  if (forceDisposeEffect && _drawWrapper->effect) {
     if (!_storeEffectOnSubMeshes) {
-      _effect->dispose();
+      _drawWrapper->effect->dispose();
     }
 
-    _effect = nullptr;
+    _drawWrapper->effect = nullptr;
   }
 
   // Callback
@@ -937,7 +959,7 @@ void Material::releaseVertexArrayObject(const AbstractMeshPtr& iMesh, bool force
       }
     }
     else {
-      geometry->_releaseVertexArrayObject(_effect);
+      geometry->_releaseVertexArrayObject(_drawWrapper->effect);
     }
   }
 }

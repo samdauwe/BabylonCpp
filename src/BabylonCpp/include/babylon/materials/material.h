@@ -28,6 +28,7 @@ FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(BaseTexture)
 FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(IMaterialContext)
 FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiMaterial)
 FWD_CLASS_SPTR(PrePassRenderer)
@@ -329,7 +330,9 @@ public:
   /**
    * @brief Hidden
    */
-  bool _preBind(const EffectPtr& effect                         = nullptr,
+  bool _preBind(const EffectPtr& effect,
+                std::optional<unsigned int> overrideOrientation = std::nullopt);
+  bool _preBind(const DrawWrapperPtr& effect,
                 std::optional<unsigned int> overrideOrientation = std::nullopt);
 
   /**
@@ -937,12 +940,6 @@ public:
   Property<Material, unsigned int> fillMode;
 
   /**
-   * Stores the effects for the material
-   * Hidden
-   */
-  EffectPtr _effect;
-
-  /**
    * Hidden
    */
   int _indexInSceneMaterialArray;
@@ -977,6 +974,12 @@ protected:
    * An event triggered when the effect is (re)created
    */
   Observable<OnCreatedEffectParameters> _onEffectCreatedObservable;
+
+  /**
+   * @hidden
+   * Stores the effects for the material
+   */
+  IMaterialContextPtr _materialContext;
 
   DrawWrapperPtr _drawWrapper;
 
