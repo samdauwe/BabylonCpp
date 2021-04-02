@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_DIVIDE_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class DivideBlock;
-using DivideBlockPtr = std::shared_ptr<DivideBlock>;
+FWD_CLASS_SPTR(DivideBlock)
 
 /**
  * @brief Block used to divide 2 vectors.
