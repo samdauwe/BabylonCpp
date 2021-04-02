@@ -136,7 +136,7 @@ bool CurrentScreenBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& 
 
 void CurrentScreenBlock::_injectVertexCode(NodeMaterialBuildState& state)
 {
-  auto uvInput = uv();
+  const auto uvInput = uv();
 
   if (uvInput->connectedPoint()->ownerBlock()->isInput()) {
     auto uvInputOwnerBlock
