@@ -51,7 +51,7 @@ void EffectRenderer::applyEffectWrapper(const EffectWrapperPtr& effectWrapper)
 {
   engine->depthCullingState()->depthTest = false;
   engine->stencilState()->stencilTest    = false;
-  engine->enableEffect(effectWrapper->effect);
+  engine->enableEffect(effectWrapper->_drawWrapper);
   bindBuffers(effectWrapper->effect);
   effectWrapper->onApplyObservable.notifyObservers(nullptr);
 }
@@ -78,7 +78,7 @@ void EffectRenderer::render(
   const std::optional<std::variant<InternalTexturePtr, RenderTargetTexturePtr>>& outputTexture)
 {
   // Ensure effect is ready
-  if (!effectWrapper->effect->isReady()) {
+  if (!effectWrapper->effect()->isReady()) {
     return;
   }
 

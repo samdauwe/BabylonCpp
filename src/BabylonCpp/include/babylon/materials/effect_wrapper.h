@@ -9,22 +9,14 @@ namespace BABYLON {
 
 struct EffectWrapperCreationOptions;
 FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(DrawWrapper)
 
 /**
  * @brief Wraps an effect to be used for rendering.
  */
-struct BABYLON_SHARED_EXPORT EffectWrapper {
+class BABYLON_SHARED_EXPORT EffectWrapper {
 
-  /**
-   * Event that is fired right before the effect is drawn (should be used to update uniforms)
-   */
-  Observable<void> onApplyObservable;
-
-  /**
-   * The underlying effect
-   */
-  EffectPtr effect;
-
+public:
   /**
    * @brief Creates an effect to be renderer.
    * @param creationOptions options to create the effect
@@ -37,7 +29,32 @@ struct BABYLON_SHARED_EXPORT EffectWrapper {
    */
   void dispose();
 
-}; // end of struct EffectWrapper
+protected:
+  /**
+   * @brief Gets the underlying effect.
+   */
+  EffectPtr& get_effect();
+
+  /**
+   * @brief Sets the underlying effect.
+   */
+  void set_effect(const EffectPtr& effect);
+
+public:
+  /**
+   * Event that is fired right before the effect is drawn (should be used to update uniforms)
+   */
+  Observable<void> onApplyObservable;
+
+  /**
+   * The underlying effect
+   */
+  Property<EffectWrapper, EffectPtr> effect;
+
+  /** @hidden */
+  DrawWrapperPtr _drawWrapper;
+
+}; // end of class EffectWrapper
 
 } // end of namespace BABYLON
 

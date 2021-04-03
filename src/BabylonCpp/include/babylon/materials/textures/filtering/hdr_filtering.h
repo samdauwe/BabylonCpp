@@ -14,7 +14,7 @@ class Effect;
 class ThinEngine;
 FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(EffectRenderer)
-FWD_STRUCT_SPTR(EffectWrapper)
+FWD_CLASS_SPTR(EffectWrapper)
 FWD_CLASS_SPTR(InternalTexture)
 
 /**

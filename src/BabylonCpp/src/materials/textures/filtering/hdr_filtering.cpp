@@ -59,7 +59,7 @@ BaseTexturePtr HDRFiltering::_prefilterInternal(const BaseTexturePtr& texture)
   const auto width        = texture->getSize().width;
   const auto mipmapsCount = std::round(Scalar::ILog2(width)) + 1;
 
-  const auto effect        = _effectWrapper->effect;
+  const auto effect        = _effectWrapper->effect();
   const auto outputTexture = _createRenderTarget(width);
   _effectRenderer->setViewport();
 
@@ -151,7 +151,7 @@ EffectWrapperPtr HDRFiltering::_createEffect(const BaseTexturePtr& texture,
 
 bool HDRFiltering::isReady(const BaseTexturePtr& texture) const
 {
-  return (texture->isReady() && _effectWrapper->effect->isReady());
+  return (texture->isReady() && _effectWrapper->effect()->isReady());
 }
 
 void HDRFiltering::prefilter(const BaseTexturePtr& texture, const std::function<void()>& onFinished)
@@ -166,7 +166,7 @@ void HDRFiltering::prefilter(const BaseTexturePtr& texture, const std::function<
   {
     _effectRenderer = std::make_shared<EffectRenderer>(_engine);
     _effectWrapper  = _createEffect(texture);
-    _effectWrapper->effect->executeWhenCompiled(
+    _effectWrapper->effect()->executeWhenCompiled(
       [this, texture, onFinished](Effect* /*effect*/) -> void {
         _prefilterInternal(texture);
         _effectRenderer->dispose();

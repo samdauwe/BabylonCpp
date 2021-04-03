@@ -15,7 +15,7 @@ struct IEffectRendererOptions;
 class ThinEngine;
 class Viewport;
 FWD_CLASS_SPTR(Effect)
-FWD_STRUCT_SPTR(EffectWrapper)
+FWD_CLASS_SPTR(EffectWrapper)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(RenderTargetTexture)
 FWD_CLASS_SPTR(Texture)
