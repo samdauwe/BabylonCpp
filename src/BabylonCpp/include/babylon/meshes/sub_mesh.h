@@ -46,6 +46,11 @@ public:
   /**
    * @brief Hidden
    */
+  DrawWrapperPtr _getDrawWrapper(const std::string& name, bool createIfNotExisting = false);
+
+  /**
+   * @brief Hidden
+   */
   std::optional<ICustomEffect> _getCustomEffect(const std::string& name,
                                                 bool createIfNotExisting = true);
 

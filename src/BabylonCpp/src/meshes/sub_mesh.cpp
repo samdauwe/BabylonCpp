@@ -73,6 +73,11 @@ void SubMesh::set_materialDefines(const MaterialDefinesPtr& defines)
   _materialDefines = defines;
 }
 
+DrawWrapperPtr SubMesh::_getDrawWrapper(const std::string& /*name*/, bool /*createIfNotExisting*/)
+{
+  return nullptr;
+}
+
 std::optional<ICustomEffect> SubMesh::_getCustomEffect(const std::string& name,
                                                        bool createIfNotExisting)
 {
