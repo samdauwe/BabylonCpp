@@ -23,6 +23,8 @@ FWD_CLASS_SPTR(RenderTargetTexture)
 class BABYLON_SHARED_EXPORT DepthRenderer {
 
 public:
+  static size_t _Counter;
+
   /**
    * @brief Instantiates a depth renderer.
    * @param scene The scene the renderer belongs to
@@ -81,11 +83,10 @@ public:
 private:
   Scene* _scene;
   RenderTargetTexturePtr _depthMap;
-  EffectPtr _effect;
+  std::string _nameForDrawWrapper;
   bool _storeNonLinearDepth;
   Color4 _clearColor;
 
-  std::string _cachedDefines;
   CameraPtr _camera;
 
 }; // end of class DepthRenderer

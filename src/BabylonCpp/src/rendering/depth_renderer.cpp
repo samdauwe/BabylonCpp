@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -24,13 +25,14 @@
 
 namespace BABYLON {
 
+size_t DepthRenderer::_Counter = 0ull;
+
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& camera,
                              bool storeNonLinearDepth)
     : isPacked{type == Constants::TEXTURETYPE_UNSIGNED_BYTE}
     , enabled{true}
     , useOnlyInActiveCamera{false}
     , _depthMap{nullptr}
-    , _effect{nullptr}
 {
   _scene               = scene;
   _storeNonLinearDepth = storeNonLinearDepth;
@@ -49,6 +51,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
     scene->_addComponent(component);
   }
 
+  _nameForDrawWrapper = StringTools::printf(
+    "%s%zu", Constants::SUBMESH_DRAWWRAPPER_DEPTHRENDERER_PREFIX, DepthRenderer::_Counter++);
   _camera     = camera;
   auto engine = scene->getEngine();
 
@@ -118,6 +122,11 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   std::vector<std::string> defines;
+
+  const auto subMeshEffect = subMesh->_getDrawWrapper(_nameForDrawWrapper, true);
+
+  auto& effect        = subMeshEffect->effect;
+  auto& cachedDefines = subMeshEffect->defines;
 
   std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
@@ -194,8 +203,9 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
   // Get correct effect
   auto join = StringTools::join(defines, '\n');
-  if (_cachedDefines != join) {
-    _cachedDefines = join;
+  if (cachedDefines && std::holds_alternative<std::string>(*cachedDefines)
+      && std::get<std::string>(*cachedDefines) != join) {
+    cachedDefines = join;
 
     IEffectCreationOptions options;
     options.attributes    = std::move(attribs);
@@ -212,10 +222,12 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
-    _effect = _scene->getEngine()->createEffect("depth", options, _scene->getEngine());
+    effect = _scene->getEngine()->createEffect("depth", options, _scene->getEngine());
   }
 
-  return _effect->isReady();
+  subMeshEffect->setEffect(effect, std::get<std::string>(*cachedDefines));
+
+  return effect->isReady();
 }
 
 void DepthRenderer::renderSubMesh(SubMesh* subMesh)
@@ -254,20 +266,24 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
   if (isReady(subMesh, hardwareInstancedRendering) && camera) {
     subMesh->_renderId = scene->getRenderId();
 
-    engine->enableEffect(_effect);
-    renderingMesh->_bind(subMesh, _effect, material->fillMode());
+    const auto drawWrapper = subMesh->_getDrawWrapper(_nameForDrawWrapper);
+    const auto effect      = DrawWrapper::GetEffect(drawWrapper);
 
-    _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
-    _effect->setMatrix("world", effectiveMesh->getWorldMatrix());
+    engine->enableEffect(drawWrapper);
 
-    _effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
+    renderingMesh->_bind(subMesh, effect, material->fillMode());
+
+    effect->setMatrix("viewProjection", _scene->getTransformMatrix());
+    effect->setMatrix("world", effectiveMesh->getWorldMatrix());
+
+    effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
 
     // Alpha test
     if (material && material->needAlphaTesting()) {
       auto alphaTexture = material->getAlphaTestTexture();
       if (alphaTexture) {
-        _effect->setTexture("diffuseSampler", alphaTexture);
-        _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+        effect->setTexture("diffuseSampler", alphaTexture);
+        effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
       }
     }
 
@@ -282,27 +298,27 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
           return;
         }
 
-        _effect->setTexture("boneSampler", boneTexture);
-        _effect->setFloat("boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
+        effect->setTexture("boneSampler", boneTexture);
+        effect->setFloat("boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
       }
       else {
-        _effect->setMatrices("mBones", skeleton->getTransformMatrices(renderingMesh.get()));
+        effect->setMatrices("mBones", skeleton->getTransformMatrices(renderingMesh.get()));
       }
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), effect.get());
     if (renderingMesh->morphTargetManager()
         && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-      renderingMesh->morphTargetManager()->_bind(_effect);
+      renderingMesh->morphTargetManager()->_bind(effect);
     }
 
     // Draw
     renderingMesh->_processRendering(
-      effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+      effectiveMesh.get(), subMesh, effect, static_cast<int>(material->fillMode()), batch,
       hardwareInstancedRendering,
-      [this](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
-        _effect->setMatrix("world", world);
+      [effect](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
+        effect->setMatrix("world", world);
       });
   }
 }
