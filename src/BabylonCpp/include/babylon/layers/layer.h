@@ -12,7 +12,7 @@
 namespace BABYLON {
 
 class Layer;
-FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Texture)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
@@ -169,7 +169,7 @@ private:
   Scene* _scene;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
-  EffectPtr _effect;
+  DrawWrapperPtr _drawWrapper;
   std::string _previousDefines;
 
 }; // end of class Layer

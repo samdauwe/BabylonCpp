@@ -4,6 +4,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/layer_scene_component.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -43,6 +44,8 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
   _scene->layers.emplace_back(shared_from_this());
 
   auto engine = _scene->getEngine();
+
+  _drawWrapper = std::make_shared<DrawWrapper>(engine);
 
   // VBO
   const Float32Array vertices{
@@ -135,9 +138,9 @@ void Layer::render()
     options.samplers      = {"textureSampler"};
     options.defines       = defines;
 
-    _effect = engine->createEffect("layer", options, engine);
+    _drawWrapper->effect = engine->createEffect("layer", options, engine);
   }
-  auto currentEffect = _effect;
+  const auto currentEffect = _drawWrapper->effect;
 
   // Check
   if (!currentEffect || !currentEffect->isReady() || !texture || !texture->isReady()) {
@@ -147,7 +150,7 @@ void Layer::render()
   onBeforeRenderObservable.notifyObservers(this);
 
   // Render
-  engine->enableEffect(currentEffect);
+  engine->enableEffect(_drawWrapper);
   engine->setState(false);
 
   // Texture
