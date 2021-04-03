@@ -21,6 +21,7 @@ class Scene;
 class SubMesh;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(BaseTexture)
+FWD_CLASS_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(EffectLayer)
 FWD_CLASS_SPTR(Material)
@@ -349,9 +350,9 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
   std::string _cachedDefines;
-  EffectPtr _effectLayerMapGenerationEffect;
+  DrawWrapperPtr _effectLayerMapGenerationDrawWrapper;
   IEffectLayerOptions _effectLayerOptions;
-  EffectPtr _mergeEffect;
+  DrawWrapperPtr _mergeDrawWrapper;
 
 }; // end of struct EffectLayer
 
