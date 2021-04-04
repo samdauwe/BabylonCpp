@@ -61,10 +61,6 @@ void PrePassRendererSceneComponent::_beforeRenderTargetDraw(
   const RenderTargetTexturePtr& renderTarget, int faceIndex, int layer)
 {
   if (scene->prePassRenderer()) {
-    if (!renderTarget->_prePassRenderTarget) {
-      renderTarget->_prePassRenderTarget = scene->prePassRenderer()->_createRenderTarget(
-        renderTarget->name + "_prePassRTT", renderTarget);
-    }
     scene->prePassRenderer()->_setRenderTarget(renderTarget->_prePassRenderTarget);
     scene->prePassRenderer()->_beforeDraw(nullptr, faceIndex, layer);
   }
@@ -82,6 +78,10 @@ void PrePassRendererSceneComponent::_beforeRenderTargetClearStage(
   const RenderTargetTexturePtr& renderTarget, int /*faceIndex*/, int /*layer*/)
 {
   if (scene->prePassRenderer()) {
+    if (!renderTarget->_prePassRenderTarget) {
+      renderTarget->_prePassRenderTarget = scene->prePassRenderer()->_createRenderTarget(
+        renderTarget->name + "_prePassRTT", renderTarget);
+    }
     scene->prePassRenderer()->_setRenderTarget(renderTarget->_prePassRenderTarget);
     scene->prePassRenderer()->_clear();
   }
@@ -120,7 +120,7 @@ void PrePassRendererSceneComponent::_beforeRenderingMeshStage(AbstractMesh* mesh
 
   // Render to MRT
   const auto iScene = mesh->getScene();
-  if (iScene->prePassRenderer() && effect) {
+  if (iScene->prePassRenderer()) {
     iScene->prePassRenderer()->bindAttachmentsForEffect(*effect, subMesh);
   }
 }
