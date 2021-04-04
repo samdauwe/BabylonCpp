@@ -104,7 +104,8 @@ DrawWrapperPtr& SubMesh::get__drawWrapper()
   return _mainDrawWrapperOverride ? _mainDrawWrapperOverride : _mainDrawWrapper;
 }
 
-void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines)
+void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines,
+                        const IMaterialContextPtr& /*materialContext*/)
 {
   if (_materialEffect == iEffect) {
     if (!iEffect) {

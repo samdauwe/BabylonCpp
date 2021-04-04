@@ -13,6 +13,7 @@ namespace BABYLON {
 class IntersectionInfo;
 class WebGLDataBuffer;
 FWD_STRUCT_SPTR(DrawWrapper)
+FWD_STRUCT_SPTR(IMaterialContext)
 FWD_STRUCT_SPTR(MaterialDefines)
 FWD_CLASS_SPTR(SubMesh)
 FWD_CLASS_SPTR(WebGLDataBuffer)
@@ -64,7 +65,8 @@ public:
    * @param effect defines the effect to associate with
    * @param defines defines the set of defines used to compile this effect
    */
-  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr);
+  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr,
+                 const IMaterialContextPtr& materialContext = nullptr);
 
   void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
   bool isGlobal() const;
