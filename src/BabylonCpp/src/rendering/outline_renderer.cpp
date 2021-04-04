@@ -5,6 +5,7 @@
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -20,11 +21,15 @@
 
 namespace BABYLON {
 
+size_t OutlineRenderer::_Counter = 0ull;
+
 OutlineRenderer::OutlineRenderer(Scene* iScene) : zOffset{1.f}
 {
   ISceneComponent::name = OutlineRenderer::name;
   scene                 = iScene;
   _engine               = scene->getEngine();
+  _nameForDrawWrapper   = StringTools::printf(
+    "%s%zu", Constants::SUBMESH_DRAWWRAPPER_OUTLINERENDERER_PREFIX, OutlineRenderer::_Counter++);
 }
 
 OutlineRenderer::~OutlineRenderer() = default;
@@ -83,53 +88,55 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
     return;
   }
 
-  engine->enableEffect(_effect);
+  const auto drawWrapper = subMesh->_getDrawWrapper(_nameForDrawWrapper);
+  const auto effect      = DrawWrapper::GetEffect(drawWrapper);
+
+  engine->enableEffect(drawWrapper);
 
   // Logarithmic depth
   if (material->useLogarithmicDepth()) {
-    _effect->setFloat("logarithmicDepthConstant",
-                      2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
+    effect->setFloat("logarithmicDepthConstant",
+                     2.f / (std::log(scene->activeCamera()->maxZ + 1.f) / Math::LN2));
   }
 
-  _effect->setFloat("offset", useOverlay ? 0 : renderingMesh->outlineWidth);
-  _effect->setColor4("color",
-                     useOverlay ? renderingMesh->overlayColor : renderingMesh->outlineColor,
-                     useOverlay ? renderingMesh->overlayAlpha : material->alpha());
-  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
-  _effect->setMatrix("world", effectiveMesh->getWorldMatrix());
+  effect->setFloat("offset", useOverlay ? 0.f : renderingMesh->outlineWidth);
+  effect->setColor4("color", useOverlay ? renderingMesh->overlayColor : renderingMesh->outlineColor,
+                    useOverlay ? renderingMesh->overlayAlpha : material->alpha());
+  effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  effect->setMatrix("world", effectiveMesh->getWorldMatrix());
 
   // Bones
   if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
       && renderingMesh->skeleton()) {
-    _effect->setMatrices("mBones",
-                         renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
+    effect->setMatrices("mBones",
+                        renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
   }
 
   if (renderingMesh->morphTargetManager()
       && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-    renderingMesh->morphTargetManager()->_bind(_effect);
+    renderingMesh->morphTargetManager()->_bind(effect);
   }
 
   // Morph targets
-  MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), _effect.get());
+  MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), effect.get());
 
-  renderingMesh->_bind(subMesh, _effect, material->fillMode());
+  renderingMesh->_bind(subMesh, effect, material->fillMode());
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
     auto alphaTexture = material->getAlphaTestTexture();
     if (alphaTexture) {
-      _effect->setTexture("diffuseSampler", alphaTexture);
-      _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+      effect->setTexture("diffuseSampler", alphaTexture);
+      effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
     }
   }
 
   engine->setZOffset(-zOffset);
 
   renderingMesh->_processRendering(
-    effectiveMesh.get(), subMesh, _effect, static_cast<int>(material->fillMode()), batch,
+    effectiveMesh.get(), subMesh, effect, static_cast<int>(material->fillMode()), batch,
     hardwareInstancedRendering,
-    [this](bool, const Matrix& world, Material*) { _effect->setMatrix("world", world); });
+    [effect](bool, const Matrix& world, Material*) -> void { effect->setMatrix("world", world); });
 
   engine->setZOffset(0.f);
 }
@@ -139,8 +146,13 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   std::vector<std::string> defines;
   std::vector<std::string> attribs{VertexBuffer::PositionKind, VertexBuffer::NormalKind};
 
-  auto mesh     = subMesh->getMesh();
-  auto material = subMesh->getMaterial();
+  const auto subMeshEffect = subMesh->_getDrawWrapper(_nameForDrawWrapper, true);
+
+  auto& effect        = subMeshEffect->effect;
+  auto& cachedDefines = subMeshEffect->defines;
+
+  const auto mesh     = subMesh->getMesh();
+  const auto material = subMesh->getMaterial();
 
   if (material) {
     // Alpha test
@@ -210,8 +222,9 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
   // Get correct effect
   auto join = StringTools::join(defines, '\n');
-  if (_cachedDefines != join) {
-    _cachedDefines = join;
+  if (cachedDefines && std::holds_alternative<std::string>(*cachedDefines)
+      && std::get<std::string>(*cachedDefines) != join) {
+    cachedDefines = join;
 
     IEffectCreationOptions options;
     options.attributes    = std::move(attribs);
@@ -230,10 +243,12 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
-    _effect = scene->getEngine()->createEffect("outline", options, scene->getEngine());
+    effect = scene->getEngine()->createEffect("outline", options, scene->getEngine());
   }
 
-  return _effect->isReady();
+  subMeshEffect->setEffect(effect, std::get<std::string>(*cachedDefines));
+
+  return effect->isReady();
 }
 
 void OutlineRenderer::_beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh,

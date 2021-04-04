@@ -25,6 +25,8 @@ FWD_CLASS_SPTR(OutlineRenderer)
 class BABYLON_SHARED_EXPORT OutlineRenderer : public ISceneComponent {
 
 private:
+  static size_t _Counter;
+
   /**
    * Stencil value used to avoid outline being seen within the mesh when the mesh is transparent
    */
@@ -101,9 +103,8 @@ public:
 
 private:
   Engine* _engine;
-  EffectPtr _effect;
-  std::string _cachedDefines;
   bool _savedDepthWrite;
+  std::string _nameForDrawWrapper;
 
 }; // end of class OutlineRenderer
 
