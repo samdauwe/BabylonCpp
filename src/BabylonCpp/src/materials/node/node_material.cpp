@@ -931,7 +931,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
       }
       else {
         scene->resetCachedMaterial();
-        subMesh->setEffect(effect, defines);
+        subMesh->setEffect(effect, defines, _materialContext);
       }
     }
   }
