@@ -432,7 +432,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<StandardMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<StandardMaterialDefines>();
   }
 
   auto scene      = getScene();
@@ -623,6 +623,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
           defines.boolDef["REFRACTIONMAP_3D"] = _refractionTexture->isCube();
           defines.boolDef["RGBDREFRACTION"]   = _refractionTexture->isRGBD();
+          defines.boolDef["USE_LOCAL_REFRACTIONMAP_CUBIC"]
+            = _refractionTexture->boundingBoxSize() ? true : false;
         }
       }
       else {
@@ -874,6 +876,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
                                       "refractionRightColor",
                                       "vReflectionPosition",
                                       "vReflectionSize",
+                                      "vRefractionPosition",
+                                      "vRefractionSize",
                                       "logarithmicDepthConstant",
                                       "vTangentSpaceParams",
                                       "alphaCutOff",
@@ -892,7 +896,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
     DetailMapConfiguration::AddSamplers(samplers);
 
     PrePassConfiguration::AddUniforms(uniforms);
-    PrePassConfiguration::AddSamplers(uniforms);
+    PrePassConfiguration::AddSamplers(samplers);
 
     /* if (ImageProcessingConfiguration) */ {
       ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
@@ -952,7 +956,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
       else {
         _rebuildInParallel = false;
         scene->resetCachedMaterial();
-        subMesh->setEffect(effect, definesPtr);
+        subMesh->setEffect(effect, definesPtr, _materialContext);
         buildUniformLayout();
       }
     }
@@ -1005,6 +1009,8 @@ void StandardMaterial::buildUniformLayout()
   ubo.addUniform("pointSize", 1);
   ubo.addUniform("refractionMatrix", 16);
   ubo.addUniform("vRefractionInfos", 4);
+  ubo.addUniform("vRefractionPosition", 3);
+  ubo.addUniform("vRefractionSize", 3);
   ubo.addUniform("vSpecularColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
   ubo.addUniform("vDiffuseColor", 4);
@@ -1196,6 +1202,13 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
           }
           ubo.updateFloat4("vRefractionInfos", _refractionTexture->level, indexOfRefraction, depth,
                            invertRefractionY ? -1.f : 1.f, "");
+
+          if (_refractionTexture->boundingBoxSize()) {
+            const auto cubeTexture = std::static_pointer_cast<CubeTexture>(_refractionTexture);
+
+            ubo.updateVector3("vRefractionPosition", cubeTexture->boundingBoxPosition);
+            ubo.updateVector3("vRefractionSize", *cubeTexture->boundingBoxSize());
+          }
         }
       }
 
