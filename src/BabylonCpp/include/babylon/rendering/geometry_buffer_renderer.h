@@ -15,7 +15,7 @@ namespace BABYLON {
 class Engine;
 class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(PrePassRenderer)
@@ -305,7 +305,7 @@ public:
   Property<GeometryBufferRenderer, unsigned int> samples;
 
 protected:
-  EffectPtr _effect;
+  DrawWrapperPtr _drawWrapper;
   std::string _cachedDefines;
 
 private:
