@@ -122,7 +122,7 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<CellMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<CellMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<CellMaterialDefines>(subMesh->_materialDefines);
@@ -234,7 +234,8 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
