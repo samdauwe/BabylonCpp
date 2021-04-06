@@ -6,6 +6,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -95,6 +96,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
   _parameters.emplace_back("scale");
 
   _indexParameters = indexParameters;
+  _drawWrapper     = std::make_shared<DrawWrapper>(_engine);
 }
 
 PostProcess::~PostProcess() = default;
@@ -236,7 +238,7 @@ Engine* PostProcess::getEngine()
 
 const EffectPtr& PostProcess::getEffect() const
 {
-  return _effect;
+  return _drawWrapper->effect;
 }
 
 PostProcess& PostProcess::shareOutputWith(const PostProcessPtr& postProcess)
@@ -279,7 +281,8 @@ void PostProcess::updateEffect(
   options.onError         = onError;
   options.indexParameters = !indexParameters.empty() ? indexParameters : _indexParameters;
 
-  _effect = _engine->createEffect(baseName, options, _scene ? _scene->getEngine() : _engine);
+  _drawWrapper->effect
+    = _engine->createEffect(baseName, options, _scene ? _scene->getEngine() : _engine);
 }
 
 bool PostProcess::isReusable() const
@@ -392,9 +395,9 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
                                                           _engine->getRenderingCanvas()->height)
                        * _renderRatio);
 
-  auto desiredWidth = std::holds_alternative<PostProcessOptions>(_options) ?
-                        std::get<PostProcessOptions>(_options).width :
-                        requiredWidth;
+  auto desiredWidth  = std::holds_alternative<PostProcessOptions>(_options) ?
+                         std::get<PostProcessOptions>(_options).width :
+                         requiredWidth;
   auto desiredHeight = std::holds_alternative<PostProcessOptions>(_options) ?
                          std::get<PostProcessOptions>(_options).height :
                          requiredHeight;
@@ -498,7 +501,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
 
 bool PostProcess::get_isSupported() const
 {
-  return _effect->isSupported();
+  return _drawWrapper->effect ? _drawWrapper->effect->isSupported() : false;
 }
 
 float PostProcess::get_aspectRatio() const
@@ -518,18 +521,18 @@ float PostProcess::get_aspectRatio() const
 
 bool PostProcess::isReady() const
 {
-  return _effect && _effect->isReady();
+  return _drawWrapper->effect ? _drawWrapper->effect->isReady() : false;
 }
 
 EffectPtr PostProcess::apply()
 {
   // Check
-  if (!_effect || !_effect->isReady()) {
+  if (!_drawWrapper->effect || !_drawWrapper->effect->isReady()) {
     return nullptr;
   }
 
   // States
-  _engine->enableEffect(_effect);
+  _engine->enableEffect(_drawWrapper);
   _engine->setState(false);
   _engine->setDepthBuffer(false);
   _engine->setDepthWrite(false);
@@ -555,13 +558,13 @@ EffectPtr PostProcess::apply()
       source = inputTexture();
     }
   }
-  _effect->_bindTexture("textureSampler", source);
+  _drawWrapper->effect->_bindTexture("textureSampler", source);
 
   // Parameters
-  _effect->setVector2("scale", _scaleRatio);
-  onApplyObservable.notifyObservers(_effect.get());
+  _drawWrapper->effect->setVector2("scale", _scaleRatio);
+  onApplyObservable.notifyObservers(_drawWrapper->effect.get());
 
-  return _effect;
+  return _drawWrapper->effect;
 }
 
 void PostProcess::_disposeTextures()
