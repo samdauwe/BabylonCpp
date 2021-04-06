@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 class Engine;
-FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(ProceduralTexture)
 FWD_CLASS_SPTR(VertexBuffer)
@@ -51,6 +51,11 @@ public:
    * @returns The created effect corresponding the the postprocess.
    */
   EffectPtr& getEffect();
+
+  /**
+   * @brief Hidden
+   */
+  void _setEffect(const EffectPtr& effect);
 
   /**
    * @brief Gets texture content (Use this function wisely as reading from a texture can be slow).
@@ -304,11 +309,6 @@ public:
   /**
    * Hidden
    */
-  EffectPtr _effect;
-
-  /**
-   * Hidden
-   */
   std::unordered_map<std::string, TexturePtr> _textures;
 
   /**
@@ -325,6 +325,7 @@ protected:
   Texture* _fallbackTexture;
 
 private:
+  DrawWrapperPtr _drawWrapper;
   RenderTargetTextureSize _size;
   unsigned int _textureType;
   bool _doNotChangeAspectRatio;

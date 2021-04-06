@@ -5,6 +5,7 @@
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -26,9 +27,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
     , isEnabled{true}
     , autoClear{true}
     , onGenerated{nullptr}
-    , _generateMipMaps{generateMipMaps}
     , _isCube{iIsCube}
-    , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
     , _fallbackTexture{nullptr}
     , _textureType{0}
@@ -49,10 +48,13 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
 
   _fullEngine = scene->getEngine();
 
-  name           = iName;
-  isRenderTarget = true;
-  _size          = size;
-  _textureType   = textureType;
+  name             = iName;
+  isRenderTarget   = true;
+  _size            = size;
+  _textureType     = textureType;
+  _generateMipMaps = generateMipMaps;
+  _drawWrapper     = std::make_shared<DrawWrapper>(_fullEngine);
+
   setFragment(fragment);
 
   _fallbackTexture = fallbackTexture;
@@ -105,9 +107,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
     , isEnabled{true}
     , autoClear{true}
     , onGenerated{nullptr}
-    , _generateMipMaps{generateMipMaps}
     , _isCube{iIsCube}
-    , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate, &ProceduralTexture::set_refreshRate}
     , _fallbackTexture{nullptr}
     , _textureType{0}
@@ -127,10 +127,13 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const RenderTarge
 
   _fullEngine = scene->getEngine();
 
-  name           = iName;
-  isRenderTarget = true;
-  _size          = size;
-  _textureType   = textureType;
+  name             = iName;
+  isRenderTarget   = true;
+  _size            = size;
+  _textureType     = textureType;
+  _generateMipMaps = generateMipMaps;
+  _drawWrapper     = std::make_shared<DrawWrapper>(_fullEngine);
+
   setFragment(fragment);
 
   _fallbackTexture = fallbackTexture;
@@ -186,7 +189,12 @@ void ProceduralTexture::addToScene(const ProceduralTexturePtr& newTexture)
 
 EffectPtr& ProceduralTexture::getEffect()
 {
-  return _effect;
+  return _drawWrapper->effect;
+}
+
+void ProceduralTexture::_setEffect(const EffectPtr& effect)
+{
+  _drawWrapper->effect = effect;
 }
 
 ArrayBufferView& ProceduralTexture::getContent()
@@ -240,11 +248,11 @@ void ProceduralTexture::_rebuild(bool /*forceFullRebuild*/)
 
 void ProceduralTexture::reset()
 {
-  if (_effect == nullptr) {
+  if (_drawWrapper->effect == nullptr) {
     return;
   }
 
-  _effect->dispose();
+  _drawWrapper->effect->dispose();
 }
 
 std::string ProceduralTexture::_getDefines() const
@@ -258,7 +266,7 @@ bool ProceduralTexture::isReady()
   std::unordered_map<std::string, std::string> shaders;
 
   if (nodeMaterialSource) {
-    return _effect->isReady();
+    return _drawWrapper->effect->isReady();
   }
 
   if (_fragment.empty()) {
@@ -270,7 +278,7 @@ bool ProceduralTexture::isReady()
   }
 
   auto defines = _getDefines();
-  if (_effect && defines == _cachedDefines && _effect->isReady()) {
+  if (_drawWrapper->effect && defines == _cachedDefines && _drawWrapper->effect->isReady()) {
     return true;
   }
 
@@ -304,10 +312,10 @@ bool ProceduralTexture::isReady()
       _fallbackTextureUsed = true;
     };
 
-    _effect = engine->createEffect(shaders, options, getScene()->getEngine());
+    _drawWrapper->effect = engine->createEffect(shaders, options, getScene()->getEngine());
   }
 
-  return _effect->isReady();
+  return _drawWrapper->effect->isReady();
 }
 
 void ProceduralTexture::resetRefreshCounter()
@@ -490,55 +498,55 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   auto engine = _fullEngine;
 
   // Render
-  engine->enableEffect(_effect);
+  engine->enableEffect(_drawWrapper);
   onBeforeGenerationObservable.notifyObservers(this);
   engine->setState(false);
 
   if (!nodeMaterialSource) {
     // Texture
-    for (auto& item : _textures) {
-      _effect->setTexture(item.first, item.second);
+    for (const auto& item : _textures) {
+      _drawWrapper->effect->setTexture(item.first, item.second);
     }
 
     // Int
-    for (auto& item : _ints) {
-      _effect->setInt(item.first, item.second);
+    for (const auto& item : _ints) {
+      _drawWrapper->effect->setInt(item.first, item.second);
     }
 
     // Float
-    for (auto& item : _floats) {
-      _effect->setFloat(item.first, item.second);
+    for (const auto& item : _floats) {
+      _drawWrapper->effect->setFloat(item.first, item.second);
     }
 
     // Floats
-    for (auto& item : _floatsArrays) {
-      _effect->setArray(item.first, item.second);
+    for (const auto& item : _floatsArrays) {
+      _drawWrapper->effect->setArray(item.first, item.second);
     }
 
     // Color3
-    for (auto& item : _colors3) {
-      _effect->setColor3(item.first, item.second);
+    for (const auto& item : _colors3) {
+      _drawWrapper->effect->setColor3(item.first, item.second);
     }
 
     // Color4
-    for (auto& item : _colors4) {
+    for (const auto& item : _colors4) {
       const auto& color = item.second;
-      _effect->setFloat4(item.first, color.r, color.g, color.b, color.a);
+      _drawWrapper->effect->setFloat4(item.first, color.r, color.g, color.b, color.a);
     }
 
     // Vector2
-    for (auto& item : _vectors2) {
-      _effect->setVector2(item.first, item.second);
+    for (const auto& item : _vectors2) {
+      _drawWrapper->effect->setVector2(item.first, item.second);
     }
 
     // Vector3
-    for (auto& item : _vectors3) {
-      _effect->setVector3(item.first, item.second);
+    for (const auto& item : _vectors3) {
+      _drawWrapper->effect->setVector3(item.first, item.second);
     }
 
     // Matrix
-    for (auto& item : _matrices) {
-      _effect->setMatrix(item.first, item.second);
+    for (const auto& item : _matrices) {
+      _drawWrapper->effect->setMatrix(item.first, item.second);
     }
   }
 
@@ -554,9 +562,9 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
       engine->bindFramebuffer(_texture, face, std::nullopt, std::nullopt, true);
 
       // VBOs
-      engine->bindBuffers(_vertexBuffers, _indexBuffer, _effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer, _drawWrapper->effect);
 
-      _effect->setFloat("face", static_cast<float>(face));
+      _drawWrapper->effect->setFloat("face", static_cast<float>(face));
 
       // Clear
       if (autoClear) {
@@ -571,7 +579,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     engine->bindFramebuffer(_texture, 0u, std::nullopt, std::nullopt, true);
 
     // VBOs
-    engine->bindBuffers(_vertexBuffers, _indexBuffer, _effect);
+    engine->bindBuffers(_vertexBuffers, _indexBuffer, _drawWrapper->effect);
 
     // Clear
     if (autoClear) {
