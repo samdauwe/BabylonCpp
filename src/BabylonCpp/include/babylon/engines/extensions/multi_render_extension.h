@@ -89,18 +89,6 @@ public:
    */
   void restoreSingleAttachmentForRenderTarget();
 
-  /**
-   * @brief Clears a list of attachments.
-   * @param attachments list of the attachments
-   * @param colorMain clear color for the main attachment (the first one)
-   * @param colorOthers clear color for the other attachments
-   * @param clearDepth true to clear the depth buffer. Used only for the first attachment
-   * @param clearStencil true to clear the stencil buffer. Used only for the first attachment
-   */
-  void clearAttachments(Uint32Array& attachments, const std::optional<Color4>& colorMain,
-                        const std::optional<Color4>& colorOthers, bool clearDepth,
-                        bool clearStencil);
-
 private:
   ThinEngine* _this;
 

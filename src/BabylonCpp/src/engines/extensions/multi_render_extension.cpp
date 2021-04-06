@@ -367,27 +367,4 @@ void MultiRenderExtension::restoreSingleAttachmentForRenderTarget()
   bindAttachments({GL::COLOR_ATTACHMENT0});
 }
 
-void MultiRenderExtension::clearAttachments(Uint32Array& attachments,
-                                            const std::optional<Color4>& colorMain,
-                                            const std::optional<Color4>& colorOthers,
-                                            bool clearDepth, bool clearStencil)
-{
-  if (attachments.empty()) {
-    return;
-  }
-
-  auto& gl = *_this->_gl;
-
-  gl.drawBuffers({attachments[0]});
-  _this->clear(colorMain, colorMain.has_value(), clearDepth, clearStencil);
-
-  const auto saveVal = attachments[0];
-  attachments[0]     = GL::NONE;
-
-  gl.drawBuffers(attachments);
-  _this->clear(colorOthers, colorOthers.has_value(), false, false);
-
-  attachments[0] = saveVal;
-}
-
 } // end of namespace BABYLON

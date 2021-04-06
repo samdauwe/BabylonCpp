@@ -4180,14 +4180,6 @@ void ThinEngine::restoreSingleAttachmentForRenderTarget()
   _multiRenderExtension->restoreSingleAttachmentForRenderTarget();
 }
 
-void ThinEngine::clearAttachments(Uint32Array& attachments, const std::optional<Color4>& colorMain,
-                                  const std::optional<Color4>& colorOthers, bool clearDepth,
-                                  bool clearStencil)
-{
-  _multiRenderExtension->clearAttachments(attachments, colorMain, colorOthers, clearDepth,
-                                          clearStencil);
-}
-
 //--------------------------------------------------------------------------------------------------
 //                              Raw Texture Extension
 //--------------------------------------------------------------------------------------------------
