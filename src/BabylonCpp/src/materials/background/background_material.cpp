@@ -608,7 +608,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<BackgroundMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<BackgroundMaterialDefines>();
   }
 
   auto scene      = getScene();
@@ -892,7 +892,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
-    subMesh->setEffect(scene->getEngine()->createEffect("background", options, engine), definesPtr);
+    const auto effect = scene->getEngine()->createEffect("background", options, engine);
+    subMesh->setEffect(effect, definesPtr, _materialContext);
 
     buildUniformLayout();
   }
