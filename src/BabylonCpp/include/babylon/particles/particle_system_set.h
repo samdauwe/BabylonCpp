@@ -3,10 +3,13 @@
 
 #include <map>
 #include <nlohmann/json_fwd.hpp>
+#include <optional>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/particles/particle_system_set_emitter_creation_options.h>
 
 using json = nlohmann::json;
@@ -16,7 +19,6 @@ namespace BABYLON {
 class IParticleSystem;
 class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Represents a set of particle systems working together to create a specific effect.
@@ -24,6 +26,8 @@ FWD_CLASS_SPTR(TransformNode)
 class BABYLON_SHARED_EXPORT ParticleSystemSet : public IDisposable {
 
 public:
+  using EmitterNodeType = std::optional<std::variant<AbstractMeshPtr, Vector3>>;
+
   /**
    * Gets or sets base Assets URL
    */
@@ -73,7 +77,12 @@ protected:
   /**
    * @brief Gets the emitter node used with this set.
    */
-  TransformNodePtr& get_emitterNode();
+  EmitterNodeType& get_emitterNode();
+
+  /**
+   * @brief Sets the emitter node used with this set.
+   */
+  void set_emitterNode(const EmitterNodeType& value);
 
 public:
   /**
@@ -84,11 +93,12 @@ public:
   /**
    * Gets the emitter node used with this set.
    */
-  ReadOnlyProperty<ParticleSystemSet, TransformNodePtr> emitterNode;
+  Property<ParticleSystemSet, EmitterNodeType> emitterNode;
 
 private:
   ParticleSystemSetEmitterCreationOptions _emitterCreationOptions;
-  TransformNodePtr _emitterNode;
+  EmitterNodeType _emitterNode;
+  bool _emitterNodeIsOwned;
 
 }; // end of class ParticleSystemSetEmitterCreationOptions
 

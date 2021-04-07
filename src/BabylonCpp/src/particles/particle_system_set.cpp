@@ -11,23 +11,54 @@
 namespace BABYLON {
 
 ParticleSystemSet::ParticleSystemSet()
-    : emitterNode{this, &ParticleSystemSet::get_emitterNode}, _emitterNode{nullptr}
+    : emitterNode{this, &ParticleSystemSet::get_emitterNode, &ParticleSystemSet::set_emitterNode}
+    , _emitterNode{std::nullopt}
+    , _emitterNodeIsOwned{true}
 {
 }
 
 ParticleSystemSet::~ParticleSystemSet() = default;
 
-TransformNodePtr& ParticleSystemSet::get_emitterNode()
+ParticleSystemSet::EmitterNodeType& ParticleSystemSet::get_emitterNode()
 {
   return _emitterNode;
+}
+
+void ParticleSystemSet::set_emitterNode(const EmitterNodeType& value)
+{
+  if (_emitterNodeIsOwned && _emitterNode) {
+    if (value && std::holds_alternative<AbstractMeshPtr>(*value)
+        && std::get<AbstractMeshPtr>(*value)) {
+      std::get<AbstractMeshPtr>(*value)->dispose();
+    }
+    _emitterNodeIsOwned = false;
+  }
+
+  if (value) {
+    for (const auto& system : systems) {
+      if (std::holds_alternative<AbstractMeshPtr>(*value)) {
+        system->emitter = std::get<AbstractMeshPtr>(*value);
+      }
+      if (std::holds_alternative<Vector3>(*value)) {
+        system->emitter = std::get<Vector3>(*value);
+      }
+    }
+  }
+
+  _emitterNode = value;
 }
 
 void ParticleSystemSet::setEmitterAsSphere(const EmitterCreationOptions& options,
                                            unsigned int renderingGroupId, Scene* scene)
 {
-  if (_emitterNode) {
-    _emitterNode->dispose();
+  if (_emitterNodeIsOwned && _emitterNode) {
+    if (_emitterNode && std::holds_alternative<AbstractMeshPtr>(*_emitterNode)
+        && std::get<AbstractMeshPtr>(*_emitterNode)) {
+      std::get<AbstractMeshPtr>(*_emitterNode)->dispose();
+    }
   }
+
+  _emitterNodeIsOwned = true;
 
   _emitterCreationOptions = {
     "Sphere",        // kind
@@ -72,8 +103,11 @@ void ParticleSystemSet::dispose(bool doNotRecurse, bool disposeMaterialAndTextur
   systems.clear();
 
   if (_emitterNode) {
-    _emitterNode->dispose();
-    _emitterNode = nullptr;
+    if (_emitterNode && std::holds_alternative<AbstractMeshPtr>(*_emitterNode)
+        && std::get<AbstractMeshPtr>(*_emitterNode)) {
+      std::get<AbstractMeshPtr>(*_emitterNode)->dispose();
+    }
+    _emitterNode = std::nullopt;
   }
 }
 
