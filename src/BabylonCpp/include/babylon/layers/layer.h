@@ -12,7 +12,7 @@
 namespace BABYLON {
 
 class Layer;
-FWD_CLASS_SPTR(DrawWrapper)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Texture)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)

@@ -25,7 +25,7 @@ struct IRenderTargetOptions;
 struct RenderTargetSize;
 class Scene;
 FWD_CLASS_SPTR(Camera)
-FWD_CLASS_SPTR(DrawWrapper)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(PostProcess)

@@ -22,7 +22,7 @@ class Mesh;
 class Particle;
 class Scene;
 class ThinEngine;
-FWD_CLASS_SPTR(DrawWrapper)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;

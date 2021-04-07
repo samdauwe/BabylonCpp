@@ -21,7 +21,7 @@ class Scene;
 class SubMesh;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(BaseTexture)
-FWD_CLASS_SPTR(DrawWrapper)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(EffectLayer)
 FWD_CLASS_SPTR(Material)

@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 class Engine;
-FWD_CLASS_SPTR(DrawWrapper)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(ProceduralTexture)
 FWD_CLASS_SPTR(VertexBuffer)
