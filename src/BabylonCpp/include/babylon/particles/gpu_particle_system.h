@@ -566,6 +566,7 @@ private:
   Buffer* _targetBuffer;
 
   int _currentRenderId;
+  int _currentRenderingCameraUniqueId;
   bool _started;
   bool _stopped;
 

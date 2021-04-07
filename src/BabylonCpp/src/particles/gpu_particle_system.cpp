@@ -57,6 +57,7 @@ GPUParticleSystem::GPUParticleSystem(
     , _sourceBuffer{nullptr}
     , _targetBuffer{nullptr}
     , _currentRenderId{-1}
+    , _currentRenderingCameraUniqueId{-1}
     , _started{false}
     , _stopped{false}
     , _timeDelta{0}
@@ -905,7 +906,8 @@ void GPUParticleSystem::_initialize(bool force)
       }
     }
 
-    if (noiseTexture()) { // Random coordinates for reading into noise texture
+    if (noiseTexture()) {
+      // Random coordinates for reading into noise texture
       data.emplace_back(Math::random());
       data.emplace_back(Math::random());
       data.emplace_back(Math::random());
@@ -1321,11 +1323,18 @@ size_t GPUParticleSystem::render(bool preWarm)
       _preWarmDone = true;
     }
 
-    if (_currentRenderId == _scene->getFrameId()) {
+    if (_currentRenderId == _scene->getFrameId()
+        && (!_scene->activeCamera()
+            || (_scene->activeCamera()
+                && _currentRenderingCameraUniqueId
+                     == static_cast<int>(_scene->activeCamera()->uniqueId)))) {
       return 0;
     }
 
     _currentRenderId = _scene->getFrameId();
+    if (_scene->activeCamera()) {
+      _currentRenderingCameraUniqueId = static_cast<int>(_scene->activeCamera()->uniqueId);
+    }
   }
 
   // Get everything ready to render
