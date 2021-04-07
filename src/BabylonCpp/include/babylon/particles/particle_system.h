@@ -22,7 +22,7 @@ class Mesh;
 class Particle;
 class Scene;
 class ThinEngine;
-FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
@@ -544,6 +544,7 @@ protected:
   void _reset() override;
 
 private:
+  DrawWrapperPtr _getCustomDrawWrapper(unsigned int blendMode = 0);
   float _fetchR(float u, float v, float width, float height, const Uint8Array& pixels);
   void _addFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient,
                           float factor, const std::optional<float>& factor2 = std::nullopt);
@@ -562,7 +563,7 @@ private:
   // End of sub system methods
   void _update(int newParticles);
   /** @hidden */
-  EffectPtr _getEffect(unsigned int blendMode);
+  DrawWrapperPtr _getWrapper(unsigned int blendMode);
   void _appendParticleVertices(unsigned int offset, Particle* particle);
   size_t _render(unsigned int blendMode);
 
@@ -666,8 +667,8 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<Buffer> _spriteBuffer;
   WebGLDataBufferPtr _indexBuffer;
-  EffectPtr _effect;
-  std::unordered_map<unsigned int, EffectPtr> _customEffect;
+  DrawWrapperPtr _drawWrapper;
+  std::unordered_map<unsigned int, DrawWrapperPtr> _customWrappers;
   std::string _cachedDefines;
 
   Color4 _scaledColorStep;

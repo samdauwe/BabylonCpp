@@ -8,6 +8,7 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -96,8 +97,10 @@ ParticleSystem::ParticleSystem(
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
 
-  _customEffect[0] = customEffect;
+  _customWrappers[0]         = std::make_shared<DrawWrapper>(_engine);
+  _customWrappers[0]->effect = customEffect;
 
+  _drawWrapper   = std::make_shared<DrawWrapper>(_engine);
   _useInstancing = _engine->getCaps().instancedArrays;
 
   _createIndexBuffer();
@@ -368,12 +371,22 @@ bool ParticleSystem::isStopping() const
 
 EffectPtr ParticleSystem::getCustomEffect(unsigned int iBlendMode)
 {
-  return stl_util::contains(_customEffect, iBlendMode) ? _customEffect[iBlendMode] : nullptr;
+  return stl_util::contains(_customWrappers, iBlendMode) && _customWrappers[iBlendMode]->effect ?
+           _customWrappers[iBlendMode]->effect :
+           nullptr;
+}
+
+DrawWrapperPtr ParticleSystem::_getCustomDrawWrapper(unsigned int iBlendMode)
+{
+  return stl_util::contains(_customWrappers, iBlendMode) ?
+           _customWrappers[iBlendMode] :
+           (stl_util::contains(_customWrappers, 0) ? _customWrappers[0] : nullptr);
 }
 
 void ParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int iBlendMode)
 {
-  _customEffect[iBlendMode] = effect;
+  _customWrappers[iBlendMode]         = std::make_shared<DrawWrapper>(_engine);
+  _customWrappers[iBlendMode]->effect = effect;
 }
 
 Observable<Effect>& ParticleSystem::get_onBeforeDrawParticlesObservable()
@@ -1471,12 +1484,12 @@ void ParticleSystem::fillUniformsAttributesAndSamplerNames(std::vector<std::stri
   }
 }
 
-EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
+DrawWrapperPtr ParticleSystem::_getWrapper(unsigned int iBlendMode)
 {
-  const auto customEffect = getCustomEffect(iBlendMode);
+  const auto customWrapper = _getCustomDrawWrapper(blendMode);
 
-  if (customEffect) {
-    return customEffect;
+  if (customWrapper && customWrapper->effect) {
+    return customWrapper;
   }
 
   std::vector<std::string> defines;
@@ -1500,10 +1513,10 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
     options.samplers      = std::move(samplers);
     options.defines       = std::move(join);
 
-    _effect = _engine->createEffect("particles", options, _scene->getEngine());
+    _drawWrapper->effect = _engine->createEffect("particles", options, _scene->getEngine());
   }
 
-  return _effect;
+  return _drawWrapper;
 }
 
 void ParticleSystem::animate(bool preWarmOnly)
@@ -1640,15 +1653,15 @@ bool ParticleSystem::isReady()
   }
 
   if (blendMode != ParticleSystem::BLENDMODE_MULTIPLYADD) {
-    if (!_getEffect(blendMode)->isReady()) {
+    if (!_getWrapper(blendMode)->effect->isReady()) {
       return false;
     }
   }
   else {
-    if (!_getEffect(ParticleSystem::BLENDMODE_MULTIPLY)->isReady()) {
+    if (!_getWrapper(ParticleSystem::BLENDMODE_MULTIPLY)->effect->isReady()) {
       return false;
     }
-    if (!_getEffect(ParticleSystem::BLENDMODE_ADD)->isReady()) {
+    if (!_getWrapper(ParticleSystem::BLENDMODE_ADD)->effect->isReady()) {
       return false;
     }
   }
@@ -1658,12 +1671,13 @@ bool ParticleSystem::isReady()
 
 size_t ParticleSystem::_render(unsigned int iBlendMode)
 {
-  auto effect = _getEffect(iBlendMode);
+  const auto drawWrapper = _getWrapper(blendMode);
+  const auto effect      = drawWrapper->effect;
 
   auto engine = _engine;
 
   // Render
-  engine->enableEffect(effect);
+  engine->enableEffect(drawWrapper);
 
   auto viewMatrix = defaultViewMatrix.value_or(_scene ? _scene->getViewMatrix() : Matrix());
   effect->setTexture("diffuseSampler", particleTexture);
