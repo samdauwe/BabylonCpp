@@ -76,7 +76,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<GridMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<GridMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<GridMaterialDefines>(subMesh->_materialDefines);
@@ -164,7 +164,8 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     options.onCompiled            = onCompiled;
     options.onError               = onError;
 
-    subMesh->setEffect(scene->getEngine()->createEffect("grid", options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect("grid", options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
