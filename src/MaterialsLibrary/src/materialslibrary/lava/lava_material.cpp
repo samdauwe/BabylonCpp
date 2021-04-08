@@ -128,7 +128,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<LavaMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<LavaMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<LavaMaterialDefines>(subMesh->_materialDefines);
@@ -244,7 +244,8 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
