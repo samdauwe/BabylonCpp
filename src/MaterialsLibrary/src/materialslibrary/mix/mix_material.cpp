@@ -235,7 +235,7 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool u
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<MixMaterialDefines>();
+    subMesh->materialDefines = std::make_unique<MixMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<MixMaterialDefines>(subMesh->_materialDefines);
@@ -384,7 +384,8 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool u
     options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
