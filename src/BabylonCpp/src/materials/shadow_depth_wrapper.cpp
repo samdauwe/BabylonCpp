@@ -56,7 +56,7 @@ public:
    * @returns the effect to use to generate the depth map for the subMesh + shadow generator
    * specified
    */
-  EffectPtr getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
+  DrawWrapperPtr getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
 
   /**
    * @brief Specifies that the submesh is ready to be used for depth rendering
@@ -100,7 +100,7 @@ private:
   MaterialPtr _baseMaterial;
   Observer<OnCreatedEffectParameters>::Ptr _onEffectCreatedObserver;
   std::unordered_map<SubMesh*, Effect*> _subMeshToEffect;
-  MapMap<SubMesh*, ShadowGenerator*, DepthEffect> _subMeshToDepthEffect;
+  MapMap<SubMesh*, ShadowGenerator*, DepthWrapper> _subMeshToDepthWrapper;
   std::unordered_map<AbstractMeshPtr, Observer<Node>::Ptr> _meshes;
 
 }; // end of class ShadowDepthWrapper::ShadowDepthWrapperImpl
@@ -178,14 +178,14 @@ ShadowDepthWrapper::ShadowDepthWrapperImpl::ShadowDepthWrapperImpl(
                 const auto subMesh = item.first;
                 if (subMesh->getMesh().get() == mesh) {
                   _subMeshToEffect.erase(subMesh);
-                  _subMeshToDepthEffect.mm.erase(subMesh);
+                  _subMeshToDepthWrapper.mm.erase(subMesh);
                 }
               }
             });
       }
 
       _subMeshToEffect[params->subMesh] = params->effect;
-      _subMeshToDepthEffect.mm.erase(params->subMesh); // trigger a depth effect recreation
+      _subMeshToDepthWrapper.mm.erase(params->subMesh); // trigger a depth effect recreation
     });
 }
 
@@ -201,15 +201,16 @@ MaterialPtr& ShadowDepthWrapper::ShadowDepthWrapperImpl::get_baseMaterial()
   return _baseMaterial;
 }
 
-EffectPtr ShadowDepthWrapper::ShadowDepthWrapperImpl::getEffect(SubMesh* subMesh,
-                                                                ShadowGenerator* shadowGenerator)
+DrawWrapperPtr
+ShadowDepthWrapper::ShadowDepthWrapperImpl::getEffect(SubMesh* subMesh,
+                                                      ShadowGenerator* shadowGenerator)
 {
-  if (!_subMeshToDepthEffect.get(subMesh, shadowGenerator)
-      || !_subMeshToDepthEffect.mm[subMesh][shadowGenerator].depthEffect) {
+  if (!_subMeshToDepthWrapper.get(subMesh, shadowGenerator)
+      || !_subMeshToDepthWrapper.mm[subMesh][shadowGenerator].depthWrapper) {
     return nullptr;
   }
 
-  return _subMeshToDepthEffect.mm[subMesh][shadowGenerator].depthEffect;
+  return _subMeshToDepthWrapper.mm[subMesh][shadowGenerator].depthWrapper;
 }
 
 bool ShadowDepthWrapper::ShadowDepthWrapperImpl::isReadyForSubMesh(
@@ -218,7 +219,9 @@ bool ShadowDepthWrapper::ShadowDepthWrapperImpl::isReadyForSubMesh(
 {
   if (get_standalone()) {
     // will ensure the effect is (re)created for the base material
-    _baseMaterial->isReadyForSubMesh(subMesh->getMesh().get(), subMesh, useInstances);
+    if (!_baseMaterial->isReadyForSubMesh(subMesh->getMesh().get(), subMesh, useInstances)) {
+      return false;
+    }
   }
 
   const auto effect = _makeEffect(subMesh, defines, shadowGenerator);
@@ -271,7 +274,7 @@ MaterialPtr& ShadowDepthWrapper::get_baseMaterial()
   return _impl->get_baseMaterial();
 }
 
-EffectPtr ShadowDepthWrapper::getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator)
+DrawWrapperPtr ShadowDepthWrapper::getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator)
 {
   return _impl->getEffect(subMesh, shadowGenerator);
 }

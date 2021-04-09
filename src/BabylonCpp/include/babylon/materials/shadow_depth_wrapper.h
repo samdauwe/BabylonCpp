@@ -14,7 +14,7 @@ class Material;
 class Scene;
 class ShadowGenerator;
 class SubMesh;
-FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Material)
 
 /**
@@ -44,7 +44,7 @@ public:
    * @returns the effect to use to generate the depth map for the subMesh + shadow generator
    * specified
    */
-  EffectPtr getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
+  DrawWrapperPtr getEffect(SubMesh* subMesh, ShadowGenerator* shadowGenerator);
 
   /**
    * @brief Specifies that the submesh is ready to be used for depth rendering
