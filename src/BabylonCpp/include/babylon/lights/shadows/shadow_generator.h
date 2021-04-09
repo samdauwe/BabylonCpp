@@ -714,6 +714,9 @@ public:
   float frustumEdgeFalloff;
   bool forceBackFacesOnly;
 
+  /** @hidden */
+  std::string _nameForDrawWrapper;
+
 protected:
   float _bias;
   float _normalBias;
@@ -751,7 +754,6 @@ protected:
   unsigned int _textureType;
   Matrix _defaultTextureMatrix;
   std::optional<size_t> _storedUniqueId;
-  std::string _nameForCustomEffect;
   Matrix tmpMatrix, tmpMatrix2;
 
 }; // end of class ShadowGenerator

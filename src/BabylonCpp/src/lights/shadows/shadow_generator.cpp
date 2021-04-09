@@ -12,6 +12,7 @@
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/lights/shadows/shadow_generator_scene_component.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -119,6 +120,9 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
   _light   = light;
   _scene   = light->getScene();
   id       = light->id;
+
+  _nameForDrawWrapper = StringTools::printf(
+    "%s%zu", Constants::SUBMESH_DRAWWRAPPER_SHADOWGENERATOR_PREFIX, ShadowGenerator::_Counter++);
 
   auto component = _scene->_getComponent(SceneComponentConstants::NAME_SHADOWGENERATOR);
   if (!component) {
@@ -617,7 +621,7 @@ void ShadowGenerator::_initializeShadowMap()
 
   _shadowMap->onBeforeBindObservable.add([this](RenderTargetTexture* /*rt*/, EventState&) -> void {
     _scene->getEngine()->_debugPushGroup(
-      StringTools::printf("shadow map generation for %s", _nameForCustomEffect.c_str()), 1);
+      StringTools::printf("shadow map generation for %s", _nameForDrawWrapper.c_str()), 1);
   });
 
   // Record Face Index before render.
@@ -846,14 +850,19 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
 
     const auto shadowDepthWrapper = material->shadowDepthWrapper;
 
-    const auto iEffect = (shadowDepthWrapper && shadowDepthWrapper->getEffect(subMesh, this)) ?
-                           subMesh->_getCustomEffect(_nameForCustomEffect, false)->effect :
-                           nullptr;
+    const auto drawWrapper = (shadowDepthWrapper && shadowDepthWrapper->getEffect(subMesh, this)) ?
+                               subMesh->_getDrawWrapper(_nameForDrawWrapper) :
+                               nullptr;
+    if (!drawWrapper) {
+      return;
+    }
+
+    const auto iEffect = DrawWrapper::GetEffect(drawWrapper);
     if (!iEffect) {
       return;
     }
 
-    engine->enableEffect(iEffect);
+    engine->enableEffect(drawWrapper);
 
     renderingMesh->_bind(subMesh, iEffect, material->fillMode());
 
@@ -879,7 +888,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     }
 
     if (shadowDepthWrapper) {
-      subMesh->_effectOverride = iEffect;
+      subMesh->_setMainDrawWrapperOverride(drawWrapper);
       if (shadowDepthWrapper->standalone()) {
         shadowDepthWrapper->baseMaterial()->bindForSubMesh(effectiveMesh->getWorldMatrix(),
                                                            renderingMesh.get(), subMesh);
@@ -887,7 +896,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
       else {
         material->bindForSubMesh(effectiveMesh->getWorldMatrix(), renderingMesh.get(), subMesh);
       }
-      subMesh->_effectOverride = nullptr;
+      subMesh->_setMainDrawWrapperOverride(nullptr);
     }
     else {
       iEffect->setMatrix("viewProjection", getTransformMatrix());
@@ -1096,17 +1105,17 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
 
   _prepareShadowDefines(subMesh, useInstances, defines, isTransparent);
 
-  auto subMeshEffect = subMesh->_getCustomEffect(_nameForCustomEffect);
-
-  auto effect        = subMeshEffect->effect;
-  auto cachedDefines = subMeshEffect->defines;
-
   if (shadowDepthWrapper) {
     if (!shadowDepthWrapper->isReadyForSubMesh(subMesh, defines, this, useInstances)) {
       return false;
     }
   }
   else {
+    auto subMeshEffect = subMesh->_getDrawWrapper(_nameForDrawWrapper);
+
+    auto effect        = subMeshEffect->effect;
+    auto cachedDefines = subMeshEffect->defines;
+
     std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
     auto mesh = subMesh->getMesh();
@@ -1229,7 +1238,9 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
 
     // Get correct effect
     auto join = StringTools::join(defines, '\n');
-    if (cachedDefines != join) {
+    if (!cachedDefines
+        || (std::holds_alternative<std::string>(*cachedDefines)
+            && std::get<std::string>(*cachedDefines) != join)) {
       cachedDefines = join;
 
       std::string shaderName = "shadowMap";
@@ -1295,10 +1306,9 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
       options.indexParameters = {{"maxSimultaneousMorphTargets", morphInfluencers}};
 
       effect = engine->createEffect(shaderName, options, _scene->getEngine());
-
-      subMeshEffect->effect  = effect;
-      subMeshEffect->defines = cachedDefines;
     }
+
+    subMeshEffect->setEffect(effect, std::get<std::string>(*cachedDefines));
 
     if (!effect->isReady()) {
       return false;
