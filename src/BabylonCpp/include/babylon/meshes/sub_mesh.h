@@ -61,6 +61,11 @@ public:
   void _removeCustomEffect(const std::string& name);
 
   /**
+   * @brief Hidden
+   */
+  void _setMainDrawWrapperOverride(const DrawWrapperPtr& wrapper);
+
+  /**
    * @brief Sets associated effect (effect used to render this submesh).
    * @param effect defines the effect to associate with
    * @param defines defines the set of defines used to compile this effect
