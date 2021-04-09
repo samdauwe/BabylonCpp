@@ -12,10 +12,11 @@
 
 namespace BABYLON {
 
+class Effect;
 class ICanvas;
 class Node;
 class SubMesh;
-FWD_CLASS_SPTR(Effect)
+FWD_STRUCT_SPTR(DrawWrapper)
 
 struct Bounds {
   Vector2 min;
@@ -57,11 +58,11 @@ struct DeviceOrientationEvent {
   float beta  = 0.f;
 }; // end of struct DeviceOrientationEvent
 
-struct DepthEffect {
-  EffectPtr depthEffect    = nullptr;
-  std::string depthDefines = "";
-  std::string token        = "";
-}; // end of struct DepthEffect
+struct DepthWrapper {
+  DrawWrapperPtr depthWrapper = nullptr;
+  std::string depthDefines    = "";
+  std::string token           = "";
+}; // end of struct DepthWrapper
 
 struct DragMoveEvent {
   Vector3 delta;
