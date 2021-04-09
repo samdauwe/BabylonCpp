@@ -718,16 +718,15 @@ void CascadedShadowGenerator::_createTargetRenderTexture()
     }
   });
 
-  _shadowMap->onBeforeBindObservable.add(
-    [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
-      _scene->getEngine()->_debugPushGroup(
-        StringTools::printf("cascaded shadow map generation for %s", _nameForCustomEffect.c_str()),
-        1);
-      if (_breaksAreDirty) {
-        _splitFrustum();
-      }
-      _computeMatrices();
-    });
+  _shadowMap->onBeforeBindObservable.add([this](RenderTargetTexture* /*texture*/,
+                                                EventState& /*es*/) -> void {
+    _scene->getEngine()->_debugPushGroup(
+      StringTools::printf("cascaded shadow map generation for %s", _nameForDrawWrapper.c_str()), 1);
+    if (_breaksAreDirty) {
+      _splitFrustum();
+    }
+    _computeMatrices();
+  });
 
   _splitFrustum();
 }
