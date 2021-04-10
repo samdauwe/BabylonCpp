@@ -318,16 +318,16 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<PBRMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<PBRMaterialDefines>();
   }
 
-  auto scene      = getScene();
   auto definesPtr = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
   auto& defines   = *definesPtr;
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
+  auto scene  = getScene();
   auto engine = scene->getEngine();
 
   if (defines._areTexturesDirty) {
@@ -462,7 +462,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
     else {
       _rebuildInParallel = false;
       scene->resetCachedMaterial();
-      subMesh->setEffect(effect, definesPtr);
+      subMesh->setEffect(effect, definesPtr, _materialContext);
       buildUniformLayout();
     }
   }
@@ -723,7 +723,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   PBRSheenConfiguration::AddSamplers(samplers);
 
   PrePassConfiguration::AddUniforms(uniforms);
-  PrePassConfiguration::AddSamplers(uniforms);
+  PrePassConfiguration::AddSamplers(samplers);
 
   // if (ImageProcessingConfiguration)
   {
