@@ -4,13 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class IBrowserGamepad;
-class WebVRController;
-using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
-using WebVRControllerPtr = std::shared_ptr<WebVRController>;
+FWD_CLASS_SPTR(IBrowserGamepad)
+FWD_CLASS_SPTR(WebVRController)
 
 struct _GamePadFactory {
   virtual ~_GamePadFactory() = default;
