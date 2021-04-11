@@ -14,6 +14,8 @@
 
 namespace BABYLON {
 
+float PlaneRotationGizmo::MaxDragAngle = Math::PI * 9.f / 20.f;
+
 PlaneRotationGizmo::CircleConstants PlaneRotationGizmo::_CircleConstants = {
   0.3f,           // radius
   Math::PI * 2.f, // pi2
@@ -28,6 +30,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
     : Gizmo{iGizmoLayer}
     , dragBehavior{nullptr}
     , snapDistance{0.f}
+    , angle{0.f}
     , isEnabled{this, &PlaneRotationGizmo::get_isEnabled, &PlaneRotationGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
     , _isEnabled{true}
@@ -72,7 +75,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
   options.dragPlaneNormal    = planeNormal;
   dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
-  dragBehavior->maxDragAngle = Math::PI * 9.f / 20.f;
+  dragBehavior->maxDragAngle = PlaneRotationGizmo::MaxDragAngle;
   dragBehavior->_useAlternatePickedPointAboveMaxDragAngle = true;
   // _rootMesh->addBehavior(dragBehavior.get());
 
@@ -205,7 +208,6 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
         _tmpSnapEvent.snapDistance = angle;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
-
       _matrixChanged();
     }
   });

@@ -81,6 +81,17 @@ public:
   Observable<SnapEvent> onSnapObservable;
 
   /**
+   * The maximum angle between the camera and the rotation allowed for interaction
+   * If a rotation plane appears 'flat', a lower value allows interaction.
+   */
+  static float MaxDragAngle;
+
+  /**
+   * Acumulated relative angle value for rotation on the axis. Reset to 0 when a dragStart occurs
+   */
+  float angle;
+
+  /**
    * If the gizmo is enabled
    */
   Property<PlaneRotationGizmo, bool> isEnabled;
