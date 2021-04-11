@@ -7,14 +7,13 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class Scene;
-class StandardMaterial;
-class Texture;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
-using TexturePtr          = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(StandardMaterial)
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Class reading and parsing the MTL file bundled with the obj file.
