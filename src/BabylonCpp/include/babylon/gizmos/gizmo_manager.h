@@ -97,6 +97,16 @@ protected:
   bool get_isHovered() const;
 
   /**
+   * @brief Sets the ratio for the scale of the gizmo (Default: 1)
+   */
+  void set_scaleRatio(float value);
+
+  /**
+   * @brief Gets the ratio for the scale of the gizmo (Default: 1)
+   */
+  float get_scaleRatio() const;
+
+  /**
    * @brief Sets if the position gizmo is enabled.
    */
   void set_positionGizmoEnabled(bool value);
@@ -205,6 +215,11 @@ public:
   ReadOnlyProperty<GizmoManager, bool> isHovered;
 
   /**
+   * Ratio for the scale of the gizmo (Default: 1)
+   */
+  Property<GizmoManager, float> scaleRatio;
+
+  /**
    * If the position gizmo is enabled
    */
   Property<GizmoManager, bool> positionGizmoEnabled;
@@ -234,6 +249,7 @@ private:
   UtilityLayerRendererPtr _defaultUtilityLayer;
   UtilityLayerRendererPtr _defaultKeepDepthUtilityLayer;
   float _thickness;
+  float _scaleRatio;
   /** Node Caching for quick lookup */
   std::unordered_map<Mesh*, GizmoAxisCache> _gizmoAxisCache;
 
