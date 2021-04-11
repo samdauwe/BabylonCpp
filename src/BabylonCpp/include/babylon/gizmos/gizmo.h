@@ -131,6 +131,18 @@ protected:
   [[nodiscard]] virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
 
   /**
+   * @brief Gets the poseture that the gizmo will be display.
+   * * When set null, default value will be used (Quaternion(0, 0, 0, 1))
+   */
+  std::optional<Quaternion>& get_customRotationQuaternion();
+
+  /**
+   * @brief Sets the poseture that the gizmo will be display.
+   * * When set null, default value will be used (Quaternion(0, 0, 0, 1))
+   */
+  void set_customRotationQuaternion(const std::optional<Quaternion>& customRotationQuaternion);
+
+  /**
    * @brief Hidden
    */
   virtual void _attachedNodeChanged(const NodePtr& value);
@@ -200,6 +212,12 @@ public:
    */
   bool updateScale;
 
+  /**
+   * Poseture that the gizmo will be display
+   * * When set null, default value will be used (Quaternion(0, 0, 0, 1))
+   */
+  Property<Gizmo, std::optional<Quaternion>> customRotationQuaternion;
+
 protected:
   /**
    * Ratio for the scale of the gizmo (Default: 1)
@@ -227,6 +245,7 @@ protected:
 private:
   AbstractMeshPtr _attachedMesh;
   NodePtr _attachedNode;
+  std::optional<Quaternion> _customRotationQuaternion;
   Matrix _tmpMatrix;
   Observer<Scene>::Ptr _beforeRenderObserver;
   std::optional<Quaternion> _tempQuaternion;

@@ -23,6 +23,8 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
                                              &Gizmo::set_updateGizmoRotationToMatchAttachedMesh}
     , updateGizmoPositionToMatchAttachedMesh{true}
     , updateScale{true}
+    , customRotationQuaternion{this, &Gizmo::get_customRotationQuaternion,
+                               &Gizmo::set_customRotationQuaternion}
     , _scaleRatio{1.f}
     , _isHovered{false}
     , _customMeshSet{false}
@@ -30,6 +32,7 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _interactionsEnabled{true}
     , _attachedMesh{nullptr}
     , _attachedNode{nullptr}
+    , _customRotationQuaternion{std::nullopt}
     , _beforeRenderObserver{nullptr}
     , _tempQuaternion{Quaternion(0.f, 0.f, 0.f, 1.f)}
     , _tempVector{Vector3()}
@@ -116,6 +119,16 @@ void Gizmo::_attachedNodeChanged(const NodePtr& /*value*/)
 {
 }
 
+std::optional<Quaternion>& Gizmo::get_customRotationQuaternion()
+{
+  return _customRotationQuaternion;
+}
+
+void Gizmo::set_customRotationQuaternion(const std::optional<Quaternion>& iCustomRotationQuaternion)
+{
+  _customRotationQuaternion = iCustomRotationQuaternion;
+}
+
 void Gizmo::_update()
 {
   if (attachedNode()) {
@@ -141,7 +154,12 @@ void Gizmo::_update()
                                                 translation);
     }
     else {
-      _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
+      if (_customRotationQuaternion) {
+        _rootMesh->rotationQuaternion()->copyFrom(*_customRotationQuaternion);
+      }
+      else {
+        _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
+      }
     }
 
     // Scale
