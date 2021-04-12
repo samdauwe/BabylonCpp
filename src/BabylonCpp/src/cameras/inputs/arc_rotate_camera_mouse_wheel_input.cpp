@@ -18,6 +18,20 @@ ArcRotateCameraMouseWheelInput::ArcRotateCameraMouseWheelInput()
 
 ArcRotateCameraMouseWheelInput::~ArcRotateCameraMouseWheelInput() = default;
 
+float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(float mouseWheelDelta,
+                                                                            float radius)
+{
+  float delta           = 0.f;
+  const auto wheelDelta = (mouseWheelDelta * 0.01f * wheelDeltaPercentage) * radius;
+  if (mouseWheelDelta > 0.f) {
+    delta = wheelDelta / (1.f + wheelDeltaPercentage);
+  }
+  else {
+    delta = wheelDelta * (1.f + wheelDeltaPercentage);
+  }
+  return delta;
+}
+
 void ArcRotateCameraMouseWheelInput::attachControl(bool noPreventDefault)
 {
   _noPreventDefault = noPreventDefault;
@@ -31,19 +45,32 @@ void ArcRotateCameraMouseWheelInput::attachControl(bool noPreventDefault)
     auto delta        = 0.f;
     auto wheelDelta   = 0.f;
 
-    // Using the inertia percentage, calculate the value needed to move based on set wheel delta
-    // percentage
-    if (wheelDeltaPercentage != 0.f) {
-      wheelDelta = (event.deltaY > 0 ? -1.f : 1.f) * camera->radius * wheelDeltaPercentage;
-      delta      = wheelDelta * (camera->inertia == 1.f ? 1.f : (1.f - camera->inertia));
+    if (event.wheelDelta) {
+      wheelDelta = *event.wheelDelta;
     }
-    // If there's no percentage set, just handle using a value that emulates Chrome
     else {
-      wheelDelta = (event.deltaY > 0 ? -100.f : 100.f);
+      wheelDelta = -(event.deltaY || event.detail) * 60.f;
+    }
 
-      if (wheelPrecision != 0.f) {
-        delta = wheelDelta / (wheelPrecision * 40.f);
+    if (wheelDeltaPercentage) {
+      delta = computeDeltaFromMouseWheelLegacyEvent(wheelDelta, camera->radius);
+
+      // If zooming in, estimate the target radius and use that to compute the delta for inertia
+      // this will stop multiple scroll events zooming in from adding too much inertia
+      if (delta > 0.f) {
+        auto estimatedTargetRadius = camera->radius;
+        auto targetInertia         = camera->inertialRadiusOffset + delta;
+        for (unsigned int i = 0; i < 20 && std::abs(targetInertia) > 0.001f; ++i) {
+          estimatedTargetRadius -= targetInertia;
+          targetInertia *= camera->inertia;
+        }
+        estimatedTargetRadius
+          = Scalar::Clamp(estimatedTargetRadius, 0.f, std::numeric_limits<float>::max());
+        delta = computeDeltaFromMouseWheelLegacyEvent(wheelDelta, estimatedTargetRadius);
       }
+    }
+    else {
+      delta = wheelDelta / (wheelPrecision * 40);
     }
 
     if (delta) {

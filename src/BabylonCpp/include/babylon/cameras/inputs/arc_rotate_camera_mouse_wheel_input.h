@@ -57,6 +57,9 @@ public:
    */
   [[nodiscard]] std::string getSimpleName() const override;
 
+private:
+  float computeDeltaFromMouseWheelLegacyEvent(float mouseWheelDelta, float radius);
+
 public:
   /**
    * Gets or Set the mouse wheel precision or how fast is the camera zooming.
