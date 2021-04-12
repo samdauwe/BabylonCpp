@@ -2,12 +2,12 @@
 #define BABYLON_HELPERS_PHOTO_DOME_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/helpers/texture_dome.h>
 
 namespace BABYLON {
 
-class PhotoDome;
-using PhotoDomePtr = std::shared_ptr<PhotoDome>;
+FWD_CLASS_SPTR(PhotoDome)
 
 /**
  * @brief Display a 360 degree photo on an approximately spherical surface, useful for VR
