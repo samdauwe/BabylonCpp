@@ -274,6 +274,11 @@ struct IWheelEvent : public IMouseEvent {
    * Z-Axis scroll delta
    */
   int deltaZ;
+
+  /**
+   * WheelDelta (From MouseWheel Event)
+   */
+  std::optional<float> wheelDelta = std::nullopt;
 }; // end of struct IWheelEvent
 
 /**
