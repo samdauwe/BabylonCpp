@@ -15,8 +15,7 @@ FWD_CLASS_SPTR(BaseTexture)
 /**
  * @brief Represents the different options available during the creation of a Environment helper.
  *
- * This can control the default ground, skybox and image processing setup of
- * your scene.
+ * This can control the default ground, skybox and image processing setup of your scene.
  */
 struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
 
