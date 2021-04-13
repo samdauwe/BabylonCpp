@@ -2,15 +2,14 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_GENERIC_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
-class GenericController;
-class IBrowserGamepad;
-using GenericControllerPtr = std::shared_ptr<GenericController>;
-using IBrowserGamepadPtr   = std::shared_ptr<IBrowserGamepad>;
+FWD_CLASS_SPTR(GenericController)
+FWD_CLASS_SPTR(IBrowserGamepad)
 
 /**
  * @brief Generic Controller factory.
