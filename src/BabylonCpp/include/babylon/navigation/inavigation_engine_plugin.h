@@ -16,6 +16,8 @@ class Vector3;
 FWD_STRUCT_SPTR(ICrowd)
 FWD_CLASS_SPTR(Mesh)
 
+using IObstacle = unsigned int;
+
 /**
  * @brief Navigation plugin interface to add navigation constrained by a navigation mesh.
  */
@@ -181,6 +183,31 @@ struct INavigationEnginePlugin {
    * @returns the maximum number of iterations
    */
   virtual unsigned int getMaximumSubStepCount() const = 0;
+
+  /**
+   * @brief Creates a cylinder obstacle and add it to the navigation.
+   * @param position world position
+   * @param radius cylinder radius
+   * @param height cylinder height
+   * @returns the obstacle freshly created
+   */
+  virtual IObstacle* addCylinderObstacle(const Vector3& position, float radius, float height) = 0;
+
+  /**
+   * @brief Creates an oriented box obstacle and add it to the navigation.
+   * @param position world position
+   * @param extent box size
+   * @param angle angle in radians of the box orientation on Y axis
+   * @returns the obstacle freshly created
+   */
+  virtual IObstacle* addBoxObstacle(const Vector3& position, const Vector3& extent, float angle)
+    = 0;
+
+  /**
+   * @brief Removes an obstacle created by addCylinderObstacle or addBoxObstacle.
+   * @param obstacle obstacle to remove from the navigation
+   */
+  virtual void removeObstacle(IObstacle* obstacle) = 0;
 
   /**
    * @brief Release all resources.

@@ -166,6 +166,30 @@ public:
   void dispose() override;
 
   /**
+   * @brief Creates a cylinder obstacle and add it to the navigation.
+   * @param position world position
+   * @param radius cylinder radius
+   * @param height cylinder height
+   * @returns the obstacle freshly created
+   */
+  IObstacle* addCylinderObstacle(const Vector3& position, float radius, float height) override;
+
+  /**
+   * @brief Creates an oriented box obstacle and add it to the navigation.
+   * @param position world position
+   * @param extent box size
+   * @param angle angle in radians of the box orientation on Y axis
+   * @returns the obstacle freshly created
+   */
+  IObstacle* addBoxObstacle(const Vector3& position, const Vector3& extent, float angle) override;
+
+  /**
+   * @brief Removes an obstacle created by addCylinderObstacle or addBoxObstacle.
+   * @param obstacle obstacle to remove from the navigation
+   */
+  void removeObstacle(IObstacle* obstacle) override;
+
+  /**
    * @brief If this plugin is supported.
    * @returns true if plugin is supported
    */
