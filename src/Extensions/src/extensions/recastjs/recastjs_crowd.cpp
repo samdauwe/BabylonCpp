@@ -157,6 +157,8 @@ std::vector<int>& RecastJSCrowd::getAgents()
 
 void RecastJSCrowd::update(float deltaTime)
 {
+  // update obstacles
+  bjsRECASTPlugin->navMesh->update();
   // update crowd
   const auto timeStep     = bjsRECASTPlugin->getTimeStep();
   const auto maxStepCount = bjsRECASTPlugin->getMaximumSubStepCount();
@@ -200,6 +202,18 @@ void RecastJSCrowd::getDefaultQueryExtentToRef(Vector3& result)
 {
   const auto p = recastCrowd->getDefaultQueryExtent();
   result.set(p.x, p.y, p.z);
+}
+
+std::vector<Vector3> RecastJSCrowd::getCorners(int index)
+{
+  auto navPath          = recastCrowd->getCorners(index);
+  const auto pointCount = navPath.getPointCount();
+  std::vector<Vector3> positions;
+  for (int pt = 0; pt < pointCount; ++pt) {
+    const auto& p = navPath.getPoint(pt);
+    positions.emplace_back(Vector3(p.x, p.y, p.z));
+  }
+  return positions;
 }
 
 void RecastJSCrowd::dispose()

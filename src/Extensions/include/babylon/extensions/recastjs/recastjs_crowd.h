@@ -157,6 +157,13 @@ public:
   void getDefaultQueryExtentToRef(Vector3& result) override;
 
   /**
+   * @brief Get the next corner points composing the path (max 4 points).
+   * @param index agent index returned by addAgent
+   * @returns array containing world position composing the path
+   */
+  std::vector<Vector3> getCorners(int index) override;
+
+  /**
    * @brief Release all resources.
    */
   void dispose() override;

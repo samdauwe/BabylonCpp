@@ -155,6 +155,13 @@ struct ICrowd {
   virtual void getDefaultQueryExtentToRef(Vector3& result) = 0;
 
   /**
+   * @brief Get the next corner points composing the path (max 4 points).
+   * @param index agent index returned by addAgent
+   * @returns array containing world position composing the path
+   */
+  virtual std::vector<Vector3> getCorners(int index) = 0;
+
+  /**
    * @brief Release all resources.
    */
   virtual void dispose() = 0;
