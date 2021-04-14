@@ -79,6 +79,18 @@ struct INavMeshParameters {
    * data. (For height detail only.) [Limit: >=0] [Units: wu]
    */
   float detailSampleMaxError;
+
+  /**
+   * If using obstacles, the navmesh must be subdivided internaly by tiles.
+   * This member defines the tile cube side length in world units.
+   * If no obstacles are needed, leave it undefined or 0.
+   */
+  int tileSize = 0;
+
+  /**
+   * The size of the non-navigable border around the heightfield.
+   */
+  int borderSize = 0;
 }; // end of struct INavMeshParameters
 
 } // end of namespace BABYLON
