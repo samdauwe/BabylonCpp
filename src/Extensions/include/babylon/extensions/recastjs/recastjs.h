@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <iostream>
+#include <list>
 #include <vector>
 
 #include <recastnavigation/Detour/Include/DetourCommon.h>
@@ -234,15 +235,16 @@ public:
     return m_defaultQueryExtent;
   }
 
-  dtObstacleRef addCylinderObstacle(const Vec3& position, float radius, float height);
-  dtObstacleRef addBoxObstacle(const Vec3& position, const Vec3& extent, float angle);
-  void removeObstacle(dtObstacleRef obstacle);
+  dtObstacleRef* addCylinderObstacle(const Vec3& position, float radius, float height);
+  dtObstacleRef* addBoxObstacle(const Vec3& position, const Vec3& extent, float angle);
+  void removeObstacle(dtObstacleRef* obstacle);
   void update();
 
   dtTileCache* m_tileCache;
   dtNavMeshQuery* m_navQuery;
 
 protected:
+  std::list<dtObstacleRef> m_obstacles;
   dtNavMesh* m_navMesh;
 
   rcPolyMesh* m_pmesh;
