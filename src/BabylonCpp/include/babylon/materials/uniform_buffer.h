@@ -13,12 +13,12 @@
 namespace BABYLON {
 
 class Color3;
-class Engine;
 class Matrix;
+class ThinEngine;
 class Vector3;
 class Vector4;
-FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(Effect)
+FWD_CLASS_SPTR(ThinTexture)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
 struct ArraySizes {
@@ -57,7 +57,7 @@ public:
    * @param dynamic Define if the buffer is updatable
    * @param name to assign to the buffer (debugging purpose)
    */
-  UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
+  UniformBuffer(ThinEngine* engine, const Float32Array& data = Float32Array(),
                 const std::optional<bool>& dynamic = std::nullopt, const std::string& name = "");
   UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer(); // = default
@@ -194,7 +194,7 @@ public:
    * @param name Define the name of the sampler.
    * @param texture Define the texture to set in the sampler
    */
-  void setTexture(const std::string& name, const BaseTexturePtr& texture);
+  void setTexture(const std::string& name, const ThinTexturePtr& texture);
 
   /**
    * @brief Directly updates the value of the uniform in the cache AND on the GPU.
@@ -479,7 +479,7 @@ public:
   ReadOnlyProperty<UniformBuffer, std::string> name;
 
 private:
-  Engine* _engine;
+  ThinEngine* _engine;
   WebGLDataBufferPtr _buffer;
   std::vector<WebGLDataBufferPtr> _buffers;
   int _bufferIndex;

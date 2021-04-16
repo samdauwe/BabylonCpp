@@ -13,7 +13,7 @@ namespace BABYLON {
 std::unordered_map<std::string, unsigned int> UniformBuffer::_updatedUbosInFrame = {};
 Float32Array UniformBuffer::_tempBuffer = Float32Array(UniformBuffer::_MAX_UNIFORM_SIZE);
 
-UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
+UniformBuffer::UniformBuffer(ThinEngine* engine, const Float32Array& data,
                              const std::optional<bool>& dynamic, const std::string& name)
     : _alreadyBound{false}
     , useUbo{this, &UniformBuffer::get_useUbo}
@@ -307,33 +307,31 @@ void UniformBuffer::addMatrix(const std::string& iName, const Matrix& mat)
 
 void UniformBuffer::addFloat2(const std::string& iName, float x, float y)
 {
-  addUniform(iName, Float32Array{x, y});
+  Float32Array temp{x, y};
+  addUniform(iName, temp);
 }
 
 void UniformBuffer::addFloat3(const std::string& iName, float x, float y, float z)
 {
-  addUniform(iName, Float32Array{x, y, z});
+  Float32Array temp{x, y, z};
+  addUniform(iName, temp);
 }
 
 void UniformBuffer::addColor3(const std::string& iName, const Color3& color)
 {
-  Float32Array temp;
-  color.toArray(temp);
+  Float32Array temp{color.r, color.g, color.b};
   addUniform(iName, temp);
 }
 
 void UniformBuffer::addColor4(const std::string& iName, const Color3& color, float alpha)
 {
-  Float32Array temp;
-  color.toArray(temp);
-  temp.emplace_back(alpha);
+  Float32Array temp{color.r, color.g, color.b, alpha};
   addUniform(iName, temp);
 }
 
 void UniformBuffer::addVector3(const std::string& iName, const Vector3& vector)
 {
-  Float32Array temp;
-  vector.toArray(temp);
+  Float32Array temp{vector.x, vector.y, vector.z};
   addUniform(iName, temp);
 }
 
@@ -725,7 +723,9 @@ void UniformBuffer::_updateVector3ForEffect(const std::string& iName, const Vect
 
 void UniformBuffer::_updateVector3ForUniform(const std::string& iName, const Vector3& vector)
 {
-  vector.toArray(UniformBuffer::_tempBuffer);
+  UniformBuffer::_tempBuffer[0] = vector.x;
+  UniformBuffer::_tempBuffer[1] = vector.y;
+  UniformBuffer::_tempBuffer[2] = vector.z;
   updateUniform(iName, UniformBuffer::_tempBuffer, 3);
 }
 
@@ -736,7 +736,10 @@ void UniformBuffer::_updateVector4ForEffect(const std::string& iName, const Vect
 
 void UniformBuffer::_updateVector4ForUniform(const std::string& iName, const Vector4& vector)
 {
-  vector.toArray(UniformBuffer::_tempBuffer);
+  UniformBuffer::_tempBuffer[0] = vector.x;
+  UniformBuffer::_tempBuffer[1] = vector.y;
+  UniformBuffer::_tempBuffer[2] = vector.z;
+  UniformBuffer::_tempBuffer[3] = vector.w;
   updateUniform(iName, UniformBuffer::_tempBuffer, 4);
 }
 
@@ -748,7 +751,9 @@ void UniformBuffer::_updateColor3ForEffect(const std::string& iName, const Color
 
 void UniformBuffer::_updateColor3ForUniform(const std::string& iName, const Color3& color)
 {
-  color.toArray(UniformBuffer::_tempBuffer);
+  UniformBuffer::_tempBuffer[0] = color.r;
+  UniformBuffer::_tempBuffer[1] = color.g;
+  UniformBuffer::_tempBuffer[2] = color.b;
   updateUniform(iName, UniformBuffer::_tempBuffer, 3);
 }
 
@@ -761,7 +766,9 @@ void UniformBuffer::_updateColor4ForEffect(const std::string& iName, const Color
 void UniformBuffer::_updateColor4ForUniform(const std::string& iName, const Color3& color,
                                             float alpha)
 {
-  color.toArray(UniformBuffer::_tempBuffer);
+  UniformBuffer::_tempBuffer[0] = color.r;
+  UniformBuffer::_tempBuffer[1] = color.g;
+  UniformBuffer::_tempBuffer[2] = color.b;
   UniformBuffer::_tempBuffer[3] = alpha;
   updateUniform(iName, UniformBuffer::_tempBuffer, 4);
 }
@@ -820,7 +827,7 @@ void UniformBuffer::_updateInt4ForUniform(const std::string& iName, int x, int y
   updateUniform(iName, UniformBuffer::_tempBuffer, 4);
 }
 
-void UniformBuffer::setTexture(const std::string& iName, const BaseTexturePtr& texture)
+void UniformBuffer::setTexture(const std::string& iName, const ThinTexturePtr& texture)
 {
   _currentEffect->setTexture(iName, texture);
 }
