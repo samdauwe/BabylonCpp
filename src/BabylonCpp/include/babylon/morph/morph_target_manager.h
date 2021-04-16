@@ -63,7 +63,7 @@ public:
   /**
    * @brief hidden
    */
-  void _bind(const EffectPtr& effect);
+  void _bind(Effect* effect);
 
   /**
    * @brief Clone the current manager.

@@ -156,7 +156,7 @@ void MorphTargetManager::removeTarget(MorphTarget* target)
   }
 }
 
-void MorphTargetManager::_bind(const EffectPtr& effect)
+void MorphTargetManager::_bind(Effect* effect)
 {
   effect->setFloat3("morphTargetTextureInfo", static_cast<float>(_textureVertexStride),
                     static_cast<float>(_textureWidth), static_cast<float>(_textureHeight));

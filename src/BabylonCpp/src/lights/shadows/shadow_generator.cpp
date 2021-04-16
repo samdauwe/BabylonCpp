@@ -936,7 +936,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
 
       if (renderingMesh->morphTargetManager()
           && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-        renderingMesh->morphTargetManager()->_bind(iEffect);
+        renderingMesh->morphTargetManager()->_bind(iEffect.get());
       }
 
       // Clip planes

@@ -630,7 +630,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), effect.get());
     if (renderingMesh->morphTargetManager()
         && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-      renderingMesh->morphTargetManager()->_bind(effect);
+      renderingMesh->morphTargetManager()->_bind(effect.get());
     }
 
     // Alpha mode
