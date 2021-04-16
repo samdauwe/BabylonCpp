@@ -12,6 +12,7 @@ namespace BABYLON {
 class Camera;
 class EffectFallbacks;
 struct IEffectFallbacks;
+struct IPointerEvent;
 class Material;
 class MultiviewExtension;
 class OcclusionQueryExtension;
@@ -1198,7 +1199,7 @@ public:
   /**
    * Observable event triggered each time the canvas receives pointerout event
    */
-  Observable<PointerEvent> onCanvasPointerOutObservable;
+  Observable<IPointerEvent> onCanvasPointerOutObservable;
 
   /**
    * Observable raised when the engine begins a new frame
@@ -1282,11 +1283,11 @@ private:
   std::unique_ptr<PerformanceMonitor> _performanceMonitor = nullptr;
 
   // Focus
-  std::function<void()> _onFocus                            = nullptr;
-  std::function<void()> _onBlur                             = nullptr;
-  std::function<void(PointerEvent* ev)> _onCanvasPointerOut = nullptr;
-  std::function<void()> _onCanvasBlur                       = nullptr;
-  std::function<void()> _onCanvasFocus                      = nullptr;
+  std::function<void()> _onFocus                             = nullptr;
+  std::function<void()> _onBlur                              = nullptr;
+  std::function<void(IPointerEvent* ev)> _onCanvasPointerOut = nullptr;
+  std::function<void()> _onCanvasBlur                        = nullptr;
+  std::function<void()> _onCanvasFocus                       = nullptr;
 
   std::function<void()> _onFullscreenChange  = nullptr;
   std::function<void()> _onPointerLockChange = nullptr;

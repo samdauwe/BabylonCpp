@@ -114,7 +114,7 @@ void Engine::_sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool iAud
   };
 
   _onCanvasPointerOut
-    = [this](PointerEvent* ev) -> void { onCanvasPointerOutObservable.notifyObservers(ev); };
+    = [this](IPointerEvent* ev) -> void { onCanvasPointerOutObservable.notifyObservers(ev); };
 
   if (!doNotHandleTouchAction) {
     _disableTouchAction();
@@ -360,22 +360,22 @@ void Engine::setDepthFunction(int depthFunc)
 
 void Engine::setDepthFunctionToGreater()
 {
-  _depthCullingState->depthFunc = GL::GREATER;
+  _depthCullingState->depthFunc = Constants::GREATER;
 }
 
 void Engine::setDepthFunctionToGreaterOrEqual()
 {
-  _depthCullingState->depthFunc = GL::GEQUAL;
+  _depthCullingState->depthFunc = Constants::GEQUAL;
 }
 
 void Engine::setDepthFunctionToLess()
 {
-  _depthCullingState->depthFunc = GL::LESS;
+  _depthCullingState->depthFunc = Constants::LESS;
 }
 
 void Engine::setDepthFunctionToLessOrEqual()
 {
-  _depthCullingState->depthFunc = GL::LEQUAL;
+  _depthCullingState->depthFunc = Constants::LEQUAL;
 }
 
 void Engine::cacheStencilState()
