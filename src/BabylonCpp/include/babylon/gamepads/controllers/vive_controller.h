@@ -2,13 +2,13 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_VIVE_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
-class ViveController;
-using ViveControllerPtr = std::shared_ptr<ViveController>;
+FWD_CLASS_SPTR(ViveController)
 
 /**
  * @brief Vive Controller factory.

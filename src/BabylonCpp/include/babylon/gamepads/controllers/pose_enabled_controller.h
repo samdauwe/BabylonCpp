@@ -2,17 +2,17 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/vr/pose_controlled.h>
 #include <babylon/gamepads/generic_pad.h>
 #include <babylon/maths/matrix.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
 class Ray;
 class TargetCamera;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
-using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(IBrowserGamepad)
 
 /**
  * @brief Defines the PoseEnabledController object that contains state of a vr capable controller.
