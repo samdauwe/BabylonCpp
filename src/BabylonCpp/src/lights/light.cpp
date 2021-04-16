@@ -3,6 +3,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
+#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
