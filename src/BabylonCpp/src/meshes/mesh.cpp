@@ -1090,7 +1090,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMod
 
   // Morph targets
   if (morphTargetManager() && morphTargetManager()->isUsingTextureForTargets()) {
-    morphTargetManager()->_bind(effect);
+    morphTargetManager()->_bind(effect.get());
   }
 
   // Wireframe

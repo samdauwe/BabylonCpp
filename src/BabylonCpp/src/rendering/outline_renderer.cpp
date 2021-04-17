@@ -114,7 +114,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
 
   if (renderingMesh->morphTargetManager()
       && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-    renderingMesh->morphTargetManager()->_bind(effect);
+    renderingMesh->morphTargetManager()->_bind(effect.get());
   }
 
   // Morph targets

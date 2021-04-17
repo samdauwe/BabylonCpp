@@ -704,7 +704,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), effect.get());
     if (renderingMesh->morphTargetManager()
         && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-      renderingMesh->morphTargetManager()->_bind(effect);
+      renderingMesh->morphTargetManager()->_bind(effect.get());
     }
 
     // Velocity
