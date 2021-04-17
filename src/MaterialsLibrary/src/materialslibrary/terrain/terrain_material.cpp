@@ -201,7 +201,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<TerrainMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<TerrainMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<TerrainMaterialDefines>(subMesh->_materialDefines);
@@ -338,7 +338,8 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
     options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
