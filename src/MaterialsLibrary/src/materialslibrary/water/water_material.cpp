@@ -97,7 +97,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
   _imageProcessingConfiguration = scene->imageProcessingConfiguration();
   if (_imageProcessingConfiguration) {
     _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration* /*ic*/, EventState & /*es*/) -> void {
+      [this](ImageProcessingConfiguration* /*ic*/, EventState& /*es*/) -> void {
         _markAllSubMeshesAsImageProcessingDirty();
       });
   }
@@ -272,7 +272,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<WaterMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<WaterMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
@@ -429,7 +429,8 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool
     options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
