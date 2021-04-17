@@ -206,7 +206,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<TriPlanarMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<TriPlanarMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<TriPlanarMaterialDefines>(subMesh->_materialDefines);
@@ -331,7 +331,8 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
     options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
