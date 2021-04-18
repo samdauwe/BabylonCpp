@@ -2,13 +2,13 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_OCULUS_TOUCH_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
-class OculusTouchController;
-using OculusTouchControllerPtr = std::shared_ptr<OculusTouchController>;
+FWD_CLASS_SPTR(OculusTouchController)
 
 /**
  * @brief Oculus Touch Controller factory.
