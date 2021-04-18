@@ -106,7 +106,7 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<SimpleMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<SimpleMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<SimpleMaterialDefines>(subMesh->_materialDefines);
@@ -215,7 +215,8 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
     options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
