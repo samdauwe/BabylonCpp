@@ -83,7 +83,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<ShadowOnlyMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<ShadowOnlyMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<ShadowOnlyMaterialDefines>(subMesh->_materialDefines);
@@ -185,7 +185,8 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     options.onError               = onError;
     options.indexParameters       = {{"maxSimultaneousLights", 1}};
 
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
