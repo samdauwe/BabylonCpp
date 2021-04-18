@@ -69,7 +69,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_shared<SkyMaterialDefines>();
+    subMesh->materialDefines = std::make_shared<SkyMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
@@ -133,7 +133,8 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
     options.onCompiled          = onCompiled;
     options.onError             = onError;
 
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
+                       _materialContext);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
