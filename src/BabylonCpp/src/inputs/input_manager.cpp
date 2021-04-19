@@ -851,20 +851,24 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
       });
   };
 
-  _onKeyDown = [this](KeyboardEvent&& evt) {
+  _onKeyDown = [this](KeyboardEvent&& /*evt*/) {
     auto& scene = *_scene;
-    auto type   = KeyboardEventTypes::KEYDOWN;
+    // auto type   = KeyboardEventTypes::KEYDOWN;
     if (scene.onPreKeyboardObservable.hasObservers()) {
+#if 0
       KeyboardInfoPre pi(type, evt);
       scene.onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
       if (pi.skipOnPointerObservable) {
         return;
       }
+#endif
     }
 
     if (scene.onKeyboardObservable.hasObservers()) {
+#if 0
       KeyboardInfo pi(type, evt);
       scene.onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
     }
 
     if (scene.actionManager) {
@@ -875,20 +879,24 @@ void InputManager::attachControl(bool attachUp, bool attachDown, bool attachMove
     }
   };
 
-  _onKeyUp = [this](KeyboardEvent&& evt) {
+  _onKeyUp = [this](KeyboardEvent&& /*evt*/) {
     auto& scene = *_scene;
-    auto type   = KeyboardEventTypes::KEYUP;
+    // auto type   = KeyboardEventTypes::KEYUP;
     if (scene.onPreKeyboardObservable.hasObservers()) {
+#if 0
       KeyboardInfoPre pi(type, evt);
       scene.onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
       if (pi.skipOnPointerObservable) {
         return;
       }
+#endif
     }
 
     if (scene.onKeyboardObservable.hasObservers()) {
+#if 0
       KeyboardInfo pi(type, evt);
       scene.onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
     }
 
     if (scene.actionManager) {
