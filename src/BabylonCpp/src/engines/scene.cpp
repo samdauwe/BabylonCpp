@@ -1783,20 +1783,24 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
     });
 }
 
-void Scene::_onKeyDownEvent(KeyboardEvent&& evt)
+void Scene::_onKeyDownEvent(KeyboardEvent&& /*evt*/)
 {
-  auto type = KeyboardEventTypes::KEYDOWN;
+  //auto type = KeyboardEventTypes::KEYDOWN;
   if (onPreKeyboardObservable.hasObservers()) {
+#if 0
     KeyboardInfoPre pi(type, evt);
     onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
     if (pi.skipOnPointerObservable) {
       return;
     }
+#endif
   }
 
   if (onKeyboardObservable.hasObservers()) {
+#if 0
     KeyboardInfo pi(type, evt);
     onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
   }
 
   if (actionManager) {
@@ -1807,20 +1811,24 @@ void Scene::_onKeyDownEvent(KeyboardEvent&& evt)
   }
 }
 
-void Scene::_onKeyUpEvent(KeyboardEvent&& evt)
+void Scene::_onKeyUpEvent(KeyboardEvent&& /*evt*/)
 {
-  auto type = KeyboardEventTypes::KEYUP;
+  //auto type = KeyboardEventTypes::KEYUP;
   if (onPreKeyboardObservable.hasObservers()) {
+#if 0
     KeyboardInfoPre pi(type, evt);
     onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
     if (pi.skipOnPointerObservable) {
       return;
     }
+#endif
   }
 
   if (onKeyboardObservable.hasObservers()) {
+#if 0
     KeyboardInfo pi(type, evt);
     onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+#endif
   }
 
   if (actionManager) {
