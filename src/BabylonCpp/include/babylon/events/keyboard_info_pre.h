@@ -20,7 +20,7 @@ public:
    * @param type Defines the type of event (KeyboardEventTypes)
    * @param event Defines the related dom event
    */
-  KeyboardInfoPre(unsigned int type, const KeyboardEvent& event);
+  KeyboardInfoPre(unsigned int type, const IKeyboardEvent& event);
   ~KeyboardInfoPre(); // = default
 
 public:

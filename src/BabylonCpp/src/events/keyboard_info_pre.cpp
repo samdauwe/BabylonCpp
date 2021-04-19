@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-KeyboardInfoPre::KeyboardInfoPre(unsigned int iType, const KeyboardEvent& iEvent)
+KeyboardInfoPre::KeyboardInfoPre(unsigned int iType, const IKeyboardEvent& iEvent)
     : KeyboardInfo{iType, iEvent}, skipOnPointerObservable{false}
 {
 }
