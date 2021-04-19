@@ -2,7 +2,7 @@
 #define BABYLON_EVENTS_KEYBOARD_INFO_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/structs.h>
+#include <babylon/events/device_input_events.h>
 
 namespace BABYLON {
 
@@ -18,7 +18,7 @@ public:
    * @param type Defines the type of event (KeyboardEventTypes)
    * @param event Defines the related dom event
    */
-  KeyboardInfo(unsigned int type, const KeyboardEvent& event);
+  KeyboardInfo(unsigned int type, const IKeyboardEvent& event);
   ~KeyboardInfo(); // = default
 
 public:
@@ -30,7 +30,7 @@ public:
   /**
    * Defines the related dom event
    */
-  KeyboardEvent event;
+  IKeyboardEvent event;
 
 }; // end of class KeyboardInfo
 

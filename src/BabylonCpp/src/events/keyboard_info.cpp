@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-KeyboardInfo::KeyboardInfo(unsigned int iType, const KeyboardEvent& iEvent)
+KeyboardInfo::KeyboardInfo(unsigned int iType, const IKeyboardEvent& iEvent)
     : type{iType}, event{iEvent}
 {
 }
