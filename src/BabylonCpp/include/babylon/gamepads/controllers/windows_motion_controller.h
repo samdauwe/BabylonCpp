@@ -4,14 +4,14 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
 class TransformNode;
-class WindowsMotionController;
-using WindowsMotionControllerPtr = std::shared_ptr<WindowsMotionController>;
+FWD_CLASS_SPTR(WindowsMotionController)
 
 /**
  * @brief Defines the IMeshInfo object that describes information a webvr controller mesh.
