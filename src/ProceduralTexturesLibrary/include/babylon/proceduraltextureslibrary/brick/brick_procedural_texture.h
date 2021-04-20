@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_BRICK_BRICK_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class BrickProceduralTexture;
-using BrickProceduralTexturePtr = std::shared_ptr<BrickProceduralTexture>;
+FWD_CLASS_SPTR(BrickProceduralTexture)
 
 class BABYLON_SHARED_EXPORT BrickProceduralTexture : public ProceduralTexture {
 
