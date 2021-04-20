@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_CLOUD_CLOUD_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color4.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class CloudProceduralTexture;
-using CloudProceduralTexturePtr = std::shared_ptr<CloudProceduralTexture>;
+FWD_CLASS_SPTR(CloudProceduralTexture)
 
 class BABYLON_SHARED_EXPORT CloudProceduralTexture : public ProceduralTexture {
 
