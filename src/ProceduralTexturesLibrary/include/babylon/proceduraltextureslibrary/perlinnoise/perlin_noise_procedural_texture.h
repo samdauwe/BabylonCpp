@@ -2,13 +2,13 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_PERLIN_NOISE_PERLIN_NOISE_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class PerlinNoiseProceduralTexture;
-using PerlinNoiseProceduralTexturePtr = std::shared_ptr<PerlinNoiseProceduralTexture>;
+FWD_CLASS_SPTR(PerlinNoiseProceduralTexture)
 
 class BABYLON_SHARED_EXPORT PerlinNoiseProceduralTexture : public ProceduralTexture {
 
