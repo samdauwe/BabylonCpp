@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_ROAD_ROAD_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class RoadProceduralTexture;
-using RoadProceduralTexturePtr = std::shared_ptr<RoadProceduralTexture>;
+FWD_CLASS_SPTR(RoadProceduralTexture)
 
 class BABYLON_SHARED_EXPORT RoadProceduralTexture : public ProceduralTexture {
 
