@@ -2,12 +2,12 @@
 #define BABYLON_SPRITES_SPRITE_PACKED_MANAGER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {
 
-class SpritePackedManager;
-using SpritePackedManagerPtr = std::shared_ptr<SpritePackedManager>;
+FWD_CLASS_SPTR(SpritePackedManager)
 
 /**
  * @brief Class used to manage multiple sprites of different sizes on the same spritesheet.
