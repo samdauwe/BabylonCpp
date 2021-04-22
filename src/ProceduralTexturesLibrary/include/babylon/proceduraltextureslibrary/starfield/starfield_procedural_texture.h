@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_STARFIELD_STARFIELD_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class StarfieldProceduralTexture;
-using StarfieldProceduralTexturePtr = std::shared_ptr<StarfieldProceduralTexture>;
+FWD_CLASS_SPTR(StarfieldProceduralTexture)
 
 class BABYLON_SHARED_EXPORT StarfieldProceduralTexture : public ProceduralTexture {
 
