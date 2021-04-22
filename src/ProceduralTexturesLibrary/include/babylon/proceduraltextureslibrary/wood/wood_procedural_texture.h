@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_WOOD_WOOD_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-class WoodProceduralTexture;
-using WoodProceduralTexturePtr = std::shared_ptr<WoodProceduralTexture>;
+FWD_CLASS_SPTR(WoodProceduralTexture)
 
 class BABYLON_SHARED_EXPORT WoodProceduralTexture : public ProceduralTexture {
 
