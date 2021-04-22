@@ -2,14 +2,14 @@
 #define BABYLON_SPRITES_ISPRITE_MAP_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/sprites/isprite_map_options.h>
 #include <babylon/sprites/isprites.h>
 
 namespace BABYLON {
 
-class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+FWD_CLASS_SPTR(Texture)
 
 /**
  * @brief Defines the IDisposable interface in order to be cleanable from resources.
