@@ -703,9 +703,7 @@ public:
    * @param effect defines the effect to activate
    */
   virtual void enableEffect(const EffectPtr& effect);
-  virtual void enableEffect(const DrawWrapperPtr& /*effect*/)
-  {
-  }
+  virtual void enableEffect(const DrawWrapperPtr& effect);
 
   /**
    * @brief Set the value of an uniform to a number (int).
@@ -2125,6 +2123,9 @@ public:
   bool _badDesktopOS = false;
 
   /** @hidden */
+  float _hardwareScalingLevel = 1.f;
+
+  /** @hidden */
   EngineCapabilities _caps;
   /** @hidden */
   EngineFeatures _features;
@@ -2300,7 +2301,6 @@ protected:
   EngineOptions _creationOptions;
 
   bool _highPrecisionShadersAllowed = true;
-  float _hardwareScalingLevel       = 1.f;
   bool _isStencilEnable             = false;
   bool _renderingQueueLaunched      = false;
   std::vector<SA::delegate<void()>> _activeRenderLoops;

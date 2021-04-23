@@ -23,6 +23,7 @@
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -1998,6 +1999,11 @@ void ThinEngine::enableEffect(const EffectPtr& effect)
     effect->onBind(effect.get());
   }
   effect->onBindObservable().notifyObservers(effect.get());
+}
+
+void ThinEngine::enableEffect(const DrawWrapperPtr& effect)
+{
+  enableEffect(effect->effect);
 }
 
 bool ThinEngine::setInt(const WebGLUniformLocationPtr& uniform, int value)
