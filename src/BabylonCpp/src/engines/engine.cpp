@@ -1,5 +1,6 @@
 #include <babylon/engines/engine.h>
 
+#include <babylon/audio/audio_engine.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
@@ -1059,6 +1060,12 @@ void Engine::dispose()
     scene->dispose();
   }
   scenes.clear();
+
+  // Release audio engine
+  if (Engine::Instances().size() == 1 && Engine::audioEngine) {
+    Engine::audioEngine->dispose();
+    Engine::audioEngine = nullptr;
+  }
 
   // WebVR
   disableVR();

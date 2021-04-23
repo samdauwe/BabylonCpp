@@ -9,6 +9,7 @@ class BABYLON_SHARED_EXPORT AudioEngine {
 
 public:
     bool canUseWebAudio;
+    void dispose(){}
 
 }; // end of class AudioEngine
 
