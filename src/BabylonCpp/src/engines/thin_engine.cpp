@@ -2003,6 +2003,7 @@ void ThinEngine::enableEffect(const EffectPtr& effect)
 
 void ThinEngine::enableEffect(const DrawWrapperPtr& effect)
 {
+  // get only the effect, we don't need a Wrapper in the WebGL engine
   enableEffect(effect->effect);
 }
 
