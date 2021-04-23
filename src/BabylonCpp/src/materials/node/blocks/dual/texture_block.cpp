@@ -1,6 +1,8 @@
 #include <babylon/materials/node/blocks/dual/texture_block.h>
 
 #include <babylon/core/json_util.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -17,7 +19,7 @@ namespace BABYLON {
 TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
     : NodeMaterialBlock{iName, fragmentOnly ? NodeMaterialBlockTargets::Fragment :
                                               NodeMaterialBlockTargets::VertexAndFragment}
-    , texture{nullptr}
+    , texture{this, &TextureBlock::get_texture, &TextureBlock::set_texture}
     , convertToGammaSpace{false}
     , convertToLinearSpace{false}
     , uv{this, &TextureBlock::get_uv}
@@ -28,6 +30,7 @@ TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
     , b{this, &TextureBlock::get_b}
     , a{this, &TextureBlock::get_a}
     , _isMixed{this, &TextureBlock::get__isMixed}
+    , _texture{nullptr}
     , _currentTarget{NodeMaterialBlockTargets::VertexAndFragment}
 {
   _fragmentOnly = fragmentOnly;
@@ -61,6 +64,35 @@ TextureBlock::~TextureBlock() = default;
 std::string TextureBlock::getClassName() const
 {
   return "TextureBlock";
+}
+
+TexturePtr& TextureBlock::get_texture()
+{
+  return _texture;
+}
+
+void TextureBlock::set_texture(const TexturePtr& iTexture)
+{
+  if (_texture == iTexture) {
+    return;
+  }
+
+  const auto scene
+    = iTexture && iTexture->getScene() ? iTexture->getScene() : Engine::LastCreatedScene();
+
+  if (!iTexture && scene) {
+    scene->markAllMaterialsAsDirty(
+      Constants::MATERIAL_TextureDirtyFlag,
+      [this](Material* mat) -> bool { return mat->hasTexture(_texture); });
+  }
+
+  _texture = iTexture;
+
+  if (iTexture && scene) {
+    scene->markAllMaterialsAsDirty(
+      Constants::MATERIAL_TextureDirtyFlag,
+      [iTexture](Material* mat) -> bool { return mat->hasTexture(iTexture); });
+  }
 }
 
 NodeMaterialConnectionPointPtr& TextureBlock::get_uv()
@@ -203,7 +235,8 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
     return;
   }
 
-  if (!texture || !texture->getTextureMatrix()) {
+  const auto iTexture = texture();
+  if (!iTexture || !iTexture->getTextureMatrix()) {
     defines.setValue(_defineName, false);
     defines.setValue(_mainUVDefineName, true);
     return;
@@ -212,7 +245,7 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
   defines.setValue(_linearDefineName, convertToGammaSpace);
   defines.setValue(_gammaDefineName, convertToLinearSpace);
   if (_isMixed) {
-    if (!texture->getTextureMatrix()->isIdentityAs3x2()) {
+    if (!iTexture->getTextureMatrix()->isIdentityAs3x2()) {
       defines.setValue(_defineName, true);
     }
     else {
@@ -225,7 +258,7 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
 bool TextureBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
                            const NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
 {
-  if (texture && !texture->isReadyOrNotBlocking()) {
+  if (texture() && !texture()->isReadyOrNotBlocking()) {
     return false;
   }
 
@@ -235,15 +268,16 @@ bool TextureBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*node
 void TextureBlock::bind(Effect* effect, const NodeMaterialPtr& /*nodeMaterial*/, Mesh* /*mesh*/,
                         SubMesh* /*subMesh*/)
 {
-  if (texture) {
+  const auto iTexture = texture();
+  if (iTexture) {
     return;
   }
 
   if (_isMixed) {
-    effect->setFloat(_textureInfoName, texture->level);
-    effect->setMatrix(_textureTransformName, *texture->getTextureMatrix());
+    effect->setFloat(_textureInfoName, iTexture->level);
+    effect->setMatrix(_textureTransformName, *iTexture->getTextureMatrix());
   }
-  effect->setTexture(_samplerName, texture);
+  effect->setTexture(_samplerName, iTexture);
 }
 
 bool TextureBlock::get__isMixed() const
@@ -258,15 +292,6 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
   // Inject code in vertex
   _defineName       = state._getFreeDefineName("UVTRANSFORM");
   _mainUVDefineName = "VMAIN" + StringTools::toUpperCase(uvInput->associatedVariableName());
-
-  if (uvInput->connectedPoint()->ownerBlock()->isInput) {
-    auto uvInputOwnerBlock
-      = std::static_pointer_cast<InputBlock>(uvInput->connectedPoint()->ownerBlock());
-
-    if (!uvInputOwnerBlock->isAttribute()) {
-      state._emitUniformFromString(uvInput->associatedVariableName(), "vec2");
-    }
-  }
 
   _mainUVName           = StringTools::printf("vMain%s", uvInput->associatedVariableName().c_str());
   _transformedUVName    = state._getFreeVariableName("transformedUV");
@@ -337,6 +362,25 @@ void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexM
   state.compilationString += "#endif\r\n";
 }
 
+void TextureBlock::_generateConversionCode(NodeMaterialBuildState& state,
+                                           const NodeMaterialConnectionPointPtr& output,
+                                           const std::string& swizzle)
+{
+  if (swizzle != "a") { // no conversion if the output is "a" (alpha)
+    state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
+    state.compilationString
+      += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
+                             output->associatedVariableName().c_str());
+    state.compilationString += "#endif\r\n";
+
+    state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
+    state.compilationString += StringTools::printf("%s = toLinearSpace(%s);\r\n",
+                                                   output->associatedVariableName().c_str(),
+                                                   output->associatedVariableName().c_str());
+    state.compilationString += "#endif\r\n";
+  }
+}
+
 void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
                                 const NodeMaterialConnectionPointPtr& output,
                                 const std::string& swizzle, bool vertexMode)
@@ -365,20 +409,7 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
   state.compilationString
     += StringTools::printf("%s = %s.%s%s;\r\n", _declareOutput(output, state).c_str(),
                            _tempTextureRead.c_str(), swizzle.c_str(), complement.c_str());
-
-  if (swizzle != "a") { // no conversion if the output is "a" (alpha)
-    state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
-    state.compilationString
-      += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
-                             output->associatedVariableName().c_str());
-    state.compilationString += "#endif\r\n";
-
-    state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
-    state.compilationString += StringTools::printf("%s = toLinearSpace(%s);\r\n",
-                                                   output->associatedVariableName().c_str(),
-                                                   output->associatedVariableName().c_str());
-    state.compilationString += "#endif\r\n";
-  }
+  _generateConversionCode(state, output, swizzle);
 }
 
 TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
@@ -387,7 +418,9 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 
   if (state.target == NodeMaterialBlockTargets::Vertex || _fragmentOnly
       || (state.target == NodeMaterialBlockTargets::Fragment && _tempTextureRead == "")) {
-    _tempTextureRead = state._getFreeVariableName("tempTextureRead");
+    _tempTextureRead  = state._getFreeVariableName("tempTextureRead");
+    _linearDefineName = state._getFreeDefineName("ISLINEAR");
+    _gammaDefineName  = state._getFreeDefineName("ISGAMMA");
   }
 
   if ((!_isMixed && state.target == NodeMaterialBlockTargets::Fragment)
@@ -422,9 +455,6 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
     state._emit2DSampler(_samplerName);
   }
 
-  _linearDefineName = state._getFreeDefineName("ISLINEAR");
-  _gammaDefineName  = state._getFreeDefineName("ISGAMMA");
-
   auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunctionFromInclude("helperFunctions", iComments);
 
@@ -445,30 +475,35 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string TextureBlock::_dumpPropertiesCode()
 {
-  if (!texture) {
+  const auto iTexture = texture();
+  if (!iTexture) {
     return "";
   }
 
-  auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", nullptr);\r\n",
-                                        _codeVariableName.c_str(), texture->name.c_str());
+  auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", nullptr, %s, %s);\r\n",
+                                        _codeVariableName.c_str(), iTexture->name.c_str(),
+                                        iTexture->noMipmap() ? "true" : "false",
+                                        iTexture->invertY() ? "true" : "false");
   codeString += StringTools::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(),
-                                    texture->wrapU());
+                                    iTexture->wrapU());
   codeString += StringTools::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(),
-                                    texture->wrapV());
+                                    iTexture->wrapV());
   codeString
-    += StringTools::printf("%s.texture.uAng = %f;\r\n", _codeVariableName.c_str(), texture->uAng);
+    += StringTools::printf("%s.texture.uAng = %f;\r\n", _codeVariableName.c_str(), iTexture->uAng);
   codeString
-    += StringTools::printf("%s.texture.vAng = %f;\r\n", _codeVariableName.c_str(), texture->vAng);
+    += StringTools::printf("%s.texture.vAng = %f;\r\n", _codeVariableName.c_str(), iTexture->vAng);
   codeString
-    += StringTools::printf("%s.texture.wAng = %f;\r\n", _codeVariableName.c_str(), texture->wAng);
+    += StringTools::printf("%s.texture.wAng = %f;\r\n", _codeVariableName.c_str(), iTexture->wAng);
   codeString += StringTools::printf("%s.texture.uOffset = %f;\r\n", _codeVariableName.c_str(),
-                                    texture->uOffset);
+                                    iTexture->uOffset);
   codeString += StringTools::printf("%s.texture.vOffset = %f;\r\n", _codeVariableName.c_str(),
-                                    texture->vOffset);
+                                    iTexture->vOffset);
   codeString += StringTools::printf("%s.texture.uScale = %f;\r\n", _codeVariableName.c_str(),
-                                    texture->uScale);
+                                    iTexture->uScale);
   codeString += StringTools::printf("%s.texture.vScale = %f;\r\n", _codeVariableName.c_str(),
-                                    texture->vScale);
+                                    iTexture->vScale);
+  codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
+                                    _codeVariableName.c_str(), iTexture->coordinatesMode());
   codeString += StringTools::printf("%s.convertToGammaSpace = %s;\r\n", _codeVariableName.c_str(),
                                     convertToGammaSpace ? "true" : "false");
   codeString += StringTools::printf("%s.convertToLinearSpace = %s;\r\n", _codeVariableName.c_str(),

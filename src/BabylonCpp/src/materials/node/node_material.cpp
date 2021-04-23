@@ -1017,11 +1017,11 @@ std::vector<BaseTexturePtr> NodeMaterial::getActiveTextures() const
   if (_sharedData) {
     for (const auto& t : _sharedData->textureBlocks) {
       if (std::holds_alternative<TextureBlockPtr>(t) && std::get<TextureBlockPtr>(t)) {
-        activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture);
+        activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture());
       }
       else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
                && std::get<ReflectionTextureBlockPtr>(t)) {
-        activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture);
+        activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture());
       }
     }
   }
@@ -1050,7 +1050,7 @@ bool NodeMaterial::hasTexture(const BaseTexturePtr& texture) const
 
   for (const auto& t : _sharedData->textureBlocks) {
     if (std::holds_alternative<TextureBlockPtr>(t)
-        && std::get<TextureBlockPtr>(t)->texture == std::static_pointer_cast<Texture>(texture)) {
+        && std::get<TextureBlockPtr>(t)->texture() == std::static_pointer_cast<Texture>(texture)) {
       return true;
     }
     else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
@@ -1067,7 +1067,7 @@ void NodeMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures, b
   if (forceDisposeTextures) {
     for (const auto& tb : _sharedData->textureBlocks) {
       if (std::holds_alternative<TextureBlockPtr>(tb)) {
-        auto texture = std::get<TextureBlockPtr>(tb)->texture;
+        auto texture = std::get<TextureBlockPtr>(tb)->texture();
         if (texture) {
           texture->dispose();
         }
