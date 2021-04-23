@@ -136,6 +136,7 @@ public:
    * @param effect defines the effect to activate
    */
   void enableEffect(const EffectPtr& effect) override;
+  void enableEffect(const DrawWrapperPtr& effect) override;
 
   /**
    * @brief Set various states to the webGL context.

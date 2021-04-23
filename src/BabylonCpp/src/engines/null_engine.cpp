@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
@@ -183,6 +184,9 @@ void NullEngine::bindSamplers(Effect& /*effect*/)
 void NullEngine::enableEffect(const EffectPtr& effect)
 {
   _currentEffect = effect;
+  if (!effect) {
+    return;
+  }
 
   if (effect->onBind) {
     effect->onBind(effect.get());
@@ -190,6 +194,12 @@ void NullEngine::enableEffect(const EffectPtr& effect)
   /* if (effect->_onBindObservable) */ {
     effect->_onBindObservable.notifyObservers(effect.get());
   }
+}
+
+void NullEngine::enableEffect(const DrawWrapperPtr& effect)
+{
+  // get only the effect, we don't need a Wrapper in the WebGL engine
+  enableEffect(effect->effect);
 }
 
 void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/)
