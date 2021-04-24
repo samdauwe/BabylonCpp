@@ -25,7 +25,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
     , alpha{1.f}
     , useVertexColor{false}
     , useVertexAlpha{false}
-    , _colorShaderMaterial{nullptr}
+    , _lineMaterial{nullptr}
 {
   if (_source) {
     color          = iSource->color;
@@ -56,34 +56,49 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
     options.attributes.emplace_back(VertexBuffer::ColorKind);
   }
 
-  _colorShader = ShaderMaterial::New("colorShader", getScene(), "color", options);
+  _lineMaterial = ShaderMaterial::New("colorShader", getScene(), "color", options);
 }
 
 LinesMesh::~LinesMesh() = default;
 
+bool LinesMesh::_isShaderMaterial(const MaterialPtr& shader) const
+{
+  return shader->getClassName() == "ShaderMaterial";
+}
+
 void LinesMesh::_addClipPlaneDefine(const std::string& label)
 {
-  const auto define    = "#define " + label;
-  const auto hasDefine = stl_util::contains(_colorShader->options().defines, define);
+  if (!_isShaderMaterial(_lineMaterial)) {
+    return;
+  }
+
+  const auto _lineShaderMaterial = std::static_pointer_cast<ShaderMaterial>(_lineMaterial);
+  const auto define              = "#define " + label;
+  const auto hasDefine = stl_util::contains(_lineShaderMaterial->options().defines, define);
 
   if (hasDefine) {
     return;
   }
 
-  _colorShader->options().defines.emplace_back(define);
+  _lineShaderMaterial->options().defines.emplace_back(define);
 }
 
 void LinesMesh::_removeClipPlaneDefine(const std::string& label)
 {
-  const auto define = "#define " + label;
-  const auto index  = std::find(_colorShader->options().defines.begin(),
-                               _colorShader->options().defines.end(), define);
-
-  if (index == _colorShader->options().defines.end()) {
+  if (!_isShaderMaterial(_lineMaterial)) {
     return;
   }
 
-  _colorShader->options().defines.erase(index);
+  const auto _lineShaderMaterial = std::static_pointer_cast<ShaderMaterial>(_lineMaterial);
+  const auto define              = "#define " + label;
+  const auto index               = std::find(_lineShaderMaterial->options().defines.begin(),
+                               _lineShaderMaterial->options().defines.end(), define);
+
+  if (index == _lineShaderMaterial->options().defines.end()) {
+    return;
+  }
+
+  _lineShaderMaterial->options().defines.erase(index);
 }
 
 bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
@@ -98,7 +113,7 @@ bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
   scene.clipPlane5 ? _addClipPlaneDefine("CLIPPLANE5") : _removeClipPlaneDefine("CLIPPLANE5");
   scene.clipPlane6 ? _addClipPlaneDefine("CLIPPLANE6") : _removeClipPlaneDefine("CLIPPLANE6");
 
-  if (!_colorShader->isReady(this)) {
+  if (!_lineMaterial->isReady(this)) {
     return false;
   }
 
@@ -117,13 +132,12 @@ Type LinesMesh::type() const
 
 MaterialPtr& LinesMesh::get_material()
 {
-  _colorShaderMaterial = std::static_pointer_cast<Material>(_colorShader);
-  return _colorShaderMaterial;
+  return _lineMaterial;
 }
 
-void LinesMesh::set_material(const MaterialPtr& /*material*/)
+void LinesMesh::set_material(const MaterialPtr& value)
 {
-  // Do nothing
+  _lineMaterial = value;
 }
 
 bool LinesMesh::get_checkCollisions() const
@@ -141,16 +155,22 @@ void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/, unsigne
   if (!_geometry) {
     return;
   }
-  const auto& colorEffect = _colorShader->getEffect();
+  const auto& colorEffect = _lineMaterial->getEffect();
 
   // VBOs
   const auto indexToBind = isUnIndexed ? nullptr : _geometry->getIndexBuffer();
-  _geometry->_bind(colorEffect, indexToBind);
+  if (!_userInstancedBuffersStorage) {
+    _geometry->_bind(colorEffect, indexToBind);
+  }
+  else {
+    _geometry->_bind(colorEffect, indexToBind, _userInstancedBuffersStorage->vertexBuffers,
+                     *_userInstancedBuffersStorage->vertexArrayObjects);
+  }
 
   // Color
-  if (!useVertexColor) {
+  if (!useVertexColor && _isShaderMaterial(_lineMaterial)) {
     color4.set(color.r, color.g, color.b, alpha);
-    _colorShader->setColor4("color", color4);
+    std::static_pointer_cast<ShaderMaterial>(_lineMaterial)->setColor4("color", color4);
   }
 
   // Clip planes
@@ -190,7 +210,7 @@ PickingInfo LinesMesh::intersects(Ray& /*ray*/, const std::optional<bool>& /*fas
 
 void LinesMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  _colorShader->dispose(false, false, true);
+  _lineMaterial->dispose(false, false, true);
 
   Mesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }

@@ -144,6 +144,7 @@ protected:
   void set_checkCollisions();
 
 private:
+  bool _isShaderMaterial(const MaterialPtr& shader) const;
   void _addClipPlaneDefine(const std::string& label);
   void _removeClipPlaneDefine(const std::string& label);
 
@@ -179,8 +180,7 @@ public:
   bool useVertexAlpha;
 
 private:
-  MaterialPtr _colorShaderMaterial;
-  ShaderMaterialPtr _colorShader;
+  MaterialPtr _lineMaterial;
   Color4 color4;
 
 }; // end of class LinesMesh
