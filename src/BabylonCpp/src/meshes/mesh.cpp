@@ -109,12 +109,12 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , thinInstanceEnablePicking{false}
     , thinInstanceCount{this, &Mesh::get_thinInstanceCount, &Mesh::set_thinInstanceCount}
     , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
+    , _userInstancedBuffersStorage{std::nullopt}
     , _internalMeshDataInfo{std::make_unique<_InternalMeshDataInfo>()}
     , _onBeforeDrawObserver{nullptr}
     , _thinInstanceDataStorage{std::make_unique<_ThinInstanceDataStorage>()}
     , _userThinInstanceBuffersStorage{nullptr}
     , _effectiveMaterial{nullptr}
-    , _userInstancedBuffersStorage{std::nullopt}
     , _tessellation{0}
     , _arc{1.f}
 {

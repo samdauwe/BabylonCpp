@@ -2219,6 +2219,9 @@ public:
    */
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
 
+  /** @hidden */
+  std::optional<UserInstancedBuffersStorage> _userInstancedBuffersStorage;
+
 private:
   // Internal data
   std::unique_ptr<_InternalMeshDataInfo> _internalMeshDataInfo;
@@ -2230,8 +2233,6 @@ private:
   std::unique_ptr<_UserThinInstanceBuffersStorage> _userThinInstanceBuffersStorage;
   MaterialPtr _effectiveMaterial;
   // Instances
-  /** @hidden */
-  std::optional<UserInstancedBuffersStorage> _userInstancedBuffersStorage;
   // For extrusion and tube
   Path3D _path3D;
   std::vector<std::vector<Vector3>> _pathArray;
