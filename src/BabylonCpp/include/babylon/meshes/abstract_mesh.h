@@ -47,6 +47,7 @@ FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(PhysicsImpostor)
 FWD_CLASS_SPTR(RawTexture)
 FWD_CLASS_SPTR(Skeleton)
+FWD_CLASS_SPTR(VertexBuffer)
 
 class UniformBuffer;
 using UniformBufferPtr = std::unique_ptr<UniformBuffer>;
@@ -67,7 +68,7 @@ using WebGLVertexArrayObjectPtr = std::shared_ptr<WebGLVertexArrayObject>;
 struct UserInstancedBuffersStorage {
   std::unordered_map<std::string, Float32Array> data;
   std::unordered_map<std::string, size_t> sizes;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> vertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> vertexBuffers;
   std::unordered_map<std::string, size_t> strides;
   std::optional<std::unordered_map<std::string, WebGLVertexArrayObjectPtr>> vertexArrayObjects
     = std::nullopt;
