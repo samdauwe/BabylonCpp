@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 class Engine;
-FWD_CLASS_SPTR(nternalTexture)
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * @brief Hidden
