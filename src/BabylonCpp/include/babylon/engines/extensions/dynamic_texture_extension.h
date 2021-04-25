@@ -5,13 +5,13 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class ICanvas;
-class InternalTexture;
 class ThinEngine;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * @brief Hidden
