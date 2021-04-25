@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 
@@ -13,10 +14,9 @@ namespace BABYLON {
 
 class ArrayBufferView;
 using ArrayBufferViewArray = std::vector<ArrayBufferView>;
-class InternalTexture;
 class Scene;
 class ThinEngine;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+FWD_CLASS_SPTR(InternalTexture)
 
 /**
  * @brief Hidden
