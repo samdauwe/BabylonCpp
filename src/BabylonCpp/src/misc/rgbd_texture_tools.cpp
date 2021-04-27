@@ -38,6 +38,7 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
   // Gets everything ready.
   const auto engine  = static_cast<Engine*>(internalTexture->getEngine());
   const auto& caps   = engine->getCaps();
+  const auto isReady = internalTexture->isReady;
   auto expandTexture = false;
 
   // If half float available we can uncompress the texture
@@ -52,53 +53,63 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
   }
 
   // Expand the texture if possible
-  if (expandTexture) {
-    // Do not use during decode.
-    internalTexture->isReady = false;
+  const auto expandRGBDTexture = [&](Texture* /*texture*/, EventState& /*es*/) -> void {
+    if (expandTexture) {
+      // Do not use during decode.
+      internalTexture->isReady = false;
 
-    // Simply run through the decode PP.
-    const auto rgbdPostProcess = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
-                                                  Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
-                                                  false, "", internalTexture->type, "", {}, false);
-    internalTexture->_isRGBD   = false;
-    internalTexture->invertY   = false;
+      // Simply run through the decode PP.
+      const auto rgbdPostProcess = PostProcess::New(
+        "rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr, Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+        engine, false, "", internalTexture->type, "", {}, false);
+      internalTexture->_isRGBD = false;
+      internalTexture->invertY = false;
 
-    // Hold the output of the decoding.
-    IRenderTargetOptions options;
-    options.generateDepthBuffer   = false;
-    options.generateMipMaps       = false;
-    options.generateStencilBuffer = false;
-    options.samplingMode          = internalTexture->samplingMode;
-    options.type                  = internalTexture->type;
-    options.format                = Constants::TEXTUREFORMAT_RGBA;
-    const auto expandedTexture
-      = engine->createRenderTargetTexture(static_cast<float>(internalTexture->width), options);
+      // Hold the output of the decoding.
+      IRenderTargetOptions options;
+      options.generateDepthBuffer   = false;
+      options.generateMipMaps       = false;
+      options.generateStencilBuffer = false;
+      options.samplingMode          = internalTexture->samplingMode;
+      options.type                  = internalTexture->type;
+      options.format                = Constants::TEXTUREFORMAT_RGBA;
+      const auto expandedTexture
+        = engine->createRenderTargetTexture(static_cast<float>(internalTexture->width), options);
 
-    rgbdPostProcess->getEffect()->executeWhenCompiled([internalTexture, texture, expandedTexture,
-                                                       rgbdPostProcess,
-                                                       engine](Effect* /*effect*/) -> void {
-      // PP Render Pass
-      rgbdPostProcess->onApply = [internalTexture](Effect* effect, EventState& /*es*/) -> void {
-        effect->_bindTexture("textureSampler", internalTexture);
-        effect->setFloat2("scale", 1.f, 1.f);
-      };
-      texture->getScene()->postProcessManager->directRender({rgbdPostProcess}, expandedTexture,
-                                                            true);
+      rgbdPostProcess->getEffect()->executeWhenCompiled([internalTexture, texture, expandedTexture,
+                                                         rgbdPostProcess,
+                                                         engine](Effect* /*effect*/) -> void {
+        // PP Render Pass
+        rgbdPostProcess->onApply = [internalTexture](Effect* effect, EventState& /*es*/) -> void {
+          effect->_bindTexture("textureSampler", internalTexture);
+          effect->setFloat2("scale", 1.f, 1.f);
+        };
+        texture->getScene()->postProcessManager->directRender({rgbdPostProcess}, expandedTexture,
+                                                              true);
 
-      // Cleanup
-      engine->restoreDefaultFramebuffer();
-      engine->_releaseTexture(internalTexture);
-      engine->_releaseFramebufferObjects(expandedTexture);
-      if (rgbdPostProcess) {
-        rgbdPostProcess->dispose();
-      }
+        // Cleanup
+        engine->restoreDefaultFramebuffer();
+        engine->_releaseTexture(internalTexture);
+        engine->_releaseFramebufferObjects(expandedTexture);
+        if (rgbdPostProcess) {
+          rgbdPostProcess->dispose();
+        }
 
-      // Internal Swap
-      expandedTexture->_swapAndDie(internalTexture);
+        // Internal Swap
+        expandedTexture->_swapAndDie(internalTexture);
 
-      // Ready to get rolling again.
-      internalTexture->isReady = true;
-    });
+        // Ready to get rolling again.
+        internalTexture->isReady = true;
+      });
+    }
+  };
+
+  if (isReady) {
+    EventState es{0};
+    expandRGBDTexture(nullptr, es);
+  }
+  else {
+    texture->onLoadObservable().addOnce(expandRGBDTexture);
   }
 }
 
