@@ -10,6 +10,7 @@
 
 namespace BABYLON {
 
+class ThinEngine;
 FWD_CLASS_SPTR(Camera)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(PostProcessManager)
@@ -120,6 +121,7 @@ protected:
   std::unique_ptr<PostProcessManager> _postProcessManager;
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
   bool _forceFullscreenViewport;
+  Observer<ThinEngine>::Ptr _onContextRestoredObserver;
   bool _activated;
 
 }; // end of class MinMaxReducer

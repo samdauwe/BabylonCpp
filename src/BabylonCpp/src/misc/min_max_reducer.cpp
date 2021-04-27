@@ -21,6 +21,11 @@ MinMaxReducer::MinMaxReducer(const CameraPtr& camera)
 {
   _camera             = camera;
   _postProcessManager = std::make_unique<PostProcessManager>(camera->getScene());
+
+  _onContextRestoredObserver = camera->getEngine()->onContextRestoredObservable.add(
+    [this](ThinEngine* /*thinEngine*/, EventState& /*es*/) -> void {
+      _postProcessManager->_rebuild();
+    });
 }
 
 MinMaxReducer::~MinMaxReducer() = default;
@@ -200,6 +205,11 @@ void MinMaxReducer::dispose(bool disposeAll)
 {
   if (disposeAll) {
     onAfterReductionPerformed.clear();
+
+    if (_onContextRestoredObserver) {
+      _camera->getEngine()->onContextRestoredObservable.remove(_onContextRestoredObserver);
+      _onContextRestoredObserver = nullptr;
+    }
   }
 
   deactivate();
