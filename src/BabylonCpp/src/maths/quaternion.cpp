@@ -649,4 +649,31 @@ Quaternion Quaternion::Hermite(const Quaternion& value1, const Quaternion& tange
   return Quaternion(x, y, z, w);
 }
 
+Quaternion Quaternion::Hermite1stDerivative(const Quaternion& value1, const Quaternion& tangent1,
+                                            const Quaternion& value2, const Quaternion& tangent2,
+                                            float time)
+{
+  auto result = Quaternion::Zero();
+
+  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
+
+  return result;
+}
+
+void Quaternion::Hermite1stDerivativeToRef(const Quaternion& value1, const Quaternion& tangent1,
+                                           const Quaternion& value2, const Quaternion& tangent2,
+                                           float time, Quaternion& result)
+{
+  const auto t2 = time * time;
+
+  result.x = (t2 - time) * 6.f * value1.x + (3.f * t2 - 4.f * time + 1.f) * tangent1.x
+             + (-t2 + time) * 6.f * value2.x + (3.f * t2 - 2.f * time) * tangent2.x;
+  result.y = (t2 - time) * 6.f * value1.y + (3.f * t2 - 4.f * time + 1.f) * tangent1.y
+             + (-t2 + time) * 6.f * value2.y + (3.f * t2 - 2.f * time) * tangent2.y;
+  result.z = (t2 - time) * 6.f * value1.z + (3.f * t2 - 4.f * time + 1.f) * tangent1.z
+             + (-t2 + time) * 6.f * value2.z + (3.f * t2 - 2.f * time) * tangent2.z;
+  result.w = (t2 - time) * 6.f * value1.w + (3.f * t2 - 4.f * time + 1.f) * tangent1.w
+             + (-t2 + time) * 6.f * value2.w + (3.f * t2 - 2.f * time) * tangent2.w;
+}
+
 } // end of namespace BABYLON

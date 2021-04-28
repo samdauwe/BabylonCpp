@@ -545,6 +545,34 @@ public:
   static Quaternion Hermite(const Quaternion& value1, const Quaternion& tangent1,
                             const Quaternion& value2, const Quaternion& tangent2, float amount);
 
+  /**
+   * @brief Returns a new Quaternion which is the 1st derivative of the Hermite spline defined by
+   * the quaternions "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @returns 1st derivative
+   */
+  static Quaternion Hermite1stDerivative(const Quaternion& value1, const Quaternion& tangent1,
+                                         const Quaternion& value2, const Quaternion& tangent2,
+                                         float time);
+
+  /**
+   * @brief Update a Quaternion with the 1st derivative of the Hermite spline defined by the
+   * quaternions "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @param result define where to store the derivative
+   */
+  static void Hermite1stDerivativeToRef(const Quaternion& value1, const Quaternion& tangent1,
+                                        const Quaternion& value2, const Quaternion& tangent2,
+                                        float time, Quaternion& result);
+
 public:
   /**
    * Defines the first component (0 by default)
