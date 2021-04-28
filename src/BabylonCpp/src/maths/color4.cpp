@@ -353,6 +353,32 @@ void Color4::LerpToRef(const Color4& left, const Color4& right, float amount, Co
   result.a = left.a + (right.a - left.a) * amount;
 }
 
+Color4 Color4::Hermite1stDerivative(const Color4& value1, const Color4& tangent1,
+                                    const Color4& value2, const Color4& tangent2, float time)
+{
+  Color4 result;
+
+  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
+
+  return result;
+}
+
+void Color4::Hermite1stDerivativeToRef(const Color4& value1, const Color4& tangent1,
+                                       const Color4& value2, const Color4& tangent2, float time,
+                                       Color4& result)
+{
+  const auto t2 = time * time;
+
+  result.r = (t2 - time) * 6.f * value1.r + (3.f * t2 - 4.f * time + 1.f) * tangent1.r
+             + (-t2 + time) * 6.f * value2.r + (3.f * t2 - 2.f * time) * tangent2.r;
+  result.g = (t2 - time) * 6.f * value1.g + (3.f * t2 - 4.f * time + 1.f) * tangent1.g
+             + (-t2 + time) * 6.f * value2.g + (3.f * t2 - 2.f * time) * tangent2.g;
+  result.b = (t2 - time) * 6.f * value1.b + (3.f * t2 - 4.f * time + 1.f) * tangent1.b
+             + (-t2 + time) * 6.f * value2.b + (3.f * t2 - 2.f * time) * tangent2.b;
+  result.a = (t2 - time) * 6.f * value1.a + (3.f * t2 - 4.f * time + 1.f) * tangent1.a
+             + (-t2 + time) * 6.f * value2.a + (3.f * t2 - 2.f * time) * tangent2.a;
+}
+
 Color4 Color4::FromColor3(const Color3& color3, float alpha)
 {
   return Color4(color3.r, color3.g, color3.b, alpha);

@@ -427,6 +427,30 @@ void Color3::LerpToRef(const Color3& left, const Color3& right, float amount, Co
   result.b = left.b + ((right.b - left.b) * amount);
 }
 
+Color3 Color3::Hermite1stDerivative(const Color3& value1, const Color3& tangent1,
+                                    const Color3& value2, const Color3& tangent2, float time)
+{
+  auto result = Color3::Black();
+
+  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
+
+  return result;
+}
+
+void Color3::Hermite1stDerivativeToRef(const Color3& value1, const Color3& tangent1,
+                                       const Color3& value2, const Color3& tangent2, float time,
+                                       Color3& result)
+{
+  const auto t2 = time * time;
+
+  result.r = (t2 - time) * 6.f * value1.r + (3.f * t2 - 4.f * time + 1.f) * tangent1.r
+             + (-t2 + time) * 6.f * value2.r + (3.f * t2 - 2.f * time) * tangent2.r;
+  result.g = (t2 - time) * 6.f * value1.g + (3.f * t2 - 4.f * time + 1.f) * tangent1.g
+             + (-t2 + time) * 6.f * value2.g + (3.f * t2 - 2.f * time) * tangent2.g;
+  result.b = (t2 - time) * 6.f * value1.b + (3.f * t2 - 4.f * time + 1.f) * tangent1.b
+             + (-t2 + time) * 6.f * value2.b + (3.f * t2 - 2.f * time) * tangent2.b;
+}
+
 Color3 Color3::Red()
 {
   return Color3(1.f, 0.f, 0.f);

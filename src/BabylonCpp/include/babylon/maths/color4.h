@@ -295,6 +295,33 @@ public:
   static void LerpToRef(const Color4& left, const Color4& right, float amount, Color4& result);
 
   /**
+   * @brief Returns a new Color4 which is the 1st derivative of the Hermite spline defined by the
+   * colors "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @returns 1st derivative
+   */
+  static Color4 Hermite1stDerivative(const Color4& value1, const Color4& tangent1,
+                                     const Color4& value2, const Color4& tangent2, float time);
+
+  /**
+   * @brief Update a Color4 with the 1st derivative of the Hermite spline defined by the colors
+   * "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @param result define where to store the derivative
+   */
+  static void Hermite1stDerivativeToRef(const Color4& value1, const Color4& tangent1,
+                                        const Color4& value2, const Color4& tangent2, float time,
+                                        Color4& result);
+
+  /**
    * @brief Creates a new Color4 from a Color3 and an alpha value.
    * @param color3 defines the source Color3 to read from
    * @param alpha defines the alpha component (1.0 by default)
