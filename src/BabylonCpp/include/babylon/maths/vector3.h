@@ -837,6 +837,33 @@ public:
                          const Vector3& tangent2, float amount);
 
   /**
+   * @brief Returns a new Vector3 which is the 1st derivative of the Hermite spline defined by the
+   * vectors "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @returns 1st derivative
+   */
+  static Vector3 Hermite1stDerivative(const Vector3& value1, const Vector3& tangent1,
+                                      const Vector3& value2, const Vector3& tangent2, float time);
+
+  /**
+   * @brief Update a Vector3 with the 1st derivative of the Hermite spline defined by the vectors
+   * "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @param result define where to store the derivative
+   */
+  static void Hermite1stDerivativeToRef(const Vector3& value1, const Vector3& tangent1,
+                                        const Vector3& value2, const Vector3& tangent2, float time,
+                                        Vector3& result);
+
+  /**
    * @brief Returns a new Vector3 located for "amount" (float) on the linear interpolation between
    * the vectors "start" and "end".
    * @param start defines the start value

@@ -498,6 +498,28 @@ Vector2 Vector2::Hermite(const Vector2& value1, const Vector2& tangent1, const V
   return Vector2(x, y);
 }
 
+Vector2 Vector2::Hermite1stDerivative(const Vector2& value1, const Vector2& tangent1,
+                                      const Vector2& value2, const Vector2& tangent2, float time)
+{
+  auto result = Vector2::Zero();
+
+  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
+
+  return result;
+}
+
+void Vector2::Hermite1stDerivativeToRef(const Vector2& value1, const Vector2& tangent1,
+                                        const Vector2& value2, const Vector2& tangent2, float time,
+                                        Vector2& result)
+{
+  const auto t2 = time * time;
+
+  result.x = (t2 - time) * 6.f * value1.x + (3.f * t2 - 4.f * time + 1.f) * tangent1.x
+             + (-t2 + time) * 6.f * value2.x + (3.f * t2 - 2.f * time) * tangent2.x;
+  result.y = (t2 - time) * 6.f * value1.y + (3.f * t2 - 4.f * time + 1.f) * tangent1.y
+             + (-t2 + time) * 6.f * value2.y + (3.f * t2 - 2.f * time) * tangent2.y;
+}
+
 Vector2 Vector2::Lerp(const Vector2& start, const Vector2& end, float amount)
 {
   const float x = start.x + ((end.x - start.x) * amount);

@@ -839,6 +839,30 @@ Vector3 Vector3::Hermite(const Vector3& value1, const Vector3& tangent1, const V
   return Vector3(x, y, z);
 }
 
+Vector3 Vector3::Hermite1stDerivative(const Vector3& value1, const Vector3& tangent1,
+                                      const Vector3& value2, const Vector3& tangent2, float time)
+{
+  auto result = Vector3::Zero();
+
+  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
+
+  return result;
+}
+
+void Vector3::Hermite1stDerivativeToRef(const Vector3& value1, const Vector3& tangent1,
+                                        const Vector3& value2, const Vector3& tangent2, float time,
+                                        Vector3& result)
+{
+  const auto t2 = time * time;
+
+  result.x = (t2 - time) * 6.f * value1.x + (3.f * t2 - 4.f * time + 1.f) * tangent1.x
+             + (-t2 + time) * 6.f * value2.x + (3.f * t2 - 2.f * time) * tangent2.x;
+  result.y = (t2 - time) * 6.f * value1.y + (3.f * t2 - 4.f * time + 1.f) * tangent1.y
+             + (-t2 + time) * 6.f * value2.y + (3.f * t2 - 2.f * time) * tangent2.y;
+  result.z = (t2 - time) * 6.f * value1.z + (3.f * t2 - 4.f * time + 1.f) * tangent1.z
+             + (-t2 + time) * 6.f * value2.z + (3.f * t2 - 2.f * time) * tangent2.z;
+}
+
 Vector3 Vector3::Lerp(const Vector3& start, const Vector3& end, float amount)
 {
   Vector3 result(0.f, 0.f, 0.f);

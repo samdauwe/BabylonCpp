@@ -400,7 +400,7 @@ public:
 
   /**
    * @brief Returns a new Vector2 located for "amount" (float) on the Hermite spline defined by the
-   * vectors "value1", "value3", "tangent1", "tangent2".
+   * vectors "value1", "value2", "tangent1", "tangent2".
    * @param value1 defines the 1st control point
    * @param tangent1 defines the outgoing tangent
    * @param value2 defines the 2nd control point
@@ -410,6 +410,33 @@ public:
    */
   static Vector2 Hermite(const Vector2& value1, const Vector2& tangent1, const Vector2& value2,
                          const Vector2& tangent2, float amount);
+
+  /**
+   * @brief Returns a new Vector2 which is the 1st derivative of the Hermite spline defined by the
+   * vectors "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @returns 1st derivative
+   */
+  static Vector2 Hermite1stDerivative(const Vector2& value1, const Vector2& tangent1,
+                                      const Vector2& value2, const Vector2& tangent2, float time);
+
+  /**
+   * @brief Returns a new Vector2 which is the 1st derivative of the Hermite spline defined by the
+   * vectors "value1", "value2", "tangent1", "tangent2".
+   * @param value1 defines the first control point
+   * @param tangent1 defines the first tangent
+   * @param value2 defines the second control point
+   * @param tangent2 defines the second tangent
+   * @param time define where the derivative must be done
+   * @param result define where the derivative will be stored
+   */
+  static void Hermite1stDerivativeToRef(const Vector2& value1, const Vector2& tangent1,
+                                        const Vector2& value2, const Vector2& tangent2, float time,
+                                        Vector2& result);
 
   /**
    * @brief Returns a new Vector2 located for "amount" (float) on the linear interpolation between
