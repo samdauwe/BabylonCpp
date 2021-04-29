@@ -53,7 +53,9 @@ enum class PointerInput : unsigned int {
   /** Delta X */
   DeltaHorizontal = 10,
   /** Delta Y */
-  DeltaVertical = 11
+  DeltaVertical = 11,
+  /** MoveBeing Hijack for simultaneous buttons pressed for instance */
+  FakeMove = 12,
 }; // end of enum class PointerInput
 
 /**
