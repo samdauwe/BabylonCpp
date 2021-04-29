@@ -611,6 +611,18 @@ struct BABYLON_SHARED_EXPORT Constants {
    * Constant used as key code for Shift key
    */
   static constexpr unsigned int INPUT_SHIFT_KEY = 16;
+
+  /**
+   * Standard snapshot rendering. In this mode, some form of dynamic behavior is possible (for eg,
+   * uniform buffers are still updated)
+   */
+  static constexpr unsigned int SNAPSHOTRENDERING_STANDARD = 0;
+
+  /**
+   * Fast snapshot rendering. In this mode, everything is static and only some limited form of
+   * dynamic behaviour is possible
+   */
+  static constexpr unsigned int SNAPSHOTRENDERING_FAST = 1;
 }; // end of struct Constants
 
 } // end of namespace BABYLON
