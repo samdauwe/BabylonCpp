@@ -528,7 +528,8 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   const auto reverse = sideOrientation == Material::ClockWiseSideOrientation;
-  engine->setState(material->backFaceCulling, material->zOffset, false, reverse);
+  engine->setState(material->backFaceCulling(), material->zOffset, false, reverse,
+                   material->cullBackFaces());
 
   // Managing instances
   auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
@@ -558,7 +559,9 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
     const auto effect = _effectLayerMapGenerationDrawWrapper->effect;
 
     engine->enableEffect(_effectLayerMapGenerationDrawWrapper);
-    renderingMesh->_bind(subMesh, effect, Material::TriangleFillMode);
+    if (!hardwareInstancedRendering) {
+      renderingMesh->_bind(subMesh, effect, Material::TriangleFillMode);
+    }
 
     effect->setMatrix("viewProjection", scene->getTransformMatrix());
 
