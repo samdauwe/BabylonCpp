@@ -202,7 +202,8 @@ void NullEngine::enableEffect(const DrawWrapperPtr& effect)
   enableEffect(effect->effect);
 }
 
-void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/)
+void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/,
+                          bool /*cullBackFaces*/)
 {
 }
 

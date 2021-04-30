@@ -194,7 +194,8 @@ void Engine::generateMipMapsForCubemap(const InternalTexturePtr& texture, bool u
   }
 }
 
-void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
+void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide,
+                      bool /*iCullBackFaces*/)
 {
   // Culling
   if (_depthCullingState->cull() != culling || force) {
