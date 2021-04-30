@@ -67,6 +67,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , canRenderToMRT{this, &Material::get_canRenderToMRT}
     , alpha{this, &Material::get_alpha, &Material::set_alpha}
     , backFaceCulling{this, &Material::get_backFaceCulling, &Material::set_backFaceCulling}
+    , cullBackFaces{this, &Material::get_cullBackFaces, &Material::set_cullBackFaces}
     , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
     , onCompiled{nullptr}
     , onError{nullptr}
@@ -98,6 +99,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
+    , _cullBackFaces{true}
     , _materialContext{nullptr}
     , _drawWrapper{nullptr}
     , _forceAlphaTest{false}
@@ -179,6 +181,20 @@ void Material::set_backFaceCulling(bool value)
 bool Material::get_backFaceCulling() const
 {
   return _backFaceCulling;
+}
+
+void Material::set_cullBackFaces(bool value)
+{
+  if (_cullBackFaces == value) {
+    return;
+  }
+  _cullBackFaces = value;
+  markAsDirty(Material::TextureDirtyFlag);
+}
+
+bool Material::get_cullBackFaces() const
+{
+  return _cullBackFaces;
 }
 
 bool Material::get_hasRenderTargetTextures() const

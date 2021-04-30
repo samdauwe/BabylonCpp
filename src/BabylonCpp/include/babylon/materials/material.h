@@ -523,6 +523,17 @@ protected:
   [[nodiscard]] bool get_backFaceCulling() const;
 
   /**
+   * @brief Sets the type of faces that should be culled (true for back faces, false for front
+   * faces).
+   */
+  void set_cullBackFaces(bool value);
+
+  /**
+   * @brief Gets the type of faces that should be culled.
+   */
+  bool get_cullBackFaces() const;
+
+  /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
@@ -807,6 +818,11 @@ public:
   Property<Material, bool> backFaceCulling;
 
   /**
+   * The type of faces that should be culled (true for back faces, false for front faces)
+   */
+  Property<Material, bool> cullBackFaces;
+
+  /**
    * Gets a boolean indicating that current material needs to register RTT
    */
   ReadOnlyProperty<Material, bool> hasRenderTargetTextures;
@@ -971,6 +987,11 @@ protected:
    * Specifies if back face culling is enabled
    */
   bool _backFaceCulling;
+
+  /**
+   * Specifies if back or front faces should be culled (when culling is enabled)
+   */
+  bool _cullBackFaces;
 
   /**
    * An event triggered when the effect is (re)created
