@@ -14,7 +14,7 @@ FWD_CLASS_SPTR(Sprite)
 
 /**
  * @brief Information about the result of picking within a scene.
- * @see https://doc.babylonjs.com/babylon101/picking_collisions
+ * @see https://doc.babylonjs.com/divingDeeper/mesh/interactions/picking_collisions
  */
 class BABYLON_SHARED_EXPORT PickingInfo {
 
