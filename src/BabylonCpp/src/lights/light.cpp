@@ -287,14 +287,10 @@ Light& Light::transferTexturesToEffect(Effect* /*effect*/, const std::string& /*
 }
 
 void Light::_bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bool useSpecular,
-                       bool rebuildInParallel)
+                       bool receiveShadows)
 {
   auto iAsString  = std::to_string(lightIndex);
   auto needUpdate = false;
-
-  if (rebuildInParallel && _uniformBuffer->_alreadyBound) {
-    return;
-  }
 
   _uniformBuffer->bindToEffect(effect, "Light" + iAsString);
 
@@ -318,7 +314,7 @@ void Light::_bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bo
   transferTexturesToEffect(effect, iAsString);
 
   // Shadows
-  if (scene->shadowsEnabled() && shadowEnabled()) {
+  if (scene->shadowsEnabled() && shadowEnabled() && receiveShadows) {
     auto shadowGenerator = getShadowGenerator();
     if (shadowGenerator) {
       shadowGenerator->bindShadowLight(iAsString, effect);

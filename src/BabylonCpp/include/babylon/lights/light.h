@@ -197,10 +197,10 @@ public:
    * @param scene The scene where the light belongs to
    * @param effect The effect we are binding the data to
    * @param useSpecular Defines if specular is supported
-   * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
+   * @param receiveShadows Defines if the effect (mesh) we bind the light for receives shadows
    */
   void _bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bool useSpecular,
-                  bool rebuildInParallel = false);
+                  bool receiveShadows = true);
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
