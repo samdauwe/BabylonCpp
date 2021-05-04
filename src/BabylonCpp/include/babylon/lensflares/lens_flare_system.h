@@ -98,7 +98,12 @@ public:
   bool render();
 
   /**
-   * Dispose and release the lens flare with its associated resources.
+   * @brief Rebuilds the lens flare system.
+   */
+  void rebuild();
+
+  /**
+   * @brief Dispose and release the lens flare with its associated resources.
    */
   void dispose();
 
@@ -134,9 +139,11 @@ protected:
    */
   LensFlareSystem(const std::string& name, const LensFlareEmitterType& emitter, Scene* scene);
 
-private:
   [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
+
+private:
+  void _createIndexBuffer();
 
 public:
   /**

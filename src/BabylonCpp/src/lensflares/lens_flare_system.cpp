@@ -67,15 +67,7 @@ LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitter
     = std::make_shared<VertexBuffer>(engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
-  Uint32Array indices = {
-    0, //
-    1, //
-    2, //
-    0, //
-    2, //
-    3  //
-  };
-  _indexBuffer = engine->createIndexBuffer(indices);
+  _createIndexBuffer();
 
   // Effects
   IEffectCreationOptions effectCreationOptions;
@@ -92,6 +84,19 @@ LensFlareSystem::~LensFlareSystem() = default;
 void LensFlareSystem::addToScene(const LensFlareSystemPtr& lensFlareSystem)
 {
   _scene->lensFlareSystems.emplace_back(lensFlareSystem);
+}
+
+void LensFlareSystem::_createIndexBuffer()
+{
+  const Uint32Array indices = {
+    0, //
+    1, //
+    2, //
+    0, //
+    2, //
+    3  //
+  };
+  _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
 }
 
 bool LensFlareSystem::get_isEnabled() const
@@ -320,6 +325,15 @@ bool LensFlareSystem::render()
   engine->setDepthBuffer(true);
   engine->setAlphaMode(Constants::ALPHA_DISABLE);
   return true;
+}
+
+void LensFlareSystem::rebuild()
+{
+  _createIndexBuffer();
+
+  for (const auto& [key, vertexBuffer] : _vertexBuffers) {
+    vertexBuffer->_rebuild();
+  }
 }
 
 void LensFlareSystem::dispose()
