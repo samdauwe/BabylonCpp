@@ -11,7 +11,8 @@ namespace BABYLON {
 std::unique_ptr<Scene> SixDofDragBehavior::_virtualScene = nullptr;
 
 SixDofDragBehavior::SixDofDragBehavior()
-    : rotateDraggedObject{true}
+    : zDragFactor{3.f}
+    , rotateDraggedObject{true}
     , dragging{false}
     , dragDeltaRatio{0.2f}
     , currentDraggingPointerID{-1}
@@ -26,7 +27,6 @@ SixDofDragBehavior::SixDofDragBehavior()
     , _moving{false}
     , _attachedToElement{false}
     , _pointerCamera{this, &SixDofDragBehavior::get__pointerCamera}
-    , zDragFactor{3.f}
 {
 }
 
@@ -61,7 +61,6 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode,
     options.isVirtual                 = true;
     SixDofDragBehavior::_virtualScene = Scene::New(_scene->getEngine(), options);
     SixDofDragBehavior::_virtualScene->detachControl();
-    _scene->getEngine()->scenes.pop_back();
   }
 
   AbstractMeshPtr pickedMesh = nullptr;

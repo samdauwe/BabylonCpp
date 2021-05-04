@@ -64,6 +64,13 @@ protected:
 
 public:
   /**
+   * How much faster the object should move when the controller is moving
+   * towards it. This is useful to bring objects that are far away from the user to them faster. Set
+   * this to 0 to avoid any speed increase. (Default: 3)
+   */
+  float zDragFactor;
+
+  /**
    * If the object should rotate to face the drag origin
    */
   bool rotateDraggedObject;
@@ -123,13 +130,6 @@ private:
    * instead of active camera
    */
   ReadOnlyProperty<SixDofDragBehavior, CameraPtr> _pointerCamera;
-
-  /**
-   * How much faster the object should move when the controller is moving
-   * towards it. This is useful to bring objects that are far away from the user to them faster. Set
-   * this to 0 to avoid any speed increase. (Default: 3)
-   */
-  float zDragFactor;
 
 }; // end of class SixDofDragBehavior
 
