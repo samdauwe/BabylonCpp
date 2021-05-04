@@ -38,6 +38,9 @@ SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition, const V
     , projectionTextureUpDirection{this, &SpotLight::get_projectionTextureUpDirection,
                                    &SpotLight::set_projectionTextureUpDirection}
     , projectionTexture{this, &SpotLight::get_projectionTexture, &SpotLight::set_projectionTexture}
+    , projectionTextureProjectionLightMatrix{this,
+                                             &SpotLight::get_projectionTextureProjectionLightMatrix,
+                                             &SpotLight::set_projectionTextureProjectionLightMatrix}
     , _projectionTextureLightNear{1e-6f}
     , _projectionTextureLightFar{1000.f}
     , _projectionTextureUpDirection{Vector3::Up()}
@@ -187,6 +190,18 @@ bool SpotLight::_IsProceduralTexture(const BaseTexturePtr& texture)
 bool SpotLight::_IsTexture(const BaseTexturePtr& texture)
 {
   return std::static_pointer_cast<Texture>(texture) != nullptr;
+}
+
+Matrix& SpotLight::get_projectionTextureProjectionLightMatrix()
+{
+  return _projectionTextureProjectionLightMatrix;
+}
+
+void SpotLight::set_projectionTextureProjectionLightMatrix(const Matrix& projection)
+{
+  _projectionTextureProjectionLightMatrix = projection;
+  _projectionTextureProjectionLightDirty  = false;
+  _projectionTextureDirty                 = true;
 }
 
 void SpotLight::_setDirection(const Vector3& value)

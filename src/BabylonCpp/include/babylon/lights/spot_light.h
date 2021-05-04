@@ -178,6 +178,16 @@ protected:
   void set_projectionTexture(const BaseTexturePtr& value);
 
   /**
+   * @brief Gets the light projection matrix as used by the projection texture.
+   */
+  Matrix& get_projectionTextureProjectionLightMatrix();
+
+  /**
+   * @brief Sets the light projection matrix as used by the projection texture.
+   */
+  void set_projectionTextureProjectionLightMatrix(const Matrix& projection);
+
+  /**
    * @brief Overrides the direction setter to recompute the projection texture view light Matrix.
    */
   void _setDirection(const Vector3& value) override;
@@ -256,6 +266,11 @@ public:
    * The projection texture of the light
    */
   Property<SpotLight, BaseTexturePtr> projectionTexture;
+
+  /**
+   * Gets or sets the light projection matrix as used by the projection texture
+   */
+  Property<SpotLight, Matrix> projectionTextureProjectionLightMatrix;
 
 protected:
   float _projectionTextureLightNear;
