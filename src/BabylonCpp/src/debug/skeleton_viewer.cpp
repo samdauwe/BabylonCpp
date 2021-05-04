@@ -263,7 +263,7 @@ SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshP
     , renderingGroupId{iRenderingGroupId}
     , isEnabled{this, &SkeletonViewer::get_isEnabled, &SkeletonViewer::set_isEnabled}
     , _debugMesh{nullptr}
-    , _isEnabled{false}
+    , _isEnabled{true}
     , _obs{nullptr}
     , _utilityLayer{nullptr}
 {
