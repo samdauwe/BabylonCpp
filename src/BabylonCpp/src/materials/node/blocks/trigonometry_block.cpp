@@ -138,8 +138,9 @@ void TrigonometryBlock::_deserialize(const json& /*serializationObject*/, Scene*
 std::string TrigonometryBlock::_dumpPropertiesCode()
 {
   const auto codeString
-    = StringTools::printf("%s.operation = static_cast<TrigonometryBlockOperations>(%d);\r\n",
-                          _codeVariableName.c_str(), operation);
+    = NodeMaterialBlock::_dumpPropertiesCode()
+      + StringTools::printf("%s.operation = static_cast<TrigonometryBlockOperations>(%d);\r\n",
+                            _codeVariableName.c_str(), operation);
   return codeString;
 }
 
