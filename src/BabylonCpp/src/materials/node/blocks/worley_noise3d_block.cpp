@@ -221,8 +221,9 @@ WorleyNoise3DBlock& WorleyNoise3DBlock::_buildBlock(NodeMaterialBuildState& stat
 
 std::string WorleyNoise3DBlock::_dumpPropertiesCode()
 {
-  auto codeString = StringTools::printf("%s.manhattanDistance = %d;\r\n", _codeVariableName.c_str(),
-                                        manhattanDistance);
+  auto codeString = NodeMaterialBlock::_dumpPropertiesCode()
+                    + StringTools::printf("%s.manhattanDistance = %d;\r\n",
+                                          _codeVariableName.c_str(), manhattanDistance);
 
   return codeString;
 }
