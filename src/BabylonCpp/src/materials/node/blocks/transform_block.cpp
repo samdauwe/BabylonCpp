@@ -26,7 +26,7 @@ TransformBlock::TransformBlock(const std::string& iName)
   registerOutput("xyz", NodeMaterialBlockConnectionPointTypes::Vector3);
 
   _inputs[0]->onConnectionObservable.add(
-    [this](NodeMaterialConnectionPoint* other, EventState & /*es*/) -> void {
+    [this](NodeMaterialConnectionPoint* other, EventState& /*es*/) -> void {
       if (other && other->ownerBlock()->isInput()) {
         const auto otherAsInput = std::static_pointer_cast<InputBlock>(other->ownerBlock());
 
@@ -177,7 +177,8 @@ void TransformBlock::_deserialize(const json& /*serializationObject*/, Scene* /*
 std::string TransformBlock::_dumpPropertiesCode()
 {
   auto codeString
-    = StringTools::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
+    = NodeMaterialBlock::_dumpPropertiesCode()
+      + StringTools::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
 
   codeString
     += StringTools::printf("%s.complementW = %f;\r\n", _codeVariableName.c_str(), complementW);
