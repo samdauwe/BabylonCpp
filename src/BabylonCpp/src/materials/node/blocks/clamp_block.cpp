@@ -54,7 +54,9 @@ ClampBlock& ClampBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string ClampBlock::_dumpPropertiesCode()
 {
-  auto codeString = StringTools::printf("%s.minimum = %f;\r\n", _codeVariableName.c_str(), minimum);
+  auto codeString
+    = NodeMaterialBlock::_dumpPropertiesCode()
+      + StringTools::printf("%s.minimum = %f;\r\n", _codeVariableName.c_str(), minimum);
 
   codeString += StringTools::printf("%s.maximum = %f;\r\n", _codeVariableName.c_str(), maximum);
 
