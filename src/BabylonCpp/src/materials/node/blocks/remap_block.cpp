@@ -94,8 +94,9 @@ RemapBlock& RemapBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string RemapBlock::_dumpPropertiesCode()
 {
-  auto codeString = StringTools::printf("%s.sourceRange = Vector2(%f, %f);\r\n",
-                                        _codeVariableName.c_str(), sourceRange.x, sourceRange.y);
+  auto codeString = NodeMaterialBlock::_dumpPropertiesCode()
+                    + StringTools::printf("%s.sourceRange = Vector2(%f, %f);\r\n",
+                                          _codeVariableName.c_str(), sourceRange.x, sourceRange.y);
 
   codeString += StringTools::printf("%s.targetRange = Vector2(%f, %f);\r\n",
                                     _codeVariableName.c_str(), targetRange.x, targetRange.y);
