@@ -200,9 +200,11 @@ std::string ConditionalBlock::_dumpPropertiesCode()
     return conditionAsString;
   };
 
-  const auto codeString = StringTools::printf(
-    "%s.operation = ConditionalBlockConditions::%s;\r\n", _codeVariableName.c_str(),
-    conditionalBlockConditionsEnumToString(condition).c_str());
+  const auto codeString
+    = NodeMaterialBlock::_dumpPropertiesCode()
+      + StringTools::printf("%s.operation = ConditionalBlockConditions::%s;\r\n",
+                            _codeVariableName.c_str(),
+                            conditionalBlockConditionsEnumToString(condition).c_str());
   return codeString;
 }
 
