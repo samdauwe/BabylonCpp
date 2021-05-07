@@ -69,13 +69,13 @@ NormalBlendBlock& NormalBlendBlock::_buildBlock(NodeMaterialBuildState& state)
                                                  input0->associatedVariableName().c_str());
   state.compilationString += _declareOutput(iOutput, state) + ";\r\n";
   state.compilationString += StringTools::printf(
-    "%s.r = (1.0 - %s) * %s.r * %s.r * 2.0 + %s * (1.0 - %s.r) * (1.0 - %s.r) * 2.0;\r\n",
+    "%s.r = (1.0 - %s) * %s.r * %s.r * 2.0 + %s * (1.0 - (1.0 - %s.r) * (1.0 - %s.r) * 2.0);\r\n",
     iOutput->associatedVariableName().c_str(), stepR.c_str(),
     input0->associatedVariableName().c_str(), input1->associatedVariableName().c_str(),
     stepR.c_str(), input0->associatedVariableName().c_str(),
     input1->associatedVariableName().c_str());
   state.compilationString += StringTools::printf(
-    "%s.g = (1.0 - %s) * %s.g * %s.g * 2.0 + %s * (1.0 - %s.g) * (1.0 - %s.g) * 2.0;\r\n",
+    "%s.g = (1.0 - %s) * %s.g * %s.g * 2.0 + %s * (1.0 - (1.0 - %s.g) * (1.0 - %s.g) * 2.0);\r\n",
     iOutput->associatedVariableName().c_str(), stepG.c_str(),
     input0->associatedVariableName().c_str(), input1->associatedVariableName().c_str(),
     stepG.c_str(), input0->associatedVariableName().c_str(),

@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_NORMAL_BLEND_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class NormalBlendBlock;
-using NormalBlendBlockPtr = std::shared_ptr<NormalBlendBlock>;
+FWD_CLASS_SPTR(NormalBlendBlock)
 
 /**
  * @brief Block used to blend normals.
