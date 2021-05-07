@@ -172,10 +172,9 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
     EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
     emitFunctionFromIncludeOptions.replaceStrings
       = {{"vBumpInfos.y", replaceForBumpInfos},
-         {"vTangentSpaceParams", _tangentSpaceParameterName},
          {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
          {"varying vec2 vBumpUV;", ""},
-         {R"(uniform sampler2D bumpSampler;[\s\S]*?\})", ""}};
+         {R"(uniform sampler2D bumpSampler)", ""}};
     state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
                                    emitFunctionFromIncludeOptions);
   }
@@ -183,9 +182,10 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
   emitCodeFromIncludeOptions.replaceStrings
-    = {{"perturbNormal\\(TBN,vBumpUV\\+uvOffset\\)",
-        StringTools::printf("perturbNormal(TBN, %s)",
+    = {{"perturbNormal\\(TBN,texture2D\\(bumpSampler,vBumpUV\\+uvOffset\\).xyz,vBumpInfos.y\\)",
+        StringTools::printf("perturbNormal(TBN, %s, vBumpInfos.y)",
                             normalMapColor()->associatedVariableName().c_str())},
+       {"vTangentSpaceParams", _tangentSpaceParameterName},
        {"vBumpInfos.y", replaceForBumpInfos},
        {"vBumpUV", _uv->associatedVariableName()},
        {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
@@ -202,8 +202,9 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 
 std::string PerturbNormalBlock::_dumpPropertiesCode()
 {
-  auto codeString = StringTools::printf("%s.invertX = %s;\r\n", _codeVariableName.c_str(),
-                                        invertX ? "true" : "false");
+  auto codeString = NodeMaterialBlock::_dumpPropertiesCode()
+                    + StringTools::printf("%s.invertX = %s;\r\n", _codeVariableName.c_str(),
+                                          invertX ? "true" : "false");
 
   codeString += StringTools::printf("%s.invertY = %s;\r\n", _codeVariableName.c_str(),
                                     invertY ? "true" : "false");
