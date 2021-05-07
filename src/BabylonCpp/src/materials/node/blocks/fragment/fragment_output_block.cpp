@@ -118,7 +118,7 @@ FragmentOutputBlock& FragmentOutputBlock::_buildBlock(NodeMaterialBuildState& st
 
 std::string FragmentOutputBlock::_dumpPropertiesCode()
 {
-  std::string codeString = "";
+  std::string codeString = NodeMaterialBlock::_dumpPropertiesCode();
   codeString += StringTools::printf("%s.convertToGammaSpace = %s;\r\n", _codeVariableName.c_str(),
                                     convertToGammaSpace ? "true" : "false");
   codeString += StringTools::printf("%s.convertToLinearSpace = %s;\r\n", _codeVariableName.c_str(),
