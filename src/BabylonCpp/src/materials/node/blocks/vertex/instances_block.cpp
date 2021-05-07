@@ -181,10 +181,10 @@ InstancesBlock& InstancesBlock::_buildBlock(NodeMaterialBuildState& state)
     world()->associatedVariableName().c_str(), output()->associatedVariableName().c_str());
   state.compilationString += "#endif\r\n";
   if (engine->_caps.canUseGLInstanceID) {
-    state.compilationString += _declareOutput(instanceID, state) + " = 0.0;\r\n";
+    state.compilationString += _declareOutput(iInstanceID, state) + " = float(gl_InstanceID);\r\n";
   }
   else {
-    state.compilationString += _declareOutput(iInstanceID, state) + " = float(gl_InstanceID);\r\n";
+    state.compilationString += _declareOutput(iInstanceID, state) + " = 0.0;\r\n";
   }
   state.compilationString += "#else\r\n";
   state.compilationString
