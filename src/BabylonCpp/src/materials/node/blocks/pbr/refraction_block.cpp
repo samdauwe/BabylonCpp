@@ -23,9 +23,11 @@ RefractionBlock::RefractionBlock(const std::string& iName)
     , indexOfRefractionConnectionPoint{nullptr}
     , linkRefractionWithTransparency{false}
     , invertRefractionY{false}
+    , useThicknessAsDepth{false}
     , texture{nullptr}
     , intensity{this, &RefractionBlock::get_intensity}
     , tintAtDistance{this, &RefractionBlock::get_tintAtDistance}
+    , volumeIndexOfRefraction{this, &RefractionBlock::get_volumeIndexOfRefraction}
     , view{this, &RefractionBlock::get_view}
     , refraction{this, &RefractionBlock::get_refraction}
     , hasTexture{this, &RefractionBlock::get_hasTexture}
@@ -42,6 +44,9 @@ void RefractionBlock::RegisterConnections(const RefractionBlockPtr& refractionBl
                                  NodeMaterialBlockTargets::Fragment);
   refractionBlock->registerInput("tintAtDistance", NodeMaterialBlockConnectionPointTypes::Float,
                                  true, NodeMaterialBlockTargets::Fragment);
+  refractionBlock->registerInput("volumeIndexOfRefraction",
+                                 NodeMaterialBlockConnectionPointTypes::Float, true,
+                                 NodeMaterialBlockTargets::Fragment);
 
   refractionBlock->registerOutput(
     "refraction", NodeMaterialBlockConnectionPointTypes::Object, NodeMaterialBlockTargets::Fragment,
@@ -70,6 +75,11 @@ NodeMaterialConnectionPointPtr& RefractionBlock::get_intensity()
 NodeMaterialConnectionPointPtr& RefractionBlock::get_tintAtDistance()
 {
   return _inputs[1];
+}
+
+NodeMaterialConnectionPointPtr& RefractionBlock::get_volumeIndexOfRefraction()
+{
+  return _inputs[2];
 }
 
 NodeMaterialConnectionPointPtr& RefractionBlock::get_view()
@@ -147,6 +157,7 @@ void RefractionBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   defines.setValue("SS_RGBDREFRACTION", refractionTexture->isRGBD(), true);
   defines.setValue("SS_USE_LOCAL_REFRACTIONMAP_CUBIC",
                    refractionTexture->boundingBoxSize() ? true : false, true);
+  defines.setValue("SS_USE_THICKNESS_AS_DEPTH", useThicknessAsDepth, true);
 }
 
 bool RefractionBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
@@ -188,18 +199,22 @@ void RefractionBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, 
     }*/
   }
 
-  auto iIndexOfRefraction = 1.f;
-  (indexOfRefractionConnectionPoint && indexOfRefractionConnectionPoint->connectInputBlock()
-   && indexOfRefractionConnectionPoint->connectInputBlock()->value()) ?
-    indexOfRefractionConnectionPoint->connectInputBlock()->value()->get<float>() :
-    1.5f;
+  auto iIndexOfRefraction
+    = (volumeIndexOfRefraction() && volumeIndexOfRefraction()->connectInputBlock()
+       && volumeIndexOfRefraction()->connectInputBlock()->value()) ?
+        volumeIndexOfRefraction()->connectInputBlock()->value()->get<float>() :
+        ((indexOfRefractionConnectionPoint && indexOfRefractionConnectionPoint->connectInputBlock()
+          && indexOfRefractionConnectionPoint->connectInputBlock()->value()) ?
+           indexOfRefractionConnectionPoint->connectInputBlock()->value()->get<float>() :
+           1.5f);
 
   effect->setFloat4(_vRefractionInfosName, refractionTexture->level, 1.f / iIndexOfRefraction,
                     depth, invertRefractionY ? -1.f : 1.f);
 
-  effect->setFloat3(
-    _vRefractionMicrosurfaceInfosName, static_cast<float>(refractionTexture->getSize().width),
-    refractionTexture->lodGenerationScale(), refractionTexture->lodGenerationOffset());
+  effect->setFloat4(_vRefractionMicrosurfaceInfosName,
+                    static_cast<float>(refractionTexture->getSize().width),
+                    refractionTexture->lodGenerationScale(),
+                    refractionTexture->lodGenerationOffset(), 1.f / iIndexOfRefraction);
 
   const auto width = static_cast<float>(refractionTexture->getSize().width);
 
@@ -277,7 +292,7 @@ std::string RefractionBlock::getCode(NodeMaterialBuildState& state)
 
   _vRefractionMicrosurfaceInfosName = state._getFreeVariableName("vRefractionMicrosurfaceInfos");
 
-  state._emitUniformFromString(_vRefractionMicrosurfaceInfosName, "vec3");
+  state._emitUniformFromString(_vRefractionMicrosurfaceInfosName, "vec4");
 
   _vRefractionInfosName = state._getFreeVariableName("vRefractionInfos");
 
@@ -322,6 +337,8 @@ std::string RefractionBlock::_dumpPropertiesCode()
                            linkRefractionWithTransparency ? "true" : "false");
   codeString += StringTools::printf("%s.invertRefractionY = %s;\r\n", _codeVariableName.c_str(),
                                     invertRefractionY ? "true" : "false");
+  codeString += StringTools::printf("$%s.useThicknessAsDepth = %s;\r\n", _codeVariableName.c_str(),
+                                    useThicknessAsDepth ? "true" : "false");
 
   return codeString;
 }

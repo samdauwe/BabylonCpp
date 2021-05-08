@@ -118,6 +118,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_tintAtDistance();
 
   /**
+   * @brief Gets the volume index of refraction input component.
+   */
+  NodeMaterialConnectionPointPtr& get_volumeIndexOfRefraction();
+
+  /**
    * @brief Gets the view input component.
    */
   NodeMaterialConnectionPointPtr& get_view();
@@ -198,6 +203,13 @@ public:
   bool invertRefractionY;
 
   /**
+   * Controls if refraction needs to be inverted on Y. This could be useful for procedural texture.
+   */
+  // @editableInPropertyPage("Use thickness as depth", PropertyTypeForEdition.Boolean, "ADVANCED", {
+  // "notifiers": { "update": true }})
+  bool useThicknessAsDepth;
+
+  /**
    * Gets or sets the texture associated with the node
    */
   BaseTexturePtr texture;
@@ -211,6 +223,11 @@ public:
    * Gets the tint at distance input component
    */
   ReadOnlyProperty<RefractionBlock, NodeMaterialConnectionPointPtr> tintAtDistance;
+
+  /**
+   * Gets the volume index of refraction input component
+   */
+  ReadOnlyProperty<RefractionBlock, NodeMaterialConnectionPointPtr> volumeIndexOfRefraction;
 
   /**
    * Gets the view input component
