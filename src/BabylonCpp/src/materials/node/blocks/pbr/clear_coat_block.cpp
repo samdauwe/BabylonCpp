@@ -390,7 +390,7 @@ ClearCoatBlock& ClearCoatBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string ClearCoatBlock::_dumpPropertiesCode()
 {
-  std::string codeString;
+  std::string codeString = NodeMaterialBlock::_dumpPropertiesCode();
 
   codeString
     += StringTools::printf("%s.remapF0OnInterfaceChange = %s;\r\n", _codeVariableName.c_str(),
