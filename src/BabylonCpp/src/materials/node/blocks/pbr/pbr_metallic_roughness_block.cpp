@@ -8,6 +8,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/fragment/perturb_normal_block.h>
@@ -561,6 +562,10 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
     defines.setValue("ENVIRONMENTBRDF_RGBD", false);
   }
 
+  if (defines._areImageProcessingDirty && nodeMaterial->imageProcessingConfiguration()) {
+    nodeMaterial->imageProcessingConfiguration()->prepareDefines(defines);
+  }
+
   if (!defines._areLightsDirty) {
     return;
   }
@@ -610,13 +615,17 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
   }
 }
 
-bool PBRMetallicRoughnessBlock::isReady(AbstractMesh* /*mesh*/,
-                                        const NodeMaterialPtr& /*nodeMaterial*/,
-                                        const NodeMaterialDefines& /*defines*/,
-                                        bool /*useInstances*/)
+bool PBRMetallicRoughnessBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& nodeMaterial,
+                                        const NodeMaterialDefines& defines, bool /*useInstances*/)
 {
   if (_environmentBRDFTexture && !_environmentBRDFTexture->isReady()) {
     return false;
+  }
+
+  if (defines._areImageProcessingDirty && nodeMaterial->imageProcessingConfiguration()) {
+    if (!nodeMaterial->imageProcessingConfiguration()->isReady()) {
+      return false;
+    }
   }
 
   return true;
@@ -674,6 +683,10 @@ void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& node
   const auto metallicF90 = _metallicF0Factor;
 
   effect->setColor4(_vMetallicReflectanceFactorsName, TmpVectors::Color3Array[0], metallicF90);
+
+  if (nodeMaterial->imageProcessingConfiguration()) {
+    nodeMaterial->imageProcessingConfiguration()->bind(effect);
+  }
 }
 
 void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
@@ -902,6 +915,18 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
                        "defined(LODBASEDMICROSFURACE)");
   state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
 
+  // Image processing uniforms
+  state.uniforms.emplace_back("exposureLinear");
+  state.uniforms.emplace_back("contrast");
+  state.uniforms.emplace_back("vInverseScreenSize");
+  state.uniforms.emplace_back("vignetteSettings1");
+  state.uniforms.emplace_back("vignetteSettings2");
+  state.uniforms.emplace_back("vCameraColorCurveNegative");
+  state.uniforms.emplace_back("vCameraColorCurveNeutral");
+  state.uniforms.emplace_back("vCameraColorCurvePositive");
+  state.uniforms.emplace_back("txColorTransform");
+  state.uniforms.emplace_back("colorTransformSettings");
+
   //
   // Includes
   //
@@ -923,6 +948,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state._emitFunctionFromInclude("helperFunctions", iComments);
   state._emitFunctionFromInclude("importanceSampling", iComments);
   state._emitFunctionFromInclude("pbrHelperFunctions", iComments);
+  state._emitFunctionFromInclude("imageProcessingDeclaration", iComments);
   state._emitFunctionFromInclude("imageProcessingFunctions", iComments);
 
   EmitFunctionFromIncludeOptions functionOptions, functionOptionsRefl;
@@ -1304,7 +1330,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
 
 std::string PBRMetallicRoughnessBlock::_dumpPropertiesCode()
 {
-  std::string codeString;
+  std::string codeString = NodeMaterialBlock::_dumpPropertiesCode();
 
   codeString
     += StringTools::printf("%s.lightFalloff = %u;\r\n", _codeVariableName.c_str(), lightFalloff);
