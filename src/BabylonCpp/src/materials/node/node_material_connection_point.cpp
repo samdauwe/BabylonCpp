@@ -340,7 +340,8 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
     }
 
     for (const auto& output : otherBlock->outputs()) {
-      if (output->isConnectedInVertexShader()) {
+      if (output->ownerBlock()->target() != NodeMaterialBlockTargets::Neutral
+          && output->isConnectedInVertexShader()) {
         return NodeMaterialConnectionPointCompatibilityStates::TargetIncompatible;
       }
     }
@@ -358,7 +359,7 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
          && stl_util::contains(connectionPoint.acceptedConnectionPointTypes, type))
         || (connectionPoint._acceptedConnectionPointType
             && NodeMaterialConnectionPoint::AreEquivalentTypes(
-                 connectionPoint._acceptedConnectionPointType->type, type))) {
+              connectionPoint._acceptedConnectionPointType->type, type))) {
       return NodeMaterialConnectionPointCompatibilityStates::Compatible;
     }
     else {
