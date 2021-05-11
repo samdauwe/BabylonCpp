@@ -532,9 +532,11 @@ std::string NodeMaterialBlock::_outputRename(const std::string& iName)
 std::string NodeMaterialBlock::_dumpPropertiesCode()
 {
   const auto& variableName = _codeVariableName;
-  return StringTools::printf("%s.visibleInInspector = %s;\r\n %s.visibleOnFrame = %s;\r\n",
-                             variableName.c_str(), visibleInInspector ? "true" : "false",
-                             variableName.c_str(), visibleOnFrame ? "true" : "false");
+  return StringTools::printf(
+    "%s.visibleInInspector = %s;\r\n%s.visibleOnFrame = %s;\r\n%s.target = "
+    "static_cast<NodeMaterialBlockTargets>(%d);\r\n",
+    variableName.c_str(), visibleInInspector ? "true" : "false", variableName.c_str(),
+    visibleOnFrame ? "true" : "false", variableName.c_str(), static_cast<int>(target()));
 }
 
 std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
