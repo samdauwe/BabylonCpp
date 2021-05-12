@@ -4,6 +4,7 @@
 #include <bitset>
 #include <cstring>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <set>
