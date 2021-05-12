@@ -45,6 +45,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
@@ -526,6 +527,31 @@ void Scene::set_useRightHandedSystem(bool value)
 void Scene::setStepId(unsigned int newStepId)
 {
   _currentStepId = newStepId;
+}
+
+Vector4& Scene::bindEyePosition(Effect* effect, const std::string& variableName, bool isVector3)
+{
+  const auto eyePosition = _forcedViewPosition     ? *_forcedViewPosition :
+                           _mirroredCameraPosition ? *_mirroredCameraPosition :
+                           activeCamera()          ? activeCamera()->globalPosition :
+                                                     Vector3::Zero();
+
+  const auto invertNormal = (useRightHandedSystem() == (_mirroredCameraPosition != nullptr));
+
+  TmpVectors::Vector4Array[0].set(eyePosition.x, eyePosition.y, eyePosition.z,
+                                  invertNormal ? -1 : 1);
+
+  if (effect) {
+    if (isVector3) {
+      effect->setFloat3(variableName, TmpVectors::Vector4Array[0].x, TmpVectors::Vector4Array[0].y,
+                        TmpVectors::Vector4Array[0].z);
+    }
+    else {
+      effect->setVector4(variableName, TmpVectors::Vector4Array[0]);
+    }
+  }
+
+  return TmpVectors::Vector4Array[0];
 }
 
 unsigned int Scene::getStepId() const
@@ -1785,7 +1811,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
 
 void Scene::_onKeyDownEvent(KeyboardEvent&& /*evt*/)
 {
-  //auto type = KeyboardEventTypes::KEYDOWN;
+  // auto type = KeyboardEventTypes::KEYDOWN;
   if (onPreKeyboardObservable.hasObservers()) {
 #if 0
     KeyboardInfoPre pi(type, evt);
@@ -1813,7 +1839,7 @@ void Scene::_onKeyDownEvent(KeyboardEvent&& /*evt*/)
 
 void Scene::_onKeyUpEvent(KeyboardEvent&& /*evt*/)
 {
-  //auto type = KeyboardEventTypes::KEYUP;
+  // auto type = KeyboardEventTypes::KEYUP;
   if (onPreKeyboardObservable.hasObservers()) {
 #if 0
     KeyboardInfoPre pi(type, evt);

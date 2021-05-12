@@ -158,6 +158,17 @@ public:
    */
   ISceneComponentPtr _getComponent(const std::string& name) const;
 
+  /**
+   * @brief Bind the current view position to an effect.
+   * @param effect The effect to be bound
+   * @param scene The scene the eyes position is used from
+   * @param variableName name of the shader variable that will hold the eye position
+   * @param isVector3 true to indicates that variableName is a Vector3 and not a Vector4
+   * @return the computed eye position
+   */
+  Vector4& bindEyePosition(Effect* effect, const std::string& variableName = "vEyePosition",
+                           bool isVector3 = false);
+
   /** Properties **/
 
   /**
