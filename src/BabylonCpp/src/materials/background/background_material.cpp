@@ -1095,13 +1095,12 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
 
-    MaterialHelper::BindEyePosition(effect.get(), scene);
+    scene->bindEyePosition(effect.get());
   }
 
   if (mustRebind || !isFrozen()) {
     if (scene->lightsEnabled()) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights,
-                                 false);
+      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights);
     }
 
     // View
