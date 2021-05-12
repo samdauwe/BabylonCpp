@@ -312,7 +312,7 @@ int ImGuiAl::Log::Draw()
   snprintf( id, sizeof( id ), "console_%p", (void *)this );
   id[ sizeof( id ) - 1 ] = 0;
 
-  ImGui::BeginChild( id, ImVec2( 0, -ImGui::GetItemsLineHeightWithSpacing() ), false, ImGuiWindowFlags_HorizontalScrollbar );
+  ImGui::BeginChild( id, ImVec2( 0, -ImGui::GetTextLineHeightWithSpacing() ), false, ImGuiWindowFlags_HorizontalScrollbar );
   ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 4, 1 ) );
 
   struct Iterator
@@ -333,7 +333,7 @@ int ImGuiAl::Log::Draw()
 
   if ( m_ScrollToBottom )
   {
-    ImGui::SetScrollHere();
+    ImGui::SetScrollHereY();
     m_ScrollToBottom = false;
   }
 

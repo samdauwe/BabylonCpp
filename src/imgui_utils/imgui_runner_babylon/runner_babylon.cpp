@@ -77,10 +77,10 @@ void ImplProvideFullScreenDockSpace(const AppWindowParams& appWindowParams)
   ImGuiViewport* viewport = ImGui::GetMainViewport();
   ImGui::SetNextWindowPos(viewport->Pos);
   ImGui::SetNextWindowSize(viewport->Size);
-  ImGui::SetNextWindowViewport(viewport->ID);
+  // ImGui::SetNextWindowPos(viewport->ID);
   ImGui::SetNextWindowBgAlpha(0.0f);
 
-  ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+  ImGuiWindowFlags window_flags = 0; //ImGuiWindowFlags_NoDocking;
   window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
                   | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
   window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
@@ -94,10 +94,12 @@ void ImplProvideFullScreenDockSpace(const AppWindowParams& appWindowParams)
   ImGui::Begin(appWindowParams.Title.c_str(), &p_open, window_flags);
   ImGui::PopStyleVar(3);
 
+#if 0
   ImGuiID dockspace_id = MainDockSpaceId();
   ImGuiDockNodeFlags dockspace_flags
     = ImGuiDockNodeFlags_PassthruCentralNode; // ImGuiDockNodeFlags_PassthruDockspace;
   ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+#endif
 }
 
 bool gWasDockLayoutDone = false;
@@ -151,7 +153,7 @@ void RunnerBabylon::DoInit()
 
   std::function<void(void)> postInit = [this]() {
     if (mAppWindowParams.DefaultWindowType == DefaultWindowTypeOption::ProvideFullScreenDockSpace)
-      ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags | ImGuiConfigFlags_DockingEnable;
+      ImGui::GetIO().ConfigFlags = ImGui::GetIO().ConfigFlags /*| ImGuiConfigFlags_DockingEnable*/;
     mPostInitFunction();
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly
       = mAppWindowParams.ConfigWindowsMoveFromTitleBarOnly;

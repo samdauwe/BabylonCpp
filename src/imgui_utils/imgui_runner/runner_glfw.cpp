@@ -4,8 +4,8 @@
 #include "imgui_utils/imgui_runner/glad_callbacks.h"
 #include "imgui_utils/imgui_runner/runner_glfw.h"
 #include <GLFW/glfw3.h>
-#include <examples/imgui_impl_glfw.h>
-#include <examples/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -165,8 +165,10 @@ void RunnerGlfw::RenderDrawData_To_OpenGl()
 void RunnerGlfw::UpdateAndRenderAdditionalPlatformWindows()
 {
   GLFWwindow* backup_current_context = glfwGetCurrentContext();
+#if 0
   ImGui::UpdatePlatformWindows();
   ImGui::RenderPlatformWindowsDefault();
+#endif
   glfwMakeContextCurrent(backup_current_context);
 }
 

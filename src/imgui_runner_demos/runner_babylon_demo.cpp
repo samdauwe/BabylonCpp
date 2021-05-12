@@ -10,8 +10,9 @@
 #include <string>
 #include <vector>
 
-void MyCreateDockLayout(ImGuiID fullDockSpaceId)
+void MyCreateDockLayout(ImGuiID /*fullDockSpaceId*/)
 {
+#if 0
   ImGui::DockBuilderRemoveNode(fullDockSpaceId); // Clear out existing layout
   ImGui::DockBuilderAddNode(fullDockSpaceId);    // Add empty node
   ImGui::DockBuilderSetNodeSize(fullDockSpaceId, ImGui::GetIO().DisplaySize);
@@ -37,6 +38,7 @@ void MyCreateDockLayout(ImGuiID fullDockSpaceId)
   ImGui::DockBuilderDockWindow("Right", dock_id_right);
   ImGui::DockBuilderDockWindow("Bottom", dock_id_bottom);
   ImGui::DockBuilderFinish(fullDockSpaceId);
+#endif
 }
 
 bool DummyWindow(const char* title)

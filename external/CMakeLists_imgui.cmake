@@ -30,26 +30,26 @@ endif()
 set(imgui_dir ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE INTERNAL "imgui directory")
 file(GLOB imgui_sources ${imgui_dir}/*.h ${imgui_dir}/*.cpp)
 set(imgui_sources ${imgui_sources}
-  ${imgui_dir}/examples/imgui_impl_opengl3.h
-  ${imgui_dir}/examples/imgui_impl_opengl3.cpp
+  ${imgui_dir}/backends/imgui_impl_opengl3.h
+  ${imgui_dir}/backends/imgui_impl_opengl3.cpp
 )
 if (IMGUI_RUNNER_USE_SDL)
     set(imgui_sources ${imgui_sources}
-        ${imgui_dir}/examples/imgui_impl_sdl.h
-        ${imgui_dir}/examples/imgui_impl_sdl.cpp
+        ${imgui_dir}/backends/imgui_impl_sdl.h
+        ${imgui_dir}/backends/imgui_impl_sdl.cpp
      )
 endif()
 if (IMGUI_RUNNER_USE_GLFW)
     set(imgui_sources ${imgui_sources}
-        ${imgui_dir}/examples/imgui_impl_glfw.h
-        ${imgui_dir}/examples/imgui_impl_glfw.cpp
+        ${imgui_dir}/backends/imgui_impl_glfw.h
+        ${imgui_dir}/backends/imgui_impl_glfw.cpp
      )
 endif()
 # Add library
 source_group_by_path_all(${imgui_dir} ${imgui_sources})
 add_library(imgui ${imgui_sources})
 # Include dirs
-target_include_directories(imgui PUBLIC SYSTEM ${imgui_dir} ${imgui_dir}/examples)
+target_include_directories(imgui PUBLIC SYSTEM ${imgui_dir} ${imgui_dir}/backends)
 # Link
 target_link_libraries(imgui PUBLIC glad)
 if (UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
