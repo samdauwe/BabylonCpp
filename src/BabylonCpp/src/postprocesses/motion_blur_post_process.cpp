@@ -42,26 +42,28 @@ MotionBlurPostProcess::MotionBlurPostProcess(
     , _motionBlurSamples{32}
     , _isObjectBased{true}
     , _forceGeometryBuffer{false}
-    , _geometryBufferRenderer{nullptr}
-    , _prePassRenderer{nullptr}
+    , _geometryBufferRenderer{this, &MotionBlurPostProcess::get__geometryBufferRenderer}
+    , _prePassRenderer{this, &MotionBlurPostProcess::get__prePassRenderer}
     , _invViewProjection{std::nullopt}
     , _previousViewProjection{std::nullopt}
+    , _nullGeometryBufferRenderer{nullptr}
+    , _nullPrePassRenderer{nullptr}
 {
   _forceGeometryBuffer = forceGeometryBuffer;
 
   // Set up assets
   if (_forceGeometryBuffer) {
-    _geometryBufferRenderer = scene->enableGeometryBufferRenderer();
+    scene->enableGeometryBufferRenderer();
 
-    if (_geometryBufferRenderer) {
-      _geometryBufferRenderer->enableVelocity = true;
+    if (_geometryBufferRenderer()) {
+      _geometryBufferRenderer()->enableVelocity = true;
     }
   }
   else {
-    _prePassRenderer = scene->enablePrePassRenderer();
+    scene->enablePrePassRenderer();
 
-    if (_prePassRenderer) {
-      _prePassRenderer->markAsDirty();
+    if (_prePassRenderer()) {
+      _prePassRenderer()->markAsDirty();
       _prePassEffectConfiguration = std::make_shared<MotionBlurConfiguration>();
     }
   }
@@ -74,6 +76,24 @@ MotionBlurPostProcess::~MotionBlurPostProcess() = default;
 std::string MotionBlurPostProcess::getClassName() const
 {
   return "MotionBlurPostProcess";
+}
+
+GeometryBufferRendererPtr& MotionBlurPostProcess::get__geometryBufferRenderer()
+{
+  if (!_forceGeometryBuffer) {
+    return _nullGeometryBufferRenderer;
+  }
+
+  return _scene->geometryBufferRenderer();
+}
+
+PrePassRendererPtr& MotionBlurPostProcess::get__prePassRenderer()
+{
+  if (_forceGeometryBuffer) {
+    return _nullPrePassRenderer;
+  }
+
+  return _scene->prePassRenderer();
 }
 
 unsigned int MotionBlurPostProcess::get_motionBlurSamples() const
@@ -106,11 +126,13 @@ void MotionBlurPostProcess::excludeSkinnedMesh(const AbstractMeshPtr& skinnedMes
 {
   if (skinnedMesh->skeleton()) {
     std::vector<AbstractMeshPtr>* list = nullptr;
-    if (_geometryBufferRenderer) {
-      list = &_geometryBufferRenderer->excludedSkinnedMeshesFromVelocity;
+    const auto geometryBufferRenderer  = _geometryBufferRenderer();
+    const auto prePassRenderer         = _prePassRenderer();
+    if (geometryBufferRenderer) {
+      list = &geometryBufferRenderer->excludedSkinnedMeshesFromVelocity;
     }
-    else if (_prePassRenderer) {
-      list = &_prePassRenderer->excludedSkinnedMesh;
+    else if (prePassRenderer) {
+      list = &prePassRenderer->excludedSkinnedMesh;
     }
     else {
       return;
@@ -123,11 +145,13 @@ void MotionBlurPostProcess::removeExcludedSkinnedMesh(const AbstractMeshPtr& ski
 {
   if (skinnedMesh->skeleton()) {
     std::vector<AbstractMeshPtr>* list = nullptr;
-    if (_geometryBufferRenderer) {
-      list = &_geometryBufferRenderer->excludedSkinnedMeshesFromVelocity;
+    const auto geometryBufferRenderer  = _geometryBufferRenderer();
+    const auto prePassRenderer         = _prePassRenderer();
+    if (geometryBufferRenderer) {
+      list = &geometryBufferRenderer->excludedSkinnedMeshesFromVelocity;
     }
-    else if (_prePassRenderer) {
-      list = &_prePassRenderer->excludedSkinnedMesh;
+    else if (prePassRenderer) {
+      list = &prePassRenderer->excludedSkinnedMesh;
     }
     else {
       return;
@@ -142,11 +166,12 @@ void MotionBlurPostProcess::removeExcludedSkinnedMesh(const AbstractMeshPtr& ski
 
 void MotionBlurPostProcess::dispose(Camera* camera)
 {
-  if (_geometryBufferRenderer) {
+  const auto geometryBufferRenderer = _geometryBufferRenderer();
+  if (geometryBufferRenderer) {
     // Clear previous transformation matrices dictionary used to compute objects velocities
-    _geometryBufferRenderer->_previousTransformationMatrices.clear();
-    _geometryBufferRenderer->_previousBonesTransformationMatrices.clear();
-    _geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.clear();
+    geometryBufferRenderer->_previousTransformationMatrices.clear();
+    geometryBufferRenderer->_previousBonesTransformationMatrices.clear();
+    geometryBufferRenderer->excludedSkinnedMeshesFromVelocity.clear();
   }
 
   PostProcess::dispose(camera);
@@ -154,7 +179,10 @@ void MotionBlurPostProcess::dispose(Camera* camera)
 
 void MotionBlurPostProcess::_applyMode()
 {
-  if (!_geometryBufferRenderer && !_prePassRenderer) {
+  const auto geometryBufferRenderer = _geometryBufferRenderer();
+  const auto prePassRenderer        = _prePassRenderer();
+
+  if (!geometryBufferRenderer && !prePassRenderer) {
     // We can't get a velocity or depth texture. So, work as a passthrough.
     BABYLON_LOG_WARN("MotionBlurPostProcess",
                      "Multiple Render Target support needed to compute object based motion blur");
@@ -167,7 +195,7 @@ void MotionBlurPostProcess::_applyMode()
   _previousViewProjection = std::nullopt;
 
   if (isObjectBased) {
-    if (_prePassRenderer && _prePassEffectConfiguration) {
+    if (prePassRenderer && _prePassEffectConfiguration) {
       if (_prePassEffectConfiguration->texturesRequired().empty()) {
         _prePassEffectConfiguration->texturesRequired().resize(1);
       }
@@ -180,7 +208,7 @@ void MotionBlurPostProcess::_applyMode()
     _invViewProjection      = Matrix::Identity();
     _previousViewProjection = Matrix::Identity();
 
-    if (_prePassRenderer && _prePassEffectConfiguration) {
+    if (prePassRenderer && _prePassEffectConfiguration) {
       if (_prePassEffectConfiguration->texturesRequired().empty()) {
         _prePassEffectConfiguration->texturesRequired().resize(1);
       }
@@ -198,23 +226,26 @@ void MotionBlurPostProcess::_onApplyObjectBased(Effect* effect)
   effect->setFloat("motionScale", _scene->getAnimationRatio());
   effect->setFloat("motionStrength", motionStrength);
 
-  if (_geometryBufferRenderer) {
+  const auto geometryBufferRenderer = _geometryBufferRenderer();
+  const auto prePassRenderer        = _prePassRenderer();
+
+  if (geometryBufferRenderer) {
     const auto velocityIndex
-      = _geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE);
+      = geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE);
     effect->setTexture("velocitySampler",
                        velocityIndex >= 0
                            && velocityIndex < static_cast<int>(
-                                _geometryBufferRenderer->getGBuffer()->textures().size()) ?
-                         _geometryBufferRenderer->getGBuffer()->textures()[velocityIndex] :
+                                geometryBufferRenderer->getGBuffer()->textures().size()) ?
+                         geometryBufferRenderer->getGBuffer()->textures()[velocityIndex] :
                          nullptr);
   }
-  else if (_prePassRenderer) {
-    const auto velocityIndex = _prePassRenderer->getIndex(Constants::PREPASS_VELOCITY_TEXTURE_TYPE);
+  else if (prePassRenderer) {
+    const auto velocityIndex = prePassRenderer->getIndex(Constants::PREPASS_VELOCITY_TEXTURE_TYPE);
     effect->setTexture("velocitySampler",
                        velocityIndex >= 0
                            && velocityIndex < static_cast<int>(
-                                _prePassRenderer->getRenderTarget()->textures().size()) ?
-                         _prePassRenderer->getRenderTarget()->textures()[velocityIndex] :
+                                prePassRenderer->getRenderTarget()->textures().size()) ?
+                         prePassRenderer->getRenderTarget()->textures()[velocityIndex] :
                          nullptr);
   }
 }
@@ -241,30 +272,33 @@ void MotionBlurPostProcess::_onApplyScreenBased(Effect* effect)
   effect->setFloat("motionScale", _scene->getAnimationRatio());
   effect->setFloat("motionStrength", motionStrength);
 
-  if (_geometryBufferRenderer) {
+  const auto geometryBufferRenderer = _geometryBufferRenderer();
+  const auto prePassRenderer        = _prePassRenderer();
+
+  if (geometryBufferRenderer) {
     const auto depthIndex
-      = _geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::DEPTH_TEXTURE_TYPE);
+      = geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::DEPTH_TEXTURE_TYPE);
     effect->setTexture("depthSampler",
                        depthIndex >= 0
                            && depthIndex < static_cast<int>(
-                                _geometryBufferRenderer->getGBuffer()->textures().size()) ?
-                         _geometryBufferRenderer->getGBuffer()->textures()[depthIndex] :
+                                geometryBufferRenderer->getGBuffer()->textures().size()) ?
+                         geometryBufferRenderer->getGBuffer()->textures()[depthIndex] :
                          nullptr);
   }
-  else if (_prePassRenderer) {
-    const auto depthIndex = _prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE);
+  else if (prePassRenderer) {
+    const auto depthIndex = prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE);
     effect->setTexture(
       "depthSampler",
       depthIndex >= 0
-          && depthIndex < static_cast<int>(_prePassRenderer->getRenderTarget()->textures().size()) ?
-        _prePassRenderer->getRenderTarget()->textures()[depthIndex] :
+          && depthIndex < static_cast<int>(prePassRenderer->getRenderTarget()->textures().size()) ?
+        prePassRenderer->getRenderTarget()->textures()[depthIndex] :
         nullptr);
   }
 }
 
 void MotionBlurPostProcess::_updateEffect()
 {
-  if (_geometryBufferRenderer || _prePassRenderer) {
+  if (_geometryBufferRenderer() || _prePassRenderer()) {
     const std::vector<std::string> defines = {
       "#define GEOMETRY_SUPPORTED",                                                    //
       StringTools::printf("#define SAMPLES %d", static_cast<int>(_motionBlurSamples)), //
