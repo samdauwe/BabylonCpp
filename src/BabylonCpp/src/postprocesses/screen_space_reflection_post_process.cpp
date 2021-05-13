@@ -43,11 +43,13 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
     , smoothSteps{this, &ScreenSpaceReflectionPostProcess::get_smoothSteps,
                   &ScreenSpaceReflectionPostProcess::set_smoothSteps}
     , _forceGeometryBuffer{false}
-    , _geometryBufferRenderer{nullptr}
-    , _prePassRenderer{nullptr}
+    , _geometryBufferRenderer{this, &ScreenSpaceReflectionPostProcess::get__geometryBufferRenderer}
+    , _prePassRenderer{this, &ScreenSpaceReflectionPostProcess::get__prePassRenderer}
     , _enableSmoothReflections{false}
     , _reflectionSamples{64}
     , _smoothSteps{5}
+    , _nullGeometryBufferRenderer{nullptr}
+    , _nullPrePassRenderer{nullptr}
 {
   _forceGeometryBuffer = forceGeometryBuffer;
 
@@ -58,13 +60,14 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
       if (geometryBufferRenderer->isSupported()) {
         geometryBufferRenderer->enablePosition     = true;
         geometryBufferRenderer->enableReflectivity = true;
-        _geometryBufferRenderer                    = geometryBufferRenderer;
       }
     }
   }
   else {
-    _prePassRenderer = scene->enablePrePassRenderer();
-    _prePassRenderer->markAsDirty();
+    const auto prePassRenderer = scene->enablePrePassRenderer();
+    if (prePassRenderer) {
+      prePassRenderer->markAsDirty();
+    }
     _prePassEffectConfiguration = std::make_shared<ScreenSpaceReflectionsConfiguration>();
   }
 
@@ -75,41 +78,44 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
     const auto& geometryBufferRenderer = _geometryBufferRenderer;
     const auto& prePassRenderer        = _prePassRenderer;
 
-    if (!prePassRenderer && !geometryBufferRenderer) {
+    if (!prePassRenderer() && !geometryBufferRenderer()) {
       return;
     }
 
-    if (geometryBufferRenderer) {
+    const auto iGeometryBufferRenderer = geometryBufferRenderer();
+    const auto iPrePassRenderer        = prePassRenderer();
+
+    if (iGeometryBufferRenderer) {
       // Samplers
       const auto positionIndex = static_cast<size_t>(
-        geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::POSITION_TEXTURE_TYPE));
-      const auto roughnessIndex = static_cast<size_t>(
-        geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE));
+        iGeometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::POSITION_TEXTURE_TYPE));
+      const auto roughnessIndex = static_cast<size_t>(iGeometryBufferRenderer->getTextureIndex(
+        GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE));
 
-      effect->setTexture("normalSampler", geometryBufferRenderer->getGBuffer()->textures()[1]);
+      effect->setTexture("normalSampler", iGeometryBufferRenderer->getGBuffer()->textures()[1]);
       effect->setTexture("positionSampler",
-                         geometryBufferRenderer->getGBuffer()->textures()[positionIndex]);
+                         iGeometryBufferRenderer->getGBuffer()->textures()[positionIndex]);
       effect->setTexture("reflectivitySampler",
-                         geometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
+                         iGeometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
     }
-    else {
+    else if (iPrePassRenderer) {
       // Samplers
       const auto positionIndex
-        = prePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
+        = iPrePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
       const auto roughnessIndex
-        = prePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
-      const auto normalIndex = prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
+        = iPrePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
+      const auto normalIndex = iPrePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
 
       effect->setTexture("normalSampler",
-                         prePassRenderer->getRenderTarget()->textures()[normalIndex]);
+                         iPrePassRenderer->getRenderTarget()->textures()[normalIndex]);
       effect->setTexture("positionSampler",
-                         prePassRenderer->getRenderTarget()->textures()[positionIndex]);
+                         iPrePassRenderer->getRenderTarget()->textures()[positionIndex]);
       effect->setTexture("reflectivitySampler",
-                         prePassRenderer->getRenderTarget()->textures()[roughnessIndex]);
+                         iPrePassRenderer->getRenderTarget()->textures()[roughnessIndex]);
     }
 
     // Uniforms
-    auto camera = scene->activeCamera();
+    const auto camera = scene->activeCamera();
     if (!camera) {
       return;
     }
@@ -132,6 +138,24 @@ ScreenSpaceReflectionPostProcess::~ScreenSpaceReflectionPostProcess() = default;
 std::string ScreenSpaceReflectionPostProcess::getClassName() const
 {
   return "ScreenSpaceReflectionPostProcess";
+}
+
+GeometryBufferRendererPtr& ScreenSpaceReflectionPostProcess::get__geometryBufferRenderer()
+{
+  if (!_forceGeometryBuffer) {
+    return _nullGeometryBufferRenderer;
+  }
+
+  return _scene->geometryBufferRenderer();
+}
+
+PrePassRendererPtr& ScreenSpaceReflectionPostProcess::get__prePassRenderer()
+{
+  if (_forceGeometryBuffer) {
+    return _nullPrePassRenderer;
+  }
+
+  return _scene->prePassRenderer();
 }
 
 bool ScreenSpaceReflectionPostProcess::get_enableSmoothReflections() const
@@ -182,7 +206,7 @@ void ScreenSpaceReflectionPostProcess::set_smoothSteps(unsigned int steps)
 void ScreenSpaceReflectionPostProcess::_updateEffectDefines()
 {
   std::vector<std::string> defines;
-  if (_geometryBufferRenderer || _prePassRenderer) {
+  if (_geometryBufferRenderer() || _prePassRenderer()) {
     defines.emplace_back("#define SSR_SUPPORTED");
   }
   if (_enableSmoothReflections) {
