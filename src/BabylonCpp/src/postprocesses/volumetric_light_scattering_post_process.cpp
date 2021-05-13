@@ -237,7 +237,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
     auto engine_ = scene_->getEngine();
 
     // Culling
-    engine_->setState(material->backFaceCulling());
+    engine_->setState(material->backFaceCulling(), 0.f, false, false, material->cullBackFaces());
 
     // Managing instances
     auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
@@ -267,7 +267,9 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
       const auto effect = drawWrapper->effect;
 
       engine_->enableEffect(drawWrapper);
-      renderingMesh->_bind(subMesh, effect, material->fillMode());
+      if (!hardwareInstancedRendering) {
+        renderingMesh->_bind(subMesh, effect, material->fillMode());
+      }
 
       if (renderingMesh == mesh) {
         material->bind(effectiveMesh->getWorldMatrix(), renderingMesh.get());
