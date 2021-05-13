@@ -75,43 +75,40 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
 
   // On apply, send uniforms
   onApply = [this, scene](Effect* effect, EventState&) -> void {
-    const auto& geometryBufferRenderer = _geometryBufferRenderer;
-    const auto& prePassRenderer        = _prePassRenderer;
+    const auto geometryBufferRenderer = _geometryBufferRenderer();
+    const auto prePassRenderer        = _prePassRenderer();
 
-    if (!prePassRenderer() && !geometryBufferRenderer()) {
+    if (!prePassRenderer && !geometryBufferRenderer) {
       return;
     }
 
-    const auto iGeometryBufferRenderer = geometryBufferRenderer();
-    const auto iPrePassRenderer        = prePassRenderer();
-
-    if (iGeometryBufferRenderer) {
+    if (geometryBufferRenderer) {
       // Samplers
       const auto positionIndex = static_cast<size_t>(
-        iGeometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::POSITION_TEXTURE_TYPE));
-      const auto roughnessIndex = static_cast<size_t>(iGeometryBufferRenderer->getTextureIndex(
-        GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE));
+        geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::POSITION_TEXTURE_TYPE));
+      const auto roughnessIndex = static_cast<size_t>(
+        geometryBufferRenderer->getTextureIndex(GeometryBufferRenderer::REFLECTIVITY_TEXTURE_TYPE));
 
-      effect->setTexture("normalSampler", iGeometryBufferRenderer->getGBuffer()->textures()[1]);
+      effect->setTexture("normalSampler", geometryBufferRenderer->getGBuffer()->textures()[1]);
       effect->setTexture("positionSampler",
-                         iGeometryBufferRenderer->getGBuffer()->textures()[positionIndex]);
+                         geometryBufferRenderer->getGBuffer()->textures()[positionIndex]);
       effect->setTexture("reflectivitySampler",
-                         iGeometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
+                         geometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
     }
-    else if (iPrePassRenderer) {
+    else if (prePassRenderer) {
       // Samplers
       const auto positionIndex
-        = iPrePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
+        = prePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
       const auto roughnessIndex
-        = iPrePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
-      const auto normalIndex = iPrePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
+        = prePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
+      const auto normalIndex = prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
 
       effect->setTexture("normalSampler",
-                         iPrePassRenderer->getRenderTarget()->textures()[normalIndex]);
+                         prePassRenderer->getRenderTarget()->textures()[normalIndex]);
       effect->setTexture("positionSampler",
-                         iPrePassRenderer->getRenderTarget()->textures()[positionIndex]);
+                         prePassRenderer->getRenderTarget()->textures()[positionIndex]);
       effect->setTexture("reflectivitySampler",
-                         iPrePassRenderer->getRenderTarget()->textures()[roughnessIndex]);
+                         prePassRenderer->getRenderTarget()->textures()[roughnessIndex]);
     }
 
     // Uniforms
