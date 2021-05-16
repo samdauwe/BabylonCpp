@@ -35,7 +35,7 @@ std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats = {
   },
   {
     Constants::PREPASS_VELOCITY_TEXTURE_TYPE, // type
-    Constants::TEXTURETYPE_HALF_FLOAT,        // format
+    Constants::TEXTURETYPE_UNSIGNED_INT,      // format
   },
   {
     Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE, // type
@@ -336,10 +336,10 @@ void PrePassRenderer::_renderPostProcesses(const PrePassRenderTargetPtr& prePass
 {
   const auto firstPP
     = !_postProcessesSourceForThisPass.empty() ? _postProcessesSourceForThisPass[0] : nullptr;
-  auto outputTexture = firstPP ? firstPP->inputTexture :
-                                 (prePassRenderTarget->renderTargetTexture ?
-                                    prePassRenderTarget->renderTargetTexture->getInternalTexture() :
-                                    nullptr);
+  auto outputTexture = firstPP ? firstPP->inputTexture() :
+                       prePassRenderTarget->renderTargetTexture ?
+                                 prePassRenderTarget->renderTargetTexture->getInternalTexture() :
+                                 nullptr;
 
   // Build post process chain for this prepass post draw
   auto& postProcessChain = _currentTarget->_beforeCompositionPostProcesses;
@@ -522,7 +522,7 @@ void PrePassRenderer::_setupOutputForThisPass(const PrePassRenderTargetPtr& preP
   const auto firstPrePassPP = !prePassRenderTarget->_beforeCompositionPostProcesses.empty() ?
                                 prePassRenderTarget->_beforeCompositionPostProcesses[0] :
                                 nullptr;
-  PostProcessPtr firstPP = nullptr;
+  PostProcessPtr firstPP    = nullptr;
 
   // Setting the scene-wide post process configuration
   _scene->imageProcessingConfiguration()->applyByPostProcess
@@ -613,6 +613,9 @@ void PrePassRenderer::markAsDirty()
 
 void PrePassRenderer::_enableTextures(const std::vector<unsigned int>& types)
 {
+  // For velocity : enable storage of previous matrices for instances
+  _scene->needsPreviousWorldMatrices = false;
+
   for (const auto& type : types) {
     if (_textureIndices[type] == -1) {
       _textureIndices[type] = static_cast<int>(_mrtLayout.size());
@@ -620,6 +623,10 @@ void PrePassRenderer::_enableTextures(const std::vector<unsigned int>& types)
 
       _mrtFormats.emplace_back(_textureFormats[type].format);
       ++mrtCount;
+    }
+
+    if (type == Constants::PREPASS_VELOCITY_TEXTURE_TYPE) {
+      _scene->needsPreviousWorldMatrices = true;
     }
   }
 }
