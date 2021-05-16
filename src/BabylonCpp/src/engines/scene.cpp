@@ -143,6 +143,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , fogStart{0.f}
     , fogEnd{1000.f}
     , prePass{this, &Scene::get_prePass}
+    , needsPreviousWorldMatrices{false}
     , shadowsEnabled{this, &Scene::get_shadowsEnabled, &Scene::set_shadowsEnabled}
     , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
     , _activeCamera{nullptr}

@@ -2961,6 +2961,11 @@ public:
    */
   ReadOnlyProperty<Scene, bool> prePass;
 
+  /**
+   * Flag indicating if we need to store previous matrices when rendering
+   */
+  bool needsPreviousWorldMatrices;
+
   // Lights
 
   /**
