@@ -61,6 +61,7 @@ def main():
     current, previous = "5.0.0-alpha.6", "4.2.0"
     current, previous = "5.0.0-alpha.12", "5.0.0-alpha.6"
     current, previous = "5.0.0-alpha.15", "5.0.0-alpha.12"
+    current, previous = "5.0.0-alpha.19", "5.0.0-alpha.15"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.1.0"          : "4.1.0_2020_02_27",
@@ -68,6 +69,7 @@ def main():
         "5.0.0-alpha.6"  : "5.0.0-alpha.6_2021_01_05",
         "5.0.0-alpha.12" : "5.0.0-alpha.12_2021_02_26",
         "5.0.0-alpha.15" : "5.0.0-alpha.15_2021_03_17",
+        "5.0.0-alpha.19" : "5.0.0-alpha.19_2021_04_27",
     }
     # List containing the files to ignore
     whiteList = [
@@ -108,8 +110,8 @@ def main():
         # Engines / Native
         "nativeShaderProcessor.ts", "nativeShaderProcessors.ts",
         # Engines / WebGPU
-        "webgpuBufferManager.ts", "webgpuCacheRenderPipeline.ts",
-        "webgpuCacheRenderPipelineString.ts",
+        "webgpuBufferManager.ts", "webgpuBundleList.ts",
+        "webgpuCacheRenderPipeline.ts", "webgpuCacheRenderPipelineString.ts",
         "webgpuCacheRenderPipelineTree.ts", "webgpuCacheBindGroups.ts",
         "webgpuCacheSampler.ts", "webgpuClearQuad.ts", "webgpuConstants.ts",
         "webgpuDepthCullingState.ts", "webgpuDrawContext.ts",
@@ -117,7 +119,8 @@ def main():
         "webgpuPipelineContext.ts", "webgpuRenderPassWrapper.ts",
         "webgpuShaderManager.ts", "webgpuShaderProcessingContext.ts",
         "webgpuShaderProcessors.ts", "webgpuStencilState.ts",
-        "webgpuTextureHelper.ts",
+        "webgpuStencilStateComposer.ts", "webgpuTextureHelper.ts",
+        "webgpuTimestampQuery.ts",
         # Helpers
         "videoDome.ts",
         # LibDeclarations
