@@ -18,12 +18,12 @@ struct BABYLON_SHARED_EXPORT PolygonOptions {
 }; //  end of struct PolygonOptions
 
 /**
- * @brief Represents a convex polygon. The vertices used to initialize a polygon
- * must be coplanar and form a convex loop.
+ * @brief Represents a convex polygon. The vertices used to initialize a polygon must be coplanar
+ * and form a convex loop.
  *
- * Each convex polygon has a `shared` property, which is shared between all
- * polygons that are clones of each other or were split from the same polygon.
- * This can be used to define per-polygon properties (such as surface color)
+ * Each convex polygon has a `shared` property, which is shared between all polygons that are clones
+ * of each other or were split from the same polygon. This can be used to define per-polygon
+ * properties (such as surface color)
  */
 class BABYLON_SHARED_EXPORT Polygon {
 
