@@ -11,8 +11,8 @@
 
 namespace BABYLON {
 
-class PointerDragBehavior;
 class ScaleGizmo;
+FWD_CLASS_SPTR(PointerDragBehavior)
 FWD_CLASS_SPTR(StandardMaterial)
 
 /**
@@ -70,7 +70,7 @@ public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
    */
-  std::unique_ptr<PointerDragBehavior> dragBehavior;
+  PointerDragBehaviorPtr dragBehavior;
 
   /**
    * Scale distance in babylon units that the gizmo will snap to when dragged (Default: 0)
@@ -92,6 +92,11 @@ public:
    * Custom sensitivity value for the drag strength
    */
   float sensitivity;
+
+  /**
+   * The magnitude of the drag strength (scaling factor)
+   */
+  float dragScale;
 
   /**
    * If the gizmo is enabled
