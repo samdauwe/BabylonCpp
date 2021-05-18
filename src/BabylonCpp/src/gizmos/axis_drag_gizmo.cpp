@@ -113,7 +113,7 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
   PointerDragBehaviorOptions options;
   options.dragAxis = dragAxis;
   // options.pointerObservableScene = gizmoLayer->originalScene;
-  dragBehavior               = std::make_unique<PointerDragBehavior>(options);
+  dragBehavior               = std::make_shared<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
   // _rootMesh->addBehavior(dragBehavior.get());
 
@@ -177,6 +177,7 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
+  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(collider.get()), _cache);
   }
@@ -191,11 +192,13 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
       _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
 
       if (!_parent) {
-        auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        const auto material = dragBehavior && dragBehavior->enabled ?
+                                (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
+                                _disableMaterial;
         for (const auto& m : _cache.gizmoMeshes) {
           m->material          = material;
           const auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
-          if (linesMesh) {
+          if (linesMesh && dragBehavior->enabled) {
             linesMesh->color = material->diffuseColor;
           }
         }

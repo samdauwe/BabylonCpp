@@ -13,6 +13,7 @@ namespace BABYLON {
 
 class PointerDragBehavior;
 class PositionGizmo;
+FWD_CLASS_SPTR(PointerDragBehavior)
 FWD_CLASS_SPTR(StandardMaterial)
 FWD_CLASS_SPTR(TransformNode)
 
@@ -69,7 +70,7 @@ public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
    */
-  std::unique_ptr<PointerDragBehavior> dragBehavior;
+  PointerDragBehaviorPtr dragBehavior;
 
   /**
    * Drag distance in babylon units that the gizmo will snap to when dragged (Default: 0)
