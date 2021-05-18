@@ -1,6 +1,7 @@
 #include <babylon/gizmos/gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
@@ -316,7 +317,10 @@ Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
               = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
             const auto isHovered
               = (pickedMesh && stl_util::index_of(cache.colliderMeshes, pickedMesh) != -1);
-            const auto material = isHovered || cache.active ? cache.hoverMaterial : cache.material;
+            const auto material
+              = cache.dragBehavior && cache.dragBehavior->enabled ?
+                  (isHovered || cache.active ? cache.hoverMaterial : cache.material) :
+                  cache.disableMaterial;
             for (const auto& m : cache.gizmoMeshes) {
               m->material         = material;
               const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
@@ -343,7 +347,9 @@ Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
             const auto isHovered
               = (pickedMesh && stl_util::index_of(cache.colliderMeshes, pickedMesh) != -1);
             const auto material
-              = isHovered || cache.active ? cache.hoverMaterial : cache.disableMaterial;
+              = ((isHovered || cache.active) && cache.dragBehavior && cache.dragBehavior->enabled) ?
+                  cache.hoverMaterial :
+                  cache.disableMaterial;
             for (const auto& m : cache.gizmoMeshes) {
               m->material         = material;
               const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
@@ -362,7 +368,8 @@ Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
           cache.active = false;
           dragging     = false;
           for (const auto& m : cache.gizmoMeshes) {
-            m->material         = cache.material;
+            m->material = cache.dragBehavior && cache.dragBehavior->enabled ? cache.material :
+                                                                              cache.disableMaterial;
             const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
             if (lineMesh /* && lineMesh->color */) {
               lineMesh->color = cache.material->diffuseColor;

@@ -18,6 +18,7 @@ class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(PointerDragBehavior)
 FWD_CLASS_SPTR(StandardMaterial)
 FWD_CLASS_SPTR(UtilityLayerRenderer)
 
@@ -38,6 +39,8 @@ struct BABYLON_SHARED_EXPORT GizmoAxisCache {
   StandardMaterialPtr disableMaterial = nullptr;
   /** Used to indicate Active state of the Gizmo */
   bool active = false;
+  /** DragBehavior */
+  PointerDragBehaviorPtr dragBehavior;
 }; // end of struct GizmoAxisCache
 
 /**
