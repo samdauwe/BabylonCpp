@@ -159,8 +159,8 @@ protected:
   void set_renderingGroupId(int renderingGroupId);
 
   /**
-   * @brief Create the merge effect. This is the shader use to blit the
-   * information back to the main canvas at the end of the scene rendering.
+   * @brief Create the merge effect. This is the shader use to blit the information back to the main
+   * canvas at the end of the scene rendering.
    * @returns The effect containing the shader used to merge the effect on the main canvas
    */
   virtual EffectPtr _createMergeEffect() = 0;
