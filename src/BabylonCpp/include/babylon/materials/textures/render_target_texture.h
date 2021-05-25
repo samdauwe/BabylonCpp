@@ -132,6 +132,12 @@ public:
   int getRenderLayers() const;
 
   /**
+   * @brief Don't allow this render target texture to rescale. Mainly used to prevent rescaling by
+   * the scene optimizer.
+   */
+  void disableRescaling();
+
+  /**
    * @brief Get if the texture can be rescaled or not.
    */
   bool canRescale() const;
@@ -525,6 +531,7 @@ private:
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
   int _faceIndex;
+  bool _canRescale;
   std::optional<Vector3> _boundingBoxSize;
   bool _defaultRenderListPrepared;
   InternalTexturePtr _nullInternalTexture;

@@ -64,6 +64,7 @@ RenderTargetTexture::RenderTargetTexture(
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _onClearObserver{nullptr}
+    , _canRescale{true}
     , _boundingBoxSize{std::nullopt}
     , _defaultRenderListPrepared{false}
     , _nullInternalTexture{nullptr}
@@ -403,9 +404,14 @@ int RenderTargetTexture::getRenderLayers() const
   return 0;
 }
 
+void RenderTargetTexture::disableRescaling()
+{
+  _canRescale = false;
+}
+
 bool RenderTargetTexture::canRescale() const
 {
-  return true;
+  return _canRescale;
 }
 
 void RenderTargetTexture::scale(float ratio)
@@ -726,90 +732,96 @@ void RenderTargetTexture::renderToTarget(unsigned int faceIndex, bool useCameraP
     onBeforeRenderObservable.notifyObservers(&_faceIndex);
   }
 
-  // Get the list of meshes to render
-  std::vector<AbstractMesh*> currentRenderList;
-  auto defaultRenderList = !renderList().empty() ? renderList() : scene->getActiveMeshes();
-  auto defaultRenderListLength
-    = !renderList().empty() ? renderList().size() : scene->getActiveMeshes().size();
+  const auto fastPath = engine->snapshotRendering()
+                        && engine->snapshotRenderingMode() == Constants::SNAPSHOTRENDERING_FAST;
 
-  if (getCustomRenderList) {
-    currentRenderList = getCustomRenderList(is2DArray ? layer : faceIndex, defaultRenderList,
-                                            defaultRenderListLength);
-  }
+  if (!fastPath) {
+    // Get the list of meshes to render
+    std::vector<AbstractMesh*> currentRenderList;
+    auto defaultRenderList = !renderList().empty() ? renderList() : scene->getActiveMeshes();
+    auto defaultRenderListLength
+      = !renderList().empty() ? renderList().size() : scene->getActiveMeshes().size();
 
-  if (currentRenderList.empty()) {
-    // No custom render list provided, we prepare the rendering for the default list, but check
-    // first if we did not already performed the preparation before so as to avoid re-doing it
-    // several times
-    if (!_defaultRenderListPrepared) {
-      _prepareRenderingManager(defaultRenderList, defaultRenderListLength, camera,
-                               renderList().empty());
-      _defaultRenderListPrepared = true;
+    if (getCustomRenderList) {
+      currentRenderList = getCustomRenderList(is2DArray ? layer : faceIndex, defaultRenderList,
+                                              defaultRenderListLength);
     }
-    currentRenderList = defaultRenderList;
-  }
-  else {
-    // Prepare the rendering for the custom render list provided
-    _prepareRenderingManager(currentRenderList, defaultRenderListLength, camera, false);
-  }
 
-  // Before clear
-  for (const auto& step : scene->_beforeRenderTargetClearStage) {
-    step.action(shared_from_base<RenderTargetTexture>(), _faceIndex, _layer);
-  }
+    if (currentRenderList.empty()) {
+      // No custom render list provided, we prepare the rendering for the default list, but check
+      // first if we did not already performed the preparation before so as to avoid re-doing it
+      // several times
+      if (!_defaultRenderListPrepared) {
+        _prepareRenderingManager(defaultRenderList, defaultRenderListLength, camera,
+                                 renderList().empty());
+        _defaultRenderListPrepared = true;
+      }
+      currentRenderList = defaultRenderList;
+    }
+    else {
+      // Prepare the rendering for the custom render list provided
+      _prepareRenderingManager(currentRenderList, defaultRenderListLength, camera, false);
+    }
 
-  // Clear
-  if (onClearObservable.hasObservers()) {
-    onClearObservable.notifyObservers(engine);
-  }
-  else {
-    engine->clear(clearColor.has_value() ? *clearColor : scene->clearColor, true, true, true);
-  }
+    // Before clear
+    for (const auto& step : scene->_beforeRenderTargetClearStage) {
+      step.action(shared_from_base<RenderTargetTexture>(), _faceIndex, _layer);
+    }
 
-  if (!_doNotChangeAspectRatio) {
-    scene->updateTransformMatrix(true);
-  }
+    // Clear
+    if (onClearObservable.hasObservers()) {
+      onClearObservable.notifyObservers(engine);
+    }
+    else {
+      engine->clear(clearColor.has_value() ? *clearColor : scene->clearColor, true, true, true);
+    }
 
-  // Before Camera Draw
-  for (const auto& step : scene->_beforeRenderTargetDrawStage) {
-    step.action(shared_from_base<RenderTargetTexture>(), faceIndex, layer);
-  }
+    if (!_doNotChangeAspectRatio) {
+      scene->updateTransformMatrix(true);
+    }
 
-  // Render
-  _renderingManager->render(customRenderFunction, currentRenderList, renderParticles,
-                            renderSprites);
+    // Before Camera Draw
+    for (const auto& step : scene->_beforeRenderTargetDrawStage) {
+      step.action(shared_from_base<RenderTargetTexture>(), faceIndex, layer);
+    }
 
-  // After Camera Draw
-  for (const auto& step : scene->_afterRenderTargetDrawStage) {
-    step.action(shared_from_base<RenderTargetTexture>(), faceIndex, layer);
-  }
+    // Render
+    _renderingManager->render(customRenderFunction, currentRenderList, renderParticles,
+                              renderSprites);
 
-  const auto saveGenerateMipMaps = _texture->generateMipMaps;
+    // After Camera Draw
+    for (const auto& step : scene->_afterRenderTargetDrawStage) {
+      step.action(shared_from_base<RenderTargetTexture>(), faceIndex, layer);
+    }
 
-  _texture->generateMipMaps
-    = false; // if left true, the mipmaps will be generated (if _texture.generateMipMaps =
-             // true) when the first post process binds its own RTT: by doing so it will unbind the
-             // current RTT, which will trigger a mipmap generation. We don't want this because it's
-             // a wasted work, we will do an unbind of the current RTT at the end of the process
-             // (see unbindFrameBuffer) which will trigger the generation of the final mipmaps
+    const auto saveGenerateMipMaps = _texture->generateMipMaps;
 
-  if (_postProcessManager) {
-    _postProcessManager->_finalizeFrame(false, _texture, faceIndex, _postProcesses,
-                                        ignoreCameraViewport);
-  }
-  else if (useCameraPostProcess) {
-    scene->postProcessManager->_finalizeFrame(false, _texture, static_cast<unsigned>(_faceIndex));
-  }
+    _texture->generateMipMaps
+      = false; // if left true, the mipmaps will be generated (if _texture.generateMipMaps =
+               // true) when the first post process binds its own RTT: by doing so it will unbind
+               // the current RTT, which will trigger a mipmap generation. We don't want this
+               // because it's a wasted work, we will do an unbind of the current RTT at the end of
+               // the process (see unbindFrameBuffer) which will trigger the generation of the final
+               // mipmaps
 
-  _texture->generateMipMaps = saveGenerateMipMaps;
+    if (_postProcessManager) {
+      _postProcessManager->_finalizeFrame(false, _texture, faceIndex, _postProcesses,
+                                          ignoreCameraViewport);
+    }
+    else if (useCameraPostProcess) {
+      scene->postProcessManager->_finalizeFrame(false, _texture, static_cast<unsigned>(_faceIndex));
+    }
 
-  if (!_doNotChangeAspectRatio) {
-    scene->updateTransformMatrix(true);
-  }
+    _texture->generateMipMaps = saveGenerateMipMaps;
 
-  // Dump ?
-  if (dumpForDebug) {
-    Tools::DumpFramebuffer(getRenderWidth(), getRenderHeight(), engine);
+    if (!_doNotChangeAspectRatio) {
+      scene->updateTransformMatrix(true);
+    }
+
+    // Dump ?
+    if (dumpForDebug) {
+      Tools::DumpFramebuffer(getRenderWidth(), getRenderHeight(), engine);
+    }
   }
 
   // Unbind
