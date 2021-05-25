@@ -38,8 +38,8 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
       setFragment(_texturePath);
     }
     catch (...) {
-      BABYLON_LOG_ERROR("CustomProceduralTexture",
-                        "No json or ShaderStore or DOM element found for CustomProceduralTexture")
+      BABYLON_LOG_INFO("CustomProceduralTexture",
+                       "No json or ShaderStore or DOM element found for CustomProceduralTexture")
     }
   };
 
