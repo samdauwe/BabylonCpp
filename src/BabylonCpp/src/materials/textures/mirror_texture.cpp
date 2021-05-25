@@ -77,7 +77,7 @@ MirrorTexture::MirrorTexture(const std::string& iName,
   onAfterRenderObservable.add([this](int*, EventState&) -> void {
     const auto scene_ = getScene();
     scene_->updateTransformMatrix();
-    scene_->getEngine()->cullBackFaces = true;
+    scene_->getEngine()->cullBackFaces = std::nullopt;
     scene_->_mirroredCameraPosition    = nullptr;
 
     scene_->clipPlane = _saveClipPlane;
