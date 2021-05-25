@@ -112,6 +112,10 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , emptyCubeTexture{this, &ThinEngine::get_emptyCubeTexture}
     , isWebGPU{this, &ThinEngine::get_isWebGPU}
     , shaderPlatformName{this, &ThinEngine::get_shaderPlatformName}
+    , snapshotRendering{this, &ThinEngine::get_snapshotRendering,
+                        &ThinEngine::set_snapshotRendering}
+    , snapshotRenderingMode{this, &ThinEngine::get_snapshotRenderingMode,
+                            &ThinEngine::set_snapshotRenderingMode}
     , webGLVersion{this, &ThinEngine::get_webGLVersion}
     , isStencilEnable{this, &ThinEngine::get_isStencilEnable}
     , depthCullingState{this, &ThinEngine::get_depthCullingState}
@@ -294,6 +298,27 @@ bool ThinEngine::get_isWebGPU() const
 std::string ThinEngine::get_shaderPlatformName() const
 {
   return _shaderPlatformName;
+}
+
+bool ThinEngine::get_snapshotRendering() const
+{
+  return _snapshotRenderingEnabled;
+}
+
+void ThinEngine::set_snapshotRendering(bool /*activate*/)
+{
+  // WebGL engine does not support snapshot rendering
+  _snapshotRenderingEnabled = false;
+}
+
+unsigned int ThinEngine::get_snapshotRenderingMode() const
+{
+  return _snapshotRenderingMode;
+}
+
+void ThinEngine::set_snapshotRenderingMode(unsigned int mode)
+{
+  _snapshotRenderingMode = mode;
 }
 
 void ThinEngine::_debugPushGroup(const std::string& /*groupName*/,

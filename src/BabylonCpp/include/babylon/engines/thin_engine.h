@@ -1907,6 +1907,30 @@ protected:
   std::string get_shaderPlatformName() const;
 
   /**
+   * @brief Enables or disables the snapshot rendering mode.
+   * Note that the WebGL engine does not support snapshot rendering so setting the value won't have
+   * any effect for this engine
+   */
+  virtual bool get_snapshotRendering() const;
+
+  /**
+   * @brief Enables or disables the snapshot rendering mode.
+   * Note that the WebGL engine does not support snapshot rendering so setting the value won't have
+   * any effect for this engine
+   */
+  virtual void set_snapshotRendering(bool activate);
+
+  /**
+   * @brief Gets the snapshot rendering mode.
+   */
+  virtual unsigned int get_snapshotRenderingMode() const;
+
+  /**
+   * @brief Sets the snapshot rendering mode.
+   */
+  virtual void set_snapshotRenderingMode(unsigned int mode);
+
+  /**
    * @brief Gets version of the current webGL context.
    * Keep it for back compat - use version instead
    */
@@ -2047,9 +2071,11 @@ public:
   bool isFullscreen = false;
 
   /**
-   * Gets or sets a boolean indicating if back faces must be culled (true by default)
+   * Gets or sets a boolean indicating if back faces must be culled. If false, front faces are
+   * culled instead (true by default) If non null, this takes precedence over the value from the
+   * material.
    */
-  bool cullBackFaces = true;
+  std::optional<bool> cullBackFaces = std::nullopt;
 
   /**
    * Gets or sets a boolean indicating if the engine must keep rendering even if the window is not
@@ -2252,6 +2278,18 @@ public:
   ReadOnlyProperty<ThinEngine, std::string> shaderPlatformName;
 
   /**
+   * Enables or disables the snapshot rendering mode
+   * Note that the WebGL engine does not support snapshot rendering so setting the value won't have
+   * any effect for this engine
+   */
+  Property<ThinEngine, bool> snapshotRendering;
+
+  /**
+   * Gets or sets the snapshot rendering mode
+   */
+  Property<ThinEngine, unsigned int> snapshotRenderingMode;
+
+  /**
    * Gets version of the current webGL context
    */
   ReadOnlyProperty<ThinEngine, float> webGLVersion;
@@ -2342,6 +2380,10 @@ protected:
   bool _isWebGPU = false;
   /** @hidden */
   std::string _shaderPlatformName;
+  /** @hidden */
+  bool _snapshotRenderingEnabled = false;
+  /** @hidden */
+  unsigned int _snapshotRenderingMode = Constants::SNAPSHOTRENDERING_STANDARD;
   /** @hidden */
   Vector4 _viewportCached;
   /** @hidden */
