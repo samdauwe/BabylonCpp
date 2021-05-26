@@ -185,9 +185,11 @@ public:
   /**
    * @brief Prevents the World matrix to be computed any longer.
    * @param newWorldMatrix defines an optional matrix to use as world matrix
+   * @param decompose defines whether to decompose the given newWorldMatrix or directly assign
    * @returns the TransformNode.
    */
-  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix = std::nullopt);
+  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix = std::nullopt,
+                                   bool decompose                              = false);
 
   /**
    * @brief Allows back the World matrix computation.

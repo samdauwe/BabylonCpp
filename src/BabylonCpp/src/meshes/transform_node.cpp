@@ -444,10 +444,26 @@ TransformNodePtr TransformNode::instantiateHierarchy(
   return cloneTransformNode;
 }
 
-TransformNode& TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix)
+TransformNode& TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix,
+                                                bool decompose)
 {
   if (newWorldMatrix) {
-    _worldMatrix = *newWorldMatrix;
+    if (decompose) {
+      _rotation.setAll(0.f);
+      _rotationQuaternion              = _rotationQuaternion.value_or(Quaternion::Identity());
+      std::optional<Vector3> iScaling  = _scaling;
+      std::optional<Vector3> iPosition = _position;
+      newWorldMatrix->decompose(iScaling, _rotationQuaternion, iPosition);
+      _scaling  = *iScaling;
+      _position = *iPosition;
+      computeWorldMatrix(true);
+    }
+    else {
+      _worldMatrix = *newWorldMatrix;
+      _absolutePosition.copyFromFloats(_worldMatrix.m()[12], _worldMatrix.m()[13],
+                                       _worldMatrix.m()[14]);
+      _afterComputeWorldMatrix();
+    }
   }
   else {
     _isWorldMatrixFrozen = false; // no guarantee world is not already frozen,
