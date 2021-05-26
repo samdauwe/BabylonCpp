@@ -21,23 +21,38 @@ struct BABYLON_SHARED_EXPORT EngineFeatures {
   /** Indicates that the engine support shadow samplers */
   bool supportShadowSamplers;
 
-  /** Indicates to check the matrix bytes per bytes to know if it has changed or not. If false, only
-   * the updateFlag of the matrix is checked */
+  /**
+   * Indicates to check the matrix bytes per bytes to know if it has changed or not. If false, only
+   * the updateFlag of the matrix is checked
+   */
   bool uniformBufferHardCheckMatrix;
 
-  /** Indicates that prefiltered mipmaps can be generated in some processes (for eg when loading an
-   * HDR cube texture) */
+  /**
+   * Indicates that prefiltered mipmaps can be generated in some processes (for eg when loading an
+   * HDR cube texture)
+   */
   bool allowTexturePrefiltering;
 
-  /** Indicates to track the usage of ubos and to create new ones as necessary during a frame
-   * duration */
+  /**
+   * Indicates to track the usage of ubos and to create new ones as necessary during a frame
+   * duration
+   */
   bool trackUbosInFrame;
+
+  /**
+   * Indicates that the current content of a ubo should be compared to the content of the
+   * corresponding GPU buffer and the GPU buffer updated only if different. Requires
+   * trackUbosInFrame to be true
+   */
+  bool checkUbosContentBeforeUpload;
 
   /** Indicates that the Cascaded Shadow Map technic is supported */
   bool supportCSM;
 
-  /** Indicates that the textures transcoded by the basis transcoder must have power of 2 width and
-   * height */
+  /**
+   * Indicates that the textures transcoded by the basis transcoder must have power of 2 width and
+   * height
+   */
   bool basisNeedsPOT;
 
   /** Indicates that the engine supports 3D textures */
@@ -61,9 +76,13 @@ struct BABYLON_SHARED_EXPORT EngineFeatures {
   /** Indicates that synchronous texture reading is supported */
   bool supportSyncTextureRead;
 
-  /** Indicates that y should be inverted when dealing with bitmaps (notably in environment tools)
+  /**
+   * Indicates that y should be inverted when dealing with bitmaps (notably in environment tools)
    */
   bool needsInvertingBitmap;
+
+  /** Indicates that the engine should cache the bound UBO */
+  bool useUBOBindingCache;
 
   /** @hidden */
   bool _collectUbosUpdatedInFrame;
