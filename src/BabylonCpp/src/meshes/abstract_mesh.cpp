@@ -635,7 +635,7 @@ AbstractMesh::_getActionManagerForTrigger(const std::optional<unsigned int>& tri
   return TransformNode::_getActionManagerForTrigger(trigger, false);
 }
 
-void AbstractMesh::_rebuild()
+void AbstractMesh::_rebuild(bool /*dispose*/)
 {
   onRebuildObservable.notifyObservers(this);
 

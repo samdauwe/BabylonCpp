@@ -233,7 +233,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _rebuild();
+  virtual void _rebuild(bool dispose = false);
 
   /**
    * @brief Hidden

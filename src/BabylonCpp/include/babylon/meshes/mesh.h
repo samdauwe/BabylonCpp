@@ -842,7 +842,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild() override;
+  void _rebuild(bool dispose = false) override;
 
   /**
    * @brief Hidden

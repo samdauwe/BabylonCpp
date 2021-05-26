@@ -1765,7 +1765,7 @@ Mesh& Mesh::_processRendering(
   return *this;
 }
 
-void Mesh::_rebuild()
+void Mesh::_rebuild(bool /*dispose*/)
 {
   if (_instanceDataStorage->instancesBuffer) {
     // Dispose instance buffer to be recreated in _renderWithInstances when rendered
