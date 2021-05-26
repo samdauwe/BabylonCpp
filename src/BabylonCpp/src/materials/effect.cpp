@@ -478,6 +478,8 @@ void Effect::_prepareEffect()
 {
   auto previousPipelineContext = _pipelineContext;
 
+  _isReady = false;
+
   try {
     auto engine = _engine;
 
@@ -725,7 +727,7 @@ void Effect::bindUniformBuffer(const WebGLDataBufferPtr& buffer, const std::stri
   if (stl_util::contains(_uniformBuffersNames, iName)) {
     const auto& bufferName = _uniformBuffersNames[iName];
     if (stl_util::contains(Effect::_baseCache, bufferName)
-        && Effect::_baseCache[bufferName] == buffer) {
+        && (Effect::_baseCache[bufferName] == buffer && _engine->_features.useUBOBindingCache)) {
       return;
     }
   }
