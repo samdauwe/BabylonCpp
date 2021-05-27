@@ -300,7 +300,7 @@ private:
 
   /**
    * @brief Stores mesh texture in dynamic texture for color pixel retrievalwhen pointColor type is
-   * color for surface points
+   * color for surface points.
    */
   void _colorFromTexture(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup, bool isVolume);
 
