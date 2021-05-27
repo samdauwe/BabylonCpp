@@ -8,19 +8,19 @@ namespace BABYLON {
 
 MultiviewRenderTarget::MultiviewRenderTarget(Scene* scene, const ISize& size)
     : RenderTargetTexture{
-      "multiview rtt",                                           // name
-      RenderTargetSize{size.width, size.height},                 // size
-      scene,                                                     // scene
-      false,                                                     // generateMipMaps
-      true,                                                      // doNotChangeAspectRatio
-      static_cast<unsigned int>(InternalTextureSource::Unknown), // type
-      false,                                                     // isCube
-      TextureConstants::TRILINEAR_SAMPLINGMODE,                  // samplingMode
-      false,                                                     // generateDepthBuffer
-      false,                                                     // generateStencilBuffer
-      true,                                                      // isMulti
-      Constants::TEXTUREFORMAT_RGBA,                             // format
-      true                                                       // delayAllocation
+      "multiview rtt",                           // name
+      RenderTargetSize{size.width, size.height}, // size
+      scene,                                     // scene
+      false,                                     // generateMipMaps
+      true,                                      // doNotChangeAspectRatio
+      Constants::TEXTURETYPE_UNSIGNED_INT,       // type
+      false,                                     // isCube
+      TextureConstants::TRILINEAR_SAMPLINGMODE,  // samplingMode
+      false,                                     // generateDepthBuffer
+      false,                                     // generateStencilBuffer
+      true,                                      // isMulti
+      Constants::TEXTUREFORMAT_RGBA,             // format
+      true                                       // delayAllocation
     }
 {
   auto internalTexture
