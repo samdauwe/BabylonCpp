@@ -562,7 +562,9 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
           texture = Texture::CreateFromBase64String(
             json_util::get_string(parsedTexture, "base64String"),
             json_util::get_string(parsedTexture, "name"), scene, !generateMipMaps,
-            json_util::get_bool(parsedTexture, "invertY", true));
+            json_util::get_bool(parsedTexture, "invertY", true),
+            json_util::get_number<unsigned int>(parsedTexture, "samplingMode",
+                                                TextureConstants::TRILINEAR_SAMPLINGMODE));
         }
         else {
           std::string url2;
@@ -581,8 +583,10 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
               url2 = parsedUrl;
             }
           }
-          texture = Texture::New(url2, scene, !generateMipMaps,
-                                 json_util::get_bool(parsedTexture, "invertY", true));
+          texture = Texture::New(
+            url2, scene, !generateMipMaps, json_util::get_bool(parsedTexture, "invertY", true),
+            json_util::get_number<unsigned int>(parsedTexture, "samplingMode",
+                                                TextureConstants::TRILINEAR_SAMPLINGMODE));
         }
 
         return texture;
