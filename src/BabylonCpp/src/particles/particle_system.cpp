@@ -1633,7 +1633,15 @@ void ParticleSystem::_appendParticleVertices(unsigned int offset, Particle* part
 
 void ParticleSystem::rebuild()
 {
+  if (_engine->getCaps().vertexArrayObject) {
+    _vertexArrayObject = nullptr;
+  }
+
   _createIndexBuffer();
+
+  if (_spriteBuffer) {
+    _spriteBuffer->_rebuild();
+  }
 
   if (_vertexBuffer) {
     _vertexBuffer->_rebuild();
