@@ -532,15 +532,16 @@ void Scene::setStepId(unsigned int newStepId)
 
 Vector4& Scene::bindEyePosition(Effect* effect, const std::string& variableName, bool isVector3)
 {
-  const auto eyePosition = _forcedViewPosition     ? *_forcedViewPosition :
-                           _mirroredCameraPosition ? *_mirroredCameraPosition :
-                           activeCamera()          ? activeCamera()->globalPosition :
-                                                     Vector3::Zero();
+  const auto eyePosition = _forcedViewPosition ?
+                             *_forcedViewPosition :
+                             _mirroredCameraPosition ?
+                             *_mirroredCameraPosition :
+                             activeCamera() ? activeCamera()->globalPosition : Vector3::Zero();
 
   const auto invertNormal = (useRightHandedSystem() == (_mirroredCameraPosition != nullptr));
 
   TmpVectors::Vector4Array[0].set(eyePosition.x, eyePosition.y, eyePosition.z,
-                                  invertNormal ? -1 : 1);
+                                  invertNormal ? -1.f : 1.f);
 
   if (effect) {
     if (isVector3) {
@@ -1438,7 +1439,7 @@ bool Scene::_isPointerSwiping() const
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
   _initActionManager = [this](const AbstractActionManagerPtr& act,
-                              const ClickInfo& /*clickInfo*/) -> AbstractActionManagerPtr {
+                              const ClickInfo & /*clickInfo*/) -> AbstractActionManagerPtr {
     if (!_meshPickProceed) {
       auto pickResult = pick(_unTranslatedPointerX, _unTranslatedPointerY, pointerDownPredicate,
                              false, cameraToUseForPointers);
@@ -1761,14 +1762,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt, PointerEventTypes::POINTERTAP)) {
                 return;
               }
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -2222,9 +2223,9 @@ void Scene::_animate()
     }
     _animationTimeLast = now;
   }
-  deltaTime          = useConstantAnimationDeltaTime ?
-                         16.f :
-                         Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
+  deltaTime = useConstantAnimationDeltaTime ?
+                16.f :
+                Time::fpTimeSince<size_t, std::milli>(*_animationTimeLast) * animationTimeScale;
   _animationTimeLast = now;
 
   // Animatable::_animate can remove elements from _activeAnimatables we need to make a copy of it
@@ -4729,7 +4730,7 @@ Scene::getWorldExtends(const std::function<bool(const AbstractMeshPtr& mesh)>& f
               std::numeric_limits<float>::lowest());
   const auto _filterPredicate = filterPredicate ?
                                   filterPredicate :
-                                  [](const AbstractMeshPtr& /*mesh*/) -> bool { return true; };
+                                  [](const AbstractMeshPtr & /*mesh*/) -> bool { return true; };
   std::vector<AbstractMeshPtr> filteredMeshes;
   if (filterPredicate) {
     for (const auto& mesh : meshes) {
