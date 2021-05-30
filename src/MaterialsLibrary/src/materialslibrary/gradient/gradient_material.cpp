@@ -235,7 +235,7 @@ void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    MaterialHelper::BindEyePosition(effect.get(), scene);
+    scene->bindEyePosition(effect.get());
   }
 
   if (scene->lightsEnabled() && !disableLighting) {
