@@ -88,6 +88,11 @@ public:
   void render() override;
 
   /**
+   * @brief Rebuilds the manager (after a context lost, for eg).
+   */
+  void rebuild() override;
+
+  /**
    * @brief Release associated resources.
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;

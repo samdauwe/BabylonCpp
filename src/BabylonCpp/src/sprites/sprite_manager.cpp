@@ -379,6 +379,13 @@ void SpriteManager::_customUpdate(ThinSprite* sprite, const ISize& /*baseSize*/)
   // sprite->_ySize = _cellData[sprite->cellRef].frame.h;
 }
 
+void SpriteManager::rebuild()
+{
+  if (_spriteRenderer) {
+    _spriteRenderer->rebuild();
+  }
+}
+
 void SpriteManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
   if (_spriteRenderer) {

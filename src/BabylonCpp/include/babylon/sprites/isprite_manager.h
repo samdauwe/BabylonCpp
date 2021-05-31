@@ -107,6 +107,11 @@ public:
    */
   virtual void render() = 0;
 
+  /**
+   * @brief Rebuilds the manager (after a context lost, for eg).
+   */
+  virtual void rebuild() = 0;
+
 protected:
   /**
    * @brief Gets the hosting scene.
