@@ -94,7 +94,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerMove(int unTranslatedPo
 
     if (pickResult && pickResult->hit && pickResult->pickedSprite) {
       scene->setPointerOverSprite(pickResult->pickedSprite);
-      if (!scene->doNotHandleCursors) {
+      if (!scene->doNotHandleCursors && element) {
         if (scene->_pointerOverSprite && scene->_pointerOverSprite->actionManager
             && !scene->_pointerOverSprite->actionManager->hoverCursor.empty()) {
           element->style.cursor = scene->_pointerOverSprite->actionManager->hoverCursor;
