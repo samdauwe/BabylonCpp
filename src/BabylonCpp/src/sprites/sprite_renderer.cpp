@@ -46,19 +46,7 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
   _drawWrapperFog  = std::make_shared<DrawWrapper>(engine);
 
   if (!_useInstancing) {
-    IndicesArray indices;
-    auto index = 0;
-    for (unsigned int count = 0; count < capacity; ++count) {
-      indices.emplace_back(index + 0);
-      indices.emplace_back(index + 1);
-      indices.emplace_back(index + 2);
-      indices.emplace_back(index + 0);
-      indices.emplace_back(index + 2);
-      indices.emplace_back(index + 3);
-      index += 4;
-    }
-
-    _indexBuffer = engine->createIndexBuffer(indices);
+    _buildIndexBuffer();
   }
 
   // VBO
@@ -340,6 +328,44 @@ void SpriteRenderer::_appendSpriteVertex(
   _vertexData[arrayOffset + 15] = sprite->color.g;
   _vertexData[arrayOffset + 16] = sprite->color.b;
   _vertexData[arrayOffset + 17] = sprite->color.a;
+}
+
+void SpriteRenderer::_buildIndexBuffer()
+{
+  IndicesArray indices;
+  auto index = 0;
+  for (unsigned int count = 0; count < capacity; ++count) {
+    indices.emplace_back(index + 0);
+    indices.emplace_back(index + 1);
+    indices.emplace_back(index + 2);
+    indices.emplace_back(index + 0);
+    indices.emplace_back(index + 2);
+    indices.emplace_back(index + 3);
+    index += 4;
+  }
+
+  _indexBuffer = _engine->createIndexBuffer(indices);
+}
+
+void SpriteRenderer::rebuild()
+{
+  if (_indexBuffer) {
+    _buildIndexBuffer();
+  }
+
+  if (_useVAO) {
+    _vertexArrayObject = nullptr;
+  }
+
+  _buffer->_rebuild();
+
+  for (const auto& [name, vertexBuffer] : _vertexBuffers) {
+    vertexBuffer->_rebuild();
+  }
+
+  if (_spriteBuffer) {
+    _spriteBuffer->_rebuild();
+  }
 }
 
 void SpriteRenderer::dispose()

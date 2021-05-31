@@ -63,6 +63,11 @@ public:
          = nullptr);
 
   /**
+   * @brief Rebuilds the renderer (after a context lost, for eg).
+   */
+  void rebuild();
+
+  /**
    * @brief Release associated resources.
    */
   void dispose();
@@ -78,6 +83,7 @@ private:
     size_t index, const ThinSpritePtr& sprite, int offsetX, int offsetY, const ISize& baseSize,
     bool useRightHandedSystem,
     const std::function<void(ThinSprite* sprite, const ISize& baseSize)>& customSpriteUpdate);
+  void _buildIndexBuffer();
 
 public:
   /**
