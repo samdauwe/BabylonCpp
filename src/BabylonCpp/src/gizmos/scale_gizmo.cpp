@@ -147,6 +147,7 @@ std::unique_ptr<AxisScaleGizmo> ScaleGizmo::_createUniformScaleMesh()
   cache.hoverMaterial   = _hoverMaterial;
   cache.disableMaterial = _disableMaterial;
   cache.active          = false;
+  cache.dragBehavior    = uniformScaleGizmo->dragBehavior;
 
   addToAxisCache(iUniformScaleGizmo->_rootMesh.get(), cache);
 
