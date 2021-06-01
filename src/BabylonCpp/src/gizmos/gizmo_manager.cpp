@@ -362,8 +362,12 @@ void GizmoManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextu
     gizmos.boundingBoxGizmo->dispose();
     gizmos.boundingBoxGizmo = nullptr;
   }
-  _defaultKeepDepthUtilityLayer->dispose();
-  _defaultUtilityLayer->dispose();
+  if (_defaultKeepDepthUtilityLayer != UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()) {
+    _defaultKeepDepthUtilityLayer->dispose();
+  }
+  if (_defaultUtilityLayer != UtilityLayerRenderer::DefaultUtilityLayer()) {
+    _defaultUtilityLayer->dispose();
+  }
   boundingBoxDragBehavior->detach();
   onAttachedToMeshObservable.clear();
 }
