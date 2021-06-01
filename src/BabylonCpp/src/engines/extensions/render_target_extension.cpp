@@ -172,9 +172,10 @@ RenderTargetExtension::_createDepthStencilTexture(const RenderTargetTextureSize&
 
   _this->_bindTextureDirectly(target, internalTexture, true);
 
-  _this->_setupDepthStencilTexture(internalTexture, size, *internalOptions.generateStencil,
-                                   *internalOptions.bilinearFiltering,
-                                   *internalOptions.comparisonFunction);
+  _this->_setupDepthStencilTexture(
+    internalTexture, size, *internalOptions.generateStencil,
+    *internalOptions.comparisonFunction == 0 ? false : *internalOptions.bilinearFiltering,
+    *internalOptions.comparisonFunction);
 
   const auto type
     = internalOptions.generateStencil.value_or(false) ? GL::UNSIGNED_INT_24_8 : GL::UNSIGNED_INT;
@@ -196,6 +197,8 @@ RenderTargetExtension::_createDepthStencilTexture(const RenderTargetTextureSize&
   }
 
   _this->_bindTextureDirectly(target, nullptr);
+
+  _this->_internalTexturesCache.emplace_back(internalTexture);
 
   return internalTexture;
 }
