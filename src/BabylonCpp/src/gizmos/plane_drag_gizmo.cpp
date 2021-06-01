@@ -123,6 +123,7 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
+  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(_gizmoMesh.get()), _cache);
   }
@@ -137,7 +138,9 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
       _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
 
       if (!_parent) {
-        const auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        const auto material = _cache.dragBehavior->enabled ?
+                                (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
+                                _disableMaterial;
         for (const auto& m : _cache.gizmoMeshes) {
           m->material = material;
         }
