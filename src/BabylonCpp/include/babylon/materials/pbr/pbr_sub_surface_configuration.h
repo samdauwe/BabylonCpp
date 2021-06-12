@@ -18,6 +18,7 @@ class EffectFallbacks;
 class Engine;
 struct MaterialDefines;
 class Scene;
+class SubMesh;
 class UniformBuffer;
 FWD_CLASS_SPTR(IAnimatable)
 FWD_CLASS_SPTR(BaseTexture)
@@ -73,9 +74,11 @@ public:
    * @param lodBasedMicrosurface defines whether the material relies on lod based microsurface or
    * not.
    * @param realTimeFiltering defines whether the textures should be filtered on the fly.
+   * @param subMesh the submesh to bind data for
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine, bool isFrozen,
-                      bool lodBasedMicrosurface, bool realTimeFiltering);
+                      bool lodBasedMicrosurface, bool realTimeFiltering,
+                      SubMesh* subMesh = nullptr);
 
   /**
    * @brief Unbinds the material from the mesh.
@@ -203,8 +206,8 @@ protected:
   void set_linkRefractionWithTransparency(bool value);
   bool get_useMaskFromThicknessTexture() const;
   void set_useMaskFromThicknessTexture(bool value);
-  bool get_useMaskFromThicknessTextureGltf() const;
-  void set_useMaskFromThicknessTextureGltf(bool value);
+  bool get_useGltfStyleThicknessTexture() const;
+  void set_useGltfStyleThicknessTexture(bool value);
 
 private:
   /**
@@ -319,6 +322,11 @@ public:
   float maximumThickness;
 
   /**
+   * Defines that the thickness should be used as a measure of the depth volume.
+   */
+  bool useThicknessAsDepth;
+
+  /**
    * Defines the volume tint of the material.
    * This is used for both translucency and scattering.
    */
@@ -350,7 +358,7 @@ public:
    * * the red channel is the transmission/translucency intensity.
    * * the green channel is the thickness.
    */
-  Property<PBRSubSurfaceConfiguration, bool> useMaskFromThicknessTextureGltf;
+  Property<PBRSubSurfaceConfiguration, bool> useGltfStyleThicknessTexture;
 
 private:
   bool _isRefractionEnabled;
@@ -366,7 +374,7 @@ private:
   bool _linkRefractionWithTransparency;
   bool _useMaskFromThicknessTexture;
   Scene* _scene;
-  bool _useMaskFromThicknessTextureGltf;
+  bool _useGltfStyleThicknessTexture;
 
   /** Hidden */
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;

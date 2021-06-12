@@ -15,6 +15,7 @@ IMaterialSubSurfaceDefines::IMaterialSubSurfaceDefines()
 
     {"SS_THICKNESSANDMASK_TEXTURE", false},         //
     {"SS_THICKNESSANDMASK_TEXTUREDIRECTUV", false}, //
+    {"SS_HAS_THICKNESS", false},                    //
 
     {"SS_REFRACTIONMAP_3D", false},              //
     {"SS_REFRACTIONMAP_OPPOSITEZ", false},       //
@@ -26,9 +27,10 @@ IMaterialSubSurfaceDefines::IMaterialSubSurfaceDefines()
     {"SS_ALBEDOFORREFRACTIONTINT", false},       //
     {"SS_ALBEDOFORTRANSLUCENCYTINT", false},     //
     {"SS_USE_LOCAL_REFRACTIONMAP_CUBIC", false}, //
+    {"SS_USE_THICKNESS_AS_DEPTH", false},        //
 
-    {"SS_MASK_FROM_THICKNESS_TEXTURE", false},      //
-    {"SS_MASK_FROM_THICKNESS_TEXTURE_GLTF", false}, //
+    {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
+    {"SS_USE_GLTF_THICKNESS_TEXTURE", false},  //
   };
 }
 
