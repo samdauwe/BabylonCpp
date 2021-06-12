@@ -275,6 +275,10 @@ protected:
 public:
   /** Hidden */
   int _indexInSourceMeshInstanceArray;
+  /** Hidden */
+  float _distanceToCamera;
+  /** Hidden */
+  std::optional<Matrix> _previousWorldMatrix;
 
   /**
    * The source mesh of the instance.
@@ -284,6 +288,7 @@ public:
 private:
   MeshPtr _sourceMesh;
   Mesh* _currentLOD;
+  Matrix _billboardWorldMatrix;
 
 }; // end of class InstancedMesh
 

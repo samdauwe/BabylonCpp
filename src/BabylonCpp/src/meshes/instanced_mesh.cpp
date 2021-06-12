@@ -16,6 +16,8 @@ namespace BABYLON {
 InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
     : AbstractMesh(iName, source->getScene())
     , _indexInSourceMeshInstanceArray{-1}
+    , _distanceToCamera{0.f}
+    , _previousWorldMatrix{std::nullopt}
     , sourceMesh{this, &InstancedMesh::get_sourceMesh}
     , _currentLOD{nullptr}
 {
@@ -271,10 +273,11 @@ Matrix& InstancedMesh::getWorldMatrix()
     _currentLOD->_masterMesh = this;
     TmpVectors::Vector3Array[7].copyFrom(_currentLOD->position());
     _currentLOD->position().set(0.f, 0.f, 0.f);
-    TmpVectors::MatrixArray[0].copyFrom(_currentLOD->computeWorldMatrix(true));
+    _billboardWorldMatrix.copyFrom(_currentLOD->computeWorldMatrix(true));
     _currentLOD->position().copyFrom(TmpVectors::Vector3Array[7]);
     _currentLOD->_masterMesh = tempMaster;
-    return TmpVectors::MatrixArray[0];
+
+    return _billboardWorldMatrix;
   }
 
   return AbstractMesh::getWorldMatrix();
