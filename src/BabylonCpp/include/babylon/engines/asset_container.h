@@ -4,9 +4,11 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/abstract_scene.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
+class ThinEngine;
 FWD_CLASS_SPTR(AssetContainer)
 FWD_CLASS_SPTR(Mesh)
 
@@ -61,6 +63,7 @@ public:
 
 private:
   bool _wasAddedToScene;
+  Observer<ThinEngine>::Ptr _onContextRestoredObserver;
 
 }; // end of class AssetContainer
 

@@ -7,6 +7,7 @@
 #include <babylon/audio/sound_track.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engines/engine.h>
 #include <babylon/engines/iscene_serializable_component.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
@@ -18,17 +19,38 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/transform_node.h>
 #include <babylon/morph/morph_target_manager.h>
+#include <babylon/particles/particle_system.h>
 #include <babylon/probes/reflection_probe.h>
 
 namespace BABYLON {
 
-AssetContainer::AssetContainer(Scene* iScene) : scene{iScene}, _wasAddedToScene{false}
+AssetContainer::AssetContainer(Scene* iScene)
+    : scene{iScene}, _wasAddedToScene{false}, _onContextRestoredObserver{nullptr}
 {
-  scene->onDisposeObservable.add([this](Scene* /*scene*/, EventState & /*es*/) -> void {
+  scene->onDisposeObservable.add([this](Scene* /*scene*/, EventState& /*es*/) -> void {
     if (!_wasAddedToScene) {
       dispose();
     }
   });
+
+  _onContextRestoredObserver = scene->getEngine()->onContextRestoredObservable.add(
+    [this](ThinEngine* /*engine*/, EventState& /*es*/) -> void {
+      for (const auto& geometry : geometries) {
+        geometry->_rebuild();
+      }
+
+      for (const auto& mesh : meshes) {
+        mesh->_rebuild();
+      }
+
+      for (const auto& system : particleSystems) {
+        system->rebuild();
+      }
+
+      for (const auto& texture : textures) {
+        texture->_rebuild();
+      }
+    });
 }
 
 AssetContainer::~AssetContainer() = default;
@@ -87,6 +109,9 @@ void AssetContainer::addAllToScene()
   for (const auto& component : scene->_serializableComponents) {
     component->addFromContainer(*this);
   }
+
+  scene->getEngine()->onContextRestoredObservable.remove(_onContextRestoredObserver);
+  _onContextRestoredObserver = nullptr;
 }
 
 void AssetContainer::removeAllFromScene()
@@ -214,6 +239,11 @@ void AssetContainer::dispose()
 
   for (const auto& component : scene->_serializableComponents) {
     component->removeFromContainer(*this, true);
+  }
+
+  if (_onContextRestoredObserver) {
+    scene->getEngine()->onContextRestoredObservable.remove(_onContextRestoredObserver);
+    _onContextRestoredObserver = nullptr;
   }
 }
 
