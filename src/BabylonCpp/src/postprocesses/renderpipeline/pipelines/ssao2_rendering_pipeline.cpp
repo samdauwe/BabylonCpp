@@ -68,6 +68,8 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
     , _samples{8}
     , _textureSamples{1}
     , _forceGeometryBuffer{false}
+    , _geometryBufferRenderer{this, &SSAO2RenderingPipeline::get__geometryBufferRenderer}
+    , _prePassRenderer{this, &SSAO2RenderingPipeline::get__prePassRenderer}
     , _expensiveBlur{true}
     , _cameraList{iCameras}
     , _randomTexture{nullptr}
@@ -76,7 +78,8 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
     , _blurHPostProcess{nullptr}
     , _blurVPostProcess{nullptr}
     , _ssaoCombinePostProcess{nullptr}
-    , _prePassRenderer{nullptr}
+    , _nullGeometryBuffer{nullptr}
+    , _nullPrePassRenderer{nullptr}
 {
   _scene               = scene;
   _ratio               = iRatio;
@@ -97,7 +100,7 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
     scene->enableGeometryBufferRenderer();
   }
   else {
-    _prePassRenderer = scene->enablePrePassRenderer();
+    scene->enablePrePassRenderer();
   }
 
   _createRandomTexture();
@@ -166,8 +169,8 @@ void SSAO2RenderingPipeline::set_textureSamples(unsigned int n)
 {
   _textureSamples = n;
 
-  if (_prePassRenderer) {
-    _prePassRenderer->samples = n;
+  if (_prePassRenderer()) {
+    _prePassRenderer()->samples = n;
   }
   else {
     _originalColorPostProcess->samples = n;
@@ -177,6 +180,22 @@ void SSAO2RenderingPipeline::set_textureSamples(unsigned int n)
 unsigned int SSAO2RenderingPipeline::get_textureSamples() const
 {
   return _textureSamples;
+}
+
+GeometryBufferRendererPtr& SSAO2RenderingPipeline::get__geometryBufferRenderer()
+{
+  if (!_forceGeometryBuffer) {
+    return _nullGeometryBuffer;
+  }
+  return _scene->geometryBufferRenderer();
+}
+
+PrePassRendererPtr& SSAO2RenderingPipeline::get__prePassRenderer()
+{
+  if (_forceGeometryBuffer) {
+    return _nullPrePassRenderer;
+  }
+  return _scene->prePassRenderer();
 }
 
 void SSAO2RenderingPipeline::set_expensiveBlur(bool b)
@@ -256,15 +275,15 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     effect->setFloat("near", _scene->activeCamera()->minZ);
     effect->setFloat("far", _scene->activeCamera()->maxZ);
     effect->setFloat("radius", radius);
-    if (_forceGeometryBuffer) {
-      effect->setTexture("depthSampler",
-                         _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
+    if (_geometryBufferRenderer()) {
+      effect->setTexture("depthSampler", _geometryBufferRenderer()->getGBuffer()->textures()[0]);
     }
-    else {
+    else if (_prePassRenderer()) {
       effect->setTexture(
         "depthSampler",
-        _prePassRenderer->getRenderTarget()
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
+        _prePassRenderer()
+          ->getRenderTarget()
+          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -283,15 +302,15 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     effect->setFloat("near", _scene->activeCamera()->minZ);
     effect->setFloat("far", _scene->activeCamera()->maxZ);
     effect->setFloat("radius", radius);
-    if (_forceGeometryBuffer) {
-      effect->setTexture("depthSampler",
-                         _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
+    if (_geometryBufferRenderer()) {
+      effect->setTexture("depthSampler", _geometryBufferRenderer()->getGBuffer()->textures()[0]);
     }
-    else {
+    else if (_prePassRenderer()) {
       effect->setTexture(
         "depthSampler",
-        _prePassRenderer->getRenderTarget()
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
+        _prePassRenderer()
+          ->getRenderTarget()
+          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -414,23 +433,23 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     }
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
-    if (_forceGeometryBuffer) {
+    if (_geometryBufferRenderer()) {
       if (_scene->enableGeometryBufferRenderer()) {
-        effect->setTexture("depthSampler",
-                           _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
-        effect->setTexture("normalSampler",
-                           _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[1]);
+        effect->setTexture("depthSampler", _geometryBufferRenderer()->getGBuffer()->textures()[0]);
+        effect->setTexture("normalSampler", _geometryBufferRenderer()->getGBuffer()->textures()[1]);
       }
     }
-    else {
+    else if (_prePassRenderer()) {
       effect->setTexture(
         "depthSampler",
-        _prePassRenderer->getRenderTarget()
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
+        _prePassRenderer()
+          ->getRenderTarget()
+          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
       effect->setTexture(
         "normalSampler",
-        _prePassRenderer->getRenderTarget()
-          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE)]);
+        _prePassRenderer()
+          ->getRenderTarget()
+          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
   };

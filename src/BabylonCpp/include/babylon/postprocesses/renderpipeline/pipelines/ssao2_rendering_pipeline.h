@@ -17,6 +17,7 @@ namespace BABYLON {
 class Scene;
 class Vector3;
 FWD_CLASS_SPTR(DynamicTexture)
+FWD_CLASS_SPTR(GeometryBufferRenderer)
 FWD_CLASS_SPTR(PassPostProcess)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(SSAO2RenderingPipeline)
@@ -131,6 +132,8 @@ private:
   [[nodiscard]] unsigned int get_samples() const;
   void set_textureSamples(unsigned int n);
   [[nodiscard]] unsigned int get_textureSamples() const;
+  GeometryBufferRendererPtr& get__geometryBufferRenderer();
+  PrePassRendererPtr& get__prePassRenderer();
   void set_expensiveBlur(bool b);
   [[nodiscard]] bool get_expensiveBlur() const;
   void _createBlurPostProcess(float ssaoRatio, float blurRatio);
@@ -219,6 +222,16 @@ private:
   bool _forceGeometryBuffer;
 
   /**
+   * Hidden
+   */
+  ReadOnlyProperty<SSAO2RenderingPipeline, GeometryBufferRendererPtr> _geometryBufferRenderer;
+
+  /**
+   * Hidden
+   */
+  ReadOnlyProperty<SSAO2RenderingPipeline, PrePassRendererPtr> _prePassRenderer;
+
+  /**
    * Ratio object used for SSAO ratio and blur ratio
    */
   SSAO2Ratio _ratio;
@@ -249,9 +262,10 @@ private:
   PostProcessPtr _blurVPostProcess;
   PostProcessPtr _ssaoCombinePostProcess;
 
-  PrePassRendererPtr _prePassRenderer;
-
   Uint32Array _bits;
+
+  GeometryBufferRendererPtr _nullGeometryBuffer;
+  PrePassRendererPtr _nullPrePassRenderer;
 
   static const Float32Array ORTHO_DEPTH_PROJECTION;
   static const Float32Array PERSPECTIVE_DEPTH_PROJECTION;
