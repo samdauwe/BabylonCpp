@@ -306,7 +306,7 @@ void LavaMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    MaterialHelper::BindEyePosition(effect.get(), scene);
+    scene->bindEyePosition(effect.get());
   }
 
   _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);
