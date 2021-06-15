@@ -289,7 +289,7 @@ void CellMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", static_cast<float>(pointSize));
     }
 
-    MaterialHelper::BindEyePosition(effect.get(), scene);
+    scene->bindEyePosition(effect.get());
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
