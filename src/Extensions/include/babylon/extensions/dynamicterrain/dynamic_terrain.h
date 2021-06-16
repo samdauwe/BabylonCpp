@@ -4,6 +4,7 @@
 #include <functional>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
@@ -11,11 +12,9 @@
 
 namespace BABYLON {
 
-class Camera;
-class Mesh;
 class Scene;
-using CameraPtr = std::shared_ptr<Camera>;
-using MeshPtr   = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Camera)
+FWD_CLASS_SPTR(Mesh)
 
 namespace Extensions {
 
