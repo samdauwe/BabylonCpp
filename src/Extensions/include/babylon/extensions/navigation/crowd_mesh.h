@@ -4,12 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/extensions/entitycomponentsystem/component.h>
 
 namespace BABYLON {
 
-class AbstractMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+FWD_CLASS_SPTR(AbstractMesh)
 
 namespace Extensions {
 
