@@ -5,11 +5,11 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class Camera;
-using CameraPtr = std::shared_ptr<Camera>;
+FWD_CLASS_SPTR(Camera)
 
 namespace Extensions {
 
