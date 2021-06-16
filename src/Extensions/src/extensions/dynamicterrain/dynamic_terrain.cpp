@@ -186,9 +186,9 @@ DynamicTerrain::DynamicTerrain(const std::string& iName, DynamicTerrainOptions& 
   float deltaNbSubX = (_terrain->position().x - _mapData[0]) / _averageSubSizeX;
   float deltaNbSubZ = (_terrain->position().z - _mapData[2]) / _averageSubSizeZ;
   _deltaSubX        = (deltaNbSubX > 0.f) ? static_cast<unsigned>(std::floor(deltaNbSubX)) :
-                                     static_cast<unsigned>(std::ceil(deltaNbSubX));
-  _deltaSubZ = (deltaNbSubZ > 0.f) ? static_cast<unsigned>(std::floor(deltaNbSubZ)) :
-                                     static_cast<unsigned>(std::ceil(deltaNbSubZ));
+                                            static_cast<unsigned>(std::ceil(deltaNbSubX));
+  _deltaSubZ        = (deltaNbSubZ > 0.f) ? static_cast<unsigned>(std::floor(deltaNbSubZ)) :
+                                            static_cast<unsigned>(std::ceil(deltaNbSubZ));
   _scene->registerBeforeRender([this](Scene*, EventState&) {
     beforeUpdate(_refreshEveryFrame);
     update(_refreshEveryFrame);
