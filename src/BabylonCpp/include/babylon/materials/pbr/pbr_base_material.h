@@ -450,10 +450,26 @@ protected:
   Color3 _metallicReflectanceColor;
 
   /**
-   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A.
-   * This is multiply against the scalar values defined in the material.
+   * Specifies that only the A channel from _metallicReflectanceTexture should be used.
+   * If false, both RGB and A channels will be used
+   */
+  bool _useOnlyMetallicFromMetallicReflectanceTexture;
+
+  /**
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * This is multiplied against the scalar values defined in the material.
+   * If _useOnlyMetallicFromMetallicReflectanceTexture is true, don't use the RGB channels, only A
    */
   BaseTexturePtr _metallicReflectanceTexture;
+
+  /**
+   * Defines to store reflectanceColor in RGB
+   * This is multiplied against the scalar values defined in the material.
+   * If both _reflectanceTexture and _metallicReflectanceTexture textures are provided and
+   * _useOnlyMetallicFromMetallicReflectanceTexture is false, _metallicReflectanceTexture takes
+   * precedence and _reflectanceTexture is not used
+   */
+  BaseTexturePtr _reflectanceTexture;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending
@@ -694,11 +710,6 @@ protected:
    * If set to true, no lighting calculations will be applied.
    */
   bool _unlit;
-
-  /**
-   * Hidden
-   */
-  bool _rebuildInParallel;
 
 private:
   OnCreatedEffectParameters onCreatedEffectParameters;
