@@ -229,11 +229,29 @@ protected:
   void set_metallicReflectanceColor(const Color3& value);
 
   /**
+   * Specifies that only the A channel from metallicReflectanceTexture should be used.
+   * If false, both RGB and A channels will be used
+   */
+  bool get_useOnlyMetallicFromMetallicReflectanceTexture() const;
+  void set_useOnlyMetallicFromMetallicReflectanceTexture(bool value);
+
+  /**
    * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
-   * This is multiply against the scalar values defined in the material.
+   * This is multiplied against the scalar values defined in the material.
+   * If useOnlyMetallicFromMetallicReflectanceTexture is true, don't use the RGB channels, only A
    */
   BaseTexturePtr& get_metallicReflectanceTexture();
   void set_metallicReflectanceTexture(const BaseTexturePtr& value);
+
+  /**
+   * Defines to store reflectanceColor in RGB
+   * This is multiplied against the scalar values defined in the material.
+   * If both reflectanceTexture and metallicReflectanceTexture textures are provided and
+   * useOnlyMetallicFromMetallicReflectanceTexture is false, metallicReflectanceTexture takes
+   * priority and reflectanceTexture is not used
+   */
+  BaseTexturePtr& get_reflectanceTexture();
+  void set_reflectanceTexture(const BaseTexturePtr& value);
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending on the current
@@ -773,10 +791,26 @@ public:
   Property<PBRMaterial, Color3> metallicReflectanceColor;
 
   /**
-   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A This is multiply
-   * against the scalar values defined in the material.
+   * Specifies that only the A channel from metallicReflectanceTexture should be used.
+   * If false, both RGB and A channels will be used
+   */
+  Property<PBRMaterial, bool> useOnlyMetallicFromMetallicReflectanceTexture;
+
+  /**
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * This is multiplied against the scalar values defined in the material.
+   * If useOnlyMetallicFromMetallicReflectanceTexture is true, don't use the RGB channels, only A
    */
   Property<PBRMaterial, BaseTexturePtr> metallicReflectanceTexture;
+
+  /**
+   * Defines to store reflectanceColor in RGB
+   * This is multiplied against the scalar values defined in the material.
+   * If both reflectanceTexture and metallicReflectanceTexture textures are provided and
+   * useOnlyMetallicFromMetallicReflectanceTexture is false, metallicReflectanceTexture takes
+   * priority and reflectanceTexture is not used
+   */
+  Property<PBRMaterial, BaseTexturePtr> reflectanceTexture;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate channel depending on the current

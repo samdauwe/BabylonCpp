@@ -41,8 +41,15 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     , metallicF0Factor{this, &PBRMaterial::get_metallicF0Factor, &PBRMaterial::set_metallicF0Factor}
     , metallicReflectanceColor{this, &PBRMaterial::get_metallicReflectanceColor,
                                &PBRMaterial::set_metallicReflectanceColor}
+    , useOnlyMetallicFromMetallicReflectanceTexture{this,
+                                                    &PBRMaterial::
+                                                      get_useOnlyMetallicFromMetallicReflectanceTexture,
+                                                    &PBRMaterial::
+                                                      set_useOnlyMetallicFromMetallicReflectanceTexture}
     , metallicReflectanceTexture{this, &PBRMaterial::get_metallicReflectanceTexture,
                                  &PBRMaterial::set_metallicReflectanceTexture}
+    , reflectanceTexture{this, &PBRMaterial::get_reflectanceTexture,
+                         &PBRMaterial::set_reflectanceTexture}
     , microSurfaceTexture{this, &PBRMaterial::get_microSurfaceTexture,
                           &PBRMaterial::set_microSurfaceTexture}
     , bumpTexture{this, &PBRMaterial::get_bumpTexture, &PBRMaterial::set_bumpTexture}
@@ -148,69 +155,71 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
 {
   // Properties
   {
-    directIntensity                           = 1.f;
-    emissiveIntensity                         = 1.f;
-    environmentIntensity                      = 1.f;
-    specularIntensity                         = 1.f;
-    disableBumpMap                            = false;
-    albedoTexture                             = nullptr;
-    ambientTexture                            = nullptr;
-    ambientTextureStrength                    = 1.f;
-    ambientTextureImpactOnAnalyticalLights    = PBRMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS;
-    opacityTexture                            = nullptr;
-    reflectionTexture                         = nullptr;
-    emissiveTexture                           = nullptr;
-    reflectivityTexture                       = nullptr;
-    metallicTexture                           = nullptr;
-    metallic                                  = 0.f;
-    roughness                                 = 0.f;
-    metallicF0Factor                          = 1.0f;
-    metallicReflectanceColor                  = Color3::White();
-    metallicReflectanceTexture                = nullptr;
-    microSurfaceTexture                       = nullptr;
-    bumpTexture                               = nullptr;
-    lightmapTexture                           = nullptr;
-    refractionTexture                         = nullptr;
-    ambientColor                              = Color3(0.f, 0.f, 0.f);
-    albedoColor                               = Color3(1.f, 1.f, 1.f);
-    reflectivityColor                         = Color3(1.f, 1.f, 1.f);
-    reflectionColor                           = Color3(1.f, 1.f, 1.f);
-    emissiveColor                             = Color3(0.f, 0.f, 0.f);
-    microSurface                              = 1.f;
-    indexOfRefraction                         = 0.66f;
-    invertRefractionY                         = false;
-    linkRefractionWithTransparency            = false;
-    useLightmapAsShadowmap                    = false;
-    useAlphaFromAlbedoTexture                 = false;
-    forceAlphaTest                            = false;
-    alphaCutOff                               = 0.4f;
-    useSpecularOverAlpha                      = true;
-    useMicroSurfaceFromReflectivityMapAlpha   = false;
-    useRoughnessFromMetallicTextureAlpha      = true;
-    useRoughnessFromMetallicTextureGreen      = false;
-    useMetallnessFromMetallicTextureBlue      = false;
-    useAmbientOcclusionFromMetallicTextureRed = false;
-    useAmbientInGrayScale                     = false;
-    useAutoMicroSurfaceFromReflectivityMap    = false;
-    useRadianceOverAlpha                      = true;
-    useObjectSpaceNormalMap                   = false;
-    useParallax                               = false;
-    useParallaxOcclusion                      = false;
-    parallaxScaleBias                         = 0.05f;
-    disableLighting                           = false;
-    forceIrradianceInFragment                 = false;
-    maxSimultaneousLights                     = 4;
-    invertNormalMapX                          = false;
-    invertNormalMapY                          = false;
-    twoSidedLighting                          = false;
-    useAlphaFresnel                           = false;
-    useLinearAlphaFresnel                     = false;
-    environmentBRDFTexture                    = nullptr;
-    forceNormalForward                        = false;
-    enableSpecularAntiAliasing                = false;
-    useHorizonOcclusion                       = true;
-    useRadianceOcclusion                      = true;
-    unlit                                     = false;
+    directIntensity                               = 1.f;
+    emissiveIntensity                             = 1.f;
+    environmentIntensity                          = 1.f;
+    specularIntensity                             = 1.f;
+    disableBumpMap                                = false;
+    albedoTexture                                 = nullptr;
+    ambientTexture                                = nullptr;
+    ambientTextureStrength                        = 1.f;
+    ambientTextureImpactOnAnalyticalLights        = PBRMaterial::DEFAULT_AO_ON_ANALYTICAL_LIGHTS;
+    opacityTexture                                = nullptr;
+    reflectionTexture                             = nullptr;
+    emissiveTexture                               = nullptr;
+    reflectivityTexture                           = nullptr;
+    metallicTexture                               = nullptr;
+    metallic                                      = 0.f;
+    roughness                                     = 0.f;
+    metallicF0Factor                              = 1.0f;
+    metallicReflectanceColor                      = Color3::White();
+    useOnlyMetallicFromMetallicReflectanceTexture = false;
+    metallicReflectanceTexture                    = nullptr;
+    reflectanceTexture                            = nullptr;
+    microSurfaceTexture                           = nullptr;
+    bumpTexture                                   = nullptr;
+    lightmapTexture                               = nullptr;
+    refractionTexture                             = nullptr;
+    ambientColor                                  = Color3(0.f, 0.f, 0.f);
+    albedoColor                                   = Color3(1.f, 1.f, 1.f);
+    reflectivityColor                             = Color3(1.f, 1.f, 1.f);
+    reflectionColor                               = Color3(1.f, 1.f, 1.f);
+    emissiveColor                                 = Color3(0.f, 0.f, 0.f);
+    microSurface                                  = 1.f;
+    indexOfRefraction                             = 0.66f;
+    invertRefractionY                             = false;
+    linkRefractionWithTransparency                = false;
+    useLightmapAsShadowmap                        = false;
+    useAlphaFromAlbedoTexture                     = false;
+    forceAlphaTest                                = false;
+    alphaCutOff                                   = 0.4f;
+    useSpecularOverAlpha                          = true;
+    useMicroSurfaceFromReflectivityMapAlpha       = false;
+    useRoughnessFromMetallicTextureAlpha          = true;
+    useRoughnessFromMetallicTextureGreen          = false;
+    useMetallnessFromMetallicTextureBlue          = false;
+    useAmbientOcclusionFromMetallicTextureRed     = false;
+    useAmbientInGrayScale                         = false;
+    useAutoMicroSurfaceFromReflectivityMap        = false;
+    useRadianceOverAlpha                          = true;
+    useObjectSpaceNormalMap                       = false;
+    useParallax                                   = false;
+    useParallaxOcclusion                          = false;
+    parallaxScaleBias                             = 0.05f;
+    disableLighting                               = false;
+    forceIrradianceInFragment                     = false;
+    maxSimultaneousLights                         = 4;
+    invertNormalMapX                              = false;
+    invertNormalMapY                              = false;
+    twoSidedLighting                              = false;
+    useAlphaFresnel                               = false;
+    useLinearAlphaFresnel                         = false;
+    environmentBRDFTexture                        = nullptr;
+    forceNormalForward                            = false;
+    enableSpecularAntiAliasing                    = false;
+    useHorizonOcclusion                           = true;
+    useRadianceOcclusion                          = true;
+    unlit                                         = false;
   }
   _environmentBRDFTexture = BRDFTextureTools::GetEnvironmentBRDFTexture(scene);
 }
@@ -486,6 +495,21 @@ void PBRMaterial::set_metallicReflectanceColor(const Color3& value)
   _markAllSubMeshesAsTexturesDirty();
 }
 
+bool PBRMaterial::get_useOnlyMetallicFromMetallicReflectanceTexture() const
+{
+  return _useOnlyMetallicFromMetallicReflectanceTexture;
+}
+
+void PBRMaterial::set_useOnlyMetallicFromMetallicReflectanceTexture(bool value)
+{
+  if (_useOnlyMetallicFromMetallicReflectanceTexture == value) {
+    return;
+  }
+
+  _useOnlyMetallicFromMetallicReflectanceTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
 BaseTexturePtr& PBRMaterial::get_metallicReflectanceTexture()
 {
   return _metallicReflectanceTexture;
@@ -498,6 +522,21 @@ void PBRMaterial::set_metallicReflectanceTexture(const BaseTexturePtr& value)
   }
 
   _metallicReflectanceTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+BaseTexturePtr& PBRMaterial::get_reflectanceTexture()
+{
+  return _reflectanceTexture;
+}
+
+void PBRMaterial::set_reflectanceTexture(const BaseTexturePtr& value)
+{
+  if (_reflectanceTexture == value) {
+    return;
+  }
+
+  _reflectanceTexture = value;
   _markAllSubMeshesAsTexturesDirty();
 }
 
