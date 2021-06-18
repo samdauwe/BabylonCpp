@@ -56,6 +56,9 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"METALLIC_REFLECTANCE", false}, //
 
+    {"METALLIC_REFLECTANCE_USE_ALPHA_ONLY", false}, //
+    {"REFLECTANCE", false},                         //
+
     {"ENVIRONMENTBRDF", false},      //
     {"ENVIRONMENTBRDF_RGBD", false}, //
 
@@ -188,6 +191,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"SS_SCATTERING", false},   //
 
     {"SS_THICKNESSANDMASK_TEXTURE", false}, //
+    {"SS_HAS_THICKNESS", false},            //
 
     {"SS_REFRACTIONMAP_3D", false},              //
     {"SS_REFRACTIONMAP_OPPOSITEZ", false},       //
@@ -199,9 +203,10 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"SS_ALBEDOFORREFRACTIONTINT", false},       //
     {"SS_ALBEDOFORTRANSLUCENCYTINT", false},     //
     {"SS_USE_LOCAL_REFRACTIONMAP_CUBIC", false}, //
+    {"SS_USE_THICKNESS_AS_DEPTH", false},        //
 
-    {"SS_MASK_FROM_THICKNESS_TEXTURE", false},      //
-    {"SS_MASK_FROM_THICKNESS_TEXTURE_GLTF", false}, //
+    {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
+    {"SS_USE_GLTF_THICKNESS_TEXTURE", false},  //
 
     {"UNLIT", false}, //
   };
@@ -217,6 +222,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"REFLECTIVITYDIRECTUV", 0},                //
     {"MICROSURFACEMAPDIRECTUV", 0},             //
     {"METALLIC_REFLECTANCEDIRECTUV", 0},        //
+    {"REFLECTANCEDIRECTUV", 0},                 //
     {"BUMPDIRECTUV", 0},                        //
     {"LIGHTMAPDIRECTUV", 0},                    //
     {"NUM_BONE_INFLUENCERS", 0},                //
