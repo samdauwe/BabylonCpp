@@ -7,6 +7,7 @@
 #include <babylon/gizmos/rotation_gizmo.h>
 #include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/lights/hemispheric_light.h>
+#include <babylon/materials/shader_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -41,6 +42,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
     , _gizmoMesh{nullptr}
     , _rotationCircle{nullptr}
     , _dragging{false}
+    , _rotationShaderMaterial{nullptr}
     , _useEulerRotation{useEulerRotation}
     , _dragDistance{0.f}
     , _tmpSnapEvent{0.f}
@@ -208,6 +210,10 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
         _tmpSnapEvent.snapDistance = angle;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
+      _angles.y += angle;
+
+      angle += cameraFlipped ? -angle : angle;
+      _rotationShaderMaterial->setVector3("angles", _angles);
       _matrixChanged();
     }
   });
@@ -222,6 +228,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
+  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(_gizmoMesh.get()), _cache);
   }
@@ -234,11 +241,13 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       auto pickedMesh = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
       _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
       if (!_parent) {
-        auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        const auto material = _cache.dragBehavior->enabled ?
+                                (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
+                                _disableMaterial;
         for (auto& m : _cache.gizmoMeshes) {
           m->material         = material;
           const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
-          if (lineMesh) {
+          if (lineMesh && _cache.dragBehavior->enabled) {
             lineMesh->color = material->diffuseColor;
           }
         }
