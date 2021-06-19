@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/gizmos/gizmo.h>
+#include <babylon/maths/color3.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
@@ -12,6 +13,42 @@ class GizmoManager;
 class Mesh;
 class PlaneRotationGizmo;
 FWD_CLASS_SPTR(UtilityLayerRenderer)
+
+/**
+ * @brief Options for each individual plane rotation gizmo contained within RotationGizmo
+ */
+struct BABYLON_SHARED_EXPORT PlaneRotationGizmoOptions {
+  /**
+   * Color to use for the plane rotation gizmo
+   */
+  std::optional<Color3> color = std::nullopt;
+}; // end of struct PlaneRotationGizmoOptions
+
+/**
+ * @brief Additional options for each rotation gizmo.
+ */
+struct BABYLON_SHARED_EXPORT RotationGizmoOptions {
+  /**
+   * When set, the gizmo will always appear the same size no matter where the camera is (default:
+   * true)
+   */
+  std::optional<bool> updateScale = std::nullopt;
+
+  /**
+   * Specific options for xGizmo
+   */
+  std::optional<PlaneRotationGizmoOptions> xOptions = std::nullopt;
+
+  /**
+   * Specific options for yGizmo
+   */
+  std::optional<PlaneRotationGizmoOptions> yOptions = std::nullopt;
+
+  /**
+   * Specific options for zGizmo
+   */
+  std::optional<PlaneRotationGizmoOptions> zOptions = std::nullopt;
+}; // end of struct RotationGizmoOptions
 
 /**
  * @brief Gizmo that enables rotating a mesh along 3 axis.
@@ -25,11 +62,14 @@ public:
    * @param tessellation Amount of tessellation to be used when creating rotation circles
    * @param useEulerRotation Use and update Euler angle instead of quaternion
    * @param thickness display gizmo axis thickness
+   * @param gizmoManager Gizmo manager
+   * @param options More options
    */
   RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
                 unsigned int tessellation = 32, bool useEulerRotation = false,
-                float thickness = 1.f, GizmoManager* gizmoManager = nullptr);
+                float thickness = 1.f, GizmoManager* gizmoManager = nullptr,
+                const std::optional<RotationGizmoOptions>& options = std::nullopt);
   ~RotationGizmo() override; // = default
 
   /**
