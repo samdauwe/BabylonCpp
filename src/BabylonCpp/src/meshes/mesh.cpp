@@ -3827,7 +3827,7 @@ MeshPtr Mesh::ExtrudeShape(const std::string& iName, const std::vector<Vector3>&
   options.path            = path;
   options.scale           = scale;
   options.rotation        = iRotation;
-  options.cap             = (cap == 0) ? 0 : Mesh::NO_CAP;
+  options.cap             = cap == 0 ? 0 : Mesh::NO_CAP;
   options.sideOrientation = sideOrientation;
   options.instance        = instance;
   options.updatable       = updatable;
@@ -3849,7 +3849,7 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   options.rotationFunction = rotationFunction;
   options.ribbonCloseArray = ribbonCloseArray;
   options.ribbonClosePath  = ribbonClosePath;
-  options.cap              = (cap == 0) ? 0 : Mesh::NO_CAP;
+  options.cap              = cap == 0 ? 0 : Mesh::NO_CAP;
   options.sideOrientation  = sideOrientation;
   options.instance         = instance;
   options.updatable        = updatable;
