@@ -163,8 +163,9 @@ public:
   /**
    * @brief Build the material and generates the inner effect.
    * @param verbose defines if the build should log activity
+   * @param updateBuildId defines if the internal build Id should be updated (default is true)
    */
-  void build(bool verbose = false);
+  void build(bool verbose = false, bool updateBuildId = true);
 
   /**
    * @brief Runs an otpimization phase to try to improve the shader code.
@@ -341,9 +342,11 @@ public:
 
   /**
    * @brief Makes a duplicate of the current material.
-   * @param name - name to use for the new material.
+   * @param name defines the name to use for the new material
+   * @param shareEffect defines if the clone material should share the same effect (default is
+   * false)
    */
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool shareEffect = false) const override;
 
   /**
    * @brief Creates a node material from parsed material data.
@@ -403,6 +406,17 @@ protected:
    * @brief Sets the mode property.
    */
   void set_mode(const NodeMaterialModes& value);
+
+  /**
+   * @brief Gets the unique identifier used to identified the effect associated with the material.
+   */
+  size_t get_buildId() const;
+
+  /**
+   * @brief Sets or sets the unique identifier used to identified the effect associated with the
+   * material.
+   */
+  void set_buildId(size_t value);
 
   /**
    * @brief Attaches a new image processing configuration to the Standard Material.
@@ -503,6 +517,11 @@ public:
    * Gets or sets the mode property
    */
   Property<NodeMaterial, NodeMaterialModes> mode;
+
+  /**
+   *  Gets or sets the unique identifier used to identified the effect associated with the material
+   */
+  Property<NodeMaterial, size_t> buildId;
 
   /**
    * A free comment about the material

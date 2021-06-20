@@ -54,6 +54,7 @@ NodeMaterial::NodeMaterial(const std::string& iName, Scene* iScene,
                                    &NodeMaterial::set_imageProcessingConfiguration}
     , _mode{NodeMaterialModes::Material}
     , mode(this, &NodeMaterial::get_mode, &NodeMaterial::set_mode)
+    , buildId(this, &NodeMaterial::get_buildId, &NodeMaterial::set_buildId)
     , _imageProcessingConfiguration{nullptr}
     , _options{nullptr}
     , _vertexCompilationState{nullptr}
@@ -103,6 +104,16 @@ NodeMaterialModes& NodeMaterial::get_mode()
 void NodeMaterial::set_mode(const NodeMaterialModes& value)
 {
   _mode = value;
+}
+
+size_t NodeMaterial::get_buildId() const
+{
+  return _buildId;
+}
+
+void NodeMaterial::set_buildId(size_t value)
+{
+  _buildId = value;
 }
 
 std::string NodeMaterial::getClassName() const
@@ -393,7 +404,7 @@ void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
   }
 }
 
-void NodeMaterial::build(bool verbose)
+void NodeMaterial::build(bool verbose, bool updateBuildId)
 {
   _buildWasSuccessful = false;
   const auto engine   = getScene()->getEngine();
@@ -466,7 +477,9 @@ void NodeMaterial::build(bool verbose)
   _vertexCompilationState->finalize(*_vertexCompilationState);
   _fragmentCompilationState->finalize(*_fragmentCompilationState);
 
-  _buildId = NodeMaterial::_BuildIdGenerator++;
+  if (updateBuildId) {
+    _buildId = NodeMaterial::_BuildIdGenerator++;
+  }
 
   // Errors
   _sharedData->emitErrors();
@@ -994,7 +1007,7 @@ void NodeMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (mustRebind) {
     const auto& sharedData = _sharedData;
-    if (effect && scene->getCachedEffect() != effect) {
+    if (effect) {
       // Bindable blocks
       for (const auto& block : sharedData->bindableBlocks) {
         block->bind(effect.get(), shared_from_this(), mesh, subMesh);
@@ -1433,7 +1446,7 @@ void NodeMaterial::loadFromSerialization(const json& /*source*/, const std::stri
 {
 }
 
-MaterialPtr NodeMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
+MaterialPtr NodeMaterial::clone(const std::string& /*name*/, bool /*shareEffect*/) const
 {
   return nullptr;
 }
