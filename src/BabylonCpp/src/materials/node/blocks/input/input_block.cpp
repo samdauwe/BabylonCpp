@@ -6,7 +6,6 @@
 #include <babylon/core/json_util.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_value.h>
 #include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -577,7 +576,7 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
         effect->setMatrix(variableName, scene->getTransformMatrix());
         break;
       case NodeMaterialSystemValues::CameraPosition:
-        MaterialHelper::BindEyePosition(effect, scene, variableName, true);
+        scene->bindEyePosition(effect, variableName, true);
         break;
       case NodeMaterialSystemValues::FogColor:
         effect->setColor3(variableName, scene->fogColor);
@@ -658,12 +657,14 @@ std::string InputBlock::_dumpPropertiesCode()
   const auto& variableName = _codeVariableName;
 
   if (isAttribute()) {
-    return StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", variableName.c_str(),
-                               name().c_str());
+    return NodeMaterialBlock::_dumpPropertiesCode()
+           + StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", variableName.c_str(),
+                                 name().c_str());
   }
   if (isSystemValue()) {
-    return StringTools::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",
-                               variableName.c_str(), static_cast<unsigned int>(*_systemValue));
+    return NodeMaterialBlock::_dumpPropertiesCode()
+           + StringTools::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",
+                                 variableName.c_str(), static_cast<unsigned int>(*_systemValue));
   }
   if (isUniform()) {
     std::vector<std::string> codes;
@@ -740,9 +741,10 @@ std::string InputBlock::_dumpPropertiesCode()
     stl_util::concat(codes, {StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
                                                  isConstant ? "true" : "false")});
 
-    return StringTools::join(codes, ";\r\n");
+    return NodeMaterialBlock::_dumpPropertiesCode() + StringTools::join(codes, ";\r\n");
   }
-  return "";
+
+  return NodeMaterialBlock::_dumpPropertiesCode();
 }
 
 void InputBlock::dispose()
