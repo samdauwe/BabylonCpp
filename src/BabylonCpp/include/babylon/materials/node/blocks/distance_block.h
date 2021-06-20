@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_DISTANCE_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class DistanceBlock;
-using DistanceBlockPtr = std::shared_ptr<DistanceBlock>;
+FWD_CLASS_SPTR(DistanceBlock)
 
 /**
  * @brief Block used to get the distance between 2 values.
