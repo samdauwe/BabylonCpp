@@ -34,12 +34,10 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Cloud Procedural Texture from parsed cloud procedural
-   * texture data.
+   * @brief Creates a Cloud Procedural Texture from parsed cloud procedural texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing cloud procedural texture
-   * information
+   * @param rootUrl defines the root URL containing cloud procedural texture information
    * @returns a parsed Cloud Procedural Texture
    */
   static std::unique_ptr<CloudProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
@@ -67,5 +65,4 @@ private:
 } // end of namespace ProceduralTexturesLibrary
 } // end of namespace BABYLON
 
-#endif // end of
-       // BABYLON_PROCEDURAL_TEXTURES_LIBRARY_CLOUD_CLOUD_PROCEDURAL_TEXTURE_H
+#endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_CLOUD_CLOUD_PROCEDURAL_TEXTURE_H
