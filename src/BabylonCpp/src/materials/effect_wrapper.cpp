@@ -1,5 +1,6 @@
 #include <babylon/materials/effect_wrapper.h>
 
+#include <babylon/engines/thin_engine.h>
 #include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_wrapper_creation_options.h>
@@ -9,6 +10,7 @@ namespace BABYLON {
 
 EffectWrapper::EffectWrapper(const EffectWrapperCreationOptions& creationOptions)
     : effect{this, &EffectWrapper::get_effect, &EffectWrapper::set_effect}
+    , _onContextRestoredObserver{nullptr}
 {
   std::unordered_map<std::string, std::string> effectCreationOptions{};
   auto uniformNames = creationOptions.uniformNames;
@@ -43,6 +45,15 @@ EffectWrapper::EffectWrapper(const EffectWrapperCreationOptions& creationOptions
   options.samplers      = creationOptions.samplerNames;
 
   effect = Effect ::New(effectCreationOptions, options, creationOptions.engine);
+
+  _onContextRestoredObserver = creationOptions.engine->onContextRestoredObservable.add(
+    [this](ThinEngine* /*engine*/, EventState& /*es*/) -> void {
+      effect()->_pipelineContext
+        = nullptr; // because _prepareEffect will try to dispose this pipeline before recreating it
+                   // and that would lead to webgl errors
+      effect()->_wasPreviouslyReady = false;
+      effect()->_prepareEffect();
+    });
 }
 
 EffectWrapper::~EffectWrapper() = default;
@@ -59,6 +70,10 @@ void EffectWrapper::set_effect(const EffectPtr& iEffect)
 
 void EffectWrapper::dispose()
 {
+  if (_onContextRestoredObserver) {
+    effect()->getEngine()->onContextRestoredObservable.remove(_onContextRestoredObserver);
+    _onContextRestoredObserver = nullptr;
+  }
   effect()->dispose();
 }
 

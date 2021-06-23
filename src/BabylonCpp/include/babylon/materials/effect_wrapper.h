@@ -3,7 +3,9 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
+#include <babylon/engines/thin_engine.h>
 #include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
@@ -53,6 +55,8 @@ public:
 
   /** @hidden */
   DrawWrapperPtr _drawWrapper;
+
+  Observer<ThinEngine>::Ptr _onContextRestoredObserver;
 
 }; // end of class EffectWrapper
 
