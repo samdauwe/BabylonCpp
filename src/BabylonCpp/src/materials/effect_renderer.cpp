@@ -20,7 +20,10 @@ IEffectRendererOptions EffectRenderer::_DefaultOptions = IEffectRendererOptions{
 };
 
 EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions& options)
-    : engine{iEngine}, _fullscreenViewport{std::make_unique<Viewport>(0.f, 0.f, 1.f, 1.f)}
+    : engine{iEngine}
+    , _indices{options.indices}
+    , _fullscreenViewport{std::make_unique<Viewport>(0.f, 0.f, 1.f, 1.f)}
+    , _onContextRestoredObserver{nullptr}
 {
   _vertexBuffers = {
     {VertexBuffer::PositionKind,
@@ -28,6 +31,15 @@ EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions
                                     VertexBuffer::PositionKind, false, false, 2)},
   };
   _indexBuffer = engine->createIndexBuffer(options.indices);
+
+  _onContextRestoredObserver = engine->onContextRestoredObservable.add(
+    [this](ThinEngine* /*engine*/, EventState& /*es*/) -> void {
+      _indexBuffer = engine->createIndexBuffer(_indices);
+
+      for (const auto& [key, vertexBuffer] : _vertexBuffers) {
+        vertexBuffer->_rebuild();
+      }
+    });
 }
 
 EffectRenderer::~EffectRenderer() = default;
@@ -118,6 +130,11 @@ void EffectRenderer::dispose()
 
   if (_indexBuffer) {
     engine->_releaseBuffer(_indexBuffer);
+  }
+
+  if (_onContextRestoredObserver) {
+    engine->onContextRestoredObservable.remove(_onContextRestoredObserver);
+    _onContextRestoredObserver = nullptr;
   }
 }
 

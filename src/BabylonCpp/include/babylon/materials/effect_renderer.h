@@ -8,6 +8,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/babylon_fwd.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
@@ -102,8 +103,10 @@ public:
 private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
+  IndicesArray _indices;
 
   std::unique_ptr<Viewport> _fullscreenViewport;
+  Observer<ThinEngine>::Ptr _onContextRestoredObserver;
 
 }; // end of class EffectRenderer
 
