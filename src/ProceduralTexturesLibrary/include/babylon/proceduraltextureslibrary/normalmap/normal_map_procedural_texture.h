@@ -36,12 +36,10 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Normal Map Procedural Texture from parsed normal map
-   * procedural texture data.
+   * @brief Creates a Normal Map Procedural Texture from parsed normal map procedural texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing normal map procedural
-   * texture information
+   * @param rootUrl defines the root URL containing normal map procedural texture information
    * @returns a parsed Normal Map Procedural Texture
    */
   static std::unique_ptr<NormalMapProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
@@ -66,5 +64,4 @@ private:
 } // end of namespace ProceduralTexturesLibrary
 } // end of namespace BABYLON
 
-#endif // end of
-       // BABYLON_PROCEDURAL_TEXTURES_LIBRARY_NORMAL_MAP_NORMAL_MAP_PROCEDURAL_TEXTURE_H
+#endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_NORMAL_MAP_NORMAL_MAP_PROCEDURAL_TEXTURE_H
