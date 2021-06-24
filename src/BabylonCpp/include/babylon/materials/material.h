@@ -513,12 +513,12 @@ protected:
   [[nodiscard]] float get_alpha() const;
 
   /**
-   * @brief Sets the back-face culling state.
+   * @brief Sets the culling state (true to enable culling, false to disable).
    */
   void set_backFaceCulling(bool value);
 
   /**
-   * @brief Gets the back-face culling state.
+   * @brief Gets the culling state.
    */
   [[nodiscard]] bool get_backFaceCulling() const;
 
