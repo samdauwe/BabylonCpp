@@ -23,18 +23,16 @@ struct DynamicTerrainOptions {
   int mapSubX;
   // mapSubZ the data map number of z subdivisions
   int mapSubZ;
-  // mapUVs the array of the map UV data: u,v successive values, each between 0
-  // and 1.
+  // mapUVs the array of the map UV data: u,v successive values, each between 0 and 1.
   Float32Array mapUVs;
   // mapColors the array of the map Color data: x, y, z successive float values.
   Float32Array mapColors;
-  // mapNormals the array of the map normal data (optional) : r,g,b successive
-  // values, each between 0 and 1.
+  // mapNormals the array of the map normal data (optional) : r,g,b successive values, each between
+  // 0 and 1.
   Float32Array mapNormals;
   // invertSide boolean, to invert the terrain mesh upside down
   bool invertSide = false;
-  // camera the camera to link the terrain to. Optional, by default the scene
-  // active camera
+  // camera the camera to link the terrain to. Optional, by default the scene active camera
   CameraPtr camera = nullptr;
 }; // end of class DynamicTerrain
 
