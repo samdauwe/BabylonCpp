@@ -68,11 +68,10 @@ struct HeightMapOptions {
  * dynamically morphed from a map of 3D data.
  *
  * The dynamic terrain is a mesh that morphs on a logical data map.
- * This map is a simple flat array of successive 3D coordinates (x, y, z) as
- * floats. It can be as huge as you need, as long as you've enough memory. This
- * won't be rendered anyway. The map must be passed to the dynamic terrain
- * constructor as well as the number of subdivisions on the map width and
- * height.
+ * This map is a simple flat array of successive 3D coordinates (x, y, z) as floats. It can be as
+ * huge as you need, as long as you've enough memory. This won't be rendered anyway. The map must be
+ * passed to the dynamic terrain constructor as well as the number of subdivisions on the map width
+ * and height.
  */
 class DynamicTerrain {
 
@@ -87,16 +86,14 @@ public:
   virtual ~DynamicTerrain(); // = default
 
   /**
-   * @brief Updates the terrain position and shape according to the camera
-   * position.
+   * @brief Updates the terrain position and shape according to the camera position.
    * @param force Forces the terrain update even if no camera position change.
    * @returns The terrain.
    */
   DynamicTerrain& update(bool force);
 
   /**
-   * @brief Updates the mesh terrain size according to the LOD limits and the
-   * camera position.
+   * @brief Updates the mesh terrain size according to the LOD limits and the camera position.
    * Returns The terrain.
    */
   DynamicTerrain& updateTerrainSize();
@@ -106,30 +103,29 @@ public:
    * @param x
    * @param z
    * @param {normal: Vector3} (optional)
-   * If the optional object {normal: Vector3} is passed, then its property
-   * "normal" is updated with the normal vector value at the coordinates (x, z).
+   * If the optional object {normal: Vector3} is passed, then its property "normal" is updated with
+   * the normal vector value at the coordinates (x, z).
    * @returns The altitude (float) at the coordinates (x, z) of the passed map.
    */
   [[nodiscard]] float getHeightFromMap(float x, float z, const Vector3& normal) const;
 
   /**
-   * @brief Returns the altitude (float) at the coordinates (x, z) of the passed
-   * map.
+   * @brief Returns the altitude (float) at the coordinates (x, z) of the passed map.
    * @param x
    * @param z
    * @param mapSubX the number of points along the map width
    * @param mapSubX the number of points along the map height
    * @param {normal: Vector3} (optional)
-   * If the optional object {normal: Vector3} is passed, then its property
-   * "normal" is updated with the normal vector value at the coordinates (x, z).
+   * If the optional object {normal: Vector3} is passed, then its property "normal" is updated with
+   * the normal vector value at the coordinates (x, z).
    * @returns The altitude (float) at the coordinates (x, z) of the passed map.
    */
   static float GetHeightFromMap(float x, float z, const Float32Array& mapData, unsigned int mapSubX,
                                 unsigned int mapSubZ, const Vector3& normal = Vector3::Zero());
 
   /**
-   * @brief Computes the height and optionnally the normal at the coordinates
-   * (x,z) from the passed map.
+   * @brief Computes the height and optionnally the normal at the coordinates (x,z) from the passed
+   * map.
    * @returns The altitude at the coordinates (x, z) of the map.
    */
   static float _GetHeightFromMap(float x, float z, const Float32Array& mapData,
@@ -137,23 +133,22 @@ public:
                                  float mapSizeZ, const Vector3& normal = Vector3::Zero());
 
   /**
-   * @brief Computes all the normals from the terrain data map  and stores them
-   * in the passed Float32Array reference.
+   * @brief Computes all the normals from the terrain data map  and stores them in the passed
+   * Float32Array reference.
    * This passed array must have the same size than the mapData array.
    */
   static void ComputeNormalsFromMapToRef(const Float32Array& mapData, unsigned int mapSubX,
                                          unsigned int mapSubZ, Float32Array& normals);
 
   /**
-   * @brief Computes all the map normals from the current terrain data map and
-   * sets them to the terrain.
+   * @brief Computes all the map normals from the current terrain data map and sets them to the
+   * terrain.
    * @returns The terrain.
    */
   DynamicTerrain& computeNormalsFromMap();
 
   /**
-   * @brief Returns true if the World coordinates (x, z) are in the current
-   * terrain.
+   * @brief Returns true if the World coordinates (x, z) are in the current terrain.
    * @param x
    * @param z
    * @return
@@ -164,16 +159,14 @@ public:
    * @brief Returns a new data map from the passed heightmap image file.
    * @param width map width size (positive float, default 300)
    * @param height map height size (positive float, default 300)
-   * @param subX is the wanted number of points along the map width (default
-   * 100).
-   * @param subZ is the wanted number of points along the map height (default
-   * 100).
+   * @param subX is the wanted number of points along the map width (default 100).
+   * @param subZ is the wanted number of points along the map height (default 100).
    * @param minHeight is the minimum altitude of the map (float, default 0).
    * @param maxHeight is the maximum altitude of the map (float, default 10).
-   * @param colorFilter is the filter to apply to the image pixel colors to
-   * compute the height (optional Color3, default (0.3, 0.59, 0.11) ).
-   * @param onReady is an optional callback function, called once the map is
-   * computed. It's passed the computed map.
+   * @param colorFilter is the filter to apply to the image pixel colors to compute the height
+   * (optional Color3, default (0.3, 0.59, 0.11) ).
+   * @param onReady is an optional callback function, called once the map is computed. It's passed
+   * the computed map.
    * @param scene is the Scene object whose database will store the downloaded
    * image.
    */
