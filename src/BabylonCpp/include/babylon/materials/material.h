@@ -30,6 +30,7 @@ FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_STRUCT_SPTR(IMaterialContext)
 FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(MaterialStencilState)
 FWD_CLASS_SPTR(MultiMaterial)
 FWD_CLASS_SPTR(PrePassRenderer)
 FWD_CLASS_SPTR(RenderTargetTexture)
@@ -956,6 +957,11 @@ public:
    * The material fill mode
    */
   Property<Material, unsigned int> fillMode;
+
+  /**
+   * Gives access to the stencil properties of the material
+   */
+  MaterialStencilStatePtr stencil;
 
   /**
    * Hidden

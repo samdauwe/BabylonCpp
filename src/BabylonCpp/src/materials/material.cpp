@@ -8,6 +8,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/material_stencil_state.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -93,6 +94,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , wireframe{this, &Material::get_wireframe, &Material::set_wireframe}
     , pointsCloud{this, &Material::get_pointsCloud, &Material::set_pointsCloud}
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
+    , stencil{MaterialStencilState::New()}
     , _indexInSceneMaterialArray{-1}
     , transparencyMode{this, &Material::get_transparencyMode, &Material::set_transparencyMode}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
@@ -533,7 +535,7 @@ bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> ove
   else {
     engine->enableEffect(_getDrawWrapper());
   }
-  engine->setState(backFaceCulling(), zOffset, false, reverse);
+  engine->setState(backFaceCulling(), zOffset, false, reverse, cullBackFaces(), stencil);
 
   return reverse;
 }
@@ -588,7 +590,7 @@ void Material::bindViewProjection(const EffectPtr& effect)
 void Material::bindEyePosition(Effect* effect, const std::string& variableName)
 {
   if (!_useUBO) {
-    MaterialHelper::BindEyePosition(effect, _scene, variableName);
+    _scene->bindEyePosition(effect, variableName);
   }
   else {
     _needToBindSceneUbo = true;
@@ -601,7 +603,7 @@ void Material::_afterBind(Mesh* mesh, const EffectPtr& effect)
   if (_needToBindSceneUbo) {
     if (effect) {
       _needToBindSceneUbo = false;
-      MaterialHelper::FinalizeSceneUbo(getScene());
+      _scene->finalizeSceneUbo();
       MaterialHelper::BindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
     }
   }
