@@ -203,7 +203,7 @@ void NullEngine::enableEffect(const DrawWrapperPtr& effect)
 }
 
 void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/,
-                          bool /*cullBackFaces*/)
+                          bool /*cullBackFaces*/, const IStencilStatePtr& /*stencil*/)
 {
 }
 

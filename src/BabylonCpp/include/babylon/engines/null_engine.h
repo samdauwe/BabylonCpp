@@ -149,7 +149,7 @@ public:
    * @param stencil stencil states to set
    */
   void setState(bool culling, float zOffset = 0.f, bool force = false, bool reverseSide = false,
-                bool cullBackFaces = true) override;
+                bool cullBackFaces = true, const IStencilStatePtr& stencil = nullptr) override;
 
   /**
    * @brief Set the value of an uniform to an array of int32.
