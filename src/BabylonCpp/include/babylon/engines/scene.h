@@ -169,6 +169,13 @@ public:
   Vector4& bindEyePosition(Effect* effect, const std::string& variableName = "vEyePosition",
                            bool isVector3 = false);
 
+  /**
+   * @brief Update the scene ubo before it can be used in rendering processing.
+   * @param scene the scene to retrieve the ubo from
+   * @returns the scene UniformBuffer
+   */
+  UniformBuffer* finalizeSceneUbo();
+
   /** Properties **/
 
   /**
