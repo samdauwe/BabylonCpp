@@ -761,7 +761,6 @@ protected:
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;
-  bool _rebuildInParallel;
 
   /**
    * Keep track of the image processing observer to allow dispose and replace.

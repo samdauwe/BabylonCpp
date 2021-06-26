@@ -22,6 +22,7 @@
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/material_stencil_state.h>
 #include <babylon/materials/pre_pass_configuration.h>
 #include <babylon/materials/standard_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -145,7 +146,6 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
-    , _rebuildInParallel{false}
     , _imageProcessingConfiguration{nullptr}
     , _diffuseTexture{nullptr}
     , _ambientTexture{nullptr}
@@ -943,8 +943,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
       // Use previous effect while new one is compiling
       if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
-        effect             = previousEffect;
-        _rebuildInParallel = true;
+        effect = previousEffect;
         defines.markAsUnprocessed();
 
         if (lightDisposed) {
@@ -954,7 +953,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
         }
       }
       else {
-        _rebuildInParallel = false;
         scene->resetCachedMaterial();
         subMesh->setEffect(effect, definesPtr, _materialContext);
         buildUniformLayout();
@@ -1007,6 +1005,7 @@ void StandardMaterial::buildUniformLayout()
   ubo.addUniform("bumpMatrix", 16);
   ubo.addUniform("vTangentSpaceParams", 2);
   ubo.addUniform("pointSize", 1);
+  ubo.addUniform("alphaCutOff", 1);
   ubo.addUniform("refractionMatrix", 16);
   ubo.addUniform("vRefractionInfos", 4);
   ubo.addUniform("vRefractionPosition", 3);
@@ -1014,6 +1013,7 @@ void StandardMaterial::buildUniformLayout()
   ubo.addUniform("vSpecularColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
   ubo.addUniform("vDiffuseColor", 4);
+  ubo.addUniform("vAmbientColor", 3);
 
   DetailMapConfiguration::PrepareUniformBuffer(ubo);
 
@@ -1142,7 +1142,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
         }
 
         if (_hasAlphaChannel()) {
-          effect->setFloat("alphaCutOff", alphaCutOff);
+          ubo.updateFloat("alphaCutOff", alphaCutOff);
         }
 
         if (_reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
@@ -1224,8 +1224,10 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
         "vEmissiveColor",
         StandardMaterial::EmissiveTextureEnabled() ? emissiveColor : Color3::BlackReadOnly(), "");
 
-      // Diffuse
       ubo.updateColor4("vDiffuseColor", diffuseColor, alpha(), "");
+
+      scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
+      ubo.updateColor3("vAmbientColor", _globalAmbientColor, "");
     }
 
     // Textures
@@ -1284,23 +1286,18 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     MaterialHelper::BindClipPlane(effect, scene);
 
     // Colors
-    scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
-
     bindEyePosition(effect.get());
-
-    effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, effect.get(), defines, _maxSimultaneousLights,
-                                 _rebuildInParallel);
+      MaterialHelper::BindLights(scene, mesh, effect.get(), defines, _maxSimultaneousLights);
     }
 
     // View
     if ((scene->fogEnabled() && mesh->applyFog() && (scene->fogMode() != Scene::FOGMODE_NONE))
-        || _reflectionTexture || _refractionTexture) {
+        || _reflectionTexture || _refractionTexture || mesh->receiveShadows()) {
       bindView(effect.get());
     }
 
@@ -1514,10 +1511,14 @@ void StandardMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTexture
 
 MaterialPtr StandardMaterial::clone(const std::string& _name, bool /*cloneChildren*/) const
 {
-  auto standardMaterial  = StandardMaterial::New(*this);
-  standardMaterial->name = _name;
-  standardMaterial->id   = _name;
-  return standardMaterial;
+  auto result = StandardMaterial::New(*this);
+
+  result->name = _name;
+  result->id   = _name;
+
+  stencil->copyTo(*result->stencil);
+
+  return result;
 }
 
 json StandardMaterial::serialize() const
@@ -2137,7 +2138,13 @@ StandardMaterialPtr StandardMaterial::Parse(const json& source, Scene* scene,
 {
   return SerializationHelper::Parse(
     [source, scene, rootUrl]() {
-      return StandardMaterial::New(json_util::get_string(source, "name"), scene);
+      const auto material = StandardMaterial::New(json_util::get_string(source, "name"), scene);
+
+      if (json_util::has_valid_key_value(source, "stencil")) {
+        material->stencil->parse(source["stencil"], scene, rootUrl);
+      }
+
+      return material;
     },
     source, scene, rootUrl);
 }
