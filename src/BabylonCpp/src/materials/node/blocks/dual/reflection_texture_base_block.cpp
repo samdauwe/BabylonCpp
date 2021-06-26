@@ -478,29 +478,29 @@ ReflectionTextureBaseBlock& ReflectionTextureBaseBlock::_buildBlock(NodeMaterial
 
 std::string ReflectionTextureBaseBlock::_dumpPropertiesCode()
 {
-  if (!texture()) {
-    return "";
-  }
-  const auto iTexture = texture();
+  auto codeString = NodeMaterialBlock::_dumpPropertiesCode();
 
-  std::string codeString;
+  const auto iTexture = texture();
+  if (!iTexture) {
+    return codeString;
+  }
 
   if (iTexture->isCube()) {
     const auto iCubeTexture = std::static_pointer_cast<CubeTexture>(iTexture);
     if (iCubeTexture) {
       const auto forcedExtension = iCubeTexture->forcedExtension();
-      codeString                 = StringTools::printf(
+      codeString += StringTools::printf(
         "%s.texture = CubeTexture::New(\"%s\", std::nullopt, {}, %s, {}, nullptr, nullptr, "
         "Constants::TEXTUREFORMAT_RGBA, %s, %s);\r\n",
         _codeVariableName.c_str(), iTexture->name.c_str(), iTexture->noMipmap() ? "true" : "false",
         iTexture->_prefiltered ? "true" : "false",
         !forcedExtension.empty() ? StringTools::printf("\"%s\"", forcedExtension.c_str()).c_str() :
-                                                   "");
+                                   "");
     }
   }
   else {
-    codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", std::nullopt);\r\n",
-                                     _codeVariableName.c_str(), iTexture->name.c_str());
+    codeString += StringTools::printf("%s.texture = Texture::New(\"%s\", std::nullopt);\r\n",
+                                      _codeVariableName.c_str(), iTexture->name.c_str());
   }
   codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
                                     _codeVariableName.c_str(), iTexture->coordinatesMode());
