@@ -119,7 +119,7 @@ json MaterialStencilState::serialize() const
   return nullptr;
 }
 
-MaterialStencilStatePtr MaterialStencilState::Parse(const json& /*source*/, Scene* /*scene*/,
+MaterialStencilStatePtr MaterialStencilState::parse(const json& /*source*/, Scene* /*scene*/,
                                                     const std::string& /*rootUrl*/)
 {
   return nullptr;

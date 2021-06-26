@@ -65,8 +65,7 @@ public:
    * @param scene Defines the scene we are parsing for
    * @param rootUrl Defines the rootUrl to load from
    */
-  static MaterialStencilStatePtr Parse(const json& source, Scene* scene,
-                                       const std::string& rootUrl);
+  MaterialStencilStatePtr parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
