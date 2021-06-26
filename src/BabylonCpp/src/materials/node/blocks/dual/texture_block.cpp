@@ -22,6 +22,7 @@ TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
     , texture{this, &TextureBlock::get_texture, &TextureBlock::set_texture}
     , convertToGammaSpace{false}
     , convertToLinearSpace{false}
+    , disableLevelMultiplication{false}
     , uv{this, &TextureBlock::get_uv}
     , rgba{this, &TextureBlock::get_rgba}
     , rgb{this, &TextureBlock::get_rgb}
@@ -29,6 +30,7 @@ TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
     , g{this, &TextureBlock::get_g}
     , b{this, &TextureBlock::get_b}
     , a{this, &TextureBlock::get_a}
+    , level{this, &TextureBlock::get_level}
     , _isMixed{this, &TextureBlock::get__isMixed}
     , _texture{nullptr}
     , _currentTarget{NodeMaterialBlockTargets::VertexAndFragment}
@@ -49,6 +51,9 @@ TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
   registerOutput("b", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Neutral);
   registerOutput("a", NodeMaterialBlockConnectionPointTypes::Float,
+                 NodeMaterialBlockTargets::Neutral);
+
+  registerOutput("level", NodeMaterialBlockConnectionPointTypes::Float,
                  NodeMaterialBlockTargets::Neutral);
 
   _inputs[0]->acceptedConnectionPointTypes.emplace_back(
@@ -128,6 +133,11 @@ NodeMaterialConnectionPointPtr& TextureBlock::get_b()
 NodeMaterialConnectionPointPtr& TextureBlock::get_a()
 {
   return _outputs[5];
+}
+
+NodeMaterialConnectionPointPtr& TextureBlock::get_level()
+{
+  return _outputs[6];
 }
 
 NodeMaterialBlockTargets& TextureBlock::get_target()
@@ -247,6 +257,7 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
   if (_isMixed) {
     if (!iTexture->getTextureMatrix()->isIdentityAs3x2()) {
       defines.setValue(_defineName, true);
+      defines.setValue(_mainUVDefineName, false);
     }
     else {
       defines.setValue(_defineName, false);
@@ -298,6 +309,8 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
   _textureTransformName = state._getFreeVariableName("textureTransform");
   _textureInfoName      = state._getFreeVariableName("textureInfoName");
 
+  level()->associatedVariableName = _textureInfoName;
+
   state._emitVaryingFromString(_transformedUVName, "vec2", _defineName);
   state._emitVaryingFromString(_mainUVName, "vec2", _mainUVDefineName);
 
@@ -322,10 +335,24 @@ void TextureBlock::_injectVertexCode(NodeMaterialBuildState& state)
   _writeTextureRead(state, true);
 
   for (const auto& output : _outputs) {
-    if (output->hasEndpoints()) {
+    if (output->hasEndpoints() && output->name != "level") {
       _writeOutput(state, output, output->name, true);
     }
   }
+}
+
+void TextureBlock::_generateTextureLookup(NodeMaterialBuildState& state)
+{
+  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineName.c_str());
+  state.compilationString
+    += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
+                           _samplerName.c_str(), _transformedUVName.c_str());
+  state.compilationString
+    += StringTools::printf("#elif defined(%s)\r\n", _mainUVDefineName.c_str());
+  state.compilationString += StringTools::printf(
+    "vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(), _samplerName.c_str(),
+    !_mainUVName.empty() ? _mainUVName.c_str() : uv()->associatedVariableName().c_str());
+  state.compilationString += "#endif\r\n";
 }
 
 void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexMode)
@@ -350,16 +377,7 @@ void TextureBlock::_writeTextureRead(NodeMaterialBuildState& state, bool vertexM
     return;
   }
 
-  state.compilationString += StringTools::printf("#ifdef %s\r\n", _defineName.c_str());
-  state.compilationString
-    += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
-                           _samplerName.c_str(), _transformedUVName.c_str());
-  state.compilationString
-    += StringTools::printf("#elif defined(%s)\r\n", _mainUVDefineName.c_str());
-  state.compilationString
-    += StringTools::printf("vec4 %s = texture2D(%s, %s);\r\n", _tempTextureRead.c_str(),
-                           _samplerName.c_str(), _mainUVName.c_str());
-  state.compilationString += "#endif\r\n";
+  _generateTextureLookup(state);
 }
 
 void TextureBlock::_generateConversionCode(NodeMaterialBuildState& state,
@@ -393,7 +411,7 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
     state.compilationString
       += StringTools::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
                              _tempTextureRead.c_str(), swizzle.c_str());
-
+    _generateConversionCode(state, output, swizzle);
     return;
   }
 
@@ -401,10 +419,15 @@ void TextureBlock::_writeOutput(NodeMaterialBuildState& state,
     state.compilationString
       += StringTools::printf("%s = %s.%s;\r\n", _declareOutput(output, state).c_str(),
                              _tempTextureRead.c_str(), swizzle.c_str());
+    _generateConversionCode(state, output, swizzle);
     return;
   }
 
-  const auto complement = StringTools::printf(" * %s", _textureInfoName.c_str());
+  std::string complement;
+
+  if (!disableLevelMultiplication) {
+    complement = StringTools::printf(" * %s", _textureInfoName.c_str());
+  }
 
   state.compilationString
     += StringTools::printf("%s = %s.%s%s;\r\n", _declareOutput(output, state).c_str(),
@@ -465,7 +488,7 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
   _writeTextureRead(state);
 
   for (const auto& output : _outputs) {
-    if (output->hasEndpoints()) {
+    if (output->hasEndpoints() && output->name != "level") {
       _writeOutput(state, output, output->name);
     }
   }
@@ -475,15 +498,25 @@ TextureBlock& TextureBlock::_buildBlock(NodeMaterialBuildState& state)
 
 std::string TextureBlock::_dumpPropertiesCode()
 {
+  auto codeString = NodeMaterialBlock::_dumpPropertiesCode();
+
+  codeString += StringTools::printf("%s.convertToGammaSpace = %s;\r\n", _codeVariableName.c_str(),
+                                    convertToGammaSpace ? "true" : "false");
+  codeString += StringTools::printf("%s.convertToLinearSpace = %s;\r\n", _codeVariableName.c_str(),
+                                    convertToLinearSpace ? "true" : "false");
+  codeString
+    += StringTools::printf("%s.disableLevelMultiplication = %s;\r\n", _codeVariableName.c_str(),
+                           disableLevelMultiplication ? "true" : "false");
+
   const auto iTexture = texture();
   if (!iTexture) {
-    return "";
+    return codeString;
   }
 
-  auto codeString = StringTools::printf("%s.texture = Texture::New(\"%s\", nullptr, %s, %s);\r\n",
-                                        _codeVariableName.c_str(), iTexture->name.c_str(),
-                                        iTexture->noMipmap() ? "true" : "false",
-                                        iTexture->invertY() ? "true" : "false");
+  codeString += StringTools::printf(
+    "%s.texture = Texture::New(\"%s\", nullptr, %s, %s, %u);\r\n", _codeVariableName.c_str(),
+    iTexture->name.c_str(), iTexture->noMipmap() ? "true" : "false",
+    iTexture->invertY() ? "true" : "false", iTexture->samplingMode());
   codeString += StringTools::printf("%s.texture.wrapU = %u;\r\n", _codeVariableName.c_str(),
                                     iTexture->wrapU());
   codeString += StringTools::printf("%s.texture.wrapV = %u;\r\n", _codeVariableName.c_str(),
@@ -504,10 +537,6 @@ std::string TextureBlock::_dumpPropertiesCode()
                                     iTexture->vScale);
   codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
                                     _codeVariableName.c_str(), iTexture->coordinatesMode());
-  codeString += StringTools::printf("%s.convertToGammaSpace = %s;\r\n", _codeVariableName.c_str(),
-                                    convertToGammaSpace ? "true" : "false");
-  codeString += StringTools::printf("%s.convertToLinearSpace = %s;\r\n", _codeVariableName.c_str(),
-                                    convertToLinearSpace ? "true" : "false");
 
   return codeString;
 }

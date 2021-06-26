@@ -143,6 +143,11 @@ protected:
   NodeMaterialConnectionPointPtr& get_a();
 
   /**
+   * @brief Gets the level output component.
+   */
+  NodeMaterialConnectionPointPtr& get_level();
+
+  /**
    * @brief Gets the target.
    */
   NodeMaterialBlockTargets& get_target() override;
@@ -167,6 +172,7 @@ private:
                                const NodeMaterialConnectionPointPtr& output,
                                const std::string& swizzle);
   void _injectVertexCode(NodeMaterialBuildState& state);
+  void _generateTextureLookup(NodeMaterialBuildState& state);
   void _writeTextureRead(NodeMaterialBuildState& state, bool vertexMode = false);
   void _writeOutput(NodeMaterialBuildState& state, const NodeMaterialConnectionPointPtr& output,
                     const std::string& swizzle, bool vertexMode = false);
@@ -186,6 +192,11 @@ public:
    * Gets or sets a boolean indicating if content needs to be converted to linear space
    */
   bool convertToLinearSpace;
+
+  /**
+   * Gets or sets a boolean indicating if multiplication of texture with level should be disabled
+   */
+  bool disableLevelMultiplication;
 
   /**
    * Gets the uv input component.
@@ -218,9 +229,14 @@ public:
   ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> b;
 
   /**
-   * Gets thea output component
+   * Gets the output component
    */
   ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> a;
+
+  /**
+   * Gets the level output component
+   */
+  ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> level;
 
   /**
    * Gets whether or not the target is a mixed block target
