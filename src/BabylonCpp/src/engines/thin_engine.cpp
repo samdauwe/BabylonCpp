@@ -2238,7 +2238,7 @@ bool ThinEngine::setFloat4(const WebGLUniformLocationPtr& uniform, float x, floa
 void ThinEngine::applyStates()
 {
   _depthCullingState->apply(*_gl);
-  _stencilState->apply(*_gl);
+  //_stencilState->apply(*_gl);
   _alphaState->apply(*_gl);
 
   if (_colorWriteChanged) {
