@@ -20,7 +20,6 @@
 #include <babylon/materials/thin_material_helper.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/plane.h>
-#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -33,50 +32,6 @@ namespace BABYLON {
 std::unique_ptr<MaterialDefines> MaterialHelper::_TmpMorphInfluencers
   = std::make_unique<MaterialDefines>();
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
-
-Vector4 MaterialHelper::BindEyePosition(Effect* effect, Scene* scene,
-                                        const std::string& variableName, bool isVector3)
-{
-  const auto eyePosition = scene->_forcedViewPosition     ? *scene->_forcedViewPosition :
-                           scene->_mirroredCameraPosition ? *scene->_mirroredCameraPosition :
-                           scene->activeCamera() ? scene->activeCamera()->globalPosition() :
-                                                   Vector3();
-
-  const auto invertNormal
-    = (scene->useRightHandedSystem() == (scene->_mirroredCameraPosition != nullptr));
-
-  TmpVectors::Vector4Array[0].set(eyePosition.x, eyePosition.y, eyePosition.z,
-                                  invertNormal ? -1.f : 1.f);
-
-  if (effect) {
-    if (isVector3) {
-      effect->setFloat3(variableName, TmpVectors::Vector4Array[0].x, TmpVectors::Vector4Array[0].y,
-                        TmpVectors::Vector4Array[0].z);
-    }
-    else {
-      effect->setVector4(variableName, TmpVectors::Vector4Array[0]);
-    }
-  }
-
-  return TmpVectors::Vector4Array[0];
-}
-
-UniformBuffer* MaterialHelper::FinalizeSceneUbo(Scene* scene)
-{
-  const auto ubo         = scene->getSceneUniformBuffer();
-  const auto eyePosition = MaterialHelper::BindEyePosition(nullptr, scene);
-  ubo->updateFloat4("vEyePosition", //
-                    eyePosition.x,  //
-                    eyePosition.y,  //
-                    eyePosition.z,  //
-                    eyePosition.w,  //
-                    ""              //
-  );
-
-  ubo->update();
-
-  return ubo;
-}
 
 void MaterialHelper::BindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo)
 {
@@ -791,16 +746,23 @@ void MaterialHelper::PrepareAttributesForInstances(std::vector<std::string>& att
                                                    MaterialDefines& defines)
 {
   if (defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
-    PushAttributesForInstances(attribs);
+    PushAttributesForInstances(attribs, !!defines["PREPASS_VELOCITY"]);
   }
 }
 
-void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attribs)
+void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attribs,
+                                                bool needsPreviousMatrices)
 {
   attribs.emplace_back(VertexBuffer::World0Kind);
   attribs.emplace_back(VertexBuffer::World1Kind);
   attribs.emplace_back(VertexBuffer::World2Kind);
   attribs.emplace_back(VertexBuffer::World3Kind);
+  if (needsPreviousMatrices) {
+    attribs.emplace_back("previousWorld0");
+    attribs.emplace_back("previousWorld1");
+    attribs.emplace_back("previousWorld2");
+    attribs.emplace_back("previousWorld3");
+  }
 }
 
 void MaterialHelper::BindLightProperties(Light& light, Effect* effect, unsigned int lightIndex)
@@ -809,33 +771,32 @@ void MaterialHelper::BindLightProperties(Light& light, Effect* effect, unsigned 
 }
 
 void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                               Effect* effect, bool useSpecular, bool rebuildInParallel)
+                               Effect* effect, bool useSpecular, bool receiveShadows)
 {
-  light->_bindLight(lightIndex, scene, effect, useSpecular, rebuildInParallel);
+  light->_bindLight(lightIndex, scene, effect, useSpecular, receiveShadows);
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, bool defines,
-                                unsigned int maxSimultaneousLights, bool rebuildInParallel)
+                                unsigned int maxSimultaneousLights)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, effect, defines, rebuildInParallel);
+    BindLight(light, i, scene, effect, defines, mesh->receiveShadows());
   }
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
-                                MaterialDefines& defines, unsigned int maxSimultaneousLights,
-                                bool rebuildInParallel)
+                                MaterialDefines& defines, unsigned int maxSimultaneousLights)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, effect, defines["SPECULARTERM"], rebuildInParallel);
+    BindLight(light, i, scene, effect, defines["SPECULARTERM"], mesh->receiveShadows());
   }
 }
 
