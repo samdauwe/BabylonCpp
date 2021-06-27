@@ -602,7 +602,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
       effect->setMatrix("view", _scene->getViewMatrix());
     }
     else {
-      MaterialHelper::FinalizeSceneUbo(_scene);
+      _scene->finalizeSceneUbo();
       MaterialHelper::BindSceneUniformBuffer(effect.get(), _scene->getSceneUniformBuffer());
     }
 
@@ -613,7 +613,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
       const auto& instanceDataStorage             = renderingMeshCasted->_instanceDataStorage;
 
       if (!instanceDataStorage->isFrozen
-          && (material->backFaceCulling
+          && (material->backFaceCulling()
               || effectiveMeshCasted->overrideMaterialSideOrientation.has_value())) {
         const auto mainDeterminant = effectiveMesh->_getWorldMatrixDeterminant();
         sideOrientation            = effectiveMeshCasted->overrideMaterialSideOrientation;

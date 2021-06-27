@@ -1586,8 +1586,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights,
-                                 false);
+      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights);
     }
 
     // View
