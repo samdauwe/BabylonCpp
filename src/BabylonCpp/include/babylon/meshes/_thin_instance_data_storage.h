@@ -20,6 +20,8 @@ using BufferPtr = std::shared_ptr<Buffer>;
 struct BABYLON_SHARED_EXPORT _ThinInstanceDataStorage {
   size_t instancesCount                = 0;
   BufferPtr matrixBuffer               = nullptr;
+  BufferPtr previousMatrixBuffer       = nullptr;
+  Float32Array previousMatrixData      = {};
   size_t matrixBufferSize              = 32 * 16; // let's start with a maximum of 32 thin instances
   Float32Array matrixData              = {};
   std::vector<Vector3> boundingVectors = {};
