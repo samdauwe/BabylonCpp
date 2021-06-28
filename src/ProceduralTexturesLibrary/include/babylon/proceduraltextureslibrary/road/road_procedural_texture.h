@@ -34,12 +34,10 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Road Procedural Texture from parsed road procedural
-   * texture data.
+   * @brief Creates a Road Procedural Texture from parsed road procedural texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing road procedural texture
-   * information
+   * @param rootUrl defines the root URL containing road procedural texture information
    * @returns a parsed Road Procedural Texture
    */
   static std::unique_ptr<RoadProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
@@ -63,5 +61,4 @@ private:
 } // end of namespace ProceduralTexturesLibrary
 } // end of namespace BABYLON
 
-#endif // end of
-       // BABYLON_PROCEDURAL_TEXTURES_LIBRARY_ROAD_ROAD_PROCEDURAL_TEXTURE_H
+#endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_ROAD_ROAD_PROCEDURAL_TEXTURE_H
