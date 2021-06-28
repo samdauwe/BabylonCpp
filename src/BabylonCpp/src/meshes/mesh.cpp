@@ -1425,16 +1425,8 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
 
     if (!buffer.empty()) {
       _thinInstanceDataStorage->instancesCount = buffer.size() / stride;
-
-      const auto matrixBuffer
-        = std::make_shared<Buffer>(getEngine(), buffer, !staticBuffer, stride, false, true);
-
-      _thinInstanceDataStorage->matrixBuffer = matrixBuffer;
-
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world0", 0, 4));
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world1", 4, 4));
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world2", 8, 4));
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world3", 12, 4));
+      _thinInstanceDataStorage->matrixBuffer
+        = _thinInstanceCreateMatrixBuffer("world", buffer, !staticBuffer);
 
       if (!doNotSyncBoundingInfo) {
         thinInstanceRefreshBoundingInfo(false);
@@ -1447,6 +1439,15 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
         // regular mesh that will now be displayed
         refreshBoundingInfo(true);
       }
+    }
+  }
+  else if (kind == "previousMatrix") {
+    _thinInstanceDataStorage->previousMatrixBuffer->dispose();
+    _thinInstanceDataStorage->previousMatrixBuffer = nullptr;
+    _thinInstanceDataStorage->previousMatrixData   = buffer;
+    if (!buffer.empty()) {
+      _thinInstanceDataStorage->previousMatrixBuffer
+        = _thinInstanceCreateMatrixBuffer("previousWorld", buffer, !staticBuffer);
     }
   }
   else {
@@ -1602,18 +1603,16 @@ void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInst
 
     if (kindIsMatrix) {
       _thinInstanceDataStorage->matrixBuffer->dispose();
-
-      const auto matrixBuffer
-        = std::make_shared<Buffer>(getEngine(), data, true, stride, false, true);
-
-      _thinInstanceDataStorage->matrixBuffer     = matrixBuffer;
+      _thinInstanceDataStorage->matrixBuffer
+        = _thinInstanceCreateMatrixBuffer("world", data, false);
       _thinInstanceDataStorage->matrixData       = data;
       _thinInstanceDataStorage->matrixBufferSize = newSize;
-
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world0", 0, 4));
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world1", 4, 4));
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world2", 8, 4));
-      setVerticesBuffer(matrixBuffer->createVertexBuffer("world3", 12, 4));
+      if (_scene->needsPreviousWorldMatrices
+          && _thinInstanceDataStorage->previousMatrixData.empty()) {
+        _thinInstanceDataStorage->previousMatrixBuffer->dispose();
+        _thinInstanceDataStorage->previousMatrixBuffer
+          = _thinInstanceCreateMatrixBuffer("previousWorld", data, false);
+      }
     }
     else {
       _userThinInstanceBuffersStorage->vertexBuffers[kind]->dispose();
@@ -1626,6 +1625,20 @@ void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInst
       setVerticesBuffer(_userThinInstanceBuffersStorage->vertexBuffers[kind]);
     }
   }
+}
+
+BufferPtr Mesh::_thinInstanceCreateMatrixBuffer(const std::string& kind, const Float32Array& buffer,
+                                                bool staticBuffer)
+{
+  const auto matrixBuffer
+    = std::make_shared<Buffer>(getEngine(), buffer, !staticBuffer, 16, false, true);
+
+  for (unsigned int i = 0; i < 4; i++) {
+    setVerticesBuffer(
+      matrixBuffer->createVertexBuffer(StringTools::printf("%s%u", kind.c_str(), i), i * 4, 4));
+  }
+
+  return matrixBuffer;
 }
 
 void Mesh::_thinInstanceInitializeUserStorage()

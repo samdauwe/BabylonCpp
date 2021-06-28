@@ -806,6 +806,12 @@ public:
   /**
    * @brief Hidden
    */
+  BufferPtr _thinInstanceCreateMatrixBuffer(const std::string& kind, const Float32Array& buffer,
+                                            bool staticBuffer = false);
+
+  /**
+   * @brief Hidden
+   */
   void _renderWithThinInstances(SubMesh* subMesh, unsigned int fillMode, const EffectPtr& effect,
                                 Engine* engine);
 
