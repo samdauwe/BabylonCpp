@@ -35,12 +35,11 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Perlin Noise Procedural Texture from parsed perlin noise
-   * procedural texture data.
+   * @brief Creates a Perlin Noise Procedural Texture from parsed perlin noise procedural texture
+   * data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing perlin noise procedural
-   * texture information
+   * @param rootUrl defines the root URL containing perlin noise procedural texture information
    * @returns a parsed Perlin Noise Procedural Texture
    */
   static std::unique_ptr<PerlinNoiseProceduralTexture>
@@ -63,5 +62,4 @@ private:
 } // end of namespace ProceduralTexturesLibrary
 } // end of namespace BABYLON
 
-#endif // end of
-       // BABYLON_PROCEDURAL_TEXTURES_LIBRARY_PERLIN_NOISE_PERLIN_NOISE_PROCEDURAL_TEXTURE_H
+#endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_PERLIN_NOISE_PERLIN_NOISE_PROCEDURAL_TEXTURE_H
