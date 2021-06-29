@@ -346,7 +346,7 @@ bool CascadedShadowGenerator::get_autoCalcDepthBounds() const
 
 void CascadedShadowGenerator::set_autoCalcDepthBounds(bool value)
 {
-  auto camera = _scene->activeCamera();
+  const auto camera = _scene->activeCamera();
 
   if (!camera) {
     return;
@@ -408,7 +408,7 @@ void CascadedShadowGenerator::splitFrustum()
 
 void CascadedShadowGenerator::_splitFrustum()
 {
-  auto camera = _scene->activeCamera();
+  const auto camera = _scene->activeCamera();
   if (!camera) {
     return;
   }
@@ -449,9 +449,9 @@ void CascadedShadowGenerator::_splitFrustum()
 
 void CascadedShadowGenerator::_computeMatrices()
 {
-  auto scene = _scene;
+  const auto scene = _scene;
 
-  auto camera = scene->activeCamera();
+  const auto camera = scene->activeCamera();
   if (!camera) {
     return;
   }
