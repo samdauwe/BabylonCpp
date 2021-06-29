@@ -2,12 +2,12 @@
 #define BABYLON_HEMISPHERIC_LIGHT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/lights/light.h>
 
 namespace BABYLON {
 
-class HemisphericLight;
-using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
+FWD_CLASS_SPTR(HemisphericLight)
 
 /**
  * @brief The HemisphericLight simulates the ambient environment light,
