@@ -2,13 +2,13 @@
 #define BABYLON_LIGHTS_DIRECTIONAL_LIGHT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-class DirectionalLight;
-using DirectionalLightPtr = std::shared_ptr<DirectionalLight>;
+FWD_CLASS_SPTR(DirectionalLight)
 
 /**
  * @brief A directional light is defined by a direction (what a surprise!).
