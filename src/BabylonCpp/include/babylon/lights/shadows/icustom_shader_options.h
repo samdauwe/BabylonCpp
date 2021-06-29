@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 /**
- * @brief Defines the options associated with the creation of a custom shader
- * for a shadow generator.
+ * @brief Defines the options associated with the creation of a custom shader for a shadow
+ * generator.
  */
 struct BABYLON_SHARED_EXPORT ICustomShaderOptions {
 
