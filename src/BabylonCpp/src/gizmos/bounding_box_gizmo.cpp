@@ -140,7 +140,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
             return;
           }
         }
-        PivotTools::_RemoveAndStorePivotPoint(attachedMesh);
+        PivotTools::_RemoveAndStorePivotPoint(attachedMesh());
 
         auto worldDragDirection = startingTurnDirection;
 
@@ -252,7 +252,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
                 return;
               }
             }
-            PivotTools::_RemoveAndStorePivotPoint(attachedMesh);
+            PivotTools::_RemoveAndStorePivotPoint(attachedMesh());
             auto relativeDragDistance = (event->dragDistance / _boundingDimensions.length())
                                         * _anchorMesh->scaling().length();
             Vector3 deltaScale(relativeDragDistance, relativeDragDistance, relativeDragDistance);
@@ -450,7 +450,7 @@ void BoundingBoxGizmo::_selectNode(const MeshPtr& selectedMesh)
 void BoundingBoxGizmo::updateBoundingBox()
 {
   if (attachedMesh()) {
-    PivotTools::_RemoveAndStorePivotPoint(attachedMesh);
+    PivotTools::_RemoveAndStorePivotPoint(attachedMesh());
 
     // Store original parent
     auto originalParent = attachedMesh()->parent();
@@ -518,7 +518,7 @@ void BoundingBoxGizmo::updateBoundingBox()
 
   if (attachedMesh()) {
     _existingMeshScale.copyFrom(attachedMesh()->scaling());
-    PivotTools::_RestorePivotPoint(attachedMesh);
+    PivotTools::_RestorePivotPoint(attachedMesh());
   }
 }
 
