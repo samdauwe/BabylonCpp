@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Class containing a set of static utilities functions for managing Pivots.
@@ -28,12 +28,12 @@ public:
   /**
    * @brief Hidden
    */
-  static void _RemoveAndStorePivotPoint(const AbstractMeshPtr& mesh);
+  static void _RemoveAndStorePivotPoint(const TransformNodePtr& mesh);
 
   /**
    * @brief Hidden
    */
-  static void _RestorePivotPoint(const AbstractMeshPtr& mesh);
+  static void _RestorePivotPoint(const TransformNodePtr& mesh);
 
 }; // end of class PivotTools
 
