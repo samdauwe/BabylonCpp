@@ -51,7 +51,7 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
   auto scene = _camera->getScene();
 
   // create the first step
-  auto reductionInitial = PostProcess::New(
+  const auto reductionInitial = PostProcess::New(
     "Initial reduction phase",                                                  // name
     "minmaxRedux",                                                              // shader
     {"texSize"},                                                                // parameters
@@ -92,25 +92,26 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
     const auto _w = static_cast<int>(w);
     const auto _h = static_cast<int>(h);
 
-    auto reduction = PostProcess::New("Reduction phase " + std::to_string(index), // name
-                                      "minmaxRedux",                              // shader
-                                      {"texSize"},                                // parameters
-                                      {},                                         // textures
-                                      PostProcessOptions{_w, _h},                 // options
-                                      nullptr,                                    // camera
-                                      Constants::TEXTURE_NEAREST_NEAREST,         // sampling
-                                      scene->getEngine(),                         // engine
-                                      false,                                      // reusable
-                                      "#define "
-                                        + std::string((_w == 1 && _h == 1) ? "LAST" :
-                                                      (_w == 1 || _h == 1) ? "ONEBEFORELAST" :
-                                                                             "MAIN"), // defines
-                                      type,                                           // textureType
-                                      "",                                             // vertexUrl
-                                      {},                         // indexParameters
-                                      false,                      // blockCompilation
-                                      Constants::TEXTUREFORMAT_RG // textureFormat
-    );
+    const auto reduction
+      = PostProcess::New("Reduction phase " + std::to_string(index), // name
+                         "minmaxRedux",                              // shader
+                         {"texSize"},                                // parameters
+                         {},                                         // textures
+                         PostProcessOptions{_w, _h},                 // options
+                         nullptr,                                    // camera
+                         Constants::TEXTURE_NEAREST_NEAREST,         // sampling
+                         scene->getEngine(),                         // engine
+                         false,                                      // reusable
+                         "#define "
+                           + std::string((_w == 1 && _h == 1) ? "LAST" :
+                                         (_w == 1 || _h == 1) ? "ONEBEFORELAST" :
+                                                                "MAIN"), // defines
+                         type,                                           // textureType
+                         "",                                             // vertexUrl
+                         {},                                             // indexParameters
+                         false,                                          // blockCompilation
+                         Constants::TEXTUREFORMAT_RG                     // textureFormat
+      );
 
     reduction->autoClear               = false;
     reduction->forceFullscreenViewport = forceFullscreenViewport;
