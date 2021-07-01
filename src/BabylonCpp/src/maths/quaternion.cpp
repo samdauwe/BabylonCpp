@@ -387,6 +387,15 @@ bool Quaternion::AreClose(const Quaternion& quat0, const Quaternion& quat1)
   return dot >= 0.f;
 }
 
+void Quaternion::SmoothToRef(const Quaternion& source, const Quaternion& goal, float deltaTime,
+                             float lerpTime, Quaternion& result)
+{
+  auto slerp = lerpTime == 0.f ? 1.f : deltaTime / lerpTime;
+  slerp      = Scalar::Clamp(slerp, 0.f, 1.f);
+
+  Quaternion::SlerpToRef(source, goal, slerp, result);
+}
+
 Quaternion Quaternion::Zero()
 {
   return Quaternion(0.f, 0.f, 0.f, 0.f);

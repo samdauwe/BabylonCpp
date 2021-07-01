@@ -227,8 +227,8 @@ public:
 
   /**
    * @brief Returns a new Vector3 set with the Euler angles translated from the current quaternion.
-   * @param order is a reserved parameter and is ignored for now
    * @returns a new Vector3 containing the Euler angles
+   * @see https://doc.babylonjs.com/divingDeeper/mesh/transforms/center_origin/rotation_conventions
    */
   [[nodiscard]] Vector3 toEulerAngles(const std::string& order = "YZX") const;
 
@@ -237,6 +237,7 @@ public:
    * quaternion.
    * @param result defines the vector which will be filled with the Euler angles
    * @returns the current unchanged quaternion
+   * @see https://doc.babylonjs.com/divingDeeper/mesh/transforms/center_origin/rotation_conventions
    */
   const Quaternion& toEulerAnglesToRef(Vector3& result, const std::string& order = "YZX") const;
 
@@ -298,6 +299,18 @@ public:
    * @returns true if the two quaternions are close to each other
    */
   static bool AreClose(const Quaternion& quat0, const Quaternion& quat1);
+
+  /**
+   * @brief Smooth interpolation between two quaternions using Slerp.
+   *
+   * @param source source quaternion
+   * @param goal goal quaternion
+   * @param deltaTime current interpolation frame
+   * @param lerpTime total interpolation time
+   * @param result the smoothed quaternion
+   */
+  static void SmoothToRef(const Quaternion& source, const Quaternion& goal, float deltaTime,
+                          float lerpTime, Quaternion& result);
 
   /**
    * @brief Creates an empty quaternion.
