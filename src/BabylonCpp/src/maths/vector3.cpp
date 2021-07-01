@@ -622,6 +622,76 @@ float Vector3::GetAngleBetweenVectors(const Vector3& vector0, const Vector3& vec
   return std::isnan(angle) ? -Math::PI : -std::acos(dot);
 }
 
+float Vector3::GetAngleBetweenVectorsOnPlane(const Vector3& vector0, const Vector3& vector1,
+                                             const Vector3& normal)
+{
+  MathTmp::Vector3Array[0].copyFrom(vector0);
+  auto& v0 = MathTmp::Vector3Array[0];
+  MathTmp::Vector3Array[1].copyFrom(vector1);
+  auto& v1 = MathTmp::Vector3Array[1];
+  MathTmp::Vector3Array[2].copyFrom(normal);
+  auto& vNormal = MathTmp::Vector3Array[2];
+  auto& right   = MathTmp::Vector3Array[3];
+  auto& forward = MathTmp::Vector3Array[4];
+
+  v0.normalize();
+  v1.normalize();
+  vNormal.normalize();
+
+  Vector3::CrossToRef(vNormal, v0, right);
+  Vector3::CrossToRef(right, vNormal, forward);
+
+  const auto angle = std::atan2(Vector3::Dot(v1, right), Vector3::Dot(v1, forward));
+
+  return Scalar::NormalizeRadians(angle);
+}
+
+void Vector3::SlerpToRef(const Vector3& vector0, const Vector3& vector1, float slerp,
+                         Vector3& result)
+{
+  slerp              = Scalar::Clamp(slerp, 0.f, 1.f);
+  auto& vector0Dir   = MathTmp::Vector3Array[0];
+  auto& vector1Dir   = MathTmp::Vector3Array[1];
+  auto vector0Length = 0.f;
+  auto vector1Length = 0.f;
+
+  vector0Dir.copyFrom(vector0);
+  vector0Length = vector0Dir.length();
+  vector0Dir.normalizeFromLength(vector0Length);
+
+  vector1Dir.copyFrom(vector1);
+  vector1Length = vector1Dir.length();
+  vector1Dir.normalizeFromLength(vector1Length);
+
+  const auto dot = Vector3::Dot(vector0Dir, vector1Dir);
+
+  auto scale0 = 0.f;
+  auto scale1 = 0.f;
+
+  if (dot < 1.f - Math::Epsilon) {
+    const auto omega  = std::acos(dot);
+    const auto invSin = 1.f / std::sin(omega);
+    scale0            = std::sin((1.f - slerp) * omega) * invSin;
+    scale1            = std::sin(slerp * omega) * invSin;
+  }
+  else {
+    // Use linear interpolation
+    scale0 = 1.f - slerp;
+    scale1 = slerp;
+  }
+
+  vector0Dir.scaleInPlace(scale0);
+  vector1Dir.scaleInPlace(scale1);
+  result.copyFrom(vector0Dir).addInPlace(vector1Dir);
+  result.scaleInPlace(Scalar::Lerp(vector0Length, vector1Length, slerp));
+}
+
+void Vector3::SmoothToRef(const Vector3& source, const Vector3& goal, float deltaTime,
+                          float lerpTime, Vector3& result)
+{
+  Vector3::SlerpToRef(source, goal, lerpTime == 0.f ? 1.f : deltaTime / lerpTime, result);
+}
+
 Vector3 Vector3::FromArray(const Float32Array& array, unsigned int offset)
 {
   return Vector3(array[offset], array[offset + 1], array[offset + 2]);
@@ -1024,6 +1094,131 @@ float Vector3::DistanceSquared(const Vector3& value1, const Vector3& value2)
   const float z = value1.z - value2.z;
 
   return (x * x) + (y * y) + (z * z);
+}
+
+float Vector3::ProjectOnTriangleToRef(const Vector3& vector, const Vector3& p0, const Vector3& p1,
+                                      const Vector3& p2, Vector3& ref)
+{
+  auto& p1p0     = MathTmp::Vector3Array[0];
+  auto& p2p0     = MathTmp::Vector3Array[1];
+  auto& p2p1     = MathTmp::Vector3Array[2];
+  auto& normal   = MathTmp::Vector3Array[3];
+  auto& vectorp0 = MathTmp::Vector3Array[4];
+
+  // Triangle vectors
+  p1.subtractToRef(p0, p1p0);
+  p2.subtractToRef(p0, p2p0);
+  p2.subtractToRef(p1, p2p1);
+
+  const auto p1p0L = std::max(p1p0.length(), Math::Epsilon);
+  const auto p2p0L = std::max(p2p0.length(), Math::Epsilon);
+  const auto p2p1L = std::max(p2p1.length(), Math::Epsilon);
+
+  // Compute normal and vector to p0
+  vector.subtractToRef(p0, vectorp0);
+  Vector3::CrossToRef(p1p0, p2p0, normal);
+  normal.normalize();
+  auto l = vectorp0.length();
+  vectorp0.normalizeFromLength(l);
+
+  // Project to "proj" that lies on the triangle plane
+  const auto cosA  = Vector3::Dot(normal, vectorp0);
+  auto& projVector = MathTmp::Vector3Array[5];
+  auto& proj       = MathTmp::Vector3Array[6];
+  projVector.copyFrom(normal).scaleInPlace(-l * cosA);
+  proj.copyFrom(vector).addInPlace(projVector);
+
+  // Compute barycentric coordinates (v0, v1 and v2 are axis from barycenter to extremities)
+  auto& v0  = MathTmp::Vector3Array[4];
+  auto& v1  = MathTmp::Vector3Array[5];
+  auto& v2  = MathTmp::Vector3Array[7];
+  auto& tmp = MathTmp::Vector3Array[8];
+
+  v0.copyFrom(p1p0).scaleInPlace(1.f / p1p0L);
+  tmp.copyFrom(p2p0).scaleInPlace(1.f / p2p0L);
+  v0.addInPlace(tmp).scaleInPlace(-1.f);
+
+  v1.copyFrom(p1p0).scaleInPlace(-1.f / p1p0L);
+  tmp.copyFrom(p2p1).scaleInPlace(1.f / p2p1L);
+  v1.addInPlace(tmp).scaleInPlace(-1.f);
+
+  v2.copyFrom(p2p1).scaleInPlace(-1.f / p2p1L);
+  tmp.copyFrom(p2p0).scaleInPlace(-1.f / p2p0L);
+  v2.addInPlace(tmp).scaleInPlace(-1.f);
+
+  // Determines which edge of the triangle is closest to "proj"
+  auto& projP = MathTmp::Vector3Array[9];
+  auto dot    = 0.f;
+  auto s0 = 0.f, s1 = 0.f, s2 = 0.f;
+  projP.copyFrom(proj).subtractInPlace(p0);
+  Vector3::CrossToRef(v0, projP, tmp);
+  dot = Vector3::Dot(tmp, normal);
+  s0  = dot;
+
+  projP.copyFrom(proj).subtractInPlace(p1);
+  Vector3::CrossToRef(v1, projP, tmp);
+  dot = Vector3::Dot(tmp, normal);
+  s1  = dot;
+
+  projP.copyFrom(proj).subtractInPlace(p2);
+  Vector3::CrossToRef(v2, projP, tmp);
+  dot = Vector3::Dot(tmp, normal);
+  s2  = dot;
+
+  auto& edge = MathTmp::Vector3Array[10];
+  auto e0 = Vector3(), e1 = Vector3();
+  if (s0 > 0.f && s1 < 0.f) {
+    edge.copyFrom(p1p0);
+    e0 = p0;
+    e1 = p1;
+  }
+  else if (s1 > 0.f && s2 < 0.f) {
+    edge.copyFrom(p2p1);
+    e0 = p1;
+    e1 = p2;
+  }
+  else {
+    edge.copyFrom(p2p0).scaleInPlace(-1);
+    e0 = p2;
+    e1 = p0;
+  }
+
+  // Determines if "proj" lies inside the triangle
+  auto& tmp2 = MathTmp::Vector3Array[9];
+  auto& tmp3 = MathTmp::Vector3Array[4];
+  e0.subtractToRef(proj, tmp);
+  e1.subtractToRef(proj, tmp2);
+  Vector3::CrossToRef(tmp, tmp2, tmp3);
+  const auto isOutside = Vector3::Dot(tmp3, normal) < 0;
+
+  // If inside, we already found the projected point, "proj"
+  if (!isOutside) {
+    ref.copyFrom(proj);
+    return std::abs(l * cosA);
+  }
+
+  // If outside, we find "triProj", the closest point from "proj" on the closest edge
+  auto& r = MathTmp::Vector3Array[5];
+  Vector3::CrossToRef(edge, tmp3, r);
+  r.normalize();
+  auto& e0proj = MathTmp::Vector3Array[9];
+  e0proj.copyFrom(e0).subtractInPlace(proj);
+  const auto e0projL = e0proj.length();
+  e0proj.normalizeFromLength(e0projL);
+  const auto cosG = Vector3::Dot(r, e0proj);
+  auto& triProj   = MathTmp::Vector3Array[7];
+  triProj.copyFrom(proj).addInPlace(r.scaleInPlace(e0projL * cosG));
+
+  // Now we clamp "triProj" so it lies between e0 and e1
+  tmp.copyFrom(triProj).subtractInPlace(e0);
+  l = edge.length();
+  edge.normalizeFromLength(l);
+  auto t = Vector3::Dot(tmp, edge) / std::max(l, Math::Epsilon);
+  t      = Scalar::Clamp(t, 0.f, 1.f);
+  triProj.copyFrom(e0).addInPlace(edge.scaleInPlace(t * l));
+  ref.copyFrom(triProj);
+
+  return Vector3::Distance(vector, triProj);
 }
 
 Vector3 Vector3::Center(const Vector3& value1, const Vector3& value2)

@@ -589,6 +589,37 @@ public:
                                       const Vector3& normal);
 
   /**
+   * @brief Get angle between two vectors projected on a plane.
+   * @param vector0 angle between vector0 and vector1
+   * @param vector1 angle between vector0 and vector1
+   * @param normal Normal of the projection plane
+   * @returns the angle between vector0 and vector1 projected on the plane with the specified normal
+   */
+  static float GetAngleBetweenVectorsOnPlane(const Vector3& vector0, const Vector3& vector1,
+                                             const Vector3& normal);
+
+  /**
+   * @brief Slerp between two vectors. See also `SmoothToRef`.
+   * @param vector0 Start vector
+   * @param vector1 End vector
+   * @param slerp amount (will be clamped between 0 and 1)
+   * @param result The slerped vector
+   */
+  static void SlerpToRef(const Vector3& vector0, const Vector3& vector1, float slerp,
+                         Vector3& result);
+
+  /**
+   * @brief Smooth interpolation between two vectors using Slerp.
+   * @param source source vector
+   * @param goal goal vector
+   * @param deltaTime current interpolation frame
+   * @param lerpTime total interpolation time
+   * @param result the smoothed vector
+   */
+  static void SmoothToRef(const Vector3& source, const Vector3& goal, float deltaTime,
+                          float lerpTime, Vector3& result);
+
+  /**
    * @brief Returns a new Vector3 set from the index "offset" of the given array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
@@ -1037,6 +1068,21 @@ public:
    * @returns the squared distance
    */
   static float DistanceSquared(const Vector3& value1, const Vector3& value2);
+
+  /**
+   * @brief Projects "vector" on the triangle determined by its extremities "p0", "p1" and "p2",
+   * stores the result in "ref". and returns the distance to the projected point. From
+   * http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.104.4264&rep=rep1&type=pdf
+   *
+   * @param vector the vector to get distance from
+   * @param p0 extremity of the triangle
+   * @param p1 extremity of the triangle
+   * @param p2 extremity of the triangle
+   * @param ref variable to store the result to
+   * @returns The distance between "ref" and "vector"
+   */
+  static float ProjectOnTriangleToRef(const Vector3& vector, const Vector3& p0, const Vector3& p1,
+                                      const Vector3& p2, Vector3& ref);
 
   /**
    * @brief Returns a new Vector3 located at the center between "value1" and
