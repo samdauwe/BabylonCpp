@@ -262,6 +262,16 @@ Vector2 Vector2::fract() const
   return Vector2(x - std::floor(x), y - std::floor(y));
 }
 
+Vector2& Vector2::rotateToRef(float angle, Vector2& result)
+{
+  const auto cos = std::cos(angle);
+  const auto sin = std::sin(angle);
+  result.x       = cos * x - sin * y;
+  result.y       = sin * x + cos * y;
+
+  return *this;
+}
+
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Vector2& vector)
 {
@@ -410,14 +420,7 @@ float Vector2::lengthSquared() const
 /** Methods **/
 Vector2& Vector2::normalize()
 {
-  const float len = length();
-
-  if (stl_util::almost_equal(len, 0.f)) {
-    return *this;
-  }
-
-  x /= len;
-  y /= len;
+  Vector2::NormalizeToRef(*this, *this);
 
   return *this;
 }
@@ -535,9 +538,21 @@ float Vector2::Dot(const Vector2& left, const Vector2& right)
 
 Vector2 Vector2::Normalize(Vector2& vector)
 {
-  Vector2 newVector{vector};
-  newVector.normalize();
+  auto newVector = Vector2::Zero();
+  NormalizeToRef(vector, newVector);
   return newVector;
+}
+
+void Vector2::NormalizeToRef(const Vector2& vector, Vector2& result)
+{
+  const auto len = vector.length();
+
+  if (len == 0.f) {
+    return;
+  }
+
+  result.x = vector.x / len;
+  result.y = vector.y / len;
 }
 
 Vector2 Vector2::Minimize(const Vector2& left, const Vector2& right)

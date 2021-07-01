@@ -295,6 +295,14 @@ public:
    */
   [[nodiscard]] Vector2 fract() const;
 
+  /**
+   * @brief Rotate the current vector into a given result vector.
+   * @param angle defines the rotation angle
+   * @param result defines the result vector where to store the rotated vector
+   * @returns the current vector
+   */
+  Vector2& rotateToRef(float angle, Vector2& result);
+
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);
   Vector2 operator+(const Vector2& otherVector) const;
@@ -462,6 +470,13 @@ public:
    * @returns a new Vector2
    */
   static Vector2 Normalize(Vector2& vector);
+
+  /**
+   * @brief Normalize a given vector into a second one.
+   * @param vector defines the vector to normalize
+   * @param result defines the vector where to store the result
+   */
+  static void NormalizeToRef(const Vector2& vector, Vector2& result);
 
   /**
    * @brief Gets a new Vector2 set with the minimal coordinate values from the "left" and "right"
