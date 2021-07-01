@@ -510,9 +510,49 @@ public:
   static Vector4& CenterToRef(const Vector4& value1, const Vector4& value2, Vector4& ref);
 
   /**
-   * @brief Returns a new Vector4 set with the result of the normal
-   * transformation by the given matrix of the given vector. This methods
-   * computes transformed normalized direction vectors only.
+   * @brief Returns a new Vector4 set with the result of the transformation by the given matrix of
+   * the given vector. This method computes tranformed coordinates only, not transformed direction
+   * vectors (ie. it takes translation in account) The difference with Vector3.TransformCoordinates
+   * is that the w component is not used to divide the other coordinates but is returned in the w
+   * coordinate instead
+   * @param vector defines the Vector3 to transform
+   * @param transformation defines the transformation matrix
+   * @returns the transformed Vector4
+   */
+  static Vector4 TransformCoordinates(const Vector3& vector, const Matrix& transformation);
+
+  /**
+   * @brief Sets the given vector "result" coordinates with the result of the transformation by the
+   * given matrix of the given vector. This method computes tranformed coordinates only, not
+   * transformed direction vectors (ie. it takes translation in account) The difference with
+   * Vector3.TransformCoordinatesToRef is that the w component is not used to divide the other
+   * coordinates but is returned in the w coordinate instead
+   * @param vector defines the Vector3 to transform
+   * @param transformation defines the transformation matrix
+   * @param result defines the Vector4 where to store the result
+   */
+  static void TransformCoordinatesToRef(const Vector3& vector, const Matrix& transformation,
+                                        Vector4& result);
+
+  /**
+   * @brief Sets the given vector "result" coordinates with the result of the transformation by the
+   * given matrix of the given floats (x, y, z). This method computes tranformed coordinates only,
+   * not transformed direction vectors The difference with
+   * Vector3.TransformCoordinatesFromFloatsToRef is that the w component is not used to divide the
+   * other coordinates but is returned in the w coordinate instead
+   * @param x define the x coordinate of the source vector
+   * @param y define the y coordinate of the source vector
+   * @param z define the z coordinate of the source vector
+   * @param transformation defines the transformation matrix
+   * @param result defines the Vector4 where to store the result
+   */
+  static void TransformCoordinatesFromFloatsToRef(float x, float y, float z,
+                                                  const Matrix& transformation, Vector4& result);
+
+  /**
+   * @brief Returns a new Vector4 set with the result of the normal transformation by the given
+   * matrix of the given vector. This methods computes transformed normalized direction vectors
+   * only.
    * @param vector the vector to transform
    * @param transformation the transformation matrix to apply
    * @returns the new vector
@@ -520,9 +560,9 @@ public:
   static Vector4 TransformNormal(const Vector4& vector, const Matrix& transformation);
 
   /**
-   * @brief Sets the given vector "result" with the result of the normal
-   * transformation by the given matrix of the given vector. This methods
-   * computes transformed normalized direction vectors only.
+   * @brief Sets the given vector "result" with the result of the normal transformation by the given
+   * matrix of the given vector. This methods computes transformed normalized direction vectors
+   * only.
    * @param vector the vector to transform
    * @param transformation the transformation matrix to apply
    * @param result the vector to store the result in
