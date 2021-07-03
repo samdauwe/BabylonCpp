@@ -2099,7 +2099,10 @@ public:
    */
   bool useReverseDepthBuffer = false;
 
-  // Uniform buffers list
+  /**
+   * Indicates if the z range in NDC space is 0..1 (value: true) or -1..1 (value: false)
+   */
+  const bool isNDCHalfZRange = false;
 
   /**
    * Gets or sets a boolean indicating that uniform buffers must be disabled even if they are
