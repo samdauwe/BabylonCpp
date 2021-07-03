@@ -13,6 +13,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractScene;
 struct ISize;
 class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
@@ -151,6 +152,11 @@ public:
    * Gets or sets probe position (center of the cube map)
    */
   Vector3 position;
+
+  /**
+   * Hidden
+   */
+  AbstractScene* _parentContainer;
 
   /**
    * Gets or sets the number of samples to use for multi-sampling (0 by default). Required WebGL2
