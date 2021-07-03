@@ -3,6 +3,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/node/blocks/dual/texture_block.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -17,13 +18,18 @@ PerturbNormalBlock::PerturbNormalBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Fragment}
     , invertX{false}
     , invertY{false}
+    , useParallaxOcclusion{false}
     , worldPosition{this, &PerturbNormalBlock::get_worldPosition}
     , worldNormal{this, &PerturbNormalBlock::get_worldNormal}
     , worldTangent{this, &PerturbNormalBlock::get_worldTangent}
     , uv{this, &PerturbNormalBlock::get_uv}
     , normalMapColor{this, &PerturbNormalBlock::get_normalMapColor}
     , strength{this, &PerturbNormalBlock::get_strength}
+    , viewDirection{this, &PerturbNormalBlock::get_viewDirection}
+    , parallaxScale{this, &PerturbNormalBlock::get_parallaxScale}
+    , parallaxHeight{this, &PerturbNormalBlock::get_parallaxHeight}
     , output{this, &PerturbNormalBlock::get_output}
+    , uvOffset{this, &PerturbNormalBlock::get_uvOffset}
 {
   _isUnique = true;
 
@@ -34,9 +40,13 @@ PerturbNormalBlock::PerturbNormalBlock(const std::string& iName)
   registerInput("uv", NodeMaterialBlockConnectionPointTypes::Vector2, false);
   registerInput("normalMapColor", NodeMaterialBlockConnectionPointTypes::Color3, false);
   registerInput("strength", NodeMaterialBlockConnectionPointTypes::Float, false);
+  registerInput("viewDirection", NodeMaterialBlockConnectionPointTypes::Vector3, true);
+  registerInput("parallaxScale", NodeMaterialBlockConnectionPointTypes::Float, true);
+  registerInput("parallaxHeight", NodeMaterialBlockConnectionPointTypes::Float, true);
 
   // Fragment
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
+  registerOutput("uvOffset", NodeMaterialBlockConnectionPointTypes::Vector2);
 }
 
 PerturbNormalBlock::~PerturbNormalBlock() = default;
@@ -76,9 +86,29 @@ NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_strength()
   return _inputs[5];
 }
 
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_viewDirection()
+{
+  return _inputs[6];
+}
+
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_parallaxScale()
+{
+  return _inputs[7];
+}
+
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_parallaxHeight()
+{
+  return _inputs[8];
+}
+
 NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_output()
 {
   return _outputs[0];
+}
+
+NodeMaterialConnectionPointPtr& PerturbNormalBlock::get_uvOffset()
+{
+  return _outputs[1];
 }
 
 void PerturbNormalBlock::prepareDefines(AbstractMesh* /*mesh*/,
@@ -86,7 +116,16 @@ void PerturbNormalBlock::prepareDefines(AbstractMesh* /*mesh*/,
                                         NodeMaterialDefines& defines, bool /*useInstances*/,
                                         SubMesh* /*subMesh*/)
 {
+  const auto normalSamplerName
+    = std::static_pointer_cast<TextureBlock>(normalMapColor()->connectedPoint()->_ownerBlock)
+        ->samplerName();
+  const auto useParallax = viewDirection()->isConnected()
+                           && ((useParallaxOcclusion && !normalSamplerName.empty())
+                               || (!useParallaxOcclusion && parallaxHeight()->isConnected()));
+
   defines.setValue("BUMP", true);
+  defines.setValue("PARALLAX", useParallax, true);
+  defines.setValue("PARALLAXOCCLUSION", useParallaxOcclusion, true);
 }
 
 void PerturbNormalBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* /*mesh*/,
@@ -137,6 +176,20 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 
   state._emitUniformFromString(_tangentSpaceParameterName, "vec2");
 
+  const auto normalSamplerName
+    = std::static_pointer_cast<TextureBlock>(normalMapColor()->connectedPoint()->_ownerBlock)
+        ->samplerName();
+  const auto useParallax = viewDirection()->isConnected()
+                           && ((useParallaxOcclusion && !normalSamplerName.empty())
+                               || (!useParallaxOcclusion && parallaxHeight()->isConnected()));
+
+  const auto replaceForParallaxInfos
+    = !parallaxScale()->isConnectedToInputBlock() ?
+        "0.05" :
+      parallaxScale()->connectInputBlock()->isConstant ?
+        state._emitFloat(parallaxScale()->connectInputBlock()->value()->get<float>()) :
+        parallaxScale()->associatedVariableName();
+
   const auto replaceForBumpInfos
     = strength()->isConnectedToInputBlock() && strength()->connectInputBlock()->isConstant ?
         StringTools::printf(
@@ -170,30 +223,49 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
 
   {
     EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
-    emitFunctionFromIncludeOptions.replaceStrings
-      = {{"vBumpInfos.y", replaceForBumpInfos},
-         {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
-         {"varying vec2 vBumpUV;", ""},
-         {R"(uniform sampler2D bumpSampler)", ""}};
+    emitFunctionFromIncludeOptions.replaceStrings = {
+      {"varying vec2 vBumpUV;", ""},
+      {R"(uniform sampler2D bumpSampler)", ""},
+      {R"(vec2 parallaxOcclusion\(vec3 vViewDirCoT,vec3 vNormalCoT,vec2 texCoord,float parallaxScale\))",
+       "#define inline\r\nvec2 parallaxOcclusion(vec3 vViewDirCoT, vec3 vNormalCoT, vec2 texCoord, "
+       "float parallaxScale, sampler2D bumpSampler)"},
+      {R"(vec2 parallaxOffset\(vec3 viewDir,float heightScale\)",
+       "vec2 parallaxOffset(vec3 viewDir, float heightScale, float height_)"},
+      {R"(texture2D\(bumpSampler,vBumpUV\)\.w)", "height_"}};
     state._emitFunctionFromInclude("bumpFragmentFunctions", iComments,
                                    emitFunctionFromIncludeOptions);
   }
 
+  const auto uvForPerturbNormal
+    = !useParallax || normalSamplerName.empty() ?
+        normalMapColor()->associatedVariableName() :
+        StringTools::printf("texture2D(%s, %s + uvOffset).xyz", normalSamplerName.c_str(),
+                            uv()->associatedVariableName().c_str());
+
   state.compilationString += _declareOutput(output, state) + " = vec4(0.);\r\n";
   EmitCodeFromIncludeOptions emitCodeFromIncludeOptions;
-  emitCodeFromIncludeOptions.replaceStrings
-    = {{"perturbNormal\\(TBN,texture2D\\(bumpSampler,vBumpUV\\+uvOffset\\).xyz,vBumpInfos.y\\)",
-        StringTools::printf("perturbNormal(TBN, %s, vBumpInfos.y)",
-                            normalMapColor()->associatedVariableName().c_str())},
-       {"vTangentSpaceParams", _tangentSpaceParameterName},
-       {"vBumpInfos.y", replaceForBumpInfos},
-       {"vBumpUV", _uv->associatedVariableName()},
-       {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
-       {"normalW=", output()->associatedVariableName() + ".xyz = "},
-       {R"(mat3\(normalMatrix\)\*normalW)",
-        "mat3(normalMatrix) * " + output()->associatedVariableName() + ".xyz"},
-       {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
-       tangentReplaceString};
+  emitCodeFromIncludeOptions.replaceStrings = {
+    {R"(perturbNormal\(TBN,texture2D\(bumpSampler,vBumpUV\+uvOffset\).xyz,vBumpInfos.y\))",
+     StringTools::printf("perturbNormal(TBN, %s, vBumpInfos.y)", uvForPerturbNormal.c_str())},
+    {R"(parallaxOcclusion\(invTBN\*-viewDirectionW,invTBN\*normalW,vBumpUV,vBumpInfos.z\))",
+     StringTools::printf("parallaxOcclusion((invTBN * -viewDirectionW), (invTBN * normalW), "
+                         "vBumpUV, vBumpInfos.z, %s)",
+                         useParallax && useParallaxOcclusion ? normalSamplerName.c_str() :
+                                                               "bumpSampler")},
+    {R"(parallaxOffset\(invTBN\*viewDirectionW,vBumpInfos\.z\))",
+     StringTools::printf("parallaxOffset(invTBN * viewDirectionW, vBumpInfos.z, %s)",
+                         useParallax ? parallaxHeight()->associatedVariableName().c_str() : "0.")},
+    {"vTangentSpaceParams", _tangentSpaceParameterName},
+    {"vBumpInfos.y", replaceForBumpInfos},
+    {"vBumpInfos.z", replaceForParallaxInfos},
+    {"vBumpUV", _uv->associatedVariableName()},
+    {"vPositionW", _worldPosition->associatedVariableName() + ".xyz"},
+    {"normalW=", output()->associatedVariableName() + ".xyz = "},
+    {R"(mat3\(normalMatrix\)\*normalW)",
+     "mat3(normalMatrix) * " + output()->associatedVariableName() + ".xyz"},
+    {"normalW", _worldNormal->associatedVariableName() + ".xyz"},
+    {"viewDirectionW", useParallax ? viewDirection()->associatedVariableName() : "vec3(0.)"},
+    tangentReplaceString};
   state.compilationString
     += state._emitCodeFromInclude("bumpFragment", iComments, emitCodeFromIncludeOptions);
 
@@ -208,6 +280,8 @@ std::string PerturbNormalBlock::_dumpPropertiesCode()
 
   codeString += StringTools::printf("%s.invertY = %s;\r\n", _codeVariableName.c_str(),
                                     invertY ? "true" : "false");
+  codeString += StringTools::printf("%s.useParallaxOcclusion = %s\r\n", _codeVariableName.c_str(),
+                                    useParallaxOcclusion ? "true" : "false");
 
   return codeString;
 }
