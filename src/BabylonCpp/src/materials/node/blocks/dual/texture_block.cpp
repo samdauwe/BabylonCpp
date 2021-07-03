@@ -20,6 +20,7 @@ TextureBlock::TextureBlock(const std::string& iName, bool fragmentOnly)
     : NodeMaterialBlock{iName, fragmentOnly ? NodeMaterialBlockTargets::Fragment :
                                               NodeMaterialBlockTargets::VertexAndFragment}
     , texture{this, &TextureBlock::get_texture, &TextureBlock::set_texture}
+    , samplerName{this, &TextureBlock::get_samplerName}
     , convertToGammaSpace{false}
     , convertToLinearSpace{false}
     , disableLevelMultiplication{false}
@@ -98,6 +99,11 @@ void TextureBlock::set_texture(const TexturePtr& iTexture)
       Constants::MATERIAL_TextureDirtyFlag,
       [iTexture](Material* mat) -> bool { return mat->hasTexture(iTexture); });
   }
+}
+
+std::string TextureBlock::get_samplerName() const
+{
+  return _samplerName;
 }
 
 NodeMaterialConnectionPointPtr& TextureBlock::get_uv()

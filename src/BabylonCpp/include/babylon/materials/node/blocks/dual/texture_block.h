@@ -108,6 +108,11 @@ protected:
   void set_texture(const TexturePtr& texture);
 
   /**
+   * @brief Gets the sampler name associated with this texture.
+   */
+  std::string get_samplerName() const;
+
+  /**
    * @brief Gets the uv input component.
    */
   NodeMaterialConnectionPointPtr& get_uv();
@@ -182,6 +187,11 @@ public:
    * Gets or sets the texture associated with the node
    */
   Property<TextureBlock, TexturePtr> texture;
+
+  /**
+   * Gets the sampler name associated with this texture
+   */
+  ReadOnlyProperty<TextureBlock, std::string> samplerName;
 
   /**
    * Gets or sets a boolean indicating if content needs to be converted to gamma space
