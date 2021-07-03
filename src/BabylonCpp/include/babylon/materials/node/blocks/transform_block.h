@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_TRANSFORM_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class TransformBlock;
-using TransformBlockPtr = std::shared_ptr<TransformBlock>;
+FWD_CLASS_SPTR(TransformBlock)
 
 /**
  * @brief Block used to transform a vector (2, 3 or 4) with a matrix. It will generate a Vector4.

@@ -20,6 +20,8 @@ TransformBlock::TransformBlock(const std::string& iName)
     , xyz{this, &TransformBlock::get_xyz}
     , transform{this, &TransformBlock::get_transform}
 {
+  target = NodeMaterialBlockTargets::Vertex;
+
   registerInput("vector", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("transform", NodeMaterialBlockConnectionPointTypes::Matrix);
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
