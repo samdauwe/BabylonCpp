@@ -66,6 +66,18 @@ public:
   void bind(Effect* effect, const NodeMaterialPtr& nodeMaterial, Mesh* mesh = nullptr,
             SubMesh* subMesh = nullptr) override;
 
+  /**
+   * @brief Serializes this block in a JSON representation.
+   * @returns the serialized block object
+   */
+  json serialize() const override;
+
+  /**
+   * @brief Hidden
+   */
+  void _deserialize(const json& serializationObject, Scene* scene,
+                    const std::string& rootUrl) override;
+
 protected:
   /**
    * @brief Creates a new ImageProcessingBlock.
@@ -88,7 +100,19 @@ protected:
    */
   ImageProcessingBlock& _buildBlock(NodeMaterialBuildState& state) override;
 
+  /**
+   * @brief Hidden
+   */
+  std::string _dumpPropertiesCode() override;
+
 public:
+  /**
+   * Defines if the input should be converted to linear space (default: true)
+   */
+  // @editableInPropertyPage("Convert input to linear space", PropertyTypeForEdition.Boolean,
+  // "ADVANCED")
+  bool convertInputToLinearSpace;
+
   /**
    * Gets the color input component
    */

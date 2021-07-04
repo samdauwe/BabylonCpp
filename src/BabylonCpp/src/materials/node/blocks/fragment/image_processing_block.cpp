@@ -1,5 +1,6 @@
 #include <babylon/materials/node/blocks/fragment/image_processing_block.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/node/node_material.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -12,6 +13,7 @@ namespace BABYLON {
 
 ImageProcessingBlock::ImageProcessingBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::Fragment}
+    , convertInputToLinearSpace{true}
     , color{this, &ImageProcessingBlock::get_color}
     , output{this, &ImageProcessingBlock::get_output}
 {
@@ -134,14 +136,18 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
                              iColor->associatedVariableName().c_str());
   }
   state.compilationString += "#ifdef IMAGEPROCESSINGPOSTPROCESS\r\n";
-  state.compilationString += StringTools::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
-                                                 iOutput->associatedVariableName().c_str(),
-                                                 iColor->associatedVariableName().c_str());
+  if (convertInputToLinearSpace) {
+    state.compilationString += StringTools::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
+                                                   iOutput->associatedVariableName().c_str(),
+                                                   iColor->associatedVariableName().c_str());
+  }
   state.compilationString += "#else\r\n";
   state.compilationString += "#ifdef IMAGEPROCESSING\r\n";
-  state.compilationString += StringTools::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
-                                                 iOutput->associatedVariableName().c_str(),
-                                                 iColor->associatedVariableName().c_str());
+  if (convertInputToLinearSpace) {
+    state.compilationString += StringTools::printf("%s.rgb = toLinearSpace(%s.rgb);\r\n",
+                                                   iOutput->associatedVariableName().c_str(),
+                                                   iColor->associatedVariableName().c_str());
+  }
   state.compilationString += StringTools::printf("%s = applyImageProcessing(%s);\r\n",
                                                  iOutput->associatedVariableName().c_str(),
                                                  iOutput->associatedVariableName().c_str());
@@ -149,6 +155,27 @@ ImageProcessingBlock& ImageProcessingBlock::_buildBlock(NodeMaterialBuildState& 
   state.compilationString += "#endif\r\n";
 
   return *this;
+}
+
+std::string ImageProcessingBlock::_dumpPropertiesCode()
+{
+  auto codeString = NodeMaterialBlock::_dumpPropertiesCode();
+
+  codeString
+    += StringTools::printf("%s.convertInputToLinearSpace = %s;\r\n", _codeVariableName.c_str(),
+                           convertInputToLinearSpace ? "true" : "false");
+
+  return codeString;
+}
+
+json ImageProcessingBlock::serialize() const
+{
+  return nullptr;
+}
+
+void ImageProcessingBlock::_deserialize(const json& /*serializationObject*/, Scene* /*scene*/,
+                                        const std::string& /*rootUrl*/)
+{
 }
 
 } // end of namespace BABYLON
