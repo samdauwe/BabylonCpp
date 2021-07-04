@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_VERTEX_MORPH_TARGETS_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class MorphTargetsBlock;
-using MorphTargetsBlockPtr = std::shared_ptr<MorphTargetsBlock>;
+FWD_CLASS_SPTR(MorphTargetsBlock)
 
 /**
  * @brief Block used to add morph targets support to vertex shader.
