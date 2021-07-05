@@ -201,6 +201,10 @@ NodeMaterialBlockTargets& TextureBlock::get_target()
   return _currentTarget;
 }
 
+void TextureBlock::set_target(NodeMaterialBlockTargets& /*value*/)
+{
+}
+
 void TextureBlock::autoConfigure(const NodeMaterialPtr& material)
 {
   if (!uv()->isConnected()) {
@@ -263,7 +267,9 @@ void TextureBlock::prepareDefines(AbstractMesh* /*mesh*/, const NodeMaterialPtr&
   if (_isMixed) {
     if (!iTexture->getTextureMatrix()->isIdentityAs3x2()) {
       defines.setValue(_defineName, true);
-      defines.setValue(_mainUVDefineName, false);
+      if (!defines[_mainUVDefineName]) {
+        defines.setValue(_mainUVDefineName, false);
+      }
     }
     else {
       defines.setValue(_defineName, false);

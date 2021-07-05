@@ -158,6 +158,11 @@ protected:
   NodeMaterialBlockTargets& get_target() override;
 
   /**
+   * @brief Sets the target.
+   */
+  virtual void set_target(NodeMaterialBlockTargets& value);
+
+  /**
    * @brief Gets whether or not the target is a mixed block target.
    */
   bool get__isMixed() const;
