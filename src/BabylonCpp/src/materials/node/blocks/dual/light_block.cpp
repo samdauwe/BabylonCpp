@@ -283,7 +283,7 @@ LightBlock& LightBlock::_buildBlock(NodeMaterialBuildState& state)
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
 
-  auto iComments       = StringTools::printf("//%s", name().c_str());
+  const auto iComments = StringTools::printf("//%s", name().c_str());
   const auto& worldPos = worldPosition();
 
   state._emitFunctionFromInclude("helperFunctions", iComments);
