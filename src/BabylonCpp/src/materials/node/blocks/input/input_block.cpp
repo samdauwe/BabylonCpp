@@ -117,7 +117,8 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         _type = NodeMaterialBlockConnectionPointTypes::Vector3;
         return _type;
       }
-      else if (iName == "uv" || iName == "uv2" || iName == "position2d" || iName == "particle_uv") {
+      else if (iName == "uv" || iName == "uv2" || iName == "uv3" || iName == "uv4" || iName == "uv5"
+               || iName == "uv6" || iName == "position2d" || iName == "particle_uv") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector2;
         return _type;
       }
