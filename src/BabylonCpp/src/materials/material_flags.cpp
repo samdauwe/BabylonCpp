@@ -5,24 +5,26 @@
 
 namespace BABYLON {
 
-bool MaterialFlags::_DiffuseTextureEnabled       = true;
-bool MaterialFlags::_DetailTextureEnabled        = true;
-bool MaterialFlags::_AmbientTextureEnabled       = true;
-bool MaterialFlags::_OpacityTextureEnabled       = true;
-bool MaterialFlags::_ReflectionTextureEnabled    = true;
-bool MaterialFlags::_EmissiveTextureEnabled      = true;
-bool MaterialFlags::_SpecularTextureEnabled      = true;
-bool MaterialFlags::_BumpTextureEnabled          = true;
-bool MaterialFlags::_LightmapTextureEnabled      = true;
-bool MaterialFlags::_RefractionTextureEnabled    = true;
-bool MaterialFlags::_ColorGradingTextureEnabled  = true;
-bool MaterialFlags::_FresnelEnabled              = true;
-bool MaterialFlags::_ClearCoatTextureEnabled     = true;
-bool MaterialFlags::_ClearCoatBumpTextureEnabled = true;
-bool MaterialFlags::_ClearCoatTintTextureEnabled = true;
-bool MaterialFlags::_SheenTextureEnabled         = true;
-bool MaterialFlags::_AnisotropicTextureEnabled   = true;
-bool MaterialFlags::_ThicknessTextureEnabled     = true;
+bool MaterialFlags::_DiffuseTextureEnabled               = true;
+bool MaterialFlags::_DetailTextureEnabled                = true;
+bool MaterialFlags::_AmbientTextureEnabled               = true;
+bool MaterialFlags::_OpacityTextureEnabled               = true;
+bool MaterialFlags::_ReflectionTextureEnabled            = true;
+bool MaterialFlags::_EmissiveTextureEnabled              = true;
+bool MaterialFlags::_SpecularTextureEnabled              = true;
+bool MaterialFlags::_BumpTextureEnabled                  = true;
+bool MaterialFlags::_LightmapTextureEnabled              = true;
+bool MaterialFlags::_RefractionTextureEnabled            = true;
+bool MaterialFlags::_ColorGradingTextureEnabled          = true;
+bool MaterialFlags::_FresnelEnabled                      = true;
+bool MaterialFlags::_ClearCoatTextureEnabled             = true;
+bool MaterialFlags::_ClearCoatBumpTextureEnabled         = true;
+bool MaterialFlags::_ClearCoatTintTextureEnabled         = true;
+bool MaterialFlags::_SheenTextureEnabled                 = true;
+bool MaterialFlags::_AnisotropicTextureEnabled           = true;
+bool MaterialFlags::_ThicknessTextureEnabled             = true;
+bool MaterialFlags::_RefractionIntensityTextureEnabled   = true;
+bool MaterialFlags::_TranslucencyIntensityTextureEnabled = true;
 
 bool MaterialFlags::DiffuseTextureEnabled()
 {
@@ -290,6 +292,36 @@ void MaterialFlags::setThicknessTextureEnabled(bool value)
   }
 
   _ThicknessTextureEnabled = value;
+  Engine::MarkAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
+}
+
+bool MaterialFlags::RefractionIntensityTextureEnabled()
+{
+  return _RefractionIntensityTextureEnabled;
+}
+
+void MaterialFlags::setRefractionIntensityTextureEnabled(bool value)
+{
+  if (_RefractionIntensityTextureEnabled == value) {
+    return;
+  }
+
+  _RefractionIntensityTextureEnabled = value;
+  Engine::MarkAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
+}
+
+bool MaterialFlags::TranslucencyIntensityTextureEnabled()
+{
+  return _TranslucencyIntensityTextureEnabled;
+}
+
+void MaterialFlags::setTranslucencyIntensityTextureEnabled(bool value)
+{
+  if (_TranslucencyIntensityTextureEnabled == value) {
+    return;
+  }
+
+  _TranslucencyIntensityTextureEnabled = value;
   Engine::MarkAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
 }
 
