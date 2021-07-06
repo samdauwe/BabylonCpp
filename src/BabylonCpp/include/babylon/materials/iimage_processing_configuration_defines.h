@@ -8,8 +8,8 @@
 namespace BABYLON {
 
 /**
- * @brief Interface to follow in your material defines to integrate easily the
- * Image processing functions.
+ * @brief Interface to follow in your material defines to integrate easily the Image processing
+ * functions.
  * @hidden
  */
 struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
