@@ -527,16 +527,21 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
 {
   const auto oldNormal  = defines["NORMAL"];
   const auto oldTangent = defines["TANGENT"];
-  const auto oldUV1     = defines["UV1"];
 
   defines.boolDef["NORMAL"] = mesh->isVerticesDataPresent(VertexBuffer::NormalKind);
 
   defines.boolDef["TANGENT"] = mesh->isVerticesDataPresent(VertexBuffer::TangentKind);
 
-  defines.boolDef["UV1"] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
+  auto uvChanged = false;
+  for (unsigned int i = 1; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
+    const auto iStr = std::to_string(i);
+    auto oldUV      = defines["UV" + iStr];
+    defines.boolDef["UV" + iStr]
+      = mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 0 ? "" : iStr));
+    uvChanged = uvChanged || defines["UV" + iStr] != oldUV;
+  }
 
-  if (oldNormal != defines["NORMAL"] || oldTangent != defines["TANGENT"]
-      || oldUV1 != defines["UV1"]) {
+  if (oldNormal != defines["NORMAL"] || oldTangent != defines["TANGENT"] || uvChanged) {
     defines.markAsAttributesDirty();
   }
 }
@@ -784,6 +789,8 @@ std::optional<_ProcessedDefinesResult> NodeMaterial::_processDefines(AbstractMes
   for (const auto& b : _sharedData->blocksWithDefines) {
     b->prepareDefines(mesh, shared_from_this(), defines, useInstances, subMesh);
   }
+
+  defines.setValue("USE_REVERSE_DEPTHBUFFER", getScene()->getEngine()->useReverseDepthBuffer, true);
 
   // Need to recompile?
   if (defines.isDirty()) {
