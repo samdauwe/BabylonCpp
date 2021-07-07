@@ -46,6 +46,10 @@ struct BABYLON_SHARED_EXPORT RenderTargetCreationOptions {
    * Defines sample count (1 by default)
    */
   std::optional<unsigned int> samples = std::nullopt;
+  /**
+   * Texture creation flags
+   */
+  std::optional<unsigned int> creationFlags = std::nullopt;
 }; // end of struct RenderTargetCreationOptions
 
 } // end of namespace BABYLON
