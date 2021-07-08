@@ -84,6 +84,9 @@ struct BABYLON_SHARED_EXPORT EngineFeatures {
   /** Indicates that the engine should cache the bound UBO */
   bool useUBOBindingCache;
 
+  /** Indicates that the inliner should be run over every shader code */
+  bool needShaderCodeInlining;
+
   /** @hidden */
   bool _collectUbosUpdatedInFrame;
 }; // end of struct EngineFeatures
