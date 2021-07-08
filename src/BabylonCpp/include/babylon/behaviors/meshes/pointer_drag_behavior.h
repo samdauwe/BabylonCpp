@@ -121,7 +121,7 @@ public:
    * The id of the pointer that is currently interacting with the behavior (-1 when no pointer is
    * active)
    */
-  int currentDraggingPointerID;
+  int currentDraggingPointerId;
 
   /**
    * The last position where the pointer hit the drag plane in world space
