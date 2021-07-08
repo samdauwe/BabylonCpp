@@ -1,6 +1,7 @@
 #include <babylon/meshes/csg/csg.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/materials/material.h>
 #include <babylon/meshes/csg/node.h>
 #include <babylon/meshes/csg/polygon.h>
 #include <babylon/meshes/csg/vertex.h>
@@ -19,11 +20,12 @@ CSG::CSG::CSG(const BABYLON::CSG::CSG& otherCSG) = default;
 
 CSG::CSG::~CSG() = default;
 
-std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
+std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh, bool absolute)
 {
   Vector3 normal;
   Vector2 uv;
   Vector3 position;
+  Color4 vertColor;
   std::vector<Polygon> polygons;
 
   Matrix matrix;
@@ -32,19 +34,27 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
   std::optional<Quaternion> meshRotationQuaternion = std::nullopt;
   Vector3 meshScaling;
 
-  mesh->computeWorldMatrix(true);
-  matrix       = mesh->getWorldMatrix();
-  meshPosition = mesh->position();
-  meshRotation = mesh->rotation();
-  if (mesh->rotationQuaternion()) {
-    meshRotationQuaternion = *mesh->rotationQuaternion();
+  auto invertWinding = false;
+  {
+    mesh->computeWorldMatrix(true);
+    matrix       = mesh->getWorldMatrix();
+    meshPosition = mesh->position();
+    meshRotation = mesh->rotation();
+    if (mesh->rotationQuaternion()) {
+      meshRotationQuaternion = *mesh->rotationQuaternion();
+    }
+    meshScaling = mesh->scaling();
+    if (mesh->material() && absolute) {
+      invertWinding
+        = mesh->material()->sideOrientation == Constants::MATERIAL_ClockWiseSideOrientation;
+    }
   }
-  meshScaling = mesh->scaling();
 
-  IndicesArray indices   = mesh->getIndices();
-  Float32Array positions = mesh->getVerticesData(VertexBuffer::PositionKind);
-  Float32Array normals   = mesh->getVerticesData(VertexBuffer::NormalKind);
-  Float32Array uvs       = mesh->getVerticesData(VertexBuffer::UVKind);
+  IndicesArray indices    = mesh->getIndices();
+  Float32Array positions  = mesh->getVerticesData(VertexBuffer::PositionKind);
+  Float32Array normals    = mesh->getVerticesData(VertexBuffer::NormalKind);
+  Float32Array uvs        = mesh->getVerticesData(VertexBuffer::UVKind);
+  Float32Array vertColors = mesh->getVerticesData(VertexBuffer::ColorKind);
 
   unsigned int sm = 0;
   for (auto& subMesh : mesh->subMeshes) {
@@ -52,15 +62,25 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
          i += 3) {
       std::vector<Vertex> vertices;
       for (unsigned int j = 0; j < 3; ++j) {
-        Vector3 sourceNormal(normals[indices[i + j] * 3], normals[indices[i + j] * 3 + 1],
-                             normals[indices[i + j] * 3 + 2]);
-        Vector2 _uv(uvs[indices[i + j] * 2], uvs[indices[i + j] * 2 + 1]);
-        Vector3 sourcePosition(positions[indices[i + j] * 3], positions[indices[i + j] * 3 + 1],
-                               positions[indices[i + j] * 3 + 2]);
+        const auto indexIndices = j == 0 ? i + j : invertWinding ? i + 3 - j : i + j;
+        Vector3 sourceNormal(normals[indices[indexIndices] * 3],
+                             normals[indices[indexIndices] * 3 + 1],
+                             normals[indices[indexIndices] * 3 + 2]);
+        if (!uvs.empty()) {
+          uv = Vector2(uvs[indices[indexIndices] * 2], uvs[indices[indexIndices] * 2 + 1]);
+        }
+        if (!vertColors.empty()) {
+          vertColor = Color4(
+            vertColors[indices[indexIndices] * 4], vertColors[indices[indexIndices] * 4 + 1],
+            vertColors[indices[indexIndices] * 4 + 2], vertColors[indices[indexIndices] * 4 + 3]);
+        }
+        Vector3 sourcePosition(positions[indices[indexIndices] * 3],
+                               positions[indices[indexIndices] * 3 + 1],
+                               positions[indices[indexIndices] * 3 + 2]);
         position = Vector3::TransformCoordinates(sourcePosition, matrix);
         normal   = Vector3::TransformNormal(sourceNormal, matrix);
 
-        vertices.emplace_back(Vertex(position, normal, _uv));
+        vertices.emplace_back(Vertex(position, normal, uv, vertColor));
       }
 
       PolygonOptions shared;
@@ -81,12 +101,13 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
     ++sm;
   }
 
-  auto csg                = CSG::FromPolygons(polygons);
-  csg->matrix             = matrix;
-  csg->position           = meshPosition;
-  csg->rotation           = meshRotation;
-  csg->scaling            = meshScaling;
-  csg->rotationQuaternion = meshRotationQuaternion;
+  auto csg      = CSG::FromPolygons(polygons);
+  csg->matrix   = absolute ? Matrix::Identity() : matrix;
+  csg->position = absolute ? Vector3::Zero() : meshPosition;
+  csg->rotation = absolute ? Vector3::Zero() : meshRotation;
+  csg->scaling  = absolute ? Vector3::One() : meshScaling;
+  csg->rotationQuaternion
+    = absolute && meshRotationQuaternion ? Quaternion::Identity() : meshRotationQuaternion;
   ++currentCSGMeshId;
 
   return csg;
