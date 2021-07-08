@@ -32,14 +32,11 @@ void MultiPointerScaleBehavior::init()
 
 float MultiPointerScaleBehavior::_getCurrentDistance()
 {
-  return _dragBehaviorA->lastDragPosition
-    .subtract(_dragBehaviorB->lastDragPosition)
-    .length();
+  return _dragBehaviorA->lastDragPosition.subtract(_dragBehaviorB->lastDragPosition).length();
 }
 
 void MultiPointerScaleBehavior::attach(
-  const MeshPtr& ownerNode,
-  const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
+  const MeshPtr& ownerNode, const std::function<bool(const AbstractMeshPtr& m)>& /*predicate*/)
 {
   _ownerNode = ownerNode;
 
@@ -48,8 +45,7 @@ void MultiPointerScaleBehavior::attach(
   _dragBehaviorA->onDragStartObservable.add(
     [this](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
       if (_dragBehaviorA->dragging && _dragBehaviorB->dragging) {
-        if (_dragBehaviorA->currentDraggingPointerID
-            == _dragBehaviorB->currentDraggingPointerID) {
+        if (_dragBehaviorA->currentDraggingPointerId == _dragBehaviorB->currentDraggingPointerId) {
           _dragBehaviorA->releaseDrag();
         }
         else {
@@ -61,8 +57,7 @@ void MultiPointerScaleBehavior::attach(
   _dragBehaviorB->onDragStartObservable.add(
     [this](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
       if (_dragBehaviorA->dragging && _dragBehaviorB->dragging) {
-        if (_dragBehaviorA->currentDraggingPointerID
-            == _dragBehaviorB->currentDraggingPointerID) {
+        if (_dragBehaviorA->currentDraggingPointerId == _dragBehaviorB->currentDraggingPointerId) {
           _dragBehaviorB->releaseDrag();
         }
         else {
@@ -74,14 +69,13 @@ void MultiPointerScaleBehavior::attach(
 
   // Once both drag behaviors are active scale based on the distance between the
   // two pointers
-  for (auto& behavior : {_dragBehaviorA.get(), _dragBehaviorB.get()}) {
-    behavior->onDragObservable.add(
-      [this](DragMoveEvent* /*event*/, EventState& /*es*/) {
-        if (_dragBehaviorA->dragging && _dragBehaviorB->dragging) {
-          auto ratio = _getCurrentDistance() / _startDistance;
-          _initialScale.scaleToRef(ratio, _targetScale);
-        }
-      });
+  for (const auto& behavior : {_dragBehaviorA.get(), _dragBehaviorB.get()}) {
+    behavior->onDragObservable.add([this](DragMoveEvent* /*event*/, EventState& /*es*/) {
+      if (_dragBehaviorA->dragging && _dragBehaviorB->dragging) {
+        auto ratio = _getCurrentDistance() / _startDistance;
+        _initialScale.scaleToRef(ratio, _targetScale);
+      }
+    });
   }
 
   // _ownerNode->addBehavior(_dragBehaviorA.get());
@@ -92,8 +86,7 @@ void MultiPointerScaleBehavior::attach(
   _sceneRenderObserver = _ownerNode->getScene()->onBeforeRenderObservable.add(
     [this](Scene* /*scene*/, EventState& /*es*/) {
       if (_dragBehaviorA->dragging && _dragBehaviorB->dragging) {
-        auto change
-          = _targetScale.subtract(_ownerNode->scaling()).scaleInPlace(0.1f);
+        auto change = _targetScale.subtract(_ownerNode->scaling()).scaleInPlace(0.1f);
         if (change.length() > 0.01f) {
           _ownerNode->scaling().addInPlace(change);
         }

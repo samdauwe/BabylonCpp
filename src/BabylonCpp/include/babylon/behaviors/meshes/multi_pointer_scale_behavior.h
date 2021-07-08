@@ -2,27 +2,26 @@
 #define BABYLON_BEHAVIORS_MESHES_MULTI_POINTER_SCALE_BEHAVIOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-class Mesh;
 class PointerDragBehavior;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(Mesh)
 
 /**
- * @brief A behavior that when attached to a mesh will allow the mesh to be
- * scaled.
+ * @brief A behavior that when attached to a mesh will allow the mesh to be scaled.
  */
 class BABYLON_SHARED_EXPORT MultiPointerScaleBehavior : public Behavior<Mesh> {
 
 public:
   /**
-   * @brief Instantiate a new behavior that when attached to a mesh will allow
-   * the mesh to be scaled.
+   * @brief Instantiate a new behavior that when attached to a mesh will allow the mesh to be
+   * scaled.
    */
   MultiPointerScaleBehavior();
   ~MultiPointerScaleBehavior() override; // = default
