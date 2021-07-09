@@ -13,9 +13,13 @@ ModelShape::ModelShape(
                            const std::variant<Vector3, SolidParticleVertex>& vertex,
                            unsigned int i)>& vtxFunction,
   const MaterialPtr& material)
-    : _indicesLength{0}, _positionFunction{nullptr}, _vertexFunction{nullptr}, _material{nullptr}
+    : shapeID{this, &ModelShape::get_shapeID, &ModelShape::set_shapeID}
+    , _indicesLength{0}
+    , _positionFunction{nullptr}
+    , _vertexFunction{nullptr}
+    , _material{nullptr}
 {
-  shapeID           = id;
+  shapeId           = id;
   _shape            = shape;
   _indices          = indices;
   _indicesLength    = indices.size();
@@ -28,5 +32,15 @@ ModelShape::ModelShape(
 }
 
 ModelShape::~ModelShape() = default;
+
+int ModelShape::get_shapeID() const
+{
+  return shapeId;
+}
+
+void ModelShape::set_shapeID(int newShapeID)
+{
+  shapeId = newShapeID;
+}
 
 } // end of namespace BABYLON
