@@ -27,12 +27,29 @@ public:
               const std::function<void(CloudPoint* particle, size_t i, size_t s)>& posFunction);
   ~PointsGroup(); // default
 
+protected:
+  /**
+   * @brief Get or set the groupId.
+   */
+  int get_groupID() const;
+
+  /**
+   * @brief Get or set the groupId.
+   */
+  void set_groupID(int groupID);
+
 public:
+  /**
+   * Get or set the groupId
+   * @deprecated Please use groupId instead
+   */
+  Property<PointsGroup, int> groupID;
+
   /**
    * The group id
    * @hidden
    */
-  size_t groupID;
+  size_t groupId;
 
   /**
    * image data for group (internal use)
