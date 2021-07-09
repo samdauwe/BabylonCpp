@@ -23,7 +23,10 @@ SubEmitter::SubEmitter(const ParticleSystemPtr& iParticleSystem)
   // Automatically dispose of subemitter when system is disposed
   particleSystem->onDisposeObservable.add([this](IParticleSystem* /*ps*/, EventState& /*es*/) {
     if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
-      std::get<AbstractMeshPtr>(particleSystem->emitter)->dispose();
+      // Prevent recursive dispose to break.
+      const auto disposable   = std::get<AbstractMeshPtr>(particleSystem->emitter);
+      particleSystem->emitter = Vector3::Zero();
+      disposable->dispose();
     }
   });
 }
