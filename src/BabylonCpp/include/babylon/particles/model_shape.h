@@ -37,12 +37,28 @@ public:
              const MaterialPtr& material);
   ~ModelShape(); // = default
 
+protected:
+  /**
+   * @brief Gets the shapeId.
+   */
+  int get_shapeID() const;
+
+  /**
+   * @brief Sets the shapeId.
+   */
+  void set_shapeID(int shapeID);
+
 public:
+  /**
+   * Get or set the shapeId
+   * @deprecated Please use shapeId instead
+   */
+  Property<ModelShape, int> shapeID;
   /**
    * The shape id.
    * Hidden
    */
-  int shapeID;
+  int shapeId;
   /**
    * flat array of model positions (internal use)
    * Hidden
