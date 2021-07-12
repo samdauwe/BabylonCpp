@@ -44,7 +44,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @brief Get the time step of the physics engine.
    * @returns the current time step
    */
-  [[nodiscard]] virtual float getTimeStep() const = 0;
+  virtual float getTimeStep() const = 0;
 
   /**
    * @brief Set the sub time step of the physics engine.
@@ -69,7 +69,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
    * @brief Gets the name of the current physics plugin
    * @returns the name of the plugin
    */
-  [[nodiscard]] virtual std::string getPhysicsPluginName() const = 0;
+  virtual std::string getPhysicsPluginName() const = 0;
 
   /**
    * @brief Adding a new impostor for the impostor tracking.
@@ -149,7 +149,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEngine {
   /**
    * @brief Returns whether or not the engine is initialized.
    */
-  [[nodiscard]] virtual bool isInitialized() const = 0;
+  virtual bool isInitialized() const = 0;
 
 }; // end of struct IPhysicsEngine
 
