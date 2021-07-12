@@ -88,6 +88,17 @@ public:
    */
   static bool Intersects(const BoundingSphere& sphere0, const BoundingSphere& sphere1);
 
+  /**
+   * @brief Creates a sphere from a center and a radius.
+   * @param center The center
+   * @param radius radius
+   * @param matrix Optional worldMatrix
+   * @returns The sphere
+   */
+  static BoundingSphere CreateFromCenterAndRadius(const Vector3& center, float radius,
+                                                  const std::optional<Matrix>& matrix
+                                                  = std::nullopt);
+
 public:
   /**
    * Gets the center of the bounding sphere in local space
