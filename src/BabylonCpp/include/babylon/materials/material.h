@@ -19,6 +19,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractScene;
 struct MaterialDefines;
 class Mesh;
 class Scene;
@@ -972,6 +973,11 @@ public:
    * Hidden
    */
   std::unordered_map<std::string, AbstractMeshPtr> meshMap;
+
+  /**
+   * Hidden
+   */
+  AbstractScene* _parentContainer;
 
   /**
    * Gets or sets the current transparency mode.

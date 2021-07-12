@@ -96,6 +96,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
     , stencil{MaterialStencilState::New()}
     , _indexInSceneMaterialArray{-1}
+    , _parentContainer{nullptr}
     , transparencyMode{this, &Material::get_transparencyMode, &Material::set_transparencyMode}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
                           &Material::set_useLogarithmicDepth}
@@ -916,6 +917,11 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, b
 
   // Remove from scene
   scene.removeMaterial(this);
+
+  if (_parentContainer) {
+    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->materials, this);
+    _parentContainer = nullptr;
+  }
 
   if (!notBoundToMesh) {
     // Remove from meshes
