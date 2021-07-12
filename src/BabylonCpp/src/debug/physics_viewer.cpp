@@ -252,10 +252,35 @@ AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor, const Me
           }
         }
         for (const auto& m : filteredChildMeshes) {
-          auto a    = _getDebugBoxMesh(utilityLayerScene);
-          a->parent = m.get();
+          const auto& boundingInfo = m->getBoundingInfo();
+          const auto& min          = boundingInfo->boundingBox.minimum;
+          const auto& max          = boundingInfo->boundingBox.maximum;
+          switch (m->physicsImpostor()->physicsImposterType) {
+            case PhysicsImpostor::BoxImpostor:
+              mesh = _getDebugBoxMesh(utilityLayerScene);
+              mesh->position().copyFrom(min);
+              mesh->position().addInPlace(max);
+              mesh->position().scaleInPlace(0.5f);
+              break;
+            case PhysicsImpostor::SphereImpostor:
+              mesh = _getDebugSphereMesh(utilityLayerScene);
+              break;
+            case PhysicsImpostor::CylinderImpostor:
+              mesh = _getDebugCylinderMesh(utilityLayerScene);
+              break;
+            default:
+              mesh = nullptr;
+              break;
+          }
+          if (mesh) {
+            mesh->scaling().x = max.x - min.x;
+            mesh->scaling().y = max.y - min.y;
+            mesh->scaling().z = max.z - min.z;
+            mesh->parent      = m.get();
+          }
         }
       }
+      mesh = nullptr;
       break;
     case PhysicsImpostor::CylinderImpostor: {
       mesh              = _getDebugCylinderMesh(utilityLayerScene);
