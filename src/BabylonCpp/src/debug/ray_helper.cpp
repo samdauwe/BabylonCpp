@@ -140,7 +140,7 @@ void RayHelper::_updateToMesh()
     return;
   }
 
-  if (_attachedToMesh->_isDisposed) {
+  if (_attachedToMesh->isDisposed()) {
     detachFromMesh();
     return;
   }
