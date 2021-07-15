@@ -2623,7 +2623,15 @@ int Scene::removeSkeleton(Skeleton* toRemove)
 
 int Scene::removeMorphTargetManager(const MorphTargetManagerPtr& toRemove)
 {
-  auto it    = std::find(morphTargetManagers.begin(), morphTargetManagers.end(), toRemove);
+  return removeMorphTargetManager(toRemove.get());
+}
+
+int Scene::removeMorphTargetManager(MorphTargetManager* toRemove)
+{
+  auto it    = std::find_if(morphTargetManagers.begin(), morphTargetManagers.end(),
+                         [toRemove](const MorphTargetManagerPtr& morphTargetManager) {
+                           return morphTargetManager.get() == toRemove;
+                         });
   auto index = static_cast<int>(it - morphTargetManagers.begin());
   if (it != morphTargetManagers.end()) {
     // Remove from the scene if found

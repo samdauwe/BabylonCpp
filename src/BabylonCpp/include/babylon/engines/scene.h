@@ -744,6 +744,7 @@ public:
    * @returns the index where the morph target was in the morph target list
    */
   int removeMorphTargetManager(const MorphTargetManagerPtr& toRemove);
+  int removeMorphTargetManager(MorphTargetManager* toRemove);
 
   /**
    * @brief Remove a light for the list of scene's lights.
