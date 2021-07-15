@@ -27,7 +27,8 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
                          unsigned int textureType, const std::string& vertexUrl,
                          const std::unordered_map<std::string, unsigned int>& indexParameters,
                          bool blockCompilation, unsigned int textureFormat)
-    : width{-1}
+    : _parentContainer{nullptr}
+    , width{-1}
     , height{-1}
     , nodeMaterialSource{nullptr}
     , _outputTexture{nullptr}
@@ -610,6 +611,11 @@ void PostProcess::dispose(Camera* camera)
   }
   else {
     stl_util::remove_vector_elements_equal_sharedptr(_engine->postProcesses, this);
+  }
+
+  if (_parentContainer) {
+    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->postProcesses, this);
+    _parentContainer = nullptr;
   }
 
   if (!pCamera) {

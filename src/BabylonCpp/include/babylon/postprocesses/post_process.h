@@ -19,6 +19,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractScene;
 class Animation;
 class Engine;
 struct IRenderTargetOptions;
@@ -336,6 +337,11 @@ private:
   void _disposeTextureCache();
 
 public:
+  /**
+   * Hidden
+   */
+  AbstractScene* _parentContainer;
+
   /**
    * Gets or sets the unique id of the post process
    */
