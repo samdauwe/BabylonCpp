@@ -1,5 +1,6 @@
 #include <babylon/morph/morph_target_manager.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -12,7 +13,8 @@
 namespace BABYLON {
 
 MorphTargetManager::MorphTargetManager(Scene* scene)
-    : _targetStoreTexture{nullptr}
+    : _parentContainer{nullptr}
+    , _targetStoreTexture{nullptr}
     , optimizeInfluencers{true}
     , enableNormalMorphing{true}
     , enableTangentMorphing{true}
@@ -345,6 +347,16 @@ void MorphTargetManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAn
   }
 
   _targetStoreTexture = nullptr;
+
+  // Remove from scene
+  if (_scene) {
+    _scene->removeMorphTargetManager(this);
+
+    if (_parentContainer) {
+      stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->morphTargetManagers, this);
+      _parentContainer = nullptr;
+    }
+  }
 }
 
 MorphTargetManagerPtr MorphTargetManager::Parse(const json& serializationObject, Scene* scene)

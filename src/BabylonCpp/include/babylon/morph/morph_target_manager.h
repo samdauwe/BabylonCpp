@@ -9,6 +9,7 @@
 
 namespace BABYLON {
 
+class AbstractScene;
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(MorphTargetManager)
 FWD_CLASS_SPTR(RawTexture2DArray)
@@ -167,6 +168,9 @@ protected:
   void _syncActiveTargets(bool needUpdate);
 
 public:
+  /** @hidden */
+  AbstractScene* _parentContainer;
+
   /** @hidden */
   RawTexture2DArrayPtr _targetStoreTexture;
 
