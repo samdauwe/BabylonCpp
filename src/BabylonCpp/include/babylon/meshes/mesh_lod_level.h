@@ -19,10 +19,11 @@ class BABYLON_SHARED_EXPORT MeshLODLevel {
 public:
   /**
    * @brief Creates a new LOD level.
-   * @param distance defines the distance where this level should star being displayed
+   * @param distanceOrScreenCoverage defines either the distance or the screen coverage where this
+   * level should start being displayed
    * @param mesh defines the mesh to use to render this level
    */
-  MeshLODLevel(float distance, const MeshPtr& mesh);
+  MeshLODLevel(float distanceOrScreenCoverage, const MeshPtr& mesh);
   MeshLODLevel(const MeshLODLevel& other);
   MeshLODLevel(MeshLODLevel&& other);
   MeshLODLevel& operator=(const MeshLODLevel& other);
@@ -34,9 +35,10 @@ public:
 
 public:
   /**
-   * Defines the distance where this level should start being displayed
+   * Either distance from the center of the object to show this level or the screen coverage if
+   * `useLODScreenCoverage` is set to `true` on the mesh
    */
-  float distance;
+  float distanceOrScreenCoverage;
 
   /**
    * Defines the mesh to use to render this level

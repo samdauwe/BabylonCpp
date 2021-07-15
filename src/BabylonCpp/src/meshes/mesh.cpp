@@ -448,16 +448,16 @@ std::vector<MeshLODLevelPtr>& Mesh::getLODLevels()
 void Mesh::_sortLODLevels()
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
-  BABYLON::stl_util::sort_js_style(_LODLevels,
-                                   [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
-                                     if (a->distance < b->distance) {
-                                       return 1;
-                                     }
-                                     if (a->distance > b->distance) {
-                                       return -1;
-                                     }
-                                     return 0;
-                                   });
+  BABYLON::stl_util::sort_js_style(
+    _LODLevels, [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
+      if (a->distanceOrScreenCoverage < b->distanceOrScreenCoverage) {
+        return 1;
+      }
+      if (a->distanceOrScreenCoverage > b->distanceOrScreenCoverage) {
+        return -1;
+      }
+      return 0;
+    });
 }
 
 Mesh& Mesh::addLODLevel(float distance, const MeshPtr& mesh)
@@ -484,7 +484,7 @@ MeshPtr Mesh::getLODLevelAtDistance(float distance)
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
   for (const auto& level : _LODLevels) {
-    if (stl_util::almost_equal(level->distance, distance)) {
+    if (stl_util::almost_equal(level->distanceOrScreenCoverage, distance)) {
       return level->mesh;
     }
   }
@@ -527,7 +527,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphe
 
   auto distanceToCamera = bSphere->centerWorld.subtract(camera->globalPosition()).length();
 
-  if (_LODLevels.back()->distance > distanceToCamera) {
+  if (_LODLevels.back()->distanceOrScreenCoverage > distanceToCamera) {
     if (onLODLevelSelection) {
       onLODLevelSelection(distanceToCamera, this, this);
     }
@@ -535,7 +535,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphe
   }
 
   for (const auto& level : _LODLevels) {
-    if (level->distance < distanceToCamera) {
+    if (level->distanceOrScreenCoverage < distanceToCamera) {
       if (level->mesh) {
         if (level->mesh->delayLoadState == Constants::DELAYLOADSTATE_NOTLOADED) {
           level->mesh->_checkDelayState();
