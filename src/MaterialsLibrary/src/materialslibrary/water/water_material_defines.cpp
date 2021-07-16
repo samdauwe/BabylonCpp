@@ -26,6 +26,7 @@ WaterMaterialDefines::WaterMaterialDefines()
     {"INSTANCES", false},                 //
     {"SPECULARTERM", false},              //
     {"LOGARITHMICDEPTH", false},          //
+    {"USE_REVERSE_DEPTHBUFFER", false},   //
     {"FRESNELSEPARATE", false},           //
     {"BUMPSUPERIMPOSE", false},           //
     {"BUMPAFFECTSREFLECTION", false},     //
