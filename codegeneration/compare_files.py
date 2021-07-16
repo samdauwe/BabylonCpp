@@ -170,10 +170,14 @@ def main():
         "webXROculusTouchMotionController.ts",
         "webXRProfiledMotionController.ts",
         # Unit Tests
+        # Loading
+        "babylon.sceneLoader.tests.ts", "babylon.sceneLoader.testData.ts",
         # Misc
         "babylon.promise.tests.ts",
         # Physics
         "babylon.physicsComponents.tests.ts",
+        # XR
+        "webXRFeaturesManager.tests.ts",
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
