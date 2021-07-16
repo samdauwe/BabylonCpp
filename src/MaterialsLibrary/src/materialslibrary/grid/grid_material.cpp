@@ -62,9 +62,9 @@ bool GridMaterial::needAlphaBlending() const
   return opacity < 1.f || (_opacityTexture && _opacityTexture->isReady());
 }
 
-bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& /*mesh*/) const
+bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
 {
-  return needAlphaBlending();
+  return mesh.visibility() < 1.f || needAlphaBlending();
 }
 
 bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
@@ -147,8 +147,8 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
 
     // Uniforms
     const std::vector<std::string> uniforms{
-      "projection", "mainColor", "lineColor", "gridControl",   "gridOffset",   "vFogInfos",
-      "vFogColor",  "world",     "view",      "opacityMatrix", "vOpacityInfos"};
+      "projection", "mainColor", "lineColor", "gridControl",   "gridOffset",    "vFogInfos",
+      "vFogColor",  "world",     "view",      "opacityMatrix", "vOpacityInfos", "visibility"};
 
     // Samplers
     const std::vector<std::string> samplers{"opacitySampler"};
@@ -192,6 +192,8 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
   _activeEffect = effect;
+
+  _activeEffect->setFloat("visibility", mesh->visibility());
 
   // Matrices
   if (!(*defines)["INSTANCES"] || (*defines)["THIN_INSTANCE"]) {
