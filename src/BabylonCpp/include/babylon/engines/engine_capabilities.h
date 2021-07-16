@@ -54,6 +54,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool standardDerivatives;
   /** Defines if s3tc texture compression is supported */
   std::optional<GL::WEBGL_compressed_texture_s3tc> s3tc;
+  /** Defines if s3tc sRGB texture compression is supported */
+  std::optional<GL::WEBGL_compressed_texture_s3tc_srgb> s3tc_srgb;
   /** Defines if pvrtc texture compression is supported */
   GL::any pvrtc; // WEBGL_compressed_texture_pvrtc;
   /** Defines if etc1 texture compression is supported */
@@ -102,6 +104,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   GL::EXT_disjoint_timer_query* timerQuery = nullptr;
   /** Defines if timestamp can be used with timer query */
   bool canUseTimestampForTimerQuery;
+  /** Defines if occlusion queries are supported by the engine */
+  bool supportOcclusionQuery;
   /** Defines if multiview is supported
    * (https://www.khronos.org/registry/webgl/extensions/WEBGL_multiview/) */
   GL::any multiview;
@@ -120,6 +124,10 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool canUseGLInstanceID;
   /** Defines if gl_vertexID is available */
   bool canUseGLVertexID;
+  /** Defines if compute shaders are supported by the engine */
+  bool supportComputeShaders;
+  /** Defines if sRGB texture formats are supported */
+  bool supportSRGBBuffers;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON
