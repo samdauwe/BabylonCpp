@@ -36,6 +36,7 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/serialization_helper.h>
+#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -456,9 +457,10 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
   // Textures
   if (defines._areTexturesDirty) {
-    defines._needUVs           = false;
-    defines.boolDef["MAINUV1"] = false;
-    defines.boolDef["MAINUV2"] = false;
+    defines._needUVs = false;
+    for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
+      defines.boolDef["MAINUV" + std::to_string(i)] = false;
+    }
     if (scene->texturesEnabled()) {
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReadyOrNotBlocking()) {
@@ -808,8 +810,15 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
       attribs.emplace_back(VertexBuffer::NormalKind);
     }
 
-    if (defines["UV1"]) {
-      attribs.emplace_back(VertexBuffer::UVKind);
+    if (defines["TANGENT"]) {
+      attribs.emplace_back(VertexBuffer::TangentKind);
+    }
+
+    for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
+      const auto iStr = std::to_string(i);
+      if (defines["UV" + iStr]) {
+        attribs.emplace_back(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str()));
+      }
     }
 
     if (defines["UV2"]) {
