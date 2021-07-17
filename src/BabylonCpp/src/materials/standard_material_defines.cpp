@@ -10,6 +10,10 @@ StandardMaterialDefines::StandardMaterialDefines()
   boolDef = {
     {"MAINUV1", false},                                     //
     {"MAINUV2", false},                                     //
+    {"MAINUV3", false},                                     //
+    {"MAINUV4", false},                                     //
+    {"MAINUV5", false},                                     //
+    {"MAINUV6", false},                                     //
     {"DIFFUSE", false},                                     //
     {"DETAIL", false},                                      //
     {"AMBIENT", false},                                     //
@@ -41,8 +45,13 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"EMISSIVEFRESNEL", false},                             //
     {"FRESNEL", false},                                     //
     {"NORMAL", false},                                      //
+    {"TANGENT", false},                                     //
     {"UV1", false},                                         //
     {"UV2", false},                                         //
+    {"UV3", false},                                         //
+    {"UV4", false},                                         //
+    {"UV5", false},                                         //
+    {"UV6", false},                                         //
     {"VERTEXCOLOR", false},                                 //
     {"VERTEXALPHA", false},                                 //
     {"BONETEXTURE", false},                                 //
@@ -72,6 +81,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"REFLECTIONMAP_OPPOSITEZ", false},                     //
     {"INVERTCUBICMAP", false},                              //
     {"LOGARITHMICDEPTH", false},                            //
+    {"USE_REVERSE_DEPTHBUFFER", false},                     //
     {"REFRACTION", false},                                  //
     {"REFRACTIONMAP_3D", false},                            //
     {"REFLECTIONOVERALPHA", false},                         //
