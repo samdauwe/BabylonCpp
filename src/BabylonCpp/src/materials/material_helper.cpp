@@ -23,6 +23,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>
@@ -47,12 +48,7 @@ void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
   defines.boolDef[key] = true;
   if (texture->getTextureMatrix()->isIdentityAs3x2()) {
     defines.intDef[key + "DIRECTUV"] = texture->coordinatesIndex + 1;
-    if (texture->coordinatesIndex == 0) {
-      defines.boolDef["MAINUV1"] = true;
-    }
-    else {
-      defines.boolDef["MAINUV2"] = true;
-    }
+    defines.boolDef["MAINUV" + std::to_string(texture->coordinatesIndex + 1)] = true;
   }
   else {
     defines.intDef[key + "DIRECTUV"] = 0;
@@ -78,11 +74,12 @@ void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
                                            MaterialDefines& defines)
 {
   if (defines._areMiscDirty) {
-    defines.boolDef["LOGARITHMICDEPTH"]  = useLogarithmicDepth;
-    defines.boolDef["POINTSIZE"]         = pointsCloud;
-    defines.boolDef["FOG"]               = fogEnabled && GetFogState(mesh, scene);
-    defines.boolDef["NONUNIFORMSCALING"] = mesh->nonUniformScaling();
-    defines.boolDef["ALPHATEST"]         = alphaTest;
+    defines.boolDef["LOGARITHMICDEPTH"]        = useLogarithmicDepth;
+    defines.boolDef["POINTSIZE"]               = pointsCloud;
+    defines.boolDef["FOG"]                     = fogEnabled && GetFogState(mesh, scene);
+    defines.boolDef["NONUNIFORMSCALING"]       = mesh->nonUniformScaling();
+    defines.boolDef["ALPHATEST"]               = alphaTest;
+    defines.boolDef["USE_REVERSE_DEPTHBUFFER"] = scene->getEngine()->useReverseDepthBuffer;
   }
 }
 
@@ -239,13 +236,12 @@ bool MaterialHelper::PrepareDefinesForAttributes(AbstractMesh* mesh, MaterialDef
     defines.boolDef["TANGENT"] = true;
   }
 
-  if (defines._needUVs) {
-    defines.boolDef["UV1"] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
-    defines.boolDef["UV2"] = mesh->isVerticesDataPresent(VertexBuffer::UV2Kind);
-  }
-  else {
-    defines.boolDef["UV1"] = false;
-    defines.boolDef["UV2"] = false;
+  for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
+    const auto iStr = std::to_string(i);
+    defines.boolDef["UV" + iStr]
+      = defines._needUVs ?
+          mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str())) :
+          false;
   }
 
   if (useVertexColor) {
