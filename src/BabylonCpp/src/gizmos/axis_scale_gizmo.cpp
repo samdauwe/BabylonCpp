@@ -103,15 +103,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       auto snapped   = false;
       auto dragSteps = 0;
       if (uniformScaling) {
-        std::optional<Vector3> iScale       = _tmpVector;
-        std::optional<Quaternion> iRotation = std::nullopt;
-        std::optional<Vector3> iTranslation = std::nullopt;
-        attachedNode()->getWorldMatrix().decompose(iScale, iRotation, iTranslation);
-        _tmpVector = *iScale;
-        _tmpVector.normalize();
-        if (_tmpVector.y < 0.f) {
-          _tmpVector.scaleInPlace(-1.f);
-        }
+        _tmpVector.setAll(0.57735f); // 1 / sqrt(3)
       }
       else {
         _tmpVector.copyFrom(dragAxis);
@@ -179,7 +171,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   }
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
-    [&](PointerInfo* pointerInfo, EventState& /*es*/) {
+    [&](PointerInfo* pointerInfo, EventState& /*es*/) -> void {
       if (_customMeshSet) {
         return;
       }
@@ -192,14 +184,12 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       const auto material = dragBehavior && dragBehavior->enabled ?
                               (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
                               _disableMaterial;
-      for (auto& m : _cache.gizmoMeshes) {
-        m->material    = material;
-        auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
-        if (linesMesh && dragBehavior->enabled) {
-          linesMesh->color = material->diffuseColor;
-        }
-      }
+      _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
     });
+
+  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
+    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _coloredMaterial : _disableMaterial);
+  });
 
   const auto& light = gizmoLayer->_getSharedGizmoLight();
   light->includedOnlyMeshes

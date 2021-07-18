@@ -289,6 +289,20 @@ void Gizmo::_matrixChanged()
   }
 }
 
+void Gizmo::_setGizmoMeshMaterial(const std::vector<MeshPtr>& gizmoMeshes,
+                                  const StandardMaterialPtr& material)
+{
+  if (!gizmoMeshes.empty()) {
+    for (const auto& m : gizmoMeshes) {
+      m->material         = material;
+      const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
+      if (lineMesh) {
+        lineMesh->color = material->diffuseColor;
+      }
+    }
+  }
+}
+
 void Gizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   _rootMesh->dispose(doNotRecurse, disposeMaterialAndTextures);

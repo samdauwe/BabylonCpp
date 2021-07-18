@@ -163,6 +163,13 @@ protected:
    */
   void _matrixChanged();
 
+  /**
+   * @brief Refresh gizmo mesh material.
+   * @param material material to apply
+   */
+  void _setGizmoMeshMaterial(const std::vector<MeshPtr>& gizmoMeshes,
+                             const StandardMaterialPtr& material);
+
 public:
   /**
    * The root mesh of the gizmo

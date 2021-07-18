@@ -114,6 +114,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
       = SphereBuilder::CreateSphere("", sphereOptions, gizmoLayer->utilityLayerScene.get());
     sphere->rotationQuaternion = Quaternion();
     sphere->material           = coloredMaterial;
+    sphere->isNearGrabbable    = true;
 
     // Drag behavior
     PointerDragBehavior _dragBehavior;
@@ -230,6 +231,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(const Color3& color,
         auto box      = BoxBuilder::CreateBox("", boxOptions, gizmoLayer->utilityLayerScene.get());
         box->material = coloredMaterial;
         box->metadata = zeroAxisCount == 2; // None homogenous scale handle
+        box->isNearGrabbable = true;
 
         // Dragging logic
         auto dragAxis = Vector3(i - 1.f, j - 1.f, k - 1.f).normalize();

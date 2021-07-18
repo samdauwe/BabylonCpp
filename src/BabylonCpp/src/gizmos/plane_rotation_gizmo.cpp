@@ -244,15 +244,13 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
         const auto material = _cache.dragBehavior->enabled ?
                                 (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
                                 _disableMaterial;
-        for (auto& m : _cache.gizmoMeshes) {
-          m->material         = material;
-          const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
-          if (lineMesh && _cache.dragBehavior->enabled) {
-            lineMesh->color = material->diffuseColor;
-          }
-        }
+        _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
       }
     });
+
+  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
+    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _coloredMaterial : _disableMaterial);
+  });
 }
 
 PlaneRotationGizmo::~PlaneRotationGizmo() = default;

@@ -141,11 +141,13 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
         const auto material = _cache.dragBehavior->enabled ?
                                 (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
                                 _disableMaterial;
-        for (const auto& m : _cache.gizmoMeshes) {
-          m->material = material;
-        }
+        _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
       }
     });
+
+  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
+    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _coloredMaterial : _disableMaterial);
+  });
 }
 
 PlaneDragGizmo::~PlaneDragGizmo() = default;

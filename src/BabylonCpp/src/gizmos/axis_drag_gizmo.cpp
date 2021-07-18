@@ -195,15 +195,13 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
         const auto material = dragBehavior && dragBehavior->enabled ?
                                 (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
                                 _disableMaterial;
-        for (const auto& m : _cache.gizmoMeshes) {
-          m->material          = material;
-          const auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
-          if (linesMesh && dragBehavior->enabled) {
-            linesMesh->color = material->diffuseColor;
-          }
-        }
+        _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
       }
     });
+
+  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
+    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _cache.material : _cache.disableMaterial);
+  });
 }
 
 AxisDragGizmo::~AxisDragGizmo() = default;
