@@ -1639,6 +1639,11 @@ public:
   Property<AbstractMesh, bool> showBoundingBox;
 
   /**
+   * Gets or sets a boolean indicating if the mesh can be near grabbed. Default is false
+   */
+  bool isNearGrabbable;
+
+  /**
    * Gets or sets a boolean indicating that bounding boxes of subMeshes must be
    * rendered as well (false by default)
    */

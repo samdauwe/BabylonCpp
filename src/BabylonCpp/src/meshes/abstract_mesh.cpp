@@ -76,6 +76,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , isVisible{true}
     , isPickable{true}
     , showBoundingBox{this, &AbstractMesh::get_showBoundingBox, &AbstractMesh::set_showBoundingBox}
+    , isNearGrabbable{false}
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , enablePointerMoveEvents{false}
