@@ -18,6 +18,7 @@ class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Camera)
 FWD_CLASS_SPTR(HemisphericLight)
+FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
  * @brief Renders a layer on top of an existing scene.
@@ -139,9 +140,11 @@ public:
    */
   std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
 
-private:
-  static std::shared_ptr<UtilityLayerRenderer> _DefaultUtilityLayer;
-  static std::shared_ptr<UtilityLayerRenderer> _DefaultKeepDepthUtilityLayer;
+public:
+  /** @hidden */
+  static UtilityLayerRendererPtr _DefaultUtilityLayer;
+  /** @hidden */
+  static UtilityLayerRendererPtr _DefaultKeepDepthUtilityLayer;
 
 private:
   std::unordered_map<int, bool> _pointerCaptures;
