@@ -178,6 +178,10 @@ def main():
         "babylon.physicsComponents.tests.ts",
         # XR
         "webXRFeaturesManager.tests.ts",
+        # Inspector
+        "context.ts", "curve.ts", "eyedropper.ts", "floodfill.ts",
+        "globalState.ts", "graphSupportingTypes.ts", "rectangleSelect.ts",
+        "textureCanvasManager.ts",
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
