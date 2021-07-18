@@ -164,6 +164,11 @@ public:
   Observable<DragStartOrEndEvent> onDragEndObservable;
 
   /**
+   *  Fires each time behavior enabled state changes
+   */
+  Observable<bool> onEnabledObservable;
+
+  /**
    * If the attached mesh should be moved when dragged
    */
   bool moveAttached;
