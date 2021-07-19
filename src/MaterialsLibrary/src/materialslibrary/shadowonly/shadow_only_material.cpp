@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -18,7 +19,6 @@
 #include <babylon/materialslibrary/shadowonly/shadow_only_fragment_fx.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_vertex_fx.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {

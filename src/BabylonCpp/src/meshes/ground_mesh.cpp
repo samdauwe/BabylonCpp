@@ -1,12 +1,12 @@
 #include <babylon/meshes/ground_mesh.h>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/core/json_util.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
 #include <babylon/maths/tmp_vectors.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

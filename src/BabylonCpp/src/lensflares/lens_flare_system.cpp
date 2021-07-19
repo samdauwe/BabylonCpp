@@ -1,6 +1,7 @@
 #include <babylon/lensflares/lens_flare_system.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
@@ -21,7 +22,6 @@
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

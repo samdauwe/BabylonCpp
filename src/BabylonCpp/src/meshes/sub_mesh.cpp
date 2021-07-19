@@ -1,6 +1,7 @@
 #include <babylon/meshes/sub_mesh.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/collisions/intersection_info.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
@@ -18,7 +19,6 @@
 #include <babylon/meshes/instanced_lines_mesh.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/transform_node.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {

@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/texture.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -9,7 +10,6 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/mirror_texture.h>
 #include <babylon/maths/tmp_vectors.h>
-#include <babylon/meshes/buffer.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>

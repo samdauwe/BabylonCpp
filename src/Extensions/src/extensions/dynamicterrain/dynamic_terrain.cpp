@@ -1,6 +1,7 @@
 #include <babylon/extensions/dynamicterrain/dynamic_terrain.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
@@ -8,7 +9,6 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/file_tools.h>
 

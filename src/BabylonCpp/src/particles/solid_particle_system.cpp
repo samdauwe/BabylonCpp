@@ -1,6 +1,7 @@
 #include <babylon/particles/solid_particle_system.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/random.h>
@@ -16,7 +17,6 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
@@ -1328,7 +1328,7 @@ std::optional<PickedParticle> SolidParticleSystem::pickedParticle(const PickingI
   if (pickingInfo.hit) {
     const auto subMesh = pickingInfo.subMeshId;
     const auto faceId  = pickingInfo.faceId != -1 ? static_cast<size_t>(pickingInfo.faceId) :
-                                                   pickedBySubMesh[subMesh].size();
+                                                    pickedBySubMesh[subMesh].size();
     const auto& picked = pickedBySubMesh;
     if (subMesh < static_cast<int>(picked.size()) && faceId < picked[subMesh].size()) {
       return picked[subMesh][faceId];

@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
@@ -14,7 +15,6 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/procedurals/procedural_texture_scene_component.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {

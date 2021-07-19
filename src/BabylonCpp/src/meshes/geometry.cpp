@@ -4,6 +4,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
@@ -16,7 +17,6 @@
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/misc/guid.h>

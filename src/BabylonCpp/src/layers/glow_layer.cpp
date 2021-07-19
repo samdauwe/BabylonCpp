@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -14,7 +15,6 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 
@@ -113,11 +113,11 @@ void GlowLayer::_createTextureAndPostProcesses()
   auto blurTextureWidth  = _mainTextureDesiredSize.width;
   auto blurTextureHeight = _mainTextureDesiredSize.height;
   blurTextureWidth       = _engine->needPOTTextures() ?
-                       Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
-                       blurTextureWidth;
-  blurTextureHeight = _engine->needPOTTextures() ?
-                        Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
-                        blurTextureHeight;
+                             Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
+                             blurTextureWidth;
+  blurTextureHeight      = _engine->needPOTTextures() ?
+                             Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
+                             blurTextureHeight;
 
   auto textureType = 0u;
   if (_engine->getCaps().textureHalfFloatRender) {

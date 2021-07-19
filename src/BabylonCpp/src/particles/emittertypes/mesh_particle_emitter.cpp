@@ -1,5 +1,6 @@
 #include <babylon/particles/emittertypes/mesh_particle_emitter.h>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
@@ -7,7 +8,6 @@
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

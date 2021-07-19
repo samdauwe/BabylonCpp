@@ -7,6 +7,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/buffers/buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/logging.h>
@@ -19,7 +20,6 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>

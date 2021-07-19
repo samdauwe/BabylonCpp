@@ -1,13 +1,13 @@
 #include <babylon/meshes/csg/csg.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/materials/material.h>
 #include <babylon/meshes/csg/node.h>
 #include <babylon/meshes/csg/polygon.h>
 #include <babylon/meshes/csg/vertex.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {

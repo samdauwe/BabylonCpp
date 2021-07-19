@@ -4,10 +4,10 @@
 #include "../test_utils.h"
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/buffer.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/scene.h>
-#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 TEST(TestGeometry, TestGetVerticesData_Vec3FloatColor)
 {

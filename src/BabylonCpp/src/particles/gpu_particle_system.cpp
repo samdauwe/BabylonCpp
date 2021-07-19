@@ -3,6 +3,8 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/buffer.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/random.h>
@@ -20,8 +22,6 @@
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/buffer.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/color3_gradient.h>
 #include <babylon/misc/gradient_helper.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>

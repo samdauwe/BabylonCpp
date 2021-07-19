@@ -1,6 +1,7 @@
 #include <babylon/meshes/vertex_data.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -10,7 +11,6 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/geometry.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {

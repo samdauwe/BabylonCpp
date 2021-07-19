@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/engine.h>
@@ -17,7 +18,6 @@
 #include <babylon/materialslibrary/fire/fire_vertex_fx.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {

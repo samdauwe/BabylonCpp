@@ -2,11 +2,11 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

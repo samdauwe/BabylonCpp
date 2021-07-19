@@ -1,6 +1,7 @@
 #include <babylon/materials/effect_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_wrapper.h>
@@ -8,7 +9,6 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/states/depth_culling_state.h>
 #include <babylon/states/stencil_state.h>
 

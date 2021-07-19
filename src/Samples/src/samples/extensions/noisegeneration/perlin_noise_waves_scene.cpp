@@ -1,3 +1,4 @@
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -7,7 +8,6 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/samples/babylon_register_sample.h>
 

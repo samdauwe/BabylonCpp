@@ -1,6 +1,8 @@
 #include <babylon/rendering/edges_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/buffer.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -9,9 +11,7 @@
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/_instance_data_storage.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/rendering/face_adjacencies.h>
 

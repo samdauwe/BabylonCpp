@@ -3,6 +3,8 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/buffers/buffer.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
@@ -31,7 +33,6 @@
 #include <babylon/meshes/_internal_mesh_data_info.h>
 #include <babylon/meshes/_thin_instance_data_storage.h>
 #include <babylon/meshes/_visible_instances.h>
-#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/builders/box_builder.h>
 #include <babylon/meshes/builders/capsule_builder.h>
 #include <babylon/meshes/builders/cylinder_builder.h>
@@ -56,7 +57,6 @@
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh_lod_level.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>

@@ -1,5 +1,6 @@
 #include <babylon/materials/pbr/pbr_base_material.h>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -36,7 +37,6 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/brdf_texture_tools.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>

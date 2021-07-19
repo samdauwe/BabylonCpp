@@ -4,6 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/collisions/intersection_info.h>
@@ -27,7 +28,6 @@
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>

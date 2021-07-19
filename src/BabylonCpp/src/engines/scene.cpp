@@ -12,6 +12,8 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/buffers/buffer.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
@@ -60,12 +62,10 @@
 #include <babylon/maths/frustum.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh_simplification_scene_component.h>
 #include <babylon/meshes/simplification/simplification_queue.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/guid.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>

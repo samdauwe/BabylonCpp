@@ -1,10 +1,10 @@
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/fresnel_parameters.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {

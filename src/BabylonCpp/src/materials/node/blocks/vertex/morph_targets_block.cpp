@@ -1,5 +1,6 @@
 #include <babylon/materials/node/blocks/vertex/morph_targets_block.h>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -9,7 +10,6 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 

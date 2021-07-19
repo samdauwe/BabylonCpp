@@ -1,6 +1,7 @@
 #include <babylon/materials/node/node_material.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -33,7 +34,6 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/particles/base_particle_system.h>

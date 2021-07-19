@@ -1,6 +1,7 @@
 #include <babylon/rendering/bounding_box_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -8,7 +9,6 @@
 #include <babylon/materials/shader_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {

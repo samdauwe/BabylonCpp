@@ -1,6 +1,7 @@
 #include <babylon/particles/points_cloud_system.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
@@ -10,7 +11,6 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/cloud_point.h>
 #include <babylon/particles/points_group.h>

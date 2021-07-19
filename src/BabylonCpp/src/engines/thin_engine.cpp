@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/extensions/alpha_extension.h>
@@ -37,7 +38,6 @@
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/viewport.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/misc/dds.h>
 #include <babylon/misc/file_tools.h>

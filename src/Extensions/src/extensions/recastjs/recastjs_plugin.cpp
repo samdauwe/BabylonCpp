@@ -1,10 +1,10 @@
 #include <babylon/extensions/recastjs/recastjs_plugin.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/extensions/recastjs/recastjs_crowd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/navigation/inav_mesh_parameters.h>
 

@@ -1,6 +1,7 @@
 #include <babylon/materials/background/background_material.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
@@ -18,7 +19,6 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

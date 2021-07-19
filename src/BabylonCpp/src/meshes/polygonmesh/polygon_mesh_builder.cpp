@@ -1,12 +1,12 @@
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/maths/path2.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/indexed_vector2.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 #ifdef __GNUC__

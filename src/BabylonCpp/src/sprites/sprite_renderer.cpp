@@ -1,5 +1,7 @@
 #include <babylon/sprites/sprite_renderer.h>
 
+#include <babylon/buffers/buffer.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -8,8 +10,6 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/thin_texture.h>
-#include <babylon/meshes/buffer.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/sprites/thin_sprite.h>
 #include <babylon/states/depth_culling_state.h>
 

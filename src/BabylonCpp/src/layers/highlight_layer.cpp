@@ -4,6 +4,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -17,7 +18,6 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/glow_blur_post_process.h>

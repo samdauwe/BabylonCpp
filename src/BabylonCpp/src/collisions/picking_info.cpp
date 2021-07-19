@@ -1,10 +1,10 @@
 #include <babylon/collisions/picking_info.h>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/maths/vector2.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

@@ -1,12 +1,12 @@
 #include <babylon/meshes/builders/decal_builder.h>
 
+#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/maths/position_normal_texture_vertex.h>
 #include <babylon/maths/position_normal_vertex.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
-#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
