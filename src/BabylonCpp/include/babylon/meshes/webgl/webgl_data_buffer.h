@@ -4,13 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/buffers/data_buffer.h>
 
 namespace BABYLON {
 
 namespace GL {
-class IGLBuffer;
-using IGLBufferPtr = std::shared_ptr<IGLBuffer>;
+FWD_CLASS_SPTR(IGLBuffer)
 } // end of namespace GL
 
 /**
