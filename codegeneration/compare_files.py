@@ -166,9 +166,10 @@ def main():
         # XR
         "webXRInputSource.ts",
         # XR / features
-        "WebXRAbstractFeature.ts", "WebXRControllerPhysics.ts",
-        "WebXRControllerPointerSelection.ts", "WebXRControllerTeleportation.ts",
-        "WebXRHitTest.ts",
+        "WebXRAbstractFeature.ts", "WebXRControllerMovement.ts",
+        "WebXRControllerPhysics.ts", "WebXRControllerPointerSelection.ts",
+        "WebXRControllerTeleportation.ts", "WebXRDOMOverlay.ts",
+        "WebXRHitTest.ts", "WebXRNearInteraction.ts",
         # XR / motionController
         "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
         "WebXRFeaturePointSystem.ts", "webXRGenericHandController.ts",
