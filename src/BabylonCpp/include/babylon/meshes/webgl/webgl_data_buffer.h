@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/meshes/data_buffer.h>
+#include <babylon/buffers/data_buffer.h>
 
 namespace BABYLON {
 
