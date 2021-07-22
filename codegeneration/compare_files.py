@@ -101,6 +101,9 @@ def main():
         # Cameras / XR / features
         "WebXRAnchorSystem.ts", "WebXRBackgroundRemover.ts",
         "WebXRHitTestLegacy.ts", "WebXRPlaneDetector.ts",
+        # Compute
+        "computeEffect.ts", "computeShader.ts", "IComputeContext.ts",
+        "IComputePipelineContext.ts",
         # Debug
         "debugLayer.ts",
         # DeviceInput
@@ -154,7 +157,7 @@ def main():
         "deferred.ts", "domManagement.ts", "fileRequest.ts", "filesInput.ts",
         "filesInputStore.ts", "instantiationTools.ts",
         "khronosTextureContainer2.ts", "logger.ts", "loadFileError.ts",
-        "precisionDate.ts", "promise.ts", "retryStrategy.ts",
+        "precisionDate.ts", "promise.ts", "reflector.ts", "retryStrategy.ts",
         "sceneRecorder.ts", "sceneSerializer.ts", "screenshotTools.ts",
         "smartArray.ts", "stringDictionary.ts", "tags.ts", "timer.ts",
         "trajectoryClassifier.ts", "typeStore.ts", "videoRecorder.ts",
