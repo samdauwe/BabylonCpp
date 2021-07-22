@@ -66,20 +66,22 @@ public:
                                                  const std::string& lightDataUniformName) override;
 
   /**
-   * @brief Gets the minZ used for shadow according to both the scene and the light. Values are
-   * fixed on directional lights as it relies on an ortho projection hence the need to convert being
-   * -1 and 1 to 0 and 1 doing (depth
-   * + min) / (min + max) -> (depth + 1) / (1 + 1) -> (depth * 0.5) + 0.5.
+   * @brief Gets the minZ used for shadow according to both the scene and the light.
+   *
+   * Values are fixed on directional lights as it relies on an ortho projection hence the need to
+   * convert being -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 + 1) ->
+   * (depth * 0.5) + 0.5. (when not using reverse depth buffer / NDC half Z range)
    * @param activeCamera The camera we are returning the min for
    * @returns the depth min z
    */
   float getDepthMinZ(const Camera& activeCamera) const override;
 
   /**
-   * @brief Gets the maxZ used for shadow according to both the scene and the light. Values are
-   * fixed on directional lights as it relies on an ortho projection hence the need to convert being
-   * -1 and 1 to 0 and 1 doing (depth
-   * + min) / (min + max) -> (depth + 1) / (1 + 1) -> (depth * 0.5) + 0.5.
+   * @brief Gets the maxZ used for shadow according to both the scene and the light.
+   *
+   * Values are fixed on directional lights as it relies on an ortho projection hence the need to
+   * convert being -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 + 1) ->
+   * (depth * 0.5) + 0.5. (when not using reverse depth buffer / NDC half Z range)
    * @param activeCamera The camera we are returning the max for
    * @returns the depth max z
    */

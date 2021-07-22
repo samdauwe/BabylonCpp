@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
+#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
@@ -147,7 +148,8 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(Matrix& mat
 
   Matrix::OrthoLHToRef(shadowFrustumSize(), shadowFrustumSize(),
                        shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
+                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix,
+                       getScene()->getEngine()->isNDCHalfZRange);
 }
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
@@ -216,10 +218,16 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   const auto xOffset = _orthoRight - _orthoLeft;
   const auto yOffset = _orthoTop - _orthoBottom;
 
+  const auto minZ = shadowMinZ() ? *shadowMinZ() : activeCamera->minZ;
+  const auto maxZ = shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ;
+
+  const auto useReverseDepthBuffer = getScene()->getEngine()->useReverseDepthBuffer;
+
   Matrix::OrthoOffCenterLHToRef(
     _orthoLeft - xOffset * shadowOrthoScale(), _orthoRight + xOffset * shadowOrthoScale(),
     _orthoBottom - yOffset * shadowOrthoScale(), _orthoTop + yOffset * shadowOrthoScale(),
-    shadowMinZ().value_or(activeCamera->minZ), shadowMaxZ().value_or(activeCamera->maxZ), matrix);
+    useReverseDepthBuffer ? maxZ : minZ, useReverseDepthBuffer ? minZ : maxZ, matrix,
+    getScene()->getEngine()->isNDCHalfZRange);
 }
 
 void DirectionalLight::_buildUniformLayout()
@@ -264,12 +272,14 @@ DirectionalLight::transferToNodeMaterialEffect(Effect* effect,
 
 float DirectionalLight::getDepthMinZ(const Camera& /*activeCamera*/) const
 {
-  return 1.f;
+  const auto engine = _scene->getEngine();
+  return !engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : 1.f;
 }
 
 float DirectionalLight::getDepthMaxZ(const Camera& /*activeCamera*/) const
 {
-  return 1.f;
+  const auto engine = _scene->getEngine();
+  return engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : 1.f;
 }
 
 void DirectionalLight::prepareLightSpecificDefines(MaterialDefines& defines,
