@@ -118,10 +118,12 @@ protected:
    * This will make creation of children, recursive.
    * @param useVertexColor defines if this LinesMesh supports vertex color
    * @param useVertexAlpha defines if this LinesMesh supports vertex alpha
+   * @param material material to use to draw the line. If not provided, will create a new one
    */
   LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
-            bool useVertexColor = false, bool useVertexAlpha = false);
+            bool useVertexColor = false, bool useVertexAlpha = false,
+            const MaterialPtr& material = nullptr);
 
   /**
    * Hidden

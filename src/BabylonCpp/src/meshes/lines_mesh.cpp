@@ -17,7 +17,8 @@
 namespace BABYLON {
 
 LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, LinesMesh* iSource,
-                     bool doNotCloneChildren, bool iUseVertexColor, bool iUseVertexAlpha)
+                     bool doNotCloneChildren, bool iUseVertexColor, bool iUseVertexAlpha,
+                     const MaterialPtr& iMaterial)
     : Mesh(iName, scene, iParent, iSource, doNotCloneChildren)
     , dashSize{0.f}
     , gapSize{0.f}
@@ -56,7 +57,12 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
     options.attributes.emplace_back(VertexBuffer::ColorKind);
   }
 
-  _lineMaterial = ShaderMaterial::New("colorShader", getScene(), "color", options);
+  if (iMaterial) {
+    material = iMaterial;
+  }
+  else {
+    _lineMaterial = ShaderMaterial::New("colorShader", getScene(), "color", options);
+  }
 }
 
 LinesMesh::~LinesMesh() = default;
