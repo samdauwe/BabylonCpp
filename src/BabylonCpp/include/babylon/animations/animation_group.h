@@ -13,6 +13,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractScene;
 struct TargetedAnimation;
 class Scene;
 FWD_CLASS_SPTR(Animatable)
@@ -278,6 +279,11 @@ private:
   void _checkAnimationGroupEnded(const AnimatablePtr& animatable);
 
 public:
+  /**
+   * Hidden
+   */
+  AbstractScene* _parentContainer;
+
   /**
    * Gets or sets the unique id of the node
    */
