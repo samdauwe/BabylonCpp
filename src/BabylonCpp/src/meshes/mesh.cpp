@@ -851,7 +851,7 @@ Mesh& Mesh::refreshBoundingInfo(bool applySkeleton)
   }
 
   std::optional<Vector2> bias = geometry() ? geometry()->boundingBias() : std::nullopt;
-  _refreshBoundingInfo(_getPositionData(applySkeleton), bias);
+  _refreshBoundingInfo(_getPositionData(applySkeleton, false), bias);
   return *this;
 }
 

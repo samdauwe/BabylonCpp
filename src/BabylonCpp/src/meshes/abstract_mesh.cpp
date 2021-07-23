@@ -1024,13 +1024,13 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise, float 
   return Vector3(flipBack * defForwardMult, twirlClockwise, tiltRight * defForwardMult);
 }
 
-AbstractMesh& AbstractMesh::refreshBoundingInfo(bool applySkeleton)
+AbstractMesh& AbstractMesh::refreshBoundingInfo(bool applySkeleton, bool applyMorph)
 {
   if (_boundingInfo && _boundingInfo->isLocked()) {
     return *this;
   }
 
-  _refreshBoundingInfo(_getPositionData(applySkeleton), std::nullopt);
+  _refreshBoundingInfo(_getPositionData(applySkeleton, applyMorph), std::nullopt);
   return *this;
 }
 
@@ -1056,7 +1056,7 @@ void AbstractMesh::_refreshBoundingInfo(const Float32Array& data,
   _updateBoundingInfo();
 }
 
-Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
+Float32Array AbstractMesh::_getPositionData(bool applySkeleton, bool /*applyMorph*/)
 {
   auto data = getVerticesData(VertexBuffer::PositionKind);
 

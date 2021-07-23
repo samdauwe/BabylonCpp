@@ -196,7 +196,7 @@ std::vector<Vector3>& InstancedMesh::_positions()
   return _sourceMesh->_positions();
 }
 
-InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton)
+InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton, bool applyMorph)
 {
   if (_boundingInfo && _boundingInfo->isLocked()) {
     return *this;
@@ -204,7 +204,7 @@ InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton)
 
   const auto bias
     = _sourceMesh->geometry() ? _sourceMesh->geometry()->boundingBias() : std::nullopt;
-  _refreshBoundingInfo(_sourceMesh->_getPositionData(applySkeleton), bias);
+  _refreshBoundingInfo(_sourceMesh->_getPositionData(applySkeleton, applyMorph), bias);
   return *this;
 }
 
