@@ -13,10 +13,10 @@ struct BABYLON_SHARED_EXPORT IAnimationKey {
 
   IAnimationKey();
   IAnimationKey(float frame, AnimationValue value);
-  IAnimationKey(float frame, AnimationValue value,
-                const std::optional<AnimationValue>& inTangent,
+  IAnimationKey(float frame, AnimationValue value, const std::optional<AnimationValue>& inTangent,
                 const std::optional<AnimationValue>& outTangent,
-                const std::optional<AnimationValue>& interpolation);
+                const std::optional<AnimationValue>& interpolation,
+                const std::optional<bool>& lockedTangent = std::nullopt);
   IAnimationKey(const IAnimationKey& other);
   IAnimationKey(IAnimationKey&& other);
   IAnimationKey& operator=(const IAnimationKey& other);
@@ -47,6 +47,11 @@ struct BABYLON_SHARED_EXPORT IAnimationKey {
    * The animation interpolation type
    */
   std::optional<AnimationValue> interpolation;
+
+  /**
+   * Property defined by UI tools to link (or not ) the tangents
+   */
+  std::optional<bool> lockedTangent;
 
 }; // end of struct AnimationKey
 
