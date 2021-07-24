@@ -428,8 +428,8 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
       const auto orthoBottom = _scene->activeCamera()->orthoBottom;
       const auto orthoTop    = _scene->activeCamera()->orthoTop;
       effect->setMatrix3x3("depthProjection", SSAO2RenderingPipeline::ORTHO_DEPTH_PROJECTION);
-      effect->setFloat("xViewport", (orthoRight - orthoLeft) * 0.5f);
-      effect->setFloat("yViewport", (orthoTop - orthoBottom) * 0.5f);
+      effect->setFloat("xViewport", (orthoRight.value_or(0.f) - orthoLeft.value_or(0.f)) * 0.5f);
+      effect->setFloat("yViewport", (orthoTop.value_or(0.f) - orthoBottom.value_or(0.f)) * 0.5f);
     }
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 

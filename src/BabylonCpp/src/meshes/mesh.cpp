@@ -1426,7 +1426,7 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
     if (!buffer.empty()) {
       _thinInstanceDataStorage->instancesCount = buffer.size() / stride;
       _thinInstanceDataStorage->matrixBuffer
-        = _thinInstanceCreateMatrixBuffer("world", buffer, !staticBuffer);
+        = _thinInstanceCreateMatrixBuffer("world", buffer, staticBuffer);
 
       if (!doNotSyncBoundingInfo) {
         thinInstanceRefreshBoundingInfo(false);
@@ -1447,7 +1447,7 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
     _thinInstanceDataStorage->previousMatrixData   = buffer;
     if (!buffer.empty()) {
       _thinInstanceDataStorage->previousMatrixBuffer
-        = _thinInstanceCreateMatrixBuffer("previousWorld", buffer, !staticBuffer);
+        = _thinInstanceCreateMatrixBuffer("previousWorld", buffer, staticBuffer);
     }
   }
   else {
