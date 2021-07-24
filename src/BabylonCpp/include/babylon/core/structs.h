@@ -205,18 +205,19 @@ struct NodeCache {
   unsigned int billboardMode = 0;
   bool infiniteDistance      = false;
   // Camera
-  unsigned int mode    = 0;
-  float minZ           = 0.f;
-  float maxZ           = 0.f;
-  float fov            = 0.f;
-  unsigned int fovMode = 0;
-  float aspectRatio    = 0.f;
-  float orthoLeft      = 0.f;
-  float orthoRight     = 0.f;
-  float orthoTop       = 0.f;
-  float orthoBottom    = 0.f;
-  int renderWidth      = 0;
-  int renderHeight     = 0;
+  unsigned int mode         = 0;
+  float minZ                = 0.f;
+  float maxZ                = 0.f;
+  float fov                 = 0.f;
+  unsigned int fovMode      = 0;
+  float aspectRatio         = 0.f;
+  float orthoLeft           = 0.f;
+  float orthoRight          = 0.f;
+  float orthoTop            = 0.f;
+  float orthoBottom         = 0.f;
+  float projectionPlaneTilt = 0.f;
+  int renderWidth           = 0;
+  int renderHeight          = 0;
   // TargetCamera
   std::unique_ptr<Vector3> lockedTarget = nullptr;
   // ArcRotateCamera
