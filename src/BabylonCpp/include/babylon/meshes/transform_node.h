@@ -333,9 +333,12 @@ public:
 
   /**
    * @brief Detach the transform node if its associated with a bone.
+   * @param resetToPreviousParent Indicates if the parent that was in effect when attachToBone was
+   * called should be set back or if we should set parent to null instead (defaults to the latter)
+   * @since 5.0.0
    * @returns this object
    */
-  TransformNode& detachFromBone();
+  TransformNode& detachFromBone(bool resetToPreviousParent = false);
 
   /**
    * @brief Rotates the mesh around the axis vector for the passed angle (amount) expressed in
@@ -811,6 +814,7 @@ private:
   Vector3 _rotation;
   std::optional<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;
+  Node* _currentParentWhenAttachingToBone;
   bool _isAbsoluteSynced;
   unsigned int _billboardMode;
   bool _preserveParentRotationForBillboard;
