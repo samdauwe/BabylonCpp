@@ -335,7 +335,7 @@ public:
    * @param useScreen defines if screen size must be used (or the current render target if any)
    * @returns a number defining the aspect ratio
    */
-  float getAspectRatio(const Camera& camera, bool useScreen = false);
+  float getAspectRatio(const Camera& camera, bool useScreen = false) const;
 
   /**
    * @brief Gets current screen aspect ratio.

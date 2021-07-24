@@ -137,7 +137,7 @@ ICanvas* Engine::getInputElement() const
   return _renderingCanvas;
 }
 
-float Engine::getAspectRatio(const Camera& camera, bool useScreen)
+float Engine::getAspectRatio(const Camera& camera, bool useScreen) const
 {
   const auto& viewport = camera.viewport;
   return static_cast<float>(getRenderWidth(useScreen) * viewport.width)
