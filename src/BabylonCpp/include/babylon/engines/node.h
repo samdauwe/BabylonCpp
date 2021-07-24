@@ -7,6 +7,7 @@
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/ibehavior_aware.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
@@ -18,27 +19,34 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractActionManager;
-class AbstractMesh;
-class Animatable;
+class AbstractScene;
 struct AnimationPropertiesOverride;
-class AnimationRange;
 class Engine;
-class Node;
 class Scene;
-class TransformNode;
-using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
-using AbstractMeshPtr          = std::shared_ptr<AbstractMesh>;
-using AnimatablePtr            = std::shared_ptr<Animatable>;
-using AnimationRangePtr        = std::shared_ptr<AnimationRange>;
-using NodePtr                  = std::shared_ptr<Node>;
-using TransformNodePtr         = std::shared_ptr<TransformNode>;
+FWD_CLASS_SPTR(AbstractActionManager)
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(AnimationRange)
+FWD_CLASS_SPTR(Node)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * Defines how a node can be built from a string name.
  */
 using NodeConstructor = std::function<NodePtr(const std::string& name, Scene* scene,
                                               const std::optional<json>& options)>;
+
+/**
+ * Hidden
+ */
+struct _InternalNodeDataInfo {
+  bool _doNotSerialize     = false;
+  bool _isDisposed         = false;
+  int _sceneRootNodesIndex = -1;
+  bool _isEnabled          = true;
+  bool _isParentEnabled    = true;
+  bool _isReady            = true;
+}; // end of struct _InternalNodeDataInfo
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera.)
@@ -126,6 +134,7 @@ public:
    * @returns a {BABYLON.Engine}
    */
   Engine* getEngine();
+  const Engine* getEngine() const;
 
   // Behaviors
   /**
@@ -489,8 +498,10 @@ public:
    */
   Property<Node, bool> doNotSerialize;
 
-  /** Hidden */
-  bool _isDisposed;
+  /**
+   * Hidden
+   */
+  AbstractScene* _parentContainer;
 
   /**
    * Gets a list of Animations associated with the node.
@@ -543,14 +554,10 @@ protected:
   std::unordered_map<std::string, AnimationRangePtr> _ranges;
 
 private:
-  bool _doNotSerialize;
-  bool _isEnabled;
-  bool _isParentEnabled;
-  bool _isReady;
+  _InternalNodeDataInfo _nodeDataStorage;
   int _parentUpdateId;
   Node* _parentNode;
   std::vector<NodePtr> _children;
-  int _sceneRootNodesIndex;
   AnimationPropertiesOverridePtr _animationPropertiesOverride;
   Observer<Node>::Ptr _onDisposeObserver;
 

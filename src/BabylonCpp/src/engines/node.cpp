@@ -40,7 +40,7 @@ Node::Node(const std::string& iName, Scene* scene)
     : name{iName}
     , id{iName}
     , doNotSerialize{this, &Node::get_doNotSerialize, &Node::set_doNotSerialize}
-    , _isDisposed{false}
+    , _parentContainer{nullptr}
     , onReady{nullptr}
     , _currentRenderId{-1}
     , _childUpdateId{-1}
@@ -50,13 +50,8 @@ Node::Node(const std::string& iName, Scene* scene)
     , onDispose{this, &Node::set_onDispose}
     , behaviors{this, &Node::get_behaviors}
     , _isNode{true}
-    , _doNotSerialize{false}
-    , _isEnabled{true}
-    , _isParentEnabled{true}
-    , _isReady{true}
     , _parentUpdateId{-1}
     , _parentNode{nullptr}
-    , _sceneRootNodesIndex{-1}
     , _animationPropertiesOverride{nullptr}
     , _onDisposeObserver{nullptr}
 {
@@ -83,12 +78,12 @@ Type Node::type() const
 
 bool Node::isDisposed() const
 {
-  return _isDisposed;
+  return _nodeDataStorage._isDisposed;
 }
 
 bool Node::get_doNotSerialize() const
 {
-  if (_doNotSerialize) {
+  if (_nodeDataStorage._doNotSerialize) {
     return true;
   }
 
@@ -101,7 +96,7 @@ bool Node::get_doNotSerialize() const
 
 void Node::set_doNotSerialize(bool value)
 {
-  _doNotSerialize = value;
+  _nodeDataStorage._doNotSerialize = value;
 }
 
 void Node::set_parent(Node* const& iParent)
@@ -116,7 +111,7 @@ void Node::set_parent(Node* const& iParent)
   if (_parentNode && !_parentNode->_children.empty()) {
     stl_util::remove_vector_elements_equal_sharedptr(_parentNode->_children, this);
 
-    if (!iParent && !_isDisposed) {
+    if (!iParent && !_nodeDataStorage._isDisposed) {
       _addToSceneRootNodes();
     }
   }
@@ -144,22 +139,23 @@ Node*& Node::get_parent()
 
 void Node::_addToSceneRootNodes()
 {
-  if (_sceneRootNodesIndex == -1) {
-    _sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
+  if (_nodeDataStorage._sceneRootNodesIndex == -1) {
+    _nodeDataStorage._sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
     _scene->rootNodes.emplace_back(shared_from_this());
   }
 }
 
 void Node::_removeFromSceneRootNodes()
 {
-  if (_sceneRootNodesIndex != -1) {
-    auto& rootNodes                                      = _scene->rootNodes;
-    auto lastIdx                                         = rootNodes.size() - 1;
-    rootNodes[static_cast<size_t>(_sceneRootNodesIndex)] = rootNodes[lastIdx];
-    rootNodes[static_cast<size_t>(_sceneRootNodesIndex)]->_sceneRootNodesIndex
-      = _sceneRootNodesIndex;
+  if (_nodeDataStorage._sceneRootNodesIndex != -1) {
+    auto& rootNodes                                                       = _scene->rootNodes;
+    auto lastIdx                                                          = rootNodes.size() - 1;
+    rootNodes[static_cast<size_t>(_nodeDataStorage._sceneRootNodesIndex)] = rootNodes[lastIdx];
+    rootNodes[static_cast<size_t>(_nodeDataStorage._sceneRootNodesIndex)]
+      ->_nodeDataStorage._sceneRootNodesIndex
+      = _nodeDataStorage._sceneRootNodesIndex;
     _scene->rootNodes.pop_back();
-    _sceneRootNodesIndex = -1;
+    _nodeDataStorage._sceneRootNodesIndex = -1;
   }
 }
 
@@ -195,6 +191,11 @@ Scene* Node::getScene() const
 }
 
 Engine* Node::getEngine()
+{
+  return _scene->getEngine();
+}
+
+const Engine* Node::getEngine() const
 {
   return _scene->getEngine();
 }
@@ -351,25 +352,25 @@ bool Node::isSynchronized()
 
 bool Node::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
 {
-  return _isReady;
+  return _nodeDataStorage._isReady;
 }
 
 bool Node::isEnabled(bool checkAncestors)
 {
   if (!checkAncestors) {
-    return _isEnabled;
+    return _nodeDataStorage._isEnabled;
   }
 
-  if (!_isEnabled) {
+  if (!_nodeDataStorage._isEnabled) {
     return false;
   }
 
-  return _isParentEnabled;
+  return _nodeDataStorage._isParentEnabled;
 }
 
 void Node::_syncParentEnabledState()
 {
-  _isParentEnabled = _parentNode ? _parentNode->isEnabled() : true;
+  _nodeDataStorage._isParentEnabled = _parentNode ? _parentNode->isEnabled() : true;
 
   if (!_children.empty()) {
     for (auto& c : _children) {
@@ -380,7 +381,7 @@ void Node::_syncParentEnabledState()
 
 void Node::setEnabled(bool value)
 {
-  _isEnabled = value;
+  _nodeDataStorage._isEnabled = value;
 
   _syncParentEnabledState();
 }
@@ -446,20 +447,21 @@ std::vector<NodePtr> Node::getChildren(const std::function<bool(const NodePtr& n
 
 void Node::_setReady(bool iState)
 {
-  if (iState == _isReady) {
+  if (iState == _nodeDataStorage._isReady) {
     return;
   }
 
   if (!iState) {
-    _isReady = false;
+    _nodeDataStorage._isReady = false;
     return;
   }
 
-  _isReady = true;
+  _nodeDataStorage._isReady = true;
   if (onReady) {
     onReady(this);
   }
-  _isReady = true;
+
+  _nodeDataStorage._isReady = true;
 }
 
 std::vector<AnimationPtr> Node::getAnimations()
@@ -545,7 +547,7 @@ Matrix& Node::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 
 void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  _isDisposed = true;
+  _nodeDataStorage._isDisposed = true;
 
   if (!doNotRecurse) {
     auto nodes = getDescendants(true);
