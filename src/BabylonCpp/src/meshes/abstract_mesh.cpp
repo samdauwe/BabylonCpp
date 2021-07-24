@@ -1725,8 +1725,6 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   onCollisionPositionChangeObservable.clear();
   onRebuildObservable.clear();
 
-  _isDisposed = true;
-
   TransformNode::dispose(doNotRecurse, disposeMaterialAndTextures);
 
   // Remove from scene
