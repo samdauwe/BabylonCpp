@@ -9,6 +9,7 @@
 #include <babylon/engines/processors/shader_processing_options.h>
 #include <babylon/engines/processors/shader_processor.h>
 #include <babylon/engines/scene.h>
+#include <babylon/engines/shader_store.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/effect_includes_shaders_store.h>
 #include <babylon/materials/effect_shaders_store.h>
@@ -23,7 +24,16 @@
 
 namespace BABYLON {
 
-std::string Effect::ShadersRepository        = "src/Shaders/";
+std::string Effect::ShadersRepository()
+{
+  return ShaderStore::ShadersRepository;
+}
+
+void Effect::setShadersRepository(const std::string& repo)
+{
+  ShaderStore::ShadersRepository = repo;
+}
+
 bool Effect::LogShaderCodeOnCompilationError = true;
 
 std::unordered_map<std::string, std::string>& Effect::ShadersStore()
@@ -126,18 +136,20 @@ Effect::Effect(
   _processingContext
     = std::static_pointer_cast<ShaderProcessingContext>(_engine->_getShaderProcessingContext());
 
-  ProcessingOptions processorOptions;
+  ProcessingOptions processorOptions{};
   processorOptions.defines                      = StringTools::split(defines, '\n');
   processorOptions.indexParameters              = _indexParameters;
   processorOptions.isFragment                   = false;
   processorOptions.shouldUseHighPrecisionShader = _engine->_shouldUseHighPrecisionShader();
   processorOptions.processor                    = _engine->_shaderProcessor;
   processorOptions.supportsUniformBuffers       = _engine->supportsUniformBuffers();
-  processorOptions.shadersRepository            = Effect::ShadersRepository;
+  processorOptions.shadersRepository            = Effect::ShadersRepository();
   processorOptions.includesShadersStore         = Effect::IncludesShadersStore();
   processorOptions.version           = std::to_string(static_cast<int>(_engine->version() * 100));
   processorOptions.platformName      = _engine->shaderPlatformName();
   processorOptions.processingContext = _processingContext;
+  processorOptions.processingContext = _processingContext;
+  processorOptions.isNDCHalfZRange   = _engine->isNDCHalfZRange;
 
   std::string shaderCodes[2] = {"", ""};
   auto shadersLoaded
@@ -402,7 +414,7 @@ void Effect::_loadShader(const std::string& shader, const std::string& key,
     shaderUrl = shader;
   }
   else {
-    shaderUrl = Effect::ShadersRepository + shader;
+    shaderUrl = Effect::ShadersRepository() + shader;
   }
 
   // Vertex shader

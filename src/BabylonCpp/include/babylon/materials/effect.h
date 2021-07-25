@@ -50,7 +50,8 @@ public:
   /**
    * Gets or sets the relative url used to load shaders if using the engine in non-minified mode
    */
-  static std::string ShadersRepository;
+  static std::string ShadersRepository();
+  static void setShadersRepository(const std::string& repo);
 
   /**
    * Enable logging of the shader code when a compilation error occurs
