@@ -87,12 +87,12 @@ float ThinEngine::CollisionsEpsilon = 0.001f;
 
 std::string ThinEngine::ShadersRepository()
 {
-  return Effect::ShadersRepository;
+  return Effect::ShadersRepository();
 }
 
 void ThinEngine::setShadersRepository(const std::string& value)
 {
-  Effect::ShadersRepository = value;
+  Effect::setShadersRepository(value);
 }
 
 ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
