@@ -669,7 +669,6 @@ private:
   WebGLDataBufferPtr _indexBuffer;
   DrawWrapperPtr _drawWrapper;
   std::unordered_map<unsigned int, DrawWrapperPtr> _customWrappers;
-  std::string _cachedDefines;
 
   Color4 _scaledColorStep;
   Color4 _colorDiff;

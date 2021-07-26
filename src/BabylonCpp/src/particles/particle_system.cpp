@@ -86,8 +86,9 @@ ParticleSystem::ParticleSystem(
     // _scene->particleSystems.push(this);
   }
   else {
-    _engine                 = std::get<ThinEngine*>(*sceneOrEngine);
-    defaultProjectionMatrix = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f);
+    _engine = std::get<ThinEngine*>(*sceneOrEngine);
+    defaultProjectionMatrix
+      = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f, _engine->isNDCHalfZRange);
   }
 
   if (_engine->getCaps().vertexArrayObject) {
@@ -1498,8 +1499,10 @@ DrawWrapperPtr ParticleSystem::_getWrapper(unsigned int iBlendMode)
 
   // Effect
   std::string join = StringTools::join(defines, '\n');
-  if (_cachedDefines != join) {
-    _cachedDefines = join;
+  if (!_drawWrapper->defines
+      || (_drawWrapper->defines && std::holds_alternative<std::string>(*_drawWrapper->defines)
+          && std::get<std::string>(*_drawWrapper->defines) != join)) {
+    _drawWrapper->defines = join;
 
     std::vector<std::string> attributesNamesOrOptions;
     std::vector<std::string> effectCreationOption;
