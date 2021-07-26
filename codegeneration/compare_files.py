@@ -164,6 +164,8 @@ def main():
         "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
+        # Particles
+        "computeShaderParticleSystem.ts",
         # Physics / Plugins
         "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts",
         # XR
