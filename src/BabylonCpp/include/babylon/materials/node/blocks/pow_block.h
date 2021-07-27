@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_POW_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class PowBlock;
-using PowBlockPtr = std::shared_ptr<PowBlock>;
+FWD_CLASS_SPTR(PowBlock)
 
 /**
  * @brief Block used to get the value of the first parameter raised to the power of the second.
