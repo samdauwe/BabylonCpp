@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_POSTERIZE_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class PosterizeBlock;
-using PosterizeBlockPtr = std::shared_ptr<PosterizeBlock>;
+FWD_CLASS_SPTR(PosterizeBlock)
 
 /**
  * @brief Block used to posterize a value.
