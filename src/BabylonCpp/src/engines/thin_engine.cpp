@@ -4109,7 +4109,8 @@ InternalTexturePtr ThinEngine::createCubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension, bool createPolynomials, float lodScale,
-  float lodOffset, const InternalTexturePtr& fallback, const LoaderOptionsPtr& loaderOptions)
+  float lodOffset, const InternalTexturePtr& fallback, const LoaderOptionsPtr& loaderOptions,
+  bool /*useSRGBBuffer*/)
 {
   return _cubeTextureExtension->createCubeTexture(rootUrl, scene, files, noMipmap, onLoad, onError,
                                                   format, forcedExtension, createPolynomials,

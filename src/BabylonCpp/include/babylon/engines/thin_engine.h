@@ -1367,6 +1367,8 @@ public:
    * @param fallback defines texture to use while falling back when (compressed) texture file not
    * found.
    * @param loaderOptions options to be passed to the loader
+   * @param useSRGBBuffer defines if the texture must be loaded in a sRGB GPU buffer (if supported
+   * by the GPU).
    * @returns the cube texture as an InternalTexture
    */
   InternalTexturePtr createCubeTexture(
@@ -1376,7 +1378,8 @@ public:
     = nullptr,
     unsigned int format = 0, const std::string& forcedExtension = "",
     bool createPolynomials = false, float lodScale = 0.f, float lodOffset = 0.f,
-    const InternalTexturePtr& fallback = nullptr, const LoaderOptionsPtr& loaderOptions = nullptr);
+    const InternalTexturePtr& fallback = nullptr, const LoaderOptionsPtr& loaderOptions = nullptr,
+    bool useSRGBBuffer = false);
 
   /**
    * @brief Hidden
