@@ -50,7 +50,8 @@ CubeTexture::CubeTexture(
   const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   unsigned int format, bool prefiltered, const std::string& forcedExtension, bool createPolynomials,
-  float lodScale, float lodOffset, const LoaderOptionsPtr& loaderOptions)
+  float lodScale, float lodOffset, const LoaderOptionsPtr& loaderOptions,
+  const std::optional<bool>& iUseSRGBBuffer)
     : BaseTexture{sceneOrEngine}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
@@ -59,6 +60,7 @@ CubeTexture::CubeTexture(
     , _delayedOnLoad{nullptr}
     , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
+    , _useSRGBBuffer{std::nullopt}
     , _lodScale{lodScale}
     , _lodOffset{lodOffset}
 {
@@ -75,6 +77,7 @@ CubeTexture::CubeTexture(
   _files             = iFiles;
   _forcedExtension   = forcedExtension;
   _loaderOptions     = loaderOptions;
+  _useSRGBBuffer     = iUseSRGBBuffer;
 
   if (rootUrl.empty() && iFiles.empty()) {
     return;
@@ -103,7 +106,7 @@ CubeTexture::CubeTexture(
     }
   }
 
-  _texture = _getFromCache(rootUrl, noMipmap);
+  _texture = _getFromCache(rootUrl, noMipmap, 0, std::nullopt, iUseSRGBBuffer);
 
   if (iFiles.empty()) {
     _extensions = extensions;
@@ -139,12 +142,12 @@ CubeTexture::CubeTexture(
                                                               forcedExtension, _createPolynomials);
       }
       else {
-        _texture = _getEngine()->createCubeTexture(rootUrl, scene, _files, noMipmap, onLoad,
-                                                   onError, _format, forcedExtension, false,
-                                                   lodScale, lodOffset, nullptr, loaderOptions);
+        _texture = _getEngine()->createCubeTexture(
+          rootUrl, scene, _files, noMipmap, onLoad, onError, _format, forcedExtension, false,
+          lodScale, lodOffset, nullptr, loaderOptions, _useSRGBBuffer.value_or(false));
       }
       _texture->onLoadedObservable.add(
-        [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
+        [this](InternalTexture* /*internalTexture*/, EventState& /*es*/) -> void {
           onLoadObservable.notifyObservers(this);
         });
     }
@@ -157,10 +160,8 @@ CubeTexture::CubeTexture(
       Tools::SetImmediate([this]() { _onLoadProcessing(); });
     }
     else {
-      _texture->onLoadedObservable.add(
-        [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
-          _onLoadProcessing();
-        });
+      _texture->onLoadedObservable.add([this](InternalTexture* /*internalTexture*/,
+                                              EventState& /*es*/) -> void { _onLoadProcessing(); });
     }
   }
 }
@@ -245,7 +246,7 @@ void CubeTexture::delayLoad(const std::string& iForcedExtension)
   }
 
   delayLoadState = Constants::DELAYLOADSTATE_LOADED;
-  _texture       = _getFromCache(url, _noMipmap);
+  _texture       = _getFromCache(url, _noMipmap, 0, std::nullopt, _useSRGBBuffer);
 
   if (!_texture) {
     auto scene = getScene();
@@ -255,12 +256,12 @@ void CubeTexture::delayLoad(const std::string& iForcedExtension)
                                                      _format, iForcedExtension, _createPolynomials);
     }
     else {
-      _texture = _getEngine()->createCubeTexture(url, scene, _files, _noMipmap, _delayedOnLoad,
-                                                 nullptr, _format, iForcedExtension, false, 0, 0,
-                                                 nullptr, _loaderOptions);
+      _texture = _getEngine()->createCubeTexture(
+        url, scene, _files, _noMipmap, _delayedOnLoad, nullptr, _format, iForcedExtension, false, 0,
+        0, nullptr, _loaderOptions, _useSRGBBuffer.value_or(false));
     }
     _texture->onLoadedObservable.add(
-      [this](InternalTexture* /*internalTexture*/, EventState & /*es*/) -> void {
+      [this](InternalTexture* /*internalTexture*/, EventState& /*es*/) -> void {
         onLoadObservable.notifyObservers(this);
       });
   }
