@@ -256,6 +256,8 @@ public:
   float _lodGenerationOffset;
   /** @hidden */
   InternalTexturePtr _depthStencilTexture;
+  /** @hidden */
+  bool _useSRGBBuffer;
 
   // Multiview
   /** Hidden */

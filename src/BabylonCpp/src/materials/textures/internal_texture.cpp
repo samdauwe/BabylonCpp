@@ -60,6 +60,7 @@ InternalTexture::InternalTexture(ThinEngine* engine, InternalTextureSource sourc
     , _lodGenerationScale{0}
     , _lodGenerationOffset{0}
     , _depthStencilTexture{nullptr}
+    , _useSRGBBuffer{false}
     , _colorTextureArray{nullptr}
     , _depthStencilTextureArray{nullptr}
     , _lodTextureHigh{nullptr}
