@@ -14,6 +14,7 @@
 
 namespace BABYLON {
 
+class AbstractScene;
 class ThinEngine;
 FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(InternalTexture)
@@ -112,7 +113,9 @@ public:
    * @brief Hidden
    */
   InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap, unsigned int sampling = 0,
-                                   const std::optional<bool>& invertY = std::nullopt);
+                                   const std::optional<bool>& invertY       = std::nullopt,
+                                   const std::optional<bool>& useSRGBBuffer = std::nullopt);
+
   /**
    * @brief Hidden
    */
@@ -373,6 +376,11 @@ public:
    * texture instead.
    */
   Property<BaseTexture, bool> isBlocking;
+
+  /**
+   * Hidden
+   */
+  AbstractScene* _parentContainer;
 
   /**
    * Size of the bounding box associated with the texture (when in cube mode)

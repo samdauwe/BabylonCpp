@@ -41,6 +41,7 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , uid{this, &BaseTexture::get_uid}
     , onDispose{this, &BaseTexture::set_onDispose}
     , isBlocking{this, &BaseTexture::get_isBlocking, &BaseTexture::set_isBlocking}
+    , _parentContainer{nullptr}
     , boundingBoxSize{this, &BaseTexture::get_boundingBoxSize, &BaseTexture::set_boundingBoxSize}
     , textureType{this, &BaseTexture::get_textureType}
     , textureFormat{this, &BaseTexture::get_textureFormat}
@@ -215,7 +216,7 @@ bool BaseTexture::get_gammaSpace() const
     }
   }
 
-  return *_texture->_gammaSpace;
+  return *_texture->_gammaSpace && !_texture->_useSRGBBuffer;
 }
 
 void BaseTexture::set_gammaSpace(bool gamma)
@@ -391,20 +392,28 @@ bool BaseTexture::canRescale()
 
 InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMipmap,
                                               unsigned int sampling,
-                                              const std::optional<bool>& invertY)
+                                              const std::optional<bool>& invertY,
+                                              const std::optional<bool>& useSRGBBuffer)
 {
   auto engine = _getEngine();
   if (!engine) {
     return nullptr;
   }
 
+  const auto correctedUseSRGBBuffer
+    = useSRGBBuffer.value_or(false) && engine->_caps.supportSRGBBuffers
+      && (engine->webGLVersion() > 1.f || engine->isWebGPU() || noMipmap);
+
   auto& texturesCache = engine->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
-    if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
-      if ((texturesCacheEntry->url == url) && texturesCacheEntry->generateMipMaps != iNoMipmap) {
-        if (!sampling || sampling == texturesCacheEntry->samplingMode) {
-          texturesCacheEntry->incrementReferences();
-          return texturesCacheEntry;
+    if (!useSRGBBuffer.has_value()
+        || correctedUseSRGBBuffer == texturesCacheEntry->_useSRGBBuffer) {
+      if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
+        if ((texturesCacheEntry->url == url) && texturesCacheEntry->generateMipMaps != iNoMipmap) {
+          if (!sampling || sampling == texturesCacheEntry->samplingMode) {
+            texturesCacheEntry->incrementReferences();
+            return texturesCacheEntry;
+          }
         }
       }
     }
@@ -603,6 +612,11 @@ void BaseTexture::dispose()
 
     _scene->onTextureRemovedObservable.notifyObservers(this);
     _scene = nullptr;
+
+    if (_parentContainer) {
+      stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->textures, this);
+      _parentContainer = nullptr;
+    }
   }
 
   // Callback
