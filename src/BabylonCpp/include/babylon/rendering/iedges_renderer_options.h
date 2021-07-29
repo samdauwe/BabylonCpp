@@ -49,6 +49,12 @@ struct BABYLON_SHARED_EXPORT IEdgesRendererOptions {
    */
   std::optional<float> epsilonVertexAligned = std::nullopt;
 
+  /**
+   * Gets or sets a boolean indicating that degenerated triangles should not be processed.
+   * Degenerated triangles are triangles that have 2 or 3 vertices with the same coordinates
+   */
+  std::optional<float> removeDegeneratedTriangles = std::nullopt;
+
 }; // end of struct IEdgesRendererOptions
 
 } // end of namespace BABYLON
