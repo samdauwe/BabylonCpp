@@ -11,6 +11,7 @@
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/multi_render_target.h>
@@ -254,7 +255,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
     if (((asStandardMaterial && asStandardMaterial->bumpTexture())
          || (asPBRMaterial && asPBRMaterial->bumpTexture()))
-        && StandardMaterial::BumpTextureEnabled()) {
+        && MaterialFlags::BumpTextureEnabled()) {
       defines.emplace_back("#define BUMP");
       const auto coordinatesIndex = asStandardMaterial ?
                                       asStandardMaterial->bumpTexture()->coordinatesIndex :
@@ -646,7 +647,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
       // Bump
       if (scene()->getEngine()->getCaps().standardDerivatives
-          && StandardMaterial::BumpTextureEnabled()) {
+          && MaterialFlags::BumpTextureEnabled()) {
         if (asStandardMaterial) {
           if (asStandardMaterial->bumpTexture()) {
             effect->setFloat3(
