@@ -65,9 +65,9 @@ void OutlineRenderer::dispose()
 
 void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, bool useOverlay)
 {
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
-  bool hardwareInstancedRendering
+  const bool hardwareInstancedRendering
     = (engine->getCaps().instancedArrays
        && (batch->visibleInstances.find(subMesh->_id) != batch->visibleInstances.end())
        && (!batch->visibleInstances[subMesh->_id].empty()))
@@ -77,12 +77,12 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
     return;
   }
 
-  auto ownerMesh = subMesh->getMesh();
-  auto replacementMesh
+  const auto ownerMesh = subMesh->getMesh();
+  const auto replacementMesh
     = ownerMesh->_internalAbstractMeshDataInfo._actAsRegularMesh ? ownerMesh : nullptr;
-  auto renderingMesh = subMesh->getRenderingMesh();
-  auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
-  auto material      = subMesh->getMaterial();
+  const auto renderingMesh = subMesh->getRenderingMesh();
+  const auto effectiveMesh = replacementMesh ? replacementMesh : renderingMesh;
+  const auto material      = subMesh->getMaterial();
 
   if (!material || !scene->activeCamera()) {
     return;
@@ -193,8 +193,8 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Morph targets
-  auto morphTargetManager  = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
-  auto numMorphInfluencers = 0ull;
+  const auto morphTargetManager = std::static_pointer_cast<Mesh>(mesh)->morphTargetManager();
+  auto numMorphInfluencers      = 0ull;
   if (morphTargetManager) {
     if (morphTargetManager->numInfluencers() > 0) {
       numMorphInfluencers = morphTargetManager->numInfluencers();
