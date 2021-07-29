@@ -535,7 +535,9 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
       auto p1Index = remapVertexIndices[indices[index + (i + 1) % 3]];
       auto p2Index = remapVertexIndices[indices[index + (i + 2) % 3]];
 
-      if (p0Index == p1Index) {
+      if (p0Index == p1Index
+          || ((p0Index == p2Index || p1Index == p2Index) && _options
+              && _options->removeDegeneratedTriangles.value_or(false))) {
         continue;
       }
 
@@ -779,16 +781,6 @@ void EdgesRenderer::render()
     return;
   }
 
-  auto engine = scene->getEngine();
-  _lineShader->_preBind(EffectPtr{nullptr});
-
-  if (_source->edgesColor.a != 1.f) {
-    engine->setAlphaMode(Constants::ALPHA_COMBINE);
-  }
-  else {
-    engine->setAlphaMode(Constants::ALPHA_DISABLE);
-  }
-
   const auto hasInstances            = _source->hasInstances() && customInstances.size() > 0;
   const auto useBuffersWithInstances = hasInstances || _source->hasThinInstances();
 
@@ -805,6 +797,13 @@ void EdgesRenderer::render()
       auto& instanceStorage = _sourceMesh->_instanceDataStorage;
 
       instanceCount = customInstances.size();
+
+      if (instanceStorage->instancesData.empty()) {
+        if (!_source->getScene()->_activeMeshesFrozen) {
+          customInstances.clear();
+        }
+        return;
+      }
 
       if (!instanceStorage->isFrozen) {
         auto offset = 0u;
@@ -823,6 +822,16 @@ void EdgesRenderer::render()
     else {
       instanceCount = _sourceMesh->thinInstanceCount();
     }
+  }
+
+  const auto engine = scene->getEngine();
+  _lineShader->_preBind(EffectPtr{nullptr});
+
+  if (_source->edgesColor.a != 1.f) {
+    engine->setAlphaMode(Constants::ALPHA_COMBINE);
+  }
+  else {
+    engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
 
   // VBOs
