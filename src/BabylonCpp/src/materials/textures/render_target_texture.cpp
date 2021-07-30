@@ -28,7 +28,8 @@ RenderTargetTexture::RenderTargetTexture(
   const std::optional<bool>& iIsCube, const std::optional<unsigned int>& iSamplingMode,
   const std::optional<bool>& generateDepthBuffer, const std::optional<bool>& generateStencilBuffer,
   const std::optional<bool>& isMulti, const std::optional<unsigned int>& format,
-  const std::optional<bool>& delayAllocation, const std::optional<unsigned int>& iSamples)
+  const std::optional<bool>& delayAllocation, const std::optional<unsigned int>& iSamples,
+  const std::optional<unsigned int>& creationFlags)
     : Texture{"",      scene,   !generateMipMaps, false, iSamplingMode,
               nullptr, nullptr, std::nullopt,     false, format}
     , renderListPredicate{nullptr}
@@ -103,6 +104,7 @@ RenderTargetTexture::RenderTargetTexture(
   _renderTargetOptions.generateDepthBuffer   = generateDepthBuffer.value_or(true);
   _renderTargetOptions.generateStencilBuffer = generateStencilBuffer.value_or(false);
   _renderTargetOptions.samples               = samples;
+  _renderTargetOptions.creationFlags         = creationFlags;
 
   if (rtSamplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
     wrapU = TextureConstants::CLAMP_ADDRESSMODE;

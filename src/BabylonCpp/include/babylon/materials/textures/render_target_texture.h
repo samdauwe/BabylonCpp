@@ -273,6 +273,8 @@ protected:
    * @param format The internal format of the buffer in the RTT (RED, RG, RGB, RGBA, ALPHA...)
    * @param delayAllocation if the texture allocation should be delayed (default: false)
    * @param samples sample count to use when creating the RTT
+   * @param creationFlags specific flags to use when creating the texture
+   * (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
    */
   RenderTargetTexture(const std::string& name,
                       const std::variant<int, RenderTargetSize, float>& size, Scene* scene,
@@ -286,7 +288,8 @@ protected:
                       const std::optional<bool>& isMulti               = false,
                       const std::optional<unsigned int>& format  = Constants::TEXTUREFORMAT_RGBA,
                       const std::optional<bool>& delayAllocation = false,
-                      const std::optional<unsigned int>& samples = std::nullopt);
+                      const std::optional<unsigned int>& samples = std::nullopt,
+                      const std::optional<unsigned int>& creationFlags = std::nullopt);
 
   /**
    * @brief Use this list to define the list of mesh you want to render.
