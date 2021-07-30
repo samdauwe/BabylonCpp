@@ -15,6 +15,7 @@ namespace BABYLON {
 
 FWD_STRUCT_SPTR(LoaderOptions)
 FWD_CLASS_SPTR(MirrorTexture)
+FWD_CLASS_SPTR(RenderTargetTexture)
 FWD_CLASS_SPTR(Texture)
 
 /**
@@ -164,6 +165,14 @@ public:
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
     unsigned int format = Constants::TEXTUREFORMAT_RGBA);
+
+  /**
+   * @brief Hidden
+   */
+  static RenderTargetTexturePtr
+  _CreateRenderTargetTexture(const std::string& name, int renderTargetSize, Scene* scene,
+                             bool generateMipMaps,
+                             const std::optional<bool>& creationFlags = std::nullopt);
 
   /**
    * @brief Creates a texture from its data: representation. (data: will be added in case only the

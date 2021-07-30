@@ -619,6 +619,14 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std
   return texture;
 }
 
+RenderTargetTexturePtr
+Texture::_CreateRenderTargetTexture(const std::string& name, int renderTargetSize, Scene* scene,
+                                    bool generateMipMaps,
+                                    const std::optional<bool>& /*creationFlags*/)
+{
+  return RenderTargetTexture::New(name, renderTargetSize, scene, generateMipMaps);
+}
+
 TexturePtr Texture::LoadFromDataString(
   const std::string& iName,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
