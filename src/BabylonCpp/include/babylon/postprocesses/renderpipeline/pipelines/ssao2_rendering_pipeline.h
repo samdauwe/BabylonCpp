@@ -7,6 +7,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/babylon_fwd.h>
+#include <babylon/engines/constants.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 
@@ -121,11 +122,15 @@ protected:
    * for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
    * @param cameras The array of cameras that the rendering pipeline will be attached to
    * @param forceGeometryBuffer Set to true if you want to use the legacy geometry buffer renderer
+   * @param textureType The texture type used by the different post processes created by SSAO
+   * (default: Constants.TEXTURETYPE_UNSIGNED_INT)
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false,
+                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false,
+                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
 
 private:
   void set_samples(unsigned int n);
@@ -136,15 +141,15 @@ private:
   PrePassRendererPtr& get__prePassRenderer();
   void set_expensiveBlur(bool b);
   [[nodiscard]] bool get_expensiveBlur() const;
-  void _createBlurPostProcess(float ssaoRatio, float blurRatio);
+  void _createBlurPostProcess(float ssaoRatio, float blurRatio, unsigned int textureType);
   // Van der Corput radical inverse
   float _radicalInverse_VdC(uint32_t i);
   std::array<float, 2> _hammersley(uint32_t i, uint32_t n);
   Vector3 _hemisphereSample_uniform(float u, float v);
   Float32Array _generateHemisphere();
   std::string _getDefinesForSSAO();
-  void _createSSAOPostProcess(float ratio);
-  void _createSSAOCombinePostProcess(float ratio);
+  void _createSSAOPostProcess(float ratio, unsigned int textureType);
+  void _createSSAOCombinePostProcess(float ratio, unsigned int textureType);
   void _createRandomTexture();
 
 public:

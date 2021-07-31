@@ -43,15 +43,16 @@ const Float32Array SSAO2RenderingPipeline::PERSPECTIVE_DEPTH_PROJECTION = {
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* scene, float ratio,
                                                const std::vector<CameraPtr>& iCameras,
-                                               bool forceGeometryBuffer)
-    : SSAO2RenderingPipeline(iName, scene, {ratio, ratio}, iCameras, forceGeometryBuffer)
+                                               bool forceGeometryBuffer, unsigned int textureType)
+    : SSAO2RenderingPipeline(iName, scene, {ratio, ratio}, iCameras, forceGeometryBuffer,
+                             textureType)
 {
 }
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* scene,
                                                const SSAO2Ratio& iRatio,
                                                const std::vector<CameraPtr>& iCameras,
-                                               bool forceGeometryBuffer)
+                                               bool forceGeometryBuffer, unsigned int textureType)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , totalStrength{1.f}
     , maxZ{100.f}
@@ -105,13 +106,13 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
 
   _createRandomTexture();
 
-  _originalColorPostProcess
-    = PassPostProcess::New("SSAOOriginalSceneColor", 1.f, nullptr,
-                           TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
+  _originalColorPostProcess          = PassPostProcess::New("SSAOOriginalSceneColor", 1.f, nullptr,
+                                                   TextureConstants::BILINEAR_SAMPLINGMODE,
+                                                   scene->getEngine(), false, textureType);
   _originalColorPostProcess->samples = textureSamples;
-  _createSSAOPostProcess(1.f);
-  _createBlurPostProcess(ssaoRatio, blurRatio);
-  _createSSAOCombinePostProcess(blurRatio);
+  _createSSAOPostProcess(1.f, textureType);
+  _createBlurPostProcess(ssaoRatio, blurRatio, textureType);
+  _createSSAOCombinePostProcess(blurRatio, textureType);
 
   // Set up pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -250,7 +251,8 @@ void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
   PostProcessRenderPipeline::dispose(disableGeometryBufferRenderer, disposeMaterialAndTextures);
 }
 
-void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurRatio)
+void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurRatio,
+                                                    unsigned int textureType)
 {
   Float32Array samplerOffsets;
   samplerOffsets.reserve(16);
@@ -264,7 +266,8 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ssaoRatio, nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16\n#define EXPENSIVE "
-      + std::string(expensive ? "1" : "0") + "\n");
+      + std::string(expensive ? "1" : "0") + "\n",
+    textureType);
   _blurHPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
       return;
@@ -288,10 +291,13 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     effect->setArray("samplerOffsets", samplerOffsets);
   };
 
-  _blurVPostProcess
-    = PostProcess::New("BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, blurRatio,
-                       nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
-                       false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
+  _blurVPostProcess = PostProcess::New(
+    "BlurV", "ssao", {"outSize", "samplerOffsets", "near", "far", "radius"}, {"depthSampler"},
+    blurRatio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    StringTools::printf("#define BILATERAL_BLUR\n#define BILATERAL_BLUR_V\n#define SAMPLES "
+                        "16\n#define EXPENSIVE %s\n",
+                        expensive ? "1" : "0"),
+    textureType);
   _blurVPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
       return;
@@ -381,7 +387,7 @@ std::string SSAO2RenderingPipeline::_getDefinesForSSAO()
   return defines;
 }
 
-void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
+void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio, unsigned int textureType)
 {
   const auto sampleSphere = _generateHemisphere();
 
@@ -394,7 +400,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
                         "radius", "base", "range", "projection", "near", "far", "texelSize",
                         "xViewport", "yViewport", "maxZ", "minZAspect", "depthProjection"},
                        samplers, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-                       _scene->getEngine(), false, defines);
+                       _scene->getEngine(), false, defines, textureType);
 
   _ssaoPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
@@ -456,11 +462,11 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
   _ssaoPostProcess->samples = textureSamples;
 }
 
-void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
+void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio, unsigned int textureType)
 {
   _ssaoCombinePostProcess = PostProcess::New(
     "ssaoCombine", "ssaoCombine", {}, {"originalColor", "viewport"}, ratio, nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false, "", textureType);
 
   _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
     const auto& viewport = _scene->activeCamera()->viewport;
