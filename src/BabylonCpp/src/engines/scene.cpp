@@ -5125,7 +5125,12 @@ std::optional<PickingInfo> Scene::pickSprite(int x, int y,
 
   createPickingRayInCameraSpaceToRef(x, y, *_tempPickingRay, camera);
 
-  return _internalPickSprites(*_tempPickingRay, predicate, fastCheck, camera);
+  auto result = _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
+  if (result) {
+    result->ray = createPickingRayInCameraSpace(x, y, camera);
+  }
+
+  return result;
 }
 
 std::optional<PickingInfo>
@@ -5145,7 +5150,12 @@ Scene::pickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* sprite
 
   Ray::TransformToRef(ray, camera->getViewMatrix(), *_tempSpritePickingRay);
 
-  return _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
+  auto result = _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
+  if (result) {
+    result->ray = ray;
+  }
+
+  return result;
 }
 
 std::vector<PickingInfo> Scene::_internalMultiPickSprites(
