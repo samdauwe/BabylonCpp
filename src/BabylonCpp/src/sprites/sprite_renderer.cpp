@@ -183,10 +183,7 @@ void SpriteRenderer::render(
   const auto culling = engine->depthCullingState()->cull().value_or(true);
   const auto zOffset = engine->depthCullingState()->zOffset();
 
-  // Handle Right Handed
-  if (useRightHandedSystem && _scene) {
-    _scene->getEngine()->setState(culling, zOffset, false, false);
-  }
+  engine->setState(culling, zOffset, false, false);
 
   // Render
   engine->enableEffect(drawWrapper);
@@ -217,7 +214,8 @@ void SpriteRenderer::render(
   }
 
   // Draw order
-  engine->depthCullingState()->depthFunc = Constants::LEQUAL;
+  engine->depthCullingState()->depthFunc
+    = engine->useReverseDepthBuffer ? Constants::GEQUAL : Constants::LEQUAL;
   if (!disableDepthWrite) {
     effect->setBool("alphaTest", true);
     engine->setColorWrite(false);
