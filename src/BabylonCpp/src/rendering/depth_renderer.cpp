@@ -53,8 +53,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
 
   _nameForDrawWrapper = StringTools::printf(
     "%s%zu", Constants::SUBMESH_DRAWWRAPPER_DEPTHRENDERER_PREFIX, DepthRenderer::_Counter++);
-  _camera     = camera;
-  auto engine = scene->getEngine();
+  _camera           = camera;
+  const auto engine = scene->getEngine();
 
   // Render target
   const auto format = (isPacked || (engine && !engine->_features.supportExtendedTextureFormats)) ?
@@ -124,6 +124,7 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   std::vector<std::string> defines;
 
   const auto subMeshEffect = subMesh->_getDrawWrapper(_nameForDrawWrapper, true);
+  const auto engine        = _scene->getEngine();
 
   auto& effect        = subMeshEffect->effect;
   auto& cachedDefines = subMeshEffect->defines;
@@ -201,6 +202,11 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define PACKED");
   }
 
+  // Reverse depth buffer
+  if (engine->useReverseDepthBuffer) {
+    defines.emplace_back("#define USE_REVERSE_DEPTHBUFFER");
+  }
+
   // Get correct effect
   auto join = StringTools::join(defines, '\n');
   if (cachedDefines && std::holds_alternative<std::string>(*cachedDefines)
@@ -222,7 +228,7 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};
 
-    effect = _scene->getEngine()->createEffect("depth", options, _scene->getEngine());
+    effect = engine->createEffect("depth", options, _scene->getEngine());
   }
 
   subMeshEffect->setEffect(effect, std::get<std::string>(*cachedDefines));
@@ -267,8 +273,9 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
   if (isReady(subMesh, hardwareInstancedRendering) && camera) {
     subMesh->_renderId = scene->getRenderId();
 
-    const auto drawWrapper = subMesh->_getDrawWrapper(_nameForDrawWrapper);
-    const auto effect      = DrawWrapper::GetEffect(drawWrapper);
+    const auto drawWrapper   = subMesh->_getDrawWrapper(_nameForDrawWrapper);
+    const auto effect        = DrawWrapper::GetEffect(drawWrapper);
+    const auto cameraIsOrtho = camera->mode == Camera::ORTHOGRAPHIC_CAMERA;
 
     engine->enableEffect(drawWrapper);
 
@@ -279,7 +286,20 @@ void DepthRenderer::renderSubMesh(SubMesh* subMesh)
     effect->setMatrix("viewProjection", _scene->getTransformMatrix());
     effect->setMatrix("world", effectiveMesh->getWorldMatrix());
 
-    effect->setFloat2("depthValues", camera->minZ, camera->minZ + camera->maxZ);
+    float minZ = 0.f, maxZ = 0.f;
+
+    if (cameraIsOrtho) {
+      minZ = !engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : 1.f;
+      maxZ = engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : 1.f;
+    }
+    else {
+      minZ = engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? camera->minZ :
+             engine->isNDCHalfZRange                                  ? 0.f :
+                                                                        camera->minZ;
+      maxZ = engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : camera->maxZ;
+    }
+
+    effect->setFloat2("depthValues", minZ, minZ + maxZ);
 
     // Alpha test
     if (material && material->needAlphaTesting()) {
