@@ -152,9 +152,16 @@ void BoundingBoxRenderer::render(int renderingGroupId)
     // VBOs
     engine->bindBuffers(_vertexBuffers, _indexBuffer, _colorShader->getEffect());
 
+    const auto useReverseDepthBuffer = engine->useReverseDepthBuffer;
+
     if (showBackLines) {
       // Back
-      engine->setDepthFunctionToGreaterOrEqual();
+      if (useReverseDepthBuffer) {
+        engine->setDepthFunctionToLessOrEqual();
+      }
+      else {
+        engine->setDepthFunctionToGreaterOrEqual();
+      }
       scene->resetCachedMaterial();
       _colorShader->setColor4("color", backColor.toColor4());
       _colorShader->bind(worldMatrix, nullptr);
@@ -164,7 +171,12 @@ void BoundingBoxRenderer::render(int renderingGroupId)
     }
 
     // Front
-    engine->setDepthFunctionToLess();
+    if (useReverseDepthBuffer) {
+      engine->setDepthFunctionToGreater();
+    }
+    else {
+      engine->setDepthFunctionToLess();
+    }
     scene->resetCachedMaterial();
     _colorShader->setColor4("color", frontColor.toColor4());
     _colorShader->bind(worldMatrix);
