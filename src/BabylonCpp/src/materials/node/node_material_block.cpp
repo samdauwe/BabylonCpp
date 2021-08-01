@@ -405,22 +405,26 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
 bool NodeMaterialBlock::validateBlockName(const std::string& newName) const
 {
   static const std::vector<std::string> reservedNames{
-    "position",            //
-    "normal",              //
-    "tangent",             //
-    "particle_positionw",  //
-    "uv",                  //
-    "uv2",                 //
-    "position2d",          //
-    "particle_uv",         //
-    "matricesIndices",     //
-    "matricesWeights",     //
-    "world0",              //
-    "world1",              //
-    "world2",              //
-    "world3",              //
-    "particle_color",      //
-    "particle_texturemask" //
+    "position",             //
+    "normal",               //
+    "tangent",              //
+    "particle_positionw",   //
+    "uv",                   //
+    "uv2",                  //
+    "uv3",                  //
+    "uv4",                  //
+    "uv5",                  //
+    "uv6",                  //
+    "position2d",           //
+    "particle_uv",          //
+    "matricesIndices",      //
+    "matricesWeights",      //
+    "world0",               //
+    "world1",               //
+    "world2",               //
+    "world3",               //
+    "particle_color",       //
+    "particle_texturemask", //
   };
   return stl_util::contains(reservedNames, newName) ? false : true;
 }
