@@ -7,6 +7,7 @@
 #include <babylon/maths/color4.h>
 #include <babylon/maths/isize.h>
 #include <babylon/maths/vector3.h>
+#include <babylon/misc/file_tools.h>
 #include <babylon/misc/guid.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/utils/base64.h>
@@ -169,25 +170,12 @@ std::string Tools::RandomId()
 
 bool Tools::IsBase64(const std::string& uri)
 {
-  return uri.size() < 5 ? false : uri.substr(0, 5) == "data:";
+  return FileTools::IsBase64DataUrl(uri);
 }
 
 ArrayBuffer Tools::DecodeBase64(const std::string& uri)
 {
-  const auto uriSplit = StringTools::split(uri, ',');
-  if (uriSplit.size() < 2) {
-    return ArrayBuffer();
-  }
-
-  const auto decodedString = Base64::atob(uriSplit[1]);
-  const auto bufferLength  = decodedString.size();
-  Uint8Array bufferView(bufferLength);
-
-  for (size_t i = 0; i < bufferLength; ++i) {
-    bufferView[i] = StringTools::charCodeAt(decodedString, i);
-  }
-
-  return bufferView;
+  return FileTools::DecodeBase64UrlToBinary(uri);
 }
 
 void Tools::SetImmediate(const std::function<void()>& immediate)
