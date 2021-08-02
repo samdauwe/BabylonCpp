@@ -43,7 +43,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
   }
   _scene->layers.emplace_back(shared_from_this());
 
-  auto engine = _scene->getEngine();
+  const auto engine = _scene->getEngine();
 
   _drawWrapper = std::make_shared<DrawWrapper>(engine);
 
@@ -89,7 +89,7 @@ void Layer::set_onAfterRender(const LayerCallbackType& callback)
 
 void Layer::_createIndexBuffer()
 {
-  auto engine = _scene->getEngine();
+  const auto engine = _scene->getEngine();
 
   // Indices
   Uint32Array indices{
@@ -106,7 +106,7 @@ void Layer::_createIndexBuffer()
 
 void Layer::_rebuild()
 {
-  auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
+  const auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
 
   if (vb) {
     vb->_rebuild();
@@ -117,7 +117,7 @@ void Layer::_rebuild()
 
 void Layer::render()
 {
-  auto engine = _scene->getEngine();
+  const auto engine = _scene->getEngine();
 
   std::string defines = "";
 
@@ -183,7 +183,7 @@ void Layer::render()
 void Layer::dispose()
 {
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
-    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
+    const auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (vertexBuffer) {
       vertexBuffer->dispose();
       _vertexBuffers.erase(VertexBuffer::PositionKind);
