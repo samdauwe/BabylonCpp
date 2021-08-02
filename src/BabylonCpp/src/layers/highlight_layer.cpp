@@ -239,8 +239,8 @@ bool HighlightLayer::needStencil() const
 
 bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances)
 {
-  auto material = subMesh->getMaterial();
-  auto mesh     = subMesh->getRenderingMesh();
+  const auto material = subMesh->getMaterial();
+  const auto mesh     = subMesh->getRenderingMesh();
 
   if (!material || !mesh || _meshes.empty()) {
     return false;
@@ -261,7 +261,7 @@ void HighlightLayer::_internalRender(const EffectPtr& effect)
   effect->setTexture("textureSampler", _blurTexture);
 
   // Cache
-  auto engine = _engine;
+  const auto engine = _engine;
   engine->cacheStencilState();
 
   // Stencil operations
@@ -454,7 +454,7 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   }
 
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
-    auto& meshHighlight = _meshes[mesh->uniqueId];
+    const auto& meshHighlight = _meshes[mesh->uniqueId];
     if (meshHighlight.observerHighlight) {
       mesh->onBeforeBindObservable().remove(meshHighlight.observerHighlight);
     }
@@ -466,7 +466,7 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   }
 
   _shouldRender = false;
-  for (auto& meshHighlightToCheck : _meshes) {
+  for (const auto& meshHighlightToCheck : _meshes) {
     if (_meshes.find(meshHighlightToCheck.first) != _meshes.end()) {
       _shouldRender = true;
       break;
