@@ -2,6 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/particles/particle.h>
@@ -39,13 +41,22 @@ std::unique_ptr<IParticleEmitterType> CylinderDirectedParticleEmitter::clone() c
   return newOne;
 }
 
-void CylinderDirectedParticleEmitter::applyToShader(Effect* effect)
+void CylinderDirectedParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
 {
-  effect->setFloat("radius", radius);
-  effect->setFloat("height", height);
-  effect->setFloat("radiusRange", radiusRange);
-  effect->setVector3("direction1", direction1);
-  effect->setVector3("direction2", direction2);
+  uboOrEffect->setFloat("radius", radius);
+  uboOrEffect->setFloat("height", height);
+  uboOrEffect->setFloat("radiusRange", radiusRange);
+  uboOrEffect->setVector3("direction1", direction1);
+  uboOrEffect->setVector3("direction2", direction2);
+}
+
+void CylinderDirectedParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
+{
+  ubo->addUniform("radius", 1);
+  ubo->addUniform("height", 1);
+  ubo->addUniform("radiusRange", 1);
+  ubo->addUniform("direction1", 3);
+  ubo->addUniform("direction2", 3);
 }
 
 std::string CylinderDirectedParticleEmitter::getEffectDefines() const

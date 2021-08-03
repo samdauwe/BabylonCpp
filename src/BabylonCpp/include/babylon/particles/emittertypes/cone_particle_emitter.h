@@ -50,31 +50,37 @@ public:
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  [[nodiscard]] std::unique_ptr<IParticleEmitterType> clone() const override;
+  std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader.
-   * @param effect defines the update shader
+   * @param uboOrEffect defines the update shader
    */
-  void applyToShader(Effect* effect) override;
+  void applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect) override;
+
+  /**
+   * @brief Creates the structure of the ubo for this particle emitter.
+   * @param ubo ubo to create the structure for
+   */
+  void buildUniformLayout(UniformBuffer* ubo) override;
 
   /**
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containing the defines string
    */
-  [[nodiscard]] std::string getEffectDefines() const override;
+  std::string getEffectDefines() const override;
 
   /**
    * @brief Returns the string "ConeParticleEmitter".
    * @returns a string containing the class name
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  [[nodiscard]] json serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Parse properties from a JSON object.
@@ -87,7 +93,7 @@ protected:
   /**
    * @brief Gets the radius of the emission cone.
    */
-  [[nodiscard]] float get_radius() const;
+  float get_radius() const;
 
   /**
    * @brief Sets the radius of the emission cone.
@@ -97,7 +103,7 @@ protected:
   /**
    * @brief Gets the angle of the emission cone.
    */
-  [[nodiscard]] float get_angle() const;
+  float get_angle() const;
 
   /**
    * @brief Sets the angle of the emission cone.

@@ -71,7 +71,11 @@ std::unique_ptr<IParticleEmitterType> CustomParticleEmitter::clone() const
   return newOne;
 }
 
-void CustomParticleEmitter::applyToShader(Effect* /*effect*/)
+void CustomParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* /*uboOrEffect*/)
+{
+}
+
+void CustomParticleEmitter::buildUniformLayout(UniformBuffer* /*ubo*/)
 {
 }
 

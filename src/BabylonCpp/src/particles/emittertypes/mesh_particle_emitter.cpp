@@ -5,6 +5,8 @@
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
@@ -125,10 +127,16 @@ std::unique_ptr<IParticleEmitterType> MeshParticleEmitter::clone() const
   return newOne;
 }
 
-void MeshParticleEmitter::applyToShader(Effect* effect)
+void MeshParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
 {
-  effect->setVector3("direction1", direction1);
-  effect->setVector3("direction2", direction2);
+  uboOrEffect->setVector3("direction1", direction1);
+  uboOrEffect->setVector3("direction2", direction2);
+}
+
+void MeshParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
+{
+  ubo->addUniform("direction1", 3);
+  ubo->addUniform("direction2", 3);
 }
 
 std::string MeshParticleEmitter::getEffectDefines() const

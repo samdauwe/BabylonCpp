@@ -2,6 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/vector3.h>
@@ -67,11 +69,18 @@ std::unique_ptr<IParticleEmitterType> SphereParticleEmitter::clone() const
   return newOne;
 }
 
-void SphereParticleEmitter::applyToShader(Effect* effect)
+void SphereParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
 {
-  effect->setFloat("radius", radius);
-  effect->setFloat("radiusRange", radiusRange);
-  effect->setFloat("directionRandomizer", directionRandomizer);
+  uboOrEffect->setFloat("radius", radius);
+  uboOrEffect->setFloat("radiusRange", radiusRange);
+  uboOrEffect->setFloat("directionRandomizer", directionRandomizer);
+}
+
+void SphereParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
+{
+  ubo->addUniform("radius", 1);
+  ubo->addUniform("radiusRange", 1);
+  ubo->addUniform("directionRandomizer", 1);
 }
 
 std::string SphereParticleEmitter::getEffectDefines() const

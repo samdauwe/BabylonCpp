@@ -2,6 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/scalar.h>
 
 namespace BABYLON {
@@ -48,10 +50,16 @@ std::unique_ptr<IParticleEmitterType> PointParticleEmitter::clone() const
   return newOne;
 }
 
-void PointParticleEmitter::applyToShader(Effect* effect)
+void PointParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
 {
-  effect->setVector3("direction1", direction1);
-  effect->setVector3("direction2", direction2);
+  uboOrEffect->setVector3("direction1", direction1);
+  uboOrEffect->setVector3("direction2", direction2);
+}
+
+void PointParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
+{
+  ubo->addUniform("direction1", 3);
+  ubo->addUniform("direction2", 3);
 }
 
 std::string PointParticleEmitter::getEffectDefines() const

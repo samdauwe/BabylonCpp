@@ -2,6 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/particles/particle_system.h>
@@ -60,12 +62,20 @@ std::unique_ptr<IParticleEmitterType> BoxParticleEmitter::clone() const
   return newOne;
 }
 
-void BoxParticleEmitter::applyToShader(Effect* effect)
+void BoxParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
 {
-  effect->setVector3("direction1", direction1);
-  effect->setVector3("direction2", direction2);
-  effect->setVector3("minEmitBox", minEmitBox);
-  effect->setVector3("maxEmitBox", maxEmitBox);
+  uboOrEffect->setVector3("direction1", direction1);
+  uboOrEffect->setVector3("direction2", direction2);
+  uboOrEffect->setVector3("minEmitBox", minEmitBox);
+  uboOrEffect->setVector3("maxEmitBox", maxEmitBox);
+}
+
+void BoxParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
+{
+  ubo->addUniform("direction1", 3);
+  ubo->addUniform("direction2", 3);
+  ubo->addUniform("minEmitBox", 3);
+  ubo->addUniform("maxEmitBox", 3);
 }
 
 std::string BoxParticleEmitter::getEffectDefines() const

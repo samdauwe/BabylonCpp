@@ -2,6 +2,8 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
+#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/scalar.h>
 
 namespace BABYLON {
@@ -32,12 +34,20 @@ std::unique_ptr<IParticleEmitterType> SphereDirectedParticleEmitter::clone() con
   return newOne;
 }
 
-void SphereDirectedParticleEmitter::applyToShader(Effect* effect)
+void SphereDirectedParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
 {
-  effect->setFloat("radius", radius);
-  effect->setFloat("radiusRange", radiusRange);
-  effect->setVector3("direction1", direction1);
-  effect->setVector3("direction2", direction2);
+  uboOrEffect->setFloat("radius", radius);
+  uboOrEffect->setFloat("radiusRange", radiusRange);
+  uboOrEffect->setVector3("direction1", direction1);
+  uboOrEffect->setVector3("direction2", direction2);
+}
+
+void SphereDirectedParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
+{
+  ubo->addUniform("radius", 1);
+  ubo->addUniform("radiusRange", 1);
+  ubo->addUniform("direction1", 3);
+  ubo->addUniform("direction2", 3);
 }
 
 std::string SphereDirectedParticleEmitter::getEffectDefines() const
