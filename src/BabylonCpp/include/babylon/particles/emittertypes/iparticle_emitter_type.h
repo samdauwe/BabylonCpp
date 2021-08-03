@@ -16,6 +16,8 @@ class Effect;
 class Matrix;
 class Particle;
 class Scene;
+class UniformBuffer;
+class UniformBufferEffectCommonAccessor;
 class Vector3;
 
 /**
@@ -50,31 +52,37 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  [[nodiscard]] virtual std::unique_ptr<IParticleEmitterType> clone() const = 0;
+  virtual std::unique_ptr<IParticleEmitterType> clone() const = 0;
 
   /**
-   * @brief Called by the GPUParticleSystem to setup the update shader.
-   * @param effect defines the update shader
+   * @brief Called by the GPUParticleSystem to setup the update shader
+   * @param uboOrEffect defines the update shader
    */
-  virtual void applyToShader(Effect* effect) = 0;
+  virtual void applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect) = 0;
+
+  /**
+   * @brief Creates the structure of the ubo for this particle emitter.
+   * @param ubo ubo to create the structure for
+   */
+  virtual void buildUniformLayout(UniformBuffer* ubo) = 0;
 
   /**
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
-  [[nodiscard]] virtual std::string getEffectDefines() const = 0;
+  virtual std::string getEffectDefines() const = 0;
 
   /**
    * @brief Returns the string "SphereDirectedParticleEmitter".
    * @returns a string containing the class name
    */
-  [[nodiscard]] virtual std::string getClassName() const = 0;
+  virtual std::string getClassName() const = 0;
 
   /**
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  [[nodiscard]] virtual json serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Parse properties from a JSON object.
