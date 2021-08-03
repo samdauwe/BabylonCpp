@@ -1398,7 +1398,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
 
   if (particleEmitterType) {
-    particleEmitterType->applyToShader(_updateEffect.get());
+    // particleEmitterType->applyToShader(_updateEffect.get());
   }
   if (_isAnimationSheetEnabled) {
     _updateEffect->setFloat3("cellInfos", static_cast<float>(startSpriteCellID),
