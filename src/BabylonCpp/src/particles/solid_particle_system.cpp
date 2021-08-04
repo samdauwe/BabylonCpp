@@ -417,7 +417,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   auto storeApart = (options && options->storage) ? true : false;
   copy.idx        = idx;
   copy.idxInShape = idxInShape;
-  copy.shapeId    = model->shapeID;
+  copy.shapeId    = model->shapeId;
   if (_useModelMaterial) {
     const auto materialId     = model->_material->uniqueId;
     auto& materialIndexesById = _materialIndexesById;
