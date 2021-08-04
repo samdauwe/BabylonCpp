@@ -54,13 +54,13 @@ PointsCloudSystem::PointsCloudSystem(const std::string& iName, size_t pointSize,
 
 PointsCloudSystem::~PointsCloudSystem() = default;
 
-MeshPtr PointsCloudSystem::buildMeshSync()
+MeshPtr PointsCloudSystem::buildMeshSync(const MaterialPtr& material)
 {
   _isReady = true;
-  return _buildMesh();
+  return _buildMesh(material);
 }
 
-MeshPtr PointsCloudSystem::_buildMesh()
+MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
 {
   if (nbParticles == 0) {
     addPoints(1);
@@ -94,12 +94,16 @@ MeshPtr PointsCloudSystem::_buildMesh()
     particles.clear();
   }
 
-  auto mat             = StandardMaterial::New("point cloud material", _scene);
-  mat->emissiveColor   = Color3(ec, ec, ec);
-  mat->disableLighting = true;
-  mat->pointsCloud     = true;
-  mat->pointSize       = static_cast<float>(_size);
-  iMesh->material      = mat;
+  auto mat = material;
+
+  if (!mat) {
+    mat = StandardMaterial::New("point cloud material", _scene);
+    std::static_pointer_cast<StandardMaterial>(mat)->emissiveColor   = Color3(ec, ec, ec);
+    std::static_pointer_cast<StandardMaterial>(mat)->disableLighting = true;
+    std::static_pointer_cast<StandardMaterial>(mat)->pointsCloud     = true;
+    std::static_pointer_cast<StandardMaterial>(mat)->pointSize       = static_cast<float>(_size);
+  }
+  iMesh->material = mat;
 
   return iMesh;
 }
