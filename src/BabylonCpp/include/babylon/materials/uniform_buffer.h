@@ -13,6 +13,7 @@
 namespace BABYLON {
 
 class Color3;
+class Color4;
 class Matrix;
 class ThinEngine;
 class Vector3;
@@ -291,6 +292,9 @@ private:
   void _updateColor3ForUniform(const std::string& name, const Color3& color);
   void _updateColor4ForEffect(const std::string& name, const Color3& color, float alpha,
                               const std::string& suffix = "");
+  void _updateDirectColor4ForEffect(const std::string& name, const Color4& color,
+                                    const std::string& suffix = "");
+  void _updateDirectColor4ForUniform(const std::string& name, const Color4& color);
   void _updateColor4ForUniform(const std::string& name, const Color3& color, float alpha);
   void _updateIntForEffect(const std::string& name, int x, const std::string& suffix = "");
   void _updateIntForUniform(const std::string& name, int x);
@@ -420,6 +424,14 @@ public:
   std::function<void(const std::string& name, const Color3& color, float alpha,
                      const std::string& suffix)>
     updateColor4;
+
+  /**
+   * Lambda to Update vec4 of float from a Color in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
+   */
+  std::function<void(const std::string& name, const Color4& color, const std::string& suffix)>
+    updateDirectColor4;
 
   /**
    * Lambda to Update a int a uniform buffer.

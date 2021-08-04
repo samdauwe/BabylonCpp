@@ -93,6 +93,10 @@ UniformBuffer::UniformBuffer(ThinEngine* engine, const Float32Array& data,
                           const std::string& suffix = "") -> void {
       _updateColor4ForEffect(name, color, alpha, suffix);
     };
+    updateDirectColor4 = [this](const std::string& name, const Color4& color,
+                                const std::string& suffix = "") -> void {
+      _updateDirectColor4ForEffect(name, color, suffix);
+    };
     updateInt = [this](const std::string& name, int x, const std::string& suffix = "") -> void {
       _updateIntForEffect(name, x, suffix);
     };
@@ -158,6 +162,10 @@ UniformBuffer::UniformBuffer(ThinEngine* engine, const Float32Array& data,
     updateColor4 = [this](const std::string& name, const Color3& color, float alpha,
                           const std::string& /*suffix*/ = "") -> void {
       _updateColor4ForUniform(name, color, alpha);
+    };
+    updateDirectColor4 = [this](const std::string& name, const Color4& color,
+                                const std::string& /*suffix*/ = "") -> void {
+      _updateDirectColor4ForUniform(name, color);
     };
     updateInt = [this](const std::string& name, int x, const std::string& /*suffix*/ = "") -> void {
       _updateIntForUniform(name, x);
@@ -763,6 +771,12 @@ void UniformBuffer::_updateColor4ForEffect(const std::string& iName, const Color
   _currentEffect->setColor4(iName + suffix, color, alpha);
 }
 
+void UniformBuffer::_updateDirectColor4ForEffect(const std::string& name, const Color4& color,
+                                                 const std::string& suffix)
+{
+  _currentEffect->setDirectColor4(name + suffix, color);
+}
+
 void UniformBuffer::_updateColor4ForUniform(const std::string& iName, const Color3& color,
                                             float alpha)
 {
@@ -771,6 +785,15 @@ void UniformBuffer::_updateColor4ForUniform(const std::string& iName, const Colo
   UniformBuffer::_tempBuffer[2] = color.b;
   UniformBuffer::_tempBuffer[3] = alpha;
   updateUniform(iName, UniformBuffer::_tempBuffer, 4);
+}
+
+void UniformBuffer::_updateDirectColor4ForUniform(const std::string& name, const Color4& color)
+{
+  UniformBuffer::_tempBuffer[0] = color.r;
+  UniformBuffer::_tempBuffer[1] = color.g;
+  UniformBuffer::_tempBuffer[2] = color.b;
+  UniformBuffer::_tempBuffer[3] = color.a;
+  updateUniform(name, UniformBuffer::_tempBuffer, 4);
 }
 
 void UniformBuffer::_updateIntForEffect(const std::string& iName, int x, const std::string& suffix)
