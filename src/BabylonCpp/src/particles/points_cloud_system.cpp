@@ -70,7 +70,7 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
   _uvs32       = Float32Array(_uvs);
   _colors32    = Float32Array(_colors);
 
-  auto vertexData = std::unique_ptr<VertexData>();
+  const auto vertexData = std::unique_ptr<VertexData>();
   vertexData->set(_positions32, VertexBuffer::PositionKind);
 
   if (_uvs32.size() > 0) {
@@ -81,7 +81,7 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
     ec = 1.f;
     vertexData->set(_colors32, VertexBuffer::ColorKind);
   }
-  auto iMesh = Mesh::New(name, _scene);
+  const auto iMesh = Mesh::New(name, _scene);
   vertexData->applyToMesh(*iMesh, _updatable);
   mesh = iMesh;
 
@@ -111,7 +111,7 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
 CloudPointPtr PointsCloudSystem::_addParticle(size_t idx, const PointsGroupPtr& group,
                                               size_t groupId, size_t idxInGroup)
 {
-  auto cp = std::make_shared<CloudPoint>(idx, group, groupId, idxInGroup, this);
+  const auto cp = std::make_shared<CloudPoint>(idx, group, groupId, idxInGroup, this);
   particles.emplace_back(cp);
   return cp;
 }
