@@ -150,7 +150,7 @@ IActionPtr ActionManager::registerAction(const IActionPtr& action)
 
 bool ActionManager::unregisterAction(const IActionPtr& action)
 {
-  auto index = stl_util::index_of(actions, action);
+  const auto index = stl_util::index_of(actions, action);
   if (index == -1) {
     stl_util::remove(actions, static_cast<size_t>(index));
     ActionManager::Triggers[action->trigger] -= 1;
