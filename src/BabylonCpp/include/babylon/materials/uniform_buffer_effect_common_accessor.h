@@ -23,7 +23,7 @@ class Vector4;
 class BABYLON_SHARED_EXPORT UniformBufferEffectCommonAccessor {
 
 public:
-  UniformBufferEffectCommonAccessor();
+  UniformBufferEffectCommonAccessor(const std::variant<UniformBuffer*, Effect*>& uboOrEffect);
   ~UniformBufferEffectCommonAccessor(); // = default;
 
 private:
