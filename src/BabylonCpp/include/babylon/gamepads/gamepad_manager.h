@@ -78,6 +78,8 @@ private:
   std::function<void(Event&& evt)> _onGamepadConnectedEvent;
   std::function<void(Event&& evt)> _onGamepadDisconnectedEvent;
 
+  Int32Array _loggedErrors;
+
 }; // end of class GamepadManager
 
 } // end of namespace BABYLON
