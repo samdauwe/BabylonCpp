@@ -12,8 +12,8 @@ class AbstractMesh;
 class Bone;
 
 struct BoneIKControllerOptions {
-  AbstractMesh* targetMesh                     = nullptr;
-  AbstractMesh* poleTargetMesh                 = nullptr;
+  TransformNode* targetMesh                    = nullptr;
+  TransformNode* poleTargetMesh                = nullptr;
   Bone* poleTargetBone                         = nullptr;
   std::optional<Vector3> poleTargetLocalOffset = std::nullopt;
   std::optional<float> poleAngle               = std::nullopt;
@@ -31,11 +31,11 @@ class BABYLON_SHARED_EXPORT BoneIKController {
 public:
   /**
    * @brief Creates a new BoneIKController.
-   * @param mesh defines the mesh to control
+   * @param mesh defines the TransformNode to control
    * @param bone defines the bone to control
    * @param options defines options to set up the controller
    */
-  BoneIKController(AbstractMesh* mesh, Bone* bone,
+  BoneIKController(TransformNode* mesh, Bone* bone,
                    const std::optional<BoneIKControllerOptions>& options);
   ~BoneIKController(); // = default
 
@@ -62,14 +62,15 @@ protected:
 
 public:
   /**
-   * Gets or sets the target mesh
+   * Gets or sets the target TransformNode
+   * Name kept as mesh for back compability
    */
-  AbstractMesh* targetMesh;
+  TransformNode* targetMesh;
 
   /**
    * Gets or sets the mesh used as pole
    */
-  AbstractMesh* poleTargetMesh;
+  TransformNode* poleTargetMesh;
 
   /**
    * Gets or sets the bone used as pole
@@ -97,9 +98,10 @@ public:
   float poleAngle;
 
   /**
-   * Gets or sets the mesh associated with the controller
+   * Gets or sets the TransformNode associated with the controller
+   * Name kept as mesh for back compability
    */
-  AbstractMesh* mesh;
+  TransformNode* mesh;
 
   /**
    * The amount to slerp (spherical linear interpolation) to the target.  Set

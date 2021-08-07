@@ -12,7 +12,7 @@ std::array<Vector3, 6> BoneIKController::_tmpVecs{{Vector3::Zero(), Vector3::Zer
 Quaternion BoneIKController::_tmpQuat{Quaternion::Identity()};
 std::array<Matrix, 2> BoneIKController::_tmpMats{{Matrix::Identity(), Matrix::Identity()}};
 
-BoneIKController::BoneIKController(AbstractMesh* iMesh, Bone* bone,
+BoneIKController::BoneIKController(TransformNode *iMesh, Bone* bone,
                                    const std::optional<BoneIKControllerOptions>& iOptions)
     : targetMesh{nullptr}
     , poleTargetMesh{nullptr}
