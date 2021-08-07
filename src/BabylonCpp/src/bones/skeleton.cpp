@@ -22,6 +22,7 @@ Skeleton::Skeleton(const std::string& iName, const std::string& iId, Scene* scen
     , id{iId}
     , _numBonesWithLinkedTransformNode{0}
     , _hasWaitingData{std::nullopt}
+    , _parentContainer{nullptr}
     , doNotSerialize{false}
     , useTextureToStoreBoneMatrices{this, &Skeleton::get_useTextureToStoreBoneMatrices,
                                     &Skeleton::set_useTextureToStoreBoneMatrices}
@@ -540,6 +541,11 @@ void Skeleton::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*
 
   // Remove from scene
   getScene()->removeSkeleton(this);
+
+  if (_parentContainer) {
+    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->skeletons, this);
+    _parentContainer = nullptr;
+  }
 
   if (_transformMatrixTexture) {
     _transformMatrixTexture->dispose();

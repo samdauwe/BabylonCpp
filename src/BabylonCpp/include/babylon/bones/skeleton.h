@@ -17,6 +17,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractScene;
 class Animatable;
 struct AnimationPropertiesOverride;
 class Scene;
@@ -333,6 +334,9 @@ public:
 
   /** @hidden */
   std::string _waitingOverrideMeshId;
+
+  /** @hidden */
+  AbstractScene* _parentContainer;
 
   /**
    * Specifies if the skeleton should be serialized
