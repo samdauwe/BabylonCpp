@@ -159,11 +159,19 @@ public:
   LensFlareSystemPtr getLensFlareSystemByName(const std::string& name);
 
   /**
-   * @brief Gets a lens flare system using its id.
-   * @param id defines the id to look for
+   * @brief Gets a lens flare system using its Id.
+   * @param id defines the Id to look for
    * @returns the lens flare system or null if not found
+   * @deprecated Please use getLensFlareSystemById instead
    */
   LensFlareSystemPtr getLensFlareSystemByID(const std::string& id);
+
+  /**
+   * @brief Gets a lens flare system using its Id.
+   * @param id defines the Id to look for
+   * @returns the lens flare system or null if not found
+   */
+  LensFlareSystemPtr getLensFlareSystemById(const std::string& id);
 
   /**
    * @brief Removes the given reflection probe from this scene.
