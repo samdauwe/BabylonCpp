@@ -17,6 +17,7 @@ namespace BABYLON {
 
 FWD_CLASS_SPTR(GroundMesh)
 FWD_CLASS_SPTR(LinesMesh)
+FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(Plane)
 
@@ -106,6 +107,7 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
+  MaterialPtr material;
 
 }; // end of class DashedLinesOptions
 
@@ -409,6 +411,7 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
+  MaterialPtr material;
 
 }; // end of class LinesOptions
 
@@ -432,6 +435,7 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
+  MaterialPtr material;
 
 }; // end of class LineSystemOptions
 

@@ -72,6 +72,7 @@ DashedLinesOptions::DashedLinesOptions()
     , updatable{std::nullopt}
     , useVertexAlpha{std::nullopt}
     , instance{nullptr}
+    , material{nullptr}
 {
 }
 
@@ -263,7 +264,7 @@ LatheOptions::~LatheOptions() = default;
 //--------------------------------------------------------------------------------------------------
 
 LinesOptions::LinesOptions()
-    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}
+    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}, material{nullptr}
 {
 }
 
@@ -274,7 +275,7 @@ LinesOptions::~LinesOptions() = default;
 //--------------------------------------------------------------------------------------------------
 
 LineSystemOptions::LineSystemOptions()
-    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}
+    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}, material{nullptr}
 {
 }
 
@@ -282,6 +283,7 @@ LineSystemOptions::LineSystemOptions(LinesOptions& linesOptions)
     : updatable{linesOptions.updatable}
     , useVertexAlpha{linesOptions.useVertexAlpha}
     , instance{linesOptions.instance}
+    , material{linesOptions.material}
 {
   if (!linesOptions.points.empty()) {
     lines.emplace_back(linesOptions.points);

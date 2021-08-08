@@ -51,7 +51,7 @@ LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name, LineSystemO
   // line system creation
   const auto useVertexColor = !colors.empty();
   const auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
-                                         options.useVertexAlpha.value_or(true));
+                                         options.useVertexAlpha.value_or(true), options.material);
   const auto vertexData     = VertexData::CreateLineSystem(options);
   vertexData->applyToMesh(*lineSystem, options.updatable);
   return lineSystem;
@@ -120,7 +120,7 @@ LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name, DashedLine
   }
   // dashed lines creation
   const auto dashedLines = LinesMesh::New(name, scene, nullptr, nullptr, true, false,
-                                          options.useVertexAlpha.value_or(false));
+                                          options.useVertexAlpha.value_or(false), options.material);
   const auto vertexData  = VertexData::CreateDashedLines(options);
   vertexData->applyToMesh(*dashedLines, options.updatable);
 
