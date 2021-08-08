@@ -190,8 +190,6 @@ public:
 private:
   Scene* _scene;
   LensFlareEmitterType _emitter;
-  // Float32Array _vertexDeclaration;
-  // int _vertexStrideSize;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
   DrawWrapperPtr _drawWrapper;
