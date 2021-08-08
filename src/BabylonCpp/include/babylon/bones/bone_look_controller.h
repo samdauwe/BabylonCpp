@@ -35,9 +35,10 @@ struct BABYLON_SHARED_EXPORT BoneLookControllerOptions {
 class BABYLON_SHARED_EXPORT BoneLookController {
 
 public:
+  // clang-format off
   /**
-   * @brief Create a BoneLookController.
-   * @param mesh the mesh that the bone belongs to
+   * @brief Create a BoneLookController
+   * @param mesh the TransformNode that the bone belongs to
    * @param bone the bone that will be looking to the target
    * @param target the target Vector3 to look at
    * @param options optional settings:
@@ -47,15 +48,15 @@ public:
    * * minPitch: the minimum angle the bone will yaw to
    * * slerpAmount: set the between 0 and 1 to make the bone slerp to the target.
    * * upAxis: the up axis of the coordinate system
-   * * upAxisSpace: the space that the up axis is in - Space.BONE, Space.LOCAL (default), or
-   *Space.WORLD.
+   * * upAxisSpace: the space that the up axis is in - Space.BONE, Space.LOCAL (default), or Space.WORLD.
    * * yawAxis: set yawAxis if the bone does not yaw on the y axis
    * * pitchAxis: set pitchAxis if the bone does not pitch on the x axis
    * * adjustYaw: used to make an adjustment to the yaw of the bone
    * * adjustPitch: used to make an adjustment to the pitch of the bone
    * * adjustRoll: used to make an adjustment to the roll of the bone
    **/
-  BoneLookController(AbstractMesh* mesh, Bone* bone, const Vector3& target,
+  // clang-format on
+  BoneLookController(TransformNode* mesh, Bone* bone, const Vector3& target,
                      const std::optional<BoneLookControllerOptions>& options = std::nullopt);
   ~BoneLookController(); // = default
 
@@ -118,9 +119,10 @@ public:
   Vector3 target;
 
   /**
-   * The mesh that the bone is attached to
+   * The TransformNode that the bone is attached to
+   * Name kept as mesh for back compability
    */
-  AbstractMesh* mesh;
+  TransformNode* mesh;
 
   /**
    * The bone that will be looking to the target

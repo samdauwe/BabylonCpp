@@ -7,17 +7,15 @@
 namespace BABYLON {
 
 std::array<Vector3, 10> BoneLookController::_tmpVecs{
-  {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
-   Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
-   Vector3::Zero(), Vector3::Zero()}};
+  {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+   Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero()}};
 Quaternion BoneLookController::_tmpQuat{Quaternion::Identity()};
-std::array<Matrix, 5> BoneLookController::_tmpMats{
-  {Matrix::Identity(), Matrix::Identity(), Matrix::Identity(),
-   Matrix::Identity(), Matrix::Identity()}};
+std::array<Matrix, 5> BoneLookController::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
+                                                    Matrix::Identity(), Matrix::Identity(),
+                                                    Matrix::Identity()}};
 
-BoneLookController::BoneLookController(
-  AbstractMesh* iMesh, Bone* iBone, const Vector3& iTarget,
-  const std::optional<BoneLookControllerOptions>& iOptions)
+BoneLookController::BoneLookController(TransformNode* iMesh, Bone* iBone, const Vector3& iTarget,
+                                       const std::optional<BoneLookControllerOptions>& iOptions)
     : target{iTarget}
     , mesh{iMesh}
     , bone{iBone}
@@ -27,14 +25,10 @@ BoneLookController::BoneLookController(
     , adjustPitch{0.f}
     , adjustRoll{0.f}
     , slerpAmount{1.f}
-    , minYaw{this, &BoneLookController::get_minYaw,
-             &BoneLookController::set_minYaw}
-    , maxYaw{this, &BoneLookController::get_maxYaw,
-             &BoneLookController::set_maxYaw}
-    , minPitch{this, &BoneLookController::get_minPitch,
-               &BoneLookController::set_minPitch}
-    , maxPitch{this, &BoneLookController::get_maxPitch,
-               &BoneLookController::set_maxPitch}
+    , minYaw{this, &BoneLookController::get_minYaw, &BoneLookController::set_minYaw}
+    , maxYaw{this, &BoneLookController::get_maxYaw, &BoneLookController::set_maxYaw}
+    , minPitch{this, &BoneLookController::get_minPitch, &BoneLookController::set_minPitch}
+    , maxPitch{this, &BoneLookController::get_maxPitch, &BoneLookController::set_maxPitch}
     , _minYawSet{false}
     , _maxYawSet{false}
     , _boneQuat{Quaternion::Identity()}
@@ -114,8 +108,7 @@ BoneLookController::BoneLookController(
       auto newRollAxis = Vector3::Cross(newPitchAxis, newYawAxis);
 
       Matrix _transformYawPitchTmp = Matrix::Identity();
-      Matrix::FromXYZAxesToRef(newPitchAxis, newYawAxis, newRollAxis,
-                               _transformYawPitchTmp);
+      Matrix::FromXYZAxesToRef(newPitchAxis, newYawAxis, newRollAxis, _transformYawPitchTmp);
 
       _transformYawPitchInv = _transformYawPitchTmp;
       _transformYawPitchTmp.invert();
@@ -188,7 +181,7 @@ void BoneLookController::set_maxPitch(float value)
 
 void BoneLookController::update()
 {
-  // skip the first frame when slerping so that the mesh rotation is correct
+  // skip the first frame when slerping so that the TransformNode rotation is correct
   if (slerpAmount < 1.f && !_firstFrameSkipped) {
     _firstFrameSkipped = true;
     return;
@@ -207,15 +200,13 @@ void BoneLookController::update()
 
   if (upAxisSpace == Space::BONE && parentBone) {
     if (_transformYawPitch) {
-      Vector3::TransformCoordinatesToRef(_upAxis, _transformYawPitchInv,
-                                         _upAxis);
+      Vector3::TransformCoordinatesToRef(_upAxis, _transformYawPitchInv, _upAxis);
     }
     parentBone->getDirectionToRef(_upAxis, _upAxis, mesh);
   }
   else if (upAxisSpace == Space::LOCAL) {
     mesh->getDirectionToRef(_upAxis, _upAxis);
-    if (mesh->scaling().x != 1.f || mesh->scaling().y != 1.f
-        || mesh->scaling().z != 1.f) {
+    if (mesh->scaling().x != 1.f || mesh->scaling().y != 1.f || mesh->scaling().z != 1.f) {
       _upAxis.normalize();
     }
   }
@@ -223,8 +214,7 @@ void BoneLookController::update()
   bool checkYaw   = false;
   bool checkPitch = false;
 
-  if (!stl_util::almost_equal(_maxYaw, Math::PI)
-      || !stl_util::almost_equal(_minYaw, -Math::PI)) {
+  if (!stl_util::almost_equal(_maxYaw, Math::PI) || !stl_util::almost_equal(_minYaw, -Math::PI)) {
     checkYaw = true;
   }
   if (!stl_util::almost_equal(_maxPitch, Math::PI)
@@ -249,8 +239,7 @@ void BoneLookController::update()
       forwardAxis.copyFrom(_fowardAxis);
 
       if (_transformYawPitch) {
-        Vector3::TransformCoordinatesToRef(forwardAxis, _transformYawPitchInv,
-                                           forwardAxis);
+        Vector3::TransformCoordinatesToRef(forwardAxis, _transformYawPitchInv, forwardAxis);
       }
 
       if (parentBone) {
@@ -277,8 +266,7 @@ void BoneLookController::update()
       target.subtractToRef(bonePos, localTarget);
       Vector3::TransformCoordinatesToRef(localTarget, spaceMatInv, localTarget);
 
-      xzlen          = std::sqrt(localTarget.x * localTarget.x
-                        + localTarget.z * localTarget.z);
+      xzlen          = std::sqrt(localTarget.x * localTarget.x + localTarget.z * localTarget.z);
       float pitch    = std::atan2(localTarget.y, xzlen);
       float newPitch = pitch;
 
@@ -309,8 +297,7 @@ void BoneLookController::update()
       if (yaw > _maxYaw || yaw < _minYaw) {
 
         if (!xzlenSet) {
-          xzlen    = std::sqrt(localTarget.x * localTarget.x
-                            + localTarget.z * localTarget.z);
+          xzlen    = std::sqrt(localTarget.x * localTarget.x + localTarget.z * localTarget.z);
           xzlenSet = true;
         }
 
@@ -345,8 +332,7 @@ void BoneLookController::update()
         auto& boneFwd = BoneLookController::_tmpVecs[8];
         boneFwd.copyFrom(Axis::Z());
         if (_transformYawPitch) {
-          Vector3::TransformCoordinatesToRef(boneFwd, _transformYawPitchInv,
-                                             boneFwd);
+          Vector3::TransformCoordinatesToRef(boneFwd, _transformYawPitchInv, boneFwd);
         }
 
         auto& boneRotMat = BoneLookController::_tmpMats[4];
@@ -362,8 +348,7 @@ void BoneLookController::update()
         if (angBtwTar > angBtwMidYaw) {
 
           if (!xzlenSet) {
-            xzlen    = std::sqrt(localTarget.x * localTarget.x
-                              + localTarget.z * localTarget.z);
+            xzlen = std::sqrt(localTarget.x * localTarget.x + localTarget.z * localTarget.z);
           }
 
           float angBtwMax = _getAngleBetween(boneYaw, _maxYaw);
@@ -416,8 +401,7 @@ void BoneLookController::update()
   }
 
   if (adjustYaw != 0.f || adjustPitch != 0.f || adjustRoll != 0.f) {
-    Matrix::RotationYawPitchRollToRef(adjustYaw, adjustPitch, adjustRoll,
-                                      _tmpMat2);
+    Matrix::RotationYawPitchRollToRef(adjustYaw, adjustPitch, adjustRoll, _tmpMat2);
     _tmpMat2.multiplyToRef(_tmpMat1, _tmpMat1);
   }
 
@@ -486,8 +470,7 @@ float BoneLookController::_getAngleBetween(float ang1, float ang2) const
   return ab;
 }
 
-bool BoneLookController::_isAngleBetween(float ang, float ang1,
-                                         float ang2) const
+bool BoneLookController::_isAngleBetween(float ang, float ang1, float ang2) const
 {
   ang  = fmodf(ang, Math::PI2);
   ang  = (ang < 0.f) ? ang + Math::PI2 : ang;
