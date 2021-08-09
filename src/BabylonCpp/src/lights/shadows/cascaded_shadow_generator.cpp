@@ -438,7 +438,7 @@ void CascadedShadowGenerator::_splitFrustum()
       = cascadeIndex == 0 ? iMinDistance : _cascades[cascadeIndex - 1].breakDistance;
     _cascades[cascadeIndex].breakDistance = (d - near) / cameraRange;
 
-    _viewSpaceFrustumsZ[cascadeIndex] = near + _cascades[cascadeIndex].breakDistance * cameraRange;
+    _viewSpaceFrustumsZ[cascadeIndex] = d;
     _frustumLengths[cascadeIndex]
       = (_cascades[cascadeIndex].breakDistance - _cascades[cascadeIndex].prevBreakDistance)
         * cameraRange;
@@ -462,6 +462,8 @@ void CascadedShadowGenerator::_computeMatrices()
   }
 
   _cachedDirection.copyFrom(_lightDirection);
+
+  const auto useReverseDepthBuffer = scene->getEngine()->useReverseDepthBuffer;
 
   for (unsigned int cascadeIndex = 0; cascadeIndex < _numCascades; ++cascadeIndex) {
     _computeFrustumInWorldSpace(cascadeIndex);
@@ -500,8 +502,9 @@ void CascadedShadowGenerator::_computeMatrices()
 
     Matrix::OrthoOffCenterLHToRef(
       _cascadeMinExtents[cascadeIndex].x, _cascadeMaxExtents[cascadeIndex].x,
-      _cascadeMinExtents[cascadeIndex].y, _cascadeMaxExtents[cascadeIndex].y, minZ, maxZ,
-      _projectionMatrices[cascadeIndex]);
+      _cascadeMinExtents[cascadeIndex].y, _cascadeMaxExtents[cascadeIndex].y,
+      useReverseDepthBuffer ? maxZ : minZ, useReverseDepthBuffer ? minZ : maxZ,
+      _projectionMatrices[cascadeIndex], scene->getEngine()->isNDCHalfZRange);
 
     _cascadeMinExtents[cascadeIndex].z = minZ;
     _cascadeMaxExtents[cascadeIndex].z = maxZ;
@@ -538,15 +541,23 @@ void CascadedShadowGenerator::_computeFrustumInWorldSpace(unsigned int cascadeIn
   const auto prevSplitDist = _cascades[cascadeIndex].prevBreakDistance, //
     splitDist              = _cascades[cascadeIndex].breakDistance;
 
+  const auto isNDCHalfZRange = _scene->getEngine()->isNDCHalfZRange;
+
   _scene->activeCamera()
     ->getViewMatrix(); // make sure the transformation matrix we get when calling
                        // 'getTransformationMatrix()' is calculated with an up to date view matrix
 
-  const auto invViewProj = Matrix::Invert(_scene->activeCamera()->getTransformationMatrix());
+  const auto invViewProj       = Matrix::Invert(_scene->activeCamera()->getTransformationMatrix());
+  const auto cornerIndexOffset = _scene->getEngine()->useReverseDepthBuffer ? 4u : 0u;
   for (size_t cornerIndex = 0; cornerIndex < CascadedShadowGenerator::frustumCornersNDCSpace.size();
        ++cornerIndex) {
-    Vector3::TransformCoordinatesToRef(CascadedShadowGenerator::frustumCornersNDCSpace[cornerIndex],
-                                       invViewProj,
+    tmpv1.copyFrom(CascadedShadowGenerator::frustumCornersNDCSpace
+                     [(cornerIndex + cornerIndexOffset)
+                      % CascadedShadowGenerator::frustumCornersNDCSpace.size()]);
+    if (isNDCHalfZRange && tmpv1.z == -1.f) {
+      tmpv1.z = 0.f;
+    }
+    Vector3::TransformCoordinatesToRef(tmpv1, invViewProj,
                                        _frustumCornersWorldSpace[cascadeIndex][cornerIndex]);
   }
 
@@ -659,6 +670,21 @@ void CascadedShadowGenerator::_initializeGenerator()
 }
 
 void CascadedShadowGenerator::_createTargetRenderTexture()
+{
+  const auto engine = _scene->getEngine();
+  RenderTargetSize size{};
+  size.width  = _mapSize.width;
+  size.height = _mapSize.height;
+  size.layers = numCascades;
+  _shadowMap  = RenderTargetTexture::New(_light->name + "_shadowMap", size, _scene, false, true,
+                                        _textureType, false, std::nullopt, false, false,
+                                        std::nullopt /*, Constants.TEXTUREFORMAT_RED*/);
+
+  _shadowMap->createDepthStencilTexture(
+    engine->useReverseDepthBuffer ? Constants::GREATER : Constants::LESS, true);
+}
+
+void CascadedShadowGenerator::_initializeShadowMap()
 {
   ShadowGenerator::_initializeShadowMap();
 

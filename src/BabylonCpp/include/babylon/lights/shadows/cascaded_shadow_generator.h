@@ -360,6 +360,11 @@ protected:
   /**
    * @brief Hidden
    */
+  void _initializeShadowMap() override;
+
+  /**
+   * @brief Hidden
+   */
   void _bindCustomEffectForRenderSubMeshForShadowMap(
     SubMesh* subMesh, Effect* effect,
     const std::unordered_map<std::string, std::string>& matriceNames, AbstractMesh* mesh) override;
