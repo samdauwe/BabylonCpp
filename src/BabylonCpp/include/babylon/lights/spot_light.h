@@ -79,6 +79,20 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
+   * @brief Gets the minZ used for shadow according to both the scene and the light.
+   * @param activeCamera The camera we are returning the min for
+   * @returns the depth min z
+   */
+  float getDepthMinZ(const Camera& activeCamera) const override;
+
+  /**
+   * @brief Gets the maxZ used for shadow according to both the scene and the light.
+   * @param activeCamera The camera we are returning the max for
+   * @returns the depth max z
+   */
+  float getDepthMaxZ(const Camera& activeCamera) const override;
+
+  /**
    * @brief Prepares the list of defines specific to the light type.
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
