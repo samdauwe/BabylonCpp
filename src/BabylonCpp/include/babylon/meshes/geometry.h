@@ -18,6 +18,7 @@ namespace GL {
 class IGLVertexArrayObject;
 } // end of namespace GL
 
+class AbstractScene;
 class BoundingInfo;
 class Engine;
 class Scene;
@@ -122,9 +123,11 @@ public:
    * determine where to store the data.
    * @param buffer defines the vertex buffer to use
    * @param totalVertices defines the total number of vertices for position kind (could be null)
+   * @param disposeExistingBuffer disposes the existing buffer, if any (default: true)
    */
   void setVerticesBuffer(const VertexBufferPtr& buffer,
-                         const std::optional<size_t>& totalVertices = std::nullopt);
+                         const std::optional<size_t>& totalVertices = std::nullopt,
+                         bool disposeExistingBuffer                 = true);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -460,6 +463,9 @@ public:
   // Cache
   /** Hidden */
   std::vector<Vector3> _positions;
+
+  /** @hidden */
+  AbstractScene* _parentContainer;
 
   /**
    *  Gets or sets the Bias Vector to apply on the bounding elements

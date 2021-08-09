@@ -26,6 +26,7 @@ namespace BABYLON {
 Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData, bool updatable,
                    Mesh* mesh)
     : delayLoadState{Constants::DELAYLOADSTATE_NONE}
+    , _parentContainer{nullptr}
     , boundingBias(this, &Geometry::get_boundingBias, &Geometry::set_boundingBias)
     , meshes(this, &Geometry::get_meshes)
     , useBoundingInfoFromGeometry{false}
@@ -194,10 +195,11 @@ void Geometry::removeVerticesData(const std::string& kind)
 }
 
 void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
-                                 const std::optional<size_t>& totalVertices)
+                                 const std::optional<size_t>& totalVertices,
+                                 bool disposeExistingBuffer)
 {
   auto kind = buffer->getKind();
-  if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind]) {
+  if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind] && disposeExistingBuffer) {
     _vertexBuffers[kind]->dispose();
     _vertexBuffers.erase(kind);
   }
@@ -771,6 +773,11 @@ void Geometry::dispose()
   _boundingInfo = nullptr;
 
   _scene->removeGeometry(this);
+  if (_parentContainer) {
+    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->geometries, this);
+    _parentContainer = nullptr;
+  }
+
   _isDisposed = true;
 }
 
