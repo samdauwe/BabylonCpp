@@ -525,7 +525,7 @@ protected:
    */
   virtual void _initializeGenerator();
   virtual void _createTargetRenderTexture();
-  void _initializeShadowMap();
+  virtual void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
   void _renderForShadowMap(const std::vector<SubMesh*>& opaqueSubMeshes,
                            const std::vector<SubMesh*>& alphaTestSubMeshes,
@@ -742,7 +742,7 @@ protected:
   Vector3 _cachedPosition;
   Vector3 _cachedDirection;
   std::string _cachedDefines;
-  int _currentRenderID;
+  int _currentRenderId;
   PostProcessPtr _boxBlurPostprocess;
   PostProcessPtr _kernelBlurXPostprocess;
   PostProcessPtr _kernelBlurYPostprocess;

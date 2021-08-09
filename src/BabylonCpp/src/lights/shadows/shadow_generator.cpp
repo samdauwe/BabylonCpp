@@ -529,11 +529,16 @@ ShadowGenerator& ShadowGenerator::addShadowCaster(const AbstractMeshPtr& mesh,
     return *this;
   }
 
-  _shadowMap->renderList().emplace_back(mesh.get());
+  if (!stl_util::contains(_shadowMap->renderList(), mesh.get())) {
+    _shadowMap->renderList().emplace_back(mesh.get());
+  }
 
   if (includeDescendants) {
-    stl_util::concat(_shadowMap->renderList(),
-                     stl_util::to_raw_ptr_vector(mesh->getChildMeshes(false)));
+    for (const auto& childMesh : mesh->getChildMeshes(false)) {
+      if (!stl_util::contains(_shadowMap->renderList(), childMesh.get())) {
+        _shadowMap->renderList().emplace_back(childMesh.get());
+      }
+    }
   }
 
   return *this;
@@ -574,11 +579,13 @@ void ShadowGenerator::_initializeGenerator()
 
 void ShadowGenerator::_createTargetRenderTexture()
 {
-  if (_scene->getEngine()->_features.supportDepthStencilTexture) {
+  const auto engine = _scene->getEngine();
+  if (engine->_features.supportDepthStencilTexture) {
     _shadowMap = RenderTargetTexture::New(_light->name + "_shadowMap", _mapSize, _scene, false,
                                           true, _textureType, _light->needCube(),
                                           TextureConstants::TRILINEAR_SAMPLINGMODE, false, false);
-    _shadowMap->createDepthStencilTexture(Constants::LESS, true);
+    _shadowMap->createDepthStencilTexture(
+      engine->useReverseDepthBuffer ? Constants::GREATER : Constants::LESS, true);
   }
   else {
     _shadowMap = RenderTargetTexture::New(_light->name + "_shadowMap", _mapSize, _scene, false,
@@ -1072,6 +1079,10 @@ std::vector<std::string>& ShadowGenerator::_prepareShadowDefines(SubMesh* subMes
     StringTools::printf("#define SM_DEPTHTEXTURE %s",
                         (usePercentageCloserFiltering || useContactHardeningShadow ? "1" : "0")));
 
+  defines.emplace_back(
+    StringTools::printf("#define SM_USE_REVERSE_DEPTHBUFFER %s",
+                        (_scene->getEngine()->useReverseDepthBuffer ? "1" : "0")));
+
   const auto mesh = subMesh->getMesh();
 
   // Normal bias.
@@ -1436,11 +1447,11 @@ void ShadowGenerator::bindShadowLight(const std::string& lightIndex, Effect* eff
 Matrix ShadowGenerator::getTransformMatrix()
 {
   auto& scene = _scene;
-  if (_currentRenderID == scene->getRenderId() && _currentFaceIndexCache == _currentFaceIndex) {
+  if (_currentRenderId == scene->getRenderId() && _currentFaceIndexCache == _currentFaceIndex) {
     return _transformMatrix;
   }
 
-  _currentRenderID       = scene->getRenderId();
+  _currentRenderId       = scene->getRenderId();
   _currentFaceIndexCache = _currentFaceIndex;
 
   auto lightPosition = _light->position();
