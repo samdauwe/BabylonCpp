@@ -45,8 +45,16 @@ GPUParticleSystem::GPUParticleSystem(
   const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
   bool iIsAnimationSheetEnabled, const EffectPtr& customEffect)
     : BaseParticleSystem{iName}
+    , _randomTexture{nullptr}
+    , _randomTexture2{nullptr}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
+    , _colorGradientsTexture{nullptr}
+    , _angularSpeedGradientsTexture{nullptr}
+    , _sizeGradientsTexture{nullptr}
+    , _velocityGradientsTexture{nullptr}
+    , _limitVelocityGradientsTexture{nullptr}
+    , _dragGradientsTexture{nullptr}
     , _accumulatedCount{0}
     , _renderEffect{nullptr}
     , _updateEffect{nullptr}
@@ -61,19 +69,11 @@ GPUParticleSystem::GPUParticleSystem(
     , _started{false}
     , _stopped{false}
     , _timeDelta{0}
-    , _randomTexture{nullptr}
-    , _randomTexture2{nullptr}
     , _attributesStrideSize{21}
     , _actualFrame{0}
     , _zeroVector3{Vector3::Zero()}
     , _rawTextureWidth{256}
     , _preWarmDone{false}
-    , _colorGradientsTexture{nullptr}
-    , _angularSpeedGradientsTexture{nullptr}
-    , _sizeGradientsTexture{nullptr}
-    , _velocityGradientsTexture{nullptr}
-    , _limitVelocityGradientsTexture{nullptr}
-    , _dragGradientsTexture{nullptr}
 {
   if (!sceneOrEngine || std::holds_alternative<Scene*>(*sceneOrEngine)) {
     _scene = sceneOrEngine ? std::get<Scene*>(*sceneOrEngine) : EngineStore::LastCreatedScene();
@@ -1036,6 +1036,11 @@ void GPUParticleSystem::_recreateUpdateEffect()
 
   _updateEffectOptions->defines = std::move(defines);
   _updateEffect                 = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _engine);
+}
+
+DrawWrapperPtr GPUParticleSystem::_getWrapper(unsigned int /*blendMode*/)
+{
+  return nullptr;
 }
 
 EffectPtr GPUParticleSystem::_getEffect()

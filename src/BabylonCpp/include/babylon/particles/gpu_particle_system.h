@@ -20,6 +20,7 @@ class Engine;
 class GPUParticleSystem;
 struct IEffectCreationOptions;
 class Mesh;
+FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(RawTexture)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
@@ -373,6 +374,11 @@ public:
   void _recreateUpdateEffect();
 
   /**
+   * @brief Hidden
+   */
+  DrawWrapperPtr _getWrapper(unsigned int blendMode);
+
+  /**
    * @brief Fill the defines array according to the current settings of the particle system
    * @param defines Array to be updated
    * @param blendMode blend mode to take into account when updating the array
@@ -533,6 +539,11 @@ private:
   void _releaseVAOs();
 
 public:
+  /** @hidden */
+  RawTexturePtr _randomTexture;
+  /** @hidden */
+  RawTexturePtr _randomTexture2;
+
   /**
    * An event triggered when the system is disposed.
    */
@@ -542,6 +553,19 @@ public:
    * Gets or set the number of active particles
    */
   Property<GPUParticleSystem, size_t> activeParticleCount;
+
+  /** @hidden */
+  RawTexturePtr _colorGradientsTexture;
+  /** @hidden */
+  RawTexturePtr _angularSpeedGradientsTexture;
+  /** @hidden */
+  RawTexturePtr _sizeGradientsTexture;
+  /** @hidden */
+  RawTexturePtr _velocityGradientsTexture;
+  /** @hidden */
+  RawTexturePtr _limitVelocityGradientsTexture;
+  /** @hidden */
+  RawTexturePtr _dragGradientsTexture;
 
 protected:
   /** @hidden */
@@ -572,9 +596,6 @@ private:
 
   float _timeDelta;
 
-  RawTexturePtr _randomTexture;
-  RawTexturePtr _randomTexture2;
-
   int _attributesStrideSize;
   IEffectCreationOptions* _updateEffectOptions;
 
@@ -585,13 +606,6 @@ private:
   Vector3 _zeroVector3;
   unsigned int _rawTextureWidth;
   bool _preWarmDone;
-
-  RawTexturePtr _colorGradientsTexture;
-  RawTexturePtr _angularSpeedGradientsTexture;
-  RawTexturePtr _sizeGradientsTexture;
-  RawTexturePtr _velocityGradientsTexture;
-  RawTexturePtr _limitVelocityGradientsTexture;
-  RawTexturePtr _dragGradientsTexture;
 
   std::vector<Color3Gradient> _emptyRampGradients;
 
