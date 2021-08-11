@@ -279,6 +279,416 @@ private:
 
 public:
   /**
+   * Intensity of the direct lights e.g. the four lights available in your scene.
+   * This impacts both the direct diffuse and specular highlights.
+   * @hidden
+   */
+  float _directIntensity;
+
+  /**
+   * Intensity of the emissive part of the material.
+   * This helps controlling the emissive effect without modifying the emissive color.
+   * @hidden
+   */
+  float _emissiveIntensity;
+
+  /**
+   * Intensity of the environment e.g. how much the environment will light the object
+   * either through harmonics for rough material or through the reflection for shiny ones.
+   * @hidden
+   */
+  float _environmentIntensity;
+
+  /**
+   * This is a special control allowing the reduction of the specular highlights coming from the
+   * four lights of the scene. Those highlights may not be needed in full environment lighting.
+   * @hidden
+   */
+  float _specularIntensity;
+
+  /**
+   * Debug Control allowing disabling the bump map on this material.
+   * @hidden
+   */
+  bool _disableBumpMap;
+
+  /**
+   * AKA Diffuse Texture in standard nomenclature.
+   * @hidden
+   */
+  BaseTexturePtr _albedoTexture;
+
+  /**
+   * AKA Occlusion Texture in other nomenclature.
+   * @hidden
+   */
+  BaseTexturePtr _ambientTexture;
+
+  /**
+   * AKA Occlusion Texture Intensity in other nomenclature.
+   * @hidden
+   */
+  float _ambientTextureStrength;
+
+  /**
+   * Defines how much the AO map is occluding the analytical lights (point
+   * spot...).
+   * 1 means it completely occludes it
+   * 0 mean it has no impact
+   * @hidden
+   */
+  unsigned int _ambientTextureImpactOnAnalyticalLights;
+
+  /**
+   * Stores the alpha values in a texture.
+   * @hidden
+   */
+  BaseTexturePtr _opacityTexture;
+
+  /**
+   * Stores the reflection values in a texture.
+   * @hidden
+   */
+  BaseTexturePtr _reflectionTexture;
+
+  /**
+   * Stores the emissive values in a texture.
+   * @hidden
+   */
+  BaseTexturePtr _emissiveTexture;
+
+  /**
+   * AKA Specular texture in other nomenclature.
+   * @hidden
+   */
+  BaseTexturePtr _reflectivityTexture;
+
+  /**
+   * Used to switch from specular/glossiness to metallic/roughness workflow.
+   * @hidden
+   */
+  BaseTexturePtr _metallicTexture;
+
+  /**
+   * Specifies the metallic scalar of the metallic/roughness workflow.
+   * Can also be used to scale the metalness values of the metallic texture.
+   * @hidden
+   */
+  std::optional<float> _metallic;
+
+  /**
+   * Specifies the roughness scalar of the metallic/roughness workflow.
+   * Can also be used to scale the roughness values of the metallic texture.
+   * @hidden
+   */
+  std::optional<float> _roughness;
+
+  /**
+   * In metallic workflow, specifies an F0 factor to help configuring the material F0.
+   * By default the indexOfrefraction is used to compute F0;
+   *
+   * This is used as a factor against the default reflectance at normal incidence to tweak it.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor;
+   * F90 = metallicReflectanceColor;
+   * @hidden
+   */
+  float _metallicF0Factor;
+
+  /**
+   * In metallic workflow, specifies an F90 color to help configuring the material F90.
+   * By default the F90 is always 1;
+   *
+   * Please note that this factor is also used as a factor against the default reflectance at normal
+   * incidence.
+   *
+   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor
+   * F90 = metallicReflectanceColor;
+   * @hidden
+   */
+  Color3 _metallicReflectanceColor;
+
+  /**
+   * Specifies that only the A channel from _metallicReflectanceTexture should be used.
+   * If false, both RGB and A channels will be used
+   * @hidden
+   */
+  bool _useOnlyMetallicFromMetallicReflectanceTexture;
+
+  /**
+   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
+   * This is multiplied against the scalar values defined in the material.
+   * If _useOnlyMetallicFromMetallicReflectanceTexture is true, don't use the RGB channels, only A
+   * @hidden
+   */
+  BaseTexturePtr _metallicReflectanceTexture;
+
+  /**
+   * Defines to store reflectanceColor in RGB
+   * This is multiplied against the scalar values defined in the material.
+   * If both _reflectanceTexture and _metallicReflectanceTexture textures are provided and
+   * _useOnlyMetallicFromMetallicReflectanceTexture is false, _metallicReflectanceTexture takes
+   * precedence and _reflectanceTexture is not used
+   * @hidden
+   */
+  BaseTexturePtr _reflectanceTexture;
+
+  /**
+   * Used to enable roughness/glossiness fetch from a separate channel depending
+   * on the current mode. Gray Scale represents roughness in metallic mode and
+   * glossiness in specular mode.
+   * @hidden
+   */
+  BaseTexturePtr _microSurfaceTexture;
+
+  /**
+   * Stores surface normal data used to displace a mesh in a texture.
+   * @hidden
+   */
+  BaseTexturePtr _bumpTexture;
+
+  /**
+   * Stores the pre-calculated light information of a mesh in a texture.
+   * @hidden
+   */
+  BaseTexturePtr _lightmapTexture;
+
+  /**
+   * The color of a material in ambient lighting.
+   * @hidden
+   */
+  Color3 _ambientColor;
+
+  /**
+   * AKA Diffuse Color in other nomenclature.
+   * @hidden
+   */
+  Color3 _albedoColor;
+
+  /**
+   * AKA Specular Color in other nomenclature.
+   * @hidden
+   */
+  Color3 _reflectivityColor;
+
+  /**
+   * The color applied when light is reflected from a material.
+   * @hidden
+   */
+  Color3 _reflectionColor;
+
+  /**
+   * The color applied when light is emitted from a material.
+   * @hidden
+   */
+  Color3 _emissiveColor;
+
+  /**
+   * AKA Glossiness in other nomenclature.
+   * @hidden
+   */
+  float _microSurface;
+
+  /**
+   * Specifies that the material will use the light map as a show map.
+   * @hidden
+   */
+  bool _useLightmapAsShadowmap;
+
+  /**
+   * This parameters will enable/disable Horizon occlusion to prevent normal
+   * maps to look shiny when the normal makes the reflect vector face the model
+   * (under horizon).
+   * @hidden
+   */
+  bool _useHorizonOcclusion;
+
+  /**
+   * This parameters will enable/disable radiance occlusion by preventing the
+   * radiance to lit too much the area relying on ambient texture to define
+   * their ambient occlusion.
+   * @hidden
+   */
+  bool _useRadianceOcclusion;
+
+  /**
+   * Specifies that the alpha is coming form the albedo channel alpha channel
+   * for alpha blending.
+   * @hidden
+   */
+  bool _useAlphaFromAlbedoTexture;
+
+  /**
+   * Specifies that the material will keeps the specular highlights over a transparent surface (only
+   * the most luminous ones). A car glass is a good example of that. When sun reflects on it you can
+   * not see what is behind.
+   * @hidden
+   */
+  bool _useSpecularOverAlpha;
+
+  /**
+   * Specifies if the reflectivity texture contains the glossiness information
+   * in its alpha channel.
+   * @hidden
+   */
+  bool _useMicroSurfaceFromReflectivityMapAlpha;
+
+  /**
+   * Specifies if the metallic texture contains the roughness information in its
+   * alpha channel.
+   * @hidden
+   */
+  bool _useRoughnessFromMetallicTextureAlpha;
+
+  /**
+   * Specifies if the metallic texture contains the roughness information in its
+   * green channel.
+   * @hidden
+   */
+  bool _useRoughnessFromMetallicTextureGreen;
+
+  /**
+   * Specifies if the metallic texture contains the metallness information in
+   * its blue channel.
+   * @hidden
+   */
+  bool _useMetallnessFromMetallicTextureBlue;
+
+  /**
+   * Specifies if the metallic texture contains the ambient occlusion
+   * information in its red channel.
+   * @hidden
+   */
+  bool _useAmbientOcclusionFromMetallicTextureRed;
+
+  /**
+   * Specifies if the ambient texture contains the ambient occlusion information
+   * in its red channel only.
+   * @hidden
+   */
+  bool _useAmbientInGrayScale;
+
+  /**
+   * In case the reflectivity map does not contain the microsurface information
+   * in its alpha channel,
+   * The material will try to infer what glossiness each pixel should be.
+   * @hidden
+   */
+  bool _useAutoMicroSurfaceFromReflectivityMap;
+
+  /**
+   * Defines the  falloff type used in this material.
+   * It by default is Physical.
+   * @hidden
+   */
+  unsigned int _lightFalloff;
+
+  /**
+   * Specifies that the material will keeps the reflection highlights over a transparent surface
+   * (only the most luminous ones). A car glass is a good example of that. When the street lights
+   * reflects on it you can not see what is behind.
+   * @hidden
+   */
+  bool _useRadianceOverAlpha;
+
+  /**
+   * Allows using an object space normal map (instead of tangent space).
+   * @hidden
+   */
+  bool _useObjectSpaceNormalMap;
+
+  /**
+   * Allows using the bump map in parallax mode.
+   * @hidden
+   */
+  bool _useParallax;
+
+  /**
+   * Allows using the bump map in parallax occlusion mode.
+   * @hidden
+   */
+  bool _useParallaxOcclusion;
+
+  /**
+   * Controls the scale bias of the parallax mode.
+   * @hidden
+   */
+  float _parallaxScaleBias;
+
+  /**
+   * If sets to true, disables all the lights affecting the material.
+   * @hidden
+   */
+  bool _disableLighting;
+
+  /**
+   * Number of Simultaneous lights allowed on the material.
+   * @hidden
+   */
+  unsigned int _maxSimultaneousLights;
+
+  /**
+   * If sets to true, x component of normal map value will be inverted
+   * (x = 1.0 - x).
+   * @hidden
+   */
+  bool _invertNormalMapX;
+
+  /**
+   * If sets to true, y component of normal map value will be inverted (y = 1.0 - y).
+   * @hidden
+   */
+  bool _invertNormalMapY;
+
+  /**
+   * If sets to true and backfaceCulling is false, normals will be flipped on the backside.
+   * @hidden
+   */
+  bool _twoSidedLighting;
+
+  /**
+   * Defines the alpha limits in alpha test mode.
+   * @hidden
+   */
+  float _alphaCutOff;
+
+  /**
+   * Enforces alpha test in opaque or blend mode in order to improve the performances of some
+   * @hidden
+   * situations.
+   */
+  bool _forceAlphaTest;
+
+  /**
+   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
+   * tested. And/Or occlude the blended part. (alpha is converted to gamma to compute the fresnel)
+   * @hidden
+   */
+  bool _useAlphaFresnel;
+
+  /**
+   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
+   * tested. And/Or occlude the blended part. (alpha stays linear to compute the fresnel)
+   * @hidden
+   */
+  bool _useLinearAlphaFresnel;
+
+  /**
+   * Specifies the environment BRDF texture used to compute the scale and offset roughness values
+   * from cos theta and roughness:
+   * http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+   * _environmentBRDFTexture
+   */
+  BaseTexturePtr _environmentBRDFTexture;
+
+  /**
+   * Force the shader to compute irradiance in the fragment shader in order to
+   * take bump in account.
+   * @hidden
+   */
+  bool _forceIrradianceInFragment;
+
+  /**
    * Enables realtime filtering on the texture.
    */
   Property<PBRBaseMaterial, bool> realTimeFiltering;
@@ -287,6 +697,20 @@ public:
    * Quality switch for realtime filtering
    */
   Property<PBRBaseMaterial, unsigned int> realTimeFilteringQuality;
+
+  /**
+   * Force normal to face away from face.
+   * @hidden
+   */
+  bool _forceNormalForward;
+
+  /**
+   * Enables specular anti aliasing in the PBR shader.
+   * It will both interacts on the Geometry for analytical and IBL lighting.
+   * It also prefilter the roughness map based on the bump values.
+   * @hidden
+   */
+  bool _enableSpecularAntiAliasing;
 
   /**
    * The transparency mode of the material.
@@ -337,369 +761,6 @@ public:
   DetailMapConfigurationPtr detailMap;
 
 protected:
-  /**
-   * Intensity of the direct lights e.g. the four lights available in your scene.
-   * This impacts both the direct diffuse and specular highlights.
-   */
-  float _directIntensity;
-
-  /**
-   * Intensity of the emissive part of the material.
-   * This helps controlling the emissive effect without modifying the emissive color.
-   */
-  float _emissiveIntensity;
-
-  /**
-   * Intensity of the environment e.g. how much the environment will light the object
-   * either through harmonics for rough material or through the reflection for shiny ones.
-   */
-  float _environmentIntensity;
-
-  /**
-   * This is a special control allowing the reduction of the specular highlights coming from the
-   * four lights of the scene. Those highlights may not be needed in full environment lighting.
-   */
-  float _specularIntensity;
-
-  /**
-   * Debug Control allowing disabling the bump map on this material.
-   */
-  bool _disableBumpMap;
-
-  /**
-   * AKA Diffuse Texture in standard nomenclature.
-   */
-  BaseTexturePtr _albedoTexture;
-
-  /**
-   * AKA Occlusion Texture in other nomenclature.
-   */
-  BaseTexturePtr _ambientTexture;
-
-  /**
-   * AKA Occlusion Texture Intensity in other nomenclature.
-   */
-  float _ambientTextureStrength;
-
-  /**
-   * Defines how much the AO map is occluding the analytical lights (point
-   * spot...).
-   * 1 means it completely occludes it
-   * 0 mean it has no impact
-   */
-  unsigned int _ambientTextureImpactOnAnalyticalLights;
-
-  /**
-   * Stores the alpha values in a texture.
-   */
-  BaseTexturePtr _opacityTexture;
-
-  /**
-   * Stores the reflection values in a texture.
-   */
-  BaseTexturePtr _reflectionTexture;
-
-  /**
-   * Stores the emissive values in a texture.
-   */
-  BaseTexturePtr _emissiveTexture;
-
-  /**
-   * AKA Specular texture in other nomenclature.
-   */
-  BaseTexturePtr _reflectivityTexture;
-
-  /**
-   * Used to switch from specular/glossiness to metallic/roughness workflow.
-   */
-  BaseTexturePtr _metallicTexture;
-
-  /**
-   * Specifies the metallic scalar of the metallic/roughness workflow.
-   * Can also be used to scale the metalness values of the metallic texture.
-   */
-  std::optional<float> _metallic;
-
-  /**
-   * Specifies the roughness scalar of the metallic/roughness workflow.
-   * Can also be used to scale the roughness values of the metallic texture.
-   */
-  std::optional<float> _roughness;
-
-  /**
-   * In metallic workflow, specifies an F0 factor to help configuring the material F0.
-   * By default the indexOfrefraction is used to compute F0;
-   *
-   * This is used as a factor against the default reflectance at normal incidence to tweak it.
-   *
-   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor;
-   * F90 = metallicReflectanceColor;
-   */
-  float _metallicF0Factor;
-
-  /**
-   * In metallic workflow, specifies an F90 color to help configuring the material F90.
-   * By default the F90 is always 1;
-   *
-   * Please note that this factor is also used as a factor against the default reflectance at normal
-   * incidence.
-   *
-   * F0 = defaultF0 * metallicF0Factor * metallicReflectanceColor
-   * F90 = metallicReflectanceColor;
-   */
-  Color3 _metallicReflectanceColor;
-
-  /**
-   * Specifies that only the A channel from _metallicReflectanceTexture should be used.
-   * If false, both RGB and A channels will be used
-   */
-  bool _useOnlyMetallicFromMetallicReflectanceTexture;
-
-  /**
-   * Defines to store metallicReflectanceColor in RGB and metallicF0Factor in A
-   * This is multiplied against the scalar values defined in the material.
-   * If _useOnlyMetallicFromMetallicReflectanceTexture is true, don't use the RGB channels, only A
-   */
-  BaseTexturePtr _metallicReflectanceTexture;
-
-  /**
-   * Defines to store reflectanceColor in RGB
-   * This is multiplied against the scalar values defined in the material.
-   * If both _reflectanceTexture and _metallicReflectanceTexture textures are provided and
-   * _useOnlyMetallicFromMetallicReflectanceTexture is false, _metallicReflectanceTexture takes
-   * precedence and _reflectanceTexture is not used
-   */
-  BaseTexturePtr _reflectanceTexture;
-
-  /**
-   * Used to enable roughness/glossiness fetch from a separate channel depending
-   * on the current mode. Gray Scale represents roughness in metallic mode and
-   * glossiness in specular mode.
-   */
-  BaseTexturePtr _microSurfaceTexture;
-
-  /**
-   * Stores surface normal data used to displace a mesh in a texture.
-   */
-  BaseTexturePtr _bumpTexture;
-
-  /**
-   * Stores the pre-calculated light information of a mesh in a texture.
-   */
-  BaseTexturePtr _lightmapTexture;
-
-  /**
-   * The color of a material in ambient lighting.
-   */
-  Color3 _ambientColor;
-
-  /**
-   * AKA Diffuse Color in other nomenclature.
-   */
-  Color3 _albedoColor;
-
-  /**
-   * AKA Specular Color in other nomenclature.
-   */
-  Color3 _reflectivityColor;
-
-  /**
-   * The color applied when light is reflected from a material.
-   */
-  Color3 _reflectionColor;
-
-  /**
-   * The color applied when light is emitted from a material.
-   */
-  Color3 _emissiveColor;
-
-  /**
-   * AKA Glossiness in other nomenclature.
-   */
-  float _microSurface;
-
-  /**
-   * Specifies that the material will use the light map as a show map.
-   */
-  bool _useLightmapAsShadowmap;
-
-  /**
-   * This parameters will enable/disable Horizon occlusion to prevent normal
-   * maps to look shiny when the normal makes the reflect vector face the model
-   * (under horizon).
-   */
-  bool _useHorizonOcclusion;
-
-  /**
-   * This parameters will enable/disable radiance occlusion by preventing the
-   * radiance to lit too much the area relying on ambient texture to define
-   * their ambient occlusion.
-   */
-  bool _useRadianceOcclusion;
-
-  /**
-   * Specifies that the alpha is coming form the albedo channel alpha channel
-   * for alpha blending.
-   */
-  bool _useAlphaFromAlbedoTexture;
-
-  /**
-   * Specifies that the material will keeps the specular highlights over a transparent surface (only
-   * the most luminous ones). A car glass is a good example of that. When sun reflects on it you can
-   * not see what is behind.
-   */
-  bool _useSpecularOverAlpha;
-
-  /**
-   * Specifies if the reflectivity texture contains the glossiness information
-   * in its alpha channel.
-   */
-  bool _useMicroSurfaceFromReflectivityMapAlpha;
-
-  /**
-   * Specifies if the metallic texture contains the roughness information in its
-   * alpha channel.
-   */
-  bool _useRoughnessFromMetallicTextureAlpha;
-
-  /**
-   * Specifies if the metallic texture contains the roughness information in its
-   * green channel.
-   */
-  bool _useRoughnessFromMetallicTextureGreen;
-
-  /**
-   * Specifies if the metallic texture contains the metallness information in
-   * its blue channel.
-   */
-  bool _useMetallnessFromMetallicTextureBlue;
-
-  /**
-   * Specifies if the metallic texture contains the ambient occlusion
-   * information in its red channel.
-   */
-  bool _useAmbientOcclusionFromMetallicTextureRed;
-
-  /**
-   * Specifies if the ambient texture contains the ambient occlusion information
-   * in its red channel only.
-   */
-  bool _useAmbientInGrayScale;
-
-  /**
-   * In case the reflectivity map does not contain the microsurface information
-   * in its alpha channel,
-   * The material will try to infer what glossiness each pixel should be.
-   */
-  bool _useAutoMicroSurfaceFromReflectivityMap;
-
-  /**
-   * Defines the  falloff type used in this material.
-   * It by default is Physical.
-   */
-  unsigned int _lightFalloff;
-
-  /**
-   * Specifies that the material will keeps the reflection highlights over a transparent surface
-   * (only the most luminous ones). A car glass is a good example of that. When the street lights
-   * reflects on it you can not see what is behind.
-   */
-  bool _useRadianceOverAlpha;
-
-  /**
-   * Allows using an object space normal map (instead of tangent space).
-   */
-  bool _useObjectSpaceNormalMap;
-
-  /**
-   * Allows using the bump map in parallax mode.
-   */
-  bool _useParallax;
-
-  /**
-   * Allows using the bump map in parallax occlusion mode.
-   */
-  bool _useParallaxOcclusion;
-
-  /**
-   * Controls the scale bias of the parallax mode.
-   */
-  float _parallaxScaleBias;
-
-  /**
-   * If sets to true, disables all the lights affecting the material.
-   */
-  bool _disableLighting;
-
-  /**
-   * Number of Simultaneous lights allowed on the material.
-   */
-  unsigned int _maxSimultaneousLights;
-
-  /**
-   * If sets to true, x component of normal map value will be inverted
-   * (x = 1.0 - x).
-   */
-  bool _invertNormalMapX;
-
-  /**
-   * If sets to true, y component of normal map value will be inverted (y = 1.0 - y).
-   */
-  bool _invertNormalMapY;
-
-  /**
-   * If sets to true and backfaceCulling is false, normals will be flipped on the backside.
-   */
-  bool _twoSidedLighting;
-
-  /**
-   * Defines the alpha limits in alpha test mode.
-   */
-  float _alphaCutOff;
-
-  /**
-   * Enforces alpha test in opaque or blend mode in order to improve the performances of some
-   * situations.
-   */
-  bool _forceAlphaTest;
-
-  /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
-   * tested. And/Or occlude the blended part. (alpha is converted to gamma to compute the fresnel)
-   */
-  bool _useAlphaFresnel;
-
-  /**
-   * A fresnel is applied to the alpha of the model to ensure grazing angles edges are not alpha
-   * tested. And/Or occlude the blended part. (alpha stays linear to compute the fresnel)
-   */
-  bool _useLinearAlphaFresnel;
-
-  /**
-   * Specifies the environment BRDF texture used to compute the scale and offset roughness values
-   * from cos theta and roughness:
-   * http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
-   */
-  BaseTexturePtr _environmentBRDFTexture;
-
-  /**
-   * Force the shader to compute irradiance in the fragment shader in order to
-   * take bump in account.
-   */
-  bool _forceIrradianceInFragment;
-
-  /**
-   * Force normal to face away from face.
-   */
-  bool _forceNormalForward;
-
-  /**
-   * Enables specular anti aliasing in the PBR shader.
-   * It will both interacts on the Geometry for analytical and IBL lighting.
-   * It also prefilter the roughness map based on the bump values.
-   */
-  bool _enableSpecularAntiAliasing;
-
   /**
    * Default configuration related to image processing available in the PBR
    * Material.

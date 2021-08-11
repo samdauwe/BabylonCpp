@@ -45,24 +45,6 @@ namespace BABYLON {
 
 PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , realTimeFiltering{this, &PBRBaseMaterial::get_realTimeFiltering,
-                        &PBRBaseMaterial::set_realTimeFiltering}
-    , realTimeFilteringQuality{this, &PBRBaseMaterial::get_realTimeFilteringQuality,
-                               &PBRBaseMaterial::set_realTimeFilteringQuality}
-    , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
-                       &PBRBaseMaterial::set_transparencyMode}
-    , debugMode{this, &PBRBaseMaterial::get_debugMode, &PBRBaseMaterial::set_debugMode}
-    , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , brdf{std::make_shared<PBRBRDFConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
-    , sheen{std::make_shared<PBRSheenConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , prePassConfiguration{nullptr}
-    , detailMap{std::make_shared<DetailMapConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}
@@ -122,8 +104,26 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _useLinearAlphaFresnel{false}
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
+    , realTimeFiltering{this, &PBRBaseMaterial::get_realTimeFiltering,
+                        &PBRBaseMaterial::set_realTimeFiltering}
+    , realTimeFilteringQuality{this, &PBRBaseMaterial::get_realTimeFilteringQuality,
+                               &PBRBaseMaterial::set_realTimeFilteringQuality}
     , _forceNormalForward{false}
     , _enableSpecularAntiAliasing{false}
+    , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
+                       &PBRBaseMaterial::set_transparencyMode}
+    , debugMode{this, &PBRBaseMaterial::get_debugMode, &PBRBaseMaterial::set_debugMode}
+    , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , brdf{std::make_shared<PBRBRDFConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
+    , sheen{std::make_shared<PBRSheenConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , prePassConfiguration{nullptr}
+    , detailMap{std::make_shared<DetailMapConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _imageProcessingConfiguration{std::make_shared<ImageProcessingConfiguration>()}
     , _unlit{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity, _environmentIntensity,
@@ -602,12 +602,11 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     attribs.emplace_back(VertexBuffer::TangentKind);
   }
 
-  if (defines["UV1"]) {
-    attribs.emplace_back(VertexBuffer::UVKind);
-  }
-
-  if (defines["UV2"]) {
-    attribs.emplace_back(VertexBuffer::UV2Kind);
+  for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
+    const auto iStr = std::to_string(i);
+    if (defines["UV" + iStr]) {
+      attribs.emplace_back(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str()));
+    }
   }
 
   if (defines["VERTEXCOLOR"]) {
@@ -940,6 +939,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
       if (_emissiveTexture && MaterialFlags::EmissiveTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines, "EMISSIVE");
+        defines.boolDef["GAMMAEMISSIVE"] = _emissiveTexture->gammaSpace();
       }
       else {
         defines.boolDef["EMISSIVE"] = false;
