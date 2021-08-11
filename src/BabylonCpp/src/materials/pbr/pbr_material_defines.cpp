@@ -13,8 +13,16 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"MAINUV1", false}, //
     {"MAINUV2", false}, //
+    {"MAINUV3", false}, //
+    {"MAINUV4", false}, //
+    {"MAINUV5", false}, //
+    {"MAINUV6", false}, //
     {"UV1", false},     //
     {"UV2", false},     //
+    {"UV3", false},     //
+    {"UV4", false},     //
+    {"UV5", false},     //
+    {"UV6", false},     //
 
     {"ALBEDO", false},      //
     {"GAMMAALBEDO", false}, //
@@ -38,7 +46,8 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"LINEARALPHAFRESNEL", false}, //
     {"PREMULTIPLYALPHA", false},   //
 
-    {"EMISSIVE", false}, //
+    {"EMISSIVE", false},      //
+    {"GAMMAEMISSIVE", false}, //
 
     {"REFLECTIVITY", false}, //
     {"SPECULARTERM", false}, //
@@ -152,6 +161,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"POINTSIZE", false},               //
     {"FOG", false},                     //
     {"LOGARITHMICDEPTH", false},        //
+    {"USE_REVERSE_DEPTHBUFFER", false}, //
 
     {"FORCENORMALFORWARD", false}, //
 
@@ -186,12 +196,16 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"SUBSURFACE", false}, //
 
-    {"SS_REFRACTION", false},   //
-    {"SS_TRANSLUCENCY", false}, //
-    {"SS_SCATTERING", false},   //
+    {"SS_REFRACTION", false},                              //
+    {"SS_REFRACTION_USE_INTENSITY_FROM_TEXTURE", false},   //
+    {"SS_TRANSLUCENCY", false},                            //
+    {"SS_TRANSLUCENCY_USE_INTENSITY_FROM_TEXTURE", false}, //
+    {"SS_SCATTERING", false},                              //
 
-    {"SS_THICKNESSANDMASK_TEXTURE", false}, //
-    {"SS_HAS_THICKNESS", false},            //
+    {"SS_THICKNESSANDMASK_TEXTURE", false},      //
+    {"SS_HAS_THICKNESS", false},                 //
+    {"SS_REFRACTIONINTENSITY_TEXTURE", false},   //
+    {"SS_TRANSLUCENCYINTENSITY_TEXTURE", false}, //
 
     {"SS_REFRACTIONMAP_3D", false},              //
     {"SS_REFRACTIONMAP_OPPOSITEZ", false},       //
@@ -206,45 +220,48 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"SS_USE_THICKNESS_AS_DEPTH", false},        //
 
     {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
-    {"SS_USE_GLTF_THICKNESS_TEXTURE", false},  //
+    {"SS_USE_GLTF_TEXTURES", false},           //
 
     {"UNLIT", false}, //
   };
 
   intDef = {
-    {"NUM_SAMPLES", 0},                         //
-    {"AMBIENTDIRECTUV", 0},                     //
-    {"ALBEDODIRECTUV", 0},                      //
-    {"DETAILDIRECTUV", 0},                      //
-    {"DETAIL_NORMALBLENDMETHOD", 0},            //
-    {"OPACITYDIRECTUV", 0},                     //
-    {"EMISSIVEDIRECTUV", 0},                    //
-    {"REFLECTIVITYDIRECTUV", 0},                //
-    {"MICROSURFACEMAPDIRECTUV", 0},             //
-    {"METALLIC_REFLECTANCEDIRECTUV", 0},        //
-    {"REFLECTANCEDIRECTUV", 0},                 //
-    {"BUMPDIRECTUV", 0},                        //
-    {"LIGHTMAPDIRECTUV", 0},                    //
-    {"NUM_BONE_INFLUENCERS", 0},                //
-    {"BonesPerMesh", 0},                        //
-    {"PREPASS_IRRADIANCE_INDEX", -1},           //
-    {"PREPASS_ALBEDO_INDEX", -1},               //
-    {"PREPASS_DEPTH_INDEX", -1},                //
-    {"PREPASS_NORMAL_INDEX", -1},               //
-    {"PREPASS_POSITION_INDEX", -1},             //
-    {"PREPASS_VELOCITY_INDEX", -1},             //
-    {"PREPASS_REFLECTIVITY_INDEX", -1},         //
-    {"SCENE_MRT_COUNT", 0},                     //
-    {"NUM_MORPH_INFLUENCERS", 0},               //
-    {"CLEARCOAT_TEXTUREDIRECTUV", 0},           //
-    {"CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV", 0}, //
-    {"CLEARCOAT_BUMPDIRECTUV", 0},              //
-    {"CLEARCOAT_TINT_TEXTUREDIRECTUV", 0},      //
-    {"ANISOTROPIC_TEXTUREDIRECTUV", 0},         //
-    {"SHEEN_TEXTUREDIRECTUV", 0},               //
-    {"SHEEN_TEXTURE_ROUGHNESSDIRECTUV", 0},     //
-    {"SS_THICKNESSANDMASK_TEXTUREDIRECTUV", 0}, //
-    {"DEBUGMODE", 0},                           //
+    {"NUM_SAMPLES", 0},                              //
+    {"AMBIENTDIRECTUV", 0},                          //
+    {"ALBEDODIRECTUV", 0},                           //
+    {"DETAILDIRECTUV", 0},                           //
+    {"DETAIL_NORMALBLENDMETHOD", 0},                 //
+    {"OPACITYDIRECTUV", 0},                          //
+    {"EMISSIVEDIRECTUV", 0},                         //
+    {"GAMMAEMISSIVE", 0},                            //
+    {"REFLECTIVITYDIRECTUV", 0},                     //
+    {"MICROSURFACEMAPDIRECTUV", 0},                  //
+    {"METALLIC_REFLECTANCEDIRECTUV", 0},             //
+    {"REFLECTANCEDIRECTUV", 0},                      //
+    {"BUMPDIRECTUV", 0},                             //
+    {"LIGHTMAPDIRECTUV", 0},                         //
+    {"NUM_BONE_INFLUENCERS", 0},                     //
+    {"BonesPerMesh", 0},                             //
+    {"PREPASS_IRRADIANCE_INDEX", -1},                //
+    {"PREPASS_ALBEDO_INDEX", -1},                    //
+    {"PREPASS_DEPTH_INDEX", -1},                     //
+    {"PREPASS_NORMAL_INDEX", -1},                    //
+    {"PREPASS_POSITION_INDEX", -1},                  //
+    {"PREPASS_VELOCITY_INDEX", -1},                  //
+    {"PREPASS_REFLECTIVITY_INDEX", -1},              //
+    {"SCENE_MRT_COUNT", 0},                          //
+    {"NUM_MORPH_INFLUENCERS", 0},                    //
+    {"CLEARCOAT_TEXTUREDIRECTUV", 0},                //
+    {"CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV", 0},      //
+    {"CLEARCOAT_BUMPDIRECTUV", 0},                   //
+    {"CLEARCOAT_TINT_TEXTUREDIRECTUV", 0},           //
+    {"ANISOTROPIC_TEXTUREDIRECTUV", 0},              //
+    {"SHEEN_TEXTUREDIRECTUV", 0},                    //
+    {"SHEEN_TEXTURE_ROUGHNESSDIRECTUV", 0},          //
+    {"SS_THICKNESSANDMASK_TEXTUREDIRECTUV", 0},      //
+    {"SS_REFRACTIONINTENSITY_TEXTUREDIRECTUV", 0},   //
+    {"SS_TRANSLUCENCYINTENSITY_TEXTUREDIRECTUV", 0}, //
+    {"DEBUGMODE", 0},                                //
   };
 
   stringDef = {
