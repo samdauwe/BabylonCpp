@@ -22,12 +22,13 @@ bool Texture::UseSerializedUrlIfAny = false;
 
 Texture::Texture(
   const std::string& iUrl, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
-  bool iNoMipmap, const std::optional<bool>& invertY,
-  const std::optional<unsigned int>& iSamplingMode, const std::function<void()>& onLoad,
-  const std::function<void(const std::string& message, const std::string& exception)>& onError,
-  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
-  bool deleteBuffer, const std::optional<unsigned int>& format, const std::string& mimeType,
-  const LoaderOptionsPtr& loaderOptions)
+  const std::optional<std::variant<bool, ITextureCreationOptions>>& iNoMipmapOrOptions,
+  const std::optional<bool>& iInvertY, const std::optional<unsigned int>& iSamplingMode,
+  const std::function<void()>& iOnLoad,
+  const std::function<void(const std::string& message, const std::string& exception)>& iOnError,
+  const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& iBuffer,
+  bool deleteBuffer, const std::optional<unsigned int>& iFormat, const std::string& iMimeType,
+  const LoaderOptionsPtr& iLoaderOptions, const std::optional<unsigned int>& iCreationFlags)
     : BaseTexture{sceneOrEngine}
     , uOffset{0.f}
     , vOffset{0.f}
@@ -64,22 +65,61 @@ Texture::Texture(
     , _cachedWRotationCenter{-1}
     , _cachedHomogeneousRotationInUVTransform{false}
     , _cachedCoordinatesMode{-1}
-    , _buffer{buffer}
     , _delayedOnLoad{nullptr}
     , _delayedOnError{nullptr}
-    , _onLoad{onLoad}
+    , _creationFlags{std::nullopt}
+    , _useSRGBBuffer{std::nullopt}
+    , _load{nullptr}
 {
   const auto _samplingMode = iSamplingMode.value_or(TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  name                 = iUrl;
-  url                  = iUrl;
-  _noMipmap            = iNoMipmap;
-  _invertY             = invertY.value_or(true);
-  _initialSamplingMode = _samplingMode;
+  name = iUrl;
+  url  = iUrl;
+
+  auto noMipmap      = false;
+  auto useSRGBBuffer = false;
+  auto invertY       = iInvertY.value_or(true);
+  auto samplingMode  = iSamplingMode.value_or(TextureConstants::TRILINEAR_SAMPLINGMODE);
+  auto onLoad        = iOnLoad;
+  auto onError       = iOnError;
+  auto buffer        = iBuffer;
+  auto format        = iFormat;
+  auto mimeType      = iMimeType;
+  auto loaderOptions = iLoaderOptions;
+  auto creationFlags = iCreationFlags;
+
+  if (iNoMipmapOrOptions.has_value()) {
+    if (std::holds_alternative<ITextureCreationOptions>(*iNoMipmapOrOptions)) {
+      auto& noMipmapOrOptions = std::get<ITextureCreationOptions>(*iNoMipmapOrOptions);
+      noMipmap                = noMipmapOrOptions.noMipmap.value_or(false);
+      invertY                 = noMipmapOrOptions.invertY.value_or(true);
+      samplingMode
+        = noMipmapOrOptions.samplingMode.value_or(TextureConstants::TRILINEAR_SAMPLINGMODE);
+      onLoad        = noMipmapOrOptions.onLoad;
+      onError       = noMipmapOrOptions.onError;
+      buffer        = noMipmapOrOptions.buffer;
+      deleteBuffer  = noMipmapOrOptions.deleteBuffer.value_or(false);
+      format        = noMipmapOrOptions.format;
+      mimeType      = noMipmapOrOptions.mimeType;
+      loaderOptions = noMipmapOrOptions.loaderOptions;
+      creationFlags = noMipmapOrOptions.creationFlags;
+      useSRGBBuffer = noMipmapOrOptions.useSRGBBuffer.value_or(false);
+    }
+    else if (std::holds_alternative<bool>(*iNoMipmapOrOptions)) {
+      noMipmap = std::get<bool>(*iNoMipmapOrOptions);
+    }
+  }
+
+  _noMipmap            = noMipmap;
+  _invertY             = invertY;
+  _initialSamplingMode = samplingMode;
   _buffer              = buffer;
   _deleteBuffer        = deleteBuffer;
   _mimeType            = mimeType;
   _loaderOptions       = loaderOptions;
+  _creationFlags       = creationFlags;
+  _useSRGBBuffer       = useSRGBBuffer;
+  _onLoad              = onLoad;
   if (format) {
     _format = format;
   }
@@ -133,13 +173,13 @@ Texture::Texture(
     return;
   }
 
-  _texture = _getFromCache(url, noMipmap, _samplingMode, invertY);
+  _texture = _getFromCache(url, noMipmap, _samplingMode, invertY, useSRGBBuffer);
 
   if (!_texture) {
     if (!scene || !scene->useDelayedTextureLoading) {
-      _texture
-        = engine->createTexture(url, noMipmap, _invertY, scene, _samplingMode, _load, onError,
-                                _buffer, nullptr, _format, "", mimeType, loaderOptions);
+      _texture = engine->createTexture(url, noMipmap, _invertY, scene, _samplingMode, _load,
+                                       onError, _buffer, nullptr, _format, "", mimeType,
+                                       loaderOptions, creationFlags, useSRGBBuffer);
       if (deleteBuffer) {
         _buffer = std::nullopt;
       }
@@ -246,12 +286,12 @@ void Texture::delayLoad(const std::string& /*forcedExtension*/)
   }
 
   delayLoadState = Constants::DELAYLOADSTATE_LOADED;
-  _texture       = _getFromCache(url, _noMipmap, samplingMode, _invertY);
+  _texture       = _getFromCache(url, _noMipmap, samplingMode, _invertY, _useSRGBBuffer);
 
   if (!_texture) {
-    _texture = scene->getEngine()->createTexture(url, _noMipmap, _invertY, getScene(), samplingMode,
-                                                 _delayedOnLoad, _delayedOnError, _buffer, nullptr,
-                                                 _format, "", _mimeType, _loaderOptions);
+    _texture = scene->getEngine()->createTexture(
+      url, _noMipmap, _invertY, getScene(), samplingMode, _delayedOnLoad, _delayedOnError, _buffer,
+      nullptr, _format, "", _mimeType, _loaderOptions, _creationFlags, _useSRGBBuffer);
     if (_deleteBuffer) {
       _buffer = std::nullopt;
     }
@@ -507,13 +547,14 @@ void Texture::dispose()
 }
 
 TexturePtr Texture::CreateFromBase64String(
-  const std::string& data, const std::string& iName, Scene* scene, bool iNoMipmap, bool invertY,
+  const std::string& data, const std::string& iName, Scene* scene,
+  const std::optional<std::variant<bool, ITextureCreationOptions>>& noMipmapOrOptions, bool invertY,
   unsigned int samplingMode, const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
-  unsigned int format)
+  unsigned int format, const std::optional<unsigned int>& iCreationFlags)
 {
-  return Texture::New("data:" + iName, scene, iNoMipmap, invertY, samplingMode, onLoad, onError,
-                      data, false, format);
+  return Texture::New("data:" + iName, scene, noMipmapOrOptions, invertY, samplingMode, onLoad,
+                      onError, data, false, format, "", nullptr, iCreationFlags);
 }
 
 BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl)
@@ -630,18 +671,19 @@ Texture::_CreateRenderTargetTexture(const std::string& name, int renderTargetSiz
 TexturePtr Texture::LoadFromDataString(
   const std::string& iName,
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
-  Scene* scene, bool deleteBuffer, bool iNoMipmap, bool invertY, unsigned int samplingMode,
-  const std::function<void()>& onLoad,
+  Scene* scene, bool deleteBuffer,
+  const std::optional<std::variant<bool, ITextureCreationOptions>>& noMipmapOrOptions, bool invertY,
+  unsigned int samplingMode, const std::function<void()>& onLoad,
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
-  unsigned int format)
+  unsigned int format, const std::optional<unsigned int>& iCreationFlags)
 {
   std::string _name = iName;
   if (_name.substr(0, 5) != "data:") {
     _name = "data:" + iName;
   }
 
-  return Texture::New(iName, scene, iNoMipmap, invertY, samplingMode, onLoad, onError, buffer,
-                      deleteBuffer, format);
+  return Texture::New(iName, scene, noMipmapOrOptions, invertY, samplingMode, onLoad, onError,
+                      buffer, deleteBuffer, format, "", nullptr, iCreationFlags);
 }
 
 MirrorTexturePtr
