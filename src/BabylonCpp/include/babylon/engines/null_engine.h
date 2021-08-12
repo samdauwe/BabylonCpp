@@ -386,7 +386,7 @@ public:
   /**
    * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
-   * @param urlArg defines a value which contains one of the following:
+   * @param url defines a value which contains one of the following:
    * * A conventional http URL, e.g. 'http://...' or 'file://...'
    * * A base64 string of in-line texture data, e.g. 'data:image/jpg;base64,/...'
    * * An indicator that data being passed using the buffer parameter, e.g. 'data:mytexture.jpg'
@@ -407,6 +407,11 @@ public:
    * compressed textures
    * @param forcedExtension defines the extension to use to pick the right loader
    * @param mimeType defines an optional mime type
+   * @param loaderOptions options to be passed to the loader
+   * @param creationFlags specific flags to use when creating the texture
+   * (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
+   * @param useSRGBBuffer defines if the texture must be loaded in a sRGB GPU buffer (if supported
+   * by the GPU).
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   InternalTexturePtr createTexture(
@@ -420,7 +425,9 @@ public:
     const InternalTexturePtr& fallBack        = nullptr,
     const std::optional<unsigned int>& format = std::nullopt,
     const std::string& forcedExtension = "", const std::string& mimeType = "",
-    const LoaderOptionsPtr& loaderOptions = nullptr) override;
+    const LoaderOptionsPtr& loaderOptions            = nullptr,
+    const std::optional<unsigned int>& creationFlags = std::nullopt,
+    const std::optional<bool>& useSRGBBuffer         = std::nullopt) override;
 
   /**
    * @brief Creates a new render target texture
