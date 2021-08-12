@@ -2671,7 +2671,8 @@ InternalTexturePtr ThinEngine::createTexture(
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format,
   const std::string& forcedExtension, const std::string& mimeType,
-  const LoaderOptionsPtr& loaderOptions)
+  const LoaderOptionsPtr& loaderOptions, const std::optional<unsigned int>& /*creationFlags*/,
+  const std::optional<bool>& /*useSRGBBuffer*/)
 {
   return _createTextureBase(url, noMipmap, invertY, scene, samplingMode, onLoad, onError, buffer,
                             fallback, format, forcedExtension, mimeType, loaderOptions);
