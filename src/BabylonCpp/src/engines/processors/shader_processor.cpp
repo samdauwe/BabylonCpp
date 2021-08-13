@@ -12,6 +12,7 @@
 #include <babylon/engines/processors/shader_code_node.h>
 #include <babylon/engines/processors/shader_code_test_node.h>
 #include <babylon/engines/processors/shader_processing_options.h>
+#include <babylon/engines/thin_engine.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
 
@@ -32,6 +33,18 @@ void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& 
                    [&options, callback, &engine](const std::string& codeWithIncludes) -> void {
                      const auto migratedCode
                        = _ProcessShaderConversion(codeWithIncludes, options, engine);
+                     callback(migratedCode);
+                   });
+}
+
+void ShaderProcessor::PreProcess(
+  const std::string& sourceCode, ProcessingOptions& options,
+  const std::function<void(const std::string& migratedCode)>& callback, ThinEngine* engine)
+{
+  _ProcessIncludes(sourceCode, options,
+                   [&options, callback, &engine](const std::string& codeWithIncludes) -> void {
+                     const auto migratedCode
+                       = _ApplyPreProcessing(codeWithIncludes, options, engine);
                      callback(migratedCode);
                    });
 }
@@ -355,7 +368,7 @@ ShaderProcessor::_EvaluatePreProcessors(const std::string& sourceCode,
 }
 
 std::unordered_map<std::string, std::string>
-ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options)
+ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, bool addGLES)
 {
   const auto& defines = options.defines;
   std::unordered_map<std::string, std::string> preprocessors;
@@ -367,9 +380,17 @@ ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options)
     preprocessors[split[0]] = split.size() > 1 ? split[1] : "";
   }
 
-  preprocessors["GL_ES"]              = "true";
+  if (addGLES) {
+    preprocessors["GL_ES"] = "true";
+  }
   preprocessors["__VERSION__"]        = options.version;
   preprocessors[options.platformName] = "true";
+  if (options.isNDCHalfZRange) {
+    preprocessors["IS_NDC_HALF_ZRANGE"] = "";
+  }
+  else {
+    preprocessors.erase("IS_NDC_HALF_ZRANGE");
+  }
 
   return preprocessors;
 }
@@ -405,6 +426,42 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
   if (options.processor->postProcessor) {
     preparedSourceCode = options.processor->postProcessor(
       preparedSourceCode, defines, options.isFragment, options.processingContext, engine);
+  }
+
+  // Inline functions tagged with #define inline
+  if (engine->_features.needShaderCodeInlining) {
+    preparedSourceCode = engine->inlineShaderCode(preparedSourceCode);
+  }
+
+  return preparedSourceCode;
+}
+
+std::string ShaderProcessor::_ApplyPreProcessing(const std::string& sourceCode,
+                                                 ProcessingOptions& options, ThinEngine* engine)
+{
+  auto preparedSourceCode = sourceCode;
+
+  const auto& defines = options.defines;
+
+  auto preprocessors = _PreparePreProcessors(options, false);
+
+  // General pre processing
+  if (options.processor && options.processor->preProcessor) {
+    preparedSourceCode = options.processor->preProcessor(
+      preparedSourceCode, defines, options.isFragment, options.processingContext);
+  }
+
+  preparedSourceCode = _EvaluatePreProcessors(preparedSourceCode, preprocessors, options);
+
+  // Post processing
+  if (options.processor && options.processor->postProcessor) {
+    preparedSourceCode = options.processor->postProcessor(
+      preparedSourceCode, defines, options.isFragment, options.processingContext, engine);
+  }
+
+  // Inline functions tagged with #define inline
+  if (engine->_features.needShaderCodeInlining) {
+    preparedSourceCode = engine->inlineShaderCode(preparedSourceCode);
   }
 
   return preparedSourceCode;
