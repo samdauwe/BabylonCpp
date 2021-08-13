@@ -639,6 +639,13 @@ public:
                       const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
+   * @brief Inline functions in shader code that are marked to be inlined.
+   * @param code code to inline
+   * @returns inlined code
+   */
+  virtual std::string inlineShaderCode(const std::string& code) const;
+
+  /**
    * @brief Creates a new pipeline context.
    * @param shaderProcessingContext defines the shader processing context used during the processing
    * if available

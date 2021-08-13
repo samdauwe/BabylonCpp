@@ -1806,6 +1806,12 @@ ThinEngine::createShaderProgram(const IPipelineContextPtr& pipelineContext,
                               vertexShader, fragmentShader, context, transformFeedbackVaryings);
 }
 
+std::string ThinEngine::inlineShaderCode(const std::string& code) const
+{
+  // no inlining needed in the WebGL engine
+  return code;
+}
+
 IPipelineContextPtr
 ThinEngine::createPipelineContext(const ShaderProcessingContextPtr& /*shaderProcessingContext*/)
 {
