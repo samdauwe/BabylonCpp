@@ -6,6 +6,7 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
@@ -17,8 +18,9 @@ FWD_CLASS_SPTR(Texture)
 /**
  * @brief Class used to host texture specific utilities.
  */
-struct BABYLON_SHARED_EXPORT TextureTools {
+class BABYLON_SHARED_EXPORT TextureTools {
 
+public:
   /**
    * @brief Uses the GPU to create a copy texture rescaled at a given size.
    * @param texture Texture to copy from
@@ -48,7 +50,27 @@ struct BABYLON_SHARED_EXPORT TextureTools {
                    const std::optional<unsigned int>& samplingMode = std::nullopt,
                    const std::optional<unsigned int>& format       = std::nullopt);
 
-}; // end of struct TextureTools
+  // ref:
+  // http://stackoverflow.com/questions/32633585/how-do-you-convert-to-half-floats-in-javascript
+  /**
+   * @brief Converts a number to half float.
+   * @param value number to convert
+   * @returns converted number
+   */
+  static int ToHalfFloat(float value);
+
+  /**
+   * @brief Converts a half float to a number.
+   * @param value half float to convert
+   * @returns converted half float
+   */
+  static int FromHalfFloat(int value);
+
+private:
+  static Float32Array _FloatView;
+  static Int32Array _Int32View;
+
+}; // end of class TextureTools
 
 } // end of namespace BABYLON
 
