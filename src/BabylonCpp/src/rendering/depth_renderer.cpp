@@ -28,7 +28,7 @@ namespace BABYLON {
 size_t DepthRenderer::_Counter = 0ull;
 
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& camera,
-                             bool storeNonLinearDepth)
+                             bool storeNonLinearDepth, unsigned int /*samplingMode*/)
     : isPacked{type == Constants::TEXTURETYPE_UNSIGNED_BYTE}
     , enabled{true}
     , useOnlyInActiveCamera{false}

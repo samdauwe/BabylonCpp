@@ -4,6 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
+#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/matrix.h>
 
@@ -32,9 +33,11 @@ public:
    * @param camera The camera to be used to render the depth map (default: scene's active camera)
    * @param storeNonLinearDepth Defines whether the depth is stored linearly like in Babylon Shadows
    * or directly like glFragCoord.z
+   * @param samplingMode The sampling mode to be used with the render target (Linear, Nearest...)
    */
   DepthRenderer(Scene* scene, unsigned int type = Constants::TEXTURETYPE_FLOAT,
-                const CameraPtr& camera = nullptr, bool storeNonLinearDepth = false);
+                const CameraPtr& camera = nullptr, bool storeNonLinearDepth = false,
+                unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
   virtual ~DepthRenderer(); // = default
 
   /**
