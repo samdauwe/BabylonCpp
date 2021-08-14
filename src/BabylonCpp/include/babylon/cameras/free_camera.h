@@ -180,6 +180,26 @@ protected:
    */
   void set_keysRight(const Int32Array& value);
 
+  /**
+   * @brief Gets the list of keyboard keys used to control the left rotation move of the camera.
+   */
+  Int32Array& get_keysRotateLeft();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the left rotation move of the camera.
+   */
+  void set_keysRotateLeft(const Int32Array& value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the right rotation move of the camera.
+   */
+  Int32Array& get_keysRotateRight();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the right rotation move of the camera.
+   */
+  void set_keysRotateRight(const Int32Array& value);
+
 public:
   /**
    * Define the collision ellipsoid of the camera.
@@ -245,6 +265,16 @@ public:
    * Gets or Set the list of keyboard keys used to control the right strafe move of the camera.
    */
   Property<FreeCamera, Int32Array> keysRight;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the left rotation move of the camera.
+   */
+  Property<FreeCamera, Int32Array> keysRotateLeft;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the right rotation move of the camera.
+   */
+  Property<FreeCamera, Int32Array> keysRotateRight;
 
   /**
    * Event raised when the camera collide with a mesh in the scene.
