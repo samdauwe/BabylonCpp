@@ -184,14 +184,14 @@ void InputManager::_setRayOnPointerInfo(PointerInfo& pointerInfo)
     if (!pointerInfo.pickInfo.ray.has_value()) {
       auto identityMatrix = Matrix::Identity();
       if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
-        pointerInfo.pickInfo.ray = scene.createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
-                                                          pointerInfo.mouseWheelEvent.offsetY,
-                                                          identityMatrix, scene.activeCamera);
+        pointerInfo.pickInfo.ray = scene.createPickingRay(
+          pointerInfo.mouseWheelEvent.offsetX, pointerInfo.mouseWheelEvent.offsetY, identityMatrix,
+          scene.activeCamera().get());
       }
       else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
-        pointerInfo.pickInfo.ray = scene.createPickingRay(pointerInfo.pointerEvent.offsetX,
-                                                          pointerInfo.pointerEvent.offsetY,
-                                                          identityMatrix, scene.activeCamera);
+        pointerInfo.pickInfo.ray = scene.createPickingRay(
+          pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY, identityMatrix,
+          scene.activeCamera().get());
       }
     }
   }

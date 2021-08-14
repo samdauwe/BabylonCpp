@@ -1121,14 +1121,14 @@ void Scene::_setRayOnPointerInfo(PointerInfo& pointerInfo)
     if (!pointerInfo.pickInfo.ray) {
       auto identityMatrix = Matrix::Identity();
       if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
-        pointerInfo.pickInfo.ray
-          = createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
-                             pointerInfo.mouseWheelEvent.offsetY, identityMatrix, _activeCamera);
+        pointerInfo.pickInfo.ray = createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
+                                                    pointerInfo.mouseWheelEvent.offsetY,
+                                                    identityMatrix, _activeCamera.get());
       }
       else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
         pointerInfo.pickInfo.ray
           = createPickingRay(pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
-                             identityMatrix, _activeCamera);
+                             identityMatrix, _activeCamera.get());
       }
     }
   }
@@ -4809,8 +4809,7 @@ Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity, 
 }
 
 /** Picking **/
-Ray Scene::createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera,
-                            bool cameraViewSpace)
+Ray Scene::createPickingRay(int x, int y, Matrix& world, Camera* camera, bool cameraViewSpace)
 {
   auto result = Ray::Zero();
 
@@ -4820,7 +4819,7 @@ Ray Scene::createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera
 }
 
 Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
-                                    CameraPtr camera, bool cameraViewSpace)
+                                    Camera* camera, bool cameraViewSpace)
 {
   auto engine = _engine;
 
@@ -4829,7 +4828,7 @@ Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& w
       return *this;
     }
 
-    camera = _activeCamera;
+    camera = _activeCamera.get();
   }
 
   auto& cameraViewport = camera->viewport;
@@ -5084,13 +5083,13 @@ Scene::pickWithBoundingInfo(int x, int y,
         _tempPickingRay = std::make_unique<Ray>(Ray::Zero());
       }
 
-      createPickingRayToRef(x, y, world, *_tempPickingRay, camera ? camera : nullptr);
+      createPickingRayToRef(x, y, world, *_tempPickingRay, camera ? camera.get() : nullptr);
       return *_tempPickingRay;
     },
     predicate, fastCheck, true);
   if (result) {
     auto world  = Matrix::Identity();
-    result->ray = createPickingRay(x, y, world, camera ? camera : nullptr);
+    result->ray = createPickingRay(x, y, world, camera ? camera.get() : nullptr);
   }
   return result;
 }
@@ -5102,14 +5101,14 @@ Scene::pick(int x, int y, const std::function<bool(const AbstractMeshPtr& mesh)>
 {
   auto result = _internalPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
-      createPickingRayToRef(x, y, world, *_tempPickingRay, camera);
+      createPickingRayToRef(x, y, world, *_tempPickingRay, camera.get());
       return *_tempPickingRay;
     },
     predicate, fastCheck, false, trianglePredicate);
   if (result) {
     auto _result     = *result;
     auto identityMat = Matrix::Identity();
-    _result.ray      = createPickingRay(x, y, identityMat, camera ? camera : nullptr);
+    _result.ray      = createPickingRay(x, y, identityMat, camera ? camera.get() : nullptr);
     result           = _result;
   }
   return result;
@@ -5251,7 +5250,9 @@ Scene::multiPick(int x, int y, const std::function<bool(AbstractMesh* mesh)>& pr
                  const CameraPtr& camera)
 {
   return _internalMultiPick(
-    [this, x, y, &camera](Matrix& world) -> Ray { return createPickingRay(x, y, world, camera); },
+    [this, x, y, &camera](Matrix& world) -> Ray {
+      return createPickingRay(x, y, world, camera.get());
+    },
     predicate);
 }
 

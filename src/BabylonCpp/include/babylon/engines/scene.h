@@ -1415,7 +1415,7 @@ public:
    * @param cameraViewSpace defines if picking will be done in view space (false by default)
    * @returns a Ray
    */
-  Ray createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera = nullptr,
+  Ray createPickingRay(int x, int y, Matrix& world, Camera* camera = nullptr,
                        bool cameraViewSpace = false);
 
   /**
@@ -1430,7 +1430,7 @@ public:
    * @returns the current scene
    */
   Scene& createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
-                               CameraPtr camera, bool cameraViewSpace = false);
+                               Camera* camera, bool cameraViewSpace = false);
 
   /**
    * @brief Creates a ray that can be used to pick in the scene.
