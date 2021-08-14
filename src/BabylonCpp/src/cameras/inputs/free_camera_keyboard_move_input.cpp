@@ -9,7 +9,8 @@
 namespace BABYLON {
 
 FreeCameraKeyboardMoveInput::FreeCameraKeyboardMoveInput()
-    : _canvas{nullptr}
+    : rotationSpeed{0.5f}
+    , _canvas{nullptr}
     , _noPreventDefault{false}
     , _onCanvasBlurObserver{nullptr}
     , _onKeyboardObserver{nullptr}
@@ -51,8 +52,11 @@ void FreeCameraKeyboardMoveInput::attachControl(bool noPreventDefault)
             || (std::find(keysLeft.begin(), keysLeft.end(), keyCode) != keysLeft.end())
             || (std::find(keysRight.begin(), keysRight.end(), keyCode) != keysRight.end())
             || (std::find(keysUpward.begin(), keysUpward.end(), keyCode) != keysUpward.end())
-            || (std::find(keysDownward.begin(), keysDownward.end(), keyCode)
-                != keysDownward.end())) {
+            || (std::find(keysDownward.begin(), keysDownward.end(), keyCode) != keysDownward.end())
+            || (std::find(keysRotateLeft.begin(), keysRotateLeft.end(), keyCode)
+                != keysRotateLeft.end())
+            || (std::find(keysRotateRight.begin(), keysRotateRight.end(), keyCode)
+                != keysRotateRight.end())) {
 
           if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
             _keys.emplace_back(keyCode);
@@ -70,8 +74,11 @@ void FreeCameraKeyboardMoveInput::attachControl(bool noPreventDefault)
             || (std::find(keysLeft.begin(), keysLeft.end(), keyCode) != keysLeft.end())
             || (std::find(keysRight.begin(), keysRight.end(), keyCode) != keysRight.end())
             || (std::find(keysUpward.begin(), keysUpward.end(), keyCode) != keysUpward.end())
-            || (std::find(keysDownward.begin(), keysDownward.end(), keyCode)
-                != keysDownward.end())) {
+            || (std::find(keysDownward.begin(), keysDownward.end(), keyCode) != keysDownward.end())
+            || (std::find(keysRotateLeft.begin(), keysRotateLeft.end(), keyCode)
+                != keysRotateLeft.end())
+            || (std::find(keysRotateRight.begin(), keysRotateRight.end(), keyCode)
+                != keysRotateRight.end())) {
 
           _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode), _keys.end());
 
@@ -124,6 +131,16 @@ void FreeCameraKeyboardMoveInput::checkInputs()
       else if (std::find(keysDownward.begin(), keysDownward.end(), keyCode) != keysDownward.end()) {
         camera->_localDirection->copyFromFloats(0.f, -speed, 0.f);
       }
+      else if (std::find(keysRotateLeft.begin(), keysRotateLeft.end(), keyCode)
+               != keysRotateLeft.end()) {
+        camera->_localDirection->copyFromFloats(0.f, 0.f, 0.f);
+        camera->cameraRotation->y -= _getLocalRotation();
+      }
+      else if (std::find(keysRotateRight.begin(), keysRotateRight.end(), keyCode)
+               != keysRotateRight.end()) {
+        camera->_localDirection->copyFromFloats(0.f, 0.f, 0.f);
+        camera->cameraRotation->y += _getLocalRotation();
+      }
 
       if (camera->getScene()->useRightHandedSystem()) {
         camera->_localDirection->z *= -1.f;
@@ -150,6 +167,18 @@ void FreeCameraKeyboardMoveInput::_onLostFocus()
 std::string FreeCameraKeyboardMoveInput::getSimpleName() const
 {
   return "keyboard";
+}
+
+float FreeCameraKeyboardMoveInput::_getLocalRotation() const
+{
+  auto rotation = rotationSpeed * _engine->getDeltaTime() / 1000.f;
+  if (camera->getScene()->useRightHandedSystem()) {
+    rotation *= -1.f;
+  }
+  if (camera->parent() && camera->parent()->_getWorldMatrixDeterminant() < 0.f) {
+    rotation *= -1.f;
+  }
+  return rotation;
 }
 
 } // end of namespace BABYLON
