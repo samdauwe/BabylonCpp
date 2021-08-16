@@ -211,7 +211,7 @@ public:
   virtual void dispose(Camera* camera = nullptr);
 
   /**
-   * @brief Serializes the particle system to a JSON object.
+   * @brief Serializes the post process to a JSON object.
    * @returns the JSON object
    */
   json serialize() const;
