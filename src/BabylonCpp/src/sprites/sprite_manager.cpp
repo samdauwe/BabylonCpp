@@ -211,6 +211,8 @@ SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
   auto& pickedPoint         = TmpVectors::Vector3Array[0];
   auto& cameraSpacePosition = TmpVectors::Vector3Array[1];
   auto cameraView           = camera->getViewMatrix();
+  auto activeRay            = ray;
+  auto pickedRay            = ray;
 
   for (unsigned int index = 0; index < count; ++index) {
     auto sprite = std::static_pointer_cast<Sprite>(sprites[index]);
@@ -229,6 +231,28 @@ SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
 
     Vector3::TransformCoordinatesToRef(sprite->position, cameraView, cameraSpacePosition);
 
+    if (sprite->angle) {
+      // Create a rotation matrix to rotate the ray to the sprite's rotation
+      Matrix::TranslationToRef(-cameraSpacePosition.x, -cameraSpacePosition.y, 0,
+                               TmpVectors::MatrixArray[1]);
+      Matrix::TranslationToRef(cameraSpacePosition.x, cameraSpacePosition.y, 0,
+                               TmpVectors::MatrixArray[2]);
+      Matrix::RotationZToRef(sprite->angle, TmpVectors::MatrixArray[3]);
+
+      // inv translation x rotation x translation
+      TmpVectors::MatrixArray[1].multiplyToRef(TmpVectors::MatrixArray[3],
+                                               TmpVectors::MatrixArray[4]);
+      TmpVectors::MatrixArray[4].multiplyToRef(TmpVectors::MatrixArray[2],
+                                               TmpVectors::MatrixArray[0]);
+
+      activeRay = ray;
+      Vector3::TransformCoordinatesToRef(ray.origin, TmpVectors::MatrixArray[0], activeRay.origin);
+      Vector3::TransformNormalToRef(ray.direction, TmpVectors::MatrixArray[0], activeRay.direction);
+    }
+    else {
+      activeRay = ray;
+    }
+
     min.copyFromFloats(cameraSpacePosition.x - static_cast<float>(sprite->width) / 2.f,
                        cameraSpacePosition.y - static_cast<float>(sprite->height) / 2.f,
                        cameraSpacePosition.z);
@@ -236,15 +260,16 @@ SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
                        cameraSpacePosition.y + static_cast<float>(sprite->height) / 2.f,
                        cameraSpacePosition.z);
 
-    if (ray.intersectsBoxMinMax(min, max)) {
-      auto currentDistance = Vector3::Distance(cameraSpacePosition, ray.origin);
+    if (activeRay.intersectsBoxMinMax(min, max)) {
+      auto currentDistance = Vector3::Distance(cameraSpacePosition, activeRay.origin);
 
       if (distance > currentDistance) {
 
-        if (!_checkTextureAlpha(*sprite, ray, currentDistance, min, max)) {
+        if (!_checkTextureAlpha(*sprite, activeRay, currentDistance, min, max)) {
           continue;
         }
 
+        pickedRay     = activeRay;
         distance      = currentDistance;
         currentSprite = sprite;
 
@@ -265,11 +290,11 @@ SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
 
     // Get picked point
     auto& direction = TmpVectors::Vector3Array[0];
-    direction.copyFrom(ray.direction);
+    direction.copyFrom(pickedRay.direction);
     direction.normalize();
     direction.scaleInPlace(distance);
 
-    ray.origin.addToRef(direction, pickedPoint);
+    pickedRay.origin.addToRef(direction, pickedPoint);
     result.pickedPoint = Vector3::TransformCoordinates(pickedPoint, TmpVectors::MatrixArray[0]);
 
     return result;
