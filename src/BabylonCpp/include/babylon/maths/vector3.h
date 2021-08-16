@@ -25,6 +25,10 @@ class BABYLON_SHARED_EXPORT Vector3 {
 
 private:
   static const Vector3 _UpReadOnly;
+  static const Vector3 _LeftHandedForwardReadOnly;
+  static const Vector3 _RightHandedForwardReadOnly;
+  static const Vector3 _RightReadOnly;
+  static const Vector3 _ZeroReadOnly;
 
 public:
   /**
@@ -683,12 +687,6 @@ public:
   static Vector3 Zero();
 
   /**
-   * @brief Returns a new Vector3 set to (0.0, 0.0, 0.0).
-   * @returns a new empty Vector3
-   */
-  static Vector3 ZeroReadOnly();
-
-  /**
    * @brief Returns a new Vector3 set to (1.0, 1.0, 1.0).
    * @returns a new unit Vector3
    */
@@ -704,6 +702,26 @@ public:
    * @brief Gets a up Vector3 that must not be updated.
    */
   static Vector3 UpReadOnly();
+
+  /**
+   * @brief Gets a right Vector3 that must not be updated.
+   */
+  static Vector3 RightReadOnly();
+
+  /**
+   * @brief Gets a forward Vector3 that must not be updated.
+   */
+  static Vector3 LeftHandedForwardReadOnly();
+
+  /**
+   * @brief Gets a forward Vector3 that must not be updated.
+   */
+  static Vector3 RightHandedForwardReadOnly();
+
+  /**
+   * @brief Gets a zero Vector3 that must not be updated.
+   */
+  static Vector3 ZeroReadOnly();
 
   /**
    * @brief Returns a new Vector3 set to (0.0, -1.0, 0.0).

@@ -12,7 +12,11 @@
 
 namespace BABYLON {
 
-const Vector3 Vector3::_UpReadOnly = Vector3::Up();
+const Vector3 Vector3::_UpReadOnly                 = Vector3::Up();
+const Vector3 Vector3::_LeftHandedForwardReadOnly  = Vector3::Forward(false);
+const Vector3 Vector3::_RightHandedForwardReadOnly = Vector3::Forward(true);
+const Vector3 Vector3::_RightReadOnly              = Vector3::Right();
+const Vector3 Vector3::_ZeroReadOnly               = Vector3::Zero();
 
 Vector3::Vector3() : x{0.f}, y{0.f}, z{0.f}
 {
@@ -733,11 +737,6 @@ Vector3 Vector3::Zero()
   return Vector3(0.f, 0.f, 0.f);
 }
 
-Vector3 Vector3::ZeroReadOnly()
-{
-  return Vector3(0.f, 0.f, 0.f);
-}
-
 Vector3 Vector3::One()
 {
   return Vector3(1.f, 1.f, 1.f);
@@ -751,6 +750,25 @@ Vector3 Vector3::Up()
 Vector3 Vector3::UpReadOnly()
 {
   return Vector3::_UpReadOnly;
+}
+
+Vector3 Vector3::RightReadOnly()
+{
+  return Vector3::_RightReadOnly;
+}
+
+Vector3 Vector3::LeftHandedForwardReadOnly()
+{
+  return Vector3::_LeftHandedForwardReadOnly;
+}
+Vector3 Vector3::RightHandedForwardReadOnly()
+{
+  return Vector3::_RightHandedForwardReadOnly;
+}
+
+Vector3 Vector3::ZeroReadOnly()
+{
+  return Vector3::_ZeroReadOnly;
 }
 
 Vector3 Vector3::Down()
@@ -1110,15 +1128,36 @@ float Vector3::ProjectOnTriangleToRef(const Vector3& vector, const Vector3& p0, 
   p2.subtractToRef(p0, p2p0);
   p2.subtractToRef(p1, p2p1);
 
-  const auto p1p0L = std::max(p1p0.length(), Math::Epsilon);
-  const auto p2p0L = std::max(p2p0.length(), Math::Epsilon);
-  const auto p2p1L = std::max(p2p1.length(), Math::Epsilon);
+  const auto p1p0L = p1p0.length();
+  const auto p2p0L = p2p0.length();
+  const auto p2p1L = p2p1.length();
+
+  if (p1p0L < Math::Epsilon || //
+      p2p0L < Math::Epsilon || //
+      p2p1L < Math::Epsilon) {
+    // This is a degenerate triangle. As we assume this is part of a non-degenerate mesh,
+    // we will find a better intersection later.
+    // Let's just return one of the extremities
+    ref.copyFrom(p0);
+    return Vector3::Distance(vector, p0);
+  }
 
   // Compute normal and vector to p0
   vector.subtractToRef(p0, vectorp0);
   Vector3::CrossToRef(p1p0, p2p0, normal);
-  normal.normalize();
+  const auto nl = normal.length();
+  if (nl < Math::Epsilon) {
+    // Extremities are aligned, we are back on the case of a degenerate triangle
+    ref.copyFrom(p0);
+    return Vector3::Distance(vector, p0);
+  }
+  normal.normalizeFromLength(nl);
   auto l = vectorp0.length();
+  if (l < Math::Epsilon) {
+    // Vector is p0
+    ref.copyFrom(p0);
+    return 0;
+  }
   vectorp0.normalizeFromLength(l);
 
   // Project to "proj" that lies on the triangle plane
@@ -1204,6 +1243,11 @@ float Vector3::ProjectOnTriangleToRef(const Vector3& vector, const Vector3& p0, 
   auto& e0proj = MathTmp::Vector3Array[9];
   e0proj.copyFrom(e0).subtractInPlace(proj);
   const auto e0projL = e0proj.length();
+  if (e0projL < Math::Epsilon) {
+    // Proj is e0
+    ref.copyFrom(e0);
+    return Vector3::Distance(vector, e0);
+  }
   e0proj.normalizeFromLength(e0projL);
   const auto cosG = Vector3::Dot(r, e0proj);
   auto& triProj   = MathTmp::Vector3Array[7];
