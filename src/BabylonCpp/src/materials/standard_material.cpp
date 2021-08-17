@@ -821,10 +821,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
       }
     }
 
-    if (defines["UV2"]) {
-      attribs.emplace_back(VertexBuffer::UV2Kind);
-    }
-
     if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKind);
     }
