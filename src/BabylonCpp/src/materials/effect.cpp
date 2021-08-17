@@ -150,6 +150,7 @@ Effect::Effect(
   processorOptions.processingContext = _processingContext;
   processorOptions.processingContext = _processingContext;
   processorOptions.isNDCHalfZRange   = _engine->isNDCHalfZRange;
+  processorOptions.useReverseDepthBuffer = _engine->useReverseDepthBuffer;
 
   std::string shaderCodes[2] = {"", ""};
   auto shadersLoaded
