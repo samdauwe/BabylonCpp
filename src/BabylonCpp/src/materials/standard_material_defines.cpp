@@ -81,7 +81,6 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"REFLECTIONMAP_OPPOSITEZ", false},                     //
     {"INVERTCUBICMAP", false},                              //
     {"LOGARITHMICDEPTH", false},                            //
-    {"USE_REVERSE_DEPTHBUFFER", false},                     //
     {"REFRACTION", false},                                  //
     {"REFRACTIONMAP_3D", false},                            //
     {"REFLECTIONOVERALPHA", false},                         //
