@@ -42,6 +42,7 @@ struct BABYLON_SHARED_EXPORT ProcessingOptions {
   std::optional<bool> lookForClosingBracketForUniformBuffer{std::nullopt};
   ShaderProcessingContextPtr processingContext{nullptr};
   std::optional<bool> isNDCHalfZRange{std::nullopt};
+  std::optional<bool> useReverseDepthBuffer{std::nullopt};
 }; // end of struct ProcessingOptions
 
 } // end of namespace BABYLON
