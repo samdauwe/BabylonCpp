@@ -74,12 +74,11 @@ void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
                                            MaterialDefines& defines)
 {
   if (defines._areMiscDirty) {
-    defines.boolDef["LOGARITHMICDEPTH"]        = useLogarithmicDepth;
-    defines.boolDef["POINTSIZE"]               = pointsCloud;
-    defines.boolDef["FOG"]                     = fogEnabled && GetFogState(mesh, scene);
-    defines.boolDef["NONUNIFORMSCALING"]       = mesh->nonUniformScaling();
-    defines.boolDef["ALPHATEST"]               = alphaTest;
-    defines.boolDef["USE_REVERSE_DEPTHBUFFER"] = scene->getEngine()->useReverseDepthBuffer;
+    defines.boolDef["LOGARITHMICDEPTH"]  = useLogarithmicDepth;
+    defines.boolDef["POINTSIZE"]         = pointsCloud;
+    defines.boolDef["FOG"]               = fogEnabled && GetFogState(mesh, scene);
+    defines.boolDef["NONUNIFORMSCALING"] = mesh->nonUniformScaling();
+    defines.boolDef["ALPHATEST"]         = alphaTest;
   }
 }
 
