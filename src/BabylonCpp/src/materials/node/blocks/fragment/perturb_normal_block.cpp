@@ -224,7 +224,8 @@ PerturbNormalBlock& PerturbNormalBlock::_buildBlock(NodeMaterialBuildState& stat
   {
     EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
     emitFunctionFromIncludeOptions.replaceStrings = {
-      {"varying vec2 vBumpUV;", ""},
+      {R"(#include<samplerFragmentDeclaration>\(_DEFINENAME_,BUMP,_VARYINGNAME_,Bump,_SAMPLERNAME_,bump\))",
+       ""},
       {R"(uniform sampler2D bumpSampler)", ""},
       {R"(vec2 parallaxOcclusion\(vec3 vViewDirCoT,vec3 vNormalCoT,vec2 texCoord,float parallaxScale\))",
        "#define inline\r\nvec2 parallaxOcclusion(vec3 vViewDirCoT, vec3 vNormalCoT, vec2 texCoord, "
