@@ -410,7 +410,7 @@ NodeMaterialConnectionPoint::connectTo(const NodeMaterialConnectionPointPtr& con
 NodeMaterialConnectionPoint&
 NodeMaterialConnectionPoint::disconnectFrom(const NodeMaterialConnectionPointPtr& endpoint)
 {
-  auto index = stl_util::index_of(_endpoints, endpoint);
+  const auto index = stl_util::index_of(_endpoints, endpoint);
 
   if (index == -1) {
     return *this;
