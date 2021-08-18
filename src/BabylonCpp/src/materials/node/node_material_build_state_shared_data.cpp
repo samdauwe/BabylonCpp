@@ -17,7 +17,6 @@ NodeMaterialBuildStateSharedData::NodeMaterialBuildStateSharedData()
   variableNames["uv2"]                  = 0;
   variableNames["uv3"]                  = 0;
   variableNames["uv4"]                  = 0;
-  variableNames["uv4"]                  = 0;
   variableNames["uv5"]                  = 0;
   variableNames["uv6"]                  = 0;
   variableNames["color"]                = 0;

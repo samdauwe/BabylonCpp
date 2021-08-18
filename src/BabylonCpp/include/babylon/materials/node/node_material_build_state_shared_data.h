@@ -8,26 +8,19 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class CurrentScreenBlock;
-class InputBlock;
-class NodeMaterialBlock;
-class NodeMaterialConnectionPoint;
-class ParticleTextureBlock;
-class ReflectionTextureBlock;
-class RefractionBlock;
 class Scene;
-class TextureBlock;
-using CurrentScreenBlockPtr          = std::shared_ptr<CurrentScreenBlock>;
-using InputBlockPtr                  = std::shared_ptr<InputBlock>;
-using NodeMaterialBlockPtr           = std::shared_ptr<NodeMaterialBlock>;
-using NodeMaterialConnectionPointPtr = std::shared_ptr<NodeMaterialConnectionPoint>;
-using ParticleTextureBlockPtr        = std::shared_ptr<ParticleTextureBlock>;
-using ReflectionTextureBlockPtr      = std::shared_ptr<ReflectionTextureBlock>;
-using RefractionBlockPtr             = std::shared_ptr<RefractionBlock>;
-using TextureBlockPtr                = std::shared_ptr<TextureBlock>;
+FWD_CLASS_SPTR(CurrentScreenBlock)
+FWD_CLASS_SPTR(InputBlock)
+FWD_CLASS_SPTR(NodeMaterialBlock)
+FWD_CLASS_SPTR(NodeMaterialConnectionPoint)
+FWD_CLASS_SPTR(ParticleTextureBlock)
+FWD_CLASS_SPTR(ReflectionTextureBlock)
+FWD_CLASS_SPTR(RefractionBlock)
+FWD_CLASS_SPTR(TextureBlock)
 
 struct BABYLON_SHARED_EXPORT NodeMaterialCompilationHints {
   bool needWorldViewMatrix           = false;
