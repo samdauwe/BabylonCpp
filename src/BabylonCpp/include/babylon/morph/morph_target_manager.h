@@ -84,7 +84,7 @@ public:
   void synchronize();
 
   /**
-   * Release all resources
+   * @brief Release all resources.
    */
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
