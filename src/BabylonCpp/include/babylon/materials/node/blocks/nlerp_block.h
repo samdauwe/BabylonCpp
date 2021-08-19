@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_NLERP_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class NLerpBlock;
-using NLerpBlockPtr = std::shared_ptr<NLerpBlock>;
+FWD_CLASS_SPTR(NLerpBlock)
 
 /**
  * @brief Block used to normalize lerp between 2 values.
