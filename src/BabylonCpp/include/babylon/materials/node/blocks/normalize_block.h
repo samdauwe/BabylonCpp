@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_NORMALIZE_BLOCK_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-class NormalizeBlock;
-using NormalizeBlockPtr = std::shared_ptr<NormalizeBlock>;
+FWD_CLASS_SPTR(NormalizeBlock)
 
 /**
  * @brief Block used to normalize a vector.
