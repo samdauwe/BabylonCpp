@@ -225,7 +225,7 @@ std::string MorphTarget::getClassName() const
 
 MorphTargetPtr MorphTarget::Parse(const json& serializationObject)
 {
-  auto result
+  const auto result
     = MorphTarget::New(json_util::get_string(serializationObject, "name"),
                        json_util::get_number<float>(serializationObject, "influence", 0.f));
 
