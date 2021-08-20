@@ -312,11 +312,13 @@ public:
    * Defines the  falloff type used in this material.
    * It by default is Physical.
    */
-  // @editableInPropertyPage("Light falloff", PropertyTypeForEdition.List, "LIGHTING & COLORS", { "notifiers": { "update": true }, "options": [
-  //    { label: "Physical", value: PBRBaseMaterial.LIGHTFALLOFF_PHYSICAL },
-  //    { label: "GLTF", value: PBRBaseMaterial.LIGHTFALLOFF_GLTF },
-  //    { label: "Standard", value: PBRBaseMaterial.LIGHTFALLOFF_STANDARD },
-  //]})
+  // @editableInPropertyPage("Light falloff", PropertyTypeForEdition.List, "LIGHTING & COLORS", {
+  //     "notifiers": { "update": true }, "options": [
+  //        { label: "Physical", value: PBRBaseMaterial.LIGHTFALLOFF_PHYSICAL },
+  //        { label: "GLTF", value: PBRBaseMaterial.LIGHTFALLOFF_GLTF },
+  //        { label: "Standard", value: PBRBaseMaterial.LIGHTFALLOFF_STANDARD },
+  //    ]
+  // })
   unsigned int lightFalloff;
 
   /**
@@ -368,11 +370,13 @@ public:
   /**
    * Quality switch for realtime filtering
    */
-  // @editableInPropertyPage("Realtime filtering quality", PropertyTypeForEdition.List, "RENDERING", { "notifiers": { "update": true }, "options": [
-  //     { label: "Low", value: Constants.TEXTURE_FILTERING_QUALITY_LOW },
-  //     { label: "Medium", value: Constants.TEXTURE_FILTERING_QUALITY_MEDIUM },
-  //     { label: "High", value: Constants.TEXTURE_FILTERING_QUALITY_HIGH },
-  // ]})
+  // @editableInPropertyPage("Realtime filtering quality", PropertyTypeForEdition.List, "RENDERING", {
+  //     "notifiers": { "update": true }, "options": [
+  //         { label: "Low", value: Constants.TEXTURE_FILTERING_QUALITY_LOW },
+  //         { label: "Medium", value: Constants.TEXTURE_FILTERING_QUALITY_MEDIUM },
+  //         { label: "High", value: Constants.TEXTURE_FILTERING_QUALITY_HIGH },
+  //     ]
+  // })
   unsigned int realTimeFilteringQuality;
 
   /**
@@ -411,8 +415,8 @@ public:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  // @editableInPropertyPage("Debug mode", PropertyTypeForEdition.List, "DEBUG", { "notifiers": { "update": true }, "options": [
-  //     { label: "None", value: 0 },
+  // @editableInPropertyPage("Debug mode", PropertyTypeForEdition.List, "DEBUG", {
+  //  "notifiers": { "update": true }, "options": [
   //     // Geometry
   //     { label: "Normalized position", value: 1 },
   //     { label: "Normals", value: 2 },
@@ -462,7 +466,8 @@ public:
   //     { label: "Sheen Reflectance", value: 85 },
   //     { label: "Luminance Over Alpha", value: 86 },
   //     { label: "Alpha", value: 87 },
-  // ]})
+  //   ]
+  // })
   unsigned int debugMode;
 
   /**
