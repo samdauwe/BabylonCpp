@@ -4,6 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
+#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_value.h>
@@ -151,6 +152,9 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
           return _type;
         case NodeMaterialSystemValues::DeltaTime:
           _type = NodeMaterialBlockConnectionPointTypes::Float;
+          return _type;
+        case NodeMaterialSystemValues::CameraParameters:
+          _type = NodeMaterialBlockConnectionPointTypes::Vector4;
           return _type;
       }
     }
@@ -584,6 +588,14 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
         break;
       case NodeMaterialSystemValues::DeltaTime:
         effect->setFloat(variableName, scene->deltaTime / 1000.f);
+        break;
+      case NodeMaterialSystemValues::CameraParameters:
+        if (scene->activeCamera()) {
+          effect->setFloat4(variableName, scene->getEngine()->hasOriginBottomLeft ? -1.f : 1.f,
+                            scene->activeCamera()->minZ, scene->activeCamera()->maxZ,
+                            1.f / scene->activeCamera()->maxZ);
+        }
+        break;
     }
     return;
   }
