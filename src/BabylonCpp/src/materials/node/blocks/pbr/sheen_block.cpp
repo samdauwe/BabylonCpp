@@ -109,6 +109,7 @@ std::string SheenBlock::getCode(const ReflectionBlockPtr& reflectionBlock) const
             roughness,
         #ifdef SHEEN_TEXTURE
             %s,
+            1.0,
         #endif
             reflectance,
         #ifdef SHEEN_LINKWITHALBEDO
