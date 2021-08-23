@@ -85,6 +85,10 @@ void RayHelper::_render()
   _renderPoints[0].copyFrom(ray->origin);
 
   Mesh::CreateLines("ray", _renderPoints, _scene, true, _renderLine);
+
+  if (_renderLine) {
+    _renderLine->refreshBoundingInfo();
+  }
 }
 
 void RayHelper::attachToMesh(const AbstractMeshPtr& mesh, const Vector3& meshSpaceDirection,
