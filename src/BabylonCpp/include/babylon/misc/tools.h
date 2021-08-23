@@ -72,6 +72,14 @@ struct BABYLON_SHARED_EXPORT Tools {
   static bool IsExponentOfTwo(size_t value);
 
   /**
+   * @brief Returns the nearest 32-bit single precision float representation of a Number.
+   * @param value A Number.  If the parameter is of a different type, it will get converted
+   * to a number or to NaN if it cannot be converted
+   * @returns number
+   */
+  static float FloatRound(float value);
+
+  /**
    * @brief Extracts the filename from a path.
    * @param path defines the path to use
    * @returns the filename

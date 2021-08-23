@@ -62,6 +62,11 @@ bool Tools::IsExponentOfTwo(size_t value)
   return count == value;
 }
 
+static float FloatRound(float value)
+{
+  return std::roundf(value);
+}
+
 std::string Tools::GetFilename(const std::string& path)
 {
   const auto index = StringTools::lastIndexOf(path, "/");
