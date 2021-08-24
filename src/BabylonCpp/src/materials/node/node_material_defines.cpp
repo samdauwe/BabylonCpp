@@ -7,15 +7,14 @@ namespace BABYLON {
 NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
 {
   boolDef = {
-    {"NORMAL", false},                  //
-    {"TANGENT", false},                 //
-    {"UV1", false},                     //
-    {"UV2", false},                     //
-    {"UV3", false},                     //
-    {"UV4", false},                     //
-    {"UV5", false},                     //
-    {"UV6", false},                     //
-    {"USE_REVERSE_DEPTHBUFFER", false}, //
+    {"NORMAL", false},  //
+    {"TANGENT", false}, //
+    {"UV1", false},     //
+    {"UV2", false},     //
+    {"UV3", false},     //
+    {"UV4", false},     //
+    {"UV5", false},     //
+    {"UV6", false},     //
 
     /** BONES */
     {"BONETEXTURE", false}, //

@@ -537,7 +537,7 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
     const auto iStr = std::to_string(i);
     auto oldUV      = defines["UV" + iStr];
     defines.boolDef["UV" + iStr]
-      = mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 0 ? "" : iStr));
+      = mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 1 ? "" : iStr));
     uvChanged = uvChanged || defines["UV" + iStr] != oldUV;
   }
 
@@ -789,8 +789,6 @@ std::optional<_ProcessedDefinesResult> NodeMaterial::_processDefines(AbstractMes
   for (const auto& b : _sharedData->blocksWithDefines) {
     b->prepareDefines(mesh, shared_from_this(), defines, useInstances, subMesh);
   }
-
-  defines.setValue("USE_REVERSE_DEPTHBUFFER", getScene()->getEngine()->useReverseDepthBuffer, true);
 
   // Need to recompile?
   if (defines.isDirty()) {
@@ -1358,7 +1356,7 @@ std::string NodeMaterial::generateCode()
 {
   std::vector<NodeMaterialBlockPtr> alreadyDumped;
   std::vector<NodeMaterialBlockPtr> vertexBlocks;
-  std::vector<std::string> uniqueNames;
+  std::vector<std::string> uniqueNames = {"const", "var", "let"};
   // Gets active blocks
   for (const auto& outputNode : _vertexOutputNodes) {
     _gatherBlocks(outputNode, vertexBlocks);
