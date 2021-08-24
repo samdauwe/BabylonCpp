@@ -229,7 +229,8 @@ void MultiRenderTarget::resize(Size size)
 }
 
 void MultiRenderTarget::updateCount(size_t iCount,
-                                    const std::optional<IMultiRenderTargetOptions>& options)
+                                    const std::optional<IMultiRenderTargetOptions>& options,
+                                    const std::vector<std::string>& /*textureNames*/)
 {
   _multiRenderTargetOptions.textureCount = iCount;
   _count                                 = iCount;

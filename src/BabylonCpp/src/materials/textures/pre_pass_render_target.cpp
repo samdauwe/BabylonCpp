@@ -53,9 +53,10 @@ void PrePassRenderTarget::_checkSize()
 }
 
 void PrePassRenderTarget::updateCount(size_t iCount,
-                                      const std::optional<IMultiRenderTargetOptions>& options)
+                                      const std::optional<IMultiRenderTargetOptions>& options,
+                                      const std::vector<std::string>& textureNames)
 {
-  MultiRenderTarget::updateCount(iCount, options);
+  MultiRenderTarget::updateCount(iCount, options, textureNames);
   _internalTextureDirty = true;
 }
 
@@ -82,6 +83,15 @@ void PrePassRenderTarget::dispose()
 
   if (imageProcessingPostProcess) {
     imageProcessingPostProcess->dispose();
+  }
+
+  if (renderTargetTexture) {
+    renderTargetTexture->_prePassRenderTarget = nullptr;
+  }
+
+  if (_outputPostProcess) {
+    _outputPostProcess->autoClear = true;
+    _outputPostProcess->restoreDefaultInputTexture();
   }
 }
 

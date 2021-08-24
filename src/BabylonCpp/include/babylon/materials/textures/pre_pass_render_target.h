@@ -44,9 +44,11 @@ public:
    * Be careful as it will recreate all the data in the new texture.
    * @param count new texture count
    * @param options Specifies texture types and sampling modes for new textures
+   * @param textureNames Specifies the names of the textures (optional)
    */
   void updateCount(size_t count,
-                   const std::optional<IMultiRenderTargetOptions>& options = std::nullopt) override;
+                   const std::optional<IMultiRenderTargetOptions>& options = std::nullopt,
+                   const std::vector<std::string>& textureNames            = {}) override;
 
   /**
    * @brief Resets the post processes chains applied to this RT.
