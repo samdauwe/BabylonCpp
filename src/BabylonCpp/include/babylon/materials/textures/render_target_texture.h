@@ -422,6 +422,11 @@ public:
   /**
    * Hidden
    */
+  bool _cleared;
+
+  /**
+   * Hidden
+   */
   std::vector<std::string> _waitingRenderList;
 
   /**

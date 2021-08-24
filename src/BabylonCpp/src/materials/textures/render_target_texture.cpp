@@ -44,6 +44,7 @@ RenderTargetTexture::RenderTargetTexture(
     , ignoreCameraViewport{false}
     , postProcesses{this, &RenderTargetTexture::get_postProcesses}
     , clearColor{std::nullopt}
+    , _cleared{false}
     , boundingBoxPosition{Vector3::Zero()}
     , depthStencilTexture{this, &RenderTargetTexture::get_depthStencilTexture}
     , onAfterUnbind{this, &RenderTargetTexture::set_onAfterUnbind}
