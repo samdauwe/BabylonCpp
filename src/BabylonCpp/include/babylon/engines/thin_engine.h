@@ -1711,7 +1711,7 @@ public:
   ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture, int width, int height,
                                      int faceIndex = -1, int level = 0,
                                      std::optional<ArrayBufferView> buffer = std::nullopt,
-                                     bool flushRenderer                    = true);
+                                     bool flushRenderer = true, bool noDataConversion = false);
 
   /**
    * @brief Hidden
@@ -1719,7 +1719,7 @@ public:
   ArrayBufferView _readTexturePixelsSync(const InternalTexturePtr& texture, int width, int height,
                                          int faceIndex = -1, int level = 0,
                                          std::optional<ArrayBufferView> buffer = std::nullopt,
-                                         bool flushRenderer                    = true);
+                                         bool flushRenderer = true, bool noDataConversion = false);
 
   //------------------------------------------------------------------------------------------------
   //                              Render Target Extension

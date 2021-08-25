@@ -119,7 +119,8 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _rebuild(bool forceFullRebuild = false);
+  virtual void _rebuild(bool forceFullRebuild                        = false,
+                        const std::vector<std::string>& textureNames = {});
 
   /**
    * @brief Hidden
@@ -141,18 +142,21 @@ public:
    * @param buffer defines a user defined buffer to fill with data (can be null)
    * @param flushRenderer true to flush the renderer from the pending commands before reading the
    * pixels
+   * @param noDataConversion false to convert the data to Uint8Array (if texture type is
+   * UNSIGNED_BYTE) or to Float32Array (if texture type is anything but UNSIGNED_BYTE). If true, the
+   * type of the generated buffer (if buffer==null) will depend on the type of the texture
    * @returns The Array buffer promise containing the pixels data.
    */
   ArrayBufferView readPixels(unsigned int faceIndex = 0, int level = 0,
                              std::optional<ArrayBufferView> buffer = std::nullopt,
-                             bool flushRenderer                    = true);
+                             bool flushRenderer = true, bool noDataConversion = false);
 
   /**
    * @brief Hidden
    */
   ArrayBufferView _readPixelsSync(unsigned int faceIndex = 0, int level = 0,
                                   std::optional<ArrayBufferView> buffer = std::nullopt,
-                                  bool flushRenderer                    = true);
+                                  bool flushRenderer = true, bool noDataConversion = false);
 
   /**
    * @brief Dispose the texture and release its associated resources.

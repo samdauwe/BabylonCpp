@@ -422,7 +422,8 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
   return nullptr;
 }
 
-void BaseTexture::_rebuild(bool /*forceFullRebuild*/)
+void BaseTexture::_rebuild(bool /*forceFullRebuild*/,
+                           const std::vector<std::string>& /*textureNames*/)
 {
 }
 
@@ -475,7 +476,8 @@ void BaseTexture::_markAllSubMeshesAsTexturesDirty()
 }
 
 ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
-                                        std::optional<ArrayBufferView> buffer, bool flushRenderer)
+                                        std::optional<ArrayBufferView> buffer, bool flushRenderer,
+                                        bool noDataConversion)
 {
   if (!_texture) {
     return ArrayBufferView();
@@ -500,15 +502,16 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, width, height, static_cast<int>(faceIndex), iLevel,
-                                      buffer, flushRenderer);
+                                      buffer, flushRenderer, noDataConversion);
   }
 
-  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer, flushRenderer);
+  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer, flushRenderer,
+                                    noDataConversion);
 }
 
 ArrayBufferView BaseTexture::_readPixelsSync(unsigned int faceIndex, int iLevel,
                                              std::optional<ArrayBufferView> buffer,
-                                             bool flushRenderer)
+                                             bool flushRenderer, bool noDataConversion)
 {
   if (!_texture) {
     return ArrayBufferView();
@@ -533,10 +536,11 @@ ArrayBufferView BaseTexture::_readPixelsSync(unsigned int faceIndex, int iLevel,
 
   if (_texture->isCube) {
     return engine->_readTexturePixelsSync(_texture, width, height, static_cast<int>(faceIndex),
-                                          iLevel, buffer, flushRenderer);
+                                          iLevel, buffer, flushRenderer, noDataConversion);
   }
 
-  return engine->_readTexturePixelsSync(_texture, width, height, -1, iLevel, buffer, flushRenderer);
+  return engine->_readTexturePixelsSync(_texture, width, height, -1, iLevel, buffer, flushRenderer,
+                                        noDataConversion);
 }
 
 SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
