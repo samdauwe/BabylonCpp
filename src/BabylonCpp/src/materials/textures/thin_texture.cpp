@@ -18,9 +18,11 @@ ThinTexture::ThinTexture(const InternalTexturePtr& internalTexture)
     , is3D{this, &ThinTexture::get_is3D, &ThinTexture::set_is3D}
     , is2DArray{this, &ThinTexture::get_is2DArray, &ThinTexture::set_is2DArray}
     , _texture{nullptr}
+    , samplingMode{this, &ThinTexture::get_samplingMode}
     , _wrapU{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , _wrapV{Constants::TEXTURE_WRAP_ADDRESSMODE}
     , _engine{nullptr}
+    , _initialSamplingMode{Constants::TEXTURE_BILINEAR_SAMPLINGMODE}
     , _cachedSize{Size::Zero()}
     , _cachedBaseSize{Size::Zero()}
 {
@@ -179,6 +181,15 @@ ISize& ThinTexture::getBaseSize()
   _cachedBaseSize.width  = _texture->baseWidth;
   _cachedBaseSize.height = _texture->baseHeight;
   return _cachedBaseSize;
+}
+
+unsigned int ThinTexture::get_samplingMode() const
+{
+  if (!_texture) {
+    return _initialSamplingMode;
+  }
+
+  return _texture->samplingMode;
 }
 
 void ThinTexture::updateSamplingMode(unsigned int samplingMode)
