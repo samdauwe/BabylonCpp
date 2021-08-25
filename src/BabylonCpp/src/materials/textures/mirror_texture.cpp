@@ -182,9 +182,10 @@ void MirrorTexture::_preparePostProcesses()
   if (_blurKernelX != 0.f && _blurKernelY != 0.f) {
     const auto engine = getScene()->getEngine();
 
-    const auto iTextureType = engine->getCaps().textureFloatRender ?
-                                Constants::TEXTURETYPE_FLOAT :
-                                Constants::TEXTURETYPE_HALF_FLOAT;
+    const auto iTextureType
+      = engine->getCaps().textureFloatRender && engine->getCaps().textureFloatLinearFiltering ?
+          Constants::TEXTURETYPE_FLOAT :
+          Constants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = BlurPostProcess::New("horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio,
                                   nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
