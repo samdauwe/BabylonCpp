@@ -238,7 +238,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild(bool forceFullRebuild = false) override;
+  void _rebuild(bool forceFullRebuild                        = false,
+                const std::vector<std::string>& textureNames = {}) override;
 
   /**
    * @brief Clear the info related to rendering groups preventing retention point in material

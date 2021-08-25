@@ -947,7 +947,8 @@ void RenderTargetTexture::dispose()
   Texture::dispose();
 }
 
-void RenderTargetTexture::_rebuild(bool /*forceFullRebuild*/)
+void RenderTargetTexture::_rebuild(bool /*forceFullRebuild*/,
+                                   const std::vector<std::string>& /*textureNames*/)
 {
   if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
     refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE;

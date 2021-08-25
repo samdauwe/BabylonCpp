@@ -9,7 +9,8 @@ namespace BABYLON {
 MultiRenderTarget::MultiRenderTarget(const std::string& iName,
                                      const std::variant<int, RenderTargetSize, float>& size,
                                      std::size_t count, Scene* scene,
-                                     const std::optional<IMultiRenderTargetOptions>& options)
+                                     const std::optional<IMultiRenderTargetOptions>& options,
+                                     const std::vector<std::string>& textureNames)
     : RenderTargetTexture{iName, // name
                           size,  // size
                           scene, // scene
@@ -78,7 +79,7 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
 
   if (count > 0) {
     _createInternalTextures();
-    _createInternalTextures();
+    _createTextures(textureNames);
   }
 }
 
@@ -144,7 +145,8 @@ void MultiRenderTarget::_initTypes(size_t iCount, std::vector<unsigned int>& typ
   }
 }
 
-void MultiRenderTarget::_rebuild(bool forceFullRebuild)
+void MultiRenderTarget::_rebuild(bool forceFullRebuild,
+                                 const std::vector<std::string>& textureNames)
 {
   if (_count < 1) {
     return;
@@ -154,7 +156,8 @@ void MultiRenderTarget::_rebuild(bool forceFullRebuild)
   _createInternalTextures();
 
   if (forceFullRebuild) {
-    _createTextures();
+    _releaseTextures();
+    _createTextures(textureNames);
   }
 
   for (auto i = 0ull; i < _internalTextures.size(); ++i) {
@@ -178,11 +181,26 @@ void MultiRenderTarget::_createInternalTextures()
   _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
 }
 
-void MultiRenderTarget::_createTextures()
+void MultiRenderTarget::_releaseTextures()
+{
+  if (!_textures.empty()) {
+    for (const auto& texture : _textures) {
+      texture->_texture
+        = nullptr; // internal textures are released by a call to releaseInternalTextures()
+      texture->dispose();
+    }
+  }
+}
+
+void MultiRenderTarget::_createTextures(const std::vector<std::string>& textureNames)
 {
   _textures.clear();
+  auto i = 0ull;
   for (const auto& internalTexture : _internalTextures) {
-    auto texture      = Texture::New("", getScene());
+    auto texture = Texture::New("", getScene());
+    if (i < textureNames.size()) {
+      texture->name = textureNames[i++];
+    }
     texture->_texture = internalTexture;
     _textures.emplace_back(texture);
   }
@@ -230,7 +248,7 @@ void MultiRenderTarget::resize(Size size)
 
 void MultiRenderTarget::updateCount(size_t iCount,
                                     const std::optional<IMultiRenderTargetOptions>& options,
-                                    const std::vector<std::string>& /*textureNames*/)
+                                    const std::vector<std::string>& textureNames)
 {
   _multiRenderTargetOptions.textureCount = iCount;
   _count                                 = iCount;
@@ -241,7 +259,7 @@ void MultiRenderTarget::updateCount(size_t iCount,
   _initTypes(iCount, types, samplingModes, options);
   _multiRenderTargetOptions.types         = types;
   _multiRenderTargetOptions.samplingModes = samplingModes;
-  _rebuild(true);
+  _rebuild(true, textureNames);
 }
 
 void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex)
@@ -254,6 +272,7 @@ void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex
 
 void MultiRenderTarget::dispose()
 {
+  _releaseTextures();
   releaseInternalTextures();
 
   RenderTargetTexture::dispose();
@@ -269,6 +288,7 @@ void MultiRenderTarget::releaseInternalTextures()
     if (_internalTextures[i] != nullptr) {
       _internalTextures[i]->dispose();
     }
+    _textures[i]->_texture = nullptr;
   }
   _internalTextures.clear();
 }

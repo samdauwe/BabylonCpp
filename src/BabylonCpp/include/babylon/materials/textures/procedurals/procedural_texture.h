@@ -67,7 +67,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild(bool forceFullRebuild = false) override;
+  void _rebuild(bool forceFullRebuild                        = false,
+                const std::vector<std::string>& textureNames = {}) override;
 
   /**
    * @brief Resets the texture in order to recreate its associated resources.

@@ -18,25 +18,28 @@ class BABYLON_SHARED_EXPORT MultiRenderTarget : public RenderTargetTexture {
 public:
   /**
    * @brief Instantiate a new multi render target texture.
-   * A multi render target, like a render target provides the ability to render
-   * to a texture. Unlike the render target, it can render to several draw
-   * buffers in one draw. This is specially interesting in deferred rendering or
-   * for any effects requiring more than just one color from a single pass.
+   * A multi render target, like a render target provides the ability to render to a texture.
+   * Unlike the render target, it can render to several draw buffers in one draw.
+   * This is specially interesting in deferred rendering or for any effects requiring more than
+   * just one color from a single pass.
    * @param name Define the name of the texture
    * @param size Define the size of the buffers to render to
    * @param count Define the number of target we are rendering into
    * @param scene Define the scene the texture belongs to
    * @param options Define the options used to create the multi render target
+   * @param textureNames Define the names to set to the textures (if count > 0 - optional)
    */
   MultiRenderTarget(const std::string& name, const std::variant<int, RenderTargetSize, float>& size,
                     size_t count, Scene* scene,
-                    const std::optional<IMultiRenderTargetOptions>& options = std::nullopt);
+                    const std::optional<IMultiRenderTargetOptions>& options = std::nullopt,
+                    const std::vector<std::string>& textureNames            = {});
   ~MultiRenderTarget() override; // = default
 
   /**
    * @brief Hidden
    */
-  void _rebuild(bool forceFullRebuild = false) override;
+  void _rebuild(bool forceFullRebuild                        = false,
+                const std::vector<std::string>& textureNames = {}) override;
 
   /**
    * @brief Replaces a texture within the MRT.
@@ -57,6 +60,7 @@ public:
    * Be careful as it will recreate all the data in the new texture.
    * @param count new texture count
    * @param options Specifies texture types and sampling modes for new textures
+   * @param textureNames Specifies the names of the textures (optional)
    */
   virtual void updateCount(size_t count,
                            const std::optional<IMultiRenderTargetOptions>& options = std::nullopt,
@@ -124,7 +128,8 @@ private:
                   std::vector<unsigned int>& samplingModes,
                   const std::optional<IMultiRenderTargetOptions>& options = std::nullopt);
   void _createInternalTextures();
-  void _createTextures();
+  void _releaseTextures();
+  void _createTextures(const std::vector<std::string>& textureNames = {});
 
 public:
   /**
