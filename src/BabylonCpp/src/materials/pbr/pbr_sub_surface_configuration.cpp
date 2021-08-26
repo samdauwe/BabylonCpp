@@ -552,7 +552,7 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sc
     uniformBuffer.updateColor3("vDiffusionDistance", diffusionDistance, "");
 
     uniformBuffer.updateFloat4("vTintColor", tintColor.r, tintColor.g, tintColor.b,
-                               tintColorAtDistance, "");
+                               std::max(0.00001f, tintColorAtDistance), "");
 
     uniformBuffer.updateFloat3("vSubSurfaceIntensity", refractionIntensity, translucencyIntensity,
                                0.f, "");
