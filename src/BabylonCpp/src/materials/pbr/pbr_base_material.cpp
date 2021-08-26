@@ -953,12 +953,14 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
             = !_useRoughnessFromMetallicTextureAlpha && _useRoughnessFromMetallicTextureGreen;
           defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"] = _useMetallnessFromMetallicTextureBlue;
           defines.boolDef["AOSTOREINMETALMAPRED"] = _useAmbientOcclusionFromMetallicTextureRed;
+          defines.boolDef["REFLECTIVITY_GAMMA"]   = false;
         }
         else if (_reflectivityTexture) {
           MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture, defines, "REFLECTIVITY");
           defines.boolDef["MICROSURFACEFROMREFLECTIVITYMAP"]
             = _useMicroSurfaceFromReflectivityMapAlpha;
           defines.boolDef["MICROSURFACEAUTOMATIC"] = _useAutoMicroSurfaceFromReflectivityMap;
+          defines.boolDef["REFLECTIVITY_GAMMA"]    = _reflectivityTexture->gammaSpace();
         }
         else {
           defines.boolDef["REFLECTIVITY"] = false;
@@ -975,6 +977,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
           if (_metallicReflectanceTexture) {
             MaterialHelper::PrepareDefinesForMergedUV(_metallicReflectanceTexture, defines,
                                                       "METALLIC_REFLECTANCE");
+            defines.boolDef["METALLIC_REFLECTANCE_GAMMA"]
+              = _metallicReflectanceTexture->gammaSpace();
           }
           else {
             defines.boolDef["METALLIC_REFLECTANCE"] = false;
@@ -984,6 +988,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
                   || (_metallicReflectanceTexture
                       && _useOnlyMetallicFromMetallicReflectanceTexture))) {
             MaterialHelper::PrepareDefinesForMergedUV(_reflectanceTexture, defines, "REFLECTANCE");
+            defines.boolDef["REFLECTANCE_GAMMA"] = _reflectanceTexture->gammaSpace();
           }
           else {
             defines.boolDef["REFLECTANCE"] = false;
