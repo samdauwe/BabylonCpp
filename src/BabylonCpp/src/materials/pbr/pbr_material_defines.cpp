@@ -49,24 +49,25 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"EMISSIVE", false},      //
     {"GAMMAEMISSIVE", false}, //
 
-    {"REFLECTIVITY", false}, //
-    {"SPECULARTERM", false}, //
+    {"REFLECTIVITY", false},       //
+    {"REFLECTIVITY_GAMMA", false}, //
+    {"SPECULARTERM", false},       //
 
     {"MICROSURFACEFROMREFLECTIVITYMAP", false}, //
     {"MICROSURFACEAUTOMATIC", false},           //
     {"LODBASEDMICROSFURACE", false},            //
     {"MICROSURFACEMAP", false},                 //
 
-    {"METALLICWORKFLOW", false},              //
-    {"ROUGHNESSSTOREINMETALMAPALPHA", false}, //
-    {"ROUGHNESSSTOREINMETALMAPGREEN", false}, //
-    {"METALLNESSSTOREINMETALMAPBLUE", false}, //
-    {"AOSTOREINMETALMAPRED", false},          //
-
-    {"METALLIC_REFLECTANCE", false}, //
-
+    {"METALLICWORKFLOW", false},                    //
+    {"ROUGHNESSSTOREINMETALMAPALPHA", false},       //
+    {"ROUGHNESSSTOREINMETALMAPGREEN", false},       //
+    {"METALLNESSSTOREINMETALMAPBLUE", false},       //
+    {"AOSTOREINMETALMAPRED", false},                //
+    {"METALLIC_REFLECTANCE", false},                //
+    {"METALLIC_REFLECTANCE_GAMMA", false},          //
     {"METALLIC_REFLECTANCE_USE_ALPHA_ONLY", false}, //
     {"REFLECTANCE", false},                         //
+    {"REFLECTANCE_GAMMA", false},                   //
 
     {"ENVIRONMENTBRDF", false},      //
     {"ENVIRONMENTBRDF_RGBD", false}, //
@@ -161,7 +162,6 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"POINTSIZE", false},               //
     {"FOG", false},                     //
     {"LOGARITHMICDEPTH", false},        //
-    {"USE_REVERSE_DEPTHBUFFER", false}, //
 
     {"FORCENORMALFORWARD", false}, //
 
@@ -177,6 +177,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"CLEARCOAT_REMAP_F0", true},                        //
     {"CLEARCOAT_TINT", false},                           //
     {"CLEARCOAT_TINT_TEXTURE", false},                   //
+    {"CLEARCOAT_TINT_GAMMATEXTURE", false},              //
 
     {"ANISOTROPIC", false},         //
     {"ANISOTROPIC_TEXTURE", false}, //
@@ -187,6 +188,7 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"SHEEN", false},                                //
     {"SHEEN_TEXTURE", false},                        //
+    {"SHEEN_GAMMATEXTURE", false},                   //
     {"SHEEN_TEXTURE_ROUGHNESS", false},              //
     {"SHEEN_LINKWITHALBEDO", false},                 //
     {"SHEEN_ROUGHNESS", false},                      //
@@ -275,10 +277,10 @@ void PBRMaterialDefines::reset()
 {
   MaterialDefines::reset();
 
+  stringDef["ALPHATESTVALUE"] = "0.5";
+
   boolDef["PBR"]           = true;
   boolDef["NORMALXYSCALE"] = true;
-
-  stringDef["ALPHATESTVALUE"] = "0.5";
 }
 
 std::string PBRMaterialDefines::toString() const

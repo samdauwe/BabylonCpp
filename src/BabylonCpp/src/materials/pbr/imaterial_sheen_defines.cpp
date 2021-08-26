@@ -9,6 +9,7 @@ IMaterialSheenDefines::IMaterialSheenDefines()
   boolDef = {
     {"SHEEN", false},                                //
     {"SHEEN_TEXTURE", false},                        //
+    {"SHEEN_GAMMATEXTURE", false},                   //
     {"SHEEN_TEXTURE_ROUGHNESS", false},              //
     {"SHEEN_LINKWITHALBEDO", false},                 //
     {"SHEEN_ROUGHNESS", false},                      //
