@@ -190,6 +190,7 @@ void PBRSheenConfiguration::prepareDefines(MaterialDefines& defines, Scene* scen
       if (scene->texturesEnabled()) {
         if (_texture && MaterialFlags::SheenTextureEnabled()) {
           MaterialHelper::PrepareDefinesForMergedUV(_texture, defines, "SHEEN_TEXTURE");
+          defines.boolDef["SHEEN_GAMMATEXTURE"] = _texture->gammaSpace();
         }
         else {
           defines.boolDef["SHEEN_TEXTURE"] = false;

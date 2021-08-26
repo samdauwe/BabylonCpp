@@ -273,6 +273,7 @@ void PBRClearCoatConfiguration::prepareDefines(MaterialDefines& defines, Scene* 
           if (_tintTexture && MaterialFlags::ClearCoatTintTextureEnabled()) {
             MaterialHelper::PrepareDefinesForMergedUV(_tintTexture, defines,
                                                       "CLEARCOAT_TINT_TEXTURE");
+            defines.boolDef["CLEARCOAT_TINT_GAMMATEXTURE"] = _tintTexture->gammaSpace();
           }
           else {
             defines.boolDef["CLEARCOAT_TINT_TEXTURE"] = false;
