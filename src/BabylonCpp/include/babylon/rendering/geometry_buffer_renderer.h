@@ -223,7 +223,7 @@ private:
   /**
    * @brief Hidden
    */
-  int _assignRenderTargetIndices();
+  std::pair<int, std::vector<std::string>> _assignRenderTargetIndices();
 
   /**
    * @brief _Copies the bones transformation matrices into the target array and

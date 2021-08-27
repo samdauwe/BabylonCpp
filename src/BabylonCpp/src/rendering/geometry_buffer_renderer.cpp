@@ -10,8 +10,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
-#include <babylon/materials/material_helper.h>
 #include <babylon/materials/material_flags.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/multi_render_target.h>
@@ -446,43 +446,60 @@ void GeometryBufferRenderer::dispose()
   getGBuffer()->dispose();
 }
 
-int GeometryBufferRenderer::_assignRenderTargetIndices()
+std::pair<int, std::vector<std::string>> GeometryBufferRenderer::_assignRenderTargetIndices()
 {
+  std::vector<std::string> textureNames;
   auto count = 2;
+
+  stl_util::concat(textureNames, {"gBuffer_Depth", "gBuffer_Normal"});
 
   if (_enablePosition) {
     _positionIndex = count;
     ++count;
+    textureNames.emplace_back("gBuffer_Position");
   }
 
   if (_enableVelocity) {
     _velocityIndex = count;
     ++count;
+    textureNames.emplace_back("gBuffer_Velocity");
   }
 
   if (_enableReflectivity) {
     _reflectivityIndex = count;
     ++count;
+    textureNames.emplace_back("gBuffer_Reflectivity");
   }
 
-  return count;
+  return std::pair<int, std::vector<std::string>>{count, textureNames};
 }
 
 void GeometryBufferRenderer::_createRenderTargets()
 {
   const auto engine = _scene->getEngine();
-  const auto count  = _assignRenderTargetIndices();
+  int count         = 0;
+  std::vector<std::string> textureNames;
+  std::tie(count, textureNames) = _assignRenderTargetIndices();
+
+  auto type = Constants::TEXTURETYPE_UNSIGNED_BYTE;
+  if (engine->_caps.textureFloat && engine->_caps.textureFloatLinearFiltering) {
+    type = Constants::TEXTURETYPE_FLOAT;
+  }
+  else if (engine->_caps.textureHalfFloat && engine->_caps.textureHalfFloatLinearFiltering) {
+    type = Constants::TEXTURETYPE_HALF_FLOAT;
+  }
 
   // Render target
   IMultiRenderTargetOptions options;
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
-  options.defaultType          = Constants::TEXTURETYPE_FLOAT;
-  _multiRenderTarget           = std::make_shared<MultiRenderTarget>(
+  options.defaultType          = type;
+  textureNames.emplace_back("gBuffer_DepthBuffer");
+  _multiRenderTarget = std::make_shared<MultiRenderTarget>(
     "gBuffer",
     RenderTargetSize{static_cast<int>(engine->getRenderWidth() * _ratio),
                      static_cast<int>(engine->getRenderHeight() * _ratio)},
-    count, _scene, options);
+    count, _scene, options, textureNames);
   if (!isSupported()) {
     return;
   }
