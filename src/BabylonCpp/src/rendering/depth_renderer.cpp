@@ -28,9 +28,10 @@ namespace BABYLON {
 size_t DepthRenderer::_Counter = 0ull;
 
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& camera,
-                             bool storeNonLinearDepth, unsigned int /*samplingMode*/)
+                             bool storeNonLinearDepth, unsigned int samplingMode)
     : isPacked{type == Constants::TEXTURETYPE_UNSIGNED_BYTE}
     , enabled{true}
+    , forceDepthWriteTransparentMeshes{false}
     , useOnlyInActiveCamera{false}
     , _depthMap{nullptr}
 {
@@ -56,13 +57,23 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
   _camera           = camera;
   const auto engine = scene->getEngine();
 
+  if (samplingMode != TextureConstants::NEAREST_SAMPLINGMODE) {
+    if (type == Constants::TEXTURETYPE_FLOAT && !engine->_caps.textureFloatLinearFiltering) {
+      samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+    }
+    if (type == Constants::TEXTURETYPE_HALF_FLOAT
+        && !engine->_caps.textureHalfFloatLinearFiltering) {
+      samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+    }
+  }
+
   // Render target
   const auto format = (isPacked || (engine && !engine->_features.supportExtendedTextureFormats)) ?
                         Constants::TEXTUREFORMAT_RGBA :
                         Constants::TEXTUREFORMAT_R;
   _depthMap         = RenderTargetTexture::New(
     "depthMap", RenderTargetSize{engine->getRenderWidth(), engine->getRenderHeight()}, _scene,
-    false, true, type, false, TextureConstants::TRILINEAR_SAMPLINGMODE, true, false, false, format);
+    false, true, type, false, samplingMode, true, false, false, format);
   _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->refreshRate     = 1;
@@ -88,28 +99,37 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, const CameraPtr& c
       engine->_debugPopGroup(1);
     });
 
-  _depthMap->customRenderFunction
-    = [this, engine](const std::vector<SubMesh*>& opaqueSubMeshes,
-                     const std::vector<SubMesh*>& alphaTestSubMeshes,
-                     const std::vector<SubMesh*>& /*transparentSubMeshes*/,
-                     const std::vector<SubMesh*>& depthOnlySubMeshes,
-                     const std::function<void()>& /*beforeTransparents*/) {
-        if (!depthOnlySubMeshes.empty()) {
-          engine->setColorWrite(false);
-          for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
-            renderSubMesh(depthOnlySubMesh);
-          }
-          engine->setColorWrite(true);
-        }
+  _depthMap->customRenderFunction = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+                                           const std::vector<SubMesh*>& alphaTestSubMeshes,
+                                           const std::vector<SubMesh*>& transparentSubMeshes,
+                                           const std::vector<SubMesh*>& depthOnlySubMeshes,
+                                           const std::function<void()>& /*beforeTransparents*/) {
+    if (!depthOnlySubMeshes.empty()) {
+      for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
+        renderSubMesh(depthOnlySubMesh);
+      }
+    }
 
-        for (auto& opaqueSubMesh : opaqueSubMeshes) {
-          renderSubMesh(opaqueSubMesh);
-        }
+    for (const auto& opaqueSubMesh : opaqueSubMeshes) {
+      renderSubMesh(opaqueSubMesh);
+    }
 
-        for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
-          renderSubMesh(alphaTestSubMesh);
-        }
-      };
+    for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
+      renderSubMesh(alphaTestSubMesh);
+    }
+
+    if (forceDepthWriteTransparentMeshes) {
+      for (const auto& transparentSubMesh : transparentSubMeshes) {
+        renderSubMesh(transparentSubMesh);
+      }
+    }
+    else {
+      for (const auto& transparentSubMesh : transparentSubMeshes) {
+        transparentSubMesh->getEffectiveMesh()->_internalAbstractMeshDataInfo._isActiveIntermediate
+          = false;
+      }
+    }
+  };
 }
 
 DepthRenderer::~DepthRenderer() = default;
@@ -159,6 +179,12 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back(
       "#define BonesPerMesh "
       + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0));
+
+    const auto skeleton = subMesh->getRenderingMesh()->skeleton();
+
+    if (skeleton && skeleton->isUsingTextureForMatrices()) {
+      defines.emplace_back("#define BONETEXTURE");
+    }
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -202,11 +228,6 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define PACKED");
   }
 
-  // Reverse depth buffer
-  if (engine->useReverseDepthBuffer) {
-    defines.emplace_back("#define USE_REVERSE_DEPTHBUFFER");
-  }
-
   // Get correct effect
   auto join = StringTools::join(defines, '\n');
   if (cachedDefines && std::holds_alternative<std::string>(*cachedDefines)
@@ -217,13 +238,14 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.attributes    = std::move(attribs);
     options.uniformsNames = {"world",
                              "mBones",
+                             "boneTextureWidth",
                              "viewProjection",
                              "diffuseMatrix",
                              "depthValues",
                              "morphTargetInfluences",
                              "morphTargetTextureInfo",
                              "morphTargetTextureIndices"};
-    options.samplers      = {"diffuseSampler", "morphTargets"};
+    options.samplers      = {"diffuseSampler", "morphTargets", "boneSampler"};
     options.defines       = std::move(join);
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", static_cast<unsigned>(numMorphInfluencers)}};

@@ -78,6 +78,11 @@ public:
   bool enabled;
 
   /**
+   *  Force writing the transparent objects into the depth map
+   */
+  bool forceDepthWriteTransparentMeshes;
+
+  /**
    * Specifies that the depth renderer will only be used within the camera it is created for.
    * This can help forcing its rendering during the camera processing.
    */
