@@ -29,6 +29,7 @@ FWD_CLASS_SPTR(SubSurfaceConfiguration)
 struct TextureFormatMapping {
   unsigned int type   = 0;
   unsigned int format = 0;
+  std::string name    = "";
 }; // end of struct TextureFormatMapping
 
 /**
@@ -116,6 +117,11 @@ public:
    * @return The index
    */
   int getIndex(unsigned int type);
+
+  /**
+   *  @brief Hidden
+   */
+  void _unlinkInternalTexture(const PrePassRenderTargetPtr& prePassRenderTarget);
 
   /**
    * @brief Marks the prepass renderer as dirty, triggering a check if the prepass is necessary for
@@ -269,6 +275,7 @@ private:
 
   Uint32Array _mrtFormats;
   Uint32Array _mrtLayout;
+  std::vector<std::string> _mrtNames;
   Int32Array _textureIndices;
 
   GeometryBufferRendererPtr _geometryBuffer;

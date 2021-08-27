@@ -28,34 +28,42 @@ std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats = {
   {
     Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_HALF_FLOAT,          // format
+    "prePass_Irradiance",                       // name
   },
   {
     Constants::PREPASS_POSITION_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_HALF_FLOAT,        // format
+    "prePass_Position",                       // name
   },
   {
     Constants::PREPASS_VELOCITY_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_UNSIGNED_INT,      // format
+    "prePass_Velocity",                       // name
   },
   {
     Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_UNSIGNED_INT,          // format
+    "prePass_Reflectivity",                       // name
   },
   {
     Constants::PREPASS_COLOR_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_HALF_FLOAT,     // format
+    "prePass_Color",                       // name
   },
   {
     Constants::PREPASS_DEPTH_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_HALF_FLOAT,     // format
+    "prePass_Depth",                       // name
   },
   {
     Constants::PREPASS_NORMAL_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_HALF_FLOAT,      // format
+    "prePass_Normal",                       // name
   },
   {
     Constants::PREPASS_ALBEDO_TEXTURE_TYPE, // type
     Constants::TEXTURETYPE_UNSIGNED_INT,    // format
+    "prePass_Albedo",                       // name
   },
 };
 
@@ -229,8 +237,9 @@ void PrePassRenderer::_resetLayout()
 
   _textureIndices[Constants::PREPASS_COLOR_TEXTURE_TYPE] = 0;
   _mrtLayout                                             = {Constants::PREPASS_COLOR_TEXTURE_TYPE};
-  _mrtFormats                                            = {Constants::TEXTURETYPE_HALF_FLOAT};
-  mrtCount                                               = 1;
+  _mrtFormats = {PrePassRenderer::_textureFormats[Constants::PREPASS_COLOR_TEXTURE_TYPE].format};
+  _mrtNames   = {PrePassRenderer::_textureFormats[Constants::PREPASS_COLOR_TEXTURE_TYPE].name};
+  mrtCount    = 1;
 }
 
 void PrePassRenderer::_updateGeometryBufferLayout()
@@ -398,6 +407,9 @@ void PrePassRenderer::_setRenderTargetEnabled(const PrePassRenderTargetPtr& preP
                                               bool iEnabled)
 {
   prePassRenderTarget->enabled = iEnabled;
+  if (!iEnabled) {
+    _unlinkInternalTexture(prePassRenderTarget);
+  }
 }
 
 PrePassEffectConfigurationPtr
@@ -429,7 +441,8 @@ void PrePassRenderer::_enable()
     if (mrtCount != previousMrtCount) {
       IMultiRenderTargetOptions options;
       options.types = _mrtFormats;
-      renderTarget->updateCount(mrtCount, options);
+      _mrtNames.emplace_back("prePass_DepthBuffer");
+      renderTarget->updateCount(mrtCount, options, _mrtNames);
     }
 
     renderTarget->_resetPostProcessChain();
@@ -558,7 +571,7 @@ void PrePassRenderer::_linkInternalTexture(const PrePassRenderTargetPtr& prePass
 
   if (prePassRenderTarget->_outputPostProcess != postProcess) {
     if (prePassRenderTarget->_outputPostProcess) {
-      prePassRenderTarget->_outputPostProcess->restoreDefaultInputTexture();
+      _unlinkInternalTexture(prePassRenderTarget);
     }
     prePassRenderTarget->_outputPostProcess = postProcess;
   }
@@ -566,6 +579,15 @@ void PrePassRenderer::_linkInternalTexture(const PrePassRenderTargetPtr& prePass
   if (prePassRenderTarget->_internalTextureDirty) {
     _updateGeometryBufferLayout();
     prePassRenderTarget->_internalTextureDirty = false;
+  }
+}
+
+void PrePassRenderer::_unlinkInternalTexture(const PrePassRenderTargetPtr& prePassRenderTarget)
+{
+  if (prePassRenderTarget->_outputPostProcess) {
+    prePassRenderTarget->_outputPostProcess->autoClear = true;
+    prePassRenderTarget->_outputPostProcess->restoreDefaultInputTexture();
+    prePassRenderTarget->_outputPostProcess = nullptr;
   }
 }
 
@@ -622,6 +644,7 @@ void PrePassRenderer::_enableTextures(const std::vector<unsigned int>& types)
       _mrtLayout.emplace_back(type);
 
       _mrtFormats.emplace_back(_textureFormats[type].format);
+      _mrtNames.emplace_back(PrePassRenderer::_textureFormats[type].name);
       ++mrtCount;
     }
 
