@@ -54,7 +54,7 @@ void DefaultCollisionCoordinator::_collideWithWorld(Vector3& position, Vector3& 
                                                     Vector3& finalPosition,
                                                     const AbstractMeshPtr& excludedMesh)
 {
-  auto closeDistance = Engine::CollisionsEpsilon * 10.f;
+  const auto closeDistance = Engine::CollisionsEpsilon * 10.f;
 
   if (collider->_retry >= maximumRetry) {
     finalPosition.copyFrom(position);
@@ -62,7 +62,8 @@ void DefaultCollisionCoordinator::_collideWithWorld(Vector3& position, Vector3& 
   }
 
   // Check if this is a mesh else camera or -1
-  auto collisionMask = (excludedMesh ? excludedMesh->collisionMask() : collider->collisionMask());
+  const auto collisionMask
+    = (excludedMesh ? excludedMesh->collisionMask() : collider->collisionMask());
 
   collider->_initialize(position, velocity, closeDistance);
 
