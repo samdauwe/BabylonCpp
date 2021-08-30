@@ -70,7 +70,7 @@ public:
   Camera& storeState() override;
 
   /**
-   * @brief Restored camera state. You must call storeState() first
+   * @brief Restored camera state. You must call storeState() first.
    * Hidden
    */
   bool _restoreStateValues() override;
@@ -107,8 +107,7 @@ public:
   void _checkInputs() override;
 
   /**
-   * @brief Rebuilds angles (alpha, beta) and radius from the give position and
-   * target.
+   * @brief Rebuilds angles (alpha, beta) and radius from the give position and target.
    */
   void rebuildAnglesAndRadius();
 
@@ -137,8 +136,8 @@ public:
   Matrix _getViewMatrix() override;
 
   /**
-   * @brief Zooms on a mesh to be at the min distance where we could see it
-   * fully in the current viewport.
+   * @brief Zooms on a mesh to be at the min distance where we could see it fully in the current
+   * viewport.
    * @param meshes Defines the mesh to zoom on
    * @param doNotUpdateMaxZ Defines whether or not maxZ should be updated whilst zooming on the mesh
    * (this can happen if the mesh is big and the maxradius pretty small for instance)
