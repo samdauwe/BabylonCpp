@@ -27,8 +27,7 @@ public:
   static LowestRoot GetLowestRoot(float a, float b, float c, float maxR);
 
   /**
-   * @brief Gets the plane normal used to compute the sliding response (in local
-   * space)
+   * @brief Gets the plane normal used to compute the sliding response (in local space)
    */
   Vector3& slidePlaneNormal();
 
