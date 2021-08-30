@@ -42,7 +42,7 @@ std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates, bool use
     return std::nullopt;
   }
 
-  auto indices = pickedMesh->getIndices();
+  const auto indices = pickedMesh->getIndices();
 
   if (indices.empty()) {
     return std::nullopt;
@@ -51,7 +51,7 @@ std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates, bool use
   Vector3 result;
 
   if (useVerticesNormals) {
-    auto normals = pickedMesh->getVerticesData(VertexBuffer::NormalKind);
+    const auto normals = pickedMesh->getVerticesData(VertexBuffer::NormalKind);
 
     auto normal0 = Vector3::FromArray(normals, indices[faceId * 3] * 3);
     auto normal1 = Vector3::FromArray(normals, indices[faceId * 3 + 1] * 3);
@@ -65,14 +65,14 @@ std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates, bool use
                      normal0.z + normal1.z + normal2.z);
   }
   else {
-    auto positions = pickedMesh->getVerticesData(VertexBuffer::PositionKind);
+    const auto positions = pickedMesh->getVerticesData(VertexBuffer::PositionKind);
 
-    auto vertex1 = Vector3::FromArray(positions, indices[faceId * 3] * 3);
-    auto vertex2 = Vector3::FromArray(positions, indices[faceId * 3 + 1] * 3);
-    auto vertex3 = Vector3::FromArray(positions, indices[faceId * 3 + 2] * 3);
+    const auto vertex1 = Vector3::FromArray(positions, indices[faceId * 3] * 3);
+    const auto vertex2 = Vector3::FromArray(positions, indices[faceId * 3 + 1] * 3);
+    const auto vertex3 = Vector3::FromArray(positions, indices[faceId * 3 + 2] * 3);
 
-    auto p1p2 = vertex1.subtract(vertex2);
-    auto p3p2 = vertex3.subtract(vertex2);
+    const auto p1p2 = vertex1.subtract(vertex2);
+    const auto p3p2 = vertex3.subtract(vertex2);
 
     result = Vector3::Cross(p1p2, p3p2);
   }
