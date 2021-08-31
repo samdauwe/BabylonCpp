@@ -89,7 +89,7 @@ ShaderMaterialPtr SkeletonViewer::CreateBoneWeightShader(const IBoneWeightShader
           color = mix(color, colorFull, smoothstep(0.75, 1.0, totalWeight));
           vColor = color;
 
-      gl_Position = projection * view * worldPos;
+          gl_Position = projection * view * worldPos;
       }
   )ShaderCode";
 
