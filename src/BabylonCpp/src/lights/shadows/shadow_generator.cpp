@@ -753,15 +753,10 @@ void ShadowGenerator::_renderForShadowMap(const std::vector<SubMesh*>& opaqueSub
                                           const std::vector<SubMesh*>& transparentSubMeshes,
                                           const std::vector<SubMesh*>& depthOnlySubMeshes)
 {
-  auto engine = _scene->getEngine();
-
-  const auto colorWrite = engine->getColorWrite();
   if (!depthOnlySubMeshes.empty()) {
-    engine->setColorWrite(false);
     for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
       _renderSubMeshForShadowMap(depthOnlySubMesh);
     }
-    engine->setColorWrite(colorWrite);
   }
 
   for (const auto& opaqueSubMesh : opaqueSubMeshes) {
@@ -1078,10 +1073,6 @@ std::vector<std::string>& ShadowGenerator::_prepareShadowDefines(SubMesh* subMes
   defines.emplace_back(
     StringTools::printf("#define SM_DEPTHTEXTURE %s",
                         (usePercentageCloserFiltering || useContactHardeningShadow ? "1" : "0")));
-
-  defines.emplace_back(
-    StringTools::printf("#define SM_USE_REVERSE_DEPTHBUFFER %s",
-                        (_scene->getEngine()->useReverseDepthBuffer ? "1" : "0")));
 
   const auto mesh = subMesh->getMesh();
 
@@ -1507,7 +1498,22 @@ void ShadowGenerator::recreateShadowMap()
   // Reaffect the filter.
   _applyFilterValues();
   // Reaffect Render List.
-  _shadowMap->renderList = renderList;
+  if (!renderList.empty()) {
+    // Note: don't do _shadowMap!.renderList = renderList;
+    // The renderList hooked array is accessing the old RenderTargetTexture (see
+    // RenderTargetTexture._hookArray), which is disposed at this point (by the call to
+    // _disposeRTTandPostProcesses)
+    if (_shadowMap) {
+      for (const auto& mesh : renderList) {
+        _shadowMap->renderList().emplace_back(mesh);
+      }
+    }
+  }
+  else {
+    if (_shadowMap) {
+      _shadowMap->renderList = {};
+    }
+  }
 }
 
 void ShadowGenerator::_disposeBlurPostProcesses()
