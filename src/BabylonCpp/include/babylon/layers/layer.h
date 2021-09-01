@@ -127,6 +127,11 @@ public:
   bool renderOnlyInRenderTargetTextures;
 
   /**
+   * Define if the layer is enabled (ie. should be displayed). Default: true
+   */
+  bool isEnabled;
+
+  /**
    * An event triggered when the layer is disposed.
    */
   Observable<Layer> onDisposeObservable;

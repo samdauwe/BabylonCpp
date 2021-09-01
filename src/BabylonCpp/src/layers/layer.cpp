@@ -24,6 +24,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
     , alphaBlendingMode{Constants::ALPHA_COMBINE}
     , layerMask{0x0FFFFFFF}
     , renderOnlyInRenderTargetTextures{false}
+    , isEnabled{true}
     , onDispose{this, &Layer::set_onDispose}
     , onBeforeRender{this, &Layer::set_onBeforeRender}
     , onAfterRender{this, &Layer::set_onAfterRender}
@@ -117,6 +118,10 @@ void Layer::_rebuild()
 
 void Layer::render()
 {
+  if (!isEnabled) {
+    return;
+  }
+
   const auto engine = _scene->getEngine();
 
   std::string defines = "";
