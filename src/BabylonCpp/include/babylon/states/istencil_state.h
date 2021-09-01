@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT IStencilState {
 
 public:
   IStencilState();
-  ~IStencilState(); // = default
+  virtual ~IStencilState(); // = default
 
 public:
   /**
