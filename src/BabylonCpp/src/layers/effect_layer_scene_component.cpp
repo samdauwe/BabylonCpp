@@ -38,7 +38,7 @@ void EffectLayerSceneComponent::_register()
 
   scene->_beforeCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORECAMERADRAW_EFFECTLAYER, this,
-    [this](Camera * /*camera*/) -> bool {
+    [this](Camera* /*camera*/) -> bool {
       _setStencil();
       return true;
     });
@@ -49,13 +49,13 @@ void EffectLayerSceneComponent::_register()
 
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER, this,
-    [this](Camera * /*camera*/) -> bool {
+    [this](Camera* /*camera*/) -> bool {
       _setStencilBack();
       return true;
     });
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER_DRAW, this,
-    [this](Camera * /*camera*/) -> bool {
+    [this](Camera* /*camera*/) -> bool {
       _drawCamera();
       return true;
     });
@@ -179,7 +179,7 @@ void EffectLayerSceneComponent::_draw(int renderingGroupId)
   if (_renderEffects) {
     _engine->setDepthBuffer(false);
 
-    auto& layers = scene->effectLayers;
+    const auto& layers = scene->effectLayers;
     for (const auto& effectLayer : layers) {
       if (effectLayer->renderingGroupId() == renderingGroupId) {
         if (effectLayer->shouldRender()) {
