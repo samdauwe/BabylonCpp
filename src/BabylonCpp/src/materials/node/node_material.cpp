@@ -537,7 +537,7 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
     const auto iStr = std::to_string(i);
     auto oldUV      = defines["UV" + iStr];
     defines.boolDef["UV" + iStr]
-      = mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 1 ? "" : iStr));
+      = mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str()));
     uvChanged = uvChanged || defines["UV" + iStr] != oldUV;
   }
 
@@ -577,7 +577,7 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
 
   const auto dummyMesh = AbstractMesh::New(tempName + "PostProcess", getScene());
 
-  auto buildId = _buildId;
+  auto buildId_ = _buildId;
 
   _processDefines(dummyMesh.get(), defines);
 
@@ -601,8 +601,8 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
   postProcess->nodeMaterialSource = shared_from_this();
 
   postProcess->onApplyObservable.add(
-    [this, &buildId, &tempName, &defines, &dummyMesh](Effect* effect, EventState& /*es*/) -> void {
-      if (buildId != _buildId) {
+    [this, &buildId_, &tempName, &defines, &dummyMesh](Effect* effect, EventState& /*es*/) -> void {
+      if (buildId_ != _buildId) {
         Effect::ShadersStore().erase(tempName + "VertexShader");
         Effect::ShadersStore().erase(tempName + "PixelShader");
 
@@ -610,7 +610,7 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
 
         defines.markAsUnprocessed();
 
-        buildId = _buildId;
+        buildId_ = _buildId;
       }
 
       const auto result = _processDefines(dummyMesh.get(), defines);
@@ -663,7 +663,7 @@ void NodeMaterial::_createEffectForParticles(
     }
   }
 
-  auto buildId = _buildId;
+  auto buildId_ = _buildId;
 
   std::vector<std::string> particleSystemDefines;
   auto particleSystemDefinesJoined = particleSystemDefinesJoined_;
@@ -686,18 +686,18 @@ void NodeMaterial::_createEffectForParticles(
     particleSystem->setCustomEffect(effect, blendMode);
   }
 
-  effect->onBindObservable().add([this, &buildId, &tempName, &blendMode, &defines,
+  effect->onBindObservable().add([this, &buildId_, &tempName, &blendMode, &defines,
                                   &particleSystemDefines, &particleSystem,
                                   &particleSystemDefinesJoined, &dummyMesh, iOnCompiled, iOnError,
                                   &effect](Effect* /*effect*/, EventState& /*es*/) -> void {
-    if (buildId != _buildId) {
+    if (buildId_ != _buildId) {
       Effect::ShadersStore().erase(tempName + "PixelShader");
 
       tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
 
       defines->markAsUnprocessed();
 
-      buildId = _buildId;
+      buildId_ = _buildId;
     }
 
     particleSystemDefines.clear();
