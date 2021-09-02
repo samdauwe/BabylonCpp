@@ -82,7 +82,7 @@ private:
                          std::unordered_map<std::string, std::string>& preprocessors,
                          ProcessingOptions& options);
   static std::unordered_map<std::string, std::string>
-  _PreparePreProcessors(const ProcessingOptions& options, bool addGLES = true);
+  _PreparePreProcessors(const ProcessingOptions& options, ThinEngine* engine, bool addGLES = true);
   static std::string _ProcessShaderConversion(const std::string& sourceCode,
                                               ProcessingOptions& options, ThinEngine* engine);
   static std::string _ApplyPreProcessing(const std::string& sourceCode, ProcessingOptions& options,

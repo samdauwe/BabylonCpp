@@ -368,7 +368,8 @@ ShaderProcessor::_EvaluatePreProcessors(const std::string& sourceCode,
 }
 
 std::unordered_map<std::string, std::string>
-ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, bool addGLES)
+ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, ThinEngine* engine,
+                                       bool addGLES)
 {
   const auto& defines = options.defines;
   std::unordered_map<std::string, std::string> preprocessors;
@@ -385,12 +386,8 @@ ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, bool ad
   }
   preprocessors["__VERSION__"]        = options.version;
   preprocessors[options.platformName] = "true";
-  if (options.isNDCHalfZRange) {
-    preprocessors["IS_NDC_HALF_ZRANGE"] = "";
-  }
-  else {
-    preprocessors.erase("IS_NDC_HALF_ZRANGE");
-  }
+
+  engine->_getGlobalDefines(preprocessors);
 
   return preprocessors;
 }
@@ -412,7 +409,7 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
 
   const auto& defines = options.defines;
 
-  auto preprocessors = _PreparePreProcessors(options);
+  auto preprocessors = _PreparePreProcessors(options, engine);
 
   // General pre processing
   if (options.processor->preProcessor) {
@@ -443,7 +440,7 @@ std::string ShaderProcessor::_ApplyPreProcessing(const std::string& sourceCode,
 
   const auto& defines = options.defines;
 
-  auto preprocessors = _PreparePreProcessors(options, false);
+  auto preprocessors = _PreparePreProcessors(options, engine, false);
 
   // General pre processing
   if (options.processor && options.processor->preProcessor) {
