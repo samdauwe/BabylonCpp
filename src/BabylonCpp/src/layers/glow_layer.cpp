@@ -136,8 +136,8 @@ void GlowLayer::_createTextureAndPostProcesses()
   _blurTexture1->renderParticles      = false;
   _blurTexture1->ignoreCameraViewport = true;
 
-  auto blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
-  auto blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
+  const auto blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
+  const auto blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
 
   _blurTexture2        = RenderTargetTexture::New("GlowLayerBlurRTT2",
                                            RenderTargetSize{blurTextureWidth2, blurTextureHeight2},
