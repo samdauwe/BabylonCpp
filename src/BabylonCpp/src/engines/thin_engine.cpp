@@ -1692,6 +1692,39 @@ void ThinEngine::_deletePipelineContext(const IPipelineContextPtr& pipelineConte
   }
 }
 
+std::string
+ThinEngine::_getGlobalDefines(std::unordered_map<std::string, std::string>& defines) const
+{
+  if (!defines.empty()) {
+    if (isNDCHalfZRange) {
+      defines["IS_NDC_HALF_ZRANGE"] = "";
+    }
+    else {
+      defines.erase("IS_NDC_HALF_ZRANGE");
+    }
+    if (useReverseDepthBuffer) {
+      defines["USE_REVERSE_DEPTHBUFFER"] = "";
+    }
+    else {
+      defines.erase("USE_REVERSE_DEPTHBUFFER");
+    }
+    return "";
+  }
+  else {
+    std::string s = "";
+    if (isNDCHalfZRange) {
+      s += "#define IS_NDC_HALF_ZRANGE";
+    }
+    if (useReverseDepthBuffer) {
+      if (!s.empty()) {
+        s += "\n";
+      }
+      s += "#define USE_REVERSE_DEPTHBUFFER";
+    }
+    return s;
+  }
+}
+
 EffectPtr ThinEngine::createEffect(
   const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
   IEffectCreationOptions& options, ThinEngine* engine,

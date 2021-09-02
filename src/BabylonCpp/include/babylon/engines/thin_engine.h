@@ -583,6 +583,11 @@ public:
   virtual void _deletePipelineContext(const IPipelineContextPtr& pipelineContext);
 
   /**
+   * @brief Hidden
+   */
+  std::string _getGlobalDefines(std::unordered_map<std::string, std::string>& defines) const;
+
+  /**
    * @brief Create a new effect (used to store vertex/fragment shaders).
    * @param baseName defines the base name of the effect (The name of file without .fragment.fx or
    * .vertex.fx)
