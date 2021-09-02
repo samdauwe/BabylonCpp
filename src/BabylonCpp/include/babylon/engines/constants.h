@@ -179,6 +179,8 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int TEXTUREFORMAT_DEPTH24_STENCIL8 = 13;
   /** Depth 32 bits float */
   static constexpr unsigned int TEXTUREFORMAT_DEPTH32_FLOAT = 14;
+  /** Depth 16 bits */
+  static constexpr unsigned int TEXTUREFORMAT_DEPTH16 = 15;
 
   /** Compressed BC7 */
   static constexpr unsigned int TEXTUREFORMAT_COMPRESSED_RGBA_BPTC_UNORM = 36492;
