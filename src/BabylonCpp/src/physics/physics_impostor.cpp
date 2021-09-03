@@ -207,8 +207,10 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
     }
     const auto& boundingInfo = *object->getBoundingInfo();
     // get the global scaling of the object
-    const auto size = boundingInfo.boundingBox.extendSizeWorld.scale(2.f).multiplyInPlace(scaling);
-
+    auto size = boundingInfo.boundingBox.extendSizeWorld.scale(2.f).multiplyInPlace(scaling);
+    size.x    = std::abs(size.x);
+    size.y    = std::abs(size.y);
+    size.z    = std::abs(size.z);
     // bring back the rotation
     object->rotationQuaternion = *q;
     // calculate the world matrix with the new rotation
