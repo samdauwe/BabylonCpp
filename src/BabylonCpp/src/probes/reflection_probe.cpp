@@ -84,7 +84,7 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
 
         if (scene->activeCamera()) {
           _projectionMatrix = Matrix::PerspectiveFovRH(
-            Math::PI / 2.f, 1,
+            Math::PI / 2.f, 1.f,
             useReverseDepthBuffer ? scene->activeCamera()->maxZ : scene->activeCamera()->minZ,
             useReverseDepthBuffer ? scene->activeCamera()->minZ : scene->activeCamera()->maxZ,
             _scene->getEngine()->isNDCHalfZRange);
@@ -96,7 +96,7 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
 
         if (_scene->activeCamera()) {
           _projectionMatrix = Matrix::PerspectiveFovLH(
-            Math::PI / 2.f, 1,
+            Math::PI / 2.f, 1.f,
             useReverseDepthBuffer ? scene->activeCamera()->maxZ : scene->activeCamera()->minZ,
             useReverseDepthBuffer ? scene->activeCamera()->minZ : scene->activeCamera()->maxZ,
             _scene->getEngine()->isNDCHalfZRange);
