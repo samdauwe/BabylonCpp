@@ -169,7 +169,9 @@ void HighlightLayer::_createTextureAndPostProcesses()
       = PassPostProcess::New("HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
                              TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _downSamplePostprocess->onApplyObservable.add(
-      [&](Effect* effect, EventState&) { effect->setTexture("textureSampler", _mainTexture); });
+      [_mainTexture = this->_mainTexture](Effect* effect, EventState&) {
+        effect->setTexture("textureSampler", _mainTexture);
+      });
 
     _horizontalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1.f, nullptr,
@@ -367,9 +369,9 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh       = mesh;
     meshExcluded.beforeBind = mesh->onBeforeBindObservable().add(
-      [](Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(false); });
+      [](Mesh* mesh, EventState&) -> void { mesh->getEngine()->setStencilBuffer(false); });
     meshExcluded.afterRender = mesh->onAfterRenderObservable().add(
-      [](Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(true); });
+      [](Mesh* mesh, EventState&) -> void { mesh->getEngine()->setStencilBuffer(true); });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }
