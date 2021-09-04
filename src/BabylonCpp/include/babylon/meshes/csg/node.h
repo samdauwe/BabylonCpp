@@ -11,11 +11,10 @@ namespace CSG {
 /**
  * @brief class Node
  *
- * Holds a node in a BSP tree. A BSP tree is built from a collection of polygons
- * by picking a polygon to split along. That polygon (and all other coplanar
- * polygons) are added directly to that node and the other polygons are added to
- * the front and/or back subtrees. This is not a leafy BSP tree since there is
- * no distinction between internal and leaf nodes
+ * Holds a node in a BSP tree. A BSP tree is built from a collection of polygons by picking a
+ * polygon to split along. That polygon (and all other coplanar polygons) are added directly to that
+ * node and the other polygons are added to the front and/or back subtrees. This is not a leafy BSP
+ * tree since there is no distinction between internal and leaf nodes
  */
 class BABYLON_SHARED_EXPORT Node {
 
@@ -41,16 +40,14 @@ public:
   void invert();
 
   /**
-   * @brief Recursively remove all polygons in `polygons` that are inside this
-   * BSP tree.
+   * @brief Recursively remove all polygons in `polygons` that are inside this BSP tree.
    * @param polygons Polygons to remove from the BSP
    * @returns Polygons clipped from the BSP
    */
   std::vector<Polygon> clipPolygons(const std::vector<Polygon>& polygons);
 
   /**
-   * @brief Remove all polygons in this BSP tree that are inside the other BSP
-   * tree `bsp`.
+   * @brief Remove all polygons in this BSP tree that are inside the other BSP tree `bsp`.
    * @param bsp BSP containing polygons to remove from this BSP
    */
   void clipTo(Node& bsp);
@@ -62,10 +59,9 @@ public:
   std::vector<Polygon> allPolygons();
 
   /**
-   * @brief Build a BSP tree out of `polygons`. When called on an existing tree,
-   * the new polygons are filtered down to the bottom of the tree and become new
-   * nodes there. Each set of polygons is partitioned using the first polygon
-   * (no heuristic is used to pick a good split)
+   * @brief Build a BSP tree out of `polygons`. When called on an existing tree, the new polygons
+   * are filtered down to the bottom of the tree and become new nodes there. Each set of polygons is
+   * partitioned using the first polygon (no heuristic is used to pick a good split)
    * @param polygons Polygons used to construct the BSP tree
    */
   void build(const std::vector<Polygon>& polygons);
