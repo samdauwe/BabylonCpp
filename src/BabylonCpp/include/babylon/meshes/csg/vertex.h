@@ -46,8 +46,8 @@ public:
   [[nodiscard]] std::string toString() const;
 
   /**
-   * @brief Invert all orientation-specific data (e.g. vertex normal). Called
-   * when the orientation of a polygon is flipped.
+   * @brief Invert all orientation-specific data (e.g. vertex normal). Called when the orientation
+   * of a polygon is flipped.
    */
   void flip();
 
