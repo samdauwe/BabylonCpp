@@ -57,7 +57,7 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh, bool 
   Float32Array vertColors = mesh->getVerticesData(VertexBuffer::ColorKind);
 
   unsigned int sm = 0;
-  for (auto& subMesh : mesh->subMeshes) {
+  for (const auto& subMesh : mesh->subMeshes) {
     for (size_t i = subMesh->indexStart, il = subMesh->indexCount + subMesh->indexStart; i < il;
          i += 3) {
       std::vector<Vertex> vertices;
@@ -188,7 +188,7 @@ void CSG::CSG::subtractInPlace(const BABYLON::CSG::CSGPtr& csg)
   b.invert();
   b.clipTo(a);
   b.invert();
-  auto allPolygonsB = b.allPolygons();
+  const auto allPolygonsB = b.allPolygons();
   a.build(allPolygonsB);
   a.invert();
 
@@ -204,7 +204,7 @@ CSG::CSG CSG::CSG::intersect(const BABYLON::CSG::CSGPtr& csg)
   b.invert();
   a.clipTo(b);
   b.clipTo(a);
-  auto allPolygonsB = b.allPolygons();
+  const auto allPolygonsB = b.allPolygons();
   a.build(allPolygonsB);
   a.invert();
   return CSG::FromPolygons(a.allPolygons())->copyTransformAttributes(*this);
@@ -220,7 +220,7 @@ void CSG::CSG::intersectInPlace(const BABYLON::CSG::CSGPtr& csg)
   b.invert();
   a.clipTo(b);
   b.clipTo(a);
-  auto allPolygonsB = b.allPolygons();
+  const auto allPolygonsB = b.allPolygons();
   a.build(allPolygonsB);
   a.invert();
 
@@ -259,7 +259,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
 
   using SubMeshObj = std::array<unsigned int, 3>;
 
-  auto mesh = Mesh::New(name, scene);
+  const auto mesh = Mesh::New(name, scene);
   Float32Array vertices;
   Uint32Array indices;
   Float32Array normals;
@@ -288,7 +288,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
     });
   }
 
-  for (auto& polygon : polygons) {
+  for (const auto& polygon : polygons) {
     // Building SubMeshes
     if (subMesh_dict.find(polygon.shared.meshId) == subMesh_dict.end()) {
       subMesh_dict[polygon.shared.meshId] = std::unordered_map<unsigned int, SubMeshObj>();
@@ -384,7 +384,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene, bool 
 MeshPtr CSG::CSG::toMesh(const std::string& name, const MaterialPtr& material, Scene* scene,
                          bool keepSubMeshes)
 {
-  auto mesh = buildMeshGeometry(name, scene, keepSubMeshes);
+  const auto mesh = buildMeshGeometry(name, scene, keepSubMeshes);
 
   mesh->material = material;
 
