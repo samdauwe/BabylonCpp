@@ -98,8 +98,7 @@ public:
   static constexpr unsigned int CAP_END = 2;
 
   /**
-   * Mesh cap setting : two caps, one at the beginning  and one at the end of
-   * the mesh
+   * Mesh cap setting : two caps, one at the beginning  and one at the end of the mesh
    */
   static constexpr unsigned int CAP_ALL = 3;
 
@@ -109,14 +108,12 @@ public:
   static constexpr unsigned int NO_FLIP = 0;
 
   /**
-   * Mesh pattern setting : flip (reflect in y axis) alternate tiles on each row
-   * or column
+   * Mesh pattern setting : flip (reflect in y axis) alternate tiles on each row or column
    */
   static constexpr unsigned int FLIP_TILE = 1;
 
   /**
-   * Mesh pattern setting : rotate (180degs) alternate tiles on each row or
-   * column
+   * Mesh pattern setting : rotate (180degs) alternate tiles on each row or column
    */
   static constexpr unsigned int ROTATE_TILE = 2;
 
@@ -131,8 +128,7 @@ public:
   static constexpr unsigned int ROTATE_ROW = 4;
 
   /**
-   * Mesh pattern setting : flip and rotate alternate tiles on each row or
-   * column
+   * Mesh pattern setting : flip and rotate alternate tiles on each row or column
    */
   static constexpr unsigned int FLIP_N_ROTATE_TILE = 5;
 
