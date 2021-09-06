@@ -505,7 +505,7 @@ void Geometry::_releaseVertexArrayObject(const EffectPtr& effect)
 
 void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 {
-  auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
+  const auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
   if (it == _meshes.end()) {
     return;
   }
@@ -529,7 +529,7 @@ void Geometry::applyToMesh(Mesh* mesh)
     return;
   }
 
-  auto previousGeometry = mesh->geometry();
+  const auto previousGeometry = mesh->geometry();
   if (previousGeometry) {
     previousGeometry->releaseForMesh(mesh);
   }
@@ -541,6 +541,7 @@ void Geometry::applyToMesh(Mesh* mesh)
   // must be done before setting vertexBuffers because of
   // mesh->_createGlobalSubMesh()
   mesh->setGeometry(shared_from_this());
+  // mesh->_internalAbstractMeshDataInfo._positions = nullptr;
 
   // Geometry is already in scene when constructed
   // _scene->pushGeometry(this);
@@ -574,7 +575,7 @@ void Geometry::_updateExtend(Float32Array data)
 
 void Geometry::_applyToMesh(Mesh* mesh)
 {
-  auto numOfMeshes = _meshes.size();
+  const auto numOfMeshes = _meshes.size();
 
   // vertexBuffers
   for (const auto& item : _vertexBuffers) {
