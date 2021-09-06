@@ -1115,7 +1115,7 @@ void TransformNode::resetLocalMatrix(bool independentOfChildren)
         tmpRotationQuaternion = *iRotationQuaternion;
         child->position       = *iPosition;
         if (child->rotationQuaternion()) {
-          child->rotationQuaternion = tmpRotationQuaternion;
+          child->rotationQuaternion()->copyFrom(tmpRotationQuaternion);
         }
         else {
           tmpRotationQuaternion.toEulerAnglesToRef(child->rotation());
