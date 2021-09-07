@@ -34,8 +34,8 @@ public:
   void _bindFrameBuffer(unsigned int faceIndex = 0);
 
   /**
-   * @brief Gets the number of views the corresponding to the texture (eg. a
-   * MultiviewRenderTarget will have > 1)
+   * @brief Gets the number of views the corresponding to the texture (eg. a MultiviewRenderTarget
+   * will have > 1)
    * @returns the view count
    */
   unsigned int getViewCount() const;
