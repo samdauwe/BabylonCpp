@@ -231,15 +231,6 @@ bool Texture::get_isBlocking() const
   return _isBlocking;
 }
 
-unsigned int Texture::get_samplingMode() const
-{
-  if (!_texture) {
-    return _initialSamplingMode;
-  }
-
-  return _texture->samplingMode;
-}
-
 bool Texture::get_invertY() const
 {
   return _invertY;
