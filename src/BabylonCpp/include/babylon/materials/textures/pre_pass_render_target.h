@@ -11,11 +11,11 @@ FWD_CLASS_SPTR(ImageProcessingPostProcess)
 
 /**
  * @brief A multi render target designed to render the prepass.
- * Prepass is a scene component used to render information in multiple textures
- * alongside with the scene materials rendering.
- * Note : This is an internal class, and you should NOT need to instanciate this.
- * Only the `PrePassRenderer` should instanciate this class.
- * It is more likely that you need a regular `MultiRenderTarget`
+ * Prepass is a scene component used to render information in multiple textures alongside with the
+ * scene materials rendering.
+ * Note : This is an internal class, and you should NOT need to
+ * instanciate this. Only the `PrePassRenderer` should instanciate this class. It is more likely
+ * that you need a regular `MultiRenderTarget`
  * @hidden
  */
 class BABYLON_SHARED_EXPORT PrePassRenderTarget : public MultiRenderTarget {
