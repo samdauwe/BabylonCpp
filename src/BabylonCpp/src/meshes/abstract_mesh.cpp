@@ -31,6 +31,7 @@
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/particles/solid_particle.h>
 #include <babylon/physics/joint/physics_joint.h>
@@ -57,6 +58,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , collisionRetryCount{this, &AbstractMesh::get_collisionRetryCount,
                           &AbstractMesh::set_collisionRetryCount}
     , isFacetDataEnabled{this, &AbstractMesh::get_isFacetDataEnabled}
+    , morphTargetManager{this, &AbstractMesh::get_morphTargetManager,
+                         &AbstractMesh::set_morphTargetManager}
     , onCollide{this, &AbstractMesh::set_onCollide}
     , onCollisionPositionChange{this, &AbstractMesh::set_onCollisionPositionChange}
     , definedFacingForward{true} // orientation for POV movement & rotation
@@ -237,6 +240,24 @@ void AbstractMesh::set_collisionRetryCount(unsigned int retryCount)
 bool AbstractMesh::get_isFacetDataEnabled() const
 {
   return _internalAbstractMeshDataInfo._facetData.facetDataEnabled;
+}
+
+MorphTargetManagerPtr& AbstractMesh::get_morphTargetManager()
+{
+  return _internalAbstractMeshDataInfo._morphTargetManager;
+}
+
+void AbstractMesh::set_morphTargetManager(const MorphTargetManagerPtr& value)
+{
+  if (_internalAbstractMeshDataInfo._morphTargetManager == value) {
+    return;
+  }
+  _internalAbstractMeshDataInfo._morphTargetManager = value;
+  _syncGeometryWithMorphTargetManager();
+}
+
+void AbstractMesh::_syncGeometryWithMorphTargetManager()
+{
 }
 
 bool AbstractMesh::_updateNonUniformScalingState(bool value)
@@ -476,8 +497,13 @@ void AbstractMesh::set_visibility(float value)
     return;
   }
 
+  const auto oldValue = _internalAbstractMeshDataInfo._visibility;
+
   _internalAbstractMeshDataInfo._visibility = value;
-  _markSubMeshesAsMiscDirty();
+
+  if ((oldValue == 1.f && value != 1.f) || (oldValue != 1.f && value == 1.f)) {
+    _markSubMeshesAsMiscDirty();
+  }
 }
 
 bool AbstractMesh::get_showBoundingBox() const
@@ -1056,12 +1082,26 @@ void AbstractMesh::_refreshBoundingInfo(const Float32Array& data,
   _updateBoundingInfo();
 }
 
-Float32Array AbstractMesh::_getPositionData(bool applySkeleton, bool /*applyMorph*/)
+Float32Array AbstractMesh::_getPositionData(bool applySkeleton, bool applyMorph)
 {
   auto data = getVerticesData(VertexBuffer::PositionKind);
 
-  if (!data.empty() && applySkeleton && skeleton()) {
+  if (!_internalAbstractMeshDataInfo._positions.empty()) {
+    _internalAbstractMeshDataInfo._positions = {};
+  }
+
+  if (!data.empty() && ((applySkeleton && skeleton()) || (applyMorph && morphTargetManager()))) {
     _generatePointsArray();
+    if (!_positions().empty()) {
+      const auto& pos = _positions();
+      _internalAbstractMeshDataInfo._positions.resize(pos.size());
+      for (size_t i = 0; i < pos.size(); ++i) {
+        _internalAbstractMeshDataInfo._positions[i] = pos[i];
+      }
+    }
+  }
+
+  if (!data.empty() && applySkeleton && skeleton()) {
     auto matricesIndicesData = getVerticesData(VertexBuffer::MatricesIndicesKind);
     auto matricesWeightsData = getVerticesData(VertexBuffer::MatricesWeightsKind);
     if (!matricesWeightsData.empty() && !matricesIndicesData.empty()) {
@@ -1115,6 +1155,34 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton, bool /*applyMorp
         if ((index / 3) < _positions().size()) {
           _positions()[index / 3].copyFrom(tempVector);
         }
+      }
+    }
+  }
+  if (!data.empty() && applyMorph && morphTargetManager()) {
+    auto faceIndexCount = 0ull;
+    auto positionIndex  = 0ull;
+    for (size_t vertexCount = 0; vertexCount < data.size(); ++vertexCount) {
+      for (size_t targetCount = 0; targetCount < morphTargetManager()->numTargets();
+           ++targetCount) {
+        const auto targetMorph = morphTargetManager()->getTarget(targetCount);
+        const auto influence   = targetMorph->influence();
+        if (influence > 0.f) {
+          const auto morphTargetPositions = targetMorph->getPositions();
+          if (!morphTargetPositions.empty()) {
+            data[vertexCount]
+              += (morphTargetPositions[vertexCount] - data[vertexCount]) * influence;
+          }
+        }
+      }
+
+      ++faceIndexCount;
+
+      if (!_positions().empty()
+          && faceIndexCount
+               == 3) { // We want to merge into positions every 3 indices starting (but not 0)
+        faceIndexCount   = 0;
+        const auto index = positionIndex * 3;
+        _positions()[positionIndex++].copyFromFloats(data[index], data[index + 1], data[index + 2]);
       }
     }
   }

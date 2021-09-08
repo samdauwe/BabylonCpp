@@ -195,6 +195,11 @@ public:
   /**
    * @brief Hidden
    */
+  virtual void _syncGeometryWithMorphTargetManager();
+
+  /**
+   * @brief Hidden
+   */
   bool _updateNonUniformScalingState(bool value) override;
 
   /**
@@ -1047,6 +1052,18 @@ protected:
   bool get_isFacetDataEnabled() const;
 
   /**
+   * @brief Gets the morph target manager.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
+   */
+  MorphTargetManagerPtr& get_morphTargetManager();
+
+  /**
+   * @brief Sets the morph target manager.
+   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
+   */
+  void set_morphTargetManager(const MorphTargetManagerPtr& value);
+
+  /**
    * @brief Set a function to call when this mesh collides with another one.
    */
   void set_onCollide(const std::function<void(AbstractMesh*, EventState&)>& callback);
@@ -1514,6 +1531,12 @@ public:
    * A boolean indicating if facetData is enabled
    */
   ReadOnlyProperty<AbstractMesh, bool> isFacetDataEnabled;
+
+  /**
+   * Gets or sets the morph target manager
+   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
+   */
+  Property<AbstractMesh, MorphTargetManagerPtr> morphTargetManager;
 
   /**
    * An event triggered when this mesh collides with another one
