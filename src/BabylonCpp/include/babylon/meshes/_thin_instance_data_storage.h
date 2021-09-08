@@ -7,12 +7,12 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-class Buffer;
-using BufferPtr = std::shared_ptr<Buffer>;
+FWD_CLASS_SPTR(Buffer)
 
 /**
  * @brief Hidden
