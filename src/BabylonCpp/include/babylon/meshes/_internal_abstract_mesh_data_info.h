@@ -9,31 +9,40 @@
 
 namespace BABYLON {
 
+FWD_CLASS_SPTR(_MeshCollisionData)
 FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Material)
+FWD_CLASS_SPTR(MorphTargetManager)
 FWD_CLASS_SPTR(Skeleton)
 
 /**
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT _InternalAbstractMeshDataInfo {
-  bool _hasVertexAlpha             = false;
-  bool _useVertexColors            = true;
-  unsigned int _numBoneInfluencers = 4;
-  bool _applyFog                   = true;
-  bool _receiveShadows             = false;
-  _FacetDataStorage _facetData;
-  float _visibility                  = 1.f;
-  SkeletonPtr _skeleton              = nullptr;
-  unsigned int _layerMask            = 0x0FFFFFFF;
-  bool _computeBonesUsingShaders     = true;
-  bool _isActive                     = false;
-  bool _onlyForInstances             = false;
-  bool _isActiveIntermediate         = false;
-  bool _onlyForInstancesIntermediate = false;
-  bool _actAsRegularMesh             = false;
-  AbstractMesh* _currentLOD          = nullptr;
-  bool _currentLODIsUpToDate         = false;
-  unsigned int _collisionRetryCount  = 3;
+  bool _hasVertexAlpha                      = false;
+  bool _useVertexColors                     = true;
+  unsigned int _numBoneInfluencers          = 4;
+  bool _applyFog                            = true;
+  bool _receiveShadows                      = false;
+  _FacetDataStorage _facetData              = {};
+  float _visibility                         = 1.f;
+  SkeletonPtr _skeleton                     = nullptr;
+  unsigned int _layerMask                   = 0x0FFFFFFF;
+  bool _computeBonesUsingShaders            = true;
+  bool _isActive                            = false;
+  bool _onlyForInstances                    = false;
+  bool _isActiveIntermediate                = false;
+  bool _onlyForInstancesIntermediate        = false;
+  bool _actAsRegularMesh                    = false;
+  AbstractMesh* _currentLOD                 = nullptr;
+  bool _currentLODIsUpToDate                = false;
+  unsigned int _collisionRetryCount         = 3;
+  MorphTargetManagerPtr _morphTargetManager = nullptr;
+  unsigned int _renderingGroupId            = 0;
+  MaterialPtr _material                     = nullptr;
+  std::vector<Vector3> _positions           = {};
+  // Collisions
+  _MeshCollisionDataPtr _meshCollisionData = nullptr;
 }; // end of struct _InternalAbstractMeshDataInfo
 
 } // end of namespace BABYLON
