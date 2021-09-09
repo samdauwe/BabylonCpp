@@ -77,6 +77,11 @@ public:
    */
   float touchMoveSensibility;
 
+  /**
+   * Swap touch actions so that one touch is used for rotation and multiple for movement
+   */
+  bool singleFingerRotate;
+
 private:
   std::optional<float> _offsetX;
   std::optional<float> _offsetY;
