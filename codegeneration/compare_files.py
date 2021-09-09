@@ -176,7 +176,7 @@ def main():
         "WebXRAbstractFeature.ts", "WebXRControllerMovement.ts",
         "WebXRControllerPhysics.ts", "WebXRControllerPointerSelection.ts",
         "WebXRControllerTeleportation.ts", "WebXRDOMOverlay.ts",
-        "WebXRHitTest.ts", "WebXRNearInteraction.ts",
+        "WebXRHitTest.ts", "WebXRNearInteraction.ts", "WebXREyeTracking.ts",
         # XR / motionController
         "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
         "WebXRFeaturePointSystem.ts", "webXRGenericHandController.ts",
@@ -189,6 +189,14 @@ def main():
         # Unit Tests
         # Loading
         "babylon.sceneLoader.tests.ts", "babylon.sceneLoader.testData.ts",
+        "babylon.example.tests.ts", "babylon.node.tests.ts",
+        "babylon.postProcess.tests.ts", "babylon.material.tests.ts",
+        "babylon.fresnelParameters.tests.ts", "babylon.animationGroup.tests.ts",
+        "babylon.animation.tests.ts", "Culling/babylon.ray.tests.ts",
+        "babylon.dictionaryMode.tests.ts", "babylon.geometry.tests.ts",
+        "babylon.positionAndRotation.tests.ts",
+        "babylon.mesh.vertexData.tests.ts",
+        "babylon.pointerInput.tests.ts", "babylon.glTFSerializer.tests.ts",
         # Misc
         "babylon.promise.tests.ts",
         # Physics
@@ -196,9 +204,10 @@ def main():
         # XR
         "webXRFeaturesManager.tests.ts",
         # Inspector
-        "context.ts", "curve.ts", "eyedropper.ts", "floodfill.ts",
-        "globalState.ts", "graphSupportingTypes.ts", "rectangleSelect.ts",
-        "textureCanvasManager.ts",
+        "canvasGraphService.ts", "context.ts", "curve.ts", "eyedropper.ts",
+        "floodfill.ts", "globalState.ts", "graphSupportingTypes.ts",
+        "rectangleSelect.ts", "replayRecorder.ts", "textureCanvasManager.ts",
+        "textureHelper.ts"
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
