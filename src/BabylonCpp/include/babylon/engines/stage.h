@@ -142,8 +142,7 @@ public:
   void registerStep(unsigned int index, ISceneComponent* component, const T& action)
   {
     size_t i = 0;
-    // Additional parenthesis below are here in order to defeat WinDef.h's "max"
-    // macro.
+    // Additional parenthesis below are here in order to defeat WinDef.h's "max" macro.
     size_t maxIndex = (std::numeric_limits<size_t>::max)();
     for (; i < _steps.size(); ++i) {
       const auto& step = _steps[i];
