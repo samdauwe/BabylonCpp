@@ -96,7 +96,7 @@ WebGLUniformLocationPtr WebGLPipelineContext::getUniform(const std::string& unif
 
 bool WebGLPipelineContext::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
 {
-  auto flag = matrix.updateFlag;
+  const auto flag = matrix.updateFlag;
   if (stl_util::contains(_valueCache, uniformName) && !_valueCache[uniformName].empty()
       && static_cast<int>(_valueCache[uniformName][0]) == flag) {
     return false;
