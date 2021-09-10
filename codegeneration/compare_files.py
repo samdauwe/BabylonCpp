@@ -64,6 +64,7 @@ def main():
     current, previous = "5.0.0-alpha.19", "5.0.0-alpha.15"
     current, previous = "5.0.0-alpha.30", "5.0.0-alpha.19"
     current, previous = "5.0.0-alpha.37", "5.0.0-alpha.30"
+    current, previous = "5.0.0-alpha.44", "5.0.0-alpha.37"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.1.0"          : "4.1.0_2020_02_27",
@@ -74,6 +75,7 @@ def main():
         "5.0.0-alpha.19" : "5.0.0-alpha.19_2021_04_27",
         "5.0.0-alpha.30" : "5.0.0-alpha.30_2021_06_28",
         "5.0.0-alpha.37" : "5.0.0-alpha.37_2021_08_04",
+        "5.0.0-alpha.44" : "5.0.0-alpha.44_2021_09_10",
     }
     # List containing the files to ignore
     whiteList = [
@@ -129,7 +131,7 @@ def main():
         "webgpuShaderProcessingContext.ts", "webgpuQuerySet.ts",
         "webgpuShaderProcessors.ts", "webgpuStencilState.ts",
         "webgpuStencilStateComposer.ts", "webgpuTextureHelper.ts",
-        "webgpuTimestampQuery.ts",
+        "webgpuTimestampQuery.ts", "webgpuTintWASM.ts",
         # Engines / WebGPU / Extensions
         "engine.alpha.ts", "engine.cubeTexture.ts", "engine.computeShader.ts",
         "engine.debugging.ts", "engine.dynamicBuffer.ts",
@@ -176,7 +178,8 @@ def main():
         "WebXRAbstractFeature.ts", "WebXRControllerMovement.ts",
         "WebXRControllerPhysics.ts", "WebXRControllerPointerSelection.ts",
         "WebXRControllerTeleportation.ts", "WebXRDOMOverlay.ts",
-        "WebXRHitTest.ts", "WebXRNearInteraction.ts", "WebXREyeTracking.ts",
+        "WebXREyeTracking.ts", "WebXRHitTest.ts", "WebXRNearInteraction.ts",
+        "WebXRWalkingLocomotion.ts",
         # XR / motionController
         "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
         "WebXRFeaturePointSystem.ts", "webXRGenericHandController.ts",
