@@ -397,17 +397,21 @@ void TextureBlock::_generateConversionCode(NodeMaterialBuildState& state,
                                            const std::string& swizzle)
 {
   if (swizzle != "a") { // no conversion if the output is "a" (alpha)
-    state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
-    state.compilationString
-      += StringTools::printf("%s = toGammaSpace(%s);\r\n", output->associatedVariableName().c_str(),
-                             output->associatedVariableName().c_str());
-    state.compilationString += "#endif\r\n";
+    if (!texture() || !texture()->gammaSpace()) {
+      state.compilationString += StringTools::printf("#ifdef %s\r\n", _linearDefineName.c_str());
+      state.compilationString += StringTools::printf("%s = toGammaSpace(%s);\r\n",
+                                                     output->associatedVariableName().c_str(),
+                                                     output->associatedVariableName().c_str());
+      state.compilationString += "#endif\r\n";
+    }
 
-    state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
-    state.compilationString += StringTools::printf("%s = toLinearSpace(%s);\r\n",
-                                                   output->associatedVariableName().c_str(),
-                                                   output->associatedVariableName().c_str());
-    state.compilationString += "#endif\r\n";
+    if (!texture() || texture()->gammaSpace()) {
+      state.compilationString += StringTools::printf("#ifdef %s\r\n", _gammaDefineName.c_str());
+      state.compilationString += StringTools::printf("%s = toLinearSpace(%s);\r\n",
+                                                     output->associatedVariableName().c_str(),
+                                                     output->associatedVariableName().c_str());
+      state.compilationString += "#endif\r\n";
+    }
   }
 }
 
