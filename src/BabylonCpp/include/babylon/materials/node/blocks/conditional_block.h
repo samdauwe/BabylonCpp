@@ -34,7 +34,8 @@ enum class ConditionalBlockConditions {
 }; // end of enum class ConditionalBlockConditions
 
 /**
- * @brief Block used to apply conditional operation between floats
+ * @brief Block used to apply conditional operation between floats.
+ * @since 5.0.0
  */
 class BABYLON_SHARED_EXPORT ConditionalBlock : public NodeMaterialBlock {
 
