@@ -1168,7 +1168,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _syncGeometryWithMorphTargetManager();
+  void _syncGeometryWithMorphTargetManager() override;
 
   /**
    * @brief Creates points inside a mesh. This utility enables you to create and
