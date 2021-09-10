@@ -226,22 +226,22 @@ protected:
   /**
    * @brief Gets the indirect diffuse output component.
    */
-  NodeMaterialConnectionPointPtr& get_diffuseIndirect();
+  NodeMaterialConnectionPointPtr& get_diffuseInd();
 
   /**
    * @brief Gets the indirect specular output component.
    */
-  NodeMaterialConnectionPointPtr& get_specularIndirect();
+  NodeMaterialConnectionPointPtr& get_specularInd();
 
   /**
    * @brief Gets the indirect clear coat output component.
    */
-  NodeMaterialConnectionPointPtr& get_clearcoatIndirect();
+  NodeMaterialConnectionPointPtr& get_clearcoatInd();
 
   /**
    * @brief Gets the indirect sheen output component.
    */
-  NodeMaterialConnectionPointPtr& get_sheenIndirect();
+  NodeMaterialConnectionPointPtr& get_sheenInd();
 
   /**
    * @brief Gets the refraction output component.
@@ -601,22 +601,22 @@ public:
   /**
    * Gets the indirect diffuse output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> diffuseIndirect;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> diffuseInd;
 
   /**
    * Gets the indirect specular output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specularIndirect;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specularInd;
 
   /**
    * Gets the indirect clear coat output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoatIndirect;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoatInd;
 
   /**
    * Gets the indirect sheen output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenIndirect;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenInd;
 
   /**
    * Gets the refraction output component

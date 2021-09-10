@@ -110,10 +110,10 @@ PBRMetallicRoughnessBlock::PBRMetallicRoughnessBlock(const std::string& iName)
     , specularDir{this, &PBRMetallicRoughnessBlock::get_specularDir}
     , clearcoatDir{this, &PBRMetallicRoughnessBlock::get_clearcoatDir}
     , sheenDir{this, &PBRMetallicRoughnessBlock::get_sheenDir}
-    , diffuseIndirect{this, &PBRMetallicRoughnessBlock::get_diffuseIndirect}
-    , specularIndirect{this, &PBRMetallicRoughnessBlock::get_specularIndirect}
-    , clearcoatIndirect{this, &PBRMetallicRoughnessBlock::get_clearcoatIndirect}
-    , sheenIndirect{this, &PBRMetallicRoughnessBlock::get_sheenIndirect}
+    , diffuseInd{this, &PBRMetallicRoughnessBlock::get_diffuseInd}
+    , specularInd{this, &PBRMetallicRoughnessBlock::get_specularInd}
+    , clearcoatInd{this, &PBRMetallicRoughnessBlock::get_clearcoatInd}
+    , sheenInd{this, &PBRMetallicRoughnessBlock::get_sheenInd}
     , refraction{this, &PBRMetallicRoughnessBlock::get_refraction}
     , lighting{this, &PBRMetallicRoughnessBlock::get_lighting}
     , shadow{this, &PBRMetallicRoughnessBlock::get_shadow}
@@ -405,22 +405,22 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenDir()
   return _outputs[4];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_diffuseIndirect()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_diffuseInd()
 {
   return _outputs[5];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specularIndirect()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specularInd()
 {
   return _outputs[6];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatIndirect()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatInd()
 {
   return _outputs[7];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenIndirect()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenInd()
 {
   return _outputs[8];
 }
