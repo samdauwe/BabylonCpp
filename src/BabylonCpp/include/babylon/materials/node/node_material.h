@@ -164,8 +164,10 @@ public:
    * @brief Build the material and generates the inner effect.
    * @param verbose defines if the build should log activity
    * @param updateBuildId defines if the internal build Id should be updated (default is true)
+   * @param autoConfigure defines if the autoConfigure method should be called when initializing
+   * blocks (default is true)
    */
-  void build(bool verbose = false, bool updateBuildId = true);
+  void build(bool verbose = false, bool updateBuildId = true, bool autoConfigure = true);
 
   /**
    * @brief Runs an otpimization phase to try to improve the shader code.
@@ -430,7 +432,8 @@ private:
   NodeMaterial& _addFragmentOutputNode(const NodeMaterialBlockPtr& node);
   NodeMaterial& _removeFragmentOutputNode(const NodeMaterialBlockPtr& node);
   void _initializeBlock(const NodeMaterialBlockPtr& node, const NodeMaterialBuildStatePtr& state,
-                        std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState);
+                        std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState,
+                        bool autoConfigure = true);
   void _resetDualBlocks(const NodeMaterialBlockPtr& node, size_t id);
   void _prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterialDefines& defines);
   PostProcessPtr

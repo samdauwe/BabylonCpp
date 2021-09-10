@@ -330,10 +330,12 @@ bool NodeMaterial::needAlphaTesting() const
 
 void NodeMaterial::_initializeBlock(
   const NodeMaterialBlockPtr& node, const NodeMaterialBuildStatePtr& iState,
-  std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState)
+  std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState, bool autoConfigure)
 {
   node->initialize(*iState);
-  node->autoConfigure(shared_from_this());
+  if (autoConfigure) {
+    node->autoConfigure(shared_from_this());
+  }
   node->_preparationId = _buildId;
 
   if (!stl_util::contains(attachedBlocks, node)) {
@@ -365,7 +367,7 @@ void NodeMaterial::_initializeBlock(
                  && block->_preparationId != _buildId) {
           nodesToProcessForOtherBuildState.emplace_back(block);
         }
-        _initializeBlock(block, iState, nodesToProcessForOtherBuildState);
+        _initializeBlock(block, iState, nodesToProcessForOtherBuildState, autoConfigure);
       }
     }
   }
@@ -404,7 +406,7 @@ void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
   }
 }
 
-void NodeMaterial::build(bool verbose, bool updateBuildId)
+void NodeMaterial::build(bool verbose, bool updateBuildId, bool autoConfigure)
 {
   _buildWasSuccessful = false;
   const auto engine   = getScene()->getEngine();
@@ -443,12 +445,12 @@ void NodeMaterial::build(bool verbose, bool updateBuildId)
 
   for (const auto& vertexOutputNode : _vertexOutputNodes) {
     vertexNodes.emplace_back(vertexOutputNode);
-    _initializeBlock(vertexOutputNode, _vertexCompilationState, fragmentNodes);
+    _initializeBlock(vertexOutputNode, _vertexCompilationState, fragmentNodes, autoConfigure);
   }
 
   for (const auto& fragmentOutputNode : _fragmentOutputNodes) {
     fragmentNodes.emplace_back(fragmentOutputNode);
-    _initializeBlock(fragmentOutputNode, _fragmentCompilationState, vertexNodes);
+    _initializeBlock(fragmentOutputNode, _fragmentCompilationState, vertexNodes, autoConfigure);
   }
 
   // Optimize
