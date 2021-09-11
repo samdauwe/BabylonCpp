@@ -18,9 +18,11 @@ public:
    * @param triggerOptions defines the trigger options
    * @param children defines the list of aggregated animations to run
    * @param condition defines the trigger related conditions
+   * @param enableChildrenConditions defines if the children actions conditions should be check
+   * before execution
    */
   CombineAction(unsigned int triggerOptions, const std::vector<Action*>& children,
-                Condition* condition = nullptr);
+                Condition* condition = nullptr, bool enableChildrenConditions = true);
   ~CombineAction() override; // = default
 
   /**
@@ -45,6 +47,11 @@ public:
    * The list of aggregated animations to run.
    */
   std::vector<Action*> children;
+
+  /**
+   * Defines if the children actions conditions should be check before execution
+   */
+  bool enableChildrenConditions;
 
 }; // end of class CombineAction
 
