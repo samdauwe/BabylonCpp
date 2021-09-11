@@ -42,28 +42,29 @@ void Action::setTriggerParameter(const std::string& value)
   _triggerParameter = value;
 }
 
+bool Action::_evaluateConditionForCurrentFrame()
+{
+  const auto condition = _condition;
+  if (!condition) {
+    return true;
+  }
+
+  const auto currentRenderId = _actionManager->getScene()->getRenderId();
+
+  // We cache the current evaluation for the current frame
+  if (condition->_evaluationId != currentRenderId) {
+    condition->_evaluationId  = currentRenderId;
+    condition->_currentResult = condition->isValid();
+  }
+
+  return condition->_currentResult;
+}
+
 void Action::_executeCurrent(const IActionEventPtr& evt)
 {
-  if (_nextActiveAction->_condition) {
-    auto condition       = _nextActiveAction->_condition;
-    auto currentRenderId = _actionManager->getScene()->getRenderId();
-
-    // We cache the current evaluation for the current frame
-    if (condition->_evaluationId == currentRenderId) {
-      if (!condition->_currentResult) {
-        return;
-      }
-    }
-    else {
-      condition->_evaluationId = currentRenderId;
-
-      if (!condition->isValid()) {
-        condition->_currentResult = false;
-        return;
-      }
-
-      condition->_currentResult = true;
-    }
+  const auto isConditionValid = _evaluateConditionForCurrentFrame();
+  if (!isConditionValid) {
+    return;
   }
 
   onBeforeExecuteObservable.notifyObservers(this);

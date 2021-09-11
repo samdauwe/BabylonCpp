@@ -58,6 +58,12 @@ public:
   void setTriggerParameter(const std::string& value);
 
   /**
+   * @brief  Internal only - Returns if the current condition allows to run the action
+   * @hidden
+   */
+  bool _evaluateConditionForCurrentFrame();
+
+  /**
    * @brief Internal only - executes current action event.
    */
   void _executeCurrent(const IActionEventPtr& evt) override;
