@@ -118,7 +118,7 @@ public:
 
   /**
    * @brief Synchronize and normalize all animatables with a source animatable.
-   * @param root defines the root animatable to synchronize with
+   * @param root defines the root animatable to synchronize with (null to stop synchronizing)
    * @return the animationGroup
    * @see https://doc.babylonjs.com/babylon101/animations#animation-weights
    */
