@@ -29,6 +29,7 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget, float iFromF
     , speedRatio{this, &Animatable::get_speedRatio, &Animatable::set_speedRatio}
     , _localDelayOffset{std::nullopt}
     , _pausedDelay{std::nullopt}
+    , _manualJumpDelay{std::nullopt}
     , _paused{false}
     , _scene{scene}
     , _weight{-1.f}
@@ -186,11 +187,8 @@ void Animatable::goToFrame(float frame)
     auto adjustTime   = frame - currentFrame;
     auto delay        = (speedRatio != 0.f) ? static_cast<float>(adjustTime) * 1000.f
                                          / (static_cast<float>(fps) * speedRatio) :
-                                       0.f;
-    if (_localDelayOffset == std::nullopt) {
-      _localDelayOffset = millisecond_t(0);
-    }
-    _localDelayOffset = (*_localDelayOffset) - std::chrono::milliseconds(static_cast<long>(delay));
+                                              0.f;
+    _manualJumpDelay  = -std::chrono::milliseconds(static_cast<long>(delay));
   }
 
   for (const auto& runtimeAnimations : _runtimeAnimations) {
@@ -273,6 +271,11 @@ bool Animatable::_animate(const millisecond_t& delay)
   else if (_pausedDelay != std::nullopt) {
     _localDelayOffset = (*_localDelayOffset) + delay - (*_pausedDelay);
     _pausedDelay      = std::nullopt;
+  }
+
+  if (_manualJumpDelay.has_value()) {
+    *_localDelayOffset += *_manualJumpDelay;
+    _manualJumpDelay = std::nullopt;
   }
 
   if (_weight == 0.f) { // We consider that an animation with a weight === 0 is
