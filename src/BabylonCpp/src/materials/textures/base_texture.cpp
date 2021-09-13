@@ -390,6 +390,15 @@ bool BaseTexture::canRescale()
   return false;
 }
 
+void BaseTexture::forceSphericalPolynomialsRecompute()
+{
+  if (_texture) {
+    _texture->_sphericalPolynomial         = nullptr;
+    _texture->_sphericalPolynomialPromise  = nullptr;
+    _texture->_sphericalPolynomialComputed = false;
+  }
+}
+
 InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMipmap,
                                               unsigned int sampling,
                                               const std::optional<bool>& invertY,

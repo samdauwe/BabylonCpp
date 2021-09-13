@@ -110,6 +110,13 @@ public:
   bool canRescale();
 
   /**
+   * @brief Force recomputation of spherical polynomials.
+   * Can be useful if you generate a cubemap multiple times (from a probe for eg) and you need the
+   * proper polynomials each time
+   */
+  void forceSphericalPolynomialsRecompute();
+
+  /**
    * @brief Hidden
    */
   InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap, unsigned int sampling = 0,
