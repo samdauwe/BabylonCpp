@@ -332,7 +332,10 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
   }
 
   for (const auto& _define : _options.defines) {
-    defines.emplace_back(_define);
+    const auto defineToAdd = stl_util::index_of(_define, "#define") == 0 ?
+                               _define :
+                               StringTools::printf("#define %s", _define.c_str());
+    defines.emplace_back(defineToAdd);
   }
 
   for (const auto& _attrib : _options.attributes) {
