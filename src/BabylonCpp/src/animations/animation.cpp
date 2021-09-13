@@ -22,6 +22,8 @@
 
 namespace BABYLON {
 
+size_t Animation::_UniqueIdGenerator = 0;
+
 bool Animation::_AllowMatricesInterpolation = false;
 
 bool Animation::_AllowMatrixDecomposeForInterpolation = true;
@@ -180,6 +182,7 @@ Animation::Animation(const std::string& iName, const std::string& iTargetPropert
   dataType       = iDataType;
   loopMode       = iLoopMode;
   enableBlending = iEnableBlending;
+  uniqueId       = Animation::_UniqueIdGenerator++;
 }
 
 Animation::~Animation() = default;

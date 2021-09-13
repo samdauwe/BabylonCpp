@@ -30,6 +30,9 @@ FWD_CLASS_SPTR(RuntimeAnimation)
  */
 class BABYLON_SHARED_EXPORT Animation {
 
+private:
+  static size_t _UniqueIdGenerator;
+
 public:
   /** Statics **/
 
@@ -131,6 +134,11 @@ public:
    * Define the Url to load snippets
    */
   static constexpr const char* SnippetUrl = "https://snippet.babylonjs.com";
+
+  /**
+   * Gets or sets the unique id of the animation (the uniqueness is solely among other animations)
+   */
+  size_t uniqueId;
 
   /**
    * Snippet ID if the animation was created from the snippet server
