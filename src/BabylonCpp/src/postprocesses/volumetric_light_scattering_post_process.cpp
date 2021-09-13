@@ -52,7 +52,8 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   auto scene_ = (camera == nullptr) ? scene : camera->getScene();
 
   auto engine_ = scene_->getEngine();
-  _viewPort = Viewport(0, 0, 1, 1).toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
+  _viewPort
+    = Viewport(0.f, 0.f, 1.f, 1.f).toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
 
   // Configure mesh
   mesh                           = (iMesh != nullptr) ? iMesh :
