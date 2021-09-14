@@ -438,6 +438,16 @@ public:
   BoundingInfoPtr& getBoundingInfo();
 
   /**
+   * @brief Creates a new bounding info for the mesh.
+   * @param minimum min vector of the bounding box/sphere
+   * @param maximum max vector of the bounding box/sphere
+   * @param worldMatrix defines the new world matrix
+   * @returns the new bounding info
+   */
+  BoundingInfoPtr& buildBoundingInfo(const Vector3& minimum, const Vector3& maximum,
+                                     const std::optional<Matrix>& worldMatrix = std::nullopt);
+
+  /**
    * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
    * units).
    * @param includeDescendants Use the hierarchy's bounding box instead of the
@@ -1378,6 +1388,11 @@ protected:
   virtual bool get_isBlocked() const;
 
   /**
+   * @brief Returns true if there is already a bounding info.
+   */
+  bool get_hasBoundingInfo() const;
+
+  /**
    * @brief Gets a boolean indicating if this mesh has skinning data and an attached skeleton.
    */
   bool get_useBones() const;
@@ -1964,6 +1979,11 @@ public:
    * Returns true if the mesh is blocked. Implemented by child classes
    */
   ReadOnlyProperty<AbstractMesh, bool> isBlocked;
+
+  /**
+   * Returns true if there is already a bounding info.
+   */
+  ReadOnlyProperty<AbstractMesh, bool> hasBoundingInfo;
 
   /**
    * Gets a boolean indicating if this mesh has skinning data and an attached

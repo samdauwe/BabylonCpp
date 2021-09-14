@@ -137,6 +137,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}
+    , hasBoundingInfo{this, &AbstractMesh::get_hasBoundingInfo}
     , useBones{this, &AbstractMesh::get_useBones}
     , isAnInstance{this, &AbstractMesh::get_isAnInstance}
     , hasInstances{this, &AbstractMesh::get_hasInstances}
@@ -932,6 +933,13 @@ BoundingInfoPtr& AbstractMesh::getBoundingInfo()
   return _boundingInfo;
 }
 
+BoundingInfoPtr& AbstractMesh::buildBoundingInfo(const Vector3& minimum, const Vector3& maximum,
+                                                 const std::optional<Matrix>& worldMatrix)
+{
+  _boundingInfo = std::make_unique<BoundingInfo>(minimum, maximum, worldMatrix);
+  return _boundingInfo;
+}
+
 AbstractMesh&
 AbstractMesh::normalizeToUnitCube(bool includeDescendants, bool ignoreRotation,
                                   const std::function<bool(const AbstractMeshPtr& node)>& predicate)
@@ -944,6 +952,11 @@ AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
   _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
+}
+
+bool AbstractMesh::get_hasBoundingInfo() const
+{
+  return _boundingInfo != nullptr;
 }
 
 bool AbstractMesh::get_useBones() const
@@ -1268,11 +1281,11 @@ bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise, bool include
 
 bool AbstractMesh::intersectsMesh(SolidParticle& sp, bool precise, bool includeDescendants)
 {
-  if (!_boundingInfo || !sp._boundingInfo) {
+  if (!_boundingInfo || !sp.hasBoundingInfo()) {
     return false;
   }
 
-  if (_boundingInfo->intersects(*sp._boundingInfo, precise)) {
+  if (_boundingInfo->intersects(*sp.getBoundingInfo(), precise)) {
     return true;
   }
 
