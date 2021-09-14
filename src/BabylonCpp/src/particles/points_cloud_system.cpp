@@ -684,7 +684,7 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
     if (start != 0
         || end != nbParticles - 1) { // only some particles are updated, then use the current
                                      // existing BBox basis. Note : it can only increase.
-      const auto& boundingInfo = iMesh->_boundingInfo;
+      const auto& boundingInfo = iMesh->getBoundingInfo();
       if (boundingInfo) {
         minimum.copyFrom(boundingInfo->minimum);
         maximum.copyFrom(boundingInfo->maximum);
@@ -852,11 +852,11 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
   }
 
   if (_computeBoundingBox) {
-    if (iMesh->_boundingInfo) {
-      iMesh->_boundingInfo->reConstruct(minimum, maximum, iMesh->_worldMatrix);
+    if (iMesh->hasBoundingInfo()) {
+      iMesh->getBoundingInfo()->reConstruct(minimum, maximum, iMesh->_worldMatrix);
     }
     else {
-      iMesh->_boundingInfo = std::make_shared<BoundingInfo>(minimum, maximum, iMesh->_worldMatrix);
+      iMesh->buildBoundingInfo(minimum, maximum, iMesh->_worldMatrix);
     }
   }
   afterUpdateParticles(start, end, update);
@@ -889,8 +889,7 @@ PointsCloudSystem& PointsCloudSystem::refreshVisibleSize()
 void PointsCloudSystem::setVisibilityBox(float size)
 {
   auto vis = size / 2.f;
-  mesh->_boundingInfo
-    = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
+  mesh->buildBoundingInfo(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
 }
 
 bool PointsCloudSystem::get_isAlwaysVisible() const

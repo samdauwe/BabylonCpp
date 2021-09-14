@@ -763,7 +763,7 @@ SolidParticleSystem& SolidParticleSystem::insertParticlesFromArray(
     const auto& meshNor = model->_normals;
     const auto noNor    = (!meshNor.empty()) ? false : true;
     recomputeNormals    = (noNor || recomputeNormals);
-    const auto& bbInfo  = sp->_boundingInfo;
+    const auto& bbInfo  = sp->getBoundingInfo();
 
     std::optional<std::vector<SolidParticlePtr>> storage = std::nullopt;
     auto newPart = _insertNewParticle(nbParticles, idxInShape, model, shape, meshInd, meshUV,
@@ -916,7 +916,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
     if (start != 0 || end != nbParticles - 1) { // only some particles are updated, then
                                                 // use the current existing BBox basis.
                                                 // Note : it can only increase.
-      auto& boundingInfo = mesh->_boundingInfo;
+      auto& boundingInfo = mesh->getBoundingInfo();
       if (boundingInfo) {
         minimum.copyFrom(boundingInfo->minimum);
         maximum.copyFrom(boundingInfo->maximum);
@@ -1173,7 +1173,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
 
     // if the particle intersections must be computed : update the bbInfo
     if (_particlesIntersect) {
-      auto& bInfo             = particle->_boundingInfo;
+      auto& bInfo             = particle->getBoundingInfo();
       auto& bBox              = bInfo->boundingBox;
       auto& bSphere           = bInfo->boundingSphere;
       auto& modelBoundingInfo = particle->_modelBoundingInfo;
@@ -1286,11 +1286,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
     }
   }
   if (_computeBoundingBox) {
-    if (mesh->_boundingInfo) {
-      mesh->_boundingInfo->reConstruct(minimum, maximum, mesh->_worldMatrix);
+    if (mesh->hasBoundingInfo()) {
+      mesh->getBoundingInfo()->reConstruct(minimum, maximum, mesh->_worldMatrix);
     }
     else {
-      mesh->_boundingInfo = std::make_unique<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
+      mesh->buildBoundingInfo(minimum, maximum, mesh->_worldMatrix);
     }
   }
   if (_autoUpdateSubMeshes) {
@@ -1519,8 +1519,7 @@ SolidParticleSystem& SolidParticleSystem::refreshVisibleSize()
 void SolidParticleSystem::setVisibilityBox(float size)
 {
   auto vis = size / 2.f;
-  mesh->_boundingInfo
-    = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
+  mesh->buildBoundingInfo(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
 }
 
 bool SolidParticleSystem::isAlwaysVisible() const
