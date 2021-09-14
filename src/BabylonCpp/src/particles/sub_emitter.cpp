@@ -19,16 +19,6 @@ SubEmitter::SubEmitter(const ParticleSystemPtr& iParticleSystem)
     particleSystem->emitter
       = AbstractMesh::New("SubemitterSystemEmitter", particleSystem->getScene());
   }
-
-  // Automatically dispose of subemitter when system is disposed
-  particleSystem->onDisposeObservable.add([this](IParticleSystem* /*ps*/, EventState& /*es*/) {
-    if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
-      // Prevent recursive dispose to break.
-      const auto disposable   = std::get<AbstractMeshPtr>(particleSystem->emitter);
-      particleSystem->emitter = Vector3::Zero();
-      disposable->dispose();
-    }
-  });
 }
 
 SubEmitter::~SubEmitter() = default;
@@ -50,7 +40,7 @@ SubEmitterPtr SubEmitter::clone() const
     emitter                = meshEmitter;
   }
   auto clone = std::make_shared<SubEmitter>(
-    std::static_pointer_cast<ParticleSystem>(particleSystem->clone("", emitter)));
+    std::static_pointer_cast<ParticleSystem>(particleSystem->clone(particleSystem->name, emitter)));
 
   // Clone properties
   clone->particleSystem->name += "Clone";
