@@ -182,6 +182,10 @@ void Gizmo::_update()
   }
 }
 
+void Gizmo::_handlePivot()
+{
+}
+
 void Gizmo::_matrixChanged()
 {
   if (!_attachedNode) {

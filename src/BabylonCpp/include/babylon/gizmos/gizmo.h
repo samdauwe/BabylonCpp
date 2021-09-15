@@ -157,6 +157,11 @@ protected:
   void _update();
 
   /**
+   * @brief Handle position/translation when using an attached node using pivot.
+   */
+  void _handlePivot();
+
+  /**
    * @brief computes the rotation/scaling/position of the transform once the Node world matrix has
    * changed.
    * @param value Node, TransformNode or mesh
