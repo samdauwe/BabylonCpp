@@ -1,6 +1,7 @@
 #include <babylon/maths/spherical_polynomial.h>
 
 #include <babylon/maths/color3.h>
+#include <babylon/maths/tmp_vectors.h>
 
 namespace BABYLON {
 
@@ -51,10 +52,11 @@ SphericalHarmonics& SphericalPolynomial::preScaledHarmonics()
 
 void SphericalPolynomial::addAmbient(const Color3& color)
 {
-  const Vector3 colorVector(color.r, color.g, color.b);
-  xx = xx.add(colorVector);
-  yy = yy.add(colorVector);
-  zz = zz.add(colorVector);
+  TmpVectors::Vector3Array[0].copyFromFloats(color.r, color.g, color.b);
+  auto& colorVector = TmpVectors::Vector3Array[0];
+  xx.addInPlace(colorVector);
+  yy.addInPlace(colorVector);
+  zz.addInPlace(colorVector);
 }
 
 void SphericalPolynomial::scaleInPlace(float scale)
@@ -70,8 +72,7 @@ void SphericalPolynomial::scaleInPlace(float scale)
   xy.scaleInPlace(scale);
 }
 
-SphericalPolynomial
-SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
+SphericalPolynomial SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
 {
   SphericalPolynomial result;
   result._harmonics = harmonics;
@@ -86,8 +87,7 @@ SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
   result.yy = harmonics.l00.scale(0.886277f)
                 .subtract(harmonics.l20.scale(0.247708f))
                 .subtract(harmonics.l22.scale(0.429043f));
-  result.zz
-    = harmonics.l00.scale(0.886277f).add(harmonics.l20.scale(0.495417f));
+  result.zz = harmonics.l00.scale(0.886277f).add(harmonics.l20.scale(0.495417f));
 
   result.yz = harmonics.l2_1.scale(0.858086f).scale(-1.f);
   result.zx = harmonics.l21.scale(0.858086f).scale(-1.f);
@@ -98,8 +98,7 @@ SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
   return result;
 }
 
-SphericalPolynomial
-SphericalPolynomial::FromArray(const std::vector<Float32Array>& data)
+SphericalPolynomial SphericalPolynomial::FromArray(const std::vector<Float32Array>& data)
 {
   SphericalPolynomial sp;
   if (data.size() < 9) {
