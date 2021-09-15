@@ -15,7 +15,8 @@ class PlaneRotationGizmo;
 FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
- * @brief Options for each individual plane rotation gizmo contained within RotationGizmo
+ * @brief Options for each individual plane rotation gizmo contained within RotationGizmo.
+ * @since 5.0.0
  */
 struct BABYLON_SHARED_EXPORT PlaneRotationGizmoOptions {
   /**
