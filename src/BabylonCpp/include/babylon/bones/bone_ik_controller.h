@@ -2,6 +2,7 @@
 #define BABYLON_BONES_IK_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
@@ -10,6 +11,8 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Bone;
+class Node;
+FWD_CLASS_SPTR(TransformNode)
 
 struct BoneIKControllerOptions {
   TransformNode* targetMesh                    = nullptr;
@@ -59,6 +62,10 @@ protected:
    * @brief Sets maximum allowed angle.
    */
   void _setMaxAngle(float ang = Math::PI);
+
+private:
+  static void _SetAbsoluteRotation(const TransformNodePtr& transform, const Quaternion& rotation);
+  static bool _IsTransformNode(Node* node);
 
 public:
   /**

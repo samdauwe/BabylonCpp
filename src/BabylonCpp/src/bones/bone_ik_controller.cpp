@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
@@ -12,7 +13,7 @@ std::array<Vector3, 6> BoneIKController::_tmpVecs{{Vector3::Zero(), Vector3::Zer
 Quaternion BoneIKController::_tmpQuat{Quaternion::Identity()};
 std::array<Matrix, 2> BoneIKController::_tmpMats{{Matrix::Identity(), Matrix::Identity()}};
 
-BoneIKController::BoneIKController(TransformNode *iMesh, Bone* bone,
+BoneIKController::BoneIKController(TransformNode* iMesh, Bone* bone,
                                    const std::optional<BoneIKControllerOptions>& iOptions)
     : targetMesh{nullptr}
     , poleTargetMesh{nullptr}
@@ -268,17 +269,59 @@ void BoneIKController::update()
       Quaternion::SlerpToRef(_bone1Quat, _iTmpQuat, slerpAmount, _bone1Quat);
       angC = _bone2Ang * (1.f - slerpAmount) + angC * slerpAmount;
       _bone1->setRotationQuaternion(_bone1Quat, Space::WORLD, mesh);
+      if (_bone1->_linkedTransformNode) {
+        BoneIKController::_SetAbsoluteRotation(_bone1->_linkedTransformNode, _bone1Quat);
+      }
+      else {
+      }
       _slerping = true;
     }
     else {
-      _bone1->setRotationMatrix(mat1, Space::WORLD, mesh);
+      if (_bone1->_linkedTransformNode) {
+        Quaternion::FromRotationMatrixToRef(mat1, _tmpQuat);
+        BoneIKController::_SetAbsoluteRotation(_bone1->_linkedTransformNode, _tmpQuat);
+      }
+      else {
+        _bone1->setRotationMatrix(mat1, Space::WORLD, mesh);
+      }
       _bone1Mat.copyFrom(mat1);
       _slerping = false;
     }
   }
 
-  _bone2->setAxisAngle(_bendAxis, angC, Space::LOCAL);
+  if (_bone2->_linkedTransformNode) {
+    if (!_bone2->_linkedTransformNode->rotationQuaternion()) {
+      _bone2->_linkedTransformNode->rotationQuaternion = Quaternion();
+    }
+    Quaternion::RotationAxisToRef(_bendAxis, angC,
+                                  *_bone2->_linkedTransformNode->rotationQuaternion());
+  }
+  else {
+    _bone2->setAxisAngle(_bendAxis, angC, Space::LOCAL);
+  }
   _bone2Ang = angC;
+}
+
+void BoneIKController::_SetAbsoluteRotation(const TransformNodePtr& transform,
+                                            const Quaternion& rotation)
+{
+  if (!transform->rotationQuaternion().has_value()) {
+    transform->rotationQuaternion = Quaternion();
+  }
+  if (_IsTransformNode(transform->parent())) {
+    auto& tmpQuat = TmpVectors::QuaternionArray[0];
+    Quaternion::InverseToRef(
+      static_cast<TransformNode*>(transform->parent())->absoluteRotationQuaternion(), tmpQuat);
+    tmpQuat.multiplyToRef(rotation, *transform->rotationQuaternion());
+  }
+  else {
+    transform->rotationQuaternion()->copyFrom(rotation);
+  }
+}
+
+bool BoneIKController::_IsTransformNode(Node* node)
+{
+  return !!node && static_cast<TransformNode*>(node) != nullptr;
 }
 
 } // end of namespace BABYLON
