@@ -122,8 +122,8 @@ void PoseEnabledController::attachToMesh(const AbstractMeshPtr& iMesh)
     _mesh->rotationQuaternion = Quaternion();
   }
 
-  // Sync controller mesh and pointing pose node's state with controller, this
-  // is done to avoid a frame where position is 0,0,0 when attaching mesh
+  // Sync controller mesh and pointing pose node's state with controller, this is done to avoid a
+  // frame where position is 0,0,0 when attaching mesh
   if (!isXR) {
     _updatePoseAndMesh();
     if (_pointingPoseNode) {
