@@ -79,31 +79,24 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
 
       position.addToRef(_add, _target);
 
-      if (scene->useRightHandedSystem()) {
-        Matrix::LookAtRHToRef(position, _target, Vector3::Up(), _viewMatrix);
+      const auto lookAtFunction
+        = scene->useRightHandedSystem() ? Matrix::LookAtRHToRef : Matrix::LookAtLHToRef;
+      const auto perspectiveFunction
+        = scene->useRightHandedSystem ? Matrix::PerspectiveFovRH : Matrix::PerspectiveFovLH;
 
-        if (scene->activeCamera()) {
-          _projectionMatrix = Matrix::PerspectiveFovRH(
-            Math::PI / 2.f, 1.f,
-            useReverseDepthBuffer ? scene->activeCamera()->maxZ : scene->activeCamera()->minZ,
-            useReverseDepthBuffer ? scene->activeCamera()->minZ : scene->activeCamera()->maxZ,
-            _scene->getEngine()->isNDCHalfZRange);
-          scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+      lookAtFunction(position, _target, Vector3::Up(), _viewMatrix);
+
+      if (scene->activeCamera()) {
+        _projectionMatrix = perspectiveFunction(
+          Math::PI / 2, 1.f,
+          useReverseDepthBuffer ? scene->activeCamera()->maxZ : scene->activeCamera()->minZ,
+          useReverseDepthBuffer ? scene->activeCamera()->minZ : scene->activeCamera()->maxZ,
+          _scene->getEngine()->isNDCHalfZRange, false);
+        scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+        if (scene->activeCamera()->isRigCamera && !_renderTargetTexture->activeCamera) {
+          _renderTargetTexture->activeCamera = scene->activeCamera()->rigParent;
         }
       }
-      else {
-        Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
-
-        if (_scene->activeCamera()) {
-          _projectionMatrix = Matrix::PerspectiveFovLH(
-            Math::PI / 2.f, 1.f,
-            useReverseDepthBuffer ? scene->activeCamera()->maxZ : scene->activeCamera()->minZ,
-            useReverseDepthBuffer ? scene->activeCamera()->minZ : scene->activeCamera()->maxZ,
-            _scene->getEngine()->isNDCHalfZRange);
-          _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
-        }
-      }
-
       _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
     });
 
