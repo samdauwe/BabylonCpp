@@ -54,12 +54,11 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name, RibbonOptions& opti
     };
     auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
     positionFunction(positions);
-    if (instance->_boundingInfo) {
-      instance->_boundingInfo->reConstruct(minimum, maximum, instance->_worldMatrix);
+    if (instance->hasBoundingInfo()) {
+      instance->getBoundingInfo()->reConstruct(minimum, maximum, instance->_worldMatrix);
     }
     else {
-      instance->_boundingInfo
-        = std::make_shared<BoundingInfo>(minimum, maximum, instance->_worldMatrix);
+      instance->buildBoundingInfo(minimum, maximum, instance->_worldMatrix);
     }
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false, false);
     if (!options.colors.empty()) {
