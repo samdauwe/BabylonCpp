@@ -9,12 +9,14 @@
 namespace BABYLON {
 
 namespace GL {
+class IGLRenderbuffer;
 class IGLRenderingContext;
 class IGLTexture;
 } // end of namespace GL
 
 // GL
 using WebGLTexturePtr       = std::shared_ptr<GL::IGLTexture>;
+using WebGLRenderbufferPtr  = std::shared_ptr<GL::IGLRenderbuffer>;
 using WebGLRenderingContext = GL::IGLRenderingContext;
 
 /**
@@ -40,6 +42,9 @@ public:
   void reset() override;
 
   void release() override;
+
+public:
+  WebGLRenderbufferPtr _MSAARenderBuffer;
 
 private:
   WebGLTexturePtr _webGLTexture;

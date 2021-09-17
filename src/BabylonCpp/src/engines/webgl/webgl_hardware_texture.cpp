@@ -8,6 +8,7 @@ namespace BABYLON {
 
 WebGLHardwareTexture::WebGLHardwareTexture(WebGLTexturePtr existingTexture,
                                            WebGLRenderingContext* context)
+    : _MSAARenderBuffer{nullptr}
 {
   _context = context;
   if (!existingTexture) {
@@ -39,11 +40,17 @@ void WebGLHardwareTexture::set(const WebGLTexturePtr& hardwareTexture)
 
 void WebGLHardwareTexture::reset()
 {
-  _webGLTexture = nullptr;
+  _webGLTexture     = nullptr;
+  _MSAARenderBuffer = nullptr;
 }
 
 void WebGLHardwareTexture::release()
 {
+  if (_MSAARenderBuffer) {
+    _context->deleteRenderbuffer(_MSAARenderBuffer.get());
+    _MSAARenderBuffer = nullptr;
+  }
+
   if (_webGLTexture && _context) {
     _context->deleteTexture(_webGLTexture.get());
   }
