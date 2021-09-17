@@ -21,6 +21,12 @@ FWD_CLASS_SPTR(RawTexture2DArray)
 class BABYLON_SHARED_EXPORT MorphTargetManager : public IDisposable {
 
 public:
+  /**
+   *  Enable storing morph target data into textures when set to true (true by default)
+   */
+  static bool EnableTextureStorage;
+
+public:
   template <typename... Ts>
   static MorphTargetManagerPtr New(Ts&&... args)
   {
@@ -104,6 +110,18 @@ protected:
    * @param scene defines the current scene
    */
   MorphTargetManager(Scene* scene = nullptr);
+
+  /**
+   * Gets a boolean indicating that adding new target will or will not update the underlying data
+   * buffers
+   */
+  bool get_areUpdatesFrozen() const;
+
+  /**
+   * Sets a boolean indicating that adding new target will or will not update the underlying data
+   * buffers
+   */
+  void set_areUpdatesFrozen(bool block);
 
   /**
    * @brief Gets the unique ID of this manager.
@@ -196,6 +214,12 @@ public:
   bool enableUVMorphing;
 
   /**
+   * Gets or sets a boolean indicating that adding new target will or will not update the underlying
+   * data buffers
+   */
+  Property<MorphTargetManager, bool> areUpdatesFrozen;
+
+  /**
    * Unique ID of this manager
    */
   ReadOnlyProperty<MorphTargetManager, size_t> uniqueId;
@@ -266,6 +290,7 @@ private:
   size_t _uniqueId;
   Float32Array _tempInfluences;
   bool _canUseTextureForTargets;
+  int _blockCounter;
   bool _useTextureToStoreTargets;
 
 }; // end of class MorphTargetManager

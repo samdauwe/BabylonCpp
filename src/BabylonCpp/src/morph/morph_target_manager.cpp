@@ -12,6 +12,8 @@
 
 namespace BABYLON {
 
+bool MorphTargetManager::EnableTextureStorage = true;
+
 MorphTargetManager::MorphTargetManager(Scene* scene)
     : _parentContainer{nullptr}
     , _targetStoreTexture{nullptr}
@@ -19,6 +21,8 @@ MorphTargetManager::MorphTargetManager(Scene* scene)
     , enableNormalMorphing{true}
     , enableTangentMorphing{true}
     , enableUVMorphing{true}
+    , areUpdatesFrozen{this, &MorphTargetManager::get_areUpdatesFrozen,
+                       &MorphTargetManager::set_areUpdatesFrozen}
     , uniqueId{this, &MorphTargetManager::get_uniqueId}
     , vertexCount{this, &MorphTargetManager::get_vertexCount}
     , supportsNormals{this, &MorphTargetManager::get_supportsNormals}
@@ -39,6 +43,7 @@ MorphTargetManager::MorphTargetManager(Scene* scene)
     , _textureHeight{1}
     , _uniqueId{0}
     , _canUseTextureForTargets{false}
+    , _blockCounter{0}
     , _useTextureToStoreTargets{true}
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
@@ -57,6 +62,26 @@ void MorphTargetManager::addToScene(const MorphTargetManagerPtr& newMorphTargetM
     _canUseTextureForTargets = engineCaps.canUseGLVertexID && engineCaps.textureFloat
                                && engineCaps.maxVertexTextureImageUnits > 0;
   }
+}
+
+void MorphTargetManager::set_areUpdatesFrozen(bool block)
+{
+  if (block) {
+    _blockCounter++;
+  }
+  else {
+    _blockCounter--;
+    if (_blockCounter <= 0) {
+      _blockCounter = 0;
+
+      _syncActiveTargets(true);
+    }
+  }
+}
+
+bool MorphTargetManager::get_areUpdatesFrozen() const
+{
+  return _blockCounter > 0;
 }
 
 size_t MorphTargetManager::get_uniqueId() const
@@ -111,7 +136,8 @@ void MorphTargetManager::set_useTextureToStoreTargets(bool value)
 
 bool MorphTargetManager::get_isUsingTextureForTargets() const
 {
-  return useTextureToStoreTargets() && _canUseTextureForTargets;
+  return MorphTargetManager::EnableTextureStorage && useTextureToStoreTargets()
+         && _canUseTextureForTargets;
 }
 
 MorphTargetPtr MorphTargetManager::getActiveTarget(size_t index)
@@ -139,7 +165,9 @@ void MorphTargetManager::addTarget(const MorphTargetPtr& target)
     [this](const bool* needUpdate, EventState&) -> void { _syncActiveTargets(*needUpdate); }));
   _targetDataLayoutChangedObservers.emplace_back(_targets.back()->_onDataLayoutChanged.add(
     [this](void*, EventState&) -> void { _syncActiveTargets(true); }));
-  _syncActiveTargets(true);
+  if (!areUpdatesFrozen) {
+    _syncActiveTargets(true);
+  }
 }
 
 void MorphTargetManager::removeTarget(MorphTarget* target)
