@@ -94,6 +94,7 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
 
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
     if (attachedNode()) {
+      _handlePivot();
       // Drag strength is modified by the scale of the gizmo (eg. for small objects like boombox the
       // strength will be increased to match the behavior of larger objects)
       const auto dragStrength

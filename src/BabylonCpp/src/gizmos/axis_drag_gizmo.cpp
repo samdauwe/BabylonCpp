@@ -119,6 +119,7 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
 
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
     if (attachedNode()) {
+      _handlePivot();
       // Keep world translation and use it to update world transform
       // if the node has parent, the local transform properties (position, rotation, scale)
       // will be recomputed in _matrixChanged function
