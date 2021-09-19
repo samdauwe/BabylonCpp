@@ -1,6 +1,7 @@
 #include <babylon/gizmos/light_gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -26,6 +27,7 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     , _attachedMeshParent{nullptr}
     , _pointerObserver{nullptr}
     , _light{nullptr}
+    , _tmpAttachedNode{nullptr}
 {
   attachedMesh        = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _attachedMeshParent = TransformNode::New("parent", gizmoLayer->utilityLayerScene.get());
@@ -104,6 +106,18 @@ void LightGizmo::set_light(const LightPtr& iLight)
 
     _update();
   }
+}
+
+NodePtr& LightGizmo::get_attachedNode()
+{
+  _tmpAttachedNode = std::static_pointer_cast<Node>(attachedMesh());
+  return _tmpAttachedNode;
+}
+
+void LightGizmo::set_attachedNode(const NodePtr& /*value*/)
+{
+  BABYLON_LOG_WARN("LightGizmo",
+                   "Nodes cannot be attached to LightGizmo. Attach to a mesh instead.");
 }
 
 LightPtr& LightGizmo::get_light()

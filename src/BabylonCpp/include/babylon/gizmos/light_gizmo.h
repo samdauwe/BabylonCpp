@@ -52,6 +52,20 @@ private:
 
 protected:
   /**
+   * @brief Override attachedNode because lightgizmo only support attached mesh
+   * It will return the attached mesh (if any) and setting an attached node will log
+   * a warning
+   */
+  NodePtr& get_attachedNode() override;
+
+  /**
+   * @brief Sets the node that the gizmo will be attached to. (eg. on a drag gizmo the mesh, bone or
+   * NodeTransform that will be dragged)
+   * * When set, interactions will be enabled
+   */
+  void set_attachedNode(const NodePtr& value) override;
+
+  /**
    * @brief Gets the light that the gizmo is attached to.
    */
   LightPtr& get_light();
@@ -91,6 +105,7 @@ private:
   TransformNodePtr _attachedMeshParent;
   Observer<PointerInfo>::Ptr _pointerObserver;
   LightPtr _light;
+  NodePtr _tmpAttachedNode;
 
 }; // end of class LightGizmo
 
