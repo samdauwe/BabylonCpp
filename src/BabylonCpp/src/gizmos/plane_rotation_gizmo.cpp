@@ -99,11 +99,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       const auto originalRotationPoint
         = _rotationCircle->getAbsolutePosition().clone()->addInPlace(direction);
       const auto dragStartPoint = e->dragPlanePoint;
-      const auto angle
+      const auto iAngle
         = Vector3::GetAngleBetweenVectors(originalRotationPoint.subtract(origin),
                                           dragStartPoint.subtract(origin), _rotationCircle->up());
 
-      _rotationCircle->addRotation(0.f, angle, 0.f);
+      _rotationCircle->addRotation(0.f, iAngle, 0.f);
       _dragging = true;
     }
   });
@@ -124,13 +124,14 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       std::optional<Vector3> nodeScale         = Vector3(1.f, 1.f, 1.f);
       std::optional<Quaternion> nodeQuaternion = Quaternion(0.f, 0.f, 0.f, 1.f);
       std::optional<Vector3> nodeTranslation   = Vector3(0.f, 0.f, 0.f);
+      _handlePivot();
       attachedNode()->getWorldMatrix().decompose(nodeScale, nodeQuaternion, nodeTranslation);
 
       auto newVector      = event->dragPlanePoint.subtract(*nodeTranslation).normalize();
       auto originalVector = _lastDragPosition.subtract(*nodeTranslation).normalize();
       auto cross          = Vector3::Cross(newVector, originalVector);
       auto dot            = Vector3::Dot(newVector, originalVector);
-      auto angle          = std::atan2(cross.length(), dot);
+      auto iAngle         = std::atan2(cross.length(), dot);
       _planeNormalTowardsCamera.copyFrom(planeNormal);
       _localPlaneNormalTowardsCamera.copyFrom(planeNormal);
       if (updateGizmoRotationToMatchAttachedMesh) {
@@ -151,37 +152,37 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       }
       auto halfCircleSide = Vector3::Dot(_localPlaneNormalTowardsCamera, cross) > 0.f;
       if (halfCircleSide) {
-        angle = -angle;
+        iAngle = -iAngle;
       }
 
       // Snapping logic
       auto snapped = false;
       if (snapDistance != 0.f) {
-        _currentSnapDragDistance += angle;
+        _currentSnapDragDistance += iAngle;
         if (std::abs(_currentSnapDragDistance) > snapDistance) {
           auto dragSteps = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
           if (_currentSnapDragDistance < 0.f) {
             dragSteps *= -1.f;
           }
           _currentSnapDragDistance = std::fmod(_currentSnapDragDistance, snapDistance);
-          angle                    = snapDistance * dragSteps;
+          iAngle                   = snapDistance * dragSteps;
           snapped                  = true;
         }
         else {
-          angle = 0.f;
+          iAngle = 0.f;
         }
       }
 
-      _dragDistance += cameraFlipped ? -angle : angle;
+      _dragDistance += cameraFlipped ? -iAngle : iAngle;
       updateRotationCircle(_rotationCircle, rotationCirclePaths, _dragDistance, _dragPlanePoint);
 
       // Convert angle and axis to quaternion
       // (http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm)
-      auto quaternionCoefficient = std::sin(angle / 2.f);
+      auto quaternionCoefficient = std::sin(iAngle / 2.f);
       _amountToRotate.set(_planeNormalTowardsCamera.x * quaternionCoefficient,
                           _planeNormalTowardsCamera.y * quaternionCoefficient,
                           _planeNormalTowardsCamera.z * quaternionCoefficient,
-                          std::cos(angle / 2.f));
+                          std::cos(iAngle / 2.f));
 
       // If the meshes local scale is inverted (eg. loaded gltf file parent with z scale of -1) the
       // rotation needs to be inverted on the y axis
@@ -207,12 +208,12 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
 
       _lastDragPosition.copyFrom(event->dragPlanePoint);
       if (snapped) {
-        _tmpSnapEvent.snapDistance = angle;
+        _tmpSnapEvent.snapDistance = iAngle;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
-      _angles.y += angle;
+      _angles.y += iAngle;
 
-      angle += cameraFlipped ? -angle : angle;
+      iAngle += cameraFlipped ? -iAngle : iAngle;
       _rotationShaderMaterial->setVector3("angles", _angles);
       _matrixChanged();
     }
