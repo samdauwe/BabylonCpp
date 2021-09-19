@@ -74,6 +74,7 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
 
   dragBehavior->onDragObservable.add([this](DragMoveEvent* event, EventState& /*es*/) -> void {
     if (attachedNode()) {
+      _handlePivot();
       // Keep world translation and use it to update world transform
       // if the node has parent, the local transform properties (position, rotation, scale)
       // will be recomputed in _matrixChanged function
