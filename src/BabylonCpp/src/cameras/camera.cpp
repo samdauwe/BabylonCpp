@@ -82,6 +82,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}
     , _refreshFrustumPlanes{true}
+    , _absoluteRotation{Quaternion::Identity()}
     , _setActiveOnSceneIfNoneActive{setActiveOnSceneIfNoneActive}
 {
   position = iPosition;
@@ -991,12 +992,14 @@ Vector3 Camera::getDirection(const Vector3& localAxis)
 Quaternion Camera::absoluteRotation()
 {
   std::optional<Vector3> iScale       = std::nullopt;
-  std::optional<Quaternion> result    = Quaternion::Zero();
+  std::optional<Quaternion> result    = _absoluteRotation;
   std::optional<Vector3> iTranslation = std::nullopt;
 
   getWorldMatrix().decompose(iScale, result, iTranslation);
 
-  return *result;
+  _absoluteRotation = *result;
+
+  return _absoluteRotation;
 }
 
 void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
