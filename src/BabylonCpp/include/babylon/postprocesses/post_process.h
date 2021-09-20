@@ -177,7 +177,7 @@ public:
    * specified in the post process constructor. (default: null)
    * @param forceDepthStencil If true, a depth and stencil buffer will be generated. (default:
    * false)
-   * @returns The target texture that was bound to be written to.
+   * @returns The render target wrapper that was bound to be written to.
    */
   InternalTexturePtr activate(const CameraPtr& camera,
                               const InternalTexturePtr& sourceTexture = nullptr,
