@@ -853,6 +853,7 @@ private:
   bool _refreshFrustumPlanes;
   float _storedFov;
   bool _stateStored;
+  Quaternion _absoluteRotation;
   bool _setActiveOnSceneIfNoneActive;
 
 }; // end of class Camera
