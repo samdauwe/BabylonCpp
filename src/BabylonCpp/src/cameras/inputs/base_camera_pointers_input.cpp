@@ -15,6 +15,8 @@ BaseCameraPointersInput<TCamera>::BaseCameraPointersInput()
     , _ctrlKey{false}
     , _metaKey{false}
     , _shiftKey{false}
+    , _currentActiveButton{-1}
+    , _usingSafari{false}
     , _pointerInput{nullptr}
     , _observer{nullptr}
     , _onLostFocus{nullptr}
@@ -62,8 +64,9 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
   _buttonsPressed = 0;
 
   _pointerInput = [this](PointerInfo* p, EventState& /*es*/) -> void {
-    auto& evt    = p->pointerEvent;
-    auto isTouch = evt.pointerType == "touch";
+    auto& evt          = p->pointerEvent;
+    auto isTouch       = evt.pointerType == "touch";
+    auto ignoreContext = isTouch || _usingSafari;
 
     if (p->type != PointerEventTypes::POINTERMOVE
         && (std::find(buttons.begin(), buttons.end(), evt.button) == buttons.end())) {
@@ -108,6 +111,9 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
         };
       }
 
+      if (_currentActiveButton == -1 && !isTouch) {
+        _currentActiveButton = evt.button;
+      }
       onButtonDown(evt);
 
       if (!_noPreventDefault) {
@@ -119,7 +125,11 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
     else if (p->type == PointerEventTypes::POINTERDOUBLETAP) {
       // onDoubleTap(evt.pointerType);
     }
-    else if (p->type == PointerEventTypes::POINTERUP && srcElement) {
+    else if (srcElement
+             && (p->type == PointerEventTypes::POINTERUP
+                 || (p->type == PointerEventTypes::POINTERMOVE
+                     /* && p->event.button == _currentActiveButton */
+                     && _currentActiveButton != -1 && !ignoreContext))) {
       if (evt.srcElement) {
         evt.srcElement->releasePointerCapture(evt.pointerId);
       }
@@ -164,6 +174,7 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
         _previousMultiTouchPanPosition = std::nullopt;
       }
 
+      _currentActiveButton = -1;
       onButtonUp(evt);
 
       if (!_noPreventDefault) {
@@ -211,7 +222,8 @@ void BaseCameraPointersInput<TCamera>::attachControl(bool noPreventDefault)
   _observer = ICameraInput<TCamera>::camera->getScene()->onPointerObservable.add(
     _pointerInput, static_cast<int>(PointerEventTypes::POINTERDOWN)
                      | static_cast<int>(PointerEventTypes::POINTERUP)
-                     | static_cast<int>(PointerEventTypes::POINTERMOVE));
+                     | static_cast<int>(PointerEventTypes::POINTERMOVE)
+                     | static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
 
   _onLostFocus = [this](const FocusEvent&) {
     pointA = pointB                = std::nullopt;

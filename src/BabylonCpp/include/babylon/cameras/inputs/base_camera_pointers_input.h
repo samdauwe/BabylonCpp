@@ -129,6 +129,8 @@ protected:
   int _buttonsPressed;
 
 private:
+  int _currentActiveButton;
+  bool _usingSafari;
   std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
   Observer<PointerInfo>::Ptr _observer;
   std::function<void(FocusEvent& e)> _onLostFocus;
