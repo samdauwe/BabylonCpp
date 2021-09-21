@@ -5281,7 +5281,8 @@ AbstractMeshPtr& Scene::getPointerOverMesh()
   return _pointerOverMesh;
 }
 
-void Scene::setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& /*pointerId*/)
+void Scene::setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& /*pointerId*/,
+                               const std::optional<PickingInfo>& /*pickResult*/)
 {
   if (_pointerOverMesh.get() == mesh) {
     return;

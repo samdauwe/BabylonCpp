@@ -1579,9 +1579,11 @@ public:
   /**
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
-   * @param pointerId optional pointer id when using more than one pointer
+   * @param pointerId optional pointer id when using more than one pointer. Defaults to 0
+   * @param pickResult optional pickingInfo data used to find mesh
    */
-  void setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& pointerId = std::nullopt);
+  void setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& pointerId = std::nullopt,
+                          const std::optional<PickingInfo>& pickResult = std::nullopt);
 
   /**
    * @brief Gets the mesh under the pointer.
