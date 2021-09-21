@@ -81,6 +81,11 @@ private:
 
 public:
   /**
+   * The minimum radius used for pinch, to avoid radius lock at 0
+   */
+  static float MinimumRadiusForPinch;
+
+  /**
    * Defines the pointer angular sensibility  along the X axis or how fast is the camera rotating.
    */
   float angularSensibilityX;

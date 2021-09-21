@@ -8,6 +8,8 @@
 
 namespace BABYLON {
 
+float ArcRotateCameraPointersInput::MinimumRadiusForPinch = 0.001f;
+
 ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
     : angularSensibilityX{1000.f}
     , angularSensibilityY{1000.f}
@@ -47,13 +49,15 @@ void ArcRotateCameraPointersInput::_computeMultiTouchPanning(
 void ArcRotateCameraPointersInput::_computePinchZoom(float previousPinchSquaredDistance,
                                                      float pinchSquaredDistance)
 {
+  const auto radius
+    = camera->radius != 0.f ? camera->radius : ArcRotateCameraPointersInput::MinimumRadiusForPinch;
   if (useNaturalPinchZoom) {
     camera->radius
-      = camera->radius * std::sqrt(previousPinchSquaredDistance) / std::sqrt(pinchSquaredDistance);
+      = radius * std::sqrt(previousPinchSquaredDistance) / std::sqrt(pinchSquaredDistance);
   }
   else if (pinchDeltaPercentage) {
     camera->inertialRadiusOffset += (pinchSquaredDistance - previousPinchSquaredDistance) * 0.001f
-                                    * camera->radius * pinchDeltaPercentage;
+                                    * radius * pinchDeltaPercentage;
   }
   else {
     camera->inertialRadiusOffset += (pinchSquaredDistance - previousPinchSquaredDistance)
