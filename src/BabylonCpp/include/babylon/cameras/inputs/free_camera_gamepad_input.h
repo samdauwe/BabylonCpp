@@ -89,6 +89,12 @@ public:
   float gamepadMoveSensibility;
 
   /**
+   * Defines the minimum value at which any analog stick input is ignored.
+   * Note: This value should only be a value between 0 and 1.
+   */
+  float deadzoneDelta;
+
+  /**
    * Gets or sets a boolean indicating that Yaxis (for right stick) should be inverted
    */
   Property<FreeCameraGamepadInput, bool> invertYAxis;
