@@ -41,6 +41,11 @@ public:
   static bool ForceSerializeBuffers;
 
   /**
+   * This observable will notify when any texture had a loading error
+   */
+  static Observable<BaseTexture> OnTextureLoadErrorObservable;
+
+  /**
    * @brief Hidden
    */
   static MirrorTexturePtr

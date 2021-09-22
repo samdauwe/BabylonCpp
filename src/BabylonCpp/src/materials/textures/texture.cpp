@@ -16,9 +16,10 @@
 
 namespace BABYLON {
 
-bool Texture::SerializeBuffers      = true;
-bool Texture::ForceSerializeBuffers = false;
-bool Texture::UseSerializedUrlIfAny = false;
+bool Texture::SerializeBuffers                                = true;
+bool Texture::ForceSerializeBuffers                           = false;
+bool Texture::UseSerializedUrlIfAny                           = false;
+Observable<BaseTexture> Texture::OnTextureLoadErrorObservable = {};
 
 Texture::Texture(
   const std::string& iUrl, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
@@ -167,9 +168,18 @@ Texture::Texture(
     }
   };
 
+  const auto errorHandler
+    = [this, iOnError](const std::string& message, const std::string& exception) -> void {
+    _loadingError = true;
+    _errorObject  = ErrorObject{message, exception};
+    if (iOnError) {
+      iOnError(message, exception);
+    }
+  };
+
   if (url.empty()) {
     _delayedOnLoad  = _load;
-    _delayedOnError = onError;
+    _delayedOnError = errorHandler;
     return;
   }
 
@@ -188,7 +198,7 @@ Texture::Texture(
       delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
 
       _delayedOnLoad  = _load;
-      _delayedOnError = onError;
+      _delayedOnError = errorHandler;
     }
   }
   else {
