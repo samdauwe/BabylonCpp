@@ -20,6 +20,11 @@ FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(SphericalPolynomial)
 
+struct ErrorObject {
+  std::string message;
+  std::string exception;
+};
+
 /**
  * @brief Base class of all the textures in babylon.
  * It groups all the common properties the materials, post process, lights... might need
@@ -427,6 +432,8 @@ public:
 protected:
   unsigned int _coordinatesMode;
   Scene* _scene;
+  bool _loadingError;
+  ErrorObject _errorObject;
 
 private:
   bool _hasAlpha;

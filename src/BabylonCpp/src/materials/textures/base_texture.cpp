@@ -52,6 +52,7 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _scene{nullptr}
+    , _loadingError{false}
     , _hasAlpha{false}
     , _isCube{false}
     , _gammaSpace{true}
