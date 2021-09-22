@@ -11,6 +11,7 @@ FWD_CLASS_SPTR(OcclusionMaterial)
 
 /**
  * @brief A material to use for fast depth-only rendering.
+ * @since 5.0.0
  */
 class BABYLON_SHARED_EXPORT OcclusionMaterial : public ShaderMaterial {
 
