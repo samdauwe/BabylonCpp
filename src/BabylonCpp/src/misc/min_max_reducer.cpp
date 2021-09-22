@@ -135,7 +135,7 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
           = [this, scene, reduction, w, h](Effect* /*effect*/, EventState /*es*/) -> void {
           Float32Array buffer(4 * static_cast<size_t>(w * h));
           MinMaxFloats minmax{0.f, 0.f};
-          scene->getEngine()->_readTexturePixels(reduction->inputTexture, w, h, -1, 0, buffer,
+          scene->getEngine()->_readTexturePixels(reduction->inputTexture(), w, h, -1, 0, buffer,
                                                  false);
           minmax.min = buffer[0];
           minmax.max = buffer[1];
