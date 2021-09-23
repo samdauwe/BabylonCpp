@@ -1,8 +1,11 @@
 #ifndef BABYLON_MISC_IINSPECTABLE_H
 #define BABYLON_MISC_IINSPECTABLE_H
 
+#include <functional>
 #include <optional>
 #include <string>
+#include <variant>
+#include <vector>
 
 #include <babylon/babylon_api.h>
 
@@ -36,7 +39,39 @@ enum class InspectableType {
    * String
    */
   String = 5,
-};
+  /**
+   * Button
+   */
+  Button = 6,
+  /**
+   * Options
+   */
+  Options = 7,
+  /**
+   * Tab
+   */
+  Tab = 8,
+}; // end of class InspectableType
+
+/**
+ * Interface used to define custom inspectable options in "Options" mode.
+ * This interface is used by the inspector to display the list of options
+ */
+struct BABYLON_SHARED_EXPORT IInspectableOptions {
+  /**
+   * Defines the visible part of the option
+   */
+  std::string label;
+  /**
+   * Defines the value part of the option (returned through the callback)
+   */
+  std::variant<float, std::string> value;
+
+  /**
+   * Defines if the option should be selected or not
+   */
+  std::optional<bool> selected = std::nullopt;
+}; // end of class IInspectableOptions
 
 /**
  * @brief Interface used to define custom inspectable properties.
@@ -68,6 +103,14 @@ struct BABYLON_SHARED_EXPORT IInspectable {
    * Gets the setp to use when using in "slider" mode
    */
   std::optional<float> step = std::nullopt;
+  /**
+   * Gets the callback function when using "Button" mode
+   */
+  std::function<void()> callback = nullptr;
+  /**
+   * Gets the list of options when using "Option" mode
+   */
+  std::vector<IInspectableOptions> options;
 }; // end of class IInspectable
 
 } // end of namespace BABYLON
