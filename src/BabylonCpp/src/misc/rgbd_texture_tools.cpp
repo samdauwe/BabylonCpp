@@ -90,7 +90,7 @@ void RGBDTextureTools::runRgbdDecodePostProcess(Texture* texture)
         // Cleanup
         engine->restoreDefaultFramebuffer();
         engine->_releaseTexture(internalTexture);
-        engine->_releaseFramebufferObjects(expandedTexture);
+
         if (rgbdPostProcess) {
           rgbdPostProcess->dispose();
         }
