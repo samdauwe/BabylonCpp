@@ -25,9 +25,9 @@ MeshExploder::MeshExploder(const std::vector<MeshPtr>& meshes, const MeshPtr& ce
     if (mesh) {
       _meshesOrigins.emplace_back(mesh->getAbsolutePosition());
       _toCenterVectors.emplace_back(Vector3::Zero());
-      if (mesh->_boundingInfo && _centerMesh->_boundingInfo) {
-        mesh->_boundingInfo->boundingBox.centerWorld.subtractToRef(
-          _centerMesh->_boundingInfo->boundingBox.centerWorld, _toCenterVectors.back());
+      if (mesh->hasBoundingInfo() && _centerMesh->hasBoundingInfo()) {
+        mesh->getBoundingInfo()->boundingBox.centerWorld.subtractToRef(
+          _centerMesh->getBoundingInfo()->boundingBox.centerWorld, _toCenterVectors.back());
       }
     }
   }
