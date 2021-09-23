@@ -367,7 +367,6 @@ void EnvironmentTextureTools::UploadLevelsSync(
 
   // Release temp RTT.
   if (cubeRtt) {
-    engine->_releaseFramebufferObjects(cubeRtt);
     engine->_releaseTexture(texture);
     cubeRtt->_swapAndDie(texture);
   }
