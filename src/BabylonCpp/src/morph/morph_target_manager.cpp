@@ -172,7 +172,7 @@ void MorphTargetManager::addTarget(const MorphTargetPtr& target)
 
 void MorphTargetManager::removeTarget(MorphTarget* target)
 {
-  auto it
+  const auto it
     = std::find_if(_targets.begin(), _targets.end(), [target](const MorphTargetPtr& morphTarget) {
         return target == morphTarget.get();
       });
@@ -360,8 +360,8 @@ void MorphTargetManager::synchronize()
   }
 
   // Flag meshes as dirty to resync with the active targets
-  for (auto& abstractMesh : _scene->meshes) {
-    auto mesh = std::static_pointer_cast<Mesh>(abstractMesh);
+  for (const auto& abstractMesh : _scene->meshes) {
+    const auto mesh = std::static_pointer_cast<Mesh>(abstractMesh);
     if (mesh && (mesh->morphTargetManager().get() == this)) {
       mesh->_syncGeometryWithMorphTargetManager();
     }
@@ -389,7 +389,7 @@ void MorphTargetManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAn
 
 MorphTargetManagerPtr MorphTargetManager::Parse(const json& serializationObject, Scene* scene)
 {
-  auto result = MorphTargetManager::New(scene);
+  const auto result = MorphTargetManager::New(scene);
 
   result->_uniqueId = json_util::get_number<unsigned>(serializationObject, "id", 0);
 
