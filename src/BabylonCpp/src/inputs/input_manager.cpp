@@ -134,7 +134,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
 
   auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
-    scene.setPointerOverMesh(pickResult->pickedMesh.get(), evt.pointerId);
+    scene.setPointerOverMesh(pickResult->pickedMesh.get(), evt.pointerId, pickResult);
 
     if (_pointerOverMesh && _pointerOverMesh->actionManager
         && _pointerOverMesh->actionManager->hasPointerTriggers()) {
@@ -149,7 +149,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
     }
   }
   else {
-    scene.setPointerOverMesh(nullptr, evt.pointerId);
+    scene.setPointerOverMesh(nullptr, evt.pointerId, pickResult);
   }
 
   for (const auto& step : scene._pointerMoveStage) {
