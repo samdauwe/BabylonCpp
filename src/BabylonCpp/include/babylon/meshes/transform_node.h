@@ -102,6 +102,12 @@ public:
   std::string getClassName() const override;
 
   /**
+   * @brief return true if a pivot has been set.
+   * @returns true if a pivot matrix is used
+   */
+  bool isUsingPivotMatrix() const;
+
+  /**
    * @brief Copies the parameter passed Matrix into the mesh Pose matrix.
    * @param matrix the matrix to copy the pose from
    * @returns this TransformNode.
@@ -335,7 +341,6 @@ public:
    * @brief Detach the transform node if its associated with a bone.
    * @param resetToPreviousParent Indicates if the parent that was in effect when attachToBone was
    * called should be set back or if we should set parent to null instead (defaults to the latter)
-   * @since 5.0.0
    * @returns this object
    */
   TransformNode& detachFromBone(bool resetToPreviousParent = false);

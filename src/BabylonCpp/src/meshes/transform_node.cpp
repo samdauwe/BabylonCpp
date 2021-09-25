@@ -234,6 +234,11 @@ void TransformNode::set_position(const Vector3& newPosition)
   _isDirty  = true;
 }
 
+bool TransformNode::isUsingPivotMatrix() const
+{
+  return _usePivotMatrix;
+}
+
 Vector3& TransformNode::get_rotation()
 {
   return _rotation;
