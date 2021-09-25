@@ -846,7 +846,7 @@ void Mesh::_postActivate()
 
 Mesh& Mesh::refreshBoundingInfo(bool applySkeleton)
 {
-  if (_boundingInfo && _boundingInfo->isLocked()) {
+  if (hasBoundingInfo() && getBoundingInfo()->isLocked()) {
     return *this;
   }
 
@@ -2572,6 +2572,7 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer, unsigned int
   if (forceUpdate) {
     setVerticesData(VertexBuffer::PositionKind, positions);
     setVerticesData(VertexBuffer::NormalKind, normals);
+    setVerticesData(VertexBuffer::UVKind, uvs);
   }
   else {
     updateVerticesData(VertexBuffer::PositionKind, positions);
@@ -3430,7 +3431,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
   if (json_util::has_valid_key_value(parsedMesh, "delayLoadingFile")) {
     mesh->delayLoadState   = Constants::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile = rootUrl + json_util::get_string(parsedMesh, "delayLoadingFile");
-    mesh->_boundingInfo    = std::make_unique<BoundingInfo>(
+    mesh->buildBoundingInfo(
       Vector3::FromArray(json_util::get_array<float>(parsedMesh, "boundingBoxMinimum")),
       Vector3::FromArray(json_util::get_array<float>(parsedMesh, "boundingBoxMaximum")));
 
@@ -3619,6 +3620,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
   // Thin instances
   if (json_util::has_valid_key_value(parsedMesh, "thinInstances")) {
     const auto thinInstances = parsedMesh["thinInstances"];
+
+    mesh->thinInstanceEnablePicking = json_util::get_bool(thinInstances, "enablePicking");
 
     if (json_util::has_valid_key_value(thinInstances, "matrixData")) {
 #if 0
