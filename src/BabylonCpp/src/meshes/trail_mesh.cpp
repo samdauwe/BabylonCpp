@@ -42,8 +42,8 @@ void TrailMesh::_createMesh()
   auto meshCenter = Vector3::Zero();
 
   const auto generatorAsAbstractMesh = std::static_pointer_cast<AbstractMesh>(_generator);
-  if (generatorAsAbstractMesh && generatorAsAbstractMesh->_boundingInfo) {
-    meshCenter = generatorAsAbstractMesh->_boundingInfo->boundingBox.centerWorld;
+  if (generatorAsAbstractMesh && generatorAsAbstractMesh->hasBoundingInfo()) {
+    meshCenter = generatorAsAbstractMesh->getBoundingInfo()->boundingBox.centerWorld;
   }
   else {
     meshCenter = _generator->position();
