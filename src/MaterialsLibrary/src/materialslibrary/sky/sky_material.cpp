@@ -88,6 +88,11 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, false);
 
+  if (defines["IMAGEPROCESSINGPOSTPROCESS"]
+      != scene->imageProcessingConfiguration()->applyByPostProcess()) {
+    defines.markAsMiscDirty();
+  }
+
   // Get correct effect
   if (defines.isDirty()) {
     defines.markAsProcessed();
