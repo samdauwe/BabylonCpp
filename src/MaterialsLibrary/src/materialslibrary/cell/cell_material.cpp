@@ -125,9 +125,9 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     subMesh->materialDefines = std::make_shared<CellMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<CellMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr = std::static_pointer_cast<CellMaterialDefines>(subMesh->_materialDefines);
+  auto& defines         = *definesPtr.get();
+  const auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -250,7 +250,7 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
 
 void CellMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   auto defines = static_cast<CellMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
