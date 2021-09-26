@@ -51,14 +51,22 @@ protected:
   void set_skyColor(const Color4& value);
   Color4& get_cloudColor();
   void set_cloudColor(const Color4& value);
+  float get_amplitude() const;
+  void set_amplitude(float value);
+  int get_numOctaves() const;
+  void set_numOctaves(int value);
 
 public:
   Property<CloudProceduralTexture, Color4> skyColor;
   Property<CloudProceduralTexture, Color4> cloudColor;
+  Property<CloudProceduralTexture, float> amplitude;
+  Property<CloudProceduralTexture, int> numOctaves;
 
 private:
   Color4 _skyColor;
   Color4 _cloudColor;
+  float _amplitude;
+  int _numOctaves;
 
 }; // end of class CloudProceduralTexture
 

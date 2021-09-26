@@ -16,8 +16,14 @@ CloudProceduralTexture::CloudProceduralTexture(const std::string& iName,
     , skyColor{this, &CloudProceduralTexture::get_skyColor, &CloudProceduralTexture::set_skyColor}
     , cloudColor{this, &CloudProceduralTexture::get_cloudColor,
                  &CloudProceduralTexture::set_cloudColor}
+    , amplitude{this, &CloudProceduralTexture::get_amplitude,
+                &CloudProceduralTexture::set_amplitude}
+    , numOctaves{this, &CloudProceduralTexture::get_numOctaves,
+                 &CloudProceduralTexture::set_numOctaves}
     , _skyColor{Color4(0.15f, 0.68f, 1.f, 1.f)}
     , _cloudColor{Color4(1.f, 1.f, 1.f, 1.f)}
+    , _amplitude{1.f}
+    , _numOctaves{4}
 {
   // Fragment shader
   Effect::ShadersStore()["cloudProceduralTexturePixelShader"] = cloudProceduralTexturePixelShader;
@@ -31,6 +37,8 @@ void CloudProceduralTexture::updateShaderUniforms()
 {
   setColor4("skyColor", _skyColor);
   setColor4("cloudColor", _cloudColor);
+  setFloat("amplitude", _amplitude);
+  setInt("numOctaves", _numOctaves);
 }
 
 Color4& CloudProceduralTexture::get_skyColor()
@@ -52,6 +60,28 @@ Color4& CloudProceduralTexture::get_cloudColor()
 void CloudProceduralTexture::set_cloudColor(const Color4& value)
 {
   _cloudColor = value;
+  updateShaderUniforms();
+}
+
+float CloudProceduralTexture::get_amplitude() const
+{
+  return _amplitude;
+}
+
+void CloudProceduralTexture::set_amplitude(float value)
+{
+  _amplitude = value;
+  updateShaderUniforms();
+}
+
+int CloudProceduralTexture::get_numOctaves() const
+{
+  return _numOctaves;
+}
+
+void CloudProceduralTexture::set_numOctaves(int value)
+{
+  _numOctaves = value;
   updateShaderUniforms();
 }
 
