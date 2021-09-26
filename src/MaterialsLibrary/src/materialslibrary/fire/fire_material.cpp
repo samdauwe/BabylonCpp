@@ -112,15 +112,15 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     subMesh->materialDefines = std::make_shared<FireMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
+  auto& defines         = *definesPtr.get();
+  const auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
