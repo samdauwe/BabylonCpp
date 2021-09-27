@@ -169,14 +169,14 @@ void HighlightLayer::_createTextureAndPostProcesses()
       = PassPostProcess::New("HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
                              TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _downSamplePostprocess->onApplyObservable.add(
-      [_mainTexture = this->_mainTexture](Effect* effect, EventState&) {
+      [_mainTexture = this->_mainTexture](Effect* effect, EventState&) -> void {
         effect->setTexture("textureSampler", _mainTexture);
       });
 
     _horizontalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) {
+    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
       effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                         static_cast<float>(blurTextureHeight));
     });
@@ -184,7 +184,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
     _verticalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) {
+    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
       effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                         static_cast<float>(blurTextureHeight));
     });
@@ -199,15 +199,16 @@ void HighlightLayer::_createTextureAndPostProcesses()
       textureType*/);
     _horizontalBlurPostprocess->width  = blurTextureWidth;
     _horizontalBlurPostprocess->height = blurTextureHeight;
-    _horizontalBlurPostprocess->onApplyObservable.add(
-      [&](Effect* effect, EventState&) { effect->setTexture("textureSampler", _mainTexture); });
+    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
+      effect->setTexture("textureSampler", _mainTexture);
+    });
 
     _verticalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize,
       1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine()/*, false,
       textureType*/);
-    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) {
+    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
       effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                         static_cast<float>(blurTextureHeight));
     });
@@ -216,7 +217,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
   }
 
   _mainTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) {
+    [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) -> void {
       onBeforeBlurObservable.notifyObservers(this);
 
       auto internalTexture = _blurTexture->getInternalTexture();
