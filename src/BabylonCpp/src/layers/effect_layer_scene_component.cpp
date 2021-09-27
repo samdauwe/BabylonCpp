@@ -25,7 +25,7 @@ void EffectLayerSceneComponent::_register()
 {
   scene->_isReadyForMeshStage.registerStep(
     SceneComponentConstants::STEP_ISREADYFORMESH_EFFECTLAYER, this,
-    [this](AbstractMesh* mesh, bool hardwareInstancedRendering) {
+    [this](AbstractMesh* mesh, bool hardwareInstancedRendering) -> bool {
       return _isReadyForMesh(mesh, hardwareInstancedRendering);
     });
 
@@ -45,7 +45,7 @@ void EffectLayerSceneComponent::_register()
 
   scene->_afterRenderingGroupDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW, this,
-    [this](int renderingGroupId) { _drawRenderingGroup(renderingGroupId); });
+    [this](int renderingGroupId) -> void { _drawRenderingGroup(renderingGroupId); });
 
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER, this,
