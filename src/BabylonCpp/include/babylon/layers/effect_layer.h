@@ -60,7 +60,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  [[nodiscard]] virtual std::string getEffectName() const = 0;
+  virtual std::string getEffectName() const = 0;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -74,7 +74,7 @@ public:
    * @brief Returns whether or not the layer needs stencil enabled during the mesh rendering.
    * @returns true if the effect requires stencil during the main canvas render pass.
    */
-  [[nodiscard]] virtual bool needStencil() const = 0;
+  virtual bool needStencil() const = 0;
 
   /**
    * @brief Free any resources and references associated to a mesh.
@@ -87,7 +87,7 @@ public:
    * @brief Serializes this layer (Glow or Highlight for example).
    * @returns a serialized layer object
    */
-  [[nodiscard]] virtual json serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Renders the glowing part of the scene by blending the blurred glowing meshes on top of
@@ -106,7 +106,7 @@ public:
    * @brief Returns true if the layer contains information to display, otherwise false.
    * @returns true if the glow layer should be rendered
    */
-  [[nodiscard]] virtual bool shouldRender() const;
+  virtual bool shouldRender() const;
 
   /**
    * @brief Rebuild the required buffers.
@@ -123,7 +123,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  [[nodiscard]] virtual std::string getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Creates an effect layer from parsed effect layer data.
@@ -151,7 +151,7 @@ protected:
   /**
    * @brief Gets the rendering group id the layer should render in.
    */
-  [[nodiscard]] int get_renderingGroupId() const;
+  int get_renderingGroupId() const;
 
   /**
    * @brief Sets the rendering group id the layer should render in.
@@ -224,14 +224,13 @@ protected:
    * @param material The material used on the mesh
    * @returns true if it can be rendered otherwise false
    */
-  [[nodiscard]] virtual bool _canRenderMesh(const AbstractMeshPtr& mesh,
-                                            const MaterialPtr& material) const;
+  virtual bool _canRenderMesh(const AbstractMeshPtr& mesh, const MaterialPtr& material) const;
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
    * @returns true if it should render otherwise false
    */
-  [[nodiscard]] virtual bool _shouldRenderEmissiveTextureForMesh() const;
+  virtual bool _shouldRenderEmissiveTextureForMesh() const;
 
   /**
    * @brief Renders the submesh passed in parameter to the generation map.
