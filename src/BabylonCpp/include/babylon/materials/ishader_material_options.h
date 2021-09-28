@@ -1,6 +1,7 @@
 #ifndef BABYLON_MATERIALS_ISHADER_MATERIAL_OPTIONS_H
 #define BABYLON_MATERIALS_ISHADER_MATERIAL_OPTIONS_H
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -46,6 +47,12 @@ struct BABYLON_SHARED_EXPORT IShaderMaterialOptions {
    * The list of defines used in the shader
    */
   std::vector<std::string> defines;
+
+  /**
+   * Defines if clip planes have to be turned on: true to turn them on, false to turn them off and
+   * null to turn them on/off depending on the scene configuration (scene.clipPlaneX)
+   */
+  std::optional<bool> useClipPlane = false;
 }; // end of struct IShaderMaterialOptions
 
 } // end of namespace BABYLON
