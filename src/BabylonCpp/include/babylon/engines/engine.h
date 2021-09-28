@@ -16,6 +16,7 @@ struct IPointerEvent;
 class Material;
 class MultiviewExtension;
 class OcclusionQueryExtension;
+class PerfCounter;
 class TransformFeedbackExtension;
 FWD_CLASS_SPTR(AudioEngine)
 FWD_CLASS_SPTR(ILoadingScreen)
@@ -926,6 +927,14 @@ public:
   static void _ExitFullscreen();
 
   //------------------------------------------------------------------------------------------------
+  //                              GPU Frame Time Extension
+  //------------------------------------------------------------------------------------------------
+
+  std::unique_ptr<PerfCounter>& getGPUFrameTimeCounter();
+
+  void captureGPUFrameTime(bool value);
+
+  //------------------------------------------------------------------------------------------------
   //                              Multiview Extension
   //------------------------------------------------------------------------------------------------
 
@@ -1082,10 +1091,10 @@ public:
 protected:
   /**
    * @brief Creates a new engine.
-   * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you provide
-   * a WebGL context, Babylon.js will not hook events on the canvas (like pointers, keyboards,
-   * etc...) so no event observables will be available. This is mostly used when Babylon.js is used
-   * as a plugin on a system which already used the WebGL context
+   * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you
+   * provide a WebGL context, Babylon.js will not hook events on the canvas (like pointers,
+   * keyboards, etc...) so no event observables will be available. This is mostly used when
+   * Babylon.js is used as a plugin on a system which already used the WebGL context
    * @param antialias defines enable antialiasing (default: false)
    * @param options defines further options to be sent to the getContext() function
    * @param adaptToDeviceRatio defines whether to adapt to the device's viewport characteristics
@@ -1158,8 +1167,8 @@ public:
   bool enableOfflineSupport = false;
 
   /**
-   * Gets or sets a boolean to enable/disable checking manifest if IndexedDB support is enabled (js
-   *will always consider the database is up to date)
+   * Gets or sets a boolean to enable/disable checking manifest if IndexedDB support is enabled
+   *(js will always consider the database is up to date)
    **/
   bool disableManifestCheck = false;
 
@@ -1236,8 +1245,8 @@ public:
   PerfCounter _drawCalls;
 
   /**
-   * Gets or sets the tab index to set to the rendering canvas. 1 is the minimum value to set to be
-   * able to capture keyboard events
+   * Gets or sets the tab index to set to the rendering canvas. 1 is the minimum value to set to
+   * be able to capture keyboard events
    */
   int canvasTabIndex = 1;
 
@@ -1286,6 +1295,13 @@ private:
   float _deltaTime                                        = 0.f;
   std::unique_ptr<PerformanceMonitor> _performanceMonitor = nullptr;
 
+  // Query extension
+  bool _captureGPUFrameTime                    = false;
+  std::unique_ptr<PerfCounter> _gpuFrameTime   = nullptr;
+  std::optional<_TimeToken> _gpuFrameTimeToken = std::nullopt;
+  Observer<Engine>::Ptr _onBeginFrameObserver  = nullptr;
+  Observer<Engine>::Ptr _onEndFrameObserver    = nullptr;
+
   // Focus
   std::function<void()> _onFocus                             = nullptr;
   std::function<void()> _onBlur                              = nullptr;
@@ -1305,9 +1321,9 @@ private:
   int _cachedStencilReference;
 
   /** Extensions */
-  std::unique_ptr<MultiviewExtension> _multiviewExtension;
-  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension;
-  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension;
+  std::unique_ptr<MultiviewExtension> _multiviewExtension                 = nullptr;
+  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension       = nullptr;
+  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension = nullptr;
 
 }; // end of class Engine
 

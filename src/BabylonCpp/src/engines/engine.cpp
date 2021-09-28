@@ -18,6 +18,7 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
+#include <babylon/misc/perf_counter.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/particles/iparticle_system.h>
 #include <babylon/particles/particle_system.h>
@@ -70,6 +71,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , loadingUIBackgroundColor{this, &Engine::set_loadingUIBackgroundColor}
     , _rescalePostProcess{nullptr}
     , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
+    , _gpuFrameTime{std::make_unique<PerfCounter>()}
     , _multiviewExtension{std::make_unique<MultiviewExtension>(this)}
     , _occlusionQueryExtension{std::make_unique<OcclusionQueryExtension>(this)}
     , _transformFeedbackExtension{std::make_unique<TransformFeedbackExtension>(this)}
@@ -1081,6 +1083,14 @@ void Engine::dispose()
   }
 
   // Observables
+  if (_onBeginFrameObserver) {
+    onBeginFrameObservable.remove(_onBeginFrameObserver);
+    _onBeginFrameObserver = nullptr;
+  }
+  if (_onEndFrameObserver) {
+    onEndFrameObservable.remove(_onEndFrameObserver);
+    _onEndFrameObserver = nullptr;
+  }
   onResizeObservable.clear();
   onCanvasBlurObservable.clear();
   onCanvasFocusObservable.clear();
@@ -1146,6 +1156,52 @@ void Engine::_RequestFullscreen(ICanvas* /*element*/)
 
 void Engine::_ExitFullscreen()
 {
+}
+
+//------------------------------------------------------------------------------------------------
+//                              GPU Frame Time Extension
+//------------------------------------------------------------------------------------------------
+
+std::unique_ptr<PerfCounter>& Engine::getGPUFrameTimeCounter()
+{
+  return _gpuFrameTime;
+}
+
+void Engine::captureGPUFrameTime(bool value)
+{
+  if (value == _captureGPUFrameTime) {
+    return;
+  }
+
+  _captureGPUFrameTime = value;
+
+  if (value) {
+    _onBeginFrameObserver
+      = onBeginFrameObservable.add([this](Engine* /*engine*/, EventState& /*es*/) {
+          if (!_gpuFrameTimeToken) {
+            _gpuFrameTimeToken = startTimeQuery();
+          }
+        });
+
+    _onEndFrameObserver = onEndFrameObservable.add([this](Engine* /*engine*/, EventState& /*es*/) {
+      if (!_gpuFrameTimeToken) {
+        return;
+      }
+      const auto time = endTimeQuery(_gpuFrameTimeToken);
+
+      if (time > -1) {
+        _gpuFrameTimeToken = std::nullopt;
+        _gpuFrameTime->fetchNewFrame();
+        _gpuFrameTime->addCount(static_cast<size_t>(time), true);
+      }
+    });
+  }
+  else {
+    onBeginFrameObservable.remove(_onBeginFrameObserver);
+    _onBeginFrameObserver = nullptr;
+    onEndFrameObservable.remove(_onEndFrameObserver);
+    _onEndFrameObserver = nullptr;
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
