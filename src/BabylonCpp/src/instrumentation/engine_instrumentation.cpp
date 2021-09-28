@@ -13,10 +13,7 @@ EngineInstrumentation::EngineInstrumentation(Engine* engine)
                                    &EngineInstrumentation::set_captureShaderCompilationTime}
     , _engine{engine}
     , _captureGPUFrameTime{false}
-    , _gpuFrameTimeToken{std::nullopt}
     , _captureShaderCompilationTime{false}
-    , _onBeginFrameObserver{nullptr}
-    , _onEndFrameObserver{nullptr}
     , _onBeforeShaderCompilationObserver{nullptr}
     , _onAfterShaderCompilationObserver{nullptr}
 {
@@ -26,7 +23,7 @@ EngineInstrumentation::~EngineInstrumentation() = default;
 
 PerfCounter& EngineInstrumentation::get_gpuFrameTimeCounter()
 {
-  return _gpuFrameTime;
+  return *_engine->getGPUFrameTimeCounter();
 }
 
 bool EngineInstrumentation::get_captureGPUFrameTime() const
@@ -41,35 +38,7 @@ void EngineInstrumentation::set_captureGPUFrameTime(bool value)
   }
 
   _captureGPUFrameTime = value;
-
-  if (value) {
-    _onBeginFrameObserver
-      = _engine->onBeginFrameObservable.add([this](Engine* /*engine*/, EventState& /*es*/) {
-          if (!_gpuFrameTimeToken) {
-            _gpuFrameTimeToken = _engine->startTimeQuery();
-          }
-        });
-
-    _onEndFrameObserver
-      = _engine->onEndFrameObservable.add([this](Engine* /*engine*/, EventState& /*es*/) {
-          if (!_gpuFrameTimeToken) {
-            return;
-          }
-          auto time = _engine->endTimeQuery(_gpuFrameTimeToken);
-
-          if (time > -1) {
-            _gpuFrameTimeToken = std::nullopt;
-            _gpuFrameTime.fetchNewFrame();
-            _gpuFrameTime.addCount(static_cast<size_t>(time), true);
-          }
-        });
-  }
-  else {
-    _engine->onBeginFrameObservable.remove(_onBeginFrameObserver);
-    _onBeginFrameObserver = nullptr;
-    _engine->onEndFrameObservable.remove(_onEndFrameObserver);
-    _onEndFrameObserver = nullptr;
-  }
+  _engine->captureGPUFrameTime(value);
 }
 
 PerfCounter& EngineInstrumentation::get_shaderCompilationTimeCounter()
@@ -110,12 +79,6 @@ void EngineInstrumentation::set_captureShaderCompilationTime(bool value)
 
 void EngineInstrumentation::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
 {
-  _engine->onBeginFrameObservable.remove(_onBeginFrameObserver);
-  _onBeginFrameObserver = nullptr;
-
-  _engine->onEndFrameObservable.remove(_onEndFrameObserver);
-  _onEndFrameObserver = nullptr;
-
   _engine->onBeforeShaderCompilationObservable.remove(_onBeforeShaderCompilationObserver);
   _onBeforeShaderCompilationObserver = nullptr;
 

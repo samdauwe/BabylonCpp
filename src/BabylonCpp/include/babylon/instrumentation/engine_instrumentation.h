@@ -2,7 +2,6 @@
 #define BABYLON_INSTRUMENTATION_ENGINE_INSTRUMENTATION_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observer.h>
 #include <babylon/misc/perf_counter.h>
@@ -92,16 +91,12 @@ private:
    */
   Engine* _engine;
 
-  bool _captureGPUFrameTime = false;
-  std::optional<_TimeToken> _gpuFrameTimeToken;
-  PerfCounter _gpuFrameTime;
+  bool _captureGPUFrameTime;
 
   bool _captureShaderCompilationTime;
   PerfCounter _shaderCompilationTime;
 
   // Observers
-  Observer<Engine>::Ptr _onBeginFrameObserver;
-  Observer<Engine>::Ptr _onEndFrameObserver;
   Observer<Engine>::Ptr _onBeforeShaderCompilationObserver;
   Observer<Engine>::Ptr _onAfterShaderCompilationObserver;
 
