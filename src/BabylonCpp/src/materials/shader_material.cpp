@@ -11,8 +11,10 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/material_stencil_state.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
@@ -416,6 +418,17 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
     if (numInfluencers > 0ull) {
       defines.emplace_back("#define MORPHTARGETS");
     }
+    if (manager->isUsingTextureForTargets()) {
+      defines.emplace_back("#define MORPHTARGETS_TEXTURE");
+
+      if (stl_util::index_of(_options.uniforms, "morphTargetTextureIndices") == -1) {
+        _options.uniforms.emplace_back("morphTargetTextureIndices");
+      }
+
+      if (stl_util::index_of(_options.samplers, "morphTargets") == -1) {
+        _options.samplers.emplace_back("morphTargets");
+      }
+    }
     defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numInfluencers));
     for (size_t index = 0; index < numInfluencers; index++) {
       const auto indexStr = std::to_string(index);
@@ -453,6 +466,55 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
   // Alpha test
   if (mesh && _shouldTurnAlphaTestOn(mesh)) {
     defines.emplace_back("#define ALPHATEST");
+  }
+
+  // Clip planes
+  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane.has_value())
+      || _options.useClipPlane.value_or(false)) {
+    defines.emplace_back("#define CLIPPLANE");
+    if (stl_util::index_of(uniforms, "vClipPlane") == -1) {
+      uniforms.emplace_back("vClipPlane");
+    }
+  }
+
+  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane2.has_value())
+      || _options.useClipPlane.value_or(false)) {
+    defines.emplace_back("#define CLIPPLANE2");
+    if (stl_util::index_of(uniforms, "vClipPlane2") == -1) {
+      uniforms.emplace_back("vClipPlane2");
+    }
+  }
+
+  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane3.has_value())
+      || _options.useClipPlane.value_or(false)) {
+    defines.emplace_back("#define CLIPPLANE3");
+    if (stl_util::index_of(uniforms, "vClipPlane3") == -1) {
+      uniforms.emplace_back("vClipPlane3");
+    }
+  }
+
+  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane4.has_value())
+      || _options.useClipPlane.value_or(false)) {
+    defines.emplace_back("#define CLIPPLANE4");
+    if (stl_util::index_of(uniforms, "vClipPlane4") == -1) {
+      uniforms.emplace_back("vClipPlane4");
+    }
+  }
+
+  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane5.has_value())
+      || _options.useClipPlane.value_or(false)) {
+    defines.emplace_back("#define CLIPPLANE5");
+    if (stl_util::index_of(uniforms, "vClipPlane5") == -1) {
+      uniforms.emplace_back("vClipPlane5");
+    }
+  }
+
+  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane6.has_value())
+      || _options.useClipPlane.value_or(false)) {
+    defines.emplace_back("#define CLIPPLANE6");
+    if (stl_util::index_of(uniforms, "vClipPlane6") == -1) {
+      uniforms.emplace_back("vClipPlane6");
+    }
   }
 
   if (customShaderNameResolve) {
@@ -542,18 +604,38 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
 
   const auto effect = effectOverride ? effectOverride : getEffect();
 
+  const auto& uniformBuffers = _options.uniformBuffers;
+
+  auto useSceneUBO = false;
+
+  if (effect && !uniformBuffers.empty() && getScene()->getEngine()->supportsUniformBuffers()) {
+    for (const auto& bufferName : uniformBuffers) {
+      if (bufferName == "Mesh") {
+        if (mesh) {
+          mesh->getMeshUniformBuffer()->bindToEffect(effect.get(), "Mesh");
+          mesh->transferToEffect(world);
+        }
+      }
+      if (bufferName == "Scene") {
+        getScene()->finalizeSceneUbo();
+        MaterialHelper::BindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
+        useSceneUBO = true;
+      }
+    }
+  }
+
   const auto mustRebind = getScene()->getCachedMaterial() != this;
 
   if (effect && mustRebind) {
-    if (stl_util::contains(_options.uniforms, "view")) {
+    if (!useSceneUBO && stl_util::contains(_options.uniforms, "view")) {
       effect->setMatrix("view", getScene()->getViewMatrix());
     }
 
-    if (stl_util::contains(_options.uniforms, "projection")) {
+    if (!useSceneUBO && stl_util::contains(_options.uniforms, "projection")) {
       effect->setMatrix("projection", getScene()->getProjectionMatrix());
     }
 
-    if (stl_util::contains(_options.uniforms, "viewProjection")) {
+    if (!useSceneUBO && stl_util::contains(_options.uniforms, "viewProjection")) {
       effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
       if (_multiview) {
         effect->setMatrix("viewProjectionR", getScene()->_transformMatrixR);
@@ -566,6 +648,9 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
 
     // Bones
     MaterialHelper::BindBonesParameters(mesh, effect.get());
+
+    // Clip plane
+    MaterialHelper::BindClipPlane(effect, getScene());
 
     // Texture
     for (const auto& [channel, texture] : _textures) {
@@ -736,6 +821,9 @@ MaterialPtr ShaderMaterial::clone(const std::string& iName, bool /*cloneChildren
 
   result->name = name;
   result->id   = name;
+
+  // Stencil
+  stencil->copyTo(result->stencil);
 
   // Texture
   for (const auto& [channel, texture] : _textures) {
