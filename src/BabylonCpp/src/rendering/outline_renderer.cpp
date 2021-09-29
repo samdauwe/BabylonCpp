@@ -18,6 +18,7 @@
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/states/alpha_state.h>
+#include <babylon/states/stencil_state_composer.h>
 
 namespace BABYLON {
 
@@ -120,7 +121,9 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   // Morph targets
   MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), effect.get());
 
-  renderingMesh->_bind(subMesh, effect, material->fillMode());
+  if (!hardwareInstancedRendering) {
+    renderingMesh->_bind(subMesh, effect, material->fillMode());
+  }
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
@@ -270,6 +273,7 @@ void OutlineRenderer::_beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh,
       _engine->setStencilFunction(Constants::ALWAYS);
       _engine->setStencilMask(OutlineRenderer::_StencilReference);
       _engine->setStencilFunctionReference(OutlineRenderer::_StencilReference);
+      _engine->stencilStateComposer()->useStencilGlobalOnly = true;
       render(subMesh, batch, /* This sets offset to 0 */ true);
 
       _engine->setColorWrite(true);
@@ -282,6 +286,7 @@ void OutlineRenderer::_beforeRenderingMesh(Mesh* mesh, SubMesh* subMesh,
     _engine->setDepthWrite(_savedDepthWrite);
 
     if (material && material->needAlphaBlendingForMesh(*mesh)) {
+      _engine->stencilStateComposer()->useStencilGlobalOnly = false;
       _engine->restoreStencilState();
     }
   }
