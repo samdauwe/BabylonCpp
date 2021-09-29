@@ -44,14 +44,12 @@ void OutlineRenderer::_register()
 {
   scene->_beforeRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERINGMESH_OUTLINE, this,
-    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch, Effect* /*effect*/) {
-      _beforeRenderingMesh(mesh, subMesh, batch);
-    });
+    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch,
+           Effect* /*effect*/) -> void { _beforeRenderingMesh(mesh, subMesh, batch); });
   scene->_afterRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGMESH_OUTLINE, this,
-    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch, Effect* /*effect*/) {
-      _afterRenderingMesh(mesh, subMesh, batch);
-    });
+    [this](Mesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch,
+           Effect* /*effect*/) -> void { _afterRenderingMesh(mesh, subMesh, batch); });
 }
 
 void OutlineRenderer::rebuild()
