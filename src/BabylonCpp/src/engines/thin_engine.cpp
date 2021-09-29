@@ -45,6 +45,7 @@
 #include <babylon/states/alpha_state.h>
 #include <babylon/states/depth_culling_state.h>
 #include <babylon/states/stencil_state.h>
+#include <babylon/states/stencil_state_composer.h>
 
 namespace BABYLON {
 
@@ -121,7 +122,9 @@ ThinEngine::ThinEngine(ICanvas* canvas, const EngineOptions& options)
     , depthCullingState{this, &ThinEngine::get_depthCullingState}
     , alphaState{this, &ThinEngine::get_alphaState}
     , stencilState{this, &ThinEngine::get_stencilState}
+    , stencilStateComposer{this, &ThinEngine::get_stencilStateComposer}
     , _depthCullingState{std::make_unique<DepthCullingState>()}
+    , _stencilStateComposer{std::make_unique<StencilStateComposer>()}
     , _stencilState{std::make_unique<StencilState>()}
     , _supportsHardwareTextureRescaling{this, &ThinEngine::get__supportsHardwareTextureRescaling}
     , _alphaExtension{std::make_unique<AlphaExtension>(this)}
@@ -2313,6 +2316,11 @@ std::unique_ptr<AlphaState>& ThinEngine::get_alphaState()
 std::unique_ptr<StencilState>& ThinEngine::get_stencilState()
 {
   return _stencilState;
+}
+
+std::unique_ptr<StencilStateComposer>& ThinEngine::get_stencilStateComposer()
+{
+  return _stencilStateComposer;
 }
 
 void ThinEngine::clearInternalTexturesCache()

@@ -47,6 +47,7 @@ class RenderTargetCubeExtension;
 class RenderTargetExtension;
 class Scene;
 class StencilState;
+class StencilStateComposer;
 class Texture;
 class UniformBuffer;
 class UniformBufferExtension;
@@ -1980,6 +1981,11 @@ protected:
   std::unique_ptr<StencilState>& get_stencilState();
 
   /**
+   * @brief Gets the stencil state composer.
+   */
+  std::unique_ptr<StencilStateComposer>& get_stencilStateComposer();
+
+  /**
    * @brief Shared initialization across engines types.
    * @param canvas The canvas associated with this instance of the engine.
    * @param doNotHandleTouchAction Defines that engine should ignore modifying touch action
@@ -2346,6 +2352,11 @@ public:
   ReadOnlyProperty<ThinEngine, std::unique_ptr<StencilState>> stencilState;
 
   /**
+   * Gets the stencil state composer
+   */
+  ReadOnlyProperty<ThinEngine, std::unique_ptr<StencilStateComposer>> stencilStateComposer;
+
+  /**
    * In case you are sharing the context with other applications, it might
    * be interested to not cache the unpack flip y state to ensure a consistent
    * value would be set.
@@ -2382,6 +2393,8 @@ protected:
   bool _colorWriteChanged = true;
   /** @hidden */
   std::unique_ptr<DepthCullingState> _depthCullingState;
+  /** @hidden */
+  std::unique_ptr<StencilStateComposer> _stencilStateComposer;
   /** @hidden */
   std::unique_ptr<StencilState> _stencilState;
   /** @hidden */
