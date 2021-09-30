@@ -167,16 +167,16 @@ GroundMesh& GroundMesh::_computeHeightQuads()
   auto& v1v4  = TmpVectors::Vector3Array[6];
   auto& norm1 = TmpVectors::Vector3Array[7];
   auto& norm2 = TmpVectors::Vector3Array[8];
-  size_t i    = 0;
-  size_t j    = 0;
-  size_t k    = 0;
+  auto i      = 0ull;
+  auto j      = 0ull;
+  auto k      = 0ull;
   auto cd     = 0.f; // 2D slope coefficient : z = cd * x + h
   auto h      = 0.f;
   auto d1     = 0.f; // facet plane equation : ax + by + cz + d = 0
   auto d2     = 0.f;
 
-  for (size_t row = 0; row < subdivisionsY; ++row) {
-    for (size_t col = 0; col < _subdivisionsX; ++col) {
+  for (auto row = 0ull; row < subdivisionsY; ++row) {
+    for (auto col = 0ull; col < _subdivisionsX; ++col) {
       i    = col * 3;
       j    = row * (_subdivisionsX + 1) * 3;
       k    = (row + 1) * (_subdivisionsX + 1) * 3;
