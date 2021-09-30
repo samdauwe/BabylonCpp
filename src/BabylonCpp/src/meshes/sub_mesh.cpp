@@ -183,14 +183,14 @@ AbstractMeshPtr SubMesh::getEffectiveMesh() const
 
 MaterialPtr SubMesh::getMaterial()
 {
-  auto rootMaterial = _renderingMesh->getMaterial();
+  const auto rootMaterial = _renderingMesh->getMaterial();
 
   if (!rootMaterial) {
     return _mesh->getScene()->defaultMaterial();
   }
   else if (rootMaterial && _IsMultiMaterial(*rootMaterial)) {
-    auto multiMaterial     = std::static_pointer_cast<MultiMaterial>(rootMaterial);
-    auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
+    const auto multiMaterial     = std::static_pointer_cast<MultiMaterial>(rootMaterial);
+    const auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
 
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;
