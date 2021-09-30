@@ -525,50 +525,42 @@ public:
   Float32Array positions;
 
   /**
-   * An array of the x, y, z normal vector of each vertex  [...., x, y, z,
-   * .....]
+   * An array of the x, y, z normal vector of each vertex  [...., x, y, z, .....]
    */
   Float32Array normals;
 
   /**
-   * An array of the x, y, z tangent vector of each vertex  [...., x, y, z,
-   * .....]
+   * An array of the x, y, z tangent vector of each vertex  [...., x, y, z, .....]
    */
   Float32Array tangents;
 
   /**
-   * An array of u,v which maps a texture image onto each vertex  [...., u, v,
-   * .....]
+   * An array of u,v which maps a texture image onto each vertex  [...., u, v, .....]
    */
   Float32Array uvs;
 
   /**
-   * A second array of u,v which maps a texture image onto each vertex  [....,
-   * u, v, .....]
+   * A second array of u,v which maps a texture image onto each vertex  [...., u, v, .....]
    */
   Float32Array uvs2;
 
   /**
-   * A third array of u,v which maps a texture image onto each vertex  [...., u,
-   * v, .....]
+   * A third array of u,v which maps a texture image onto each vertex  [...., u, v, .....]
    */
   Float32Array uvs3;
 
   /**
-   * A fourth array of u,v which maps a texture image onto each vertex  [....,
-   * u, v, .....]
+   * A fourth array of u,v which maps a texture image onto each vertex  [...., u, v, .....]
    */
   Float32Array uvs4;
 
   /**
-   * A fifth array of u,v which maps a texture image onto each vertex  [...., u,
-   * v, .....]
+   * A fifth array of u,v which maps a texture image onto each vertex  [...., u, v, .....]
    */
   Float32Array uvs5;
 
   /**
-   * A sixth array of u,v which maps a texture image onto each vertex  [...., u,
-   * v, .....]
+   * A sixth array of u,v which maps a texture image onto each vertex  [...., u, v, .....]
    */
   Float32Array uvs6;
 
@@ -578,15 +570,14 @@ public:
   Float32Array colors;
 
   /**
-   * An array containing the list of indices to the array of matrices produced
-   * by bones, each vertex have up to 4 indices (8 if the matricesIndicesExtra
-   * is set).
+   * An array containing the list of indices to the array of matrices produced by bones, each vertex
+   * have up to 4 indices (8 if the matricesIndicesExtra is set).
    */
   Float32Array matricesIndices;
 
   /**
-   * An array containing the list of weights defining the weight of each indexed
-   * matrix in the final computation
+   * An array containing the list of weights defining the weight of each indexed matrix in the final
+   * computation
    */
   Float32Array matricesWeights;
 
@@ -602,8 +593,8 @@ public:
   Float32Array matricesWeightsExtra;
 
   /**
-   * An array of i, j, k the three vertex indices required for each triangular
-   * facet  [...., i, j, k .....]
+   * An array of i, j, k the three vertex indices required for each triangular facet  [...., i, j, k
+   * .....]
    */
   IndicesArray indices;
 
