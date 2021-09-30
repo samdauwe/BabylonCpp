@@ -15,8 +15,7 @@ Float32Array UniformBuffer::_tempBuffer = Float32Array(UniformBuffer::_MAX_UNIFO
 
 UniformBuffer::UniformBuffer(ThinEngine* engine, const Float32Array& data,
                              const std::optional<bool>& dynamic, const std::string& name)
-    : _alreadyBound{false}
-    , useUbo{this, &UniformBuffer::get_useUbo}
+    : useUbo{this, &UniformBuffer::get_useUbo}
     , isSync{this, &UniformBuffer::get_isSync}
     , _numBuffers{this, &UniformBuffer::get__numBuffers}
     , _indexBuffer{this, &UniformBuffer::get__indexBuffer}
@@ -406,6 +405,23 @@ std::string UniformBuffer::get_name() const
   return _name;
 }
 
+bool UniformBuffer::_buffersEqual(const Float32Array& buf1, const Float32Array& buf2) const
+{
+  for (size_t i = 0; i < buf1.size(); ++i) {
+    if (buf1[i] != buf2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void UniformBuffer::_copyBuffer(const Float32Array& src, Float32Array& dst) const
+{
+  for (size_t i = 0; i < src.size(); ++i) {
+    dst[i] = src[i];
+  }
+}
+
 void UniformBuffer::update()
 {
   if (!_buffer) {
@@ -417,6 +433,18 @@ void UniformBuffer::update()
     _createBufferOnWrite = _engine->_features.trackUbosInFrame;
     return;
   }
+
+#if 0
+  if (_buffers[_bufferIndex][1]) {
+      if (_buffersEqual(_bufferData, _buffers[_bufferIndex][1]!)) {
+          _needSync = false;
+          _createBufferOnWrite = _engine->_features.trackUbosInFrame;
+          return;
+      } else {
+          _copyBuffer(_bufferData, _buffers[_bufferIndex][1]!);
+      }
+  }
+#endif
 
   _engine->updateUniformBuffer(_buffer, _bufferData);
 
@@ -576,6 +604,7 @@ bool UniformBuffer::_cacheMatrix(const std::string& iName, const Matrix& matrix)
     return false;
   }
 
+  _valueCache[iName] = flag;
   return true;
 }
 
@@ -771,10 +800,10 @@ void UniformBuffer::_updateColor4ForEffect(const std::string& iName, const Color
   _currentEffect->setColor4(iName + suffix, color, alpha);
 }
 
-void UniformBuffer::_updateDirectColor4ForEffect(const std::string& name, const Color4& color,
+void UniformBuffer::_updateDirectColor4ForEffect(const std::string& iName, const Color4& color,
                                                  const std::string& suffix)
 {
-  _currentEffect->setDirectColor4(name + suffix, color);
+  _currentEffect->setDirectColor4(iName + suffix, color);
 }
 
 void UniformBuffer::_updateColor4ForUniform(const std::string& iName, const Color3& color,
@@ -787,13 +816,13 @@ void UniformBuffer::_updateColor4ForUniform(const std::string& iName, const Colo
   updateUniform(iName, UniformBuffer::_tempBuffer, 4);
 }
 
-void UniformBuffer::_updateDirectColor4ForUniform(const std::string& name, const Color4& color)
+void UniformBuffer::_updateDirectColor4ForUniform(const std::string& iName, const Color4& color)
 {
   UniformBuffer::_tempBuffer[0] = color.r;
   UniformBuffer::_tempBuffer[1] = color.g;
   UniformBuffer::_tempBuffer[2] = color.b;
   UniformBuffer::_tempBuffer[3] = color.a;
-  updateUniform(name, UniformBuffer::_tempBuffer, 4);
+  updateUniform(iName, UniformBuffer::_tempBuffer, 4);
 }
 
 void UniformBuffer::_updateIntForEffect(const std::string& iName, int x, const std::string& suffix)
@@ -871,7 +900,6 @@ void UniformBuffer::bindToEffect(Effect* effect, const std::string& iName)
     return;
   }
 
-  _alreadyBound = true;
   effect->bindUniformBuffer(_buffer, iName);
 }
 
