@@ -15,12 +15,12 @@ FWD_CLASS_SPTR(Texture)
 namespace MaterialsLibrary {
 
 struct UniformInstance {
-  float floatValue;
+  float floatValue = 0.f;
   Vector2 vec2;
   Vector3 vec3;
   Vector4 vec4;
   Matrix mat4;
-  Texture* sampler2D;
+  Texture* sampler2D = nullptr;
 }; // end of struct UniformInstance
 
 class BABYLON_SHARED_EXPORT CustomMaterial : public StandardMaterial {
