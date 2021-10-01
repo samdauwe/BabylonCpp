@@ -16,7 +16,7 @@ struct BABYLON_SHARED_EXPORT CustomShaderStructure {
   std::string FragmentStore;
   std::string VertexStore;
 
-}; // end of class CustomShaderStructure
+}; // end of struct CustomShaderStructure
 
 } // end of namespace MaterialsLibrary
 } // end of namespace BABYLON
