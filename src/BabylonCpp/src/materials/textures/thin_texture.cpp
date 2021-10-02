@@ -192,10 +192,10 @@ unsigned int ThinTexture::get_samplingMode() const
   return _texture->samplingMode;
 }
 
-void ThinTexture::updateSamplingMode(unsigned int samplingMode)
+void ThinTexture::updateSamplingMode(unsigned int iSamplingMode)
 {
   if (_texture && _engine) {
-    _engine->updateTextureSamplingMode(samplingMode, _texture);
+    _engine->updateTextureSamplingMode(iSamplingMode, _texture);
   }
 }
 
