@@ -85,10 +85,10 @@ InternalTexturePtr TextureTools::ApplyPostProcess(const std::string& postProcess
 
   const auto samplingMode = iSamplingMode.value_or(internalTexture->samplingMode);
   const auto type         = iType.has_value() ?
-                              (iType.value() == -1 ? Constants::TEXTURETYPE_UNSIGNED_BYTE :
-                                                     static_cast<unsigned int>(iType.value())) :
-                              internalTexture->type;
-  const auto format       = iFormat.value_or(internalTexture->format);
+                      (iType.value() == -1 ? Constants::TEXTURETYPE_UNSIGNED_BYTE :
+                                             static_cast<unsigned int>(iType.value())) :
+                      internalTexture->type;
+  const auto format = iFormat.value_or(internalTexture->format);
 
   {
     // Create the post process
@@ -112,9 +112,9 @@ InternalTexturePtr TextureTools::ApplyPostProcess(const std::string& postProcess
     }
     const auto encodedTexture = engine->createRenderTargetTexture(size, options);
 
-    postProcess->getEffect()->executeWhenCompiled([=](Effect* /*effect*/) -> void {
+    postProcess->getEffect()->executeWhenCompiled([=](Effect * /*effect*/) -> void {
       // PP Render Pass
-      postProcess->onApply = [=](Effect* effect, EventState& /*es*/) -> void {
+      postProcess->onApply = [=](Effect* effect, EventState & /*es*/) -> void {
         effect->_bindTexture("textureSampler", internalTexture);
         effect->setFloat2("scale", 1.f, 1.f);
       };
@@ -192,14 +192,14 @@ int TextureTools::FromHalfFloat(int value)
   const auto f = value & 0x03FF;
 
   if (e == 0) {
-    return (s ? -1 : 1) * std::pow(2, -14) * (f / std::pow(2, 10));
+    return static_cast<int>((s ? -1 : 1) * std::pow(2, -14) * (f / std::pow(2, 10)));
   }
   else if (e == 0x1F) {
     return f ? std::numeric_limits<int>::quiet_NaN() :
                ((s ? -1 : 1) * std::numeric_limits<int>::infinity());
   }
 
-  return (s ? -1 : 1) * std::pow(2, e - 15) * (1 + (f / std::pow(2, 10)));
+  return static_cast<int>((s ? -1 : 1) * std::pow(2, e - 15) * (1 + (f / std::pow(2, 10))));
 }
 
 } // end of namespace BABYLON

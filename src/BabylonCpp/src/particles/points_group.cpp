@@ -14,7 +14,7 @@ PointsGroup::~PointsGroup() = default;
 
 int PointsGroup::get_groupID() const
 {
-  return groupId;
+  return static_cast<int>(groupId);
 }
 
 void PointsGroup::set_groupID(int newGroupID)

@@ -486,7 +486,7 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sc
     if (_refractionIntensityTexture && MaterialFlags::RefractionIntensityTextureEnabled()
         && defines->boolDef["SS_REFRACTIONINTENSITY_TEXTURE"]) {
       uniformBuffer.updateFloat2("vRefractionIntensityInfos",
-                                 _refractionIntensityTexture->coordinatesIndex,
+                                 static_cast<float>(_refractionIntensityTexture->coordinatesIndex),
                                  _refractionIntensityTexture->level, "");
       MaterialHelper::BindTextureMatrix(*_refractionIntensityTexture, uniformBuffer,
                                         "refractionIntensity");
@@ -494,9 +494,10 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer, Sc
 
     if (_translucencyIntensityTexture && MaterialFlags::TranslucencyIntensityTextureEnabled()
         && defines->boolDef["SS_TRANSLUCENCYINTENSITY_TEXTURE"]) {
-      uniformBuffer.updateFloat2("vTranslucencyIntensityInfos",
-                                 _translucencyIntensityTexture->coordinatesIndex,
-                                 _translucencyIntensityTexture->level, "");
+      uniformBuffer.updateFloat2(
+        "vTranslucencyIntensityInfos",
+        static_cast<float>(_translucencyIntensityTexture->coordinatesIndex),
+        _translucencyIntensityTexture->level, "");
       MaterialHelper::BindTextureMatrix(*_translucencyIntensityTexture, uniformBuffer,
                                         "translucencyIntensity");
     }

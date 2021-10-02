@@ -191,9 +191,12 @@ void HDRCubeTexture::loadTexture()
 
           // Convert to half float texture for fallback.
           if (!shortArray.empty()) {
-            shortArray[(i * 3) + 0] = TextureTools::ToHalfFloat(dataFace[(i * 3) + 0]);
-            shortArray[(i * 3) + 1] = TextureTools::ToHalfFloat(dataFace[(i * 3) + 1]);
-            shortArray[(i * 3) + 2] = TextureTools::ToHalfFloat(dataFace[(i * 3) + 2]);
+            shortArray[(i * 3) + 0]
+              = static_cast<uint16_t>(TextureTools::ToHalfFloat(dataFace[(i * 3) + 0]));
+            shortArray[(i * 3) + 1]
+              = static_cast<uint16_t>(TextureTools::ToHalfFloat(dataFace[(i * 3) + 1]));
+            shortArray[(i * 3) + 2]
+              = static_cast<uint16_t>(TextureTools::ToHalfFloat(dataFace[(i * 3) + 2]));
           }
 
           // Convert to int texture for fallback.
