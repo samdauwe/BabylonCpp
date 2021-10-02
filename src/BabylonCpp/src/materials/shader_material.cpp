@@ -823,7 +823,7 @@ MaterialPtr ShaderMaterial::clone(const std::string& iName, bool /*cloneChildren
   result->id   = name;
 
   // Stencil
-  stencil->copyTo(result->stencil);
+  stencil->copyTo(*result->stencil);
 
   // Texture
   for (const auto& [channel, texture] : _textures) {
