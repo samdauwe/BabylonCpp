@@ -248,15 +248,15 @@ protected:
     const std::string& url, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
     const std::optional<std::variant<bool, ITextureCreationOptions>>& noMipmapOrOptions
     = std::nullopt,
-    const std::optional<bool>& invertY              = true,
-    const std::optional<unsigned int>& samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad             = nullptr,
+    std::optional<bool> invertY              = true,
+    std::optional<unsigned int> samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::function<void()>& onLoad      = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
     bool deleteBuffer = false, const std::optional<unsigned int>& format = std::nullopt,
-    const std::string& mimeType = "", const LoaderOptionsPtr& loaderOptions = nullptr,
+    std::string mimeType = "", const LoaderOptionsPtr& loaderOptions = nullptr,
     const std::optional<unsigned int>& creationFlags = std::nullopt);
 
   bool get_noMipmap() const override;
