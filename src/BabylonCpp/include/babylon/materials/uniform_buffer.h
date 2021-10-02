@@ -245,6 +245,8 @@ protected:
   std::string get_name() const;
 
 private:
+  bool _buffersEqual(const Float32Array& buf1, const Float32Array& buf2) const;
+  void _copyBuffer(const Float32Array& src, Float32Array& dst) const;
   void _createNewBuffer();
   void _checkNewFrame();
 
