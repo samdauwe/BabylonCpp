@@ -90,6 +90,16 @@ enum class WorkerReplyType {
 }; // end of enum class WorkerReplyType
 
 /**
+ * @brief Language of the shader code.
+ */
+enum class ShaderLanguage {
+  /** language is GLSL (used by WebGL) */
+  GLSL = 0,
+  /** language is WGSL (used by WebGPU) */
+  WGSL = 1
+}; // end of enum class classShaderLanguage
+
+/**
  * @brief Defines operator used for tonemapping
  */
 enum class TonemappingOperator {
