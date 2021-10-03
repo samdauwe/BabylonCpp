@@ -18,6 +18,7 @@ constexpr float PI_2    = 1.57079632679489661923f;  // pi/2
 constexpr float PI_4    = 0.785398163397448309616f; // pi/4
 constexpr float SQRT2   = 1.41421356237309504880f;  // sqrt(2)
 constexpr float SQRT2_2 = 0.707106781186547524401f; // sqrt(2)/2
+constexpr float SQRT5   = 2.236067977499789805051f; // sqrt(5)
 
 // Used by Babylon Math
 /**
@@ -28,6 +29,10 @@ constexpr float ToGammaSpace = 1.f / 2.2f;
  * Constant used to convert a value to linear space
  */
 constexpr float ToLinearSpace = 2.2f;
+/**
+ * Constant Golden Ratio value in Babylon.js
+ */
+constexpr float PHI = (1.f + SQRT5) / 2.f;
 /**
  * Constant used to define the minimal number value in Babylon.js
  */
