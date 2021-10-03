@@ -65,6 +65,7 @@ def main():
     current, previous = "5.0.0-alpha.30", "5.0.0-alpha.19"
     current, previous = "5.0.0-alpha.37", "5.0.0-alpha.30"
     current, previous = "5.0.0-alpha.44", "5.0.0-alpha.37"
+    current, previous = "5.0.0-alpha.47", "5.0.0-alpha.44"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "4.1.0"          : "4.1.0_2020_02_27",
@@ -76,6 +77,7 @@ def main():
         "5.0.0-alpha.30" : "5.0.0-alpha.30_2021_06_28",
         "5.0.0-alpha.37" : "5.0.0-alpha.37_2021_08_04",
         "5.0.0-alpha.44" : "5.0.0-alpha.44_2021_09_10",
+        "5.0.0-alpha.47" : "5.0.0-alpha.47_2021_09_23",
     }
     # List containing the files to ignore
     whiteList = [
@@ -125,20 +127,23 @@ def main():
         "webgpuCacheSampler.ts", "webgpuClearQuad.ts", "webgpuComputeContext.ts",
         "webgpuComputePipelineContext.ts", "webgpuConstants.ts",
         "webgpuDepthCullingState.ts", "webgpuDrawContext.ts",
-        "webgpuHardwareTexture.ts", "webgpuOcclusionQuery.ts",
-        "webgpuMaterialContext.ts", "webgpuPipelineContext.ts",
-        "webgpuRenderPassWrapper.ts", "webgpuShaderManager.ts",
-        "webgpuShaderProcessingContext.ts", "webgpuQuerySet.ts",
-        "webgpuShaderProcessors.ts", "webgpuStencilState.ts",
+        "webgpuExternalTexture.ts", "webgpuHardwareTexture.ts",
+        "webgpuOcclusionQuery.ts", "webgpuMaterialContext.ts",
+        "webgpuPipelineContext.ts", "webgpuRenderPassWrapper.ts",
+        "webgpuShaderManager.ts", "webgpuShaderProcessingContext.ts",
+        "webgpuQuerySet.ts", "webgpuShaderProcessor.ts",
+        "webgpuShaderProcessors.ts", "webgpuShaderProcessorsGLSL.ts",
+        "webgpuShaderProcessorsWGSL.ts", "webgpuStencilState.ts",
         "webgpuStencilStateComposer.ts", "webgpuTextureHelper.ts",
         "webgpuTimestampQuery.ts", "webgpuTintWASM.ts",
         # Engines / WebGPU / Extensions
         "engine.alpha.ts", "engine.cubeTexture.ts", "engine.computeShader.ts",
         "engine.debugging.ts", "engine.dynamicBuffer.ts",
-        "engine.dynamicTexture.ts", "engine.multiRender.ts", "engine.query.ts",
-        "engine.rawTexture.ts", "engine.readTexture.ts",
-        "engine.renderTarget.ts", "engine.renderTargetCube.ts",
-        "engine.storageBuffer.ts", "engine.uniformBuffer.ts",
+        "engine.dynamicTexture.ts", "engine.externalTexture.ts",
+        "engine.multiRender.ts", "engine.query.ts", "engine.rawTexture.ts",
+        "engine.readTexture.ts", "engine.renderTarget.ts",
+        "engine.renderTargetCube.ts", "engine.storageBuffer.ts",
+        "engine.textureSampler.ts", "engine.uniformBuffer.ts",
         # Helpers
         "videoDome.ts",
         # LibDeclarations
@@ -178,8 +183,8 @@ def main():
         "WebXRAbstractFeature.ts", "WebXRControllerMovement.ts",
         "WebXRControllerPhysics.ts", "WebXRControllerPointerSelection.ts",
         "WebXRControllerTeleportation.ts", "WebXRDOMOverlay.ts",
-        "WebXREyeTracking.ts", "WebXRHitTest.ts", "WebXRNearInteraction.ts",
-        "WebXRWalkingLocomotion.ts",
+        "WebXREyeTracking.ts", "WebXRHitTest.ts", "WebXRLightEstimation.ts",
+        "WebXRNearInteraction.ts", "WebXRWalkingLocomotion.ts",
         # XR / motionController
         "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
         "WebXRFeaturePointSystem.ts", "webXRGenericHandController.ts",
