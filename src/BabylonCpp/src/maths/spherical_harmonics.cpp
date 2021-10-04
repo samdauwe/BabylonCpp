@@ -179,6 +179,34 @@ void SphericalHarmonics::preScaleForRendering()
   l22.scaleInPlace(SH3ylmBasisConstants[8]);
 }
 
+SphericalHarmonics& SphericalHarmonics::updateFromArray(const std::vector<Float32Array>& data)
+{
+  Vector3::FromArrayToRef(data[0], 0, l00);
+  Vector3::FromArrayToRef(data[1], 0, l1_1);
+  Vector3::FromArrayToRef(data[2], 0, l10);
+  Vector3::FromArrayToRef(data[3], 0, l11);
+  Vector3::FromArrayToRef(data[4], 0, l2_2);
+  Vector3::FromArrayToRef(data[5], 0, l2_1);
+  Vector3::FromArrayToRef(data[6], 0, l20);
+  Vector3::FromArrayToRef(data[7], 0, l21);
+  Vector3::FromArrayToRef(data[8], 0, l22);
+  return *this;
+}
+
+SphericalHarmonics& SphericalHarmonics::updateFromFloatsArray(const Float32Array& data)
+{
+  Vector3::FromFloatsToRef(data[0], data[1], data[2], l00);
+  Vector3::FromFloatsToRef(data[3], data[4], data[5], l1_1);
+  Vector3::FromFloatsToRef(data[6], data[7], data[8], l10);
+  Vector3::FromFloatsToRef(data[9], data[10], data[11], l11);
+  Vector3::FromFloatsToRef(data[12], data[13], data[14], l2_2);
+  Vector3::FromFloatsToRef(data[15], data[16], data[17], l2_1);
+  Vector3::FromFloatsToRef(data[18], data[19], data[20], l20);
+  Vector3::FromFloatsToRef(data[21], data[22], data[23], l21);
+  Vector3::FromFloatsToRef(data[24], data[25], data[26], l22);
+  return *this;
+}
+
 SphericalHarmonics SphericalHarmonics::FromArray(const std::vector<Float32Array>& data)
 {
   SphericalHarmonics sh;
@@ -186,16 +214,7 @@ SphericalHarmonics SphericalHarmonics::FromArray(const std::vector<Float32Array>
     return sh;
   }
 
-  Vector3::FromArrayToRef(data[0], 0, sh.l00);
-  Vector3::FromArrayToRef(data[1], 0, sh.l1_1);
-  Vector3::FromArrayToRef(data[2], 0, sh.l10);
-  Vector3::FromArrayToRef(data[3], 0, sh.l11);
-  Vector3::FromArrayToRef(data[4], 0, sh.l2_2);
-  Vector3::FromArrayToRef(data[5], 0, sh.l2_1);
-  Vector3::FromArrayToRef(data[6], 0, sh.l20);
-  Vector3::FromArrayToRef(data[7], 0, sh.l21);
-  Vector3::FromArrayToRef(data[8], 0, sh.l22);
-  return sh;
+  return sh.updateFromArray(data);
 }
 
 SphericalHarmonics SphericalHarmonics::FromPolynomial(const SphericalPolynomial& polynomial)
