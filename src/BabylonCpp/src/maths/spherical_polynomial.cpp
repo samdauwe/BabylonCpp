@@ -72,30 +72,47 @@ void SphericalPolynomial::scaleInPlace(float scale)
   xy.scaleInPlace(scale);
 }
 
+SphericalPolynomial& SphericalPolynomial::updateFromHarmonics(const SphericalHarmonics& harmonics)
+{
+  _harmonics = harmonics;
+
+  x.copyFrom(harmonics.l11);
+  x.scaleInPlace(1.02333f).scaleInPlace(-1.f);
+  y.copyFrom(harmonics.l1_1);
+  y.scaleInPlace(1.02333f).scaleInPlace(-1.f);
+  z.copyFrom(harmonics.l10);
+  z.scaleInPlace(1.02333f);
+
+  xx.copyFrom(harmonics.l00);
+  TmpVectors::Vector3Array[0].copyFrom(harmonics.l20).scaleInPlace(0.247708f);
+  TmpVectors::Vector3Array[1].copyFrom(harmonics.l22).scaleInPlace(0.429043f);
+  xx.scaleInPlace(0.886277f)
+    .subtractInPlace(TmpVectors::Vector3Array[0])
+    .addInPlace(TmpVectors::Vector3Array[1]);
+  yy.copyFrom(harmonics.l00);
+  yy.scaleInPlace(0.886277f)
+    .subtractInPlace(TmpVectors::Vector3Array[0])
+    .subtractInPlace(TmpVectors::Vector3Array[1]);
+  zz.copyFrom(harmonics.l00);
+  TmpVectors::Vector3Array[0].copyFrom(harmonics.l20).scaleInPlace(0.495417f);
+  zz.scaleInPlace(0.886277f).addInPlace(TmpVectors::Vector3Array[0]);
+
+  yz.copyFrom(harmonics.l2_1);
+  yz.scaleInPlace(0.858086f).scaleInPlace(-1.f);
+  zx.copyFrom(harmonics.l21);
+  zx.scaleInPlace(0.858086f).scaleInPlace(-1.f);
+  xy.copyFrom(harmonics.l2_2);
+  xy.scaleInPlace(0.858086f);
+
+  scaleInPlace(1.f / Math::PI);
+
+  return *this;
+}
+
 SphericalPolynomial SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
 {
   SphericalPolynomial result;
-  result._harmonics = harmonics;
-
-  result.x = harmonics.l11.scale(1.02333f).scale(-1.f);
-  result.y = harmonics.l1_1.scale(1.02333f).scale(-1.f);
-  result.z = harmonics.l10.scale(1.02333f);
-
-  result.xx = harmonics.l00.scale(0.886277f)
-                .subtract(harmonics.l20.scale(0.247708f))
-                .add(harmonics.l22.scale(0.429043f));
-  result.yy = harmonics.l00.scale(0.886277f)
-                .subtract(harmonics.l20.scale(0.247708f))
-                .subtract(harmonics.l22.scale(0.429043f));
-  result.zz = harmonics.l00.scale(0.886277f).add(harmonics.l20.scale(0.495417f));
-
-  result.yz = harmonics.l2_1.scale(0.858086f).scale(-1.f);
-  result.zx = harmonics.l21.scale(0.858086f).scale(-1.f);
-  result.xy = harmonics.l2_2.scale(0.858086f);
-
-  result.scaleInPlace(1.f / Math::PI);
-
-  return result;
+  return result.updateFromHarmonics(harmonics);
 }
 
 SphericalPolynomial SphericalPolynomial::FromArray(const std::vector<Float32Array>& data)
