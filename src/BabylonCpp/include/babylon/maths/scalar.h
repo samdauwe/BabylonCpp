@@ -425,6 +425,21 @@ inline float NormalizeRadians(float angle)
   return angle;
 }
 
+/**
+ * @brief Returns the highest common factor of two integers.
+ * @param a first parameter
+ * @param b second parameter
+ * @return HCF of a and b
+ */
+inline int HCF(int a, int b)
+{
+  const auto r = a % b;
+  if (r == 0) {
+    return b;
+  }
+  return Scalar::HCF(b, r);
+}
+
 } // end of namespace Scalar
 } // end of namespace BABYLON
 
