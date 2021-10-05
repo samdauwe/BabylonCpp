@@ -9,7 +9,7 @@ namespace BABYLON {
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IMaterialContext {
-
+  virtual void reset() = 0;
 }; // end of struct IMaterialContext
 
 } // end of namespace BABYLON
