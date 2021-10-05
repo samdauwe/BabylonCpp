@@ -180,8 +180,9 @@ void SpriteRenderer::render(
 
   _buffer->update(_vertexData);
 
-  const auto culling = engine->depthCullingState()->cull().value_or(true);
-  const auto zOffset = engine->depthCullingState()->zOffset();
+  const auto culling      = engine->depthCullingState()->cull().value_or(true);
+  const auto zOffset      = engine->depthCullingState()->zOffset();
+  const auto zOffsetUnits = engine->depthCullingState()->zOffsetUnits();
 
   engine->setState(culling, zOffset, false, false);
 
