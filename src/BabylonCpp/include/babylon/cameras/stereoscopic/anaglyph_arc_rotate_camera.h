@@ -50,6 +50,9 @@ protected:
   AnaglyphArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
                           const Vector3& target, float interaxialDistance, Scene* scene);
 
+protected:
+  std::function<void(Camera& camera)> _setRigMode;
+
 private:
   static bool NodeConstructorAdded;
 

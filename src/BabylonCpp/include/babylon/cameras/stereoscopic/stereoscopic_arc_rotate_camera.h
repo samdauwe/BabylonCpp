@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_ARC_ROTATE_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 
 namespace BABYLON {
 
-class StereoscopicArcRotateCamera;
-using StereoscopicArcRotateCameraPtr = std::shared_ptr<StereoscopicArcRotateCamera>;
+FWD_CLASS_SPTR(StereoscopicArcRotateCamera)
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on ArcRotateCamera).
@@ -51,6 +51,9 @@ protected:
   StereoscopicArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
                               const Vector3& target, float interaxialDistance,
                               bool isStereoscopicSideBySide, Scene* scene);
+
+protected:
+  std::function<void(Camera& camera)> _setRigMode;
 
 private:
   static bool NodeConstructorAdded;
