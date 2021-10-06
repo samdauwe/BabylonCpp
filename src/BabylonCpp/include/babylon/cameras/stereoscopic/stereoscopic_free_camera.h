@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_FREE_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/free_camera.h>
 
 namespace BABYLON {
 
-class StereoscopicFreeCamera;
-using StereoscopicFreeCameraPtr = std::shared_ptr<StereoscopicFreeCamera>;
+FWD_CLASS_SPTR(StereoscopicFreeCamera)
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on FreeCamera).
@@ -47,6 +47,9 @@ protected:
    */
   StereoscopicFreeCamera(const std::string& name, const Vector3& position, float interaxialDistance,
                          bool isStereoscopicSideBySide, Scene* scene);
+
+protected:
+  std::function<void(Camera& camera)> _setRigMode;
 
 private:
   static bool NodeConstructorAdded;

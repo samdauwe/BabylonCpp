@@ -47,6 +47,9 @@ protected:
   AnaglyphFreeCamera(const std::string& name, const Vector3& position, float interaxialDistance,
                      Scene* scene);
 
+protected:
+  std::function<void(Camera& camera)> _setRigMode;
+
 private:
   static bool NodeConstructorAdded;
 
