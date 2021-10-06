@@ -27,6 +27,8 @@ AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& iName, const
   RigParamaters rigParams;
   rigParams.interaxialDistance = interaxialDistance;
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
+  _setRigMode
+    = [this](Camera& /*camera*/) -> void { Camera::_setStereoscopicAnaglyphRigMode(*this); };
 }
 
 AnaglyphUniversalCamera::~AnaglyphUniversalCamera() = default;

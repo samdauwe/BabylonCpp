@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_GAMEPAD_CAMERA_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/gamepad_camera.h>
 
 namespace BABYLON {
 
-class AnaglyphGamepadCamera;
-using AnaglyphGamepadCameraPtr = std::shared_ptr<AnaglyphGamepadCamera>;
+FWD_CLASS_SPTR(AnaglyphGamepadCamera)
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on GamepadCamera).
@@ -46,6 +46,9 @@ protected:
    */
   AnaglyphGamepadCamera(const std::string& name, const Vector3& position, float interaxialDistance,
                         Scene* scene);
+
+protected:
+  std::function<void(Camera& camera)> _setRigMode;
 
 private:
   static bool NodeConstructorAdded;
