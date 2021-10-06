@@ -8,37 +8,35 @@ bool StereoscopicGamepadCamera::NodeConstructorAdded = false;
 
 void StereoscopicGamepadCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "StereoscopicGamepadCamera", [](const std::string& iName, Scene* scene,
-                                    const std::optional<json>& options) {
-      float interaxialDistance      = 0.f;
-      bool isStereoscopicSideBySide = false;
-      if (options) {
-        interaxialDistance
-          = json_util::get_number<float>(*options, "interaxial_distance");
-        isStereoscopicSideBySide
-          = json_util::get_bool(*options, "isStereoscopicSideBySide");
-      }
-      return StereoscopicGamepadCamera::New(iName, Vector3::Zero(),
-                                            interaxialDistance,
-                                            isStereoscopicSideBySide, scene);
-    });
+  Node::AddNodeConstructor("StereoscopicGamepadCamera", [](const std::string& iName, Scene* scene,
+                                                           const std::optional<json>& options) {
+    float interaxialDistance      = 0.f;
+    bool isStereoscopicSideBySide = false;
+    if (options) {
+      interaxialDistance       = json_util::get_number<float>(*options, "interaxial_distance");
+      isStereoscopicSideBySide = json_util::get_bool(*options, "isStereoscopicSideBySide");
+    }
+    return StereoscopicGamepadCamera::New(iName, Vector3::Zero(), interaxialDistance,
+                                          isStereoscopicSideBySide, scene);
+  });
   StereoscopicGamepadCamera::NodeConstructorAdded = true;
 }
 
-StereoscopicGamepadCamera::StereoscopicGamepadCamera(
-  const std::string& iName, const Vector3& iPosition, float iInteraxialDistance,
-  bool iIsStereoscopicSideBySide, Scene* scene)
+StereoscopicGamepadCamera::StereoscopicGamepadCamera(const std::string& iName,
+                                                     const Vector3& iPosition,
+                                                     float iInteraxialDistance,
+                                                     bool iIsStereoscopicSideBySide, Scene* scene)
     : GamepadCamera{iName, iPosition, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;
   RigParamaters rigParams;
   rigParams.interaxialDistance = interaxialDistance;
-  setCameraRigMode(isStereoscopicSideBySide ?
-                     Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL :
-                     Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER,
+  setCameraRigMode(isStereoscopicSideBySide ? Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL :
+                                              Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER,
                    rigParams);
+  _setRigMode
+    = [this](Camera& /*camera*/) -> void { Camera::_setStereoscopicAnaglyphRigMode(*this); };
 }
 
 StereoscopicGamepadCamera::~StereoscopicGamepadCamera() = default;
