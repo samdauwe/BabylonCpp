@@ -26,6 +26,9 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
     , target{this, &NodeMaterialBlock::get_target, &NodeMaterialBlock::set_target}
     , inputs{this, &NodeMaterialBlock::get_inputs}
     , outputs{this, &NodeMaterialBlock::get_outputs}
+    , willBeGeneratedIntoVertexShaderFromFragmentShader{this,
+                                                        &NodeMaterialBlock::
+                                                          get_willBeGeneratedIntoVertexShaderFromFragmentShader}
     , _isUnique{false}
     , _target{NodeMaterialBlockTargets::Undefined}
 {
@@ -345,6 +348,34 @@ void NodeMaterialBlock::replaceRepeatableContent(
   NodeMaterialDefines& /*defines*/)
 {
   // Do nothing
+}
+
+bool NodeMaterialBlock::get_willBeGeneratedIntoVertexShaderFromFragmentShader() const
+{
+  if (isInput() || isFinalMerger()) {
+    return false;
+  }
+
+  for (const auto& o : _outputs) {
+    if (o->isDirectlyConnectedToVertexOutput()) {
+      return false;
+    }
+  }
+
+  if (target == NodeMaterialBlockTargets::Vertex) {
+    return true;
+  }
+
+  if (target == NodeMaterialBlockTargets::VertexAndFragment
+      || target == NodeMaterialBlockTargets::Neutral) {
+    for (const auto& o : _outputs) {
+      if (o->isConnectedInVertexShader()) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 bool NodeMaterialBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,

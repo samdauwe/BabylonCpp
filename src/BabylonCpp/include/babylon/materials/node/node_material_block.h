@@ -346,6 +346,12 @@ protected:
    */
   std::vector<NodeMaterialConnectionPointPtr>& get_outputs();
 
+  /**
+   *  @brief Gets a boolean indicating that the code of this block will be promoted to vertex shader
+   * even if connected to fragment output
+   */
+  bool get_willBeGeneratedIntoVertexShaderFromFragmentShader() const;
+
   std::string _declareOutput(const NodeMaterialConnectionPointPtr& output,
                              const NodeMaterialBuildState& state) const;
   std::string _writeVariable(const NodeMaterialConnectionPointPtr& currentPoint) const;
@@ -438,6 +444,12 @@ public:
    * Gets the list of output points
    */
   ReadOnlyProperty<NodeMaterialBlock, std::vector<NodeMaterialConnectionPointPtr>> outputs;
+
+  /**
+   * Gets a boolean indicating that the code of this block will be promoted to vertex shader even if
+   * connected to fragment output
+   */
+  ReadOnlyProperty<NodeMaterialBlock, bool> willBeGeneratedIntoVertexShaderFromFragmentShader;
 
 protected:
   /**
