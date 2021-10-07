@@ -610,7 +610,7 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
 
         tempName = name + std::to_string(_buildId);
 
-        defines.markAsUnprocessed();
+        defines.markAllAsDirty();
 
         buildId_ = _buildId;
       }
@@ -697,7 +697,7 @@ void NodeMaterial::_createEffectForParticles(
 
       tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
 
-      defines->markAsUnprocessed();
+      defines->markAllAsDirty();
 
       buildId_ = _buildId;
     }
@@ -709,7 +709,7 @@ void NodeMaterial::_createEffectForParticles(
     const auto particleSystemDefinesJoinedCurrent = StringTools::join(particleSystemDefines, "\n");
 
     if (particleSystemDefinesJoinedCurrent != particleSystemDefinesJoined) {
-      defines->markAsUnprocessed();
+      defines->markAllAsDirty();
       particleSystemDefinesJoined = particleSystemDefinesJoinedCurrent;
     }
 
