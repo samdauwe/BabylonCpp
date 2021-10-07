@@ -243,6 +243,7 @@ protected:
 public:
   /** Hidden */
   NodeMaterialBlockPtr _ownerBlock;
+
   /** Hidden */
   NodeMaterialConnectionPointPtr _connectedPoint;
 
