@@ -221,9 +221,14 @@ protected:
   std::vector<NodeMaterialConnectionPointPtr>& get_endpoints();
 
   /**
-   * @brief Gets a boolean indicating if that output point is connected to at least one input.
+   * @brief Gets a boolean indicating that this connection has a path to the vertex output.
    */
   bool get_hasEndpoints() const;
+
+  /**
+   * @brief Gets a boolean indicating if that output point is connected to at least one input.
+   */
+  bool get_isDirectlyConnectedToVertexOutput() const;
 
   /**
    * @brief Gets a boolean indicating that this connection will be used in the vertex shader.
@@ -382,6 +387,11 @@ public:
    * Gets a boolean indicating if that output point is connected to at least one input.
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> hasEndpoints;
+
+  /**
+   * Gets a boolean indicating that this connection has a path to the vertex output.
+   */
+  ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isDirectlyConnectedToVertexOutput;
 
   /**
    * Gets a boolean indicating that this connection will be used in the vertex shader

@@ -73,6 +73,8 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , connectedBlocks{this, &NodeMaterialConnectionPoint::get_connectedBlocks}
     , endpoints{this, &NodeMaterialConnectionPoint::get_endpoints}
     , hasEndpoints{this, &NodeMaterialConnectionPoint::get_hasEndpoints}
+    , isDirectlyConnectedToVertexOutput{this, &NodeMaterialConnectionPoint::
+                                                get_isDirectlyConnectedToVertexOutput}
     , isConnectedInVertexShader{this, &NodeMaterialConnectionPoint::get_isConnectedInVertexShader}
     , isConnectedInFragmentShader{this,
                                   &NodeMaterialConnectionPoint::get_isConnectedInFragmentShader}
@@ -247,6 +249,30 @@ std::vector<NodeMaterialConnectionPointPtr>& NodeMaterialConnectionPoint::get_en
 bool NodeMaterialConnectionPoint::get_hasEndpoints() const
 {
   return !_endpoints.empty();
+}
+
+bool NodeMaterialConnectionPoint::get_isDirectlyConnectedToVertexOutput() const
+{
+  if (!hasEndpoints()) {
+    return false;
+  }
+
+  for (const auto& endpoint : _endpoints) {
+    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Vertex) {
+      return true;
+    }
+
+    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Neutral
+        || endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::VertexAndFragment) {
+      for (const auto& o : endpoint->ownerBlock()->outputs()) {
+        if (o->isDirectlyConnectedToVertexOutput()) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 bool NodeMaterialConnectionPoint::get_isConnectedInVertexShader() const
