@@ -170,7 +170,7 @@ void EffectLayer::_createMainTexture()
                                               const std::function<void()>& /*beforeTransparents*/) {
     onBeforeRenderMainTextureObservable.notifyObservers(this);
 
-    auto engine = _scene->getEngine();
+    const auto engine = _scene->getEngine();
 
     if (!depthOnlySubMeshes.empty()) {
       engine->setColorWrite(false);

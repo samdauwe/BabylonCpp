@@ -379,7 +379,7 @@ void Light::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   getScene()->stopAnimation(this);
 
   // Remove from meshes
-  for (auto& mesh : getScene()->meshes) {
+  for (const auto& mesh : getScene()->meshes) {
     mesh->_removeLightSource(this, true);
   }
 
