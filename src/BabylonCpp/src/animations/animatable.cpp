@@ -34,6 +34,7 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget, float iFromF
     , _scene{scene}
     , _weight{-1.f}
     , _syncRoot{nullptr}
+    , _frameToSyncFromJump{0}
 {
   if (!animations.empty()) {
     appendAnimations(target, animations);
@@ -182,13 +183,13 @@ void Animatable::disableBlending()
 void Animatable::goToFrame(float frame)
 {
   if (!_runtimeAnimations.empty() && _runtimeAnimations[0]) {
-    auto fps          = _runtimeAnimations[0]->animation()->framePerSecond;
-    auto currentFrame = _runtimeAnimations[0]->currentFrame();
-    auto adjustTime   = frame - currentFrame;
-    auto delay        = (speedRatio != 0.f) ? static_cast<float>(adjustTime) * 1000.f
-                                         / (static_cast<float>(fps) * speedRatio) :
-                                              0.f;
-    _manualJumpDelay  = -std::chrono::milliseconds(static_cast<long>(delay));
+    const auto fps        = _runtimeAnimations[0]->animation()->framePerSecond;
+    _frameToSyncFromJump  = _frameToSyncFromJump.value_or(_runtimeAnimations[0]->currentFrame);
+    const auto adjustTime = frame - _frameToSyncFromJump.value_or(0);
+    const auto delay      = (speedRatio != 0.f) ? static_cast<float>(adjustTime) * 1000.f
+                                               / (static_cast<float>(fps) * speedRatio) :
+                                                  0.f;
+    _manualJumpDelay      = -std::chrono::milliseconds(static_cast<long>(delay));
   }
 
   for (const auto& runtimeAnimations : _runtimeAnimations) {
@@ -275,7 +276,8 @@ bool Animatable::_animate(const millisecond_t& delay)
 
   if (_manualJumpDelay.has_value()) {
     *_localDelayOffset += *_manualJumpDelay;
-    _manualJumpDelay = std::nullopt;
+    _manualJumpDelay     = std::nullopt;
+    _frameToSyncFromJump = std::nullopt;
   }
 
   if (_weight == 0.f) { // We consider that an animation with a weight === 0 is

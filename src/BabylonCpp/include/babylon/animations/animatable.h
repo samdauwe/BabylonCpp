@@ -276,6 +276,7 @@ private:
   float _speedRatio;
   float _weight;
   Animatable* _syncRoot;
+  std::optional<int> _frameToSyncFromJump;
 
 }; // end of class Animatable
 
