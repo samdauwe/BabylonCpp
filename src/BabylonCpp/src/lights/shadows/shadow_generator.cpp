@@ -121,8 +121,8 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
   _scene   = light->getScene();
   id       = light->id;
 
-  _nameForDrawWrapper = StringTools::printf(
-    "%s%zu", Constants::SUBMESH_DRAWWRAPPER_SHADOWGENERATOR_PREFIX, ShadowGenerator::_Counter++);
+  _nameForDrawWrapper = {StringTools::printf(
+    "%s%zu", Constants::SUBMESH_DRAWWRAPPER_SHADOWGENERATOR_PREFIX, ShadowGenerator::_Counter++)};
 
   auto component = _scene->_getComponent(SceneComponentConstants::NAME_SHADOWGENERATOR);
   if (!component) {
@@ -158,6 +158,8 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& li
 
   _initializeGenerator();
   _applyFilterValues();
+
+  _nameForDrawWrapperCurrent = _nameForDrawWrapper[0];
 }
 
 ShadowGenerator::~ShadowGenerator() = default;

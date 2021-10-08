@@ -715,7 +715,8 @@ public:
   bool forceBackFacesOnly;
 
   /** @hidden */
-  std::string _nameForDrawWrapper;
+  std::vector<std::string> _nameForDrawWrapper;
+  std::string _nameForDrawWrapperCurrent;
 
 protected:
   float _bias;
