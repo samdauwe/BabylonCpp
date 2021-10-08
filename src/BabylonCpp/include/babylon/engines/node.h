@@ -46,6 +46,8 @@ struct _InternalNodeDataInfo {
   bool _isEnabled          = true;
   bool _isParentEnabled    = true;
   bool _isReady            = true;
+  Observable<bool> _onEnabledStateChangedObservable;
+  Observable<Node> _onClonedObservable;
 }; // end of struct _InternalNodeDataInfo
 
 /**
@@ -453,6 +455,16 @@ protected:
   void set_onDispose(const std::function<void(Node* node, EventState& es)>& callback);
 
   /**
+   * @brief An event triggered when the enabled state of the node changes.
+   */
+  Observable<bool>& get_onEnabledStateChangedObservable();
+
+  /**
+   * @brief An event triggered when the node is cloned.
+   */
+  Observable<Node>& get_onClonedObservable();
+
+  /**
    * @brief Gets the list of attached behaviors.
    * @see https://doc.babylonjs.com/features/behaviour
    */
@@ -540,6 +552,16 @@ public:
    * Callback that will be raised when the node will be disposed.
    */
   WriteOnlyProperty<Node, std::function<void(Node* node, EventState& es)>> onDispose;
+
+  /**
+   * An event triggered when the enabled state of the node changes
+   */
+  ReadOnlyProperty<Node, Observable<bool>> onEnabledStateChangedObservable;
+
+  /**
+   * An event triggered when the node is cloned
+   */
+  ReadOnlyProperty<Node, Observable<Node>> onClonedObservable;
 
   /**
    * Gets the list of attached behaviors

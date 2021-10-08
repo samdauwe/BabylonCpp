@@ -48,6 +48,8 @@ Node::Node(const std::string& iName, Scene* scene)
     , _worldMatrixDeterminant{0.f}
     , _worldMatrixDeterminantIsDirty{true}
     , onDispose{this, &Node::set_onDispose}
+    , onEnabledStateChangedObservable{this, &Node::get_onEnabledStateChangedObservable}
+    , onClonedObservable{this, &Node::get_onClonedObservable}
     , behaviors{this, &Node::get_behaviors}
     , _isNode{true}
     , _parentUpdateId{-1}
@@ -183,6 +185,16 @@ void Node::set_onDispose(const std::function<void(Node* node, EventState& es)>& 
     onDisposeObservable.remove(_onDisposeObserver);
   }
   _onDisposeObserver = onDisposeObservable.add(callback);
+}
+
+Observable<bool>& Node::get_onEnabledStateChangedObservable()
+{
+  return _nodeDataStorage._onEnabledStateChangedObservable;
+}
+
+Observable<Node>& Node::get_onClonedObservable()
+{
+  return _nodeDataStorage._onClonedObservable;
 }
 
 Scene* Node::getScene() const
@@ -566,6 +578,9 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
+
+  onEnabledStateChangedObservable().clear();
+  onClonedObservable().clear();
 
   // Behaviors
   for (auto& behavior : _behaviors) {
