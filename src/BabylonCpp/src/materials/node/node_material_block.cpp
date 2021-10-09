@@ -177,8 +177,8 @@ NodeMaterialBlock::registerInput(const std::string& iName,
                                  const std::optional<NodeMaterialBlockTargets>& iTarget,
                                  const NodeMaterialConnectionPointPtr& point)
 {
-  auto iPoint        = point ? point :
-                               NodeMaterialConnectionPoint::New(
+  auto iPoint = point ? point :
+                        NodeMaterialConnectionPoint::New(
                           iName, shared_from_this(), NodeMaterialConnectionPointDirection::Input);
   iPoint->type       = type;
   iPoint->isOptional = isOptional;
@@ -197,8 +197,8 @@ NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const std::optional<NodeMaterialBlockTargets>& iTarget,
                                   const NodeMaterialConnectionPointPtr& point)
 {
-  auto iPoint  = point ? point :
-                         NodeMaterialConnectionPoint::New(
+  auto iPoint = point ? point :
+                        NodeMaterialConnectionPoint::New(
                           iName, shared_from_this(), NodeMaterialConnectionPointDirection::Output);
   iPoint->type = type;
   if (iTarget.has_value()) {
@@ -362,12 +362,12 @@ bool NodeMaterialBlock::get_willBeGeneratedIntoVertexShaderFromFragmentShader() 
     }
   }
 
-  if (target == NodeMaterialBlockTargets::Vertex) {
+  if (target() == NodeMaterialBlockTargets::Vertex) {
     return true;
   }
 
-  if (target == NodeMaterialBlockTargets::VertexAndFragment
-      || target == NodeMaterialBlockTargets::Neutral) {
+  if (target() == NodeMaterialBlockTargets::VertexAndFragment
+      || target() == NodeMaterialBlockTargets::Neutral) {
     for (const auto& o : _outputs) {
       if (o->isConnectedInVertexShader()) {
         return true;
@@ -584,8 +584,8 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   // Get unique name
   auto nameAsVariableName = StringTools::regexReplace(name(), "[^A-Za-z_]+", "");
   _codeVariableName       = !nameAsVariableName.empty() ?
-                              nameAsVariableName :
-                              StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
+                        nameAsVariableName :
+                        StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
 
   if (stl_util::contains(uniqueNames, _codeVariableName)) {
     auto index = 0;
