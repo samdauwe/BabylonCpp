@@ -630,7 +630,7 @@ void ShadowGenerator::_initializeShadowMap()
 
   _shadowMap->onBeforeBindObservable.add([this](RenderTargetTexture* /*rt*/, EventState&) -> void {
     _scene->getEngine()->_debugPushGroup(
-      StringTools::printf("shadow map generation for %s", _nameForDrawWrapper.c_str()), 1);
+      StringTools::printf("shadow map generation for %s", _nameForDrawWrapperCurrent.c_str()), 1);
   });
 
   // Record Face Index before render.
@@ -855,7 +855,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh, bool isTransp
     const auto shadowDepthWrapper = material->shadowDepthWrapper;
 
     const auto drawWrapper = (shadowDepthWrapper && shadowDepthWrapper->getEffect(subMesh, this)) ?
-                               subMesh->_getDrawWrapper(_nameForDrawWrapper) :
+                               subMesh->_getDrawWrapper(_nameForDrawWrapperCurrent) :
                                nullptr;
     if (!drawWrapper) {
       return;
@@ -1115,7 +1115,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances, bool isTransp
     }
   }
   else {
-    auto subMeshEffect = subMesh->_getDrawWrapper(_nameForDrawWrapper);
+    auto subMeshEffect = subMesh->_getDrawWrapper(_nameForDrawWrapperCurrent);
 
     auto effect        = subMeshEffect->effect;
     auto cachedDefines = subMeshEffect->defines;
