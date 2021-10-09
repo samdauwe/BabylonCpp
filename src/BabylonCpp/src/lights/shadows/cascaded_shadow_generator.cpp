@@ -365,7 +365,7 @@ void CascadedShadowGenerator::set_autoCalcDepthBounds(bool value)
   if (!_depthReducer) {
     _depthReducer = std::make_shared<DepthReducer>(camera);
     _depthReducer->onAfterReductionPerformed.add(
-      [this](MinMaxFloats* minmax, EventState& /*es*/) -> void {
+      [this](MinMaxFloats* minmax, EventState & /*es*/) -> void {
         auto min = minmax->min, max = minmax->max;
         if (min >= max) {
           min = 0.f;
@@ -418,8 +418,8 @@ void CascadedShadowGenerator::_splitFrustum()
     cameraRange   = far - near,   //
     iMinDistance  = _minDistance, //
     iMaxDistance  = _shadowMaxZ < far && _shadowMaxZ >= near ?
-                      std::min((_shadowMaxZ - near) / (far - near), _maxDistance) :
-                      _maxDistance;
+                     std::min((_shadowMaxZ - near) / (far - near), _maxDistance) :
+                     _maxDistance;
 
   const auto minZ = near + iMinDistance * cameraRange, //
     maxZ          = near + iMaxDistance * cameraRange;
@@ -732,7 +732,7 @@ void CascadedShadowGenerator::_initializeShadowMap()
   _shadowMap->onBeforeBindObservable.clear();
   _shadowMap->onBeforeRenderObservable.clear();
 
-  _shadowMap->onBeforeRenderObservable.add([this](int* layer, EventState& /*es*/) -> void {
+  _shadowMap->onBeforeRenderObservable.add([this](int* layer, EventState & /*es*/) -> void {
     _currentLayer = *layer;
     if (_filter == ShadowGenerator::FILTER_PCF) {
       _scene->getEngine()->setColorWrite(false);
@@ -744,15 +744,17 @@ void CascadedShadowGenerator::_initializeShadowMap()
     }
   });
 
-  _shadowMap->onBeforeBindObservable.add([this](RenderTargetTexture* /*texture*/,
-                                                EventState& /*es*/) -> void {
-    _scene->getEngine()->_debugPushGroup(
-      StringTools::printf("cascaded shadow map generation for %s", _nameForDrawWrapper.c_str()), 1);
-    if (_breaksAreDirty) {
-      _splitFrustum();
-    }
-    _computeMatrices();
-  });
+  _shadowMap->onBeforeBindObservable.add(
+    [this](RenderTargetTexture* /*texture*/, EventState & /*es*/) -> void {
+      _scene->getEngine()->_debugPushGroup(
+        StringTools::printf("cascaded shadow map generation for %s",
+                            _nameForDrawWrapperCurrent.c_str()),
+        1);
+      if (_breaksAreDirty) {
+        _splitFrustum();
+      }
+      _computeMatrices();
+    });
 
   _splitFrustum();
 }
