@@ -48,12 +48,12 @@ void Tools::FetchToRef(int u, int v, int width, int height, const Uint8Array& pi
 
 float Tools::Mix(float a, float b, float alpha)
 {
-  return a * (1 - alpha) + b * alpha;
+  return a * (1.f - alpha) + b * alpha;
 }
 
 bool Tools::IsExponentOfTwo(size_t value)
 {
-  size_t count = 1;
+  auto count = 1ull;
 
   do {
     count *= 2;
