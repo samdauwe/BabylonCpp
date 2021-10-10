@@ -157,6 +157,7 @@ GPUParticleSystem::GPUParticleSystem(
     ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA,
     sceneOrEngine, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
     Constants::TEXTURETYPE_FLOAT);
+  _randomTexture->name  = "GPUParticleSystem_random1";
   _randomTexture->wrapU = Constants::TEXTURE_WRAP_ADDRESSMODE;
   _randomTexture->wrapV = Constants::TEXTURE_WRAP_ADDRESSMODE;
 
@@ -171,6 +172,7 @@ GPUParticleSystem::GPUParticleSystem(
     ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA,
     sceneOrEngine, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
     Constants::TEXTURETYPE_FLOAT);
+  _randomTexture2->name  = "GPUParticleSystem_random2";
   _randomTexture2->wrapU = Constants::TEXTURE_WRAP_ADDRESSMODE;
   _randomTexture2->wrapV = Constants::TEXTURE_WRAP_ADDRESSMODE;
 
@@ -1367,6 +1369,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   _updateEffect->setFloat("currentCount", static_cast<float>(_currentActiveCount));
   _updateEffect->setFloat("timeDelta", _timeDelta);
   _updateEffect->setFloat("stopFactor", _stopped ? 0.f : 1.f);
+  _updateEffect->setInt("randomTextureSize", _randomTextureSize);
   _updateEffect->setTexture("randomSampler", _randomTexture);
   _updateEffect->setTexture("randomSampler2", _randomTexture2);
   _updateEffect->setFloat2("lifeTime", minLifeTime, maxLifeTime);
@@ -1406,8 +1409,9 @@ size_t GPUParticleSystem::render(bool preWarm)
     // particleEmitterType->applyToShader(_updateEffect.get());
   }
   if (_isAnimationSheetEnabled) {
-    _updateEffect->setFloat3("cellInfos", static_cast<float>(startSpriteCellID),
-                             static_cast<float>(endSpriteCellID), spriteCellChangeSpeed);
+    _updateEffect->setFloat4("cellInfos", static_cast<float>(startSpriteCellID),
+                             static_cast<float>(endSpriteCellID), spriteCellChangeSpeed,
+                             spriteCellLoop ? 1.f : 0.f);
   }
 
   if (noiseTexture()) {
