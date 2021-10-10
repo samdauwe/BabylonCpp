@@ -145,6 +145,8 @@ public:
   unsigned int _initialStartSpriteCellID;
   /** Hidden */
   unsigned int _initialEndSpriteCellID;
+  /** @hidden */
+  bool _initialSpriteCellLoop;
 
   /** Hidden */
   std::optional<ColorGradient> _currentColorGradient;
