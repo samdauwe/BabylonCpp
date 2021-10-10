@@ -73,6 +73,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     spriteCellChangeSpeed = 1.f;
     startSpriteCellID     = 0;
     endSpriteCellID       = 0;
+    spriteCellLoop        = true;
     spriteCellWidth       = 0;
     spriteCellHeight      = 0;
     spriteRandomStartCell = false;
