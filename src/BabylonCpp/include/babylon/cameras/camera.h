@@ -596,6 +596,7 @@ private:
   Vector3& get_globalPosition();
   void _cascadePostProcessesToRigCams();
   void _updateFrustumPlanes();
+  virtual void _setRigMode(const RigParamaters& rigParams);
   virtual void _updateCameraRotationMatrix();
   virtual void _updateWebVRCameraRotationMatrix();
   static void _AddNodeConstructors();

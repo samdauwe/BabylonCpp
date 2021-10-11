@@ -845,6 +845,14 @@ void Camera::setCameraRigMode(unsigned int iMode, const RigParamaters& rigParams
     }
   }
 
+  _setRigMode(rigParams);
+
+  _cascadePostProcessesToRigCams();
+  update();
+}
+
+void Camera::_setRigMode(const RigParamaters& rigParams)
+{
   switch (cameraRigMode) {
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
       Camera::_setStereoscopicAnaglyphRigMode(*this);
@@ -862,9 +870,6 @@ void Camera::setCameraRigMode(unsigned int iMode, const RigParamaters& rigParams
       Camera::_setWebVRRigMode(*this, rigParams);
       break;
   }
-
-  _cascadePostProcessesToRigCams();
-  update();
 }
 
 void Camera::_setStereoscopicRigMode(Camera& camera)
