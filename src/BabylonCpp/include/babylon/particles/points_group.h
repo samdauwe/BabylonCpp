@@ -52,7 +52,7 @@ public:
   size_t groupId;
 
   /**
-   * image data for group (internal use)
+   * Image data for group (internal use)
    * @hidden
    */
   ArrayBufferView _groupImageData;
