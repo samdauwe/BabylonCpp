@@ -1334,6 +1334,7 @@ void ParticleSystem::_update(int newParticles)
     if (_isAnimationSheetEnabled) {
       particle->_initialStartSpriteCellID = startSpriteCellID;
       particle->_initialEndSpriteCellID   = endSpriteCellID;
+      particle->_initialSpriteCellLoop    = spriteCellLoop;
     }
 
     // Inherited Velocity
