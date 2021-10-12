@@ -10,8 +10,8 @@ namespace BABYLON {
 FWD_CLASS_SPTR(HemisphericLight)
 
 /**
- * @brief The HemisphericLight simulates the ambient environment light,
- * so the passed direction is the light reflection direction, not the incoming direction.
+ * @brief The HemisphericLight simulates the ambient environment light, so the passed direction is
+ * the light reflection direction, not the incoming direction.
  */
 class BABYLON_SHARED_EXPORT HemisphericLight : public Light {
 
