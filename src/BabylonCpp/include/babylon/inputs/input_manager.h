@@ -83,7 +83,7 @@ public:
   /**
    * @brief Hidden
    */
-  [[nodiscard]] bool _isPointerSwiping() const;
+  bool _isPointerSwiping() const;
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
@@ -149,7 +149,7 @@ protected:
   /**
    * @brief Gets or sets the current on-screen X position of the pointer.
    */
-  [[nodiscard]] int get_pointerX() const;
+  int get_pointerX() const;
 
   /**
    * @brief Sets the current on-screen X position of the pointer.
@@ -159,7 +159,7 @@ protected:
   /**
    * @brief Gets the current on-screen Y position of the pointer.
    */
-  [[nodiscard]] int get_pointerY() const;
+  int get_pointerY() const;
 
   /**
    * @brief Sets the current on-screen Y position of the pointer
