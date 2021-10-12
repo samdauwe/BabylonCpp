@@ -41,7 +41,7 @@ protected:
   /**
    * @brief Gets the GPU frame time capture status.
    */
-  [[nodiscard]] bool get_captureGPUFrameTime() const;
+  bool get_captureGPUFrameTime() const;
 
   /**
    * @brief Enable or disable the GPU frame time capture.
@@ -56,7 +56,7 @@ protected:
   /**
    * @brief Gets the shader compilation time capture status.
    */
-  [[nodiscard]] bool get_captureShaderCompilationTime() const;
+  bool get_captureShaderCompilationTime() const;
 
   /**
    * @brief Enable or disable the shader compilation time capture.
