@@ -141,12 +141,16 @@ void LightGizmo::_update()
     _attachedMeshParent->freezeWorldMatrix(_light->parent()->getWorldMatrix());
   }
 
-  auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
+  // For light positon and direction, a dirty flag is set to true in the setter
+  // It means setting values individualy or copying values willl not call setter and
+  // dirty flag will not be set to true. Hence creating a new Vector3.
+  const auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
   if (shadowLight) {
     // If the gizmo is moved update the light otherwise update the gizmo to match the light
     if (!attachedMesh()->position().equals(_cachedPosition)) {
       // update light to match gizmo
-      shadowLight->position().copyFrom(attachedMesh()->position());
+      const auto& position  = attachedMesh()->position();
+      shadowLight->position = Vector3(position.x, position.y, position.z);
       _cachedPosition.copyFrom(attachedMesh()->position());
     }
     else {
@@ -160,7 +164,8 @@ void LightGizmo::_update()
     // If the gizmo is moved update the light otherwise update the gizmo to match the light
     if (Vector3::DistanceSquared(attachedMesh()->forward(), _cachedForward) > 0.0001f) {
       // update light to match gizmo
-      shadowLight->direction().copyFrom(attachedMesh()->forward);
+      const auto& direction  = attachedMesh()->forward();
+      shadowLight->direction = Vector3(direction.x, direction.y, direction.z);
       _cachedForward.copyFrom(attachedMesh()->forward);
     }
     else if (Vector3::DistanceSquared(attachedMesh()->forward, shadowLight->direction())
