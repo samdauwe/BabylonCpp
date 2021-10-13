@@ -40,7 +40,7 @@ struct BABYLON_SHARED_EXPORT GizmoAxisCache {
   /** Used to indicate Active state of the Gizmo */
   bool active = false;
   /** DragBehavior */
-  PointerDragBehaviorPtr dragBehavior;
+  PointerDragBehaviorPtr dragBehavior = nullptr;
 }; // end of struct GizmoAxisCache
 
 /**

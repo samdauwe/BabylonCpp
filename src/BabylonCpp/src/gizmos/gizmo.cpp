@@ -6,6 +6,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/engines/scene.h>
+#include <babylon/lights/shadow_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -290,6 +291,33 @@ void Gizmo::_matrixChanged()
       lmat.copyFrom(bone->getWorldMatrix());
     }
     bone->markAsDirty();
+  }
+  else {
+    const auto light = std::static_pointer_cast<ShadowLight>(_attachedNode);
+    if (light && light->getTypeID()) {
+      const auto type = light->getTypeID();
+      if (type == Light::LIGHTTYPEID_DIRECTIONALLIGHT || type == Light::LIGHTTYPEID_SPOTLIGHT
+          || type == Light::LIGHTTYPEID_POINTLIGHT) {
+        const auto parent = light->parent();
+
+        if (parent) {
+          std::optional<Vector3> scale = std::nullopt;
+          auto& invParent              = _tempMatrix1;
+          auto& nodeLocalMatrix        = _tempMatrix2;
+          parent->getWorldMatrix().invertToRef(invParent);
+          light->getWorldMatrix().multiplyToRef(invParent, nodeLocalMatrix);
+          nodeLocalMatrix.decompose(scale, _tempQuaternion, _tempVector);
+        }
+        else {
+          std::optional<Vector3> scale = std::nullopt;
+          _attachedNode->_worldMatrix.decompose(scale, _tempQuaternion, _tempVector);
+        }
+        // setter doesn't copy values. Need a new Vector3
+        light->position = Vector3(_tempVector->x, _tempVector->y, _tempVector->z);
+        Vector3::Backward(false).rotateByQuaternionToRef(*_tempQuaternion, *_tempVector);
+        light->direction = Vector3(_tempVector->x, _tempVector->y, _tempVector->z);
+      }
+    }
   }
 }
 
