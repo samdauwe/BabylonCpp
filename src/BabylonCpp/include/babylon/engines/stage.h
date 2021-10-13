@@ -2,6 +2,7 @@
 #define BABYLON_ENGINES_STAGE_H
 
 #include <functional>
+#include <limits>
 #include <memory>
 
 #include <babylon/babylon_api.h>
