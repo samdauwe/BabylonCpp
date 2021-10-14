@@ -390,14 +390,14 @@ public:
    * @param culling defines culling state: true to enable culling, false to disable it
    * @param zOffset defines the value to apply to zOffset (0 by default)
    * @param force defines if states must be applied even if cache is up to date
-   * @param reverseSide defines if culling must be reversed (CCW instead of CW and CW instead of
-   * CCW)
+   * @param reverseSide defines if culling must be reversed (CCW if false, CW if true)
    * @param cullBackFaces true to cull back faces, false to cull front faces (if culling is enabled)
    * @param stencil stencil states to set
+   * @param zOffsetUnits defines the value to apply to zOffsetUnits (0 by default)
    */
   virtual void setState(bool culling, float zOffset = 0.f, bool force = false,
                         bool reverseSide = false, bool cullBackFaces = true,
-                        const IStencilStatePtr& stencil = nullptr);
+                        const IStencilStatePtr& stencil = nullptr, float zOffsetUnits = 0.f);
 
   /**
    * @brief Set the z offset to apply to current rendering.
@@ -410,6 +410,18 @@ public:
    * @returns the current zOffset state
    */
   float getZOffset() const;
+
+  /**
+   * @brief Set the z offset Units to apply to current rendering.
+   * @param value defines the offset to apply
+   */
+  void setZOffsetUnits(float value);
+
+  /**
+   * @brief Gets the current value of the zOffset Units.
+   * @returns the current zOffset Units state
+   */
+  float getZOffsetUnits() const;
 
   /**
    * @brief Gets a boolean indicating if depth testing is enabled.

@@ -197,7 +197,8 @@ void Engine::generateMipMapsForCubemap(const InternalTexturePtr& texture, bool u
 }
 
 void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide,
-                      bool /*iCullBackFaces*/, const IStencilStatePtr& /*stencil*/)
+                      bool /*iCullBackFaces*/, const IStencilStatePtr& /*stencil*/,
+                      float /*zOffsetUnits*/)
 {
   // Culling
   if (_depthCullingState->cull() != culling || force) {
@@ -235,6 +236,17 @@ float Engine::getZOffset() const
 bool Engine::getDepthBuffer() const
 {
   return _depthCullingState->depthTest();
+}
+
+void Engine::setZOffsetUnits(float value)
+{
+  _depthCullingState->zOffsetUnits = useReverseDepthBuffer ? -value : value;
+}
+
+float Engine::getZOffsetUnits() const
+{
+  const auto zOffsetUnits = _depthCullingState->zOffsetUnits();
+  return useReverseDepthBuffer ? -zOffsetUnits : zOffsetUnits;
 }
 
 void Engine::setDepthBuffer(bool enable)

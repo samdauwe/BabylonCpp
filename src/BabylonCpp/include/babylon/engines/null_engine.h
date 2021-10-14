@@ -143,13 +143,14 @@ public:
    * @param culling defines culling state: true to enable culling, false to disable it
    * @param zOffset defines the value to apply to zOffset (0 by default)
    * @param force defines if states must be applied even if cache is up to date
-   * @param reverseSide defines if culling must be reversed (CCW instead of CW and CW instead of
-   * CCW)
+   * @param reverseSide defines if culling must be reversed (CCW if false, CW if true)
    * @param cullBackFaces true to cull back faces, false to cull front faces (if culling is enabled)
    * @param stencil stencil states to set
+   * @param zOffsetUnits defines the value to apply to zOffsetUnits (0 by default)
    */
   void setState(bool culling, float zOffset = 0.f, bool force = false, bool reverseSide = false,
-                bool cullBackFaces = true, const IStencilStatePtr& stencil = nullptr) override;
+                bool cullBackFaces = true, const IStencilStatePtr& stencil = nullptr,
+                float zOffsetUnits = 0.f) override;
 
   /**
    * @brief Set the value of an uniform to an array of int32.
