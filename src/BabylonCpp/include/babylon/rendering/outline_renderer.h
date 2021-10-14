@@ -97,9 +97,14 @@ private:
 
 public:
   /**
-   * Defines a zOffset to prevent zFighting between the overlay and the mesh.
+   * Defines a zOffset default Factor to prevent zFighting between the overlay and the mesh.
    */
   float zOffset;
+
+  /**
+   * Defines a zOffset default Unit to prevent zFighting between the overlay and the mesh.
+   */
+  float zOffsetUnits;
 
 private:
   Engine* _engine;

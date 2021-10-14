@@ -24,7 +24,8 @@ namespace BABYLON {
 
 size_t OutlineRenderer::_Counter = 0ull;
 
-OutlineRenderer::OutlineRenderer(Scene* iScene) : zOffset{1.f}
+OutlineRenderer::OutlineRenderer(Scene* iScene)
+    : zOffset{1.f}, zOffsetUnits{4.f} // 4 to account for projection a bit by default
 {
   ISceneComponent::name = OutlineRenderer::name;
   scene                 = iScene;
@@ -133,6 +134,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
   }
 
   engine->setZOffset(-zOffset);
+  engine->setZOffsetUnits(-zOffsetUnits);
 
   renderingMesh->_processRendering(
     effectiveMesh.get(), subMesh, effect, static_cast<int>(material->fillMode()), batch,
@@ -140,6 +142,7 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch, 
     [effect](bool, const Matrix& world, Material*) -> void { effect->setMatrix("world", world); });
 
   engine->setZOffset(0.f);
+  engine->setZOffsetUnits(0.f);
 }
 
 bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
