@@ -940,9 +940,14 @@ public:
   float pointSize;
 
   /**
-   * Stores the z offset value
+   * Stores the z offset Factor value
    */
   float zOffset;
+
+  /**
+   * Stores the z offset Units value
+   */
+  float zOffsetUnits;
 
   /**
    * The state of wireframe mode

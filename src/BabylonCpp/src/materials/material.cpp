@@ -91,6 +91,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , fogEnabled{this, &Material::get_fogEnabled, &Material::set_fogEnabled}
     , pointSize{1.f}
     , zOffset{0.f}
+    , zOffsetUnits{0.f}
     , wireframe{this, &Material::get_wireframe, &Material::set_wireframe}
     , pointsCloud{this, &Material::get_pointsCloud, &Material::set_pointsCloud}
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
@@ -536,7 +537,8 @@ bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> ove
   else {
     engine->enableEffect(_getDrawWrapper());
   }
-  engine->setState(backFaceCulling(), zOffset, false, reverse, cullBackFaces(), stencil);
+  engine->setState(backFaceCulling(), zOffset, false, reverse, cullBackFaces(), stencil,
+                   zOffsetUnits);
 
   return reverse;
 }
