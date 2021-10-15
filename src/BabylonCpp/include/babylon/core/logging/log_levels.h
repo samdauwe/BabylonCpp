@@ -29,7 +29,7 @@ public:
   // Functions
   static std::string ToReadableLevel(unsigned int level);
 
-}; // end of class LogChannel
+}; // end of class LogLevels
 
 } // end of namespace BABYLON
 
