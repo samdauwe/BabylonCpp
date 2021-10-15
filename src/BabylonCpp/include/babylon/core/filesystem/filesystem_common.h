@@ -10,8 +10,7 @@
 
 namespace BABYLON {
 
-// An ArrayBuffer object is used to represent a generic, fixed-length raw binary
-// data buffer.
+// An ArrayBuffer object is used to represent a generic, fixed-length raw binary data buffer.
 using ArrayBuffer = std::vector<uint8_t>;
 
 namespace Filesystem {
@@ -19,8 +18,7 @@ namespace Filesystem {
 /**
  * @brief Returns the extension of the filename.
  * @param filename A filename or file path.
- * @return The extension of the file or an empty string when the filename has no
- * extension.
+ * @return The extension of the file or an empty string when the filename has no extension.
  */
 inline std::string extension(const std::string& filename)
 {
@@ -63,8 +61,7 @@ inline std::string baseName(const std::string& filepath)
  * @brief Join two path components.
  * @param path0 First path components.
  * @param path1 Second path components.
- * @return Concatenation of two path components with path separator character in
- * between.
+ * @return Concatenation of two path components with path separator character in between.
  */
 template <typename T>
 inline T joinPath(const T& path0, const T& path1)
@@ -94,8 +91,7 @@ inline T joinPath(const T& path0, const T& path1, Args... args)
 /**
  * @brief Reads the file with the given filename into a string.
  * @param filename The path of the file to read from.
- * @return The contents of the file or an empty string in case the content could
- * not be read.
+ * @return The contents of the file or an empty string in case the content could not be read.
  */
 inline std::string readFileContents(const char* filename)
 {
@@ -114,8 +110,7 @@ inline std::string readFileContents(const char* filename)
 /**
  * @brief Reads the file with the given filename into a vector of strings.
  * @param filename The path of the file to read from.
- * @return The contents of the file or an empty vector in case the content could
- * not be read.
+ * @return The contents of the file or an empty vector in case the content could not be read.
  */
 inline std::vector<std::string> readFileLines(const char* filename)
 {
@@ -132,8 +127,7 @@ inline std::vector<std::string> readFileLines(const char* filename)
 /**
  * @brief Reads the file with the given filename into byte array.
  * @param filename The path of the file to read from.
- * @return The contents of the file or an empty vector in case the content could
- * not be read.
+ * @return The contents of the file or an empty vector in case the content could not be read.
  */
 inline ArrayBuffer readBinaryFile(const char* filename)
 {
@@ -207,8 +201,7 @@ inline bool writeFileContents(const char* filename, const std::string& contents)
  * @param contents The contents to write to the file.
  * @return Whether or not the content was written to the file.
  */
-inline bool writeFileLines(const char* filename,
-                           const std::vector<std::string>& lines)
+inline bool writeFileLines(const char* filename, const std::vector<std::string>& lines)
 {
   bool writtentoFile = false;
   std::ofstream out(filename, std::ios::out);
