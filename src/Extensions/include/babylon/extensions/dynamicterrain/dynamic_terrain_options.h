@@ -14,15 +14,14 @@ FWD_CLASS_SPTR(Camera)
 namespace Extensions {
 
 struct DynamicTerrainOptions {
-  // terrainSub the wanted terrain number of subdivisions : integer, multiple of
-  // 2.
-  int terrainSub;
+  // terrainSub the wanted terrain number of subdivisions : integer, multiple of 2.
+  int terrainSub = 0;
   // mapData the array of the map 3D data: x, y, z successive float values
   Float32Array mapData;
   // mapSubX the data map number of x subdivisions
-  int mapSubX;
+  int mapSubX = 0;
   // mapSubZ the data map number of z subdivisions
-  int mapSubZ;
+  int mapSubZ = 0;
   // mapUVs the array of the map UV data: u,v successive values, each between 0 and 1.
   Float32Array mapUVs;
   // mapColors the array of the map Color data: x, y, z successive float values.
