@@ -64,8 +64,8 @@ struct HeightMapOptions {
 }; // end of struct HeightMapOptions
 
 /**
- * @brief The DynamicTerrain class provides a way to display a terrain
- * dynamically morphed from a map of 3D data.
+ * @brief The DynamicTerrain class provides a way to display a terrain dynamically morphed from a
+ * map of 3D data.
  *
  * The dynamic terrain is a mesh that morphs on a logical data map.
  * This map is a simple flat array of successive 3D coordinates (x, y, z) as floats. It can be as
@@ -174,45 +174,40 @@ public:
                                              const HeightMapOptions& options, Scene* scene);
 
   /**
-   * @brief Updates the passed array or Float32Array with a data map computed
-   * from the passed heightmap image file.
+   * @brief Updates the passed array or Float32Array with a data map computed from the passed
+   * heightmap image file.
    * @param width map width size (positive float, default 300)
    * @param height map height size (positive float, default 300)
-   * @param subX is the wanted number of points along the map width (default
-   * 100).
-   * @param subZ is the wanted number of points along the map height (default
-   * 100).
+   * @param subX is the wanted number of points along the map width (default 100).
+   * @param subZ is the wanted number of points along the map height (default 100).
    * @param minHeight is the minimum altitude of the map (float, default 0).
    * @param maxHeight is the maximum altitude of the map (float, default 10).
-   * @param colorFilter is the filter to apply to the image pixel colors to
-   * compute the height (optional Color3, default (0.3, 0.59, 0.11) ).
-   * @param onReady is an optional callback function, called once the map is
-   * computed. It's passed the computed map.
+   * @param colorFilter is the filter to apply to the image pixel colors to compute the height
+   * (optional Color3, default (0.3, 0.59, 0.11) ).
+   * @param onReady is an optional callback function, called once the map is computed. It's passed
+   * the computed map.
    * @param data Float32Array must be the right size : 3 x subX x subZ.
-   * @param scene is the Scene object whose database will store the downloaded
-   * image.
+   * @param scene is the Scene object whose database will store the downloaded image.
    */
   static void CreateMapFromHeightMapToRef(const std::string& heightmapURL,
                                           const HeightMapOptions& options, Float32Array& data,
                                           Scene* scene);
 
   /**
-   * @brief Updates the passed arrays with UVs values to fit the whole map
-   * with
-   * subX points along its width and subZ points along its height.
-   * The passed array must be the right size : subX x subZ x 2.
+   * @brief Updates the passed arrays with UVs values to fit the whole map with subX points along
+   * its width and subZ points along its height. The passed array must be the right size : subX x
+   * subZ x 2.
    */
   static void CreateUVMapToRef(float subX, float subZ, Float32Array& mapUVs);
 
   /**
-   * @brief Returns a new UV array with values to fit the whole map with subX
-   * points along its width and subZ points along its height.
+   * @brief Returns a new UV array with values to fit the whole map with subX points along its width
+   * and subZ points along its height.
    */
   static Float32Array CreateUVMap(float subX, float subZ);
 
   /**
-   * @brief Computes and sets the terrain UV map with values to fit the whole
-   * map.
+   * @brief Computes and sets the terrain UV map with values to fit the whole map.
    * @returns The terrain.
    */
   DynamicTerrain& createUVMap();
@@ -237,16 +232,14 @@ public:
   void setCamera(const CameraPtr& val);
 
   /**
-   * Number of cells flought over by the cam on the X axis before the terrain is
-   * updated.
+   * Number of cells flought over by the cam on the X axis before the terrain is updated.
    * Integer greater or equal to 1.
    */
   [[nodiscard]] unsigned int subToleranceX() const;
   void setSubToleranceX(unsigned int val);
 
   /**
-   * Number of cells flought over by the cam on the Z axis before the terrain is
-   * updated.
+   * Number of cells flought over by the cam on the Z axis before the terrain is updated.
    * Integer greater or equal to 1. Default 1.
    */
   [[nodiscard]] unsigned int subToleranceZ() const;
@@ -261,15 +254,14 @@ public:
 
   /**
    * Current LOD factor value : the lower factor in the terrain.
-   * The LOD value is the sum of the initialLOD and the current
-   * cameraLODCorrection.
+   * The LOD value is the sum of the initialLOD and the current cameraLODCorrection.
    * Integer greater or equal to 1. Default 1.
    */
   [[nodiscard]] unsigned int LODValue() const;
 
   /**
-   * Camera LOD correction : the factor to add to the initial LOD according to
-   * the camera position, movement, etc.
+   * Camera LOD correction : the factor to add to the initial LOD according to the camera position,
+   * movement, etc.
    * Positive integer (default 0)
    */
   [[nodiscard]] unsigned int cameraLODCorrection() const;
@@ -357,8 +349,7 @@ public:
   /**
    * The map of colors.
    * A flat array of successive floats between 0 and 1 as r,g,b values.
-   * This property can be set only if a mapColors array was passed at
-   * construction time.
+   * This property can be set only if a mapColors array was passed at construction time.
    */
   [[nodiscard]] const Float32Array& mapColors() const;
   void setMapColors(const Float32Array& val);
@@ -366,31 +357,27 @@ public:
   /**
    * The map of UVs.
    * A flat array of successive floats between 0 and 1 as (u, v) values.
-   * This property can be set only if a mapUVs array was passed at construction
-   * time.
+   * This property can be set only if a mapUVs array was passed at construction time.
    */
   [[nodiscard]] const Float32Array& mapUVs() const;
   void setMapUVs(const Float32Array& val);
 
   /**
    * The map of normals.
-   * A flat array of successive floats as normal vector coordinates (x, y, z) on
-   * each map point.
+   * A flat array of successive floats as normal vector coordinates (x, y, z) on each map point.
    */
   [[nodiscard]] const Float32Array& mapNormals() const;
   void setMapNormals(const Float32Array& val);
 
   /**
-   * @brief Must the normals be recomputed on each terrain update (default :
-   * false).
+   * @brief Must the normals be recomputed on each terrain update (default : false).
    * By default, all the map normals are pre-computed on terrain creation.
    */
   [[nodiscard]] bool computeNormals() const;
   void setComputeNormals(bool val);
 
   /**
-   * @brief Will the custom function updateVertex() be called on each terrain
-   * update ?
+   * @brief Will the custom function updateVertex() be called on each terrain update ?
    * Default false.
    */
   [[nodiscard]] bool useCustomVertexFunction() const;
@@ -403,8 +390,8 @@ public:
   void setIsAlwaysVisible(bool val);
 
   /**
-   * @brief When assigning a new data map to the existing, shall the normals be
-   * automatically precomputed once ?
+   * @brief When assigning a new data map to the existing, shall the normals be automatically
+   * precomputed once ?
    * Default false.
    */
   [[nodiscard]] bool precomputeNormalsFromMap() const;
@@ -425,8 +412,7 @@ public:
   virtual void updateVertex(DynamicTerrainVertex& vertex, unsigned int i, unsigned j);
 
   /**
-   * @brief Custom function called each frame and passed the terrain camera
-   * reference.
+   * @brief Custom function called each frame and passed the terrain camera reference.
    * This should return a positive integer or zero.
    * Returns zero by default.
    */
