@@ -19,6 +19,7 @@ std::string ShaderCodeNode::process(std::unordered_map<std::string, std::string>
   if (!line.empty()) {
     auto value     = line;
     auto processor = options.processor;
+    std::smatch matches;
     if (processor) {
       // This must be done before other replacements to avoid mistakenly changing something that was
       // already changed.
@@ -31,6 +32,26 @@ std::string ShaderCodeNode::process(std::unordered_map<std::string, std::string>
       }
       else if (processor->varyingProcessor && StringTools::startsWith(line, "varying")) {
         value = processor->varyingProcessor(line, options.isFragment, preprocessors,
+                                            options.processingContext);
+      }
+      else if (processor->uniformProcessor && processor->uniformRegexp
+               && std::regex_search(line, matches, *processor->uniformRegexp)) {
+        if (!options.lookForClosingBracketForUniformBuffer) {
+          value = processor->uniformProcessor(line, options.isFragment, preprocessors,
+                                              options.processingContext);
+        }
+      }
+      else if (processor->uniformBufferProcessor && processor->uniformBufferRegexp
+               && std::regex_search(line, matches, *processor->uniformBufferRegexp)) {
+        if (!options.lookForClosingBracketForUniformBuffer) {
+          value = processor->uniformBufferProcessor(line, options.isFragment,
+                                                    options.processingContext);
+          options.lookForClosingBracketForUniformBuffer = true;
+        }
+      }
+      else if (processor->textureProcessor && processor->textureRegexp
+               && std::regex_search(line, matches, *processor->textureRegexp)) {
+        value = processor->textureProcessor(line, options.isFragment, preprocessors,
                                             options.processingContext);
       }
       else if ((processor->uniformProcessor || processor->uniformBufferProcessor)
