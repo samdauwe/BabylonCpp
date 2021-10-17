@@ -42,14 +42,7 @@ protected:
 private:
   void _collectFunctions();
   bool _processInlining(size_t numMaxIterations = 20);
-  int _extractBetweenMarkers(char markerOpen, char markerClose, const std::string& block,
-                             size_t startIndex);
-  size_t _skipWhitespaces(const std::string& s, size_t index);
-  bool _isIdentifierChar(const std::string& c) const;
-  std::string _removeComments(const std::string& block);
   bool _replaceFunctionCallsByCode();
-  int _findBackward(const std::string& s, int index, char c) const;
-  std::string _escapeRegExp(const std::string& s) const;
   std::string _replaceNames(std::string code, const std::vector<std::string>& sources,
                             const std::vector<std::string>& destinations) const;
 

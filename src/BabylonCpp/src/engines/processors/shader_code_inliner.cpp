@@ -1,6 +1,7 @@
 #include <babylon/engines/processors/shader_code_inliner.h>
 
 #include <babylon/core/logging.h>
+#include <babylon/misc/code_string_parsing_tools.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
@@ -107,7 +108,7 @@ void ShaderCodeInliner::_collectFunctions()
     // extract the parameters of the function as a whole string (without the leading / trailing
     // parenthesis)
     const auto funcParamsEndIndex
-      = _extractBetweenMarkers('(', ')', _sourceCode, funcParamsStartIndex);
+      = CodeStringParsingTools::ExtractBetweenMarkers('(', ')', _sourceCode, funcParamsStartIndex);
     if (funcParamsEndIndex < 0) {
       if (debug) {
         BABYLON_LOGF_WARN(
@@ -121,7 +122,8 @@ void ShaderCodeInliner::_collectFunctions()
     const auto funcParams = _sourceCode.substr(funcParamsStartIndex + 1, funcParamsEndIndex);
 
     // extract the body of the function (with the curly brackets)
-    const auto funcBodyStartIndex = _skipWhitespaces(_sourceCode, funcParamsEndIndex + 1);
+    const auto funcBodyStartIndex
+      = CodeStringParsingTools::SkipWhitespaces(_sourceCode, funcParamsEndIndex + 1);
     if (funcBodyStartIndex == _sourceCode.size()) {
       if (debug) {
         BABYLON_LOGF_WARN(
@@ -133,7 +135,8 @@ void ShaderCodeInliner::_collectFunctions()
       continue;
     }
 
-    const auto funcBodyEndIndex = _extractBetweenMarkers('{', '}', _sourceCode, funcBodyStartIndex);
+    const auto funcBodyEndIndex
+      = CodeStringParsingTools::ExtractBetweenMarkers('{', '}', _sourceCode, funcBodyStartIndex);
     if (funcBodyEndIndex < 0) {
       if (debug) {
         BABYLON_LOGF_WARN(
@@ -147,7 +150,7 @@ void ShaderCodeInliner::_collectFunctions()
     const auto funcBody = _sourceCode.substr(funcBodyStartIndex, funcBodyEndIndex + 1);
 
     // process the parameters: extract each names
-    auto params = StringTools::split(_removeComments(funcParams), ",");
+    auto params = StringTools::split(CodeStringParsingTools::RemoveComments(funcParams), ",");
     std::vector<std::string> paramNames{};
 
     for (auto& iParam : params) {
@@ -212,156 +215,6 @@ bool ShaderCodeInliner::_processInlining(size_t iNumMaxIterations)
   return numMaxIterations >= 0;
 }
 
-int ShaderCodeInliner::_extractBetweenMarkers(char markerOpen, char markerClose,
-                                              const std::string& block, size_t startIndex)
-{
-  auto currPos            = startIndex;
-  auto openMarkers        = 0;
-  std::string waitForChar = "";
-
-  while (currPos < block.size()) {
-    auto currChar = block[currPos];
-
-    if (waitForChar.empty()) {
-      if (currChar == markerOpen) {
-        ++openMarkers;
-      }
-      else if (currChar == markerClose) {
-        --openMarkers;
-      }
-      else if ((currChar == '"') || (currChar == '\'') || (currChar == '`')) {
-        waitForChar = std::to_string(currChar);
-      }
-      else if (currChar == '/') {
-        if (currPos + 1 < block.size()) {
-          const auto nextChar = block[currPos + 1];
-          if (nextChar == '/') {
-            waitForChar = '\n';
-          }
-          else if (nextChar == '*') {
-            waitForChar = "*/";
-          }
-        }
-      }
-    }
-    else {
-      if (std::to_string(currChar) == waitForChar) {
-        if (waitForChar == "\"" || waitForChar == "\'") {
-          if (block[currPos - 1] != '\\') {
-            waitForChar = "";
-          }
-        }
-        else {
-          waitForChar = "";
-        }
-      }
-      else if (waitForChar == "*/" && currChar == '*' && currPos + 1 < block.size()) {
-        if (block[currPos + 1] == '/') {
-          waitForChar = "";
-        }
-        if (waitForChar == "") {
-          ++currPos;
-        }
-      }
-    }
-
-    ++currPos;
-    if (openMarkers == 0) {
-      break;
-    }
-  }
-
-  return openMarkers == 0 ? static_cast<int>(currPos) - 1 : -1;
-}
-
-size_t ShaderCodeInliner::_skipWhitespaces(const std::string& s, size_t index)
-{
-  while (index < s.size()) {
-    const auto c = s[index];
-    if (c != ' ' && c != '\n' && c != '\r' && c != '\t' && c != '\u000a' /* && c != '\u00a0' */) {
-      break;
-    }
-    ++index;
-  }
-
-  return index;
-}
-
-bool ShaderCodeInliner::_isIdentifierChar(const std::string& c) const
-{
-  const int v = static_cast<int>(c[0]);
-  return (v >= 48 && v <= 57) ||  // 0-9
-         (v >= 65 && v <= 90) ||  // A-Z
-         (v >= 97 && v <= 122) || // a-z
-         (v == 95);               // _
-}
-
-std::string ShaderCodeInliner::_removeComments(const std::string& block)
-{
-  auto currPos            = 0ull;
-  std::string waitForChar = "";
-  auto inComments         = false;
-  std::vector<char> s{};
-
-  while (currPos < block.size()) {
-    auto currChar = block[currPos];
-
-    if (waitForChar.empty()) {
-      if ((currChar == '"') || (currChar == '\'') || (currChar == '`')) {
-        waitForChar = std::to_string(currChar);
-      }
-      else if (currChar == '/') {
-        if (currPos + 1 < block.size()) {
-          const auto nextChar = block[currPos + 1];
-          if (nextChar == '/') {
-            waitForChar = '\n';
-            inComments  = true;
-          }
-          else if (nextChar == '*') {
-            waitForChar = "*/";
-            inComments  = true;
-          }
-        }
-      }
-      if (!inComments) {
-        s.emplace_back(currChar);
-      }
-    }
-    else {
-      if (std::to_string(currChar) == waitForChar) {
-        if (waitForChar == "\"" || waitForChar == "\'") {
-          if (block[currPos - 1] != '\\') {
-            waitForChar = "";
-          }
-          s.emplace_back(currChar);
-        }
-        else {
-          waitForChar = "";
-          inComments  = false;
-        }
-      }
-      else if (waitForChar == "*/" && currChar == '*' && currPos + 1 < block.size()) {
-        if (block[currPos + 1] == '/') {
-          waitForChar = "";
-        }
-        if (waitForChar == "") {
-          inComments = false;
-          ++currPos;
-        }
-      }
-      else {
-        if (!inComments) {
-          s.emplace_back(currChar);
-        }
-      }
-    }
-
-    ++currPos;
-  }
-
-  return StringTools::join(s, "");
-}
-
 bool ShaderCodeInliner::_replaceFunctionCallsByCode()
 {
   auto doAgain = false;
@@ -384,14 +237,15 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
 
       // Make sure "name" is not part of a bigger string
       if (functionCallIndex == 0
-          || _isIdentifierChar(std::to_string(_sourceCode[functionCallIndex - 1]))) {
+          || CodeStringParsingTools::IsIdentifierChar(
+            std::to_string(_sourceCode[functionCallIndex - 1]))) {
         startIndex = functionCallIndex + name.size();
         continue;
       }
 
       // Find the opening parenthesis
       const auto callParamsStartIndex
-        = _skipWhitespaces(_sourceCode, functionCallIndex + name.size());
+        = CodeStringParsingTools::SkipWhitespaces(_sourceCode, functionCallIndex + name.size());
       if (callParamsStartIndex == _sourceCode.size() || _sourceCode[callParamsStartIndex] != '(') {
         startIndex = functionCallIndex + name.size();
         continue;
@@ -399,8 +253,8 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
 
       // extract the parameters of the function call as a whole string (without the leading /
       // trailing parenthesis)
-      const auto callParamsEndIndex
-        = _extractBetweenMarkers('(', ')', _sourceCode, callParamsStartIndex);
+      const auto callParamsEndIndex = CodeStringParsingTools::ExtractBetweenMarkers(
+        '(', ')', _sourceCode, callParamsStartIndex);
       if (callParamsEndIndex < 0) {
         if (debug) {
           BABYLON_LOGF_WARN("ShaderCodeInliner",
@@ -418,12 +272,12 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
       // this function split the parameter list used in the function call at ',' boundaries by
       // taking care of potential parenthesis like in:
       //      myfunc(a, vec2(1., 0.), 4.)
-      const auto splitParameterCall = [this](const std::string& s) -> std::vector<std::string> {
+      const auto splitParameterCall = [](const std::string& s) -> std::vector<std::string> {
         std::vector<std::string> parameters;
         auto curIdx = 0ull, startParamIdx = 0ull;
         while (curIdx < s.size()) {
           if (s[curIdx] == '(') {
-            const auto idx2 = _extractBetweenMarkers('(', ')', s, curIdx);
+            const auto idx2 = CodeStringParsingTools::ExtractBetweenMarkers('(', ')', s, curIdx);
             if (idx2 < 0) {
               return parameters;
             }
@@ -441,7 +295,7 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
         return parameters;
       };
 
-      auto params = splitParameterCall(_removeComments(callParams));
+      auto params = splitParameterCall(CodeStringParsingTools::RemoveComments(callParams));
 
       if (params.empty()) {
         if (debug) {
@@ -496,7 +350,8 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
         // FUNCTYPE retParamName;
         // {function body}
         // and replace the function call by retParamName
-        const auto injectDeclarationIndex = _findBackward(_sourceCode, functionCallIndex - 1, '\n');
+        const auto injectDeclarationIndex
+          = CodeStringParsingTools::FindBackward(_sourceCode, functionCallIndex - 1, '\n');
 
         partBefore       = _sourceCode.substr(0, injectDeclarationIndex + 1);
         auto partBetween = _sourceCode.substr(injectDeclarationIndex + 1, functionCallIndex);
@@ -534,20 +389,6 @@ bool ShaderCodeInliner::_replaceFunctionCallsByCode()
   return doAgain;
 }
 
-int ShaderCodeInliner::_findBackward(const std::string& s, int index, char c) const
-{
-  while (index >= 0 && s[index] != c) {
-    index--;
-  }
-
-  return index;
-}
-
-std::string ShaderCodeInliner::_escapeRegExp(const std::string& s) const
-{
-  return StringTools::regexReplace(s, R"([.*+?^%s()|[\]\\])", R"(\\$&)");
-}
-
 std::string ShaderCodeInliner::_replaceNames(std::string iCode,
                                              const std::vector<std::string>& sources,
                                              const std::vector<std::string>& destinations) const
@@ -555,7 +396,7 @@ std::string ShaderCodeInliner::_replaceNames(std::string iCode,
   // TODO: Make sure "source" is not part of a bigger identifier (for eg, if source=view and we
   // matched it with viewDirection)
   for (size_t i = 0; i < sources.size(); ++i) {
-    const auto source       = _escapeRegExp(sources[i]);
+    const auto source       = CodeStringParsingTools::EscapeRegExp(sources[i]);
     const auto& destination = destinations[i];
 
     iCode = StringTools::regexReplace(iCode, source, destination);
