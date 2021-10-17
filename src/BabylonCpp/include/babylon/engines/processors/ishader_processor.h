@@ -3,11 +3,14 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
+#include <regex>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_enums.h>
 #include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
@@ -19,6 +22,14 @@ FWD_STRUCT_SPTR(ShaderProcessingContext)
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IShaderProcessor {
+  ShaderLanguage shaderLanguage;
+
+  std::optional<std::regex> uniformRegexp       = std::nullopt;
+  std::optional<std::regex> uniformBufferRegexp = std::nullopt;
+  std::optional<std::regex> textureRegexp       = std::nullopt;
+  std::optional<bool> noPrecision               = std::nullopt;
+
+  std::function<std::string(const std::string& code)> preProcessShaderCode = nullptr;
   std::function<std::string(const std::string& attribute,
                             const std::unordered_map<std::string, std::string>& preProcessors,
                             const ShaderProcessingContextPtr& processingContext)>
@@ -34,10 +45,13 @@ struct BABYLON_SHARED_EXPORT IShaderProcessor {
   std::function<std::string(const std::string& uniformBuffer, bool isFragment,
                             const ShaderProcessingContextPtr& processingContext)>
     uniformBufferProcessor = nullptr;
+  std::function<std::string(const std::string& texture, bool isFragment,
+                            const std::unordered_map<std::string, std::string>& preProcessors,
+                            const ShaderProcessingContextPtr& processingContext)>
+    textureProcessor = nullptr;
   std::function<std::string(const std::string& closingBracketLine, bool isFragment,
                             const ShaderProcessingContextPtr& processingContext)>
     endOfUniformBufferProcessor = nullptr;
-
   std::function<std::string(const std::string& line, bool isFragment,
                             const ShaderProcessingContextPtr& processingContext)>
     lineProcessor = nullptr;
