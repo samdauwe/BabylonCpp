@@ -15,7 +15,7 @@ struct IInlineFunctionDescr {
 }; // end of struct IInlineFunctionDescr
 
 /**
- * @brief Class used to inline functions in shader code
+ * @brief Class used to inline functions in shader code.
  */
 class BABYLON_SHARED_EXPORT ShaderCodeInliner {
 
@@ -35,7 +35,7 @@ public:
 
 protected:
   /**
-   * @brief Gets the code after the inlining process
+   * @brief Gets the code after the inlining process.
    */
   std::string get_code() const;
 
