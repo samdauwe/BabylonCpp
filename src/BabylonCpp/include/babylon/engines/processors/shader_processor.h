@@ -36,10 +36,10 @@ public:
 
 public:
   static void Initialize(ProcessingOptions& options);
-  static void Process(const std::string& sourceCode, ProcessingOptions& options,
+  static void Process(std::string sourceCode, ProcessingOptions& options,
                       const std::function<void(const std::string& migratedCode)>& callback,
                       ThinEngine* engine);
-  static void PreProcess(const std::string& sourceCode, ProcessingOptions& options,
+  static void PreProcess(std::string sourceCode, ProcessingOptions& options,
                          const std::function<void(const std::string& migratedCode)>& callback,
                          ThinEngine* engine);
   static std::unordered_map<std::string, std::string> Finalize(const std::string& vertexCode,
@@ -82,7 +82,7 @@ private:
                          std::unordered_map<std::string, std::string>& preprocessors,
                          ProcessingOptions& options);
   static std::unordered_map<std::string, std::string>
-  _PreparePreProcessors(const ProcessingOptions& options, ThinEngine* engine, bool addGLES = true);
+  _PreparePreProcessors(const ProcessingOptions& options, ThinEngine* engine);
   static std::string _ProcessShaderConversion(const std::string& sourceCode,
                                               ProcessingOptions& options, ThinEngine* engine);
   static std::string _ApplyPreProcessing(const std::string& sourceCode, ProcessingOptions& options,

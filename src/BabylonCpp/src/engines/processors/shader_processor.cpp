@@ -25,10 +25,13 @@ void ShaderProcessor::Initialize(ProcessingOptions& options)
   }
 }
 
-void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& options,
+void ShaderProcessor::Process(std::string sourceCode, ProcessingOptions& options,
                               const std::function<void(const std::string& migratedCode)>& callback,
                               ThinEngine* engine)
 {
+  if (options.processor && options.processor->preProcessShaderCode) {
+    sourceCode = options.processor->preProcessShaderCode(sourceCode);
+  }
   _ProcessIncludes(sourceCode, options,
                    [&options, callback, &engine](const std::string& codeWithIncludes) -> void {
                      const auto migratedCode
@@ -38,9 +41,12 @@ void ShaderProcessor::Process(const std::string& sourceCode, ProcessingOptions& 
 }
 
 void ShaderProcessor::PreProcess(
-  const std::string& sourceCode, ProcessingOptions& options,
+  std::string sourceCode, ProcessingOptions& options,
   const std::function<void(const std::string& migratedCode)>& callback, ThinEngine* engine)
 {
+  if (options.processor && options.processor->preProcessShaderCode) {
+    sourceCode = options.processor->preProcessShaderCode(sourceCode);
+  }
   _ProcessIncludes(sourceCode, options,
                    [&options, callback, &engine](const std::string& codeWithIncludes) -> void {
                      const auto migratedCode
@@ -62,6 +68,10 @@ ShaderProcessor::Finalize(const std::string& vertexCode, const std::string& frag
 
 std::string ShaderProcessor::_ProcessPrecision(std::string source, const ProcessingOptions& options)
 {
+  if (options.processor->noPrecision) {
+    return source;
+  }
+
   const auto shouldUseHighPrecisionShader = options.shouldUseHighPrecisionShader;
 
   if (StringTools::indexOf(source, "precision highp float") == -1) {
@@ -368,8 +378,7 @@ ShaderProcessor::_EvaluatePreProcessors(const std::string& sourceCode,
 }
 
 std::unordered_map<std::string, std::string>
-ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, ThinEngine* engine,
-                                       bool addGLES)
+ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, ThinEngine* engine)
 {
   const auto& defines = options.defines;
   std::unordered_map<std::string, std::string> preprocessors;
@@ -381,7 +390,7 @@ ShaderProcessor::_PreparePreProcessors(const ProcessingOptions& options, ThinEng
     preprocessors[split[0]] = split.size() > 1 ? split[1] : "";
   }
 
-  if (addGLES) {
+  if (options.processor && options.processor->shaderLanguage == ShaderLanguage::GLSL) {
     preprocessors["GL_ES"] = "true";
   }
   preprocessors["__VERSION__"]        = options.version;
@@ -403,7 +412,8 @@ std::string ShaderProcessor::_ProcessShaderConversion(const std::string& sourceC
   }
 
   // Already converted
-  if (StringTools::indexOf(preparedSourceCode, "#version 3") != -1) {
+  if (options.processor && options.processor->shaderLanguage == ShaderLanguage::GLSL
+      && StringTools::indexOf(preparedSourceCode, "#version 3") != -1) {
     return StringTools::replace(preparedSourceCode, "#version 300 es", "");
   }
 
@@ -440,7 +450,7 @@ std::string ShaderProcessor::_ApplyPreProcessing(const std::string& sourceCode,
 
   const auto& defines = options.defines;
 
-  auto preprocessors = _PreparePreProcessors(options, engine, false);
+  auto preprocessors = _PreparePreProcessors(options, engine);
 
   // General pre processing
   if (options.processor && options.processor->preProcessor) {
