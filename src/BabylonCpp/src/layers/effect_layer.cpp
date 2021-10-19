@@ -529,7 +529,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
   const auto reverse = sideOrientation == Material::ClockWiseSideOrientation;
   engine->setState(material->backFaceCulling(), material->zOffset, false, reverse,
-                   material->cullBackFaces());
+                   material->cullBackFaces(), nullptr, material->zOffsetUnits);
 
   // Managing instances
   auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
