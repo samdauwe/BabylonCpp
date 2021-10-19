@@ -405,17 +405,16 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
                                               const std::optional<bool>& invertY,
                                               const std::optional<bool>& useSRGBBuffer)
 {
-  auto engine = _getEngine();
+  const auto engine = _getEngine();
   if (!engine) {
     return nullptr;
   }
 
-  const auto correctedUseSRGBBuffer
-    = useSRGBBuffer.value_or(false) && engine->_caps.supportSRGBBuffers
-      && (engine->webGLVersion() > 1.f || engine->isWebGPU() || noMipmap);
+  const auto correctedUseSRGBBuffer = engine->_getUseSRGBBuffer(!!useSRGBBuffer, noMipmap);
 
   auto& texturesCache = engine->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
+
     if (!useSRGBBuffer.has_value()
         || correctedUseSRGBBuffer == texturesCacheEntry->_useSRGBBuffer) {
       if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
