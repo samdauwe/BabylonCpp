@@ -930,6 +930,11 @@ public:
   std::unique_ptr<HardwareTextureWrapper<WebGLTexturePtr>> _createHardwareTexture();
 
   /**
+   * @brief Hidden
+   */
+  bool _getUseSRGBBuffer(bool useSRGBBuffer, bool noMipmap) const;
+
+  /**
    * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
    * @param url defines a value which contains one of the following:

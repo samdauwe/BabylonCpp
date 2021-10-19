@@ -2492,6 +2492,14 @@ std::unique_ptr<HardwareTextureWrapper<WebGLTexturePtr>> ThinEngine::_createHard
   return std::make_unique<WebGLHardwareTexture>(_createTexture(), _gl);
 }
 
+bool ThinEngine::_getUseSRGBBuffer(bool useSRGBBuffer, bool noMipmap) const
+{
+  // Generating mipmaps for sRGB textures is not supported in WebGL1 so we must disable the support
+  // if mipmaps is enabled
+  return useSRGBBuffer && _caps.supportSRGBBuffers
+         && (webGLVersion() > 1.f || isWebGPU() || noMipmap);
+}
+
 InternalTexturePtr ThinEngine::_createTextureBase(
   std::string url, bool noMipmap, bool invertY, Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
