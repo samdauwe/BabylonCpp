@@ -11,7 +11,7 @@ FWD_CLASS_SPTR(MultiviewRenderTarget)
 
 /**
  * @brief Renders to multiple views with a single draw call.
- * @see https://www.khronos.org/registry/webgl/extensions/WEBGL_multiview/
+ * @see https://www.khronos.org/registry/webgl/extensions/OVR_multiview2/
  */
 class BABYLON_SHARED_EXPORT MultiviewRenderTarget : public RenderTargetTexture {
 
