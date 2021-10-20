@@ -7,6 +7,8 @@ namespace BABYLON {
 
 WebGLShaderProcessor::WebGLShaderProcessor() : IShaderProcessor{}
 {
+  shaderLanguage = ShaderLanguage::GLSL;
+
   postProcessor = [this](const std::string& code, const std::vector<std::string>& defines,
                          bool isFragment, const ShaderProcessingContextPtr& processingContext,
                          ThinEngine* engine) -> std::string {
