@@ -42,6 +42,11 @@ struct BABYLON_SHARED_EXPORT IMultiRenderTargetOptions {
   std::optional<bool> generateDepthTexture = std::nullopt;
 
   /**
+   * Define depth texture format to use
+   */
+  std::optional<unsigned int> depthTextureFormat = std::nullopt;
+
+  /**
    * Define the number of desired draw buffers
    */
   std::optional<size_t> textureCount = std::nullopt;
