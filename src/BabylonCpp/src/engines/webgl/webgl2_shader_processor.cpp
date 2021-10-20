@@ -7,6 +7,8 @@ namespace BABYLON {
 
 WebGL2ShaderProcessor::WebGL2ShaderProcessor()
 {
+  shaderLanguage = ShaderLanguage::GLSL;
+
   attributeProcessor
     = [this](const std::string& attribute,
              const std::unordered_map<std::string, std::string>& /*preProcessors*/,
