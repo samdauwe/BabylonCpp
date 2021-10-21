@@ -3,7 +3,7 @@
 namespace BABYLON {
 
 std::array<unsigned int, 17> AbstractActionManager::Triggers{
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+  {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u}};
 
 AbstractActionManager::AbstractActionManager()
     : hoverCursor{""}
