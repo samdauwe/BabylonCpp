@@ -30,8 +30,7 @@ public:
 
   /**
    * @brief Creates a new Action.
-   * @param triggerOptions the trigger, with or without parameters, for the
-   * action
+   * @param triggerOptions the trigger, with or without parameters, for the action
    * @param condition an optional determinant of action
    */
   Action(unsigned int triggerOptions, Condition* condition = nullptr);
