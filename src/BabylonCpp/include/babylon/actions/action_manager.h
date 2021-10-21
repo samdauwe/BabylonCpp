@@ -153,14 +153,14 @@ public:
    * @brief Gets hosting scene.
    * @returns the hosting scene
    */
-  [[nodiscard]] Scene* getScene() const;
+  Scene* getScene() const;
 
   /**
    * @brief Does this action manager handles actions of any of the given triggers.
    * @param triggers defines the triggers to be tested
    * @return a boolean indicating whether one (or more) of the triggers is handled
    */
-  [[nodiscard]] bool hasSpecificTriggers(const Uint32Array& triggers) const override;
+  bool hasSpecificTriggers(const Uint32Array& triggers) const override;
 
   /**
    * @brief Does this action manager handles actions of any of the given triggers. This function
@@ -169,8 +169,7 @@ public:
    * @param triggerB defines the trigger to be tested
    * @return a boolean indicating whether one (or more) of the triggers is handled
    */
-  [[nodiscard]] bool hasSpecificTriggers2(unsigned int triggerA,
-                                          unsigned int triggerB) const override;
+  bool hasSpecificTriggers2(unsigned int triggerA, unsigned int triggerB) const override;
 
   /**
    * @brief Does this action manager handles actions of a given trigger.
@@ -205,18 +204,18 @@ public:
   void processTrigger(unsigned int trigger, const IActionEventPtr& evt = nullptr) override;
 
   /** hidden */
-  [[nodiscard]] IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                                   const std::string& propertyPath) const;
+  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
+                                     const std::string& propertyPath) const;
 
   /** hidden */
-  [[nodiscard]] std::string _getProperty(const std::string& propertyPath) const;
+  std::string _getProperty(const std::string& propertyPath) const;
 
   /**
    * @brief Serialize this manager to a JSON object.
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  [[nodiscard]] json serialize(const std::string& name) const override;
+  json serialize(const std::string& name) const override;
 
   // Statics
 
@@ -266,13 +265,13 @@ protected:
    * @brief Does this action manager has pointer triggers.
    * @return {boolean} whether or not it has pointer triggers
    */
-  [[nodiscard]] bool get_hasPointerTriggers() const override;
+  bool get_hasPointerTriggers() const override;
 
   /**
    * @brief Does this action manager has pick triggers.
    * @return {boolean} whether or not it has pick triggers
    */
-  [[nodiscard]] bool get_hasPickTriggers() const override;
+  bool get_hasPickTriggers() const override;
 
 private:
   Scene* _scene;
