@@ -72,7 +72,7 @@ Curve3 Curve3::CreateQuadraticBezier(const Vector3& v0, const Vector3& v1, const
   const auto equation = [](float t, float val0, float val1, float val2) -> float {
     return (1.f - t) * (1.f - t) * val0 + 2.f * t * (1.f - t) * val1 + t * t * val2;
   };
-  for (float i = 0; i <= nbPointsVal; ++i) {
+  for (float i = 0.f; i <= nbPointsVal; ++i) {
     bez.emplace_back(Vector3(equation(i / nbPointsVal, v0.x, v1.x, v2.x),
                              equation(i / nbPointsVal, v0.y, v1.y, v2.y),
                              equation(i / nbPointsVal, v0.z, v1.z, v2.z)));
@@ -89,7 +89,7 @@ Curve3 Curve3::CreateCubicBezier(const Vector3& v0, const Vector3& v1, const Vec
     return (1.f - t) * (1.f - t) * (1.f - t) * val0 + 3.f * t * (1.f - t) * (1.f - t) * val1
            + 3.f * t * t * (1.f - t) * val2 + t * t * t * val3;
   };
-  for (float i = 0; i <= nbPointsVal; ++i) {
+  for (float i = 0.f; i <= nbPointsVal; ++i) {
     bez.emplace_back(Vector3(equation(i / nbPointsVal, v0.x, v1.x, v2.x, v3.x),
                              equation(i / nbPointsVal, v0.y, v1.y, v2.y, v3.y),
                              equation(i / nbPointsVal, v0.z, v1.z, v2.z, v3.z)));
