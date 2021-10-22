@@ -212,9 +212,9 @@ Color3& Color3::set(float red, float green, float blue)
 
 std::string Color3::toHexString() const
 {
-  const int intR = static_cast<int>(round(r * 255)) | 0;
-  const int intG = static_cast<int>(round(g * 255)) | 0;
-  const int intB = static_cast<int>(round(b * 255)) | 0;
+  const int intR = static_cast<int>(round(r * 255));
+  const int intG = static_cast<int>(round(g * 255));
+  const int intB = static_cast<int>(round(b * 255));
 
   std::ostringstream ostream;
   ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG) << Scalar::ToHex(intB);
