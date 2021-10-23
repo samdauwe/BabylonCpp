@@ -4,6 +4,7 @@
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
@@ -40,7 +41,6 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* /*parentBone*/,
   _skeleton    = skeleton;
   _localMatrix = localMatrix ? *localMatrix : Matrix::Identity();
   _restPose    = iRestPose ? *iRestPose : _localMatrix;
-  _bindPose    = _localMatrix;
   _baseMatrix  = baseMatrix ? *baseMatrix : _localMatrix;
   _index       = index;
 }
@@ -95,8 +95,16 @@ Matrix& Bone::get__matrix()
 
 void Bone::set__matrix(const Matrix& value)
 {
+  _needToCompose = false; // in case there was a pending compose
+
+  // skip if the matrices are the same
+  if (value.updateFlag == _localMatrix.updateFlag) {
+    return;
+  }
+
   _localMatrix.copyFrom(value);
-  _needToDecompose = true;
+
+  _markAsDirtyAndDecompose();
 }
 
 std::string Bone::getClassName() const
@@ -178,12 +186,12 @@ void Bone::setRestPose(const Matrix& matrix)
 
 Matrix& Bone::getBindPose()
 {
-  return _bindPose;
+  return _baseMatrix;
 }
 
 void Bone::setBindPose(const Matrix& matrix)
 {
-  _bindPose.copyFrom(matrix);
+  updateMatrix(matrix);
 }
 
 Matrix& Bone::getWorldMatrix()
@@ -193,11 +201,21 @@ Matrix& Bone::getWorldMatrix()
 
 void Bone::returnToRest()
 {
-  if (_skeleton->_numBonesWithLinkedTransformNode > 0) {
-    updateMatrix(_restPose.value_or(Matrix::Identity()), false, false);
+  if (_linkedTransformNode) {
+    std::optional<Vector3> localScaling     = TmpVectors::Vector3Array[0];
+    std::optional<Quaternion> localRotation = TmpVectors::QuaternionArray[0];
+    std::optional<Vector3> localPosition    = TmpVectors::Vector3Array[1];
+
+    getRestPose()->decompose(localScaling, localRotation, localPosition);
+
+    _linkedTransformNode->position().copyFrom(*localPosition);
+    _linkedTransformNode->rotationQuaternion
+      = _linkedTransformNode->rotationQuaternion().value_or(Quaternion::Identity());
+    _linkedTransformNode->rotationQuaternion()->copyFrom(*localRotation);
+    _linkedTransformNode->scaling().copyFrom(*localScaling);
   }
   else {
-    updateMatrix(_restPose.value_or(Matrix::Identity()), false, true);
+    _matrix = *_restPose;
   }
 }
 
@@ -331,9 +349,7 @@ void Bone::updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix, bool 
   }
 
   if (updateLocalMatrix) {
-    _needToCompose = false; // in case there was a pending compose
-    _localMatrix.copyFrom(matrix);
-    _markAsDirtyAndDecompose();
+    _matrix = matrix;
   }
   else {
     markAsDirty();

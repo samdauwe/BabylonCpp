@@ -105,7 +105,7 @@ public:
 
   /**
    * @brief Gets the base matrix (initial matrix which remains unchanged).
-   * @returns a matrix
+   * @returns the base matrix (as known as bind pose matrix)
    */
   Matrix& getBaseMatrix();
 
@@ -124,12 +124,14 @@ public:
   /**
    * @brief Gets the bind pose matrix.
    * @returns the bind pose matrix
+   * @deprecated Please use getBaseMatrix instead
    */
   Matrix& getBindPose();
 
   /**
    * @brief Sets the bind pose matrix.
    * @param matrix the local-space bind pose to set for this bone
+   * @deprecated Please use updateMatrix instead
    */
   void setBindPose(const Matrix& matrix);
 
@@ -617,7 +619,6 @@ private:
   Skeleton* _skeleton;
   Matrix _localMatrix;
   std::optional<Matrix> _restPose;
-  Matrix _bindPose;
   Matrix _baseMatrix;
   Matrix _absoluteTransform;
   std::unique_ptr<Matrix> _invertedAbsoluteTransform;
