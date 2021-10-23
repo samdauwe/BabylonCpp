@@ -268,38 +268,34 @@ void BoneIKController::update()
       Quaternion::FromRotationMatrixToRef(mat1, _iTmpQuat);
       Quaternion::SlerpToRef(_bone1Quat, _iTmpQuat, slerpAmount, _bone1Quat);
       angC = _bone2Ang * (1.f - slerpAmount) + angC * slerpAmount;
+
       _bone1->setRotationQuaternion(_bone1Quat, Space::WORLD, mesh);
-      if (_bone1->_linkedTransformNode) {
-        BoneIKController::_SetAbsoluteRotation(_bone1->_linkedTransformNode, _bone1Quat);
-      }
-      else {
-      }
+
       _slerping = true;
     }
     else {
-      if (_bone1->_linkedTransformNode) {
-        Quaternion::FromRotationMatrixToRef(mat1, _tmpQuat);
-        BoneIKController::_SetAbsoluteRotation(_bone1->_linkedTransformNode, _tmpQuat);
-      }
-      else {
-        _bone1->setRotationMatrix(mat1, Space::WORLD, mesh);
-      }
+      _bone1->setRotationMatrix(mat1, Space::WORLD, mesh);
+
       _bone1Mat.copyFrom(mat1);
       _slerping = false;
     }
+    _updateLinkedTransformRotation(_bone1);
   }
 
-  if (_bone2->_linkedTransformNode) {
-    if (!_bone2->_linkedTransformNode->rotationQuaternion()) {
-      _bone2->_linkedTransformNode->rotationQuaternion = Quaternion();
-    }
-    Quaternion::RotationAxisToRef(_bendAxis, angC,
-                                  *_bone2->_linkedTransformNode->rotationQuaternion());
-  }
-  else {
-    _bone2->setAxisAngle(_bendAxis, angC, Space::LOCAL);
-  }
+  _bone2->setAxisAngle(_bendAxis, angC, Space::LOCAL);
+  _updateLinkedTransformRotation(_bone2);
   _bone2Ang = angC;
+}
+
+void BoneIKController::_updateLinkedTransformRotation(Bone* bone)
+{
+  if (bone->_linkedTransformNode) {
+    if (!bone->_linkedTransformNode->rotationQuaternion()) {
+      bone->_linkedTransformNode->rotationQuaternion = Quaternion();
+    }
+    bone->getRotationQuaternionToRef(*bone->_linkedTransformNode->rotationQuaternion(),
+                                     Space::LOCAL, nullptr);
+  }
 }
 
 void BoneIKController::_SetAbsoluteRotation(const TransformNodePtr& transform,

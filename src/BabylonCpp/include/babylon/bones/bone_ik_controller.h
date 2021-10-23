@@ -66,6 +66,7 @@ protected:
 private:
   static void _SetAbsoluteRotation(const TransformNodePtr& transform, const Quaternion& rotation);
   static bool _IsTransformNode(Node* node);
+  void _updateLinkedTransformRotation(Bone* bone);
 
 public:
   /**
