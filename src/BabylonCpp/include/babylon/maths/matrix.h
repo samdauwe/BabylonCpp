@@ -1127,7 +1127,6 @@ public:
   static void FromQuaternionToRef(const Quaternion& quat, Matrix& result);
 
 private:
-  /** @hidden */
   void _updateIdentityStatus(bool isIdentity, bool isIdentityDirty = false,
                              bool isIdentity3x2 = false, bool isIdentity3x2Dirty = true);
 

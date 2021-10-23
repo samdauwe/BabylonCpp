@@ -32,6 +32,8 @@ Matrix::Matrix()
 {
   std::fill(_m.begin(), _m.end(), 0.f);
   _updateIdentityStatus(false);
+
+  _markAsUpdated();
 }
 
 Matrix::Matrix(const Matrix& otherMatrix) = default;
@@ -86,7 +88,6 @@ void Matrix::_markAsUpdated()
 void Matrix::_updateIdentityStatus(bool isIdentity, bool isIdentityDirty, bool isIdentity3x2,
                                    bool isIdentity3x2Dirty)
 {
-  updateFlag          = Matrix::_updateFlagSeed++;
   _isIdentity         = isIdentity;
   _isIdentity3x2      = isIdentity || isIdentity3x2;
   _isIdentityDirty    = _isIdentity ? false : isIdentityDirty;
@@ -405,6 +406,7 @@ Matrix& Matrix::copyFrom(const Matrix& other)
 {
   other.copyToArray(_m);
   const auto& o = other;
+  updateFlag    = o.updateFlag;
   _updateIdentityStatus(o._isIdentity, o._isIdentityDirty, o._isIdentity3x2, o._isIdentity3x2Dirty);
   return *this;
 }
@@ -1680,6 +1682,9 @@ void Matrix::TransposeToRef(const Matrix& matrix, Matrix& result)
   rm[13] = mm[7];
   rm[14] = mm[11];
   rm[15] = mm[15];
+
+  result._markAsUpdated();
+
   // identity-ness does not change when transposing
   result._updateIdentityStatus((matrix)._isIdentity, (matrix)._isIdentityDirty);
 }
