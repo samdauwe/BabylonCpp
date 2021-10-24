@@ -16,6 +16,7 @@ CylinderParticleEmitter::CylinderParticleEmitter(float iRadius, float iHeight, f
     , height{iHeight}
     , radiusRange{iRadiusRange}
     , directionRandomizer{iDirectionRandomizer}
+    , _tempVector{Vector3::Zero()}
 {
 }
 
@@ -23,25 +24,30 @@ CylinderParticleEmitter::~CylinderParticleEmitter() = default;
 
 void CylinderParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                      Vector3& directionToUpdate, Particle* particle,
-                                                     bool isLocal)
+                                                     bool isLocal, const Matrix& inverseWorldMatrix)
 {
-  auto direction = particle->position.subtract(worldMatrix.getTranslation()).normalize();
-  auto randY     = Scalar::RandomRange(-directionRandomizer / 2.f, directionRandomizer / 2.f);
+  particle->position.subtractToRef(worldMatrix.getTranslation(), _tempVector);
 
-  auto angle = std::atan2(direction.x, direction.z);
+  _tempVector.normalize();
+
+  Vector3::TransformNormalToRef(_tempVector, inverseWorldMatrix, _tempVector);
+
+  const auto randY = Scalar::RandomRange(-directionRandomizer / 2.f, directionRandomizer / 2.f);
+
+  auto angle = std::atan2(_tempVector.x, _tempVector.z);
   angle += Scalar::RandomRange(-Math::PI_2, Math::PI_2) * directionRandomizer;
 
-  direction.y = randY; // set direction y to rand y to mirror normal of cylinder surface
-  direction.x = std::sin(angle);
-  direction.z = std::cos(angle);
-  direction.normalize();
+  _tempVector.y = randY; // set direction y to rand y to mirror normal of cylinder surface
+  _tempVector.x = std::sin(angle);
+  _tempVector.z = std::cos(angle);
+  _tempVector.normalize();
 
   if (isLocal) {
-    directionToUpdate.copyFrom(direction);
+    directionToUpdate.copyFrom(_tempVector);
     return;
   }
 
-  Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z, worldMatrix,
+  Vector3::TransformNormalFromFloatsToRef(_tempVector.x, _tempVector.y, _tempVector.z, worldMatrix,
                                           directionToUpdate);
 }
 

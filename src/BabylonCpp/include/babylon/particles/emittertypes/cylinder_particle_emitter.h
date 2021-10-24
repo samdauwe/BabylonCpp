@@ -2,6 +2,7 @@
 #define BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_PARTICLE_EMITTER_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/maths/vector3.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_type.h>
 
 namespace BABYLON {
@@ -31,9 +32,11 @@ public:
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    * @param isLocal defines if the direction should be set in local space
+   * @param inverseWorldMatrix defines the inverted world matrix to use if isLocal is false
    */
   void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                              Particle* particle, bool isLocal) override;
+                              Particle* particle, bool isLocal,
+                              const Matrix& inverseWorldMatrix) override;
 
   /**
    * @brief Called by the particle System when the position is computed for the created particle.
@@ -105,6 +108,9 @@ public:
    * How much to randomize the particle direction [0-1].
    */
   float directionRandomizer;
+
+private:
+  Vector3 _tempVector;
 
 }; // end of class CylinderParticleEmitter
 
