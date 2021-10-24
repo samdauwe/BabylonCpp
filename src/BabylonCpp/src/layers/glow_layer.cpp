@@ -9,6 +9,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -192,11 +193,11 @@ void GlowLayer::_createTextureAndPostProcesses()
                             0;
   _mainTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) {
-      auto internalTexture = _blurTexture1->getInternalTexture();
+      auto internalTexture = _blurTexture1->renderTarget();
       if (internalTexture) {
         _scene->postProcessManager->directRender(_postProcesses1, internalTexture, true);
 
-        auto internalTexture2 = _blurTexture2->getInternalTexture();
+        auto internalTexture2 = _blurTexture2->renderTarget();
         if (internalTexture2) {
           _scene->postProcessManager->directRender(_postProcesses2, internalTexture2, true);
         }
@@ -288,6 +289,9 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMes
   }
   else {
     if (material) {
+      const auto pbrMaterial       = std::static_pointer_cast<PBRMaterial>(material);
+      const auto emissiveIntensity = pbrMaterial ? pbrMaterial->emissiveIntensity() : 1.f;
+      textureLevel *= emissiveIntensity;
       _emissiveTextureAndColor.color.set(material->emissiveColor.r * textureLevel, //
                                          material->emissiveColor.g * textureLevel, //
                                          material->emissiveColor.b * textureLevel, //
@@ -369,6 +373,10 @@ bool GlowLayer::_useMeshMaterial(const AbstractMeshPtr& mesh) const
 void GlowLayer::referenceMeshToUseItsOwnMaterial(const AbstractMeshPtr& mesh)
 {
   _meshesUsingTheirOwnMaterials.emplace_back(mesh->uniqueId);
+
+  mesh->onDisposeObservable.add([this, mesh](Node* /*node*/, EventState& /*es*/) -> void {
+    _disposeMesh(static_cast<Mesh*>(mesh.get()));
+  });
 }
 
 void GlowLayer::unReferenceMeshFromUsingItsOwnMaterial(const AbstractMeshPtr& mesh)
