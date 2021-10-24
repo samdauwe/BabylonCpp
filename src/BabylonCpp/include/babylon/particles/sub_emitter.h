@@ -54,9 +54,10 @@ public:
 
   /**
    * @brief Serialize current object to a JSON object.
+   * @param serializeTexture defines if the texture must be serialized as well
    * @returns the serialized object
    */
-  [[nodiscard]] json serialize() const;
+  [[nodiscard]] json serialize(bool serializeTexture = false) const;
 
   /**
    * @brief Creates a new SubEmitter from a serialized JSON version.

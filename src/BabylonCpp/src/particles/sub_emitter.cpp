@@ -53,7 +53,7 @@ SubEmitterPtr SubEmitter::clone() const
   return clone;
 }
 
-json SubEmitter::serialize() const
+json SubEmitter::serialize(bool /*serializeTexture*/) const
 {
   return nullptr;
 }
