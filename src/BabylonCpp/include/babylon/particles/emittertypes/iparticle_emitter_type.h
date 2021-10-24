@@ -32,9 +32,11 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    * @param isLocal defines if the direction should be set in local space
+   * @param inverseWorldMatrix defines the inverted world matrix to use if isLocal is false
    */
   virtual void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                                      Particle* particle, bool isLocal)
+                                      Particle* particle, bool isLocal,
+                                      const Matrix& inverseWorldMatrix)
     = 0;
 
   /**

@@ -504,13 +504,16 @@ public:
   /**
    * @brief Parses a JSON object to create a particle system.
    * @param parsedParticleSystem The JSON object to parse
-   * @param scene The scene to create the particle system in
-   * @param rootUrl The root url to use to load external dependencies like
-   * texture
+   * @param sceneOrEngine The scene or the engine to create the particle system in
+   * @param rootUrl The root url to use to load external dependencies like texture
+   * @param doNotStart Ignore the preventAutoStart attribute and does not start
+   * @param capacity defines the system capacity (if null or undefined the sotred capacity will be
+   * used)
    * @returns the Parsed particle system
    */
   static ParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
-                               const std::string& url);
+                               const std::string& url,
+                               const std::optional<size_t>& capacity = std::nullopt);
 
 protected:
   /**
@@ -695,6 +698,7 @@ private:
   Vector3 _zeroVector3;
 
   Matrix _emitterWorldMatrix;
+  Matrix _emitterInverseWorldMatrix;
 
   /** @hidden */
   Observable<Effect> _onBeforeDrawParticlesObservable;

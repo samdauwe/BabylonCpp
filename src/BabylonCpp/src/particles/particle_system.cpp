@@ -71,6 +71,7 @@ ParticleSystem::ParticleSystem(
     , _appendParticleVertexes{nullptr}
     , _rootParticleSystem{nullptr}
     , _zeroVector3{Vector3::Zero()}
+    , _emitterInverseWorldMatrix{Matrix::Identity()}
 {
   isLocal   = false;
   _capacity = capacity;
@@ -1133,6 +1134,7 @@ void ParticleSystem::_update(int newParticles)
       = Matrix::Translation(emitterPosition.x, emitterPosition.y, emitterPosition.z);
   }
 
+  _emitterWorldMatrix.invertToRef(_emitterInverseWorldMatrix);
   updateFunction(_particles);
 
   // Add new ones
@@ -1195,7 +1197,7 @@ void ParticleSystem::_update(int newParticles)
     }
     else {
       particleEmitterType->startDirectionFunction(_emitterWorldMatrix, particle->direction,
-                                                  particle, isLocal);
+                                                  particle, isLocal, _emitterInverseWorldMatrix);
     }
 
     if (emitPower == 0.f) {
@@ -1920,11 +1922,12 @@ ParticleSystem* ParticleSystem::_Parse(const json& /*parsedParticleSystem*/,
 }
 
 ParticleSystem* ParticleSystem::Parse(const json& parsedParticleSystem, Scene* scene,
-                                      const std::string& rootUrl)
+                                      const std::string& rootUrl,
+                                      const std::optional<size_t>& capacity)
 {
-  auto name = json_util::get_string(parsedParticleSystem, "name");
-  auto particleSystem
-    = new ParticleSystem(name, json_util::get_number(parsedParticleSystem, "capacity", 0ul), scene);
+  auto name           = json_util::get_string(parsedParticleSystem, "name");
+  auto particleSystem = new ParticleSystem(
+    name, capacity.value_or(json_util::get_number(parsedParticleSystem, "capacity", 0ul)), scene);
   particleSystem->_rootUrl = rootUrl;
 
   if (json_util::has_key(parsedParticleSystem, "id")) {

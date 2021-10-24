@@ -1664,7 +1664,8 @@ json GPUParticleSystem::serialize(bool /*serializeTexture*/) const
 }
 
 IParticleSystem* GPUParticleSystem::Parse(const json& /*parsedParticleSystem*/, Scene* /*scene*/,
-                                          const std::string& /*rootUrl*/, bool /*doNotStart*/)
+                                          const std::string& /*rootUrl*/, bool /*doNotStart*/,
+                                          const std::optional<size_t>& /*capacity*/)
 {
   return nullptr;
 }

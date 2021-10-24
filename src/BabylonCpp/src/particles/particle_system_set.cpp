@@ -116,8 +116,9 @@ json ParticleSystemSet::serialize(bool /*serializeTexture*/) const
   return nullptr;
 }
 
-std::unique_ptr<ParticleSystemSet> ParticleSystemSet::Parse(const json& /*data*/, Scene* /*scene*/,
-                                                            bool /*gpu*/)
+std::unique_ptr<ParticleSystemSet>
+ParticleSystemSet::Parse(const json& /*data*/, Scene* /*scene*/, bool /*gpu*/,
+                         const std::optional<size_t>& /*capacity*/)
 {
   return nullptr;
 }

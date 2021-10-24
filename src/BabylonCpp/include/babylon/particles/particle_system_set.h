@@ -69,9 +69,13 @@ public:
    * @param data defines a JSON compatible representation of the set
    * @param scene defines the hosting scene
    * @param gpu defines if we want GPU particles or CPU particles
+   * @param capacity defines the system capacity (if null or undefined the sotred capacity will be
+   * used)
    * @returns a new ParticleSystemSet
    */
-  static std::unique_ptr<ParticleSystemSet> Parse(const json& data, Scene* scene, bool gpu = false);
+  static std::unique_ptr<ParticleSystemSet> Parse(const json& data, Scene* scene, bool gpu = false,
+                                                  const std::optional<size_t>& capacity
+                                                  = std::nullopt);
 
 protected:
   /**

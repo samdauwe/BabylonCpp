@@ -50,7 +50,8 @@ ParticleHelper::CreateDefault(const std::variant<AbstractMeshPtr, Mesh*, Vector3
 }
 
 ParticleSystemSet* ParticleHelper::CreateAsync(const std::string& /*type*/, Scene* /*scene*/,
-                                               bool /*gpu*/)
+                                               bool /*gpu*/,
+                                               const std::optional<size_t>& /*capacity*/)
 {
   return nullptr;
 }
