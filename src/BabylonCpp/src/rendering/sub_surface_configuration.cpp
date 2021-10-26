@@ -41,10 +41,10 @@ std::string SubSurfaceConfiguration::name() const
 std::vector<uint32_t> SubSurfaceConfiguration::texturesRequired() const
 {
   return {
-    Constants::PREPASS_DEPTH_TEXTURE_TYPE,      //
-    Constants::PREPASS_ALBEDO_TEXTURE_TYPE,     //
-    Constants::PREPASS_COLOR_TEXTURE_TYPE,      //
-    Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE, //
+    Constants::PREPASS_DEPTH_TEXTURE_TYPE,       //
+    Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE, //
+    Constants::PREPASS_COLOR_TEXTURE_TYPE,       //
+    Constants::PREPASS_IRRADIANCE_TEXTURE_TYPE,  //
   };
 }
 

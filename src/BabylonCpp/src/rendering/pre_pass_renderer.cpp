@@ -56,9 +56,9 @@ std::vector<TextureFormatMapping> PrePassRenderer::_textureFormats = {
     "prePass_Depth",                       // name
   },
   {
-    Constants::PREPASS_NORMAL_TEXTURE_TYPE, // type
-    Constants::TEXTURETYPE_HALF_FLOAT,      // format
-    "prePass_Normal",                       // name
+    Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE, // type
+    Constants::TEXTURETYPE_HALF_FLOAT,           // format
+    "prePass_Normal",                            // name
   },
   {
     Constants::PREPASS_ALBEDO_TEXTURE_TYPE, // type
@@ -268,7 +268,7 @@ void PrePassRenderer::_updateGeometryBufferLayout()
         GeometryBufferRenderer::DEPTH_TEXTURE_TYPE, // geometryBufferConstant
       },
       {
-        Constants::PREPASS_NORMAL_TEXTURE_TYPE,      // prePassConstant
+        Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE, // prePassConstant
         GeometryBufferRenderer::NORMAL_TEXTURE_TYPE, // geometryBufferConstant
       },
       {
