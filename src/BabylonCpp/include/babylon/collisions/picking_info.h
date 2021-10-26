@@ -11,6 +11,7 @@ namespace BABYLON {
 class Vector2;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Sprite)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Information about the result of picking within a scene.
@@ -109,15 +110,26 @@ public:
   int thinInstanceIndex;
 
   /**
+   * The ray that was used to perform the picking.
+   */
+  std::optional<Ray> ray;
+
+  /**
    * If a mesh was used to do the picking (eg. 6dof controller) as a "near interaction", this will
    * be populated.
    */
   AbstractMeshPtr originMesh;
 
   /**
-   * The ray that was used to perform the picking.
+   * The aim-space transform of the input used for picking, if it is an XR input source.
    */
-  std::optional<Ray> ray;
+  TransformNodePtr aimTransform;
+
+  /**
+   * The grip-space transform of the input used for picking, if it is an XR input source. Some XR
+   * sources, such as input coming from head mounted displays, do not have this.
+   */
+  TransformNodePtr gripTransform;
 
 }; // end of class PickingInfo
 

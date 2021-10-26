@@ -21,8 +21,10 @@ PickingInfo::PickingInfo()
     , subMeshId{0}
     , pickedSprite{nullptr}
     , thinInstanceIndex{-1}
-    , originMesh{nullptr}
     , ray{std::nullopt}
+    , originMesh{nullptr}
+    , aimTransform{nullptr}
+    , gripTransform{nullptr}
 {
 }
 
