@@ -321,9 +321,9 @@ void MaterialHelper::PrepareDefinesForPrePass(Scene* scene, MaterialDefines& def
          "PREPASS_DEPTH_INDEX",                 // index
        },
        {
-         Constants::PREPASS_NORMAL_TEXTURE_TYPE, // type
-         "PREPASS_NORMAL",                       // define
-         "PREPASS_NORMAL_INDEX",                 // index
+         Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE, // type
+         "PREPASS_NORMAL",                            // define
+         "PREPASS_NORMAL_INDEX",                      // index
        }};
 
   if (scene->prePassRenderer() && scene->prePassRenderer()->enabled() && canRenderToMRT) {

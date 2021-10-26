@@ -455,7 +455,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio, unsigned int te
         "normalSampler",
         _prePassRenderer()
           ->getRenderTarget()
-          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE)]);
+          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
   };

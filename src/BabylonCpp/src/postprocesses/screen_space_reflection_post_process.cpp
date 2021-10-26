@@ -101,7 +101,8 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
         = prePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
       const auto roughnessIndex
         = prePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
-      const auto normalIndex = prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
+      const auto normalIndex
+        = prePassRenderer->getIndex(Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE);
 
       effect->setTexture("normalSampler",
                          prePassRenderer->getRenderTarget()->textures()[normalIndex]);
