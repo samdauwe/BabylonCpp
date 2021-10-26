@@ -66,6 +66,11 @@ struct BABYLON_SHARED_EXPORT Constants {
    * Alpha will be set to DST ALPHA
    */
   static constexpr unsigned int ALPHA_EXCLUSION = 16;
+  /**
+   * Defines that alpha blending is SRC * SRC ALPHA + DST * (1 - SRC ALPHA)
+   * Alpha will be set to SRC ALPHA + (1 - SRC ALPHA) * DST ALPHA
+   */
+  static constexpr unsigned int ALPHA_LAYER_ACCUMULATE = 17;
 
   /** Defines that alpha blending equation a SUM */
   static constexpr unsigned int ALPHA_EQUATION_ADD = 0;
@@ -573,9 +578,9 @@ struct BABYLON_SHARED_EXPORT Constants {
   static constexpr unsigned int PREPASS_DEPTH_TEXTURE_TYPE = 5;
   /**
    * Constant used to retrieve normal index in the textures array in the prepass
-   * using the getIndex(Constants.PREPASS_NORMAL_TEXTURE_TYPE)
+   * using the getIndex(Constants.PREPASS_ALBEDO_SQRT_TEXTURE_TYPE)
    */
-  static constexpr unsigned int PREPASS_NORMAL_TEXTURE_TYPE = 6;
+  static constexpr unsigned int PREPASS_ALBEDO_SQRT_TEXTURE_TYPE = 6;
   /**
    * Constant used to retrieve albedo index in the textures array in the prepass
    * using the getIndex(Constants.PREPASS_ALBEDO_TEXTURE_TYPE)
