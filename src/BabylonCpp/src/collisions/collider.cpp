@@ -159,9 +159,9 @@ bool Collider::_checkPointInTriangle(const Vector3& point, const Vector3& pa, co
 bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
                                const Vector3& vecMin, const Vector3& vecMax) const
 {
-  auto distance = Vector3::Distance(_basePointWorld, sphereCenter);
+  const auto distance = Vector3::Distance(_basePointWorld, sphereCenter);
 
-  auto max = stl_util::max(_radius.x, _radius.y, _radius.z);
+  const auto max = stl_util::max(_radius.x, _radius.y, _radius.z);
 
   if (distance > _velocityWorldLength + max + sphereRadius) {
     return false;
