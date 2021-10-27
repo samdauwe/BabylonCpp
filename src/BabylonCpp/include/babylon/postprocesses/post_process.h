@@ -124,9 +124,9 @@ public:
   PostProcess& shareOutputWith(const PostProcessPtr& postProcess);
 
   /**
-   * @brief Reverses the effect of calling shareOutputWith and returns the post
-   * process back to its original state. This should be called if the post
-   * process that shares output with this post process is disabled/disposed.
+   * @brief Reverses the effect of calling shareOutputWith and returns the post process back to its
+   * original state. This should be called if the post process that shares output with this post
+   * process is disabled/disposed.
    */
   void useOwnOutput();
 
