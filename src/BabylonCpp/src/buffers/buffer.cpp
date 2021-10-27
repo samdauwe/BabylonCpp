@@ -169,7 +169,7 @@ void Buffer::_increaseReferences()
     return;
   }
 
-  _buffer->references++;
+  ++_buffer->references;
 }
 
 void Buffer::dispose()
