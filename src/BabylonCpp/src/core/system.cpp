@@ -37,7 +37,7 @@ void chdirToExecutableFolder()
 #ifdef _WIN32
   _chdir(exeFolder.c_str());
 #else
-  int result = chdir(exeFolder.c_str());
+  const auto result = chdir(exeFolder.c_str());
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "chdir to %s failed", exeFolder.c_str())
 #endif
@@ -57,8 +57,8 @@ void openBrowser(const std::string& url)
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str())
 #elif defined(__linux__)
-  std::string cmd = std::string("xdg-open ") + url;
-  int result      = system(cmd.c_str());
+  std::string cmd   = std::string("xdg-open ") + url;
+  const auto result = system(cmd.c_str());
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str())
 #endif
@@ -70,8 +70,8 @@ void openFile(const std::string& filename)
   std::string canonical_path = BABYLON::Filesystem::absolutePath(filename);
   ShellExecute(0, 0, canonical_path.c_str(), 0, 0, SW_SHOW);
 #elif defined(__EMSCRIPTEN__) || defined(__APPLE__) && defined(__x86_64__) || defined(__linux__)
-  std::string cmd = std::string("open ") + BABYLON::Filesystem::absolutePath(filename);
-  int result      = system(cmd.c_str());
+  std::string cmd   = std::string("open ") + BABYLON::Filesystem::absolutePath(filename);
+  const auto result = system(cmd.c_str());
   if (result != 0)
     BABYLON_LOG_WARN("system.cpp", "system(%S) failed", cmd.c_str())
 #endif
