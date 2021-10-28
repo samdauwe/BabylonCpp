@@ -5,11 +5,11 @@
 
 #include <babylon/animations/easing/easing_function.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class BounceEase;
-using BounceEasePtr = std::shared_ptr<BounceEase>;
+FWD_CLASS_SPTR(BounceEase)
 
 /**
  * @brief Easing function with a bouncing shape (see link below).
