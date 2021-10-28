@@ -5,11 +5,11 @@
 
 #include <babylon/animations/easing/easing_function.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class CircleEase;
-using CircleEasePtr = std::shared_ptr<CircleEase>;
+FWD_CLASS_SPTR(CircleEase)
 
 /**
  * @brief Easing function with a circle shape (see link below).
