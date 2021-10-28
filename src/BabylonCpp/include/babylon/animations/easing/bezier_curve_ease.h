@@ -5,11 +5,11 @@
 
 #include <babylon/animations/easing/easing_function.h>
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-class BezierCurveEase;
-using BezierCurveEasePtr = std::shared_ptr<BezierCurveEase>;
+FWD_CLASS_SPTR(BezierCurveEase)
 
 /**
  * @brief Easing function with a bezier shape (see link below).
