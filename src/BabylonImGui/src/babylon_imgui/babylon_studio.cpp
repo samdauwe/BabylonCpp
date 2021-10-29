@@ -4,13 +4,13 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/filesystem.h>
 #include <babylon/core/system.h>
-#include <babylon/samples/samples_info.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
+#include <babylon/samples/samples_info.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 #include <imgui_utils/icons_font_awesome_5.h>
+#include <imgui_utils/imgui_runner_babylon/runner_babylon.h>
 
 #include <babylon/babylon_imgui/babylon_studio_layout.h>
 #include <babylon/core/logging.h>
@@ -36,7 +36,6 @@ struct EmptyScene : public BABYLON::IRenderableScene {
     auto camera = BABYLON::FreeCamera::New("camera1", Vector3(0.f, 0.f, 0.f), scene);
   }
 };
-
 
 class BabylonStudioApp {
 public:
@@ -75,14 +74,10 @@ public:
       this->setRenderableScene(initialScene);
     };
 
-    _appContext._options._appWindowParams.InitialDockLayoutFunction = [this](ImGuiID mainDockId) {
-      _studioLayout.PrepareLayout(mainDockId);
-    };
-    ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(
-      _appContext._options._appWindowParams,
-      showGuiLambda,
-      initSceneLambda
-    );
+    _appContext._options._appWindowParams.InitialDockLayoutFunction
+      = [this](ImGuiID mainDockId) { _studioLayout.PrepareLayout(mainDockId); };
+    ImGuiUtils::ImGuiRunner::InvokeRunnerBabylon(_appContext._options._appWindowParams,
+                                                 showGuiLambda, initSceneLambda);
   }
 
 private:
@@ -95,27 +90,27 @@ private:
     // clang-format off
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::Inspector,
-      [this]() { 
-        if (_appContext._inspector) 
-          _appContext._inspector->render(); 
+      [this]() {
+        if (_appContext._inspector)
+          _appContext._inspector->render();
       });
-        
+
     _studioLayout.registerGuiRenderFunction(
-      DockableWindowId::Logs, 
+      DockableWindowId::Logs,
       []() { BABYLON::BabylonLogsWindow::instance().render(); });
-    
+
     _studioLayout.registerGuiRenderFunction(
-      DockableWindowId::Scene3d, 
+      DockableWindowId::Scene3d,
       [this]() { render3d(); });
-    
+
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::SamplesCodeViewer,
       [this]() { _samplesCodeEditor.render(); });
-    
+
     _studioLayout.registerGuiRenderFunction(
-      DockableWindowId::SampleBrowser, 
+      DockableWindowId::SampleBrowser,
       [this]() { _appContext.sampleListComponent().render(); });
-    
+
 #ifdef BABYLON_BUILD_PLAYGROUND
     _studioLayout.registerGuiRenderFunction(
       DockableWindowId::PlaygroundEditor,
@@ -130,10 +125,10 @@ private:
   void initScene()
   {
     _appContext.sampleListComponent().OnNewRenderableScene
-    = [=](std::shared_ptr<IRenderableScene> scene) {
-        this->setRenderableScene(scene);
-        _studioLayout.FocusWindow(DockableWindowId::Scene3d);
-      };
+      = [=](std::shared_ptr<IRenderableScene> scene) {
+          this->setRenderableScene(scene);
+          _studioLayout.FocusWindow(DockableWindowId::Scene3d);
+        };
 
     _appContext.sampleListComponent().OnEditFiles = [=](const std::vector<std::string>& files) {
       _samplesCodeEditor.setFiles(files);
@@ -167,16 +162,14 @@ private:
   {
     ImGui::GetCurrentWindow()->Flags = ImGui::GetCurrentWindow()->Flags | ImGuiWindowFlags_MenuBar;
     bool shallExit                   = false;
-    if (ImGui::BeginMenuBar()) 
-    {
-      if (ImGui::BeginMenu("File")) 
-      {
+    if (ImGui::BeginMenuBar()) {
+      if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Quit"))
           shallExit = true;
         if (ImGui::MenuItem("Save Screenshot"))
           saveScreenshot();
         if (ImGui::MenuItem("ImGui demo window", nullptr, _appContext._imgui_show_demo_window))
-          _appContext._imgui_show_demo_window = ! _appContext._imgui_show_demo_window;
+          _appContext._imgui_show_demo_window = !_appContext._imgui_show_demo_window;
         ImGui::EndMenu();
       }
       _studioLayout.renderMenu();
@@ -190,9 +183,8 @@ private:
 
   void renderStatus()
   {
-    ImVec4 statusTextColor{ 0.8f, 0.8f, 0.3f, 1.f };
-    if (_studioLayout.isVisible(DockableWindowId::Scene3d))
-    {
+    ImVec4 statusTextColor{0.8f, 0.8f, 0.3f, 1.f};
+    if (_studioLayout.isVisible(DockableWindowId::Scene3d)) {
       ImGui::SameLine(ImGui::GetIO().DisplaySize.x / 2.f);
       std::string sceneName = _appContext._sceneWidget->getRenderableScene()->getName();
       ImGui::TextColored(statusTextColor, "%s", sceneName.c_str());
@@ -209,8 +201,7 @@ private:
       ImGui::ShowDemoWindow(&_appContext._imgui_show_demo_window);
 
     static bool wasInitialLayoutApplied = false;
-    if (!wasInitialLayoutApplied)
-    {
+    if (!wasInitialLayoutApplied) {
       this->_studioLayout.ApplyLayoutMode(LayoutMode::SceneAndBrowser);
       wasInitialLayoutApplied = true;
     }
@@ -229,8 +220,6 @@ private:
       return shallExit;
   }
 
-
-
   void setRenderableScene(std::shared_ptr<BABYLON::IRenderableScene> scene)
   {
     if (_appContext._inspector)
@@ -246,10 +235,10 @@ private:
       sampleName = std::string(_appContext._sceneWidget->getRenderableScene()->getName());
 
     std::string filename = SamplesInfo::SampleScreenshotFile_Absolute(sampleName);
-    int imageWidth = 200;
-    int jpgQuality = 75;
-    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(
-      filename.c_str(), jpgQuality, imageWidth);
+    int imageWidth       = 200;
+    int jpgQuality       = 75;
+    this->_appContext._sceneWidget->getCanvas()->saveScreenshotJpg(filename.c_str(), jpgQuality,
+                                                                   imageWidth);
   }
 
   // Saves a screenshot after  few frames (returns true when done)
@@ -304,7 +293,7 @@ private:
   {
     ImVec2 sceneSize = ImGui::GetCurrentWindow()->Size;
     sceneSize.y -= 35.f;
-    sceneSize.x = (float)((int)((sceneSize.x) / 4) * 4);
+    sceneSize.x                   = (float)((int)((sceneSize.x) / 4) * 4);
     ImVec2 cursorPosBeforeScene3d = ImGui::GetCursorScreenPos();
     _appContext._sceneWidget->render(sceneSize);
     renderHud(cursorPosBeforeScene3d);
@@ -343,7 +332,8 @@ private:
       std::string sampleName
         = _appContext._loopSamples.samplesToLoop[_appContext._loopSamples.currentIdx];
       BABYLON_LOG_ERROR("LoopSample", sampleName)
-      auto scene = SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName, nullptr);
+      auto scene
+        = SamplesInfo::SamplesCollection::Instance().createRenderableScene(sampleName, nullptr);
       this->setRenderableScene(scene);
 
       if (_appContext._loopSamples.currentIdx < _appContext._loopSamples.samplesToLoop.size() - 2)
@@ -365,10 +355,11 @@ private:
     std::unique_ptr<BABYLON::Inspector> _inspector;
     int _frameCounter = 0;
     BabylonStudioOptions _options;
-    bool _isCompiling = false;
+    bool _isCompiling            = false;
     bool _imgui_show_demo_window = false;
 
-    BABYLON::SamplesBrowser& sampleListComponent() {
+    BABYLON::SamplesBrowser& sampleListComponent()
+    {
       if (!_sampleListComponent) {
         _sampleListComponent = std::make_unique<BABYLON::SamplesBrowser>();
       }
@@ -403,8 +394,8 @@ void runBabylonStudio(const std::shared_ptr<BABYLON::IRenderableScene>& scene,
 #ifndef __EMSCRIPTEN__
   BABYLON::BabylonStudioApp app;
 #endif
-  std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull =
-    scene ? scene : std::make_shared<EmptyScene>();
+  std::shared_ptr<BABYLON::IRenderableScene> sceneNotNull
+    = scene ? scene : std::make_shared<EmptyScene>();
   app.RunApp(sceneNotNull, options);
 }
 
