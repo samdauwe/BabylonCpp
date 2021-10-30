@@ -21,7 +21,8 @@ HemisphericParticleEmitter::~HemisphericParticleEmitter() = default;
 
 void HemisphericParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                         Vector3& directionToUpdate,
-                                                        Particle* particle, bool isLocal)
+                                                        Particle* particle, bool isLocal,
+                                                        const Matrix& /*inverseWorldMatrix*/)
 {
   auto direction = particle->position.subtract(worldMatrix.getTranslation()).normalize();
   auto randX     = Scalar::RandomRange(0.f, directionRandomizer);

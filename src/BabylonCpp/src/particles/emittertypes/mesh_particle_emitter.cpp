@@ -53,7 +53,7 @@ void MeshParticleEmitter::set_mesh(const AbstractMeshPtr& value)
 
 void MeshParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Vector3& directionToUpdate, Particle* /*particle*/,
-                                                 bool isLocal)
+                                                 bool isLocal, const Matrix& /*inverseWorldMatrix*/)
 {
   if (useMeshNormalsForDirection && !_normals.empty()) {
     Vector3::TransformNormalToRef(_storedNormal, worldMatrix, directionToUpdate);
