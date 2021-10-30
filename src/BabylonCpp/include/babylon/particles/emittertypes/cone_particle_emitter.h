@@ -34,7 +34,8 @@ public:
    * @param isLocal defines if the direction should be set in local space
    */
   void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                              Particle* particle, bool isLocal) override;
+                              Particle* particle, bool isLocal,
+                              const Matrix& inverseWorldMatrix) override;
 
   /**
    * @brief Called by the particle System when the direction is computed for the created particle.

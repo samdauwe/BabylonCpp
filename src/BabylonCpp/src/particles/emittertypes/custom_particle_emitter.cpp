@@ -18,7 +18,8 @@ CustomParticleEmitter::~CustomParticleEmitter()
 
 void CustomParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                    Vector3& directionToUpdate, Particle* particle,
-                                                   bool isLocal)
+                                                   bool isLocal,
+                                                   const Matrix& /*inverseWorldMatrix*/)
 {
   auto& tmpVector = TmpVectors::Vector3Array[0];
 

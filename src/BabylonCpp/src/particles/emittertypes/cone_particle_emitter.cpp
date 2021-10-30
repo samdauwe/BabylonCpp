@@ -60,7 +60,7 @@ void ConeParticleEmitter::_buildHeight()
 
 void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Vector3& directionToUpdate, Particle* particle,
-                                                 bool isLocal)
+                                                 bool isLocal, const Matrix& /*inverseWorldMatrix*/)
 {
   if (std::abs(std::cos(_angle)) == 1.f) {
     if (isLocal) {
