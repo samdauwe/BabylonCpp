@@ -114,11 +114,11 @@ void GlowLayer::_createTextureAndPostProcesses()
   auto blurTextureWidth  = _mainTextureDesiredSize.width;
   auto blurTextureHeight = _mainTextureDesiredSize.height;
   blurTextureWidth       = _engine->needPOTTextures() ?
-                             Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
-                             blurTextureWidth;
-  blurTextureHeight      = _engine->needPOTTextures() ?
-                             Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
-                             blurTextureHeight;
+                       Engine::GetExponentOfTwo(blurTextureWidth, _maxSize) :
+                       blurTextureWidth;
+  blurTextureHeight = _engine->needPOTTextures() ?
+                        Engine::GetExponentOfTwo(blurTextureHeight, _maxSize) :
+                        blurTextureHeight;
 
   auto textureType = 0u;
   if (_engine->getCaps().textureHalfFloatRender) {
@@ -191,6 +191,7 @@ void GlowLayer::_createTextureAndPostProcesses()
                             static_cast<unsigned int>(*_options.mainTextureSamples) :
                             0 :
                             0;
+#if 0
   _mainTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) {
       auto internalTexture = _blurTexture1->renderTarget();
@@ -204,6 +205,7 @@ void GlowLayer::_createTextureAndPostProcesses()
         _engine->unBindFramebuffer(internalTexture2 ? internalTexture2 : internalTexture, true);
       }
     });
+#endif
 
   // Prevent autoClear.
   for (auto& pp : _postProcesses) {
@@ -289,7 +291,8 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMes
   }
   else {
     if (material) {
-      const auto pbrMaterial       = std::static_pointer_cast<PBRMaterial>(material);
+      const auto pbrMaterial
+        = std::static_pointer_cast<PBRMaterial>(std::static_pointer_cast<Material>(material));
       const auto emissiveIntensity = pbrMaterial ? pbrMaterial->emissiveIntensity() : 1.f;
       textureLevel *= emissiveIntensity;
       _emissiveTextureAndColor.color.set(material->emissiveColor.r * textureLevel, //
@@ -374,7 +377,7 @@ void GlowLayer::referenceMeshToUseItsOwnMaterial(const AbstractMeshPtr& mesh)
 {
   _meshesUsingTheirOwnMaterials.emplace_back(mesh->uniqueId);
 
-  mesh->onDisposeObservable.add([this, mesh](Node* /*node*/, EventState& /*es*/) -> void {
+  mesh->onDisposeObservable.add([this, mesh](Node* /*node*/, EventState & /*es*/) -> void {
     _disposeMesh(static_cast<Mesh*>(mesh.get()));
   });
 }
