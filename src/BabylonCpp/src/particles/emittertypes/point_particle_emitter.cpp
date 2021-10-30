@@ -17,7 +17,8 @@ PointParticleEmitter::~PointParticleEmitter() = default;
 
 void PointParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                   Vector3& directionToUpdate,
-                                                  Particle* /*particle*/, bool isLocal)
+                                                  Particle* /*particle*/, bool isLocal,
+                                                  const Matrix& /*inverseWorldMatrix*/)
 {
   auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   auto randY = Scalar::RandomRange(direction1.y, direction2.y);

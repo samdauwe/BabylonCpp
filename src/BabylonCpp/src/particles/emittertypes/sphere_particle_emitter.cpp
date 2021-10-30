@@ -21,7 +21,8 @@ SphereParticleEmitter::~SphereParticleEmitter() = default;
 
 void SphereParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                    Vector3& directionToUpdate, Particle* particle,
-                                                   bool isLocal)
+                                                   bool isLocal,
+                                                   const Matrix& /*inverseWorldMatrix*/)
 {
   auto direction   = particle->position.subtract(worldMatrix.getTranslation()).normalize();
   const auto randX = Scalar::RandomRange(0, directionRandomizer);
