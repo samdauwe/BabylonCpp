@@ -3,8 +3,7 @@
 #if defined(_WIN32)
 #include <Windows.h>
 #include <psapi.h>
-#elif defined(__linux__) || defined(__linux) || defined(linux)                 \
-  || defined(__gnu_linux__)
+#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
 #include <stdio.h>
 #include <sys/param.h>
 #include <sys/resource.h>
@@ -26,8 +25,7 @@ int System::GetCurrentPID()
   DWORD pid;
   pid = GetCurrentProcessId();
   return (int)pid;
-#elif defined(__linux__) || defined(__linux) || defined(linux)                 \
-  || defined(__gnu_linux__)
+#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
   pid_t pid;
   pid = getpid();
   return static_cast<int>(pid);
