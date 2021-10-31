@@ -38,8 +38,8 @@ public:
   bool _checkPointInTriangle(const Vector3& point, const Vector3& pa, const Vector3& pb,
                              const Vector3& pc, const Vector3& n);
   /** Hidden */
-  [[nodiscard]] bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius,
-                                     const Vector3& vecMin, const Vector3& vecMax) const;
+  bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius, const Vector3& vecMin,
+                       const Vector3& vecMax) const;
   /** Hidden */
   void _testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlaneArray, const Vector3& p1,
                      const Vector3& p2, const Vector3& p3, bool hasMaterial,
@@ -52,7 +52,7 @@ public:
   void _getResponse(Vector3& pos, Vector3& vel);
 
 protected:
-  [[nodiscard]] int get_collisionMask() const;
+  int get_collisionMask() const;
   void set_collisionMask(int mask);
 
 public:
