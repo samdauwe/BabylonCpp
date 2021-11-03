@@ -49,7 +49,7 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
 
   const auto typeByteLength = VertexBuffer::GetTypeByteLength(type);
 
-  auto buffer = _buffer ? _buffer.get() : _ownedBuffer.get();
+  const auto buffer = _buffer ? _buffer.get() : _ownedBuffer.get();
   if (useBytes) {
     _size      = size.has_value() ?
                    *size :
