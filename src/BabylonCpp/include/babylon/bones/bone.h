@@ -79,7 +79,7 @@ public:
   std::vector<BonePtr>& getChildren();
 
   /**
-   * @brief Gets the node index in matrix array generated for rendering
+   * @brief Gets the node index in matrix array generated for rendering.
    * @returns the node index
    */
   int getIndex();
