@@ -106,7 +106,7 @@ public:
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and raise onPointerMove,
-   * onPointerDown and onPointerUp
+   * onPointerDown and onPointerUp)
    * @param attachUp defines if you want to attach events to pointerup
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove
