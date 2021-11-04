@@ -61,13 +61,15 @@ void EngineInstrumentation::set_captureShaderCompilationTime(bool value)
 
   if (value) {
     _onBeforeShaderCompilationObserver = _engine->onBeforeShaderCompilationObservable.add(
-      [this](Engine* /*engine*/, EventState& /*es*/) {
+      [this](Engine* /*engine*/, EventState& /*es*/) -> void {
         _shaderCompilationTime.fetchNewFrame();
         _shaderCompilationTime.beginMonitoring();
       });
 
     _onAfterShaderCompilationObserver = _engine->onAfterShaderCompilationObservable.add(
-      [this](Engine* /*engine*/, EventState& /*es*/) { _shaderCompilationTime.endMonitoring(); });
+      [this](Engine* /*engine*/, EventState& /*es*/) -> void {
+        _shaderCompilationTime.endMonitoring();
+      });
   }
   else {
     _engine->onBeforeShaderCompilationObservable.remove(_onBeforeShaderCompilationObserver);
