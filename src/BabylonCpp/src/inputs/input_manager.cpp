@@ -117,9 +117,9 @@ void InputManager::_updatePointerPosition(const PointerEvent& evt)
 void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
                                        const PointerEvent& evt)
 {
-  auto& scene = *_scene;
-  auto engine = scene.getEngine();
-  auto canvas = engine->getInputElement();
+  auto& scene       = *_scene;
+  const auto engine = scene.getEngine();
+  const auto canvas = engine->getInputElement();
 
   if (!canvas) {
     return;
@@ -132,7 +132,7 @@ void InputManager::_processPointerMove(std::optional<PickingInfo>& pickResult,
     canvas->style.cursor = scene.defaultCursor;
   }
 
-  auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
+  const auto isMeshPicked = pickResult && pickResult->hit && pickResult->pickedMesh;
   if (isMeshPicked) {
     scene.setPointerOverMesh(pickResult->pickedMesh.get(), evt.pointerId, pickResult);
 
