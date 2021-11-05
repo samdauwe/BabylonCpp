@@ -240,8 +240,8 @@ Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1, const Ve
 
 std::optional<float> Ray::intersectsPlane(const Plane& plane)
 {
-  auto distance = 0.f;
-  auto result1  = Vector3::Dot(plane.normal, direction);
+  auto distance      = 0.f;
+  const auto result1 = Vector3::Dot(plane.normal, direction);
   if (std::abs(result1) < 9.99999997475243e-7f) {
     return std::nullopt;
   }
@@ -317,8 +317,8 @@ std::vector<PickingInfo> Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshe
                                                const std::optional<bool>& fastCheck,
                                                std::vector<PickingInfo>& results)
 {
-  for (auto& mesh : meshes) {
-    auto pickInfo = intersectsMesh(mesh, fastCheck);
+  for (const auto& mesh : meshes) {
+    const auto pickInfo = intersectsMesh(mesh, fastCheck);
 
     if (pickInfo.hit) {
       results.emplace_back(pickInfo);
