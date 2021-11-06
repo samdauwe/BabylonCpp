@@ -128,15 +128,15 @@ IRegisteredPlugin SceneLoader::_GetPluginForDirectLoad(const std::string& data)
 
 IRegisteredPlugin SceneLoader::_GetPluginForFilename(std::string sceneFilename)
 {
-  auto queryStringPosition = sceneFilename.find("?", 0);
+  const auto queryStringPosition = sceneFilename.find("?", 0);
 
   if (queryStringPosition == std::string::npos) {
     sceneFilename = sceneFilename.substr(0, queryStringPosition);
   }
 
-  auto dotPosition = sceneFilename.find_last_of(".");
+  const auto dotPosition = sceneFilename.find_last_of(".");
 
-  auto extension
+  const auto extension
     = StringTools::toLowerCase(sceneFilename.substr(dotPosition, sceneFilename.size()));
   return SceneLoader::_GetPluginForExtension(extension);
 }
@@ -159,8 +159,8 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_Lo
   const std::function<void(const std::string& message, const std::string& exception)>& onError,
   const std::function<void()>& /*onDispose*/, const std::string& pluginExtension)
 {
-  auto directLoad = SceneLoader::_GetDirectLoad(fileInfo.url);
-  auto registeredPlugin
+  const auto directLoad = SceneLoader::_GetDirectLoad(fileInfo.url);
+  const auto registeredPlugin
     = (!pluginExtension.empty()) ?
         SceneLoader::_GetPluginForExtension(pluginExtension) :
         (!directLoad.empty() ? SceneLoader::_GetPluginForDirectLoad(fileInfo.url) :
@@ -189,7 +189,7 @@ std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> SceneLoader::_Lo
     SceneLoader::OnPluginAsyncActivatedObservable.notifyObservers(asyncedPlugin.get());
   }
 
-  auto& useArrayBuffer = registeredPlugin.isBinary;
+  const auto& useArrayBuffer = registeredPlugin.isBinary;
 
   const auto dataCallback
     = [scene, onError, onSuccess, plugin](const std::variant<std::string, ArrayBufferView>& data,
@@ -299,7 +299,7 @@ void SceneLoader::RegisterPlugin(
     return;
   }
 
-  auto extensions = syncedPlugin ? syncedPlugin->extensions : asyncedPlugin->extensions;
+  const auto extensions = syncedPlugin ? syncedPlugin->extensions : asyncedPlugin->extensions;
   if (std::holds_alternative<std::string>(extensions)) {
     auto extension = std::get<std::string>(extensions);
     SceneLoader::_registeredPlugins[StringTools::toLowerCase(extension)] = {
@@ -462,7 +462,7 @@ std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>> S
     return std::nullopt;
   }
 
-  auto fileInfo = SceneLoader::_GetFileInfo(rootUrl, sceneFilename);
+  const auto fileInfo = SceneLoader::_GetFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
     return std::nullopt;
   }
