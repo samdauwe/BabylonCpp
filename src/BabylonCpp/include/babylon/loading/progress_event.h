@@ -38,26 +38,26 @@ protected:
   /**
    * @brief Gets the name of the type of the ProgressEvent.
    */
-  [[nodiscard]] std::string get_type() const;
+  std::string get_type() const;
 
   /**
    * @brief Gets the boolean flag indicating if the total work to be done, and the amount of work
    * already done, by the underlying process is calculable. In other words, it tells if the progress
    * is measurable or not.
    */
-  [[nodiscard]] bool get_lengthComputable() const;
+  bool get_lengthComputable() const;
 
   /**
    * @brief Gets the amount of work already performed by the underlying process.
    * The ratio of work done can be calculated with the property and ProgressEvent.total.
    */
-  [[nodiscard]] size_t get_loaded() const;
+  size_t get_loaded() const;
 
   /**
    * @brief Gets the total amount of work that the underlying process is in the progress of
    * performing.
    */
-  [[nodiscard]] size_t get_total() const;
+  size_t get_total() const;
 
 public:
   /**
