@@ -19,26 +19,24 @@ private:
 
 public:
   /**
-   * @brief Gets a boolean indicating if entire scene must be loaded even if
-   * scene contains incremental data.
+   * @brief Gets a boolean indicating if entire scene must be loaded even if scene contains
+   * incremental data.
    */
   static bool ForceFullSceneLoadingForIncremental();
 
   /**
-   * @brief Sets a boolean indicating if entire scene must be loaded even if
-   * scene contains incremental data.
+   * @brief Sets a boolean indicating if entire scene must be loaded even if scene contains
+   * incremental data.
    */
   static void setForceFullSceneLoadingForIncremental(bool value);
 
   /**
-   * @brief Gets a boolean indicating if loading screen must be displayed while
-   * loading a scene.
+   * @brief Gets a boolean indicating if loading screen must be displayed while loading a scene.
    */
   static bool ShowLoadingScreen();
 
   /**
-   * @brief Sets a boolean indicating if loading screen must be displayed while
-   * loading a scene.
+   * @brief Sets a boolean indicating if loading screen must be displayed while loading a scene.
    */
   static void setShowLoadingScreen(bool value);
 
@@ -53,18 +51,16 @@ public:
   static void setloggingLevel(unsigned int value);
 
   /**
-   * @brief Gets a boolean indicating if matrix weights must be cleaned upon
-   * loading.
+   * @brief Gets a boolean indicating if matrix weights must be cleaned upon loading.
    */
   static bool CleanBoneMatrixWeights();
 
   /**
-   * @brief Sets a boolean indicating if matrix weights must be cleaned upon
-   * loading.
+   * @brief Sets a boolean indicating if matrix weights must be cleaned upon loading.
    */
   static void setCleanBoneMatrixWeights(bool value);
 
-}; // end of struct SceneLoaderFlags
+}; // end of class SceneLoaderFlags
 
 } // end of namespace BABYLON
 
