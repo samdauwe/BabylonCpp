@@ -17,7 +17,7 @@ void GamepadSystemSceneComponent::_register()
 {
   scene->_beforeCameraUpdateStage.registerStep(
     SceneComponentConstants::STEP_BEFORECAMERAUPDATE_GAMEPAD, this,
-    [this]() { _beforeCameraUpdate(); });
+    [this]() -> void { _beforeCameraUpdate(); });
 }
 
 void GamepadSystemSceneComponent::rebuild()
