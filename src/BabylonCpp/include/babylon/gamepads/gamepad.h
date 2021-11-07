@@ -86,7 +86,7 @@ protected:
   /**
    * @brief Gets if the gamepad has been connected.
    */
-  [[nodiscard]] bool get_isConnected() const;
+  bool get_isConnected() const;
 
   /**
    * @brief Gets the left joystick.
