@@ -114,7 +114,7 @@ protected:
   /**
    * @brief Gets the left trigger value.
    */
-  [[nodiscard]] float get_leftTrigger() const;
+  float get_leftTrigger() const;
 
   /**
    * @brief Sets the left trigger value.
@@ -124,7 +124,7 @@ protected:
   /**
    * @brief Gets the right trigger value.
    */
-  [[nodiscard]] float get_rightTrigger() const;
+  float get_rightTrigger() const;
 
   /**
    * @brief Sets the right trigger value.
@@ -134,7 +134,7 @@ protected:
   /**
    * @brief Gets the value of the `Cross` button.
    */
-  [[nodiscard]] unsigned int get_buttonCross() const;
+  unsigned int get_buttonCross() const;
 
   /**
    * @brief Gets the value of the `Cross` button.
@@ -144,7 +144,7 @@ protected:
   /**
    * @brief Gets the value of the `Circle` button.
    */
-  [[nodiscard]] unsigned int get_buttonCircle() const;
+  unsigned int get_buttonCircle() const;
 
   /**
    * @brief Gets the value of the `Circle` button.
@@ -154,7 +154,7 @@ protected:
   /**
    * @brief Gets the value of the `Square` button.
    */
-  [[nodiscard]] unsigned int get_buttonSquare() const;
+  unsigned int get_buttonSquare() const;
 
   /**
    * @brief Gets the value of the `Square` button.
@@ -164,7 +164,7 @@ protected:
   /**
    * @brief Gets the value of the `Triangle` button.
    */
-  [[nodiscard]] unsigned int get_buttonTriangle() const;
+  unsigned int get_buttonTriangle() const;
 
   /**
    * @brief Gets the value of the `Triangle` button.
@@ -174,7 +174,7 @@ protected:
   /**
    * @brief Gets the value of the `Options` button.
    */
-  [[nodiscard]] unsigned int get_buttonOptions() const;
+  unsigned int get_buttonOptions() const;
 
   /**
    * @brief Gets the value of the `Options` button.
@@ -184,7 +184,7 @@ protected:
   /**
    * @brief Gets the value of the `Share` button.
    */
-  [[nodiscard]] unsigned int get_buttonShare() const;
+  unsigned int get_buttonShare() const;
 
   /**
    * @brief Gets the value of the `Share` button.
@@ -194,7 +194,7 @@ protected:
   /**
    * @brief Gets the value of the `L1` button.
    */
-  [[nodiscard]] unsigned int get_buttonL1() const;
+  unsigned int get_buttonL1() const;
 
   /**
    * @brief Gets the value of the `L1` button.
@@ -204,7 +204,7 @@ protected:
   /**
    * @brief Gets the value of the `R1` button.
    */
-  [[nodiscard]] unsigned int get_buttonR1() const;
+  unsigned int get_buttonR1() const;
 
   /**
    * @brief Gets the value of the `R1` button.
@@ -214,7 +214,7 @@ protected:
   /**
    * @brief Gets the value of the Left joystick.
    */
-  [[nodiscard]] unsigned int get_buttonLeftStick() const;
+  unsigned int get_buttonLeftStick() const;
 
   /**
    * @brief Sets the value of the Left joystick.
@@ -224,7 +224,7 @@ protected:
   /**
    * @brief Gets the value of the Right joystick.
    */
-  [[nodiscard]] unsigned int get_buttonRightStick() const;
+  unsigned int get_buttonRightStick() const;
 
   /**
    * @brief Sets the value of the Right joystick.
@@ -234,7 +234,7 @@ protected:
   /**
    * @brief Gets the value of D-pad up.
    */
-  [[nodiscard]] unsigned int get_dPadUp() const;
+  unsigned int get_dPadUp() const;
 
   /**
    * @brief  Sets the value of D-pad up.
@@ -244,7 +244,7 @@ protected:
   /**
    * @brief Gets the value of D-pad down.
    */
-  [[nodiscard]] unsigned int get_dPadDown() const;
+  unsigned int get_dPadDown() const;
 
   /**
    * @brief Sets the value of D-pad down.
@@ -254,7 +254,7 @@ protected:
   /**
    * @brief Gets the value of D-pad left.
    */
-  [[nodiscard]] unsigned int get_dPadLeft() const;
+  unsigned int get_dPadLeft() const;
 
   /**
    * @brief Sets the value of D-pad left.
@@ -264,7 +264,7 @@ protected:
   /**
    * @brief Gets the value of D-pad right.
    */
-  [[nodiscard]] unsigned int get_dPadRight() const;
+  unsigned int get_dPadRight() const;
 
   /**
    * @brief Sets the value of D-pad right.
