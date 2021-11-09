@@ -33,8 +33,7 @@ public:
   // Methods
 
   /**
-   * @brief Recreates the entire bounding box from scratch as if we call the
-   * constructor in place.
+   * @brief Recreates the entire bounding box from scratch as if we call the constructor in place.
    * @param min defines the new minimum vector (in local space)
    * @param max defines the new maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
