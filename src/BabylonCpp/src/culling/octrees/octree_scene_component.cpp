@@ -37,7 +37,7 @@ bool OctreeSceneComponent::get_checksIsEnabled() const
 void OctreeSceneComponent::_register()
 {
   scene->onMeshRemovedObservable.add([this](AbstractMesh* mesh, EventState& /*es*/) {
-    auto sceneOctree = scene->selectionOctree();
+    const auto sceneOctree = scene->selectionOctree();
     if (sceneOctree != nullptr) {
       sceneOctree->dynamicContent.erase(
         std::remove(sceneOctree->dynamicContent.begin(), sceneOctree->dynamicContent.end(), mesh),
@@ -56,7 +56,7 @@ void OctreeSceneComponent::_register()
 std::vector<AbstractMesh*> OctreeSceneComponent::getActiveMeshCandidates()
 {
   if (scene->selectionOctree()) {
-    auto selection = scene->selectionOctree()->select(scene->frustumPlanes());
+    const auto selection = scene->selectionOctree()->select(scene->frustumPlanes());
     return selection;
   }
   return scene->_getDefaultMeshCandidates();
@@ -65,7 +65,7 @@ std::vector<AbstractMesh*> OctreeSceneComponent::getActiveMeshCandidates()
 std::vector<SubMesh*> OctreeSceneComponent::getActiveSubMeshCandidates(AbstractMesh* mesh)
 {
   if (mesh->_submeshesOctree && mesh->useOctreeForRenderingSelection) {
-    auto intersections = mesh->_submeshesOctree->select(scene->frustumPlanes());
+    const auto intersections = mesh->_submeshesOctree->select(scene->frustumPlanes());
     return intersections;
   }
   return scene->_getDefaultSubMeshCandidates(mesh);
@@ -76,7 +76,7 @@ std::vector<SubMesh*> OctreeSceneComponent::getIntersectingSubMeshCandidates(Abs
 {
   if (mesh->_submeshesOctree && mesh->useOctreeForPicking) {
     Ray::TransformToRef(localRay, mesh->getWorldMatrix(), _tempRay);
-    auto intersections = mesh->_submeshesOctree->intersectsRay(_tempRay);
+    const auto intersections = mesh->_submeshesOctree->intersectsRay(_tempRay);
 
     return intersections;
   }
@@ -87,9 +87,9 @@ std::vector<SubMesh*> OctreeSceneComponent::getCollidingSubMeshCandidates(Abstra
                                                                           const Collider& collider)
 {
   if (mesh->_submeshesOctree && mesh->useOctreeForCollisions) {
-    auto radius = collider._velocityWorldLength
-                  + stl_util::max(collider._radius.x, collider._radius.y, collider._radius.z);
-    auto intersections = mesh->_submeshesOctree->intersects(collider._basePointWorld, radius);
+    const auto radius = collider._velocityWorldLength
+                        + stl_util::max(collider._radius.x, collider._radius.y, collider._radius.z);
+    const auto intersections = mesh->_submeshesOctree->intersects(collider._basePointWorld, radius);
 
     return intersections;
   }
