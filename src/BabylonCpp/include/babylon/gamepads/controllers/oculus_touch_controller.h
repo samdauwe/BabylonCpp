@@ -107,7 +107,7 @@ protected:
   Observable<ExtendedGamepadButton>& get_onYButtonStateChangedObservable();
 
   /**
-   * @brief Called once for each button that changed state since the last frame
+   * @brief Called once for each button that changed state since the last frame.
    * 0) thumb stick (touch, press, value = pressed (0,1)). value is in this.leftStick
    * 1) index trigger (touch (?), press (only when value > 0.1), value 0 to 1)
    * 2) secondary trigger (same)
