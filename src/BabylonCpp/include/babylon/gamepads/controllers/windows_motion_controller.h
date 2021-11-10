@@ -193,7 +193,7 @@ protected:
   WindowsMotionController(const IBrowserGamepadPtr& vrGamepad);
 
   /**
-   * @brief Called once for each button that changed state since the last frame
+   * @brief Called once for each button that changed state since the last frame.
    * @param buttonIdx Which button index changed
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
@@ -209,7 +209,7 @@ protected:
   void _lerpButtonTransform(const std::string& buttonName, float buttonValue);
 
   /**
-   * @brief Moves the axis on the controller mesh based on its current state
+   * @brief Moves the axis on the controller mesh based on its current state.
    * @param axis the index of the axis
    * @param axisValue the value of the axis which determines the meshes new position
    */
