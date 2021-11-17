@@ -80,14 +80,12 @@ public:
   static void setForceFullSceneLoadingForIncremental(bool value);
 
   /**
-   * @brief Gets a boolean indicating if loading screen must be displayed while
-   * loading a scene.
+   * @brief Gets a boolean indicating if loading screen must be displayed while loading a scene.
    */
   static bool ShowLoadingScreen();
 
   /**
-   * @brief Sets a boolean indicating if loading screen must be displayed while
-   * loading a scene.
+   * @brief Sets a boolean indicating if loading screen must be displayed while loading a scene.
    */
   static void setShowLoadingScreen(bool value);
 
