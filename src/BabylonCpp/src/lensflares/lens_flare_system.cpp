@@ -48,7 +48,7 @@ LensFlareSystem::LensFlareSystem(const std::string& name, const LensFlareEmitter
   _emitter = emitter;
   id       = name;
 
-  meshesSelectionPredicate = [this](const AbstractMeshPtr& m) {
+  meshesSelectionPredicate = [this](const AbstractMeshPtr& m) -> bool {
     return _scene->activeCamera() && m->material() && m->isVisible && m->isEnabled() && m->isBlocker
            && ((m->layerMask() & _scene->activeCamera()->layerMask) != 0);
   };
