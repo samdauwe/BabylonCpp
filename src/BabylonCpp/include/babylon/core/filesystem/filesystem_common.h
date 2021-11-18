@@ -71,8 +71,8 @@ inline T joinPath(const T& path0, const T& path1)
   }
   else {
     // check '/'
-    char lastChar0  = *path0.rbegin();
-    char firstChar1 = path1.empty() ? '\0' : *path1.cbegin();
+    const char lastChar0  = *path0.rbegin();
+    const char firstChar1 = path1.empty() ? '\0' : *path1.cbegin();
     if ((lastChar0 != '/') && (firstChar1 != '/')) {
       return path0 + std::string("/") + path1;
     }
@@ -157,7 +157,7 @@ inline ArrayBuffer readBinaryFile(const char* filename)
  */
 inline std::string removeExtension(const std::string& filename)
 {
-  auto p = filename.find_last_of('.');
+  const auto p = filename.find_last_of('.');
   return p > 0 && p != std::string::npos ? filename.substr(0, p) : filename;
 }
 
