@@ -14,8 +14,7 @@ class BABYLON_SHARED_EXPORT LogMessage {
 public:
   /// Constructs a message with a certain level.
   /// @param level The level of the message.
-  LogMessage(unsigned int level         = LogLevels::LEVEL_QUIET,
-             const std::string& context = "");
+  LogMessage(unsigned int level = LogLevels::LEVEL_QUIET, const std::string& context = "");
   LogMessage(LogMessage const& otherLogMessage);
   LogMessage(LogMessage&& otherLogMessage);
   LogMessage& operator=(const LogMessage& otherLogMessage);
@@ -67,11 +66,9 @@ public:
 // Use "-Wall" to generate warnings in case of illegal printf format.
 //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
 #ifndef __GNUC__
-#define                                                                        \
-  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
+#define __attribute__(x) // Disable 'attributes' if compiler does not support 'em
 #endif
-  void writef(const char* printf_like_message, ...)
-    __attribute__((format(printf, 2, 3)));
+  void writef(const char* printf_like_message, ...) __attribute__((format(printf, 2, 3)));
 
 private:
   std::string prettify(char const* pretty_func);
