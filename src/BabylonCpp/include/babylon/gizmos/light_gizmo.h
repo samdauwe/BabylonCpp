@@ -53,8 +53,7 @@ private:
 protected:
   /**
    * @brief Override attachedNode because lightgizmo only support attached mesh
-   * It will return the attached mesh (if any) and setting an attached node will log
-   * a warning
+   * It will return the attached mesh (if any) and setting an attached node will log a warning.
    */
   NodePtr& get_attachedNode() override;
 
