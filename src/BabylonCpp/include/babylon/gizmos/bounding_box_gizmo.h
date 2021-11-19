@@ -94,12 +94,14 @@ private:
 public:
   /**
    * If child meshes should be ignored when calculating the bounding box. This should be set to true
-   * to avoid perf hits with heavily nested meshes (Default: false)
+   * to avoid perf hits with heavily nested meshes
+   * (Default: false)
    */
   bool ignoreChildren;
   /**
    * Returns true if a descendant should be included when computing the bounding box. When null, all
-   * descendants are included. If ignoreChildren is set this will be ignored. (Default: null)
+   * descendants are included. If ignoreChildren is set this will be ignored.
+   * (Default: null)
    */
   std::function<bool(const AbstractMeshPtr& abstractMesh)> includeChildPredicate;
 
