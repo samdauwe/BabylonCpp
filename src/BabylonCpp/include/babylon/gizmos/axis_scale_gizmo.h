@@ -52,7 +52,7 @@ protected:
   /**
    * @brief Gets if the gizmo is enabled.
    */
-  [[nodiscard]] bool get_isEnabled() const;
+  bool get_isEnabled() const;
 
   /**
    * @brief Sets if the gizmo is enabled.
