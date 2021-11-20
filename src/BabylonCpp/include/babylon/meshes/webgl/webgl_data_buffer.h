@@ -27,7 +27,7 @@ public:
 private:
   GL::IGLBufferPtr _buffer;
 
-}; // end of class ISimplifier
+}; // end of class WebGLDataBuffer
 
 } // end of namespace BABYLON
 
