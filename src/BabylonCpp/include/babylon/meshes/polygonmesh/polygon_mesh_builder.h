@@ -14,7 +14,7 @@ class VertexData;
 FWD_CLASS_SPTR(Mesh)
 
 /**
- * @brief Builds a polygon
+ * @brief Builds a polygon.
  * @see https://doc.babylonjs.com/how_to/polygonmeshbuilder
  */
 class BABYLON_SHARED_EXPORT PolygonMeshBuilder {
