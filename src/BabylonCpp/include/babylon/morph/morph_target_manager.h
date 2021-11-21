@@ -112,14 +112,14 @@ protected:
   MorphTargetManager(Scene* scene = nullptr);
 
   /**
-   * Gets a boolean indicating that adding new target will or will not update the underlying data
-   * buffers
+   * @brief Gets a boolean indicating that adding new target will or will not update the underlying
+   * data buffers
    */
   bool get_areUpdatesFrozen() const;
 
   /**
-   * Sets a boolean indicating that adding new target will or will not update the underlying data
-   * buffers
+   * @brief Sets a boolean indicating that adding new target will or will not update the underlying
+   * data buffers
    */
   void set_areUpdatesFrozen(bool block);
 
