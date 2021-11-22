@@ -108,8 +108,8 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject, unsigned int iT
       _options.damping            = _options.damping.value_or(0.f);
     }
     _joints = {};
-    // If the mesh has a parent, don't initialize the physicsBody. Instead wait
-    // for the parent to do that.
+    // If the mesh has a parent, don't initialize the physicsBody. Instead wait for the parent to do
+    // that.
     if (!object->getParent() || _options.ignoreParent) {
       _init();
     }
