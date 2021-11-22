@@ -80,7 +80,7 @@ struct BABYLON_SHARED_EXPORT PhysicsImpostorParameters {
   /**
    * @brief Hidden
    */
-  [[nodiscard]] bool contains(const std::string& key) const;
+  bool contains(const std::string& key) const;
   /**
    * @brief Hidden
    */
