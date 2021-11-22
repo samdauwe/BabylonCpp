@@ -269,7 +269,7 @@ SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigest
     facetCol.clear();
 
     // iterate over "size" facets
-    int fi = 0;
+    auto fi = 0;
     for (size_t j = f * 3; j < (f + size) * 3; ++j) {
       facetInd.emplace_back(fi);
       auto i  = static_cast<uint32_t>(meshInd[j]);
