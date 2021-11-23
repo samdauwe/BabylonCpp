@@ -12,7 +12,9 @@ namespace BABYLON {
  * @brief Defines the minimum contract an Edges renderer should follow.
  */
 struct BABYLON_SHARED_EXPORT IEdgesRenderer : public IDisposable {
+
   ~IEdgesRenderer() override = default;
+
   /**
    * Gets or sets a boolean indicating if the edgesRenderer is active
    */
