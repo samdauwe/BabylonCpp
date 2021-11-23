@@ -74,7 +74,7 @@ public:
 
 protected:
   /**
-   * @brief Gets the capacity of the manager
+   * @brief Gets the capacity of the manager.
    */
   size_t get_capacity() const;
 
