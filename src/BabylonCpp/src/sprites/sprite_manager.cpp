@@ -203,7 +203,7 @@ std::optional<PickingInfo>
 SpriteManager::intersects(const Ray& ray, const CameraPtr& camera,
                           const std::function<bool(Sprite* sprite)>& predicate, bool fastCheck)
 {
-  auto count                = std::min(capacity(), sprites.size());
+  const auto count          = std::min(capacity(), sprites.size());
   auto min                  = Vector3::Zero();
   auto max                  = Vector3::Zero();
   auto distance             = std::numeric_limits<float>::max();
