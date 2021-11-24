@@ -50,9 +50,8 @@ public:
 
 protected:
   /**
-   * Constructor
-   * @param name The name given to the material in order to identify it
-   * afterwards.
+   * @brief Constructor.
+   * @param name The name given to the material in order to identify it afterwards.
    * @param scene The scene the material is used in.
    */
   FireMaterial(const std::string& name, Scene* scene);
