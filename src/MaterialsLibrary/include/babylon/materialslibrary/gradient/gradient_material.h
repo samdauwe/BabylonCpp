@@ -29,7 +29,7 @@ public:
   ~GradientMaterial() override; // = default
 
   /**
-   * Returns wehter or not the grid requires alpha blending.
+   * @brief Returns wehter or not the grid requires alpha blending.
    */
   [[nodiscard]] bool needAlphaBlending() const override;
   [[nodiscard]] bool needAlphaTesting() const override;
@@ -49,9 +49,8 @@ public:
 
 protected:
   /**
-   * Constructor
-   * @param name The name given to the material in order to identify it
-   * afterwards.
+   * @brief Constructor
+   * @param name The name given to the material in order to identify it afterwards.
    * @param scene The scene the material is used in.
    */
   GradientMaterial(const std::string& name, Scene* scene);
