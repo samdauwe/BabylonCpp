@@ -252,12 +252,12 @@ void CellMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   const auto scene = getScene();
 
-  auto defines = static_cast<CellMaterialDefines*>(subMesh->_materialDefines.get());
+  const auto defines = static_cast<CellMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
