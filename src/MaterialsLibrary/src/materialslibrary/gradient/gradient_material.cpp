@@ -98,15 +98,15 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
     subMesh->materialDefines = std::make_shared<GradientMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  auto definesPtr  = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
+  auto& defines    = *definesPtr.get();
+  const auto scene = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
@@ -205,14 +205,14 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
 void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   auto defines = static_cast<GradientMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
