@@ -119,15 +119,16 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
     subMesh->materialDefines = std::make_shared<NormalMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<NormalMaterialDefines>(subMesh->materialDefines());
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr
+    = std::static_pointer_cast<NormalMaterialDefines>(subMesh->materialDefines());
+  auto& defines    = *definesPtr.get();
+  const auto scene = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -242,14 +243,14 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
 
 void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   auto defines = static_cast<NormalMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
