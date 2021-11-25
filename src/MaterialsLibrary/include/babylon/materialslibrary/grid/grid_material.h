@@ -33,11 +33,11 @@ public:
   /**
    * @brief Returns whether or not the grid requires alpha blending.
    */
-  [[nodiscard]] bool needAlphaBlending() const override;
-  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
+  bool needAlphaBlending() const override;
+  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Dispose the material and its associated resources.
@@ -46,9 +46,8 @@ public:
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
 
-  [[nodiscard]] MaterialPtr clone(const std::string& name,
-                                  bool cloneChildren = false) const override;
-  [[nodiscard]] json serialize() const;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  json serialize() const;
 
   /** Statics **/
   static GridMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
