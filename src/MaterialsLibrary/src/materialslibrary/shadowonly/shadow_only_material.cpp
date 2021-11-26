@@ -86,9 +86,10 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     subMesh->materialDefines = std::make_shared<ShadowOnlyMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<ShadowOnlyMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr
+    = std::static_pointer_cast<ShadowOnlyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines    = *definesPtr.get();
+  const auto scene = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -201,14 +202,14 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
 void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   auto defines = static_cast<ShadowOnlyMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
