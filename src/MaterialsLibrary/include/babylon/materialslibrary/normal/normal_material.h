@@ -49,6 +49,11 @@ public:
   static NormalMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
+  /**
+   * @brief Constructor
+   * @param name The name given to the material in order to identify it afterwards.
+   * @param scene The scene the material is used in.
+   */
   NormalMaterial(const std::string& name, Scene* scene);
 
   BaseTexturePtr& get_diffuseTexture();
