@@ -106,7 +106,8 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
           break; // We are good
         }
 
-        auto it = std::find(mesh->lightSources().begin(), mesh->lightSources().end(), iActiveLight);
+        const auto it
+          = std::find(mesh->lightSources().begin(), mesh->lightSources().end(), iActiveLight);
 
         if (it != mesh->lightSources().end()) {
           mesh->lightSources().erase(it);
