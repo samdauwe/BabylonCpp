@@ -55,8 +55,7 @@ public:
 protected:
   /**
    * @brief Constructor
-   * @param name The name given to the material in order to identify it
-   * afterwards.
+   * @param name The name given to the material in order to identify it afterwards.
    * @param scene The scene the material is used in.
    */
   GridMaterial(const std::string& name, Scene* scene);
