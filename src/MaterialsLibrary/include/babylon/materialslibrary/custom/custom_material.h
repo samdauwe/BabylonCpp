@@ -26,6 +26,11 @@ struct UniformInstance {
 class BABYLON_SHARED_EXPORT CustomMaterial : public StandardMaterial {
 
 public:
+  /**
+   * @brief Constructor.
+   * @param name The name given to the material in order to identify it afterwards.
+   * @param scene The scene the material is used in.
+   */
   CustomMaterial(const std::string& name, Scene* scene);
   ~CustomMaterial() override; // = default
 
