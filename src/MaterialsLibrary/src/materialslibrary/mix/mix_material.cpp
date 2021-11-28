@@ -238,15 +238,15 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool u
     subMesh->materialDefines = std::make_unique<MixMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<MixMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr = std::static_pointer_cast<MixMaterialDefines>(subMesh->_materialDefines);
+  auto& defines         = *definesPtr.get();
+  const auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   // Textures
   if (scene->texturesEnabled()) {
@@ -400,7 +400,7 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool u
 
 void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   auto _defines = static_cast<MixMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
@@ -408,7 +408,7 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
   auto defines = *_defines;
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
