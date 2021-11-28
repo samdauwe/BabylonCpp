@@ -47,6 +47,11 @@ public:
   static CellMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
+  /**
+   * @brief Constructor.
+   * @param name The name given to the material in order to identify it afterwards.
+   * @param scene The scene the material is used in.
+   */
   CellMaterial(const std::string& name, Scene* scene);
 
   TexturePtr& get_diffuseTexture();
