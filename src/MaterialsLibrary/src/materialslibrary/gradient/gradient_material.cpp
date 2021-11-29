@@ -98,7 +98,8 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
     subMesh->materialDefines = std::make_shared<GradientMaterialDefines>();
   }
 
-  auto definesPtr  = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
+  const auto definesPtr
+    = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
   auto& defines    = *definesPtr.get();
   const auto scene = getScene();
 
