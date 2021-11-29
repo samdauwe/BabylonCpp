@@ -42,6 +42,11 @@ public:
   static ShadowOnlyMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
+  /**
+   * @brief Constructor
+   * @param name The name given to the material in order to identify it afterwards.
+   * @param scene The scene the material is used in.
+   */
   ShadowOnlyMaterial(const std::string& name, Scene* scene);
 
   IShadowLightPtr& get_activeLight();
