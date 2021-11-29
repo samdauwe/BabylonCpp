@@ -87,7 +87,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   if (defines["TRANSPARENT"] != (opacity < 1.f)) {
     defines.boolDef["TRANSPARENT"] = !defines["TRANSPARENT"];
