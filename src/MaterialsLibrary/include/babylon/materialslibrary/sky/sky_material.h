@@ -37,13 +37,13 @@ public:
    * @brief Specifies if the material will require alpha blending.
    * @returns a boolean specifying if alpha blending is needed
    */
-  [[nodiscard]] bool needAlphaBlending() const override;
+  bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
    * @returns false as the sky material doesn't need alpha testing.
    */
-  [[nodiscard]] bool needAlphaTesting() const override;
+  bool needAlphaTesting() const override;
 
   /**
    * @brief Get the texture used for alpha test purpose.
@@ -80,7 +80,7 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  [[nodiscard]] std::string getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Disposes the material.
@@ -94,14 +94,13 @@ public:
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  [[nodiscard]] MaterialPtr clone(const std::string& name,
-                                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  [[nodiscard]] json serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a sky material from parsed material data.
