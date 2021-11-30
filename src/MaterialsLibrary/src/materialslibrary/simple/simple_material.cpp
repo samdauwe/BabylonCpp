@@ -109,9 +109,10 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
     subMesh->materialDefines = std::make_shared<SimpleMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<SimpleMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr
+    = std::static_pointer_cast<SimpleMaterialDefines>(subMesh->_materialDefines);
+  auto& defines    = *definesPtr.get();
+  const auto scene = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -233,12 +234,12 @@ void SimpleMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines = static_cast<SimpleMaterialDefines*>(subMesh->_materialDefines.get());
+  const auto defines = static_cast<SimpleMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
