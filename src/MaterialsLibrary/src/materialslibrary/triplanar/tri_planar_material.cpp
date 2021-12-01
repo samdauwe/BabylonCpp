@@ -209,9 +209,10 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
     subMesh->materialDefines = std::make_shared<TriPlanarMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<TriPlanarMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr
+    = std::static_pointer_cast<TriPlanarMaterialDefines>(subMesh->_materialDefines);
+  auto& defines    = *definesPtr.get();
+  const auto scene = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -349,13 +350,13 @@ void TriPlanarMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMe
 {
   auto scene = getScene();
 
-  auto _defines = static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get());
+  const auto _defines = static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
   auto defines = *_defines;
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
