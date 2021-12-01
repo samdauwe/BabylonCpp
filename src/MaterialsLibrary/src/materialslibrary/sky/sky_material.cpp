@@ -72,9 +72,9 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
     subMesh->materialDefines = std::make_shared<SkyMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines         = *definesPtr.get();
+  const auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -156,12 +156,12 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto defines = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
+  const auto defines = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -213,8 +213,8 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setFloat("mieDirectionalG", mieDirectionalG);
 
   if (!useSunPosition) {
-    auto theta = Math::PI * (inclination - 0.5f);
-    auto phi   = 2.f * Math::PI * (azimuth - 0.5f);
+    const auto theta = Math::PI * (inclination - 0.5f);
+    const auto phi   = 2.f * Math::PI * (azimuth - 0.5f);
 
     sunPosition.x = distance * std::cos(phi);
     sunPosition.y = distance * std::sin(phi) * std::sin(theta);
