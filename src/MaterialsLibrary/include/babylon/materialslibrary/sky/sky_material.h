@@ -114,8 +114,8 @@ public:
 protected:
   /**
    * @brief Instantiates a new sky material.
-   * This material allows to create dynamic and texture free
-   * effects for skyboxes by taking care of the atmosphere state.
+   * This material allows to create dynamic and texture free effects for skyboxes by taking care of
+   * the atmosphere state.
    * @see https://doc.babylonjs.com/extensions/sky
    * @param name Define the name of the material in the scene
    * @param scene Define the scene the material belong to
