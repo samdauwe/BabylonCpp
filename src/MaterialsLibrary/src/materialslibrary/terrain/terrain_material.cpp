@@ -204,15 +204,16 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
     subMesh->materialDefines = std::make_shared<TerrainMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<TerrainMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr
+    = std::static_pointer_cast<TerrainMaterialDefines>(subMesh->_materialDefines);
+  auto& defines    = *definesPtr.get();
+  const auto scene = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   // Textures
   if (scene->texturesEnabled()) {
@@ -356,13 +357,13 @@ void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
 {
   auto scene = getScene();
 
-  auto _defines = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
+  const auto _defines = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
   auto defines = *_defines;
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
