@@ -32,20 +32,19 @@ public:
   }
   ~TerrainMaterial() override; // = default
 
-  [[nodiscard]] bool needAlphaBlending() const override;
-  [[nodiscard]] bool needAlphaTesting() const override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
-  [[nodiscard]] std::string getClassName() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  [[nodiscard]] MaterialPtr clone(const std::string& name,
-                                  bool cloneChildren = false) const override;
-  [[nodiscard]] json serialize() const;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  json serialize() const;
 
   /** Statics **/
   static TerrainMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
@@ -67,9 +66,9 @@ protected:
   void set_bumpTexture2(const TexturePtr& value);
   TexturePtr& get_bumpTexture3();
   void set_bumpTexture3(const TexturePtr& value);
-  [[nodiscard]] bool get_disableLighting() const;
+  bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
+  unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
 public:
