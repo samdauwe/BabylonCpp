@@ -35,7 +35,7 @@ public:
 
   /**
    * @brief Specifies if the material will require alpha blending.
-   * @returns a boolean specifying if alpha blending is needed
+   * @returns a boolean specifying if alpha blending is needed.
    */
   bool needAlphaBlending() const override;
 
