@@ -38,20 +38,19 @@ public:
   void addToRenderList(const AbstractMeshPtr& node);
   void enableRenderTargets(bool enable);
   std::vector<AbstractMesh*>& getRenderList();
-  [[nodiscard]] bool needAlphaBlending() const override;
-  [[nodiscard]] bool needAlphaTesting() const override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
-  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
-  [[nodiscard]] std::string getClassName() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  [[nodiscard]] MaterialPtr clone(const std::string& name,
-                                  bool cloneChildren = false) const override;
-  [[nodiscard]] json serialize() const;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  json serialize() const;
 
   /** Statics **/
   static WaterMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
@@ -63,28 +62,28 @@ protected:
 
   BaseTexturePtr& get_bumpTexture();
   void set_bumpTexture(const BaseTexturePtr& value);
-  [[nodiscard]] bool get_disableLighting() const;
+  bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
+  unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  [[nodiscard]] bool get_bumpSuperimpose() const;
+  bool get_bumpSuperimpose() const;
   void set_bumpSuperimpose(bool value);
-  [[nodiscard]] bool get_fresnelSeparate() const;
+  bool get_fresnelSeparate() const;
   void set_fresnelSeparate(bool value);
-  [[nodiscard]] bool get_bumpAffectsReflection() const;
+  bool get_bumpAffectsReflection() const;
   void set_bumpAffectsReflection(bool value);
-  [[nodiscard]] bool get_useLogarithmicDepth() const override;
+  bool get_useLogarithmicDepth() const override;
   void set_useLogarithmicDepth(bool value) override;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
+  bool get_hasRenderTargetTextures() const override;
 
   RenderTargetTexturePtr& get_refractionTexture();
   RenderTargetTexturePtr& get_reflectionTexture();
-  [[nodiscard]] bool get_renderTargetsEnabled() const;
+  bool get_renderTargetsEnabled() const;
   float get_lastTime() const;
 
 private:
