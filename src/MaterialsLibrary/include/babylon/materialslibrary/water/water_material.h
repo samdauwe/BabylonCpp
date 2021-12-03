@@ -57,6 +57,12 @@ public:
   static MeshPtr CreateDefaultMesh(const std::string& name, Scene* scene);
 
 protected:
+  /**
+   * @brief Constructor
+   * @param name The name given to the material in order to identify it afterwards.
+   * @param scene The scene the material is used in.
+   * @param renderTargetSize The size of the render target.
+   */
   WaterMaterial(const std::string& name, Scene* scene,
                 const Vector2& renderTargetSize = Vector2(512.f, 512.f));
 
