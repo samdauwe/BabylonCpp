@@ -217,7 +217,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -348,7 +348,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
 
 void TriPlanarMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   const auto _defines = static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
