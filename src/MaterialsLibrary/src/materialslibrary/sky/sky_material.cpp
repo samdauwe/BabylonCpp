@@ -214,7 +214,7 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (!useSunPosition) {
     const auto theta = Math::PI * (inclination - 0.5f);
-    const auto phi   = 2.f * Math::PI * (azimuth - 0.5f);
+    const auto phi   = Math::PI2 * (azimuth - 0.5f);
 
     sunPosition.x = distance * std::cos(phi);
     sunPosition.y = distance * std::sin(phi) * std::sin(theta);
