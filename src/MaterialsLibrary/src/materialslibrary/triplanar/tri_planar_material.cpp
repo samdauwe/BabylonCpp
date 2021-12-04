@@ -227,7 +227,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
                                                _diffuseTextureZ};
         const std::vector<std::string> textureDefines{"DIFFUSEX", "DIFFUSEY", "DIFFUSEZ"};
 
-        for (unsigned int i = 0; i < textures.size(); i++) {
+        for (auto i = 0ull; i < textures.size(); ++i) {
           if (textures[i]) {
             if (!textures[i]->isReady()) {
               return false;
@@ -242,7 +242,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
         const std::vector<TexturePtr> textures{_normalTextureX, _normalTextureY, _normalTextureZ};
         const std::vector<std::string> textureDefines{"BUMPX", "BUMPY", "BUMPZ"};
 
-        for (unsigned int i = 0; i < textures.size(); i++) {
+        for (auto i = 0ull; i < textures.size(); ++i) {
           if (textures[i]) {
             if (!textures[i]->isReady()) {
               return false;
