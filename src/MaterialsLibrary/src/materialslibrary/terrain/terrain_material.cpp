@@ -355,7 +355,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 
 void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  auto scene = getScene();
+  const auto scene = getScene();
 
   const auto _defines = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
