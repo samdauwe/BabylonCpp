@@ -275,15 +275,15 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool
     subMesh->materialDefines = std::make_shared<WaterMaterialDefines>();
   }
 
-  auto definesPtr = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
-  auto& defines   = *definesPtr.get();
-  auto scene      = getScene();
+  const auto definesPtr = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
+  auto& defines         = *definesPtr.get();
+  const auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto engine = scene->getEngine();
+  const auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -453,7 +453,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
   auto defines = *_defines;
 
-  auto effect = subMesh->effect();
+  const auto effect = subMesh->effect();
   if (!effect || !_mesh) {
     return;
   }
