@@ -34,12 +34,10 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Starfield Procedural Texture from parsed startfield
-   * procedural texture data.
+   * @brief Creates a Starfield Procedural Texture from parsed startfield procedural texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing startfield procedural
-   * texture information
+   * @param rootUrl defines the root URL containing startfield procedural texture information
    * @returns a parsed Starfield Procedural Texture
    */
   static std::unique_ptr<StarfieldProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
