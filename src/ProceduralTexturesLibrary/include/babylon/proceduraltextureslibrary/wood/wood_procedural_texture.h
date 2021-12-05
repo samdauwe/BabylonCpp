@@ -34,12 +34,10 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Wood Procedural Texture from parsed wood procedural
-   * texture data.
+   * @brief Creates a Wood Procedural Texture from parsed wood procedural texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing wood procedural texture
-   * information
+   * @param rootUrl defines the root URL containing wood procedural texture information
    * @returns a parsed Wood Procedural Texture
    */
   static std::unique_ptr<WoodProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
