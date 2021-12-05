@@ -36,13 +36,13 @@ void PerlinNoiseProceduralTexture::updateShaderUniforms()
                      static_cast<float>(std::get<int>(getRenderSize())) :
                      std::get<float>(getRenderSize()));
 
-  auto scene = getScene();
+  const auto scene = getScene();
 
   if (!scene) {
     return;
   }
 
-  auto deltaTime = scene->getEngine()->getDeltaTime();
+  const auto deltaTime = scene->getEngine()->getDeltaTime();
 
   time += deltaTime;
   setFloat("time", time * timeScale / 1000.f);
