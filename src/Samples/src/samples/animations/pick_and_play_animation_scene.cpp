@@ -2,6 +2,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
@@ -18,15 +19,11 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Animatable;
 class EventState;
-class PBRMetallicRoughnessMaterial;
-class TransformNode;
-using AbstractMeshPtr                 = std::shared_ptr<AbstractMesh>;
-using AnimatablePtr                   = std::shared_ptr<Animatable>;
-using TransformNodePtr                = std::shared_ptr<TransformNode>;
-using PBRMetallicRoughnessMaterialPtr = std::shared_ptr<PBRMetallicRoughnessMaterial>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Animatable)
+FWD_CLASS_SPTR(PBRMetallicRoughnessMateria)
+FWD_CLASS_SPTR(TransformNode)
 
 namespace Samples {
 
