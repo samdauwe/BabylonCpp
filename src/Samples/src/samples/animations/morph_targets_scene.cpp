@@ -19,8 +19,7 @@ using MeshPtr        = std::shared_ptr<Mesh>;
 using MorphTargetPtr = std::shared_ptr<MorphTarget>;
 
 /**
- * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between
- * multiple targets
+ * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between multiple targets
  * @see https://www.babylonjs-playground.com/#2JDN66#7
  * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
