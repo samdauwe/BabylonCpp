@@ -1,5 +1,6 @@
 #include "imgui.h"
 
+#include <babylon/babylon_fwd.h>
 #include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
@@ -15,8 +16,8 @@
 namespace BABYLON {
 namespace Samples {
 
-using MeshPtr        = std::shared_ptr<Mesh>;
-using MorphTargetPtr = std::shared_ptr<MorphTarget>;
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(MorphTarget)
 
 /**
  * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between multiple targets
