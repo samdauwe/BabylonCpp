@@ -123,7 +123,7 @@ public:
 
     _platforms.emplace_back(platform);
     for (int i = 1; i < platformNb; ++i) {
-      auto instance = platform->createInstance("platform" + std::to_string(i));
+      const auto instance = platform->createInstance("platform" + std::to_string(i));
       instance->position
         = Vector3((0.5f - Math::random()) * platformLimit, (0.5f - Math::random()) * platformLimit,
                   (0.5f - Math::random()) * platformLimit);
