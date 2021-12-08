@@ -59,7 +59,7 @@ public:
              const std::vector<AnimationGroupPtr>& /*animationGroups*/,
              const std::vector<TransformNodePtr>& /*transformNodes*/,
              const std::vector<GeometryPtr>& /*geometries*/,
-             const std::vector<LightPtr>& /*lights*/) {
+             const std::vector<LightPtr>& /*lights*/) -> void {
         if (!meshes.empty() && !skeletons.empty()) {
           // Update mesh rotation
           _mesh               = meshes[0];
