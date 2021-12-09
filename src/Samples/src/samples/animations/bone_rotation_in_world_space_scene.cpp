@@ -1,3 +1,4 @@
+#include <babylon/babylon_fwd.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -11,10 +12,8 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Skeleton;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using SkeletonPtr     = std::shared_ptr<Skeleton>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Skeleton)
 
 namespace Samples {
 
