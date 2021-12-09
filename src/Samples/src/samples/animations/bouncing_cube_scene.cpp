@@ -133,7 +133,7 @@ public:
       _platforms.emplace_back(instance);
     }
 
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       _applyForces();
       _checkCollisions();
       _moveMario();
