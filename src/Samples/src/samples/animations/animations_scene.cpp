@@ -75,7 +75,7 @@ struct AnimationsScene : public IRenderableScene {
     //-------------------------------------------
     // Create a scaling animation at 30 FPS
     auto animationBox1
-      = Animation::New("scalingAnimation", "scaling.x", 30, Animation::ANIMATIONTYPE_FLOAT,
+      = Animation::New("scalingAnimation", "scaling.x", 30ull, Animation::ANIMATIONTYPE_FLOAT,
                        Animation::ANIMATIONLOOPMODE_CYCLE);
 
     // Animation keys
