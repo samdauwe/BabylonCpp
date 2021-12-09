@@ -1,6 +1,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_common.h>
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/core/time.h>
@@ -13,8 +14,7 @@
 
 namespace BABYLON {
 
-class StandardMaterial;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+FWD_CLASS_SPTR(StandardMaterial)
 
 namespace Samples {
 
