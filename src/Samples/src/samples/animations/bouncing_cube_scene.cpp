@@ -1,3 +1,4 @@
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
@@ -13,10 +14,8 @@
 
 namespace BABYLON {
 
-class AbstractMesh;
-class Mesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using MeshPtr         = std::shared_ptr<Mesh>;
+FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(Mesh)
 
 namespace Samples {
 
