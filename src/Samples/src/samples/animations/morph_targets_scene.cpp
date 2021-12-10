@@ -14,10 +14,11 @@
 #include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
-namespace Samples {
 
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(MorphTarget)
+
+namespace Samples {
 
 /**
  * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between multiple targets
