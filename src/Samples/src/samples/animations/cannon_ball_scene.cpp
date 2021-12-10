@@ -62,6 +62,7 @@ public:
   {
     return "Cannon Ball Scene";
   }
+
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Change the scene clear color
@@ -109,7 +110,7 @@ public:
     _ball->position().y  = 5.f;
 
     // Animation
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       if (_t < _startBuggling) {
         _nothing(_t);
       }
