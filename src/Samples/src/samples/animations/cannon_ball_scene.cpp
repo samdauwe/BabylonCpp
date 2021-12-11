@@ -1,3 +1,4 @@
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
@@ -10,13 +11,10 @@
 
 namespace BABYLON {
 
-class ArcRotateCamera;
-class Mesh;
-class PointLight;
 class Vector3;
-using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
-using MeshPtr            = std::shared_ptr<Mesh>;
-using PointLightPtr      = std::shared_ptr<PointLight>;
+FWD_CLASS_SPTR(ArcRotateCamera)
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(PointLight)
 
 namespace Samples {
 
