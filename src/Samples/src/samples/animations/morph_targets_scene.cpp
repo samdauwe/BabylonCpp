@@ -155,9 +155,6 @@ private:
   }
 
 private:
-  using MeshPtr        = std::shared_ptr<Mesh>;
-  using MorphTargetPtr = std::shared_ptr<MorphTarget>;
-
   MorphTargetPtr _target0;
   MorphTargetPtr _target1;
   MorphTargetPtr _target2;
