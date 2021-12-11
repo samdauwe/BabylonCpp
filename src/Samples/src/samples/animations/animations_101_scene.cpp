@@ -105,7 +105,7 @@ public:
 
     // Creation of a manual animation with box 2
     //------------------------------------------
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       auto currentTimestamp = Time::highresTimepointNow();
       auto diffMillis = Time::fpTimeDiff<size_t, std::milli>(_previousTimestamp, currentTimestamp);
       if (diffMillis >= 1000ul) {
