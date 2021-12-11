@@ -95,7 +95,7 @@ public:
 
     auto N    = 16u;
     auto size = 1.f;
-    for (unsigned i = 1u; i <= N; ++i) {
+    for (auto i = 1u; i <= N; ++i) {
       TorusKnotOptions torusKnotOptions;
       torusKnotOptions.radius = size;
       const auto istr         = std::to_string(i);
