@@ -62,7 +62,7 @@ public:
     scene->clearColor = Color4(0.f, 0.f, 0.f, 1.f);
     scene->autoClear  = true;
 
-    // materials
+    // Materials
     _mat0            = PBRMetallicRoughnessMaterial::New("mat0", scene);
     _mat0->metallic  = 0.f;
     _mat0->roughness = 1.f;
@@ -82,7 +82,7 @@ public:
     _mat2->animations    = {};
 
     //
-    // meshes
+    // Meshes
     //
 
     _mesh0 = TransformNode::New("mesh0", scene);
@@ -112,10 +112,10 @@ public:
     }
 
     //
-    // animations
+    // Animations
     //
 
-    // kind #1 ---- complex-animation
+    // Kind #1 ---- complex-animation
     _animY = [this](Scene*, EventState&) {
       if (_animYEnabled) {
         auto i = 0u;
@@ -128,12 +128,12 @@ public:
     };
     scene->registerAfterRender(_animY);
 
-    // kind #2 ---- helper-function -> Animatable{}
+    // Kind #2 ---- helper-function -> Animatable{}
     _anim0 = Animation::CreateAndStartAnimation("anim0", _mesh0, "rotation.y", 10 /*fps*/,
                                                 180.f /*totalFrame*/, 0.f, 2.f * Math::PI,
                                                 Animation::ANIMATIONLOOPMODE_CYCLE);
 
-    // kind #3 ---- Animation{}
+    // Kind #3 ---- Animation{}
     auto animColor = Animation::New("anim", "baseColor", 60, Animation::ANIMATIONTYPE_COLOR3,
                                     Animation::ANIMATIONLOOPMODE_CYCLE);
     std::vector<IAnimationKey> colorAnimation{// yoyo
@@ -148,7 +148,7 @@ public:
     _animatableColor->pause();
 
     //
-    // light and shadow
+    // Light and shadow
     //
 
     auto light0       = SpotLight::New("light0", Vector3(10.f, 20.f, 0.f), Vector3(-1.f, -2.f, 0.f),
@@ -171,7 +171,7 @@ public:
     ground->receiveShadows = true;
 
     //
-    // camera
+    // Camera
     //
 
     auto camera0 = ArcRotateCamera::New("camera0", Math::PI / 180.f * -140.f,
@@ -183,7 +183,7 @@ public:
     camera0->wheelPrecision   = 100.f;
 
     //
-    // events
+    // Events
     //
     scene->registerBeforeRender([this](Scene*, EventState&) {
       auto result = _scene->pick(_scene->pointerX, _scene->pointerY);
