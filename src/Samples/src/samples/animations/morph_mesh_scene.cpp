@@ -63,7 +63,7 @@ public:
                     const std::vector<AnimationGroupPtr>& /*animationGroups*/,
                     const std::vector<TransformNodePtr>& /*transformNodes*/,
                     const std::vector<GeometryPtr>& /*geometries*/,
-                    const std::vector<LightPtr>& /*lights*/) {
+                    const std::vector<LightPtr>& /*lights*/) -> void {
         auto test = std::static_pointer_cast<Mesh>(scene->getMeshByName("Sphere Default"));
         test->convertToFlatShadedMesh();
         test->position = Vector3::Zero();
@@ -92,7 +92,7 @@ public:
         test->morphTargetManager = testManager;
       });
 
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       auto currentTimestamp = Time::highresTimepointNow();
       auto diffMillis = Time::fpTimeDiff<size_t, std::milli>(_previousTimestamp, currentTimestamp);
       if (diffMillis >= 5000ul) {
