@@ -44,6 +44,7 @@ public:
   {
     return "Pump Jack Scene";
   }
+
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Configuration
