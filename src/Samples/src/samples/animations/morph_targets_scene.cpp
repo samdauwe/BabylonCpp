@@ -114,12 +114,12 @@ struct MorphTargetsScene : public IRenderableSceneWithHud {
     _target3->influence = 1.00f;
 
     hudGui = [=]() {
-      auto addSlider
-        = [](const std::string& label, auto& floatProperty, float min = 0.f, float max = 1.f) {
-            float currentValue = floatProperty;
-            if (ImGui::SliderFloat(label.c_str(), &currentValue, min, max))
-              floatProperty = currentValue;
-          };
+      auto addSlider = [](const std::string& label, auto& floatProperty, float min = 0.f,
+                          float max = 1.f) -> void {
+        float currentValue = floatProperty;
+        if (ImGui::SliderFloat(label.c_str(), &currentValue, min, max))
+          floatProperty = currentValue;
+      };
       addSlider("Influence #1", _target0->influence);
       addSlider("Influence #2", _target1->influence);
       addSlider("Influence #3", _target2->influence);
