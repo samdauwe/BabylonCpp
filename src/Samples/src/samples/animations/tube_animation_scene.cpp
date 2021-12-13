@@ -59,7 +59,7 @@ struct TubeAnimationScene : public IRenderableScene {
     const auto curvePoints = [](float l, float t) -> std::vector<Vector3> {
       std::vector<Vector3> path;
       float step = l / t;
-      for (float i = -l / 2.f; i < l / 2.f; i += step) {
+      for (auto i = -l / 2.f; i < l / 2.f; i += step) {
         path.emplace_back(Vector3(5.f * std::sin(i * t / 400.f), i, 5.f * std::cos(i * t / 400.f)));
       }
       return path;
