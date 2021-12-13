@@ -56,7 +56,7 @@ struct TubeAnimationScene : public IRenderableScene {
     mat->backFaceCulling = false;
     mat->wireframe       = true;
 
-    const auto curvePoints = [](float l, float t) {
+    const auto curvePoints = [](float l, float t) -> std::vector<Vector3> {
       std::vector<Vector3> path;
       float step = l / t;
       for (float i = -l / 2.f; i < l / 2.f; i += step) {
