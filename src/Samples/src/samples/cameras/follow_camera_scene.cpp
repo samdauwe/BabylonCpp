@@ -116,7 +116,7 @@ public:
     _camera->lockedTarget = _box;
 
     // Move the box to see that the camera follows it
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       _alpha += 0.01f;
       _box->position().x = _orbitRadius * std::cos(_alpha);
       _box->position().y = _orbitRadius * std::sin(_alpha);
