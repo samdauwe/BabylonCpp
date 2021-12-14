@@ -105,7 +105,7 @@ struct TubeAnimationScene : public IRenderableScene {
     // Animation keys
     std::vector<IAnimationKey> rotationKeys;
     frame = 0;
-    for (unsigned int index = 0; index < curve.size() - 1; ++index) {
+    for (auto index = 0u; index < curve.size() - 1; ++index) {
       auto pointToRotateTo = curve[index + 1];
       auto axis1           = curve[index].subtract(pointToRotateTo).normalize();
       auto axis2           = Vector3::Cross(axis1, Vector3(0.f, 1.f, 0.f)).normalize();
