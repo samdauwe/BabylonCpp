@@ -248,8 +248,9 @@ public:
     scene->beginAnimation(shape7, 0, 120, true);
 
     // create the camera animation
-    scene->onBeforeCameraRenderObservable.add(
-      [this](Camera*, EventState&) { _camera->alpha += 0.01f * getScene()->getAnimationRatio(); });
+    scene->onBeforeCameraRenderObservable.add([this](Camera*, EventState&) -> void {
+      _camera->alpha += 0.01f * getScene()->getAnimationRatio();
+    });
   }
 
 private:
