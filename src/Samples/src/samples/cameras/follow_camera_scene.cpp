@@ -1,3 +1,4 @@
+#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
@@ -13,10 +14,8 @@
 
 namespace BABYLON {
 
-class Mesh;
-class FollowCamera;
-using MeshPtr         = std::shared_ptr<Mesh>;
-using FollowCameraPtr = std::shared_ptr<FollowCamera>;
+FWD_CLASS_SPTR(Mesh)
+FWD_CLASS_SPTR(FollowCamera)
 
 namespace Samples {
 
