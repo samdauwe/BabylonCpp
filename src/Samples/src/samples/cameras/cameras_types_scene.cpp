@@ -35,9 +35,9 @@ struct CamerasTypesScene : public IRenderableScene {
     auto box1 = Mesh::CreateBox("b1", 1.f, scene);
     box1->position().x += 0.f;
     auto box2          = Mesh::CreateBox("b2", 1.f, scene);
-    box2->position().x = -3;
+    box2->position().x = -3.f;
     auto box3          = Mesh::CreateBox("b3", 1.f, scene);
-    box3->position().x = 3;
+    box3->position().x = 3.f;
 
     // ArcRotateCamera >> Camera rotating around a 3D point (here Vector zero)
     // Parameters : name, alpha, beta, radius, target, scene
