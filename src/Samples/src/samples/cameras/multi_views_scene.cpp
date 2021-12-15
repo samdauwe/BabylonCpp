@@ -75,7 +75,7 @@ struct MultiViewsScene : public IRenderableScene {
     box->material         = StandardMaterial::New("", scene);
 
     // Create and Draw Axes
-    const auto showAxis = [scene](float size) {
+    const auto showAxis = [scene](float size) -> void {
       // X Axis
       {
         const std::vector<Vector3> axisXPoints{
