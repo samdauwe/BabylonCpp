@@ -46,8 +46,8 @@ struct CamerasTypesScene : public IRenderableScene {
     arcCamera->setPosition(Vector3(0.f, 0.f, 50.f));
     arcCamera->target = Vector3(3.f, 0.f, 0.f);
 
-    // FreeCamera >> You can move around the world with mouse and keyboard
-    // (LEFT/RIGHT/UP/DOWN) Parameters : name, position, scene
+    // FreeCamera >> You can move around the world with mouse and keyboard (LEFT/RIGHT/UP/DOWN)
+    // Parameters : name, position, scene
     auto freeCamera      = FreeCamera::New("FreeCamera", Vector3(0.f, 0.f, 5.f), scene);
     freeCamera->rotation = Vector3(0.f, Math::PI, 0.f);
 
