@@ -253,7 +253,7 @@ public:
 
     // Animation
     // the wagon slides many steps on each curve segment
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       _curvect.scaleToRef(static_cast<float>(_k) / static_cast<float>(_step), _scaled);
       _points[_i].addToRef(_scaled, _pos);
       _pos.addInPlace(_norms[_i]);
