@@ -50,8 +50,7 @@ public:
     // The goal height of camera above local origin (centre) of target
     _camera->heightOffset = 10.f;
 
-    // The goal rotation of camera around local origin (centre) of target in x y
-    // plane
+    // The goal rotation of camera around local origin (centre) of target in x y plane
     _camera->rotationOffset = 0.f;
 
     // Acceleration of camera in moving from current to goal position
@@ -80,10 +79,10 @@ public:
     unsigned int vSpriteNb = 4; // 4 sprite rows
 
     std::array<std::optional<Vector4>, 6> faceUV;
-    for (unsigned int i = 0; i < 6; i++) {
+    for (auto i = 0u; i < 6; i++) {
       faceUV[i]
         = Vector4(i / static_cast<float>(hSpriteNb), 0.f, (i + 1) / static_cast<float>(hSpriteNb),
-                  1 / static_cast<float>(vSpriteNb));
+                  1.f / static_cast<float>(vSpriteNb));
     }
 
     // Shape to follow
