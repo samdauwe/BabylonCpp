@@ -68,7 +68,7 @@ struct TubeAnimationScene : public IRenderableScene {
     auto curve = curvePoints(40.f, 200.f);
 
     // Create tube
-    auto tube = Mesh::CreateTube("tube", curve, 5, 60, nullptr, 0, scene, false, Mesh::FRONTSIDE);
+    auto tube = Mesh::CreateTube("tube", curve, 5.f, 60, nullptr, 0, scene, false, Mesh::FRONTSIDE);
     tube->material = mat;
 
     auto mat1          = StandardMaterial::New("mat1", scene);
