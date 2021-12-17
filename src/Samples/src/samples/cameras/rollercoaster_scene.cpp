@@ -110,7 +110,7 @@ public:
     std::vector<Vector3> hill;
     nbpt  = 80;
     nbptf = static_cast<float>(nbpt);
-    for (float hp = 0; hp < nbpt; ++hp) {
+    for (float hp = 0.f; hp < nbpt; ++hp) {
       x = -hp * 2.f;
       y = 80.f * std::exp(-(hp - nbptf / 3.f) * (hp - nbptf / 3.f) / (nbptf * 5.f));
       z = -hp * 3.2f;
@@ -122,7 +122,7 @@ public:
     nbpt  = 60;
     nbptf = static_cast<float>(nbpt);
     ang   = -Math::PI * 3.f / 2.f;
-    for (float tp = 0; tp < nbpt; ++tp) {
+    for (float tp = 0.f; tp < nbpt; ++tp) {
       x = 30.f * std::cos(ang * tp / nbptf - 0.6f);
       y = -tp / 2.5f;
       z = 30.f * std::sin(ang * tp / nbptf - 0.6f);
