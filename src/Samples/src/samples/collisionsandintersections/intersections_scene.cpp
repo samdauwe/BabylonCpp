@@ -43,6 +43,7 @@ public:
   {
     return "Intersections Scene";
   }
+
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     auto camera = ArcRotateCamera::New("Camera", 1.f, 0.8f, 70.f, Vector3::Zero(), scene);
