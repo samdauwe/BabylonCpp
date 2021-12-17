@@ -106,7 +106,7 @@ public:
     _balloon3->position = Vector3(-30.f, 5.f, 0.f);
 
     // Animation
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
       // Balloon 1 intersection -- Precise = false
       if (_balloon1->intersectsMesh(*_plane1, false)) {
         _balloon1Material->emissiveColor = Color3(1.f, 0.f, 0.f);
