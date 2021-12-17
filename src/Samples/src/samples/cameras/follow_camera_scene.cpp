@@ -104,7 +104,7 @@ public:
     auto box        = MeshBuilder::CreateBox("box_0", boxOptions, scene);
     box->position   = getRandomPosition();
 
-    for (unsigned int i = 1; i < 400; ++i) {
+    for (auto i = 1u; i < 400; ++i) {
       const auto iStr       = std::to_string(i);
       auto boxInstance      = box->createInstance("box_" + iStr);
       boxInstance->position = getRandomPosition();
