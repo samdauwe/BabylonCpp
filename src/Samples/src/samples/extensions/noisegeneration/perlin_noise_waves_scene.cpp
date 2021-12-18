@@ -66,7 +66,7 @@ public:
     _indices   = _ground->getIndices();
 
     // Animations
-    _scene->registerBeforeRender([this](Scene*, EventState&) {
+    _scene->registerBeforeRender([this](Scene*, EventState&) -> void {
       _alpha += 0.016f;
       for (unsigned int i = 0; i < _positions.size(); i += 3) {
         _positions[i + 1]
