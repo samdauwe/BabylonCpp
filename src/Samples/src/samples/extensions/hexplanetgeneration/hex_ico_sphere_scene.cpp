@@ -70,20 +70,20 @@ private:
     Float32Array positions;
 
     // Generate dual polyhedron position and face indices
-    for (auto& node : icosahedronMesh.nodes) {
+    for (const auto& node : icosahedronMesh.nodes) {
       auto relativeZeroIndex = static_cast<unsigned int>(positions.size() / 3);
 
       const auto rand = Math::randomList(0.f, 1.f, 2);
       const Color3 color(0.f, rand[0] * 0.5f, rand[1] * 1.f);
 
       // Get all the centroids of the faces adjacent to this vertex
-      for (auto& fi : node.f) {
+      for (const auto& fi : node.f) {
         const Vector3& centroid = icosahedronMesh.faces[fi].centroid;
         stl_util::concat(positions, {centroid.x, centroid.y, centroid.z});
         stl_util::concat(colors, {color.r, color.g, color.b, 1.f});
       }
 
-      for (unsigned int i = relativeZeroIndex; i < (positions.size() / 3) - 2; ++i) {
+      for (auto i = relativeZeroIndex; i < (positions.size() / 3) - 2; ++i) {
         stl_util::concat(indices, {relativeZeroIndex, i + 1, i + 2});
       }
     }
