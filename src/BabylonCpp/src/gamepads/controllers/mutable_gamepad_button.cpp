@@ -4,11 +4,13 @@
 
 namespace BABYLON {
 
-MutableGamepadButton::MutableGamepadButton() : _value{0}, _touched{false}, _pressed{false}
+MutableGamepadButton::MutableGamepadButton()
+    : _value{0}, _touched{false}, _pressed{false}
 {
 }
 
-MutableGamepadButton::MutableGamepadButton(int iValue, bool touched, bool iPressed)
+MutableGamepadButton::MutableGamepadButton(int iValue, bool touched,
+                                           bool iPressed)
     : _value{iValue}, _touched{touched}, _pressed{iPressed}
 {
 }
@@ -25,7 +27,8 @@ MutableGamepadButton::MutableGamepadButton(MutableGamepadButton&& other)
 {
 }
 
-MutableGamepadButton& MutableGamepadButton::operator=(const MutableGamepadButton& other)
+MutableGamepadButton& MutableGamepadButton::
+operator=(const MutableGamepadButton& other)
 {
   if (&other != this) {
     _value   = other._value;
@@ -36,7 +39,8 @@ MutableGamepadButton& MutableGamepadButton::operator=(const MutableGamepadButton
   return *this;
 }
 
-MutableGamepadButton& MutableGamepadButton::operator=(MutableGamepadButton&& other)
+MutableGamepadButton& MutableGamepadButton::
+operator=(MutableGamepadButton&& other)
 {
   if (&other != this) {
     _value   = std::move(other._value);
@@ -72,7 +76,8 @@ bool MutableGamepadButton::pressed() const
   return _pressed;
 }
 
-std::ostream& operator<<(std::ostream& os, const MutableGamepadButton& mutableGamepadButton)
+std::ostream& operator<<(std::ostream& os,
+                         const MutableGamepadButton& mutableGamepadButton)
 {
   os << "{\"Value\":" << mutableGamepadButton._value
      << ",\"Touched\":" << mutableGamepadButton._touched
@@ -80,13 +85,15 @@ std::ostream& operator<<(std::ostream& os, const MutableGamepadButton& mutableGa
   return os;
 }
 
-bool operator==(const MutableGamepadButton& lhs, const MutableGamepadButton& rhs)
+bool operator==(const MutableGamepadButton& lhs,
+                const MutableGamepadButton& rhs)
 {
   return (lhs._value == rhs._value) && (lhs._touched == rhs._touched)
          && (lhs._pressed == rhs._pressed);
 }
 
-bool operator!=(const MutableGamepadButton& lhs, const MutableGamepadButton& rhs)
+bool operator!=(const MutableGamepadButton& lhs,
+                const MutableGamepadButton& rhs)
 {
   return !(lhs == rhs);
 }

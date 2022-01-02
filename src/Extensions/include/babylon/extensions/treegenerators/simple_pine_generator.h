@@ -4,13 +4,14 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
+class Material;
+class Mesh;
 class Scene;
-FWD_CLASS_SPTR(Material)
-FWD_CLASS_SPTR(Mesh)
+using MaterialPtr = std::shared_ptr<Material>;
+using MeshPtr     = std::shared_ptr<Mesh>;
 
 namespace Extensions {
 
@@ -33,9 +34,10 @@ struct BABYLON_SHARED_EXPORT SimplePineGenerator {
    * @return the mesh representing the tree
    */
   static MeshPtr CreateTree(Scene* scene, const MaterialPtr& trunkMaterial,
-                            const MaterialPtr& leafMaterial, unsigned int canopies = 7,
-                            float baseRadius = 1.8f, float height = 75.f,
-                            unsigned int tessellation = 6, float twist = 0.6f);
+                            const MaterialPtr& leafMaterial,
+                            unsigned int canopies = 7, float baseRadius = 1.8f,
+                            float height = 75.f, unsigned int tessellation = 6,
+                            float twist = 0.6f);
 
 }; // end of class SimplePineGenerator
 

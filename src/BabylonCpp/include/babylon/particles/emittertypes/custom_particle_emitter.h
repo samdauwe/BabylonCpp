@@ -29,8 +29,7 @@ public:
    * @param isLocal defines if the direction should be set in local space
    */
   void startDirectionFunction(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                              Particle* particle, bool isLocal,
-                              const Matrix& inverseWorldMatrix) override;
+                              Particle* particle, bool isLocal) override;
 
   /**
    * @brief Called by the particle System when the position is computed for the created particle.
@@ -49,16 +48,10 @@ public:
   std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
-   * @brief Called by the GPUParticleSystem to setup the update shader.
-   * @param uboOrEffect defines the update shader
+   * @brief Called by the GPUParticleSystem to setup the update shader
+   * @param effect defines the update shader
    */
-  void applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect) override;
-
-  /**
-   * @brief Creates the structure of the ubo for this particle emitter.
-   * @param ubo ubo to create the structure for
-   */
-  void buildUniformLayout(UniformBuffer* ubo) override;
+  void applyToShader(Effect* effect) override;
 
   /**
    * @brief Returns a string to use to update the GPU particles update shader.

@@ -2,7 +2,6 @@
 #define BABYLON_ENGINES_STAGE_H
 
 #include <functional>
-#include <limits>
 #include <memory>
 
 #include <babylon/babylon_api.h>
@@ -14,10 +13,10 @@ class AbstractMesh;
 class Camera;
 class Effect;
 class ICanvas;
-struct IPointerEvent;
 struct ISceneComponent;
 class Mesh;
 class PickingInfo;
+struct PointerEvent;
 class SubMesh;
 FWD_STRUCT_SPTR(_InstancesBatch)
 FWD_CLASS_SPTR(RenderTargetTexture)
@@ -87,7 +86,7 @@ using PointerMoveStageAction = std::function<std::optional<PickingInfo>(
  */
 using PointerUpDownStageAction = std::function<std::optional<PickingInfo>(
   int unTranslatedPointerX, int unTranslatedPointerY, std::optional<PickingInfo> pickResult,
-  const IPointerEvent& evt)>;
+  const PointerEvent& evt)>;
 
 /**
  * @brief Representation of a step.
@@ -142,9 +141,10 @@ public:
    */
   void registerStep(unsigned int index, ISceneComponent* component, const T& action)
   {
-    auto i = 0ull;
-    // Additional parenthesis below are here in order to defeat WinDef.h's "max" macro.
-    auto maxIndex = (std::numeric_limits<size_t>::max)();
+    size_t i = 0;
+    // Additional parenthesis below are here in order to defeat WinDef.h's "max"
+    // macro.
+    size_t maxIndex = (std::numeric_limits<size_t>::max)();
     for (; i < _steps.size(); ++i) {
       const auto& step = _steps[i];
       maxIndex         = step.index;

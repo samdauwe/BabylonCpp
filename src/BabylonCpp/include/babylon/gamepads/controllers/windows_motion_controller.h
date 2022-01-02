@@ -4,14 +4,14 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
 class TransformNode;
-FWD_CLASS_SPTR(WindowsMotionController)
+class WindowsMotionController;
+using WindowsMotionControllerPtr = std::shared_ptr<WindowsMotionController>;
 
 /**
  * @brief Defines the IMeshInfo object that describes information a webvr controller mesh.
@@ -193,7 +193,7 @@ protected:
   WindowsMotionController(const IBrowserGamepadPtr& vrGamepad);
 
   /**
-   * @brief Called once for each button that changed state since the last frame.
+   * @brief Called once for each button that changed state since the last frame
    * @param buttonIdx Which button index changed
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
@@ -209,7 +209,7 @@ protected:
   void _lerpButtonTransform(const std::string& buttonName, float buttonValue);
 
   /**
-   * @brief Moves the axis on the controller mesh based on its current state.
+   * @brief Moves the axis on the controller mesh based on its current state
    * @param axis the index of the axis
    * @param axisValue the value of the axis which determines the meshes new position
    */

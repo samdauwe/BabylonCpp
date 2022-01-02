@@ -38,16 +38,10 @@ public:
   Ray& operator=(const Ray& otherRay);
   Ray& operator=(Ray&& otherRay);
   ~Ray(); // = default
+  [[nodiscard]] std::unique_ptr<Ray> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 
-  // Methods
-
-  /**
-   * @brief Clone the current ray.
-   * @returns a new ray
-   */
-  std::unique_ptr<Ray> clone() const;
-
+  /** Methods **/
   /**
    * @brief Checks if the ray intersects a box.
    * This does not account for the ray length by design to improve perfs.
@@ -56,8 +50,8 @@ public:
    * @param intersectionTreshold extra extend to be added to the box in all direction
    * @returns if the box was hit
    */
-  bool intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
-                           float intersectionTreshold = 0.f) const;
+  [[nodiscard]] bool intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
+                                         float intersectionTreshold = 0.f) const;
 
   /**
    * @brief Checks if the ray intersects a box.
@@ -66,14 +60,15 @@ public:
    * @param intersectionTreshold extra extend to be added to the BoundingBox in all direction
    * @returns if the box was hit
    */
-  bool intersectsBox(const BoundingBox& box, float intersectionTreshold = 0.f) const;
+  [[nodiscard]] bool intersectsBox(const BoundingBox& box, float intersectionTreshold = 0.f) const;
 
   /**
    * @brief If the ray hits a sphere.
    * @param sphere the bounding sphere to check
    * @returns true if it hits the sphere
    */
-  bool intersectsSphere(const BoundingSphere& sphere, float intersectionTreshold = 0.f) const;
+  [[nodiscard]] bool intersectsSphere(const BoundingSphere& sphere,
+                                      float intersectionTreshold = 0.f) const;
 
   /**
    * @brief If the ray hits a triange.
@@ -95,9 +90,10 @@ public:
   /**
    * @brief Calculate the intercept of a ray on a given axis.
    * @param axis to check 'x' | 'y' | 'z'
-   * @param offset from axis interception (i.e. an offset of 1y is intercepted above ground)
-   * @returns a vector containing the coordinates where 'axis' is equal to zero (else offset), or
-   * null if there is no intercept.
+   * @param offset from axis interception (i.e. an offset of 1y is intercepted
+   * above ground)
+   * @returns a vector containing the coordinates where 'axis' is equal to zero
+   * (else offset), or null if there is no intercept.
    */
   std::optional<Vector3> intersectsAxis(const std::string& axis, float offset = 0.f);
 
@@ -140,7 +136,8 @@ public:
    * @return the distance from the ray origin to the intersection point if there's intersection, or
    * -1 if there's no intersection
    */
-  float intersectionSegment(const Vector3& sega, const Vector3& segb, float threshold) const;
+  [[nodiscard]] float intersectionSegment(const Vector3& sega, const Vector3& segb,
+                                          float threshold) const;
 
   /**
    * @brief Update the ray from viewport position.

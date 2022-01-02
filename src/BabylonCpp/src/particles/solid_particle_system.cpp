@@ -1,7 +1,6 @@
 #include <babylon/particles/solid_particle_system.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/random.h>
@@ -17,6 +16,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
@@ -269,7 +269,7 @@ SolidParticleSystem::digest(Mesh* _mesh, std::optional<SolidParticleSystemDigest
     facetCol.clear();
 
     // iterate over "size" facets
-    auto fi = 0;
+    int fi = 0;
     for (size_t j = f * 3; j < (f + size) * 3; ++j) {
       facetInd.emplace_back(fi);
       auto i  = static_cast<uint32_t>(meshInd[j]);
@@ -417,7 +417,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   auto storeApart = (options && options->storage) ? true : false;
   copy.idx        = idx;
   copy.idxInShape = idxInShape;
-  copy.shapeId    = model->shapeId;
+  copy.shapeId    = model->shapeID;
   if (_useModelMaterial) {
     const auto materialId     = model->_material->uniqueId;
     auto& materialIndexesById = _materialIndexesById;
@@ -763,7 +763,7 @@ SolidParticleSystem& SolidParticleSystem::insertParticlesFromArray(
     const auto& meshNor = model->_normals;
     const auto noNor    = (!meshNor.empty()) ? false : true;
     recomputeNormals    = (noNor || recomputeNormals);
-    const auto& bbInfo  = sp->getBoundingInfo();
+    const auto& bbInfo  = sp->_boundingInfo;
 
     std::optional<std::vector<SolidParticlePtr>> storage = std::nullopt;
     auto newPart = _insertNewParticle(nbParticles, idxInShape, model, shape, meshInd, meshUV,
@@ -916,7 +916,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
     if (start != 0 || end != nbParticles - 1) { // only some particles are updated, then
                                                 // use the current existing BBox basis.
                                                 // Note : it can only increase.
-      auto& boundingInfo = mesh->getBoundingInfo();
+      auto& boundingInfo = mesh->_boundingInfo;
       if (boundingInfo) {
         minimum.copyFrom(boundingInfo->minimum);
         maximum.copyFrom(boundingInfo->maximum);
@@ -1173,7 +1173,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
 
     // if the particle intersections must be computed : update the bbInfo
     if (_particlesIntersect) {
-      auto& bInfo             = particle->getBoundingInfo();
+      auto& bInfo             = particle->_boundingInfo;
       auto& bBox              = bInfo->boundingBox;
       auto& bSphere           = bInfo->boundingSphere;
       auto& modelBoundingInfo = particle->_modelBoundingInfo;
@@ -1286,11 +1286,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(size_t start, size_t end,
     }
   }
   if (_computeBoundingBox) {
-    if (mesh->hasBoundingInfo()) {
-      mesh->getBoundingInfo()->reConstruct(minimum, maximum, mesh->_worldMatrix);
+    if (mesh->_boundingInfo) {
+      mesh->_boundingInfo->reConstruct(minimum, maximum, mesh->_worldMatrix);
     }
     else {
-      mesh->buildBoundingInfo(minimum, maximum, mesh->_worldMatrix);
+      mesh->_boundingInfo = std::make_unique<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
     }
   }
   if (_autoUpdateSubMeshes) {
@@ -1328,7 +1328,7 @@ std::optional<PickedParticle> SolidParticleSystem::pickedParticle(const PickingI
   if (pickingInfo.hit) {
     const auto subMesh = pickingInfo.subMeshId;
     const auto faceId  = pickingInfo.faceId != -1 ? static_cast<size_t>(pickingInfo.faceId) :
-                                                    pickedBySubMesh[subMesh].size();
+                                                   pickedBySubMesh[subMesh].size();
     const auto& picked = pickedBySubMesh;
     if (subMesh < static_cast<int>(picked.size()) && faceId < picked[subMesh].size()) {
       return picked[subMesh][faceId];
@@ -1519,7 +1519,8 @@ SolidParticleSystem& SolidParticleSystem::refreshVisibleSize()
 void SolidParticleSystem::setVisibilityBox(float size)
 {
   auto vis = size / 2.f;
-  mesh->buildBoundingInfo(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
+  mesh->_boundingInfo
+    = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
 }
 
 bool SolidParticleSystem::isAlwaysVisible() const

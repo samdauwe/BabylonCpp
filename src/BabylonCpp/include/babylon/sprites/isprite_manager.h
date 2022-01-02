@@ -20,7 +20,7 @@ FWD_CLASS_SPTR(Texture)
 FWD_CLASS_SPTR(ThinSprite)
 
 /**
- * @brief Defines the minimum interface to fulfill in order to be a sprite manager.
+ * @brief Defines the minimum interface to fullfil in order to be a sprite manager.
  */
 class BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
 
@@ -106,11 +106,6 @@ public:
    * @brief Renders the list of sprites on screen.
    */
   virtual void render() = 0;
-
-  /**
-   * @brief Rebuilds the manager (after a context lost, for eg).
-   */
-  virtual void rebuild() = 0;
 
 protected:
   /**

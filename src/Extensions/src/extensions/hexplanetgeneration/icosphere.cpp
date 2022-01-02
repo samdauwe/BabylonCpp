@@ -135,8 +135,8 @@ IcosahedronMesh Icosphere::generateIcosahedronMesh(size_t icosahedronSubdivision
   }
 
   // Relaxing Triangle Mesh
-  float averageNodeRadius = std::sqrt(4.f * Math::PI / mesh.nodes.size());
-  float minShiftDelta     = averageNodeRadius / 50000.f * mesh.nodes.size();
+  float averageNodeRadius = std::sqrt(4 * Math::PI / mesh.nodes.size());
+  float minShiftDelta     = averageNodeRadius / 50000 * mesh.nodes.size();
 
   float priorShift = relaxMesh(mesh, 0.5f);
   for (int i = 0; i < 300; ++i) {

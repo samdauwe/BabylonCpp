@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_MIN_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(MinBlock)
+class MinBlock;
+using MinBlockPtr = std::shared_ptr<MinBlock>;
 
 /**
  * @brief Block used to get the min of 2 values.

@@ -28,9 +28,7 @@ void LensFlareSystemSceneComponent::_register()
 
 void LensFlareSystemSceneComponent::rebuild()
 {
-  for (const auto& lensFlareSystem : scene->lensFlareSystems) {
-    lensFlareSystem->rebuild();
-  }
+  // Nothing to do for lens flare
 }
 
 void LensFlareSystemSceneComponent::addFromContainer(AbstractScene* container)

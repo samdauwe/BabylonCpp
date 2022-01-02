@@ -47,10 +47,6 @@ FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(PhysicsImpostor)
 FWD_CLASS_SPTR(RawTexture)
 FWD_CLASS_SPTR(Skeleton)
-FWD_CLASS_SPTR(VertexBuffer)
-
-class UniformBuffer;
-using UniformBufferPtr = std::unique_ptr<UniformBuffer>;
 
 namespace GL {
 class IGLQuery;
@@ -68,7 +64,7 @@ using WebGLVertexArrayObjectPtr = std::shared_ptr<WebGLVertexArrayObject>;
 struct UserInstancedBuffersStorage {
   std::unordered_map<std::string, Float32Array> data;
   std::unordered_map<std::string, size_t> sizes;
-  std::unordered_map<std::string, VertexBufferPtr> vertexBuffers;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> vertexBuffers;
   std::unordered_map<std::string, size_t> strides;
   std::optional<std::unordered_map<std::string, WebGLVertexArrayObjectPtr>> vertexArrayObjects
     = std::nullopt;
@@ -90,11 +86,11 @@ public:
 public:
   /** No occlusion */
   static constexpr unsigned int OCCLUSION_TYPE_NONE = 0;
-  /** Occlusion set to optimistic */
+  /** Occlusion set to optimisitic */
   static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC = 1;
   /** Occlusion set to strict */
   static constexpr unsigned int OCCLUSION_TYPE_STRICT = 2;
-  /** Use an accurate occlusion algorithm */
+  /** Use an accurante occlusion algorithm */
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE = 0;
   /** Use a conservative occlusion algorithm */
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
@@ -195,24 +191,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _syncGeometryWithMorphTargetManager();
-
-  /**
-   * @brief Hidden
-   */
   bool _updateNonUniformScalingState(bool value) override;
-
-  /**
-   * @brief Transfer the mesh values to its UBO.
-   * @param world The world matrix associated with the mesh
-   */
-  void transferToEffect(const Matrix& world);
-
-  /**
-   * @brief Gets the mesh uniform buffer.
-   * @return the uniform buffer of the mesh.
-   */
-  UniformBufferPtr& getMeshUniformBuffer();
 
   /**
    * @brief Returns the string "AbstractMesh".
@@ -238,7 +217,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _rebuild(bool dispose = false);
+  virtual void _rebuild();
 
   /**
    * @brief Hidden
@@ -328,12 +307,6 @@ public:
    * @returns an integer
    */
   virtual size_t getTotalVertices() const;
-
-  /**
-   * @brief Returns a positive integer : the total number of indices in this mesh geometry.
-   * @returns the number of indices or zero if the mesh has no geometry.
-   */
-  virtual size_t getTotalIndices() const;
 
   /**
    * @brief Returns null by default. Implemented by child classes.
@@ -436,16 +409,6 @@ public:
    * @returns a BoundingInfo
    */
   BoundingInfoPtr& getBoundingInfo();
-
-  /**
-   * @brief Creates a new bounding info for the mesh.
-   * @param minimum min vector of the bounding box/sphere
-   * @param maximum max vector of the bounding box/sphere
-   * @param worldMatrix defines the new world matrix
-   * @returns the new bounding info
-   */
-  BoundingInfoPtr& buildBoundingInfo(const Vector3& minimum, const Vector3& maximum,
-                                     const std::optional<Matrix>& worldMatrix = std::nullopt);
 
   /**
    * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
@@ -561,13 +524,14 @@ public:
   Vector3 calcRotatePOV(float flipBack, float twirlClockwise, float tiltRight);
 
   /**
-   * @brief This method recomputes and sets a new BoundingInfo to the mesh unless it is locked.
-   * This means the mesh underlying bounding box and sphere are recomputed.
-   * @param applySkeleton defines whether to apply the skeleton before computing the bounding info
-   * @param applyMorph  defines whether to apply the morph target before computing the bounding info
+   * @brief This method recomputes and sets a new BoundingInfo to the mesh
+   * unless it is locked. This means the mesh underlying bounding box and sphere
+   * are recomputed.
+   * @param applySkeleton defines whether to apply the skeleton before computing
+   * the bounding info
    * @returns the current mesh
    */
-  AbstractMesh& refreshBoundingInfo(bool applySkeleton = false, bool applyMorph = false);
+  AbstractMesh& refreshBoundingInfo(bool applySkeleton = false);
 
   /**
    * @brief Hidden
@@ -577,7 +541,7 @@ public:
   /**
    * @brief Hidden
    */
-  Float32Array _getPositionData(bool applySkeleton, bool applyMorph);
+  Float32Array _getPositionData(bool applySkeleton);
 
   /**
    * @brief Hidden
@@ -808,7 +772,7 @@ public:
   std::vector<Vector3>& getFacetLocalPositions();
 
   /**
-   * @brief Returns the facetLocalPartitioning array.
+   * @brief Returns the facetLocalPartioning array.
    * @returns an array of array of numbers
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
@@ -865,14 +829,16 @@ public:
   Uint32Array getFacetsAtLocalCoordinates(float x, float y, float z);
 
   /**
-   * @brief Returns the closest mesh facet index at (x,y,z) World coordinates, null if not found
+   * @brief Returns the closest mesh facet index at (x,y,z) World coordinates,
+   * null if not found.
    * @param projected sets as the (x,y,z) world projection on the facet
-   * @param checkFace if true (default false), only the facet "facing" to (x,y,z) or only the ones
-   * "turning their backs", according to the parameter "facing" are returned
-   * @param facing if facing and checkFace are true, only the facet "facing" to (x, y, z) are
-   * returned : positive dot (x, y, z) * facet position. If facing si false and checkFace is true,
-   * only the facet "turning their backs" to (x, y, z) are returned : negative dot (x, y, z) * facet
-   * position
+   * @param checkFace if true (default false), only the facet "facing" to
+   * (x,y,z) or only the ones "turning their backs", according to the parameter
+   * "facing" are returned
+   * @param facing if facing and checkFace are true, only the facet "facing" to
+   * (x, y, z) are returned : positive dot (x, y, z) * facet position. If facing
+   * si false and checkFace is true, only the facet "turning their backs" to (x,
+   * y, z) are returned : negative dot (x, y, z) * facet position
    * @param x defines x coordinate
    * @param y defines y coordinate
    * @param z defines z coordinate
@@ -975,11 +941,6 @@ protected:
   /**
    * @brief Hidden
    */
-  void _buildUniformLayout();
-
-  /**
-   * @brief Hidden
-   */
   void _afterComputeWorldMatrix() override;
 
 protected:
@@ -990,27 +951,27 @@ protected:
   size_t get_facetNb() const;
 
   /**
-   * @brief Gets the number (integer) of subdivisions per axis in the partitioning space
+   * @brief Gets the number (integer) of subdivisions per axis in the partioning space.
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   unsigned int get_partitioningSubdivisions() const;
 
   /**
-   * @brief Set the number (integer) of subdivisions per axis in the partitioning space
+   * @brief Set the number (integer) of subdivisions per axis in the partioning space.
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   void set_partitioningSubdivisions(unsigned int nb);
 
   /**
-   * @brief Gets the ratio (float) to apply to the bounding box size to set to the partitioning
-   * space. Ex : 1.01 (default) the partitioning space is 1% bigger than the bounding box
+   * @brief Gets the ratio (float) to apply to the bouding box size to set to the partioning space.
+   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding box
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   float get_partitioningBBoxRatio() const;
 
   /**
-   * @brief Set the ratio (float) to apply to the bounding box size to set to the partitioning
-   * space. Ex : 1.01 (default) the partitioning space is 1% bigger than the bounding box
+   * @brief Set the ratio (float) to apply to the bouding box size to set to the partioning space.
+   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding box
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
    */
   void set_partitioningBBoxRatio(float ratio);
@@ -1044,34 +1005,10 @@ protected:
   void set_facetDepthSortFrom(const Vector3& location);
 
   /**
-   * @brief Gets the number of collision detection tries. Change this value if not all colisions are
-   * detected and handled properly.
-   */
-  unsigned int get_collisionRetryCount() const;
-
-  /**
-   * @brief Sets the number of collision detection tries. Change this value if not all colisions are
-   * detected and handled properly.
-   */
-  void set_collisionRetryCount(unsigned int retryCount);
-
-  /**
    * @brief Gets a boolean indicating if facetData is enabled.
    * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
    */
   bool get_isFacetDataEnabled() const;
-
-  /**
-   * @brief Gets the morph target manager.
-   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
-   */
-  MorphTargetManagerPtr& get_morphTargetManager();
-
-  /**
-   * @brief Sets the morph target manager.
-   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
-   */
-  void set_morphTargetManager(const MorphTargetManagerPtr& value);
 
   /**
    * @brief Set a function to call when this mesh collides with another one.
@@ -1349,13 +1286,13 @@ protected:
   virtual std::vector<Vector3>& get__positions();
 
   /**
-   * @brief Sets a skeleton to apply skinning transformations.
+   * @brief Sets a skeleton to apply skining transformations.
    * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   void set_skeleton(const SkeletonPtr& value);
 
   /**
-   * @brief Gets a skeleton to apply skinning transformations.
+   * @brief Gets a skeleton to apply skining transformations.
    * @see https://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   virtual SkeletonPtr& get_skeleton();
@@ -1386,11 +1323,6 @@ protected:
    * @brief Returns true if the mesh is blocked. Implemented by child classes.
    */
   virtual bool get_isBlocked() const;
-
-  /**
-   * @brief Returns true if there is already a bounding info.
-   */
-  bool get_hasBoundingInfo() const;
 
   /**
    * @brief Gets a boolean indicating if this mesh has skinning data and an attached skeleton.
@@ -1510,15 +1442,13 @@ public:
   ReadOnlyProperty<AbstractMesh, size_t> facetNb;
 
   /**
-   * The number (integer) of subdivisions per axis in the partitioning space
-   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   * The number (integer) of subdivisions per axis in the partioning space
    */
   Property<AbstractMesh, unsigned int> partitioningSubdivisions;
 
   /**
-   * The ratio (float) to apply to the bounding box size to set to the partitioning space.
-   * Ex : 1.01 (default) the partitioning space is 1% bigger than the bounding box
-   * @see https://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   * The ratio (float) to apply to the bouding box size to set to the partioning
+   * space.
    */
   Property<AbstractMesh, float> partitioningBBoxRatio;
 
@@ -1537,21 +1467,9 @@ public:
   Property<AbstractMesh, Vector3> facetDepthSortFrom;
 
   /**
-   * Number of collision detection tries. Change this value if not all colisions are detected and
-   * handled properly
-   */
-  Property<AbstractMesh, unsigned int> collisionRetryCount;
-
-  /**
    * A boolean indicating if facetData is enabled
    */
   ReadOnlyProperty<AbstractMesh, bool> isFacetDataEnabled;
-
-  /**
-   * Gets or sets the morph target manager
-   * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
-   */
-  Property<AbstractMesh, MorphTargetManagerPtr> morphTargetManager;
 
   /**
    * An event triggered when this mesh collides with another one
@@ -1602,8 +1520,8 @@ public:
    * This number indicates the number of allowed retries before stop the occlusion query, this is
    * useful if the occlusion query is taking long time before to the query result is retireved, the
    * query result indicates if the object is visible within the scene or not and based on that
-   * Babylon.Js engine decides to show or hide the object. The default value is -1 which means don't
-   * break the query and wait till the result
+   * Babylon.Js engine decideds to show or hide the object. The default value is -1 which means
+   * don't break the query and wait till the result
    * @see https://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, int> occlusionRetryCount;
@@ -1612,7 +1530,7 @@ public:
    * This property is responsible for starting the occlusion query within the Mesh or not, this
    * property is also used to determine what should happen when the occlusionRetryCount is reached.
    * It has supports 3 values:
-   * * OCCLUSION_TYPE_NONE (Default Value): this option means no occlusion query within the Mesh.
+   * * OCCLUSION_TYPE_NONE (Default Value): this option means no occlusion query whith the Mesh.
    * * OCCLUSION_TYPE_OPTIMISTIC: this option is means use occlusion query and if
    * occlusionRetryCount is reached and the query is broken show the mesh.
    * * OCCLUSION_TYPE_STRICT: this option is means use occlusion query and if occlusionRetryCount is
@@ -1633,7 +1551,7 @@ public:
   Property<AbstractMesh, unsigned int> occlusionQueryAlgorithmType;
 
   /**
-   * Gets or sets whether the mesh is occluded or not, it is used also to set the initial state of
+   * Gets or sets whether the mesh is occluded or not, it is used also to set the intial state of
    * the mesh to be occluded or not
    * @see https://doc.babylonjs.com/features/occlusionquery
    */
@@ -1674,11 +1592,6 @@ public:
    * well (false by default).
    */
   Property<AbstractMesh, bool> showBoundingBox;
-
-  /**
-   * Gets or sets a boolean indicating if the mesh can be near grabbed. Default is false
-   */
-  bool isNearGrabbable;
 
   /**
    * Gets or sets a boolean indicating that bounding boxes of subMeshes must be
@@ -1955,7 +1868,7 @@ public:
   RawTexturePtr _transformMatrixTexture;
 
   /**
-   * A skeleton to apply skinning transformations
+   * A skeleton to apply skining transformations
    */
   Property<AbstractMesh, SkeletonPtr> skeleton;
 
@@ -1963,12 +1876,6 @@ public:
    * An event triggered when the mesh is rebuilt.
    */
   Observable<AbstractMesh> onRebuildObservable;
-
-  /**
-   * The current mesh uniform buffer.
-   * @hidden Internal use only.
-   */
-  UniformBufferPtr _uniformBuffer;
 
   /**
    * Gets the edgesRenderer associated with the mesh
@@ -1979,11 +1886,6 @@ public:
    * Returns true if the mesh is blocked. Implemented by child classes
    */
   ReadOnlyProperty<AbstractMesh, bool> isBlocked;
-
-  /**
-   * Returns true if there is already a bounding info.
-   */
-  ReadOnlyProperty<AbstractMesh, bool> hasBoundingInfo;
 
   /**
    * Gets a boolean indicating if this mesh has skinning data and an attached

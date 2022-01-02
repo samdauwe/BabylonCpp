@@ -8,13 +8,13 @@
 #include <memory>
 #include <optional>
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
 class ICanvas;
-FWD_CLASS_SPTR(IRenderableScene)
+class IRenderableScene;
+using IRenderableScenePtr = std::shared_ptr<IRenderableScene>;
 
 namespace SamplesInfo {
 

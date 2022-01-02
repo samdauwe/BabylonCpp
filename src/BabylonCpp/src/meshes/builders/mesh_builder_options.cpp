@@ -72,7 +72,6 @@ DashedLinesOptions::DashedLinesOptions()
     , updatable{std::nullopt}
     , useVertexAlpha{std::nullopt}
     , instance{nullptr}
-    , material{nullptr}
 {
 }
 
@@ -83,11 +82,7 @@ DashedLinesOptions::~DashedLinesOptions() = default;
 //--------------------------------------------------------------------------------------------------
 
 DecalOptions::DecalOptions()
-    : position{std::nullopt}
-    , normal{std::nullopt}
-    , size{std::nullopt}
-    , angle{std::nullopt}
-    , captureUVS{std::nullopt}
+    : position{std::nullopt}, normal{std::nullopt}, size{std::nullopt}, angle{std::nullopt}
 {
 }
 
@@ -232,7 +227,6 @@ ICreateCapsuleOptions::ICreateCapsuleOptions()
     , radiusBottom{std::nullopt}
     , topCapSubdivisions{std::nullopt}
     , bottomCapSubdivisions{std::nullopt}
-    , updatable{std::nullopt}
 {
 }
 
@@ -264,7 +258,7 @@ LatheOptions::~LatheOptions() = default;
 //--------------------------------------------------------------------------------------------------
 
 LinesOptions::LinesOptions()
-    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}, material{nullptr}
+    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}
 {
 }
 
@@ -275,7 +269,7 @@ LinesOptions::~LinesOptions() = default;
 //--------------------------------------------------------------------------------------------------
 
 LineSystemOptions::LineSystemOptions()
-    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}, material{nullptr}
+    : updatable{std::nullopt}, useVertexAlpha{std::nullopt}, instance{nullptr}
 {
 }
 
@@ -283,7 +277,6 @@ LineSystemOptions::LineSystemOptions(LinesOptions& linesOptions)
     : updatable{linesOptions.updatable}
     , useVertexAlpha{linesOptions.useVertexAlpha}
     , instance{linesOptions.instance}
-    , material{linesOptions.material}
 {
   if (!linesOptions.points.empty()) {
     lines.emplace_back(linesOptions.points);

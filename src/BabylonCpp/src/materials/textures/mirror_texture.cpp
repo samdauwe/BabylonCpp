@@ -8,7 +8,6 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/image_processing_configuration.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 
 namespace BABYLON {
@@ -30,13 +29,13 @@ MirrorTexture::MirrorTexture(const std::string& iName,
     , _imageProcessingConfigChangeObserver{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
+    , _savedViewMatrix{Matrix::Zero()}
     , _blurX{nullptr}
     , _blurY{nullptr}
     , _adaptiveBlurKernel{0.f}
     , _blurKernelX{0.f}
     , _blurKernelY{0.f}
     , _blurRatio{1.f}
-    , _saveClipPlane{std::nullopt}
 
 {
   ignoreCameraViewport = true;
@@ -48,39 +47,25 @@ MirrorTexture::MirrorTexture(const std::string& iName,
         _updateGammaSpace();
       });
 
-  const auto engine = getScene()->getEngine();
-
-  onBeforeBindObservable.add(
-    [engine, name = this->name](RenderTargetTexture*, EventState&) -> void {
-      engine->_debugPushGroup(StringTools::printf("mirror generation for %s", name.c_str()), 1);
-    });
-
-  onAfterUnbindObservable.add(
-    [engine](RenderTargetTexture*, EventState&) -> void { engine->_debugPopGroup(1); });
-
   onBeforeRenderObservable.add([this](int*, EventState&) -> void {
     const auto scene_ = getScene();
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
-    _mirrorMatrix.multiplyToRef(scene->getViewMatrix(), _transformMatrix);
-
+    _savedViewMatrix = scene_->getViewMatrix();
+    _mirrorMatrix.multiplyToRef(_savedViewMatrix, _transformMatrix);
     scene_->setTransformMatrix(_transformMatrix, scene_->getProjectionMatrix());
-
-    _saveClipPlane    = scene->clipPlane;
-    scene_->clipPlane = mirrorPlane;
-
+    scene_->clipPlane                  = mirrorPlane;
     scene_->getEngine()->cullBackFaces = false;
-
     scene_->setMirroredCameraPosition(
       Vector3::TransformCoordinates(scene_->activeCamera()->globalPosition(), _mirrorMatrix));
   });
 
   onAfterRenderObservable.add([this](int*, EventState&) -> void {
     const auto scene_ = getScene();
-    scene_->updateTransformMatrix();
-    scene_->getEngine()->cullBackFaces = std::nullopt;
-    scene_->_mirroredCameraPosition    = nullptr;
+    scene_->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
+    scene_->getEngine()->cullBackFaces = true;
+    scene_->_mirroredCameraPosition.reset(nullptr);
 
-    scene_->clipPlane = _saveClipPlane;
+    scene_->clipPlane = std::nullopt;
   });
 }
 
@@ -182,10 +167,9 @@ void MirrorTexture::_preparePostProcesses()
   if (_blurKernelX != 0.f && _blurKernelY != 0.f) {
     const auto engine = getScene()->getEngine();
 
-    const auto iTextureType
-      = engine->getCaps().textureFloatRender && engine->getCaps().textureFloatLinearFiltering ?
-          Constants::TEXTURETYPE_FLOAT :
-          Constants::TEXTURETYPE_HALF_FLOAT;
+    const auto iTextureType = engine->getCaps().textureFloatRender ?
+                                Constants::TEXTURETYPE_FLOAT :
+                                Constants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = BlurPostProcess::New("horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio,
                                   nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,

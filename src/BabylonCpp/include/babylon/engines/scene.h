@@ -158,24 +158,6 @@ public:
    */
   ISceneComponentPtr _getComponent(const std::string& name) const;
 
-  /**
-   * @brief Bind the current view position to an effect.
-   * @param effect The effect to be bound
-   * @param scene The scene the eyes position is used from
-   * @param variableName name of the shader variable that will hold the eye position
-   * @param isVector3 true to indicates that variableName is a Vector3 and not a Vector4
-   * @return the computed eye position
-   */
-  Vector4& bindEyePosition(Effect* effect, const std::string& variableName = "vEyePosition",
-                           bool isVector3 = false);
-
-  /**
-   * @brief Update the scene ubo before it can be used in rendering processing.
-   * @param scene the scene to retrieve the ubo from
-   * @returns the scene UniformBuffer
-   */
-  UniformBuffer* finalizeSceneUbo();
-
   /** Properties **/
 
   /**
@@ -744,7 +726,6 @@ public:
    * @returns the index where the morph target was in the morph target list
    */
   int removeMorphTargetManager(const MorphTargetManagerPtr& toRemove);
-  int removeMorphTargetManager(MorphTargetManager* toRemove);
 
   /**
    * @brief Remove a light for the list of scene's lights.
@@ -1415,7 +1396,7 @@ public:
    * @param cameraViewSpace defines if picking will be done in view space (false by default)
    * @returns a Ray
    */
-  Ray createPickingRay(int x, int y, Matrix& world, Camera* camera = nullptr,
+  Ray createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera = nullptr,
                        bool cameraViewSpace = false);
 
   /**
@@ -1430,7 +1411,7 @@ public:
    * @returns the current scene
    */
   Scene& createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
-                               Camera* camera, bool cameraViewSpace = false);
+                               CameraPtr camera, bool cameraViewSpace = false);
 
   /**
    * @brief Creates a ray that can be used to pick in the scene.
@@ -1579,11 +1560,9 @@ public:
   /**
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
-   * @param pointerId optional pointer id when using more than one pointer. Defaults to 0
-   * @param pickResult optional pickingInfo data used to find mesh
+   * @param pointerId optional pointer id when using more than one pointer
    */
-  void setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& pointerId = std::nullopt,
-                          const std::optional<PickingInfo>& pickResult = std::nullopt);
+  void setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& pointerId = std::nullopt);
 
   /**
    * @brief Gets the mesh under the pointer.
@@ -1613,9 +1592,8 @@ public:
 
   /**
    * @brief Enables physics to the current scene.
-   * @param gravity defines the scene's gravity for the physics engine. defaults to real earth
-   * gravity : (0, -9.81, 0)
-   * @param plugin defines the physics engine to be used. defaults to CannonJS.
+   * @param gravity defines the scene's gravity for the physics engine
+   * @param plugin defines the physics engine to be used. defaults to OimoJS.
    * @return a boolean indicating if the physics engine was initialized
    */
   bool enablePhysics(const std::optional<Vector3>& gravity = std::nullopt,
@@ -2101,11 +2079,6 @@ protected:
    * @see https://doc.babylonjs.com/babylon101/environment#fog
    */
   unsigned int get_fogMode() const;
-
-  /**
-   * @brief Flag indicating that the frame buffer binding is handled by another component.
-   */
-  bool get_prePass() const;
 
   /**
    * @brief Sets a boolean indicating if shadows are enabled on this scene.
@@ -2970,12 +2943,7 @@ public:
   /**
    * Flag indicating that the frame buffer binding is handled by another component
    */
-  ReadOnlyProperty<Scene, bool> prePass;
-
-  /**
-   * Flag indicating if we need to store previous matrices when rendering
-   */
-  bool needsPreviousWorldMatrices;
+  bool prePass;
 
   // Lights
 
@@ -3246,12 +3214,6 @@ public:
   std::vector<AnimatablePtr> _activeAnimatables;
 
   /** Hidden */
-  Matrix _viewMatrix;
-
-  /** Hidden */
-  Matrix _projectionMatrix;
-
-  /** Hidden */
   std::unique_ptr<Vector3> _forcedViewPosition;
 
   /**
@@ -3410,12 +3372,6 @@ public:
    * Hidden
    */
   Stage<SimpleStageAction> _beforeClearStage;
-
-  /**
-   * Defines the actions happening before clear the canvas.
-   * Hidden
-   */
-  Stage<RenderTargetStageAction> _beforeRenderTargetClearStage;
 
   /**
    * Defines the actions happening before camera updates.
@@ -3762,6 +3718,8 @@ private:
 
   /** Hidden */
   OutlineRendererPtr _outlineRenderer;
+  Matrix _viewMatrix;
+  Matrix _projectionMatrix;
   Matrix _alternateViewMatrix;
   Matrix _alternateProjectionMatrix;
   std::unique_ptr<Matrix> _alternateTransformMatrix;

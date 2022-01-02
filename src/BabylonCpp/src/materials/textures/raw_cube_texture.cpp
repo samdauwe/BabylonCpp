@@ -22,7 +22,7 @@ void RawCubeTexture::update(const std::vector<ArrayBufferView>& data, unsigned i
                             unsigned int type, bool invertY, const std::string& compression,
                             unsigned int /*level*/)
 {
-  const auto engine = static_cast<Engine*>(_texture->getEngine());
+  auto engine = static_cast<Engine*>(_texture->getEngine());
   if (engine) {
     engine->updateRawCubeTexture(_texture, data, format, type, invertY, compression);
   }

@@ -11,11 +11,10 @@ namespace BABYLON {
 class Vector2;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Sprite)
-FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Information about the result of picking within a scene.
- * @see https://doc.babylonjs.com/divingDeeper/mesh/interactions/picking_collisions
+ * @see https://doc.babylonjs.com/babylon101/picking_collisions
  */
 class BABYLON_SHARED_EXPORT PickingInfo {
 
@@ -29,8 +28,8 @@ public:
 
   /**
    * @brief Gets the normal corresponding to the face the pick collided with.
-   * @param useWorldCoordinates If the resulting normal should be relative to the world
-   * (default: false)
+   * @param useWorldCoordinates If the resulting normal should be relative to the world (default:
+   * false)
    * @param useVerticesNormals If the vertices normals should be used to calculate the normal
    * instead of the normal map
    * @returns The normal corresponding to the face the pick collided with
@@ -71,20 +70,20 @@ public:
   AbstractMeshPtr pickedMesh;
 
   /**
-   * (See getTextureCoordinates) The barycentric U coordinate that is used when calculating the
-   * texture coordinates of the collision.
+   * (See getTextureCoordinates) The barycentric U coordinate that is used when
+   * calculating the texture coordinates of the collision.
    */
   float bu;
 
   /**
-   * (See getTextureCoordinates) The barycentric V coordinate that is used when calculating the
-   * texture coordinates of the collision.
+   * (See getTextureCoordinates) The barycentric V coordinate that is used when
+   * calculating the texture coordinates of the collision.
    */
   float bv;
 
   /**
-   * The index of the face on the mesh that was picked, or the index of the Line if the picked Mesh
-   * is a LinesMesh
+   * The index of the face on the mesh that was picked, or the index of the Line
+   * if the picked Mesh is a LinesMesh
    */
   int faceId;
 
@@ -110,26 +109,15 @@ public:
   int thinInstanceIndex;
 
   /**
-   * The ray that was used to perform the picking.
-   */
-  std::optional<Ray> ray;
-
-  /**
-   * If a mesh was used to do the picking (eg. 6dof controller) as a "near interaction", this will
-   * be populated.
+   * If a mesh was used to do the picking (eg. 6dof controller) this will be
+   * populated.
    */
   AbstractMeshPtr originMesh;
 
   /**
-   * The aim-space transform of the input used for picking, if it is an XR input source.
+   * The ray that was used to perform the picking.
    */
-  TransformNodePtr aimTransform;
-
-  /**
-   * The grip-space transform of the input used for picking, if it is an XR input source. Some XR
-   * sources, such as input coming from head mounted displays, do not have this.
-   */
-  TransformNodePtr gripTransform;
+  std::optional<Ray> ray;
 
 }; // end of class PickingInfo
 

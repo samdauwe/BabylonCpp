@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_DESATURATE_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(DesaturateBlock)
+class DesaturateBlock;
+using DesaturateBlockPtr = std::shared_ptr<DesaturateBlock>;
 
 /**
  * @brief Block used to desaturate a color.

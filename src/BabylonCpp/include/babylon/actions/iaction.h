@@ -7,7 +7,6 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 
 using json = nlohmann::json;
@@ -16,7 +15,7 @@ namespace BABYLON {
 
 class ActionEvent;
 class ActionManager;
-FWD_STRUCT_SPTR(IActionEvent)
+struct IActionEvent;
 
 /**
  * @brief Interface used to define Action.
@@ -43,7 +42,7 @@ struct BABYLON_SHARED_EXPORT IAction {
    * @brief Internal only - executes current action event.
    * Hidden
    */
-  virtual void _executeCurrent(const IActionEventPtr& evt = nullptr) = 0;
+  virtual void _executeCurrent(const std::optional<IActionEvent>& evt) = 0;
 
   /**
    * @brief Serialize placeholder for child classes.

@@ -50,14 +50,13 @@ public:
    * @brief Clones the sub emitter.
    * @returns the cloned sub emitter
    */
-  SubEmitterPtr clone() const;
+  [[nodiscard]] SubEmitterPtr clone() const;
 
   /**
    * @brief Serialize current object to a JSON object.
-   * @param serializeTexture defines if the texture must be serialized as well
    * @returns the serialized object
    */
-  json serialize(bool serializeTexture = false) const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Creates a new SubEmitter from a serialized JSON version.

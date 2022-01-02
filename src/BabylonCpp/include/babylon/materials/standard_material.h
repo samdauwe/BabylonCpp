@@ -319,11 +319,6 @@ protected:
   void set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
 
   /**
-   * @brief Can this material render to prepass.
-   */
-  bool get_isPrePassCapable() const override;
-
-  /**
    * @brief Gets whether the color curves effect is enabled.
    */
   bool get_cameraColorCurvesEnabled() const;
@@ -334,22 +329,22 @@ protected:
   void set_cameraColorCurvesEnabled(bool value);
 
   /**
-   * @brief Gets whether the color grading effect is enabled.
+   * @brief Gets wether the color grading effect is enabled.
    */
   bool get_cameraColorGradingEnabled() const;
 
   /**
-   * @brief Gets whether the color grading effect is enabled.
+   * @brief Gets wether the color grading effect is enabled.
    */
   void set_cameraColorGradingEnabled(bool value);
 
   /**
-   * @brief Gets whether tonemapping is enabled or not.
+   * @brief Gets wether tonemapping is enabled or not.
    */
   bool get_cameraToneMappingEnabled() const;
 
   /**
-   * @brief Sets whether tonemapping is enabled or not
+   * @brief Sets wether tonemapping is enabled or not
    */
   void set_cameraToneMappingEnabled(bool value);
 
@@ -390,7 +385,7 @@ protected:
   void set_cameraColorGradingTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief The color grading curves provide additional color adjustment that is applied after any
+   * @brief The color grading curves provide additional color adjustmnent that is applied after any
    * color grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
    * adjustments, along with color filter tinting to provide white balance adjustment or more
    * stylistic effects. These are similar to controls found in many professional imaging or colorist
@@ -401,7 +396,7 @@ protected:
   std::shared_ptr<ColorCurves>& get_cameraColorCurves();
 
   /**
-   * @brief The color grading curves provide additional color adjustment that is applied after any
+   * @brief The color grading curves provide additional color adjustmnent that is applied after any
    * color grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
    * adjustments, along with color filter tinting to provide white balance adjustment or more
    * stylistic effects. These are similar to controls found in many professional imaging or colorist
@@ -557,14 +552,14 @@ public:
 
   /**
    * Specifies that the material will keep the specular highlights over a transparent surface (only
-   * the most luminous ones). A car glass is a good exemple of that. When sun reflects on it you can
+   * the most limunous ones). A car glass is a good exemple of that. When sun reflects on it you can
    * not see what is behind.
    */
   Property<StandardMaterial, bool> useSpecularOverAlpha;
 
   /**
    * Specifies that the material will keeps the reflection highlights over a transparent surface
-   * (only the most luminous ones). A car glass is a good exemple of that. When the street lights
+   * (only the most limunous ones). A car glass is a good exemple of that. When the street lights
    * reflects on it you can not see what is behind.
    */
   Property<StandardMaterial, bool> useReflectionOverAlpha;
@@ -698,14 +693,9 @@ public:
   Property<StandardMaterial, ImageProcessingConfiguration*> imageProcessingConfiguration;
 
   /**
-   * Defines additional PrePass parameters for the material.
+   * Defines additionnal PrePass parameters for the material.
    */
   PrePassConfigurationPtr prePassConfiguration;
-
-  /**
-   * Can this material render to prepass
-   */
-  ReadOnlyProperty<StandardMaterial, bool> isPrePassCapable;
 
   /**
    * Whether the color curves effect is enabled
@@ -713,12 +703,12 @@ public:
   Property<StandardMaterial, bool> cameraColorCurvesEnabled;
 
   /**
-   * Whether the color grading effect is enabled
+   * Wether the color grading effect is enabled
    */
   Property<StandardMaterial, bool> cameraColorGradingEnabled;
 
   /**
-   * Whether tonemapping is enabled or not
+   * Wether tonemapping is enabled or not
    */
   Property<StandardMaterial, bool> cameraToneMappingEnabled;
 
@@ -741,7 +731,7 @@ public:
   Property<StandardMaterial, BaseTexturePtr> cameraColorGradingTexture;
 
   /**
-   * The color grading curves provide additional color adjustment that is applied after any color
+   * The color grading curves provide additional color adjustmnent that is applied after any color
    * grading transform (3D LUT). They allow basic adjustment of saturation and small exposure
    * adjustments, along with color filter tinting to provide white balance adjustment or more
    * stylistic effects. These are similar to controls found in many professional imaging or colorist
@@ -761,6 +751,7 @@ protected:
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;
+  bool _rebuildInParallel;
 
   /**
    * Keep track of the image processing observer to allow dispose and replace.

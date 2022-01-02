@@ -4,12 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(IBrowserGamepad)
-FWD_CLASS_SPTR(WebVRController)
+class IBrowserGamepad;
+class WebVRController;
+using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+using WebVRControllerPtr = std::shared_ptr<WebVRController>;
 
 struct _GamePadFactory {
   virtual ~_GamePadFactory() = default;
@@ -19,7 +20,7 @@ struct _GamePadFactory {
    * @param gamepadInfo Defines the gamepad info as received from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
-  virtual bool canCreate(const IBrowserGamepadPtr& /*gamepadInfo*/) const
+  [[nodiscard]] virtual bool canCreate(const IBrowserGamepadPtr& /*gamepadInfo*/) const
   {
     return false;
   }
@@ -29,7 +30,7 @@ struct _GamePadFactory {
    * @param gamepadInfo Defines the gamepad info as received from the controller APIs.
    * @returns the new gamepad instance
    */
-  virtual WebVRControllerPtr create(const IBrowserGamepadPtr& /*gamepadInfo*/) const
+  [[nodiscard]] virtual WebVRControllerPtr create(const IBrowserGamepadPtr& /*gamepadInfo*/) const
   {
     return nullptr;
   }

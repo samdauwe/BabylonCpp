@@ -1,7 +1,6 @@
 #include <babylon/materials/pbr/pbr_anisotropic_configuration.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_flags.h>
@@ -10,6 +9,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

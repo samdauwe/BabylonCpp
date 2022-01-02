@@ -68,13 +68,11 @@ void ImGuiSceneWidget::render(ImVec2 size)
 
   if ((width > 0) && (height > 0)) {
     if ((width != _width) || (height != _height)) {
-#if 0
       if (!ImGui::IsMouseDragging() && !ImGui::IsAnyMouseDown()) {
         _width  = width;
         _height = height;
         resizeFramebuffer();
       }
-#endif
     }
   }
 

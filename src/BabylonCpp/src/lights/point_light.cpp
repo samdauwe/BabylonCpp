@@ -1,7 +1,6 @@
 #include <babylon/lights/point_light.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/effect.h>
@@ -112,14 +111,8 @@ void PointLight::_setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix&
     return;
   }
 
-  const auto minZ = shadowMinZ() ? *shadowMinZ() : activeCamera->minZ;
-  const auto maxZ = shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ;
-
-  const auto useReverseDepthBuffer = getScene()->getEngine()->useReverseDepthBuffer;
-
-  Matrix::PerspectiveFovLHToRef(shadowAngle, 1.f, useReverseDepthBuffer ? maxZ : minZ,
-                                useReverseDepthBuffer ? minZ : maxZ, matrix, true,
-                                _scene->getEngine()->isNDCHalfZRange);
+  Matrix::PerspectiveFovLHToRef(shadowAngle(), 1.f, getDepthMinZ(*activeCamera),
+                                getDepthMaxZ(*activeCamera), matrix);
 }
 
 void PointLight::_buildUniformLayout()

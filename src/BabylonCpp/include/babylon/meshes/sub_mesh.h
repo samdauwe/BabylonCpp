@@ -12,15 +12,13 @@ namespace BABYLON {
 
 class IntersectionInfo;
 class WebGLDataBuffer;
-FWD_STRUCT_SPTR(DrawWrapper)
-FWD_STRUCT_SPTR(IMaterialContext)
 FWD_STRUCT_SPTR(MaterialDefines)
 FWD_CLASS_SPTR(SubMesh)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /** @hidden */
 struct BABYLON_SHARED_EXPORT ICustomEffect {
-  EffectPtr effect    = nullptr;
+  Effect* effect      = nullptr;
   std::string defines = "";
 }; // end of struct ICustomEffect
 
@@ -45,33 +43,11 @@ public:
   ~SubMesh() override; // = default
 
   /**
-   * @brief Hidden
-   */
-  DrawWrapperPtr _getDrawWrapper(const std::string& name, bool createIfNotExisting = false);
-
-  /**
-   * @brief Hidden
-   */
-  std::optional<ICustomEffect> _getCustomEffect(const std::string& name,
-                                                bool createIfNotExisting = true);
-
-  /**
-   * @brief Hidden
-   */
-  void _removeCustomEffect(const std::string& name);
-
-  /**
-   * @brief Hidden
-   */
-  void _setMainDrawWrapperOverride(const DrawWrapperPtr& wrapper);
-
-  /**
    * @brief Sets associated effect (effect used to render this submesh).
    * @param effect defines the effect to associate with
    * @param defines defines the set of defines used to compile this effect
    */
-  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr,
-                 const IMaterialContextPtr& materialContext = nullptr);
+  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines = nullptr);
 
   void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
   bool isGlobal() const;
@@ -253,14 +229,20 @@ protected:
   void set_materialDefines(const MaterialDefinesPtr& defines);
 
   /**
-   * @brief Gets associated (main) effect (possibly the effect override if defined)
+   * @brief Hidden
    */
-  EffectPtr& get_effect();
+  std::optional<ICustomEffect> _getCustomEffect(const std::string& name,
+                                                bool createIfNotExisting = true);
 
   /**
    * @brief Hidden
    */
-  DrawWrapperPtr& get__drawWrapper();
+  void _removeCustomEffect(const std::string& name);
+
+  /**
+   * @brief Gets the associated effect.
+   */
+  EffectPtr& get_effect();
 
 private:
   /** @hidden */
@@ -307,13 +289,6 @@ public:
    */
   ReadOnlyProperty<SubMesh, EffectPtr> effect;
 
-  /**
-   * Hidden
-   */
-  ReadOnlyProperty<SubMesh, DrawWrapperPtr> _drawWrapper;
-
-  DrawWrapperPtr _drawWrapperOverride;
-
   /** the material index to use */
   unsigned int materialIndex;
   /** vertex index start */
@@ -342,11 +317,6 @@ public:
   size_t _id;
 
 private:
-  std::unordered_map<std::string, DrawWrapperPtr> _drawWrappers;
-  DrawWrapperPtr
-    _mainDrawWrapper; // same thing than _drawWrappers[Constants.SUBMESHEFFECT_MAINMATERIAL] but
-                      // faster access
-  DrawWrapperPtr _mainDrawWrapperOverride;
   AbstractMeshPtr _mesh;
   MeshPtr _renderingMesh;
   BoundingInfoPtr _boundingInfo;

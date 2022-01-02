@@ -17,7 +17,7 @@ class BABYLON_SHARED_EXPORT BoundingBox : public ICullable {
 
 public:
   /**
-   * @brief Creates a new bounding box.
+   * @brief Creates a new bounding box
    * @param min defines the minimum vector (in local space)
    * @param max defines the maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
@@ -33,7 +33,8 @@ public:
   // Methods
 
   /**
-   * @brief Recreates the entire bounding box from scratch as if we call the constructor in place.
+   * @brief Recreates the entire bounding box from scratch as if we call the
+   * constructor in place.
    * @param min defines the new minimum vector (in local space)
    * @param max defines the new maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
@@ -88,7 +89,8 @@ public:
   bool intersectsSphere(const BoundingSphere& sphere);
 
   /**
-   * @brief Tests if the bounding box intersects with a box defined by a min and max vectors.
+   * @brief Tests if the bounding box intersects with a box defined by a min and
+   * max vectors.
    * @param min defines the min vector to use
    * @param max defines the max vector to use
    * @returns true if there is an intersection
@@ -105,7 +107,8 @@ public:
   static bool Intersects(const BoundingBox& box0, const BoundingBox& box1);
 
   /**
-   * @brief Tests if a bounding box defines by a min/max vectors intersects a sphere.
+   * @brief Tests if a bounding box defines by a min/max vectors intersects a
+   * sphere.
    * @param minPoint defines the minimum vector of the bounding box
    * @param maxPoint defines the maximum vector of the bounding box
    * @param sphereCenter defines the sphere center
@@ -116,8 +119,10 @@ public:
                                const Vector3& sphereCenter, float sphereRadius);
 
   /**
-   * @brief Tests if a bounding box defined with 8 vectors is entirely inside frustum planes.
-   * @param boundingVectors defines an array of 8 vectors representing a bounding box
+   * @brief Tests if a bounding box defined with 8 vectors is entirely inside
+   * frustum planes.
+   * @param boundingVectors defines an array of 8 vectors representing a
+   * bounding box
    * @param frustumPlanes defines the frustum planes to test
    * @return true if there is an inclusion
    */
@@ -125,8 +130,10 @@ public:
                                     const std::array<Plane, 6>& frustumPlanes);
 
   /**
-   * @brief Tests if a bounding box defined with 8 vectors intersects frustum planes.
-   * @param boundingVectors defines an array of 8 vectors representing a bounding box
+   * @brief Tests if a bounding box defined with 8 vectors intersects frustum
+   * planes.
+   * @param boundingVectors defines an array of 8 vectors representing a
+   * bounding box
    * @param frustumPlanes defines the frustum planes to test
    * @return true if there is an intersection
    */

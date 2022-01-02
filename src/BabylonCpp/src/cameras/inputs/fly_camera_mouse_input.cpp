@@ -9,7 +9,7 @@ namespace BABYLON {
 
 FlyCameraMouseInput::FlyCameraMouseInput(bool iTouchEnabled)
     : touchEnabled{iTouchEnabled}
-    , buttons{{0, 1, 2}}
+    , buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE, MouseButtonType::RIGHT}}
     , buttonsYaw{{-1, 0, 1}}
     , buttonsPitch{{-1, 0, 1}}
     , buttonsRoll{2}
@@ -78,7 +78,7 @@ void FlyCameraMouseInput::_pointerInput(PointerInfo* p, EventState& /*s*/)
 
   auto engine = camera->getEngine();
 
-  if (!touchEnabled && e.pointerType == "touch") {
+  if (!touchEnabled && e.pointerType == PointerType::TOUCH) {
     return;
   }
 

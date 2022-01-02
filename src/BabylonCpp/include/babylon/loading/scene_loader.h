@@ -63,7 +63,7 @@ public:
   static constexpr unsigned int SUMMARY_LOGGING = Constants::SCENELOADER_SUMMARY_LOGGING;
 
   /**
-   * Detailed logging while loading
+   * Detailled logging while loading
    */
   static constexpr unsigned int DETAILED_LOGGING = Constants::SCENELOADER_DETAILED_LOGGING;
 
@@ -80,12 +80,14 @@ public:
   static void setForceFullSceneLoadingForIncremental(bool value);
 
   /**
-   * @brief Gets a boolean indicating if loading screen must be displayed while loading a scene.
+   * @brief Gets a boolean indicating if loading screen must be displayed while
+   * loading a scene.
    */
   static bool ShowLoadingScreen();
 
   /**
-   * @brief Sets a boolean indicating if loading screen must be displayed while loading a scene.
+   * @brief Sets a boolean indicating if loading screen must be displayed while
+   * loading a scene.
    */
   static void setShowLoadingScreen(bool value);
 

@@ -2,7 +2,6 @@
 #define BABYLON_BONES_IK_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/quaternion.h>
 #include <babylon/maths/vector3.h>
@@ -11,12 +10,10 @@ namespace BABYLON {
 
 class AbstractMesh;
 class Bone;
-class Node;
-FWD_CLASS_SPTR(TransformNode)
 
 struct BoneIKControllerOptions {
-  TransformNode* targetMesh                    = nullptr;
-  TransformNode* poleTargetMesh                = nullptr;
+  AbstractMesh* targetMesh                     = nullptr;
+  AbstractMesh* poleTargetMesh                 = nullptr;
   Bone* poleTargetBone                         = nullptr;
   std::optional<Vector3> poleTargetLocalOffset = std::nullopt;
   std::optional<float> poleAngle               = std::nullopt;
@@ -34,11 +31,11 @@ class BABYLON_SHARED_EXPORT BoneIKController {
 public:
   /**
    * @brief Creates a new BoneIKController.
-   * @param mesh defines the TransformNode to control
+   * @param mesh defines the mesh to control
    * @param bone defines the bone to control
    * @param options defines options to set up the controller
    */
-  BoneIKController(TransformNode* mesh, Bone* bone,
+  BoneIKController(AbstractMesh* mesh, Bone* bone,
                    const std::optional<BoneIKControllerOptions>& options);
   ~BoneIKController(); // = default
 
@@ -63,22 +60,16 @@ protected:
    */
   void _setMaxAngle(float ang = Math::PI);
 
-private:
-  static void _SetAbsoluteRotation(const TransformNodePtr& transform, const Quaternion& rotation);
-  static bool _IsTransformNode(Node* node);
-  void _updateLinkedTransformRotation(Bone* bone);
-
 public:
   /**
-   * Gets or sets the target TransformNode
-   * Name kept as mesh for back compability
+   * Gets or sets the target mesh
    */
-  TransformNode* targetMesh;
+  AbstractMesh* targetMesh;
 
   /**
    * Gets or sets the mesh used as pole
    */
-  TransformNode* poleTargetMesh;
+  AbstractMesh* poleTargetMesh;
 
   /**
    * Gets or sets the bone used as pole
@@ -106,10 +97,9 @@ public:
   float poleAngle;
 
   /**
-   * Gets or sets the TransformNode associated with the controller
-   * Name kept as mesh for back compability
+   * Gets or sets the mesh associated with the controller
    */
-  TransformNode* mesh;
+  AbstractMesh* mesh;
 
   /**
    * The amount to slerp (spherical linear interpolation) to the target.  Set

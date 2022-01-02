@@ -248,12 +248,6 @@ public:
   unsigned int endSpriteCellID;
 
   /**
-   * If using a spritesheet (isAnimationSheetEnabled), defines wether the sprite animation is
-   * looping
-   */
-  bool spriteCellLoop;
-
-  /**
    * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell width to use
    */
   unsigned int spriteCellWidth;

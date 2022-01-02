@@ -14,17 +14,20 @@ GenericPad::GenericPad(const std::string& iId, int iIndex,
 
 GenericPad::~GenericPad() = default;
 
-void GenericPad::onbuttondown(const std::function<void(unsigned int buttonPressed)>& callback)
+void GenericPad::onbuttondown(
+  const std::function<void(unsigned int buttonPressed)>& callback)
 {
   _onbuttondown = callback;
 }
 
-void GenericPad::onbuttonup(const std::function<void(unsigned int buttonPressed)>& callback)
+void GenericPad::onbuttonup(
+  const std::function<void(unsigned int buttonPressed)>& callback)
 {
   _onbuttonup = callback;
 }
 
-unsigned int GenericPad::_setButtonValue(unsigned int newValue, unsigned int currentValue,
+unsigned int GenericPad::_setButtonValue(unsigned int newValue,
+                                         unsigned int currentValue,
                                          unsigned int buttonIndex)
 {
   if (newValue != currentValue) {
@@ -49,9 +52,9 @@ unsigned int GenericPad::_setButtonValue(unsigned int newValue, unsigned int cur
 void GenericPad::update()
 {
   Gamepad::update();
-  for (auto _index = 0u; _index < _buttons.size(); ++_index) {
-    _buttons[_index]
-      = _setButtonValue(browserGamepad->buttons[_index].value, _buttons[_index], _index);
+  for (unsigned int _index = 0; _index < _buttons.size(); ++_index) {
+    _buttons[_index] = _setButtonValue(browserGamepad->buttons[_index].value,
+                                       _buttons[_index], _index);
   }
 }
 

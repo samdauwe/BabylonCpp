@@ -5,10 +5,9 @@
 
 namespace BABYLON {
 
-DepthCullingState::DepthCullingState(bool iReset)
+DepthCullingState::DepthCullingState()
     : isDirty{this, &DepthCullingState::get_isDirty}
     , zOffset{this, &DepthCullingState::get_zOffset, &DepthCullingState::set_zOffset}
-    , zOffsetUnits{this, &DepthCullingState::get_zOffsetUnits, &DepthCullingState::set_zOffsetUnits}
     , cullFace{this, &DepthCullingState::get_cullFace, &DepthCullingState::set_cullFace}
     , cull{this, &DepthCullingState::get_cull, &DepthCullingState::set_cull}
     , depthFunc{this, &DepthCullingState::get_depthFunc, &DepthCullingState::set_depthFunc}
@@ -28,9 +27,7 @@ DepthCullingState::DepthCullingState(bool iReset)
     , _zOffset{0.f}
     , _frontFace{std::nullopt}
 {
-  if (iReset) {
-    reset();
-  }
+  reset();
 }
 
 DepthCullingState::~DepthCullingState() = default;
@@ -53,21 +50,6 @@ void DepthCullingState::set_zOffset(float value)
   }
 
   _zOffset        = value;
-  _isZOffsetDirty = true;
-}
-
-float DepthCullingState::get_zOffsetUnits() const
-{
-  return _zOffsetUnits;
-}
-
-void DepthCullingState::set_zOffsetUnits(float value)
-{
-  if (_zOffsetUnits == value) {
-    return;
-  }
-
-  _zOffsetUnits   = value;
   _isZOffsetDirty = true;
 }
 
@@ -179,14 +161,13 @@ void DepthCullingState::set_frontFace(const std::optional<unsigned int>& value)
 
 void DepthCullingState::reset()
 {
-  _depthMask    = true;
-  _depthTest    = true;
-  _depthFunc    = std::nullopt;
-  _cullFace     = std::nullopt;
-  _cull         = std::nullopt;
-  _zOffset      = 0.f;
-  _zOffsetUnits = 0.f;
-  _frontFace    = std::nullopt;
+  _depthMask = true;
+  _depthTest = true;
+  _depthFunc = std::nullopt;
+  _cullFace  = std::nullopt;
+  _cull      = std::nullopt;
+  _zOffset   = 0.f;
+  _frontFace = std::nullopt;
 
   _isDepthTestDirty = true;
   _isDepthMaskDirty = true;
@@ -247,9 +228,9 @@ void DepthCullingState::apply(GL::IGLRenderingContext& gl)
 
   // zOffset
   if (_isZOffsetDirty) {
-    if (!stl_util::almost_equal(zOffset(), 0.f) || !stl_util::almost_equal(zOffsetUnits(), 0.f)) {
+    if (!stl_util::almost_equal(zOffset(), 0.f)) {
       gl.enable(GL::POLYGON_OFFSET_FILL);
-      gl.polygonOffset(zOffset(), zOffsetUnits());
+      gl.polygonOffset(zOffset(), 0);
     }
     else {
       gl.disable(GL::POLYGON_OFFSET_FILL);

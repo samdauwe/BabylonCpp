@@ -29,9 +29,7 @@ enum class BABYLON_SHARED_EXPORT NodeMaterialConnectionPointCompatibilityStates 
   /** Points are incompatible because of their types */
   TypeIncompatible,
   /** Points are incompatible because of their targets (vertex vs fragment) */
-  TargetIncompatible,
-  /** Points are incompatible because they are in the same hierarchy **/
-  HierarchyIssue
+  TargetIncompatible
 }; // end of enum class NodeMaterialConnectionPointCompatibilityStates
 
 /**
@@ -221,14 +219,9 @@ protected:
   std::vector<NodeMaterialConnectionPointPtr>& get_endpoints();
 
   /**
-   * @brief Gets a boolean indicating that this connection has a path to the vertex output.
-   */
-  bool get_hasEndpoints() const;
-
-  /**
    * @brief Gets a boolean indicating if that output point is connected to at least one input.
    */
-  bool get_isDirectlyConnectedToVertexOutput() const;
+  bool get_hasEndpoints() const;
 
   /**
    * @brief Gets a boolean indicating that this connection will be used in the vertex shader.
@@ -243,15 +236,11 @@ protected:
 public:
   /** Hidden */
   NodeMaterialBlockPtr _ownerBlock;
-
   /** Hidden */
   NodeMaterialConnectionPointPtr _connectedPoint;
 
   /** Hidden */
   NodeMaterialConnectionPointPtr _typeConnectionSource;
-
-  /** @hidden */
-  std::optional<NodeMaterialBlockConnectionPointTypes> _defaultConnectionPointType;
 
   /** Hidden */
   NodeMaterialConnectionPointPtr _linkedConnectionSource;
@@ -388,11 +377,6 @@ public:
    * Gets a boolean indicating if that output point is connected to at least one input.
    */
   ReadOnlyProperty<NodeMaterialConnectionPoint, bool> hasEndpoints;
-
-  /**
-   * Gets a boolean indicating that this connection has a path to the vertex output.
-   */
-  ReadOnlyProperty<NodeMaterialConnectionPoint, bool> isDirectlyConnectedToVertexOutput;
 
   /**
    * Gets a boolean indicating that this connection will be used in the vertex shader

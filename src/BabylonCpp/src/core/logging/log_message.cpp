@@ -84,7 +84,8 @@ LogMessage::~LogMessage() = default;
 std::ostream& operator<<(std::ostream& os, const LogMessage& logMsg)
 {
   os << '[' << Time::toIso8601Ms(logMsg.timestamp()) << "] "
-     << "[" << std::setw(5) << LogLevels::ToReadableLevel(logMsg.level()) << "] "
+     << "[" << std::setw(5) << LogLevels::ToReadableLevel(logMsg.level())
+     << "] "
      << "[" << logMsg.context() << "::" << logMsg.function() << "] "
      << "| " << logMsg.message();
   // Add file and line number for traces
@@ -195,12 +196,14 @@ void LogMessage::writef(const char* printf_like_message, ...)
   va_list arglist;
   va_start(arglist, printf_like_message);
 
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
-  const int nbrcharacters = vsnprintf_s(finished_message, _countof(finished_message), _TRUNCATE,
-                                        printf_like_message, arglist);
-#else
+#if (defined(WIN32) || defined(_WIN32)                                         \
+     || defined(__WIN32__) && !defined(__GNUC__))
   const int nbrcharacters
-    = vsnprintf(finished_message, sizeof(finished_message), printf_like_message, arglist);
+    = vsnprintf_s(finished_message, _countof(finished_message), _TRUNCATE,
+                  printf_like_message, arglist);
+#else
+  const int nbrcharacters = vsnprintf(
+    finished_message, sizeof(finished_message), printf_like_message, arglist);
 #endif
   va_end(arglist);
 

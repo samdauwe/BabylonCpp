@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -18,6 +17,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -116,19 +116,18 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<NormalMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<NormalMaterialDefines>();
   }
 
-  const auto definesPtr
-    = std::static_pointer_cast<NormalMaterialDefines>(subMesh->materialDefines());
-  auto& defines    = *definesPtr.get();
-  const auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<NormalMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -227,8 +226,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
     options.indexParameters       = {{"maxSimultaneousLights", 4}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -243,14 +241,14 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, boo
 
 void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  const auto scene = getScene();
+  auto scene = getScene();
 
   auto defines = static_cast<NormalMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -282,7 +280,7 @@ void NormalMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);

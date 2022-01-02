@@ -12,8 +12,8 @@ class Vector3;
 struct BABYLON_SHARED_EXPORT IWorld {
   virtual ~IWorld() = default;
 
-  virtual void create(float timeStep, unsigned int broadPhaseType, unsigned int iterations,
-                      bool noStat)
+  virtual void create(float timeStep, unsigned int broadPhaseType,
+                      unsigned int iterations, bool noStat)
     = 0;
   virtual void clear()                                 = 0;
   virtual void setNoStat(bool)                         = 0;

@@ -51,7 +51,7 @@ void FireProceduralTexture::updateShaderUniforms()
 
 void FireProceduralTexture::render(bool useCameraPostProcess)
 {
-  const auto scene = getScene();
+  auto scene = getScene();
   if (_autoGenerateTime && scene) {
     _time += scene->getAnimationRatio() * 0.03f;
     updateShaderUniforms();

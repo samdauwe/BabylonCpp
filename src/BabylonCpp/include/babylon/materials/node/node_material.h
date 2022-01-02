@@ -163,11 +163,8 @@ public:
   /**
    * @brief Build the material and generates the inner effect.
    * @param verbose defines if the build should log activity
-   * @param updateBuildId defines if the internal build Id should be updated (default is true)
-   * @param autoConfigure defines if the autoConfigure method should be called when initializing
-   * blocks (default is true)
    */
-  void build(bool verbose = false, bool updateBuildId = true, bool autoConfigure = true);
+  void build(bool verbose = false);
 
   /**
    * @brief Runs an otpimization phase to try to improve the shader code.
@@ -344,11 +341,9 @@ public:
 
   /**
    * @brief Makes a duplicate of the current material.
-   * @param name defines the name to use for the new material
-   * @param shareEffect defines if the clone material should share the same effect (default is
-   * false)
+   * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const std::string& name, bool shareEffect = false) const override;
+  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Creates a node material from parsed material data.
@@ -405,22 +400,6 @@ protected:
   NodeMaterialModes& get_mode();
 
   /**
-   * @brief Sets the mode property.
-   */
-  void set_mode(const NodeMaterialModes& value);
-
-  /**
-   * @brief Gets the unique identifier used to identified the effect associated with the material.
-   */
-  size_t get_buildId() const;
-
-  /**
-   * @brief Sets or sets the unique identifier used to identified the effect associated with the
-   * material.
-   */
-  void set_buildId(size_t value);
-
-  /**
    * @brief Attaches a new image processing configuration to the Standard Material.
    * @param configuration
    */
@@ -432,8 +411,7 @@ private:
   NodeMaterial& _addFragmentOutputNode(const NodeMaterialBlockPtr& node);
   NodeMaterial& _removeFragmentOutputNode(const NodeMaterialBlockPtr& node);
   void _initializeBlock(const NodeMaterialBlockPtr& node, const NodeMaterialBuildStatePtr& state,
-                        std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState,
-                        bool autoConfigure = true);
+                        std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState);
   void _resetDualBlocks(const NodeMaterialBlockPtr& node, size_t id);
   void _prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterialDefines& defines);
   PostProcessPtr
@@ -517,14 +495,9 @@ public:
   NodeMaterialModes _mode;
 
   /**
-   * Gets or sets the mode property
+   * Gets the mode property
    */
-  Property<NodeMaterial, NodeMaterialModes> mode;
-
-  /**
-   *  Gets or sets the unique identifier used to identified the effect associated with the material
-   */
-  Property<NodeMaterial, size_t> buildId;
+  ReadOnlyProperty<NodeMaterial, NodeMaterialModes> mode;
 
   /**
    * A free comment about the material

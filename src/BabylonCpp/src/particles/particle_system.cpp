@@ -1,8 +1,6 @@
 #include <babylon/particles/particle_system.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/buffer.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/json_util.h>
@@ -10,7 +8,6 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/engine_store.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -24,7 +21,9 @@
 #include <babylon/materials/thin_material_helper.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
+#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/color3_gradient.h>
 #include <babylon/misc/gradient_helper.h>
 #include <babylon/misc/string_tools.h>
@@ -71,7 +70,6 @@ ParticleSystem::ParticleSystem(
     , _appendParticleVertexes{nullptr}
     , _rootParticleSystem{nullptr}
     , _zeroVector3{Vector3::Zero()}
-    , _emitterInverseWorldMatrix{Matrix::Identity()}
 {
   isLocal   = false;
   _capacity = capacity;
@@ -87,9 +85,8 @@ ParticleSystem::ParticleSystem(
     // _scene->particleSystems.push(this);
   }
   else {
-    _engine = std::get<ThinEngine*>(*sceneOrEngine);
-    defaultProjectionMatrix
-      = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f, _engine->isNDCHalfZRange);
+    _engine                 = std::get<ThinEngine*>(*sceneOrEngine);
+    defaultProjectionMatrix = Matrix::PerspectiveFovLH(0.8f, 1.f, 0.1f, 100.f);
   }
 
   if (_engine->getCaps().vertexArrayObject) {
@@ -99,10 +96,8 @@ ParticleSystem::ParticleSystem(
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
 
-  _customWrappers[0]         = std::make_shared<DrawWrapper>(_engine);
-  _customWrappers[0]->effect = customEffect;
+  _customEffect[0] = customEffect;
 
-  _drawWrapper   = std::make_shared<DrawWrapper>(_engine);
   _useInstancing = _engine->getCaps().instancedArrays;
 
   _createIndexBuffer();
@@ -373,22 +368,12 @@ bool ParticleSystem::isStopping() const
 
 EffectPtr ParticleSystem::getCustomEffect(unsigned int iBlendMode)
 {
-  return stl_util::contains(_customWrappers, iBlendMode) && _customWrappers[iBlendMode]->effect ?
-           _customWrappers[iBlendMode]->effect :
-           nullptr;
-}
-
-DrawWrapperPtr ParticleSystem::_getCustomDrawWrapper(unsigned int iBlendMode)
-{
-  return stl_util::contains(_customWrappers, iBlendMode) ?
-           _customWrappers[iBlendMode] :
-           (stl_util::contains(_customWrappers, 0) ? _customWrappers[0] : nullptr);
+  return stl_util::contains(_customEffect, iBlendMode) ? _customEffect[iBlendMode] : nullptr;
 }
 
 void ParticleSystem::setCustomEffect(const EffectPtr& effect, unsigned int iBlendMode)
 {
-  _customWrappers[iBlendMode]         = std::make_shared<DrawWrapper>(_engine);
-  _customWrappers[iBlendMode]->effect = effect;
+  _customEffect[iBlendMode] = effect;
 }
 
 Observable<Effect>& ParticleSystem::get_onBeforeDrawParticlesObservable()
@@ -1134,7 +1119,6 @@ void ParticleSystem::_update(int newParticles)
       = Matrix::Translation(emitterPosition.x, emitterPosition.y, emitterPosition.z);
   }
 
-  _emitterWorldMatrix.invertToRef(_emitterInverseWorldMatrix);
   updateFunction(_particles);
 
   // Add new ones
@@ -1197,7 +1181,7 @@ void ParticleSystem::_update(int newParticles)
     }
     else {
       particleEmitterType->startDirectionFunction(_emitterWorldMatrix, particle->direction,
-                                                  particle, isLocal, _emitterInverseWorldMatrix);
+                                                  particle, isLocal);
     }
 
     if (emitPower == 0.f) {
@@ -1336,7 +1320,6 @@ void ParticleSystem::_update(int newParticles)
     if (_isAnimationSheetEnabled) {
       particle->_initialStartSpriteCellID = startSpriteCellID;
       particle->_initialEndSpriteCellID   = endSpriteCellID;
-      particle->_initialSpriteCellLoop    = spriteCellLoop;
     }
 
     // Inherited Velocity
@@ -1488,12 +1471,12 @@ void ParticleSystem::fillUniformsAttributesAndSamplerNames(std::vector<std::stri
   }
 }
 
-DrawWrapperPtr ParticleSystem::_getWrapper(unsigned int iBlendMode)
+EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
 {
-  const auto customWrapper = _getCustomDrawWrapper(blendMode);
+  const auto customEffect = getCustomEffect(iBlendMode);
 
-  if (customWrapper && customWrapper->effect) {
-    return customWrapper;
+  if (customEffect) {
+    return customEffect;
   }
 
   std::vector<std::string> defines;
@@ -1502,10 +1485,8 @@ DrawWrapperPtr ParticleSystem::_getWrapper(unsigned int iBlendMode)
 
   // Effect
   std::string join = StringTools::join(defines, '\n');
-  if (!_drawWrapper->defines
-      || (_drawWrapper->defines && std::holds_alternative<std::string>(*_drawWrapper->defines)
-          && std::get<std::string>(*_drawWrapper->defines) != join)) {
-    _drawWrapper->defines = join;
+  if (_cachedDefines != join) {
+    _cachedDefines = join;
 
     std::vector<std::string> attributesNamesOrOptions;
     std::vector<std::string> effectCreationOption;
@@ -1519,10 +1500,10 @@ DrawWrapperPtr ParticleSystem::_getWrapper(unsigned int iBlendMode)
     options.samplers      = std::move(samplers);
     options.defines       = std::move(join);
 
-    _drawWrapper->effect = _engine->createEffect("particles", options, _scene->getEngine());
+    _effect = _engine->createEffect("particles", options, _scene->getEngine());
   }
 
-  return _drawWrapper;
+  return _effect;
 }
 
 void ParticleSystem::animate(bool preWarmOnly)
@@ -1639,15 +1620,7 @@ void ParticleSystem::_appendParticleVertices(unsigned int offset, Particle* part
 
 void ParticleSystem::rebuild()
 {
-  if (_engine->getCaps().vertexArrayObject) {
-    _vertexArrayObject = nullptr;
-  }
-
   _createIndexBuffer();
-
-  if (_spriteBuffer) {
-    _spriteBuffer->_rebuild();
-  }
 
   if (_vertexBuffer) {
     _vertexBuffer->_rebuild();
@@ -1667,15 +1640,15 @@ bool ParticleSystem::isReady()
   }
 
   if (blendMode != ParticleSystem::BLENDMODE_MULTIPLYADD) {
-    if (!_getWrapper(blendMode)->effect->isReady()) {
+    if (!_getEffect(blendMode)->isReady()) {
       return false;
     }
   }
   else {
-    if (!_getWrapper(ParticleSystem::BLENDMODE_MULTIPLY)->effect->isReady()) {
+    if (!_getEffect(ParticleSystem::BLENDMODE_MULTIPLY)->isReady()) {
       return false;
     }
-    if (!_getWrapper(ParticleSystem::BLENDMODE_ADD)->effect->isReady()) {
+    if (!_getEffect(ParticleSystem::BLENDMODE_ADD)->isReady()) {
       return false;
     }
   }
@@ -1685,13 +1658,12 @@ bool ParticleSystem::isReady()
 
 size_t ParticleSystem::_render(unsigned int iBlendMode)
 {
-  const auto drawWrapper = _getWrapper(blendMode);
-  const auto effect      = drawWrapper->effect;
+  auto effect = _getEffect(iBlendMode);
 
   auto engine = _engine;
 
   // Render
-  engine->enableEffect(drawWrapper);
+  engine->enableEffect(effect);
 
   auto viewMatrix = defaultViewMatrix.value_or(_scene ? _scene->getViewMatrix() : Matrix());
   effect->setTexture("diffuseSampler", particleTexture);
@@ -1922,12 +1894,11 @@ ParticleSystem* ParticleSystem::_Parse(const json& /*parsedParticleSystem*/,
 }
 
 ParticleSystem* ParticleSystem::Parse(const json& parsedParticleSystem, Scene* scene,
-                                      const std::string& rootUrl,
-                                      const std::optional<size_t>& capacity)
+                                      const std::string& rootUrl)
 {
-  auto name           = json_util::get_string(parsedParticleSystem, "name");
-  auto particleSystem = new ParticleSystem(
-    name, capacity.value_or(json_util::get_number(parsedParticleSystem, "capacity", 0ul)), scene);
+  auto name = json_util::get_string(parsedParticleSystem, "name");
+  auto particleSystem
+    = new ParticleSystem(name, json_util::get_number(parsedParticleSystem, "capacity", 0ul), scene);
   particleSystem->_rootUrl = rootUrl;
 
   if (json_util::has_key(parsedParticleSystem, "id")) {

@@ -5,7 +5,6 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/events/pointer_info_pre.h>
@@ -15,10 +14,10 @@
 
 namespace BABYLON {
 
+class AbstractActionManager;
 class Engine;
 class Scene;
-FWD_CLASS_SPTR(AbstractActionManager)
-FWD_STRUCT_SPTR(IPointerEvent)
+using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
 
 /**
  * @brief Class used to manage all inputs for the scene.
@@ -83,7 +82,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _isPointerSwiping() const;
+  [[nodiscard]] bool _isPointerSwiping() const;
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
@@ -106,7 +105,7 @@ public:
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and raise onPointerMove,
-   * onPointerDown and onPointerUp)
+   * onPointerDown and onPointerUp
    * @param attachUp defines if you want to attach events to pointerup
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove
@@ -149,7 +148,7 @@ protected:
   /**
    * @brief Gets or sets the current on-screen X position of the pointer.
    */
-  int get_pointerX() const;
+  [[nodiscard]] int get_pointerX() const;
 
   /**
    * @brief Sets the current on-screen X position of the pointer.
@@ -159,7 +158,7 @@ protected:
   /**
    * @brief Gets the current on-screen Y position of the pointer.
    */
-  int get_pointerY() const;
+  [[nodiscard]] int get_pointerY() const;
 
   /**
    * @brief Sets the current on-screen Y position of the pointer
@@ -173,8 +172,8 @@ private:
   void _setRayOnPointerInfo(PointerInfo& pointerInfo);
   bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt, PointerEventTypes type);
-  void _processPointerDown(std::optional<PickingInfo>& pickResult, const IPointerEventPtr& evt);
-  void _processPointerUp(std::optional<PickingInfo>& pickResult, const IPointerEventPtr& evt,
+  void _processPointerDown(std::optional<PickingInfo>& pickResult, const PointerEvent& evt);
+  void _processPointerUp(std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
                          const ClickInfo& clickInfo);
 
 public:

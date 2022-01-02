@@ -20,15 +20,13 @@ TransformBlock::TransformBlock(const std::string& iName)
     , xyz{this, &TransformBlock::get_xyz}
     , transform{this, &TransformBlock::get_transform}
 {
-  target = NodeMaterialBlockTargets::Vertex;
-
   registerInput("vector", NodeMaterialBlockConnectionPointTypes::AutoDetect);
   registerInput("transform", NodeMaterialBlockConnectionPointTypes::Matrix);
   registerOutput("output", NodeMaterialBlockConnectionPointTypes::Vector4);
   registerOutput("xyz", NodeMaterialBlockConnectionPointTypes::Vector3);
 
   _inputs[0]->onConnectionObservable.add(
-    [this](NodeMaterialConnectionPoint* other, EventState& /*es*/) -> void {
+    [this](NodeMaterialConnectionPoint* other, EventState & /*es*/) -> void {
       if (other && other->ownerBlock()->isInput()) {
         const auto otherAsInput = std::static_pointer_cast<InputBlock>(other->ownerBlock());
 
@@ -179,8 +177,7 @@ void TransformBlock::_deserialize(const json& /*serializationObject*/, Scene* /*
 std::string TransformBlock::_dumpPropertiesCode()
 {
   auto codeString
-    = NodeMaterialBlock::_dumpPropertiesCode()
-      + StringTools::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
+    = StringTools::printf("%s.complementZ = %f;\r\n", _codeVariableName.c_str(), complementZ);
 
   codeString
     += StringTools::printf("%s.complementW = %f;\r\n", _codeVariableName.c_str(), complementW);

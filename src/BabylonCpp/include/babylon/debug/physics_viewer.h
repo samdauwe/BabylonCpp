@@ -64,7 +64,6 @@ private:
   MaterialPtr _getDebugMaterial(Scene* scene);
   AbstractMeshPtr _getDebugBoxMesh(Scene* scene);
   AbstractMeshPtr _getDebugSphereMesh(Scene* scene);
-  AbstractMeshPtr _getDebugCapsuleMesh(Scene* scene);
   AbstractMeshPtr _getDebugCylinderMesh(Scene* scene);
   AbstractMeshPtr _getDebugMeshMesh(const MeshPtr& mesh, Scene* scene);
   AbstractMeshPtr _getDebugMesh(PhysicsImpostor* impostor, const MeshPtr& targetMesh);
@@ -100,7 +99,6 @@ private:
   UtilityLayerRendererPtr _utilityLayer;
   MeshPtr _debugBoxMesh;
   MeshPtr _debugSphereMesh;
-  MeshPtr _debugCapsuleMesh;
   MeshPtr _debugCylinderMesh;
   StandardMaterialPtr _debugMaterial;
   std::vector<MeshPtr> _debugMeshMeshes;

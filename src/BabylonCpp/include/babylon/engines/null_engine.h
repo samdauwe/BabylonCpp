@@ -107,22 +107,22 @@ public:
 
   /**
    * @brief Gets the list of webGL uniform locations associated with a specific program based on a
-   * list of uniform names
+   * list of uniform names.
    * @param pipelineContext defines the pipeline context to use
    * @param uniformsNames defines the list of uniform names
    * @returns an array of webGL uniform locations
    */
-  std::vector<WebGLUniformLocationPtr>
-  getUniforms(IPipelineContext* pipelineContext,
+  std::unordered_map<std::string, WebGLUniformLocationPtr>
+  getUniforms(const IPipelineContextPtr& pipelineContext,
               const std::vector<std::string>& uniformsNames) override;
 
   /**
-   * @brief Gets the lsit of active attributes for a given webGL program.
+   * @brief Gets the lsit of active attributes for a given webGL program
    * @param pipelineContext defines the pipeline context to use
    * @param attributesNames defines the list of attribute names to get
    * @returns an array of indices indicating the offset of each attribute
    */
-  Int32Array getAttributes(IPipelineContext* pipelineContext,
+  Int32Array getAttributes(const IPipelineContextPtr& pipelineContext,
                            const std::vector<std::string>& attributesNames) override;
 
   /**
@@ -132,25 +132,21 @@ public:
   void bindSamplers(Effect& effect) override;
 
   /**
-   * @brief Activates an effect, making it the current one (ie. the one used for rendering)
+   * @brief Activates an effect, mkaing it the current one (ie. the one used for rendering).
    * @param effect defines the effect to activate
    */
   void enableEffect(const EffectPtr& effect) override;
-  void enableEffect(const DrawWrapperPtr& effect) override;
 
   /**
    * @brief Set various states to the webGL context.
-   * @param culling defines culling state: true to enable culling, false to disable it
+   * @param culling defines backface culling state
    * @param zOffset defines the value to apply to zOffset (0 by default)
    * @param force defines if states must be applied even if cache is up to date
-   * @param reverseSide defines if culling must be reversed (CCW if false, CW if true)
-   * @param cullBackFaces true to cull back faces, false to cull front faces (if culling is enabled)
-   * @param stencil stencil states to set
-   * @param zOffsetUnits defines the value to apply to zOffsetUnits (0 by default)
+   * @param reverseSide defines if culling must be reversed (CCW instead of CW and CW instead of
+   * CCW)
    */
-  void setState(bool culling, float zOffset = 0.f, bool force = false, bool reverseSide = false,
-                bool cullBackFaces = true, const IStencilStatePtr& stencil = nullptr,
-                float zOffsetUnits = 0.f) override;
+  void setState(bool culling, float zOffset = 0.f, bool force = false,
+                bool reverseSide = false) override;
 
   /**
    * @brief Set the value of an uniform to an array of int32.
@@ -329,17 +325,15 @@ public:
   void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false) override;
 
   /**
-   * @brief Bind a list of vertex buffers to the webGL context.
-   * @param vertexBuffers defines the list of vertex buffers to bind
+   * @brief Bind webGl buffers directly to the webGL context.
+   * @param vertexBuffers defines the vertex buffer to bind
    * @param indexBuffer defines the index buffer to bind
-   * @param effect defines the effect associated with the vertex buffers
-   * @param overrideVertexBuffers defines optional list of avertex buffers that overrides the
-   * entries in vertexBuffers
+   * @param vertexDeclaration defines the vertex declaration to use with the vertex buffer
+   * @param vertexStrideSize defines the vertex stride of the vertex buffer
+   * @param effect defines the effect associated with the vertex buffer
    */
   void bindBuffers(const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
-                   const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect,
-                   const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers
-                   = {}) override;
+                   const WebGLDataBufferPtr& indexBuffer, const EffectPtr& effect) override;
 
   /**
    * @brief Force the entire cache to be cleared.
@@ -382,12 +376,17 @@ public:
   /**
    * @brief Hidden
    */
+  WebGLTexturePtr _createTexture() override;
+
+  /**
+   * @brief Hidden
+   */
   void _releaseTexture(const InternalTexturePtr& texture) override;
 
   /**
    * @brief Usually called from Texture.ts.
    * Passed information to create a WebGLTexture
-   * @param url defines a value which contains one of the following:
+   * @param urlArg defines a value which contains one of the following:
    * * A conventional http URL, e.g. 'http://...' or 'file://...'
    * * A base64 string of in-line texture data, e.g. 'data:image/jpg;base64,/...'
    * * An indicator that data being passed using the buffer parameter, e.g. 'data:mytexture.jpg'
@@ -408,11 +407,6 @@ public:
    * compressed textures
    * @param forcedExtension defines the extension to use to pick the right loader
    * @param mimeType defines an optional mime type
-   * @param loaderOptions options to be passed to the loader
-   * @param creationFlags specific flags to use when creating the texture
-   * (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
-   * @param useSRGBBuffer defines if the texture must be loaded in a sRGB GPU buffer (if supported
-   * by the GPU).
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   InternalTexturePtr createTexture(
@@ -426,9 +420,7 @@ public:
     const InternalTexturePtr& fallBack        = nullptr,
     const std::optional<unsigned int>& format = std::nullopt,
     const std::string& forcedExtension = "", const std::string& mimeType = "",
-    const LoaderOptionsPtr& loaderOptions            = nullptr,
-    const std::optional<unsigned int>& creationFlags = std::nullopt,
-    const std::optional<bool>& useSRGBBuffer         = std::nullopt) override;
+    const LoaderOptionsPtr& loaderOptions = nullptr) override;
 
   /**
    * @brief Creates a new render target texture
@@ -543,8 +535,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _bindTexture(int channel, const InternalTexturePtr& texture,
-                    const std::string& name) override;
+  void _bindTexture(int channel, const InternalTexturePtr& texture) override;
 
   /**
    * @brief Force the engine to release all cached effects. This means that next effect compilation
@@ -593,11 +584,6 @@ public:
 
 protected:
   NullEngine(const NullEngineOptions& options = NullEngineOptions{});
-
-  /**
-   * @brief Hidden
-   */
-  WebGLTexturePtr _createTexture() override;
 
   void _deleteBuffer(GL::IGLBuffer* buffer);
 

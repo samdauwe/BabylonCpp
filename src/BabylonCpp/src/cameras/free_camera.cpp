@@ -43,8 +43,6 @@ FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition, Scene
     , keysDownward{this, &FreeCamera::get_keysDownward, &FreeCamera::set_keysDownward}
     , keysLeft{this, &FreeCamera::get_keysLeft, &FreeCamera::set_keysLeft}
     , keysRight{this, &FreeCamera::get_keysRight, &FreeCamera::set_keysRight}
-    , keysRotateLeft{this, &FreeCamera::get_keysRotateLeft, &FreeCamera::set_keysRotateLeft}
-    , keysRotateRight{this, &FreeCamera::get_keysRotateRight, &FreeCamera::set_keysRotateRight}
     , collisionMask{this, &FreeCamera::get_collisionMask, &FreeCamera::set_collisionMask}
     , _collider{nullptr}
     , _collisionMask{-1}
@@ -229,57 +227,9 @@ void FreeCamera::set_keysRight(const Int32Array& value)
   }
 }
 
-Int32Array& FreeCamera::get_keysRotateLeft()
-{
-  if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard
-      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
-    if (keyboard) {
-      return keyboard->keysRotateLeft;
-    }
-  }
-
-  return _emptyKeyboardKeys;
-}
-
-void FreeCamera::set_keysRotateLeft(const Int32Array& value)
-{
-  if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard
-      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
-    if (keyboard) {
-      keyboard->keysRotateLeft = value;
-    }
-  }
-}
-
-Int32Array& FreeCamera::get_keysRotateRight()
-{
-  if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard
-      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
-    if (keyboard) {
-      return keyboard->keysRotateRight;
-    }
-  }
-
-  return _emptyKeyboardKeys;
-}
-
-void FreeCamera::set_keysRotateRight(const Int32Array& value)
-{
-  if (stl_util::contains(inputs->attached, "keyboard")) {
-    auto keyboard
-      = std::static_pointer_cast<FreeCameraKeyboardMoveInput>(inputs->attached["keyboard"]);
-    if (keyboard) {
-      keyboard->keysRotateRight = value;
-    }
-  }
-}
-
 /** Controls **/
 void FreeCamera::attachControl(bool noPreventDefault, bool /*useCtrlForPanning*/,
-                               int /*panningMouseButton*/)
+                               MouseButtonType /*panningMouseButton*/)
 {
   inputs->attachElement(noPreventDefault);
 }

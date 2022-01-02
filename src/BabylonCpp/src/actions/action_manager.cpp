@@ -9,7 +9,6 @@
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/events/device_input_events.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
@@ -150,7 +149,7 @@ IActionPtr ActionManager::registerAction(const IActionPtr& action)
 
 bool ActionManager::unregisterAction(const IActionPtr& action)
 {
-  const auto index = stl_util::index_of(actions, action);
+  auto index = stl_util::index_of(actions, action);
   if (index == -1) {
     stl_util::remove(actions, static_cast<size_t>(index));
     ActionManager::Triggers[action->trigger] -= 1;
@@ -163,26 +162,24 @@ bool ActionManager::unregisterAction(const IActionPtr& action)
   return false;
 }
 
-void ActionManager::processTrigger(unsigned int trigger, const IActionEventPtr& evt)
+void ActionManager::processTrigger(unsigned int trigger, const std::optional<IActionEvent>& evt)
 {
   for (const auto& action : actions) {
     if (action->trigger == trigger) {
-      if (evt) {
+      if (evt.has_value()) {
         if (trigger == ActionManager::OnKeyUpTrigger
             || trigger == ActionManager::OnKeyDownTrigger) {
-          const auto parameter = action->getTriggerParameter();
-          const IKeyboardEventPtr sourceEvent
-            = evt->sourceEvent ? std::static_pointer_cast<IKeyboardEvent>(evt->sourceEvent) :
-                                 nullptr;
+          const auto parameter   = action->getTriggerParameter();
+          const auto sourceEvent = *evt->sourceEvent;
           if (!parameter.empty()
-              && parameter != std::to_string(static_cast<char>(sourceEvent->keyCode))) {
+              && parameter != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
             auto lowerCase = StringTools::toLowerCase(parameter);
             if (lowerCase.empty()) {
               continue;
             }
 
-            if (lowerCase != std::to_string(static_cast<char>(sourceEvent->keyCode))) {
-              auto unicode   = sourceEvent->charCode.value_or(sourceEvent->keyCode);
+            if (lowerCase != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+              auto unicode   = sourceEvent.charCode ? sourceEvent.charCode : sourceEvent.keyCode;
               auto actualkey = StringTools::toLowerCase(std::to_string(static_cast<char>(unicode)));
               if (actualkey != lowerCase) {
                 continue;

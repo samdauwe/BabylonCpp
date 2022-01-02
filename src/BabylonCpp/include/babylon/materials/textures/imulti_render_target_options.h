@@ -42,11 +42,6 @@ struct BABYLON_SHARED_EXPORT IMultiRenderTargetOptions {
   std::optional<bool> generateDepthTexture = std::nullopt;
 
   /**
-   * Define depth texture format to use
-   */
-  std::optional<unsigned int> depthTextureFormat = std::nullopt;
-
-  /**
    * Define the number of desired draw buffers
    */
   std::optional<size_t> textureCount = std::nullopt;
@@ -61,11 +56,6 @@ struct BABYLON_SHARED_EXPORT IMultiRenderTargetOptions {
    * Define the default type of the buffers we are creating
    */
   std::optional<unsigned int> defaultType = std::nullopt;
-
-  /**
-   * Define the default type of the buffers we are creating
-   */
-  std::optional<bool> drawOnlyOnFirstAttachmentByDefault = std::nullopt;
 
 }; // end of struct IMultiRenderTargetOptions
 

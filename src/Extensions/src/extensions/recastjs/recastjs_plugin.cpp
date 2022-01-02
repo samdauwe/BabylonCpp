@@ -1,10 +1,10 @@
 #include <babylon/extensions/recastjs/recastjs_plugin.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/extensions/recastjs/recastjs_crowd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/navigation/inav_mesh_parameters.h>
 
@@ -52,8 +52,8 @@ void RecastJSPlugin::createNavMesh(const std::vector<MeshPtr>& meshes,
   rcConfig rc;
   rc.cs                     = parameters.cs;
   rc.ch                     = parameters.ch;
-  rc.borderSize             = parameters.borderSize;
-  rc.tileSize               = parameters.tileSize;
+  rc.borderSize             = 0;
+  rc.tileSize               = 0;
   rc.walkableSlopeAngle     = parameters.walkableSlopeAngle;
   rc.walkableHeight         = parameters.walkableHeight;
   rc.walkableClimb          = parameters.walkableClimb;
@@ -255,23 +255,6 @@ void RecastJSPlugin::getDefaultQueryExtentToRef(Vector3& result)
 
 void RecastJSPlugin::dispose()
 {
-}
-
-IObstacle* RecastJSPlugin::addCylinderObstacle(const Vector3& position, float radius, float height)
-{
-  return navMesh->addCylinderObstacle(Vec3(position.x, position.y, position.z), radius, height);
-}
-
-IObstacle* RecastJSPlugin::addBoxObstacle(const Vector3& position, const Vector3& extent,
-                                          float angle)
-{
-  return navMesh->addBoxObstacle(Vec3(position.x, position.y, position.z),
-                                 Vec3(extent.x, extent.y, extent.z), angle);
-}
-
-void RecastJSPlugin::removeObstacle(IObstacle* obstacle)
-{
-  navMesh->removeObstacle(obstacle);
 }
 
 bool RecastJSPlugin::isSupported() const

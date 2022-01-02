@@ -24,7 +24,7 @@ DepthRendererPtr& DepthReducer::get_depthRenderer()
 void DepthReducer::setDepthRenderer(DepthRendererPtr iDepthRenderer, unsigned int type,
                                     bool forceFullscreenViewport)
 {
-  const auto scene = _camera->getScene();
+  auto scene = _camera->getScene();
 
   if (_depthRenderer) {
     scene->_depthRenderer.erase(_depthRendererId);
@@ -38,9 +38,8 @@ void DepthReducer::setDepthRenderer(DepthRendererPtr iDepthRenderer, unsigned in
       scene->_depthRenderer = {};
     }
 
-    iDepthRenderer = _depthRenderer = std::make_shared<DepthRenderer>(
-      scene, type, _camera, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE);
-    iDepthRenderer->enabled = false;
+    iDepthRenderer = _depthRenderer = std::make_shared<DepthRenderer>(scene, type, _camera, false);
+    iDepthRenderer->enabled         = false;
 
     _depthRendererId                        = "minmax" + _camera->id;
     scene->_depthRenderer[_depthRendererId] = iDepthRenderer;

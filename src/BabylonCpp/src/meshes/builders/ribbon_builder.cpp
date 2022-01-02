@@ -1,10 +1,10 @@
 #include <babylon/meshes/builders/ribbon_builder.h>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
@@ -54,11 +54,12 @@ MeshPtr RibbonBuilder::CreateRibbon(const std::string& name, RibbonOptions& opti
     };
     auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
     positionFunction(positions);
-    if (instance->hasBoundingInfo()) {
-      instance->getBoundingInfo()->reConstruct(minimum, maximum, instance->_worldMatrix);
+    if (instance->_boundingInfo) {
+      instance->_boundingInfo->reConstruct(minimum, maximum, instance->_worldMatrix);
     }
     else {
-      instance->buildBoundingInfo(minimum, maximum, instance->_worldMatrix);
+      instance->_boundingInfo
+        = std::make_shared<BoundingInfo>(minimum, maximum, instance->_worldMatrix);
     }
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false, false);
     if (!options.colors.empty()) {

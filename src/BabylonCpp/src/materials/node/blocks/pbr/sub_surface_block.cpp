@@ -120,10 +120,8 @@ void SubSurfaceBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& 
   defines.setValue("SUBSURFACE", translucencyEnabled || refraction()->isConnected(), true);
   defines.setValue("SS_TRANSLUCENCY", translucencyEnabled, true);
   defines.setValue("SS_THICKNESSANDMASK_TEXTURE", false, true);
-  defines.setValue("SS_REFRACTIONINTENSITY_TEXTURE", false, true);
-  defines.setValue("SS_TRANSLUCENCYINTENSITY_TEXTURE", false, true);
   defines.setValue("SS_MASK_FROM_THICKNESS_TEXTURE", false, true);
-  defines.setValue("SS_USE_GLTF_TEXTURES", false, true);
+  defines.setValue("SS_MASK_FROM_THICKNESS_TEXTURE_GLTF", false, true);
 }
 
 std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
@@ -200,13 +198,11 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
                 #endif
             #endif
         #endif
-        #if defined(SS_REFRACTION) || defined(SS_TRANSLUCENCY)
-            surfaceAlbedo,
-        #endif
         #ifdef SS_REFRACTION
             %s.xyz,
             viewDirectionW,
             %s,
+            surfaceAlbedo,
             %s,
             %s,
             %s,
@@ -219,8 +215,9 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
             #endif
             #ifdef %s
                 roughness,
+            #else
+                alphaG,
             #endif
-            alphaG,
             #ifdef %s
                 %s,
             #else
@@ -240,10 +237,6 @@ std::string SubSurfaceBlock::GetCode(NodeMaterialBuildState& state,
             #endif
             #ifdef REALTIME_FILTERING
                 %s,
-            #endif
-            #ifdef SS_USE_LOCAL_REFRACTIONMAP_CUBIC
-                vRefractionPosition,
-                vRefractionSize,
             #endif
         #endif
         #ifdef SS_TRANSLUCENCY

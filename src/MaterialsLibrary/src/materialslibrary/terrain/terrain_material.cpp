@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -18,6 +17,7 @@
 #include <babylon/materialslibrary/terrain/terrain_vertex_fx.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -201,19 +201,18 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<TerrainMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<TerrainMaterialDefines>();
   }
 
-  const auto definesPtr
-    = std::static_pointer_cast<TerrainMaterialDefines>(subMesh->_materialDefines);
-  auto& defines    = *definesPtr.get();
-  const auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<TerrainMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   // Textures
   if (scene->texturesEnabled()) {
@@ -339,8 +338,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
     options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -355,15 +353,15 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 
 void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  const auto scene = getScene();
+  auto scene = getScene();
 
-  const auto _defines = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
+  auto _defines = static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
   auto defines = *_defines;
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -423,7 +421,7 @@ void TerrainMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);

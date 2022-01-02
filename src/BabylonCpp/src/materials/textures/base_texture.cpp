@@ -41,7 +41,6 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , uid{this, &BaseTexture::get_uid}
     , onDispose{this, &BaseTexture::set_onDispose}
     , isBlocking{this, &BaseTexture::get_isBlocking, &BaseTexture::set_isBlocking}
-    , _parentContainer{nullptr}
     , boundingBoxSize{this, &BaseTexture::get_boundingBoxSize, &BaseTexture::set_boundingBoxSize}
     , textureType{this, &BaseTexture::get_textureType}
     , textureFormat{this, &BaseTexture::get_textureFormat}
@@ -52,7 +51,6 @@ BaseTexture::BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>&
     , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
     , _coordinatesMode{Constants::TEXTURE_EXPLICIT_MODE}
     , _scene{nullptr}
-    , _loadingError{false}
     , _hasAlpha{false}
     , _isCube{false}
     , _gammaSpace{true}
@@ -217,7 +215,7 @@ bool BaseTexture::get_gammaSpace() const
     }
   }
 
-  return *_texture->_gammaSpace && !_texture->_useSRGBBuffer;
+  return *_texture->_gammaSpace;
 }
 
 void BaseTexture::set_gammaSpace(bool gamma)
@@ -391,38 +389,22 @@ bool BaseTexture::canRescale()
   return false;
 }
 
-void BaseTexture::forceSphericalPolynomialsRecompute()
-{
-  if (_texture) {
-    _texture->_sphericalPolynomial         = nullptr;
-    _texture->_sphericalPolynomialPromise  = nullptr;
-    _texture->_sphericalPolynomialComputed = false;
-  }
-}
-
 InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMipmap,
                                               unsigned int sampling,
-                                              const std::optional<bool>& invertY,
-                                              const std::optional<bool>& useSRGBBuffer)
+                                              const std::optional<bool>& invertY)
 {
-  const auto engine = _getEngine();
+  auto engine = _getEngine();
   if (!engine) {
     return nullptr;
   }
 
-  const auto correctedUseSRGBBuffer = engine->_getUseSRGBBuffer(!!useSRGBBuffer, noMipmap);
-
   auto& texturesCache = engine->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
-
-    if (!useSRGBBuffer.has_value()
-        || correctedUseSRGBBuffer == texturesCacheEntry->_useSRGBBuffer) {
-      if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
-        if ((texturesCacheEntry->url == url) && texturesCacheEntry->generateMipMaps != iNoMipmap) {
-          if (!sampling || sampling == texturesCacheEntry->samplingMode) {
-            texturesCacheEntry->incrementReferences();
-            return texturesCacheEntry;
-          }
+    if (!invertY.has_value() || *invertY == texturesCacheEntry->invertY) {
+      if ((texturesCacheEntry->url == url) && texturesCacheEntry->generateMipMaps != iNoMipmap) {
+        if (!sampling || sampling == texturesCacheEntry->samplingMode) {
+          texturesCacheEntry->incrementReferences();
+          return texturesCacheEntry;
         }
       }
     }
@@ -431,8 +413,7 @@ InternalTexturePtr BaseTexture::_getFromCache(const std::string& url, bool iNoMi
   return nullptr;
 }
 
-void BaseTexture::_rebuild(bool /*forceFullRebuild*/,
-                           const std::vector<std::string>& /*textureNames*/)
+void BaseTexture::_rebuild(bool /*forceFullRebuild*/)
 {
 }
 
@@ -485,8 +466,7 @@ void BaseTexture::_markAllSubMeshesAsTexturesDirty()
 }
 
 ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
-                                        std::optional<ArrayBufferView> buffer, bool flushRenderer,
-                                        bool noDataConversion)
+                                        std::optional<ArrayBufferView> buffer)
 {
   if (!_texture) {
     return ArrayBufferView();
@@ -511,72 +491,23 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, width, height, static_cast<int>(faceIndex), iLevel,
-                                      buffer, flushRenderer, noDataConversion);
+                                      buffer);
   }
 
-  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer, flushRenderer,
-                                    noDataConversion);
-}
-
-ArrayBufferView BaseTexture::_readPixelsSync(unsigned int faceIndex, int iLevel,
-                                             std::optional<ArrayBufferView> buffer,
-                                             bool flushRenderer, bool noDataConversion)
-{
-  if (!_texture) {
-    return ArrayBufferView();
-  }
-
-  auto size   = getSize();
-  auto width  = size.width;
-  auto height = size.height;
-
-  const auto engine = _getEngine();
-  if (!engine) {
-    return ArrayBufferView();
-  }
-
-  if (iLevel != 0) {
-    width  = width / static_cast<int>(std::pow(2, iLevel));
-    height = height / static_cast<int>(std::pow(2, iLevel));
-
-    width  = static_cast<int>(std::round(width));
-    height = static_cast<int>(std::round(height));
-  }
-
-  if (_texture->isCube) {
-    return engine->_readTexturePixelsSync(_texture, width, height, static_cast<int>(faceIndex),
-                                          iLevel, buffer, flushRenderer, noDataConversion);
-  }
-
-  return engine->_readTexturePixelsSync(_texture, width, height, -1, iLevel, buffer, flushRenderer,
-                                        noDataConversion);
+  return engine->_readTexturePixels(_texture, width, height, -1, iLevel, buffer);
 }
 
 SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
 {
   if (_texture) {
-    if (_texture->_sphericalPolynomial || _texture->_sphericalPolynomialComputed) {
+    if (_texture->_sphericalPolynomial) {
       return _texture->_sphericalPolynomial;
     }
 
     if (_texture->isReady) {
-      if (!_texture->_sphericalPolynomialPromise) {
-        _texture->_sphericalPolynomialPromise = [this]() -> SphericalPolynomialPtr {
-          return CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
-            *this);
-        };
-        if (_texture->_sphericalPolynomialPromise == nullptr) {
-          _texture->_sphericalPolynomialComputed = true;
-        }
-        else {
-          _texture->_sphericalPolynomial         = _texture->_sphericalPolynomialPromise();
-          _texture->_sphericalPolynomialComputed = true;
-
-          return _texture->_sphericalPolynomial;
-        }
-      }
-
-      return _nullSphericalPolynomial;
+      _texture->_sphericalPolynomial
+        = CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(*this);
+      return _texture->_sphericalPolynomial;
     }
   }
 
@@ -625,11 +556,6 @@ void BaseTexture::dispose()
 
     _scene->onTextureRemovedObservable.notifyObservers(this);
     _scene = nullptr;
-
-    if (_parentContainer) {
-      stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->textures, this);
-      _parentContainer = nullptr;
-    }
   }
 
   // Callback

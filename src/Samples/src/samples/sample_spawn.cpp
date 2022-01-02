@@ -22,27 +22,24 @@ SpawnResult SpawnWaitSubProcess(const std::vector<std::string>& command,
 
   struct subprocess_s subProcess;
 
-  auto processOptions = 0;
-  if (spawnOptions.MixStdOutStdErr) {
+  int processOptions = 0;
+  if (spawnOptions.MixStdOutStdErr)
     processOptions = processOptions | subprocess_option_combined_stdout_stderr;
-  }
-  if (spawnOptions.InheritEnvironment) {
+  if (spawnOptions.InheritEnvironment)
     processOptions = processOptions | subprocess_option_inherit_environment;
-  }
 
   int resultCreateProcess = subprocess_create_cpp(
     command, subprocess_option_inherit_environment | subprocess_option_combined_stdout_stderr,
     &subProcess);
-  if (0 != resultCreateProcess) {
+  if (0 != resultCreateProcess)
     throw std::runtime_error("spawnScreenshots: Error while spawning screenshot process");
-  }
   Timer timer;
   timer.start();
 
   FILE* outPipe                      = subprocess_stdout(&subProcess);
   std::atomic<bool> wasProcessKilled = false;
 
-  const auto lambdaCopyOutput = [outPipe, spawnOptions, &spawnResult, &wasProcessKilled]() -> void {
+  auto lambdaCopyOutput = [outPipe, spawnOptions, &spawnResult, &wasProcessKilled]() {
     char line[256];
     while ((!wasProcessKilled) && (fgets(line, sizeof line, outPipe))) {
       if (spawnOptions.CopyOutputToMainProgramOutput)
@@ -54,18 +51,17 @@ SpawnResult SpawnWaitSubProcess(const std::vector<std::string>& command,
 
   auto asyncCallFuture = std::async(std::launch::async, lambdaCopyOutput);
 
-  auto done = false;
+  bool done = false;
   while (!done) {
     done = true;
 
-    auto elapsedSeconds = timer.getElapsedTimeInSec();
+    double elapsedSeconds = timer.getElapsedTimeInSec();
     if ((spawnOptions.MaxExecutionTimeSeconds > 0.)
         && (elapsedSeconds > spawnOptions.MaxExecutionTimeSeconds)) {
-      wasProcessKilled               = true;
-      auto resultTerminateSubprocess = subprocess_terminate(&subProcess);
-      if (0 != resultTerminateSubprocess) {
+      wasProcessKilled              = true;
+      int resultTerminateSubprocess = subprocess_terminate(&subProcess);
+      if (0 != resultTerminateSubprocess)
         throw std::runtime_error("spawnScreenshots: Error while killing subprocess after timeeout");
-      }
       done                               = true;
       spawnResult.MaxExecutionTimePassed = true;
     }
@@ -91,7 +87,7 @@ bool ReadImage_IsUniformColor_Sync(const std::string& imageFileName)
     return true;
   };
 
-  auto are_all_pixels_equal   = true;
+  bool are_all_pixels_equal   = true;
   unsigned char* firstPixel   = data;
   unsigned char* currentPixel = data;
   for (int y = 0; y < h; ++y) {
@@ -108,7 +104,7 @@ bool ReadImage_IsUniformColor_Sync(const std::string& imageFileName)
 
 bool ReadScreenshot_IsImageEmpty(const std::string& sampleName)
 {
-  auto filename = BABYLON::SamplesInfo::SampleScreenshotFile_Absolute(sampleName);
+  std::string filename = BABYLON::SamplesInfo::SampleScreenshotFile_Absolute(sampleName);
   return ReadImage_IsUniformColor_Sync(filename);
 }
 

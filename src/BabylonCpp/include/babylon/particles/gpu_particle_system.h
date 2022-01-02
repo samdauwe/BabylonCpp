@@ -20,7 +20,6 @@ class Engine;
 class GPUParticleSystem;
 struct IEffectCreationOptions;
 class Mesh;
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(RawTexture)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
@@ -374,11 +373,6 @@ public:
   void _recreateUpdateEffect();
 
   /**
-   * @brief Hidden
-   */
-  DrawWrapperPtr _getWrapper(unsigned int blendMode);
-
-  /**
    * @brief Fill the defines array according to the current settings of the particle system
    * @param defines Array to be updated
    * @param blendMode blend mode to take into account when updating the array
@@ -446,16 +440,13 @@ public:
   /**
    * @brief Parses a JSON object to create a GPU particle system.
    * @param parsedParticleSystem The JSON object to parse
-   * @param sceneOrEngine The scene or the engine to create the particle system in
+   * @param scene The scene to create the particle system in
    * @param rootUrl The root url to use to load external dependencies like texture
    * @param doNotStart Ignore the preventAutoStart attribute and does not start
-   * @param capacity defines the system capacity (if null or undefined the sotred capacity will be
-   * used)
    * @returns the parsed GPU particle system
    */
   static IParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
-                                const std::string& rootUrl, bool doNotStart = false,
-                                const std::optional<size_t>& capacity = std::nullopt);
+                                const std::string& rootUrl, bool doNotStart = false);
 
 protected:
   /**
@@ -542,11 +533,6 @@ private:
   void _releaseVAOs();
 
 public:
-  /** @hidden */
-  RawTexturePtr _randomTexture;
-  /** @hidden */
-  RawTexturePtr _randomTexture2;
-
   /**
    * An event triggered when the system is disposed.
    */
@@ -556,19 +542,6 @@ public:
    * Gets or set the number of active particles
    */
   Property<GPUParticleSystem, size_t> activeParticleCount;
-
-  /** @hidden */
-  RawTexturePtr _colorGradientsTexture;
-  /** @hidden */
-  RawTexturePtr _angularSpeedGradientsTexture;
-  /** @hidden */
-  RawTexturePtr _sizeGradientsTexture;
-  /** @hidden */
-  RawTexturePtr _velocityGradientsTexture;
-  /** @hidden */
-  RawTexturePtr _limitVelocityGradientsTexture;
-  /** @hidden */
-  RawTexturePtr _dragGradientsTexture;
 
 protected:
   /** @hidden */
@@ -593,11 +566,13 @@ private:
   Buffer* _targetBuffer;
 
   int _currentRenderId;
-  int _currentRenderingCameraUniqueId;
   bool _started;
   bool _stopped;
 
   float _timeDelta;
+
+  RawTexturePtr _randomTexture;
+  RawTexturePtr _randomTexture2;
 
   int _attributesStrideSize;
   IEffectCreationOptions* _updateEffectOptions;
@@ -609,6 +584,13 @@ private:
   Vector3 _zeroVector3;
   unsigned int _rawTextureWidth;
   bool _preWarmDone;
+
+  RawTexturePtr _colorGradientsTexture;
+  RawTexturePtr _angularSpeedGradientsTexture;
+  RawTexturePtr _sizeGradientsTexture;
+  RawTexturePtr _velocityGradientsTexture;
+  RawTexturePtr _limitVelocityGradientsTexture;
+  RawTexturePtr _dragGradientsTexture;
 
   std::vector<Color3Gradient> _emptyRampGradients;
 

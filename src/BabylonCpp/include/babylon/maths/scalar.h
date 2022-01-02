@@ -322,11 +322,11 @@ constexpr float InverseLerp(float a, float b, float value)
  * @brief Returns a new scalar located for "amount" (float) on the Hermite spline defined by the
  * scalars "value1", "value3", "tangent1", "tangent2".
  * @see http://mathworld.wolfram.com/HermitePolynomial.html
- * @param value1 defines the first control point
- * @param tangent1 defines the first tangent
- * @param value2 defines the second control point
- * @param tangent2 defines the second tangent
- * @param amount defines the amount on the interpolation spline (between 0 and 1)
+ * @param value1 spline value
+ * @param tangent1 spline value
+ * @param value2 spline value
+ * @param tangent2 spline value
+ * @param amount input value
  * @returns hermite result
  */
 constexpr float Hermite(float value1, float tangent1, float value2, float tangent2, float amount)
@@ -339,27 +339,6 @@ constexpr float Hermite(float value1, float tangent1, float value2, float tangen
   const float part4   = cubed - squared;
 
   return (((value1 * part1) + (value2 * part2)) + (tangent1 * part3)) + (tangent2 * part4);
-}
-
-/**
- * @brief Returns a new scalar which is the 1st derivative of the Hermite spline defined by the
- * scalars "value1", "value2", "tangent1", "tangent2".
- * @param value1 defines the first control point
- * @param tangent1 defines the first tangent
- * @param value2 defines the second control point
- * @param tangent2 defines the second tangent
- * @param time define where the derivative must be done
- * @returns 1st derivative
- */
-constexpr float Hermite1stDerivative(float value1, float tangent1, float value2, float tangent2,
-                                     float time)
-{
-  const auto t2 = time * time;
-  return ((t2 - time) * 6.f * value1 +               //
-          (3.f * t2 - 4.f * time + 1.f) * tangent1 + //
-          (-t2 + time) * 6.f * value2 +              //
-          (3.f * t2 - 2.f * time) * tangent2         //
-  );
 }
 
 /**
@@ -423,21 +402,6 @@ inline float NormalizeRadians(float angle)
   angle -= (Scalar::TwoPi() * std::floor((angle + Math::PI) / Scalar::TwoPi()));
 
   return angle;
-}
-
-/**
- * @brief Returns the highest common factor of two integers.
- * @param a first parameter
- * @param b second parameter
- * @return HCF of a and b
- */
-inline int HCF(int a, int b)
-{
-  const auto r = a % b;
-  if (r == 0) {
-    return b;
-  }
-  return Scalar::HCF(b, r);
 }
 
 } // end of namespace Scalar

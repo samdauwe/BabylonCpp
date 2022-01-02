@@ -34,12 +34,6 @@ struct BABYLON_SHARED_EXPORT PrePassConfiguration {
   std::optional<Matrix> previousViewProjection;
 
   /**
-   * Current view projection matrix
-   * Used for computing velocity
-   */
-  Matrix currentViewProjection;
-
-  /**
    * Previous bones of meshes carrying this material
    * Used for computing velocity
    */

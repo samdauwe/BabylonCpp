@@ -60,9 +60,6 @@ public:
   /** Hidden */
   void _onLostFocus();
 
-private:
-  float _getLocalRotation() const;
-
 public:
   /**
    * Gets or Set the list of keyboard keys used to control the forward move of the camera.
@@ -93,22 +90,6 @@ public:
    * Gets or Set the list of keyboard keys used to control the right strafe move of the camera.
    */
   Int32Array keysRight;
-
-  /**
-   * Defines the pointer angular sensibility  along the X and Y axis or how fast is the camera
-   * rotating.
-   */
-  float rotationSpeed;
-
-  /**
-   * Gets or Set the list of keyboard keys used to control the left rotation move of the camera.
-   */
-  Int32Array keysRotateLeft;
-
-  /**
-   * Gets or Set the list of keyboard keys used to control the right rotation move of the camera.
-   */
-  Int32Array keysRotateRight;
 
 private:
   Int32Array _keys;

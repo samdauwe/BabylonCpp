@@ -1,5 +1,5 @@
-#ifndef BABYLON_BUFFERS_BUFFER_H
-#define BABYLON_BUFFERS_BUFFER_H
+#ifndef BABYLON_MESHES_BUFFER_H
+#define BABYLON_MESHES_BUFFER_H
 
 #include <memory>
 
@@ -105,9 +105,8 @@ public:
   // Methods
 
   /**
-   * @brief Store data into the buffer. Creates the buffer if not used already.
-   * If the buffer was already used, it will be updated only if it is updatable, otherwise it will
-   * do nothing.
+   * @brief Store data into the buffer. If the buffer was already used it will be either recreated
+   * or updated depending on isUpdatable property
    * @param data defines the data to store
    */
   WebGLDataBufferPtr create(Float32Array data = {});
@@ -167,4 +166,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_BUFFERS_BUFFER_H
+#endif // end of BABYLON_MESHES_BUFFER_H

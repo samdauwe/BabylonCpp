@@ -286,11 +286,6 @@ LensFlareSystemPtr AbstractScene::getLensFlareSystemByName(const std::string& na
 
 LensFlareSystemPtr AbstractScene::getLensFlareSystemByID(const std::string& id)
 {
-  return getLensFlareSystemById(id);
-}
-
-LensFlareSystemPtr AbstractScene::getLensFlareSystemById(const std::string& id)
-{
   auto it = std::find_if(
     lensFlareSystems.begin(), lensFlareSystems.end(),
     [&id](const LensFlareSystemPtr& lensFlareSystem) { return lensFlareSystem->id == id; });

@@ -1,7 +1,6 @@
 #include <babylon/particles/points_cloud_system.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
@@ -11,6 +10,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/particles/cloud_point.h>
 #include <babylon/particles/points_group.h>
@@ -54,13 +54,13 @@ PointsCloudSystem::PointsCloudSystem(const std::string& iName, size_t pointSize,
 
 PointsCloudSystem::~PointsCloudSystem() = default;
 
-MeshPtr PointsCloudSystem::buildMeshSync(const MaterialPtr& material)
+MeshPtr PointsCloudSystem::buildMeshSync()
 {
   _isReady = true;
-  return _buildMesh(material);
+  return _buildMesh();
 }
 
-MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
+MeshPtr PointsCloudSystem::_buildMesh()
 {
   if (nbParticles == 0) {
     addPoints(1);
@@ -70,7 +70,7 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
   _uvs32       = Float32Array(_uvs);
   _colors32    = Float32Array(_colors);
 
-  const auto vertexData = std::unique_ptr<VertexData>();
+  auto vertexData = std::unique_ptr<VertexData>();
   vertexData->set(_positions32, VertexBuffer::PositionKind);
 
   if (_uvs32.size() > 0) {
@@ -81,7 +81,7 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
     ec = 1.f;
     vertexData->set(_colors32, VertexBuffer::ColorKind);
   }
-  const auto iMesh = Mesh::New(name, _scene);
+  auto iMesh = Mesh::New(name, _scene);
   vertexData->applyToMesh(*iMesh, _updatable);
   mesh = iMesh;
 
@@ -94,16 +94,12 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
     particles.clear();
   }
 
-  auto mat = material;
-
-  if (!mat) {
-    mat = StandardMaterial::New("point cloud material", _scene);
-    std::static_pointer_cast<StandardMaterial>(mat)->emissiveColor   = Color3(ec, ec, ec);
-    std::static_pointer_cast<StandardMaterial>(mat)->disableLighting = true;
-    std::static_pointer_cast<StandardMaterial>(mat)->pointsCloud     = true;
-    std::static_pointer_cast<StandardMaterial>(mat)->pointSize       = static_cast<float>(_size);
-  }
-  iMesh->material = mat;
+  auto mat             = StandardMaterial::New("point cloud material", _scene);
+  mat->emissiveColor   = Color3(ec, ec, ec);
+  mat->disableLighting = true;
+  mat->pointsCloud     = true;
+  mat->pointSize       = static_cast<float>(_size);
+  iMesh->material      = mat;
 
   return iMesh;
 }
@@ -111,7 +107,7 @@ MeshPtr PointsCloudSystem::_buildMesh(const MaterialPtr& material)
 CloudPointPtr PointsCloudSystem::_addParticle(size_t idx, const PointsGroupPtr& group,
                                               size_t groupId, size_t idxInGroup)
 {
-  const auto cp = std::make_shared<CloudPoint>(idx, group, groupId, idxInGroup, this);
+  auto cp = std::make_shared<CloudPoint>(idx, group, groupId, idxInGroup, this);
   particles.emplace_back(cp);
   return cp;
 }
@@ -684,7 +680,7 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
     if (start != 0
         || end != nbParticles - 1) { // only some particles are updated, then use the current
                                      // existing BBox basis. Note : it can only increase.
-      const auto& boundingInfo = iMesh->getBoundingInfo();
+      const auto& boundingInfo = iMesh->_boundingInfo;
       if (boundingInfo) {
         minimum.copyFrom(boundingInfo->minimum);
         maximum.copyFrom(boundingInfo->maximum);
@@ -852,11 +848,11 @@ PointsCloudSystem& PointsCloudSystem::setParticles(size_t start, size_t end, boo
   }
 
   if (_computeBoundingBox) {
-    if (iMesh->hasBoundingInfo()) {
-      iMesh->getBoundingInfo()->reConstruct(minimum, maximum, iMesh->_worldMatrix);
+    if (iMesh->_boundingInfo) {
+      iMesh->_boundingInfo->reConstruct(minimum, maximum, iMesh->_worldMatrix);
     }
     else {
-      iMesh->buildBoundingInfo(minimum, maximum, iMesh->_worldMatrix);
+      iMesh->_boundingInfo = std::make_shared<BoundingInfo>(minimum, maximum, iMesh->_worldMatrix);
     }
   }
   afterUpdateParticles(start, end, update);
@@ -889,7 +885,8 @@ PointsCloudSystem& PointsCloudSystem::refreshVisibleSize()
 void PointsCloudSystem::setVisibilityBox(float size)
 {
   auto vis = size / 2.f;
-  mesh->buildBoundingInfo(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
+  mesh->_boundingInfo
+    = std::make_shared<BoundingInfo>(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis));
 }
 
 bool PointsCloudSystem::get_isAlwaysVisible() const

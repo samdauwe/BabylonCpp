@@ -1,7 +1,6 @@
 #include <babylon/meshes/vertex_data.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -11,6 +10,7 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/geometry.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -3575,8 +3575,8 @@ void VertexData::ComputeNormals(const Float32Array& positions, const Uint32Array
   uint32_t subSq  = 0;
 
   uint32_t ox           = 0; // X partitioning index for facet position
-  uint32_t oy           = 0; // Y partitioning index for facet position
-  uint32_t oz           = 0; // Z partitioning index for facet position
+  uint32_t oy           = 0; // Y partinioning index for facet position
+  uint32_t oz           = 0; // Z partinioning index for facet position
   uint32_t b1x          = 0; // X partitioning index for facet v1 vertex
   uint32_t b1y          = 0; // Y partitioning index for facet v1 vertex
   uint32_t b1z          = 0; // z partitioning index for facet v1 vertex

@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT HDRTools {
 public:
   /**
    * @brief Reads header information from an RGBE texture stored in a native array. More information
-   * on this format are available here: https://en.wikipedia.org/wiki/RGBE_image_format.
+   * on this format are available here: https://en.wikipedia.org/wiki/RGBE_image_format
    *
    * @param uint8array The binary file stored in  native array.
    * @return The header information.

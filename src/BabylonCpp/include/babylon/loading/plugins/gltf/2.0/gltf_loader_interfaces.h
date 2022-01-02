@@ -5,8 +5,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/array_buffer_view.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 using json = nlohmann::json;
 

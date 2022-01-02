@@ -8,7 +8,6 @@
 namespace BABYLON {
 
 class Engine;
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(ProceduralTexture)
@@ -54,11 +53,6 @@ public:
   EffectPtr& getEffect();
 
   /**
-   * @brief Hidden
-   */
-  void _setEffect(const EffectPtr& effect);
-
-  /**
    * @brief Gets texture content (Use this function wisely as reading from a texture can be slow).
    * @returns an ArrayBufferView (Uint8Array or Float32Array)
    */
@@ -67,8 +61,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild(bool forceFullRebuild                        = false,
-                const std::vector<std::string>& textureNames = {}) override;
+  void _rebuild(bool forceFullRebuild = false) override;
 
   /**
    * @brief Resets the texture in order to recreate its associated resources.
@@ -311,6 +304,11 @@ public:
   /**
    * Hidden
    */
+  EffectPtr _effect;
+
+  /**
+   * Hidden
+   */
   std::unordered_map<std::string, TexturePtr> _textures;
 
   /**
@@ -327,7 +325,6 @@ protected:
   Texture* _fallbackTexture;
 
 private:
-  DrawWrapperPtr _drawWrapper;
   RenderTargetTextureSize _size;
   unsigned int _textureType;
   bool _doNotChangeAspectRatio;

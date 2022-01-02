@@ -6,7 +6,8 @@
 namespace BABYLON {
 
 StencilState::StencilState()
-    : stencilFunc{this, &StencilState::get_stencilFunc, &StencilState::set_stencilFunc}
+    : isDirty{this, &StencilState::get_isDirty}
+    , stencilFunc{this, &StencilState::get_stencilFunc, &StencilState::set_stencilFunc}
     , stencilFuncRef{this, &StencilState::get_stencilFuncRef, &StencilState::set_stencilFuncRef}
     , stencilFuncMask{this, &StencilState::get_stencilFuncMask, &StencilState::set_stencilFuncMask}
     , stencilOpStencilFail{this, &StencilState::get_stencilOpStencilFail,
@@ -17,183 +18,194 @@ StencilState::StencilState()
                                 &StencilState::set_stencilOpStencilDepthPass}
     , stencilMask{this, &StencilState::get_stencilMask, &StencilState::set_stencilMask}
     , stencilTest{this, &StencilState::get_stencilTest, &StencilState::set_stencilTest}
+    , _isStencilTestDirty{false}
+    , _isStencilMaskDirty{false}
+    , _isStencilFuncDirty{false}
+    , _isStencilOpDirty{false}
 {
+  reset();
 }
 
 StencilState::~StencilState() = default;
 
-void StencilState::reset()
+bool StencilState::get_isDirty() const
 {
-  enabled = false;
-  mask    = 0xFF;
-
-  func     = StencilState::ALWAYS;
-  funcRef  = 1;
-  funcMask = 0xFF;
-
-  opStencilFail      = StencilState::KEEP;
-  opDepthFail        = StencilState::KEEP;
-  opStencilDepthPass = StencilState::REPLACE;
-}
-
-unsigned int StencilState::get_func() const
-{
-  return _func;
-}
-
-void StencilState::set_func(unsigned int value)
-{
-  _func = value;
-}
-
-unsigned int StencilState::get_funcRef() const
-{
-  return _funcRef;
-}
-
-void StencilState::set_funcRef(unsigned int value)
-{
-  _funcRef = value;
-}
-
-unsigned int StencilState::get_funcMask() const
-{
-  return _funcMask;
-}
-
-void StencilState::set_funcMask(unsigned int value)
-{
-  _funcMask = value;
-}
-
-unsigned int StencilState::get_opStencilFail() const
-{
-  return _opStencilFail;
-}
-
-void StencilState::set_opStencilFail(unsigned int value)
-{
-  _opStencilFail = value;
-}
-
-unsigned int StencilState::get_opDepthFail() const
-{
-  return _opDepthFail;
-}
-
-void StencilState::set_opDepthFail(unsigned int value)
-{
-  _opDepthFail = value;
-}
-
-unsigned int StencilState::get_opStencilDepthPass() const
-{
-  return _opStencilDepthPass;
-}
-
-void StencilState::set_opStencilDepthPass(unsigned int value)
-{
-  _opStencilDepthPass = value;
-}
-
-unsigned int StencilState::get_mask() const
-{
-  return _mask;
-}
-
-void StencilState::set_mask(unsigned int value)
-{
-  _mask = value;
-}
-
-bool StencilState::get_enabled() const
-{
-  return _enabled;
-}
-
-void StencilState::set_enabled(bool value)
-{
-  _enabled = value;
+  return _isStencilTestDirty || _isStencilMaskDirty || _isStencilFuncDirty || _isStencilOpDirty;
 }
 
 unsigned int StencilState::get_stencilFunc() const
 {
-  return _func;
+  return _stencilFunc;
 }
 
 void StencilState::set_stencilFunc(unsigned int value)
 {
-  _func = value;
+  if (_stencilFunc == value) {
+    return;
+  }
+
+  _stencilFunc        = value;
+  _isStencilFuncDirty = true;
 }
 
 int StencilState::get_stencilFuncRef() const
 {
-  return _funcRef;
+  return _stencilFuncRef;
 }
 
 void StencilState::set_stencilFuncRef(int value)
 {
-  _funcRef = value;
+  if (_stencilFuncRef == value) {
+    return;
+  }
+
+  _stencilFuncRef     = value;
+  _isStencilFuncDirty = true;
 }
 
 unsigned int StencilState::get_stencilFuncMask() const
 {
-  return _funcMask;
+  return _stencilFuncMask;
 }
 
 void StencilState::set_stencilFuncMask(unsigned int value)
 {
-  _funcMask = value;
+  if (_stencilFuncMask == value) {
+    return;
+  }
+
+  _stencilFuncMask    = value;
+  _isStencilFuncDirty = true;
 }
 
 unsigned int StencilState::get_stencilOpStencilFail() const
 {
-  return _opStencilFail;
+  return _stencilOpStencilFail;
 }
 
 void StencilState::set_stencilOpStencilFail(unsigned int value)
 {
-  _opStencilFail = value;
+  if (_stencilOpStencilFail == value) {
+    return;
+  }
+
+  _stencilOpStencilFail = value;
+  _isStencilOpDirty     = true;
 }
 
 unsigned int StencilState::get_stencilOpDepthFail() const
 {
-  return _opDepthFail;
+  return _stencilOpDepthFail;
 }
 
 void StencilState::set_stencilOpDepthFail(unsigned int value)
 {
-  _opDepthFail = value;
+  if (_stencilOpDepthFail == value) {
+    return;
+  }
+
+  _stencilOpDepthFail = value;
+  _isStencilOpDirty   = true;
 }
 
 unsigned int StencilState::get_stencilOpStencilDepthPass() const
 {
-  return _opStencilDepthPass;
+  return _stencilOpStencilDepthPass;
 }
 
 void StencilState::set_stencilOpStencilDepthPass(unsigned int value)
 {
-  _opStencilDepthPass = value;
+  if (_stencilOpStencilDepthPass == value) {
+    return;
+  }
+
+  _stencilOpStencilDepthPass = value;
+  _isStencilOpDirty          = true;
 }
 
 unsigned int StencilState::get_stencilMask() const
 {
-  return _mask;
+  return _stencilMask;
 }
 
 void StencilState::set_stencilMask(unsigned int value)
 {
-  _mask = value;
+  if (_stencilMask == value) {
+    return;
+  }
+
+  _stencilMask        = value;
+  _isStencilMaskDirty = true;
 }
 
 bool StencilState::get_stencilTest() const
 {
-  return _enabled;
+  return _stencilTest;
 }
 
 void StencilState::set_stencilTest(bool value)
 {
-  _enabled = value;
+  if (_stencilTest == value) {
+    return;
+  }
+
+  _stencilTest        = value;
+  _isStencilTestDirty = true;
+}
+
+void StencilState::reset()
+{
+  _stencilTest = false;
+  _stencilMask = 0xFF;
+
+  _stencilFunc     = StencilState::ALWAYS;
+  _stencilFuncRef  = 1;
+  _stencilFuncMask = 0xFF;
+
+  _stencilOpStencilFail      = StencilState::KEEP;
+  _stencilOpDepthFail        = StencilState::KEEP;
+  _stencilOpStencilDepthPass = StencilState::REPLACE;
+
+  _isStencilTestDirty = true;
+  _isStencilMaskDirty = true;
+  _isStencilFuncDirty = true;
+  _isStencilOpDirty   = true;
+}
+
+void StencilState::apply(GL::IGLRenderingContext& gl)
+{
+  if (!isDirty()) {
+    return;
+  }
+
+  // Stencil test
+  if (_isStencilTestDirty) {
+    if (stencilTest()) {
+      gl.enable(GL::STENCIL_TEST);
+    }
+    else {
+      gl.disable(GL::STENCIL_TEST);
+    }
+    _isStencilTestDirty = false;
+  }
+
+  // Stencil mask
+  if (_isStencilMaskDirty) {
+    gl.stencilMask(stencilMask());
+    _isStencilMaskDirty = false;
+  }
+
+  // Stencil func
+  if (_isStencilFuncDirty) {
+    gl.stencilFunc(stencilFunc(), stencilFuncRef(), stencilFuncMask());
+    _isStencilFuncDirty = false;
+  }
+
+  // Stencil op
+  if (_isStencilOpDirty) {
+    gl.stencilOp(stencilOpStencilFail(), stencilOpDepthFail(), stencilOpStencilDepthPass());
+    _isStencilOpDirty = false;
+  }
 }
 
 } // end of namespace BABYLON

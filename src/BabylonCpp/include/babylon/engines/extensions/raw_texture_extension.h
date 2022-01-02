@@ -6,7 +6,6 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 
@@ -14,9 +13,10 @@ namespace BABYLON {
 
 class ArrayBufferView;
 using ArrayBufferViewArray = std::vector<ArrayBufferView>;
+class InternalTexture;
 class Scene;
 class ThinEngine;
-FWD_CLASS_SPTR(InternalTexture)
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 /**
  * @brief Hidden
@@ -81,7 +81,7 @@ public:
 
   /**
    * @brief Update a raw cube texture.
-   * @param texture defines the texture to update
+   * @param texture defines the texture to udpdate
    * @param data defines the data to store
    * @param format defines the data format
    * @param type defines the type fo the data (Engine.TEXTURETYPE_UNSIGNED_INT by default)

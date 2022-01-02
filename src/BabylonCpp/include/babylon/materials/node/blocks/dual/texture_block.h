@@ -98,21 +98,6 @@ protected:
   TextureBlock(const std::string& name, bool fragmentOnly = false);
 
   /**
-   * @brief Gets the texture associated with the node.
-   */
-  TexturePtr& get_texture();
-
-  /**
-   * @brief Sets the texture associated with the node.
-   */
-  void set_texture(const TexturePtr& texture);
-
-  /**
-   * @brief Gets the sampler name associated with this texture.
-   */
-  std::string get_samplerName() const;
-
-  /**
    * @brief Gets the uv input component.
    */
   NodeMaterialConnectionPointPtr& get_uv();
@@ -148,19 +133,9 @@ protected:
   NodeMaterialConnectionPointPtr& get_a();
 
   /**
-   * @brief Gets the level output component.
-   */
-  NodeMaterialConnectionPointPtr& get_level();
-
-  /**
    * @brief Gets the target.
    */
   NodeMaterialBlockTargets& get_target() override;
-
-  /**
-   * @brief Sets the target.
-   */
-  virtual void set_target(NodeMaterialBlockTargets& value);
 
   /**
    * @brief Gets whether or not the target is a mixed block target.
@@ -178,11 +153,7 @@ protected:
   std::string _dumpPropertiesCode() override;
 
 private:
-  void _generateConversionCode(NodeMaterialBuildState& state,
-                               const NodeMaterialConnectionPointPtr& output,
-                               const std::string& swizzle);
   void _injectVertexCode(NodeMaterialBuildState& state);
-  void _generateTextureLookup(NodeMaterialBuildState& state);
   void _writeTextureRead(NodeMaterialBuildState& state, bool vertexMode = false);
   void _writeOutput(NodeMaterialBuildState& state, const NodeMaterialConnectionPointPtr& output,
                     const std::string& swizzle, bool vertexMode = false);
@@ -191,12 +162,7 @@ public:
   /**
    * Gets or sets the texture associated with the node
    */
-  Property<TextureBlock, TexturePtr> texture;
-
-  /**
-   * Gets the sampler name associated with this texture
-   */
-  ReadOnlyProperty<TextureBlock, std::string> samplerName;
+  TexturePtr texture;
 
   /**
    * Gets or sets a boolean indicating if content needs to be converted to gamma space
@@ -207,11 +173,6 @@ public:
    * Gets or sets a boolean indicating if content needs to be converted to linear space
    */
   bool convertToLinearSpace;
-
-  /**
-   * Gets or sets a boolean indicating if multiplication of texture with level should be disabled
-   */
-  bool disableLevelMultiplication;
 
   /**
    * Gets the uv input component.
@@ -244,22 +205,14 @@ public:
   ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> b;
 
   /**
-   * Gets the output component
+   * Gets thea output component
    */
   ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> a;
-
-  /**
-   * Gets the level output component
-   */
-  ReadOnlyProperty<TextureBlock, NodeMaterialConnectionPointPtr> level;
 
   /**
    * Gets whether or not the target is a mixed block target
    */
   ReadOnlyProperty<TextureBlock, bool> _isMixed;
-
-protected:
-  TexturePtr _texture;
 
 private:
   std::string _defineName;

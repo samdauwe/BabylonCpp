@@ -2,13 +2,13 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_OCULUS_TOUCH_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(OculusTouchController)
+class OculusTouchController;
+using OculusTouchControllerPtr = std::shared_ptr<OculusTouchController>;
 
 /**
  * @brief Oculus Touch Controller factory.
@@ -107,7 +107,7 @@ protected:
   Observable<ExtendedGamepadButton>& get_onYButtonStateChangedObservable();
 
   /**
-   * @brief Called once for each button that changed state since the last frame.
+   * @brief Called once for each button that changed state since the last frame
    * 0) thumb stick (touch, press, value = pressed (0,1)). value is in this.leftStick
    * 1) index trigger (touch (?), press (only when value > 0.1), value 0 to 1)
    * 2) secondary trigger (same)

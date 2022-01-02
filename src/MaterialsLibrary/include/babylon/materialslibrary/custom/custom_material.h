@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/custom/shader_special_parts.h>
 #include <babylon/maths/vector4.h>
@@ -10,27 +9,23 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(Texture)
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
 
 namespace MaterialsLibrary {
 
 struct UniformInstance {
-  float floatValue = 0.f;
+  float floatValue;
   Vector2 vec2;
   Vector3 vec3;
   Vector4 vec4;
   Matrix mat4;
-  Texture* sampler2D = nullptr;
+  Texture* sampler2D;
 }; // end of struct UniformInstance
 
 class BABYLON_SHARED_EXPORT CustomMaterial : public StandardMaterial {
 
 public:
-  /**
-   * @brief Constructor.
-   * @param name The name given to the material in order to identify it afterwards.
-   * @param scene The scene the material is used in.
-   */
   CustomMaterial(const std::string& name, Scene* scene);
   ~CustomMaterial() override; // = default
 

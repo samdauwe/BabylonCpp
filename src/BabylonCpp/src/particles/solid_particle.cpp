@@ -28,7 +28,6 @@ SolidParticle::SolidParticle(size_t particleIndex, int particleId, size_t positi
     , _ind{0}
     , shapeId{0}
     , idxInShape{0}
-    , hasBoundingInfo{this, &SolidParticle::get_hasBoundingInfo}
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
     , parentId{std::nullopt}
@@ -56,16 +55,6 @@ SolidParticle::SolidParticle(size_t particleIndex, int particleId, size_t positi
 }
 
 SolidParticle::~SolidParticle() = default;
-
-BoundingInfoPtr& SolidParticle::getBoundingInfo()
-{
-  return _boundingInfo;
-}
-
-bool SolidParticle::get_hasBoundingInfo() const
-{
-  return _boundingInfo != nullptr;
-}
 
 SolidParticle& SolidParticle::copyToRef(SolidParticle& target)
 {
@@ -104,9 +93,9 @@ SolidParticle& SolidParticle::copyToRef(SolidParticle& target)
 
 bool SolidParticle::intersectsMesh(const std::variant<Mesh*, SolidParticle*>& target) const
 {
-  BoundingInfoPtr targetBoundingInfo = std::holds_alternative<Mesh*>(target) ?
-                                         std::get<Mesh*>(target)->_boundingInfo :
-                                         std::get<SolidParticle*>(target)->_boundingInfo;
+  std::shared_ptr<BoundingInfo> targetBoundingInfo
+    = std::holds_alternative<Mesh*>(target) ? std::get<Mesh*>(target)->_boundingInfo :
+                                              std::get<SolidParticle*>(target)->_boundingInfo;
 
   if (!_boundingInfo || !targetBoundingInfo) {
     return false;

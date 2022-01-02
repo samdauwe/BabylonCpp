@@ -173,12 +173,12 @@ protected:
   void set_influence(float influence);
 
   /**
-   * @brief Gets the animation properties override.
+   * @brief Gets the animation properties override
    */
   AnimationPropertiesOverridePtr& get_animationPropertiesOverride() override;
 
   /**
-   * @brief Sets the animation properties override.
+   * @brief Sets the animation properties override
    */
   void set_animationPropertiesOverride(const AnimationPropertiesOverridePtr& value) override;
 

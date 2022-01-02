@@ -43,7 +43,6 @@ target_include_directories(${TARGET}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/DetourCrowd/Include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/DetourTileCache/Include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/Recast/Include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/recastnavigation/RecastDemo/Include>
 )
 
 # Libraries

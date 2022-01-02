@@ -2,8 +2,6 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/uniform_buffer.h>
-#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/scalar.h>
 
 namespace BABYLON {
@@ -17,8 +15,7 @@ PointParticleEmitter::~PointParticleEmitter() = default;
 
 void PointParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                   Vector3& directionToUpdate,
-                                                  Particle* /*particle*/, bool isLocal,
-                                                  const Matrix& /*inverseWorldMatrix*/)
+                                                  Particle* /*particle*/, bool isLocal)
 {
   auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   auto randY = Scalar::RandomRange(direction1.y, direction2.y);
@@ -51,16 +48,10 @@ std::unique_ptr<IParticleEmitterType> PointParticleEmitter::clone() const
   return newOne;
 }
 
-void PointParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
+void PointParticleEmitter::applyToShader(Effect* effect)
 {
-  uboOrEffect->setVector3("direction1", direction1);
-  uboOrEffect->setVector3("direction2", direction2);
-}
-
-void PointParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
-{
-  ubo->addUniform("direction1", 3);
-  ubo->addUniform("direction2", 3);
+  effect->setVector3("direction1", direction1);
+  effect->setVector3("direction2", direction2);
 }
 
 std::string PointParticleEmitter::getEffectDefines() const

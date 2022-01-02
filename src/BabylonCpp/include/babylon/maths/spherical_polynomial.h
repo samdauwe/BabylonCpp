@@ -46,13 +46,6 @@ public:
    */
   void scaleInPlace(float scale);
 
-  /**
-   * @brief Updates the spherical polynomial from harmonics.
-   * @param harmonics the spherical harmonics
-   * @returns the spherical polynomial
-   */
-  SphericalPolynomial& updateFromHarmonics(const SphericalHarmonics& harmonics);
-
   /** Statics **/
 
   /**

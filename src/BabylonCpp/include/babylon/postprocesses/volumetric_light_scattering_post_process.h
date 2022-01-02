@@ -8,7 +8,6 @@
 
 namespace BABYLON {
 
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(RenderTargetTexture)
@@ -146,7 +145,7 @@ public:
   float density;
 
 private:
-  DrawWrapperPtr _volumetricLightScatteringPass;
+  EffectPtr _volumetricLightScatteringPass;
   RenderTargetTexturePtr _volumetricLightScatteringRTT;
   Viewport _viewPort;
   Vector2 _screenCoordinates;

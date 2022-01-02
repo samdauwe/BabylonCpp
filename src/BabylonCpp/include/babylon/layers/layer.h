@@ -12,7 +12,7 @@
 namespace BABYLON {
 
 class Layer;
-FWD_STRUCT_SPTR(DrawWrapper)
+FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(Texture)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
@@ -127,11 +127,6 @@ public:
   bool renderOnlyInRenderTargetTextures;
 
   /**
-   * Define if the layer is enabled (ie. should be displayed). Default: true
-   */
-  bool isEnabled;
-
-  /**
    * An event triggered when the layer is disposed.
    */
   Observable<Layer> onDisposeObservable;
@@ -174,7 +169,7 @@ private:
   Scene* _scene;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
-  DrawWrapperPtr _drawWrapper;
+  EffectPtr _effect;
   std::string _previousDefines;
 
 }; // end of class Layer

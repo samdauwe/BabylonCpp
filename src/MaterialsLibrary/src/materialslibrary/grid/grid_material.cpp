@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -17,6 +16,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -62,9 +62,9 @@ bool GridMaterial::needAlphaBlending() const
   return opacity < 1.f || (_opacityTexture && _opacityTexture->isReady());
 }
 
-bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
+bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& /*mesh*/) const
 {
-  return mesh.visibility() < 1.f || needAlphaBlending();
+  return needAlphaBlending();
 }
 
 bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
@@ -76,7 +76,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<GridMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<GridMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<GridMaterialDefines>(subMesh->_materialDefines);
@@ -87,7 +87,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     return true;
   }
 
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   if (defines["TRANSPARENT"] != (opacity < 1.f)) {
     defines.boolDef["TRANSPARENT"] = !defines["TRANSPARENT"];
@@ -147,8 +147,8 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
 
     // Uniforms
     const std::vector<std::string> uniforms{
-      "projection", "mainColor", "lineColor", "gridControl",   "gridOffset",    "vFogInfos",
-      "vFogColor",  "world",     "view",      "opacityMatrix", "vOpacityInfos", "visibility"};
+      "projection", "mainColor", "lineColor", "gridControl",   "gridOffset",   "vFogInfos",
+      "vFogColor",  "world",     "view",      "opacityMatrix", "vOpacityInfos"};
 
     // Samplers
     const std::vector<std::string> samplers{"opacitySampler"};
@@ -164,8 +164,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     options.onCompiled            = onCompiled;
     options.onError               = onError;
 
-    subMesh->setEffect(scene->getEngine()->createEffect("grid", options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect("grid", options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -192,8 +191,6 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
   _activeEffect = effect;
-
-  _activeEffect->setFloat("visibility", mesh->visibility());
 
   // Matrices
   if (!(*defines)["INSTANCES"] || (*defines)["THIN_INSTANCE"]) {

@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_LENGTH_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(LengthBlock)
+class LengthBlock;
+using LengthBlockPtr = std::shared_ptr<LengthBlock>;
 
 /**
  * @brief Block used to get the length of a vector.

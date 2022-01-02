@@ -1,5 +1,5 @@
-#ifndef BABYLON_BUFFERS_DATA_BUFFER_H
-#define BABYLON_BUFFERS_DATA_BUFFER_H
+#ifndef BABYLON_MESHES_DATA_BUFFER_H
+#define BABYLON_MESHES_DATA_BUFFER_H
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -53,4 +53,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_BUFFERS_DATA_BUFFER_H
+#endif // end of BABYLON_MESHES_DATA_BUFFER_H

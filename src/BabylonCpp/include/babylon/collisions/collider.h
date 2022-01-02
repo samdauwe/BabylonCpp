@@ -27,7 +27,8 @@ public:
   static LowestRoot GetLowestRoot(float a, float b, float c, float maxR);
 
   /**
-   * @brief Gets the plane normal used to compute the sliding response (in local space)
+   * @brief Gets the plane normal used to compute the sliding response (in local
+   * space)
    */
   Vector3& slidePlaneNormal();
 
@@ -38,8 +39,8 @@ public:
   bool _checkPointInTriangle(const Vector3& point, const Vector3& pa, const Vector3& pb,
                              const Vector3& pc, const Vector3& n);
   /** Hidden */
-  bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius, const Vector3& vecMin,
-                       const Vector3& vecMax) const;
+  [[nodiscard]] bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius,
+                                     const Vector3& vecMin, const Vector3& vecMax) const;
   /** Hidden */
   void _testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlaneArray, const Vector3& p1,
                      const Vector3& p2, const Vector3& p3, bool hasMaterial,
@@ -52,7 +53,7 @@ public:
   void _getResponse(Vector3& pos, Vector3& vel);
 
 protected:
-  int get_collisionMask() const;
+  [[nodiscard]] int get_collisionMask() const;
   void set_collisionMask(int mask);
 
 public:
@@ -107,8 +108,6 @@ private:
   Vector3 _normalizedVelocity;
   float _nearestDistance;
   int _collisionMask;
-  float _velocitySquaredLength;
-  float _nearestDistanceSquared;
 
 }; // end of class Collider
 

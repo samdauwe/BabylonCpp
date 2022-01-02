@@ -112,15 +112,8 @@ Vector3& Collider::slidePlaneNormal()
 
 void Collider::_initialize(Vector3& source, Vector3& dir, float e)
 {
-  _velocity              = dir;
-  _velocitySquaredLength = _velocity.lengthSquared();
-  const auto len         = std::sqrt(_velocitySquaredLength);
-  if (len == 0.f || len == 1.f) {
-    _normalizedVelocity.copyFromFloats(dir.x, dir.y, dir.z);
-  }
-  else {
-    dir.scaleToRef(1.f / len, _normalizedVelocity);
-  }
+  _velocity = dir;
+  Vector3::NormalizeToRef(dir, _normalizedVelocity);
   _basePoint = source;
 
   source.multiplyToRef(_radius, _basePointWorld);
@@ -159,9 +152,9 @@ bool Collider::_checkPointInTriangle(const Vector3& point, const Vector3& pa, co
 bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
                                const Vector3& vecMin, const Vector3& vecMax) const
 {
-  const auto distance = Vector3::Distance(_basePointWorld, sphereCenter);
+  auto distance = Vector3::Distance(_basePointWorld, sphereCenter);
 
-  const auto max = stl_util::max(_radius.x, _radius.y, _radius.z);
+  auto max = stl_util::max(_radius.x, _radius.y, _radius.z);
 
   if (distance > _velocityWorldLength + max + sphereRadius) {
     return false;
@@ -242,7 +235,9 @@ void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlane
   }
 
   if (!found) {
-    auto a = _velocitySquaredLength;
+    auto velocitySquaredLength = _velocity.lengthSquared();
+
+    auto a = velocitySquaredLength;
 
     _basePoint.subtractToRef(p1, _tempVector);
     auto b = 2.f * (Vector3::Dot(_velocity, _tempVector));
@@ -283,10 +278,9 @@ void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlane
     auto edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
     auto edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
-    a = edgeSquaredLength * (-_velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
-    b = 2.f
-        * (edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
-           - 2.f * edgeDotVelocity * edgeDotBaseToVertex);
+    a = edgeSquaredLength * (-velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
+    b = edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
+        - 2.f * edgeDotVelocity * edgeDotBaseToVertex;
     c = edgeSquaredLength * (1.f - _baseToVertex.lengthSquared())
         + edgeDotBaseToVertex * edgeDotBaseToVertex;
 
@@ -308,10 +302,9 @@ void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlane
     edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
     edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
-    a = edgeSquaredLength * (-_velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
-    b = 2.f
-        * (edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
-           - 2.f * edgeDotVelocity * edgeDotBaseToVertex);
+    a = edgeSquaredLength * (-velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
+    b = edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
+        - 2.f * edgeDotVelocity * edgeDotBaseToVertex;
     c = edgeSquaredLength * (1.f - _baseToVertex.lengthSquared())
         + edgeDotBaseToVertex * edgeDotBaseToVertex;
     lowestRoot = GetLowestRoot(a, b, c, t);
@@ -332,10 +325,9 @@ void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlane
     edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
     edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
-    a = edgeSquaredLength * (-_velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
-    b = 2.f
-        * (edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
-           - 2.f * edgeDotVelocity * edgeDotBaseToVertex);
+    a = edgeSquaredLength * (-velocitySquaredLength) + edgeDotVelocity * edgeDotVelocity;
+    b = edgeSquaredLength * (2.f * Vector3::Dot(_velocity, _baseToVertex))
+        - 2.f * edgeDotVelocity * edgeDotBaseToVertex;
     c = edgeSquaredLength * (1.f - _baseToVertex.lengthSquared())
         + edgeDotBaseToVertex * edgeDotBaseToVertex;
 
@@ -353,9 +345,9 @@ void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlane
   }
 
   if (found) {
-    auto distToCollisionSquared = t * t * _velocitySquaredLength;
+    auto distToCollision = t * _velocity.length();
 
-    if (!collisionFound || distToCollisionSquared < _nearestDistanceSquared) {
+    if (!collisionFound || distToCollision < _nearestDistance) {
       // if collisionResponse is false, collision is not found but the collidedMesh is set anyway.
       // onCollide observable are triggered if collideMesh is set
       // this allow trigger volumes to be created.
@@ -367,9 +359,8 @@ void Collider::_testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlane
         else {
           intersectionPoint.copyFrom(_collisionPoint);
         }
-        _nearestDistanceSquared = distToCollisionSquared;
-        _nearestDistance        = std::sqrt(distToCollisionSquared);
-        collisionFound          = true;
+        _nearestDistance = distToCollision;
+        collisionFound   = true;
       }
       collidedMesh = hostMesh;
     }

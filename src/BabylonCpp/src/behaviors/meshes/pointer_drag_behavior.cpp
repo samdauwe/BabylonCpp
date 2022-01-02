@@ -117,11 +117,6 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
   _pointerObserver = _scene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
       if (!enabled) {
-        // If behavior is disabled before releaseDrag is ever called, call it now.
-        if (_attachedToElement) {
-          releaseDrag();
-        }
-
         return;
       }
 
@@ -135,7 +130,7 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
       }
       else if (pointerInfo->type == PointerEventTypes::POINTERUP) {
         if (startAndReleaseDragOnPointerEvents
-            && currentDraggingPointerId == pointerInfo->pointerEvent.pointerId) {
+            && currentDraggingPointerID == pointerInfo->pointerEvent.pointerId) {
           releaseDrag();
         }
       }
@@ -143,18 +138,18 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
         auto pointerId = pointerInfo->pointerEvent.pointerId;
 
         // If drag was started with anyMouseID specified, set pointerID to the next mouse that moved
-        if (currentDraggingPointerId == PointerDragBehavior::_AnyMouseID
+        if (currentDraggingPointerID == PointerDragBehavior::_AnyMouseID
             && pointerId != PointerDragBehavior::_AnyMouseID) {
           const auto& evt = pointerInfo->pointerEvent;
           const auto isMouseEvent
-            = evt.pointerType == "mouse"
+            = evt.pointerType == PointerType::MOUSE
               || (!_scene->getEngine()->hostInformation.isMobile /* && evt instanceof MouseEvent*/);
           if (isMouseEvent) {
-            if (stl_util::contains(_lastPointerRay, currentDraggingPointerId)) {
-              _lastPointerRay[pointerId] = _lastPointerRay[currentDraggingPointerId];
-              _lastPointerRay.erase(currentDraggingPointerId);
+            if (stl_util::contains(_lastPointerRay, currentDraggingPointerID)) {
+              _lastPointerRay[pointerId] = _lastPointerRay[currentDraggingPointerID];
+              _lastPointerRay.erase(currentDraggingPointerID);
             }
-            currentDraggingPointerId = pointerId;
+            currentDraggingPointerID = pointerId;
           }
         }
 
@@ -166,7 +161,7 @@ void PointerDragBehavior::attach(const AbstractMeshPtr& ownerNode,
         if (pointerInfo->pickInfo.ray) {
           _lastPointerRay[pointerId].origin.copyFrom(pointerInfo->pickInfo.ray->origin);
           _lastPointerRay[pointerId].direction.copyFrom(pointerInfo->pickInfo.ray->direction);
-          if (currentDraggingPointerId == pointerId && dragging) {
+          if (currentDraggingPointerID == pointerId && dragging) {
             _moveDrag(*pointerInfo->pickInfo.ray);
           }
         }
@@ -195,11 +190,11 @@ void PointerDragBehavior::releaseDrag()
     dragging = false;
     DragStartOrEndEvent event;
     event.dragPlanePoint = lastDragPosition;
-    event.pointerId      = currentDraggingPointerId;
+    event.pointerId      = currentDraggingPointerID;
     onDragEndObservable.notifyObservers(&event);
   }
 
-  currentDraggingPointerId = -1;
+  currentDraggingPointerID = -1;
   _moving                  = false;
 
   // Reattach camera controls
@@ -262,15 +257,15 @@ void PointerDragBehavior::_startDrag(int pointerId, const std::optional<Ray>& fr
   auto pickedPoint = _pickWithRayOnDragPlane(_startDragRay);
   if (pickedPoint) {
     dragging                 = true;
-    currentDraggingPointerId = pointerId;
+    currentDraggingPointerID = pointerId;
     lastDragPosition.copyFrom(*pickedPoint);
 
     DragStartOrEndEvent dragStartOrEndEvent;
     dragStartOrEndEvent.dragPlanePoint = *pickedPoint;
-    dragStartOrEndEvent.pointerId      = currentDraggingPointerId;
+    dragStartOrEndEvent.pointerId      = currentDraggingPointerID;
 
     onDragStartObservable.notifyObservers(&dragStartOrEndEvent);
-    _targetPosition.copyFrom(std::dynamic_pointer_cast<Mesh>(attachedNode)->getAbsolutePosition());
+    _targetPosition.copyFrom(std::dynamic_pointer_cast<Mesh>(attachedNode)->absolutePosition());
 
     // Detach camera controls
     if (detachCameraControls && _scene->activeCamera() && !_scene->activeCamera()->leftCamera()) {
@@ -324,7 +319,7 @@ void PointerDragBehavior::_moveDrag(const Ray& ray)
     dragMoveEvent.delta           = _dragDelta;
     dragMoveEvent.dragPlanePoint  = *pickedPoint;
     dragMoveEvent.dragPlaneNormal = _dragPlane->forward;
-    dragMoveEvent.pointerId       = currentDraggingPointerId;
+    dragMoveEvent.pointerId       = currentDraggingPointerID;
 
     onDragObservable.notifyObservers(&dragMoveEvent);
     lastDragPosition.copyFrom(*pickedPoint);
@@ -434,7 +429,7 @@ void PointerDragBehavior::_updateDragPlanePosition(const Ray& ray, const Vector3
   }
   // Update the position of the drag plane so it doesn't get out of sync with the node (eg. when
   // moving back and forth quickly)
-  _dragPlane->position().copyFrom(attachedNode->getAbsolutePosition());
+  _dragPlane->position().copyFrom(attachedNode->absolutePosition());
 
   _dragPlane->computeWorldMatrix(true);
 }

@@ -18,7 +18,6 @@ namespace GL {
 class IGLVertexArrayObject;
 } // end of namespace GL
 
-class AbstractScene;
 class BoundingInfo;
 class Engine;
 class Scene;
@@ -123,11 +122,9 @@ public:
    * determine where to store the data.
    * @param buffer defines the vertex buffer to use
    * @param totalVertices defines the total number of vertices for position kind (could be null)
-   * @param disposeExistingBuffer disposes the existing buffer, if any (default: true)
    */
   void setVerticesBuffer(const VertexBufferPtr& buffer,
-                         const std::optional<size_t>& totalVertices = std::nullopt,
-                         bool disposeExistingBuffer                 = true);
+                         const std::optional<size_t>& totalVertices = std::nullopt);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -155,14 +152,6 @@ public:
    * @brief Hidden
    */
   void _bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind = nullptr);
-
-  /**
-   * @brief Hidden
-   */
-  void
-  _bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind,
-        const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers,
-        std::unordered_map<std::string, WebGLVertexArrayObjectPtr>& overrideVertexArrayObjects);
 
   /**
    * @brief Gets total number of vertices.
@@ -325,7 +314,7 @@ public:
   [[nodiscard]] json serialize() const;
 
   /**
-   * @brief Serialize all vertices data into a JSON object.
+   * @brief Serialize all vertices data into a JSON oject.
    * @returns a JSON representation of the current geometry data
    */
   [[nodiscard]] json serializeVerticeData() const;
@@ -464,9 +453,6 @@ public:
   /** Hidden */
   std::vector<Vector3> _positions;
 
-  /** @hidden */
-  AbstractScene* _parentContainer;
-
   /**
    *  Gets or sets the Bias Vector to apply on the bounding elements
    * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the min is computed as v
@@ -484,9 +470,9 @@ public:
   std::vector<Vector3> centroids;
 
   /**
-   * If set to true (false by default), the bounding info applied to the meshes sharing this
-   * geometry will be the bounding info defined at the class level and won't be computed based on
-   * the vertex positions (which is what we get when useBoundingInfoFromGeometry = false)
+   * If set to true (false by defaut), the bounding info applied to the meshes sharing this geometry
+   * will be the bounding info defined at the class level and won't be computed based on the vertex
+   * positions (which is what we get when useBoundingInfoFromGeometry = false)
    */
   bool useBoundingInfoFromGeometry;
 

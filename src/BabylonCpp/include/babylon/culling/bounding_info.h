@@ -91,7 +91,7 @@ public:
   /**
    * @brief Gets the world distance between the min and max points of the bounding box.
    */
-  float diagonalLength() const;
+  [[nodiscard]] float diagonalLength() const;
 
   /**
    * @brief Checks if a cullable object (mesh...) is in the camera frustum.
@@ -104,7 +104,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _checkCollision(const Collider& collider) const;
+  [[nodiscard]] bool _checkCollision(const Collider& collider) const;
 
   /**
    * @brief Checks if a point is inside the bounding box and bounding sphere or the mesh.
@@ -127,7 +127,7 @@ public:
 protected:
   Vector3& get_minimum();
   Vector3& get_maximum();
-  bool get_isLocked() const;
+  [[nodiscard]] bool get_isLocked() const;
   void set_isLocked(bool value);
 
 private:

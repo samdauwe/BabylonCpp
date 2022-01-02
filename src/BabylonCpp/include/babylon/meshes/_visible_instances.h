@@ -14,10 +14,10 @@ class InstancedMesh;
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT _VisibleInstances {
-  int defaultRenderId                                         = -1;
-  int selfDefaultRenderId                                     = -1;
-  int intermediateDefaultRenderId                             = -1;
-  std::unordered_map<int, std::vector<InstancedMesh*>> meshes = {};
+  int defaultRenderId;
+  int selfDefaultRenderId;
+  int intermediateDefaultRenderId;
+  std::unordered_map<int, std::vector<InstancedMesh*>> meshes;
 }; // end of struct _VisibleInstances
 
 } // end of namespace BABYLON

@@ -26,7 +26,8 @@ inline std::string absolutePath(const std::string& path)
 
 inline bool createDirectory(const std::string& path)
 {
-  return (CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError());
+  return (CreateDirectory(path.c_str(), NULL)
+          || ERROR_ALREADY_EXISTS == GetLastError());
 }
 
 inline std::string getcwd()

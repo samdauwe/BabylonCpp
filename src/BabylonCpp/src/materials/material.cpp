@@ -4,11 +4,8 @@
 #include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
-#include <babylon/materials/material_helper.h>
-#include <babylon/materials/material_stencil_state.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -17,7 +14,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/misc/tools.h>
+#include <babylon/misc/guid.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>
 
@@ -68,7 +65,6 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , canRenderToMRT{this, &Material::get_canRenderToMRT}
     , alpha{this, &Material::get_alpha, &Material::set_alpha}
     , backFaceCulling{this, &Material::get_backFaceCulling, &Material::set_backFaceCulling}
-    , cullBackFaces{this, &Material::get_cullBackFaces, &Material::set_cullBackFaces}
     , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
     , onCompiled{nullptr}
     , onError{nullptr}
@@ -82,7 +78,6 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , onEffectCreatedObservable{this, &Material::get_onEffectCreatedObservable}
     , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
     , needDepthPrePass{this, &Material::get_needDepthPrePass, &Material::set_needDepthPrePass}
-    , isPrePassCapable{this, &Material::get_isPrePassCapable}
     , disableDepthWrite{false}
     , disableColorWrite{false}
     , forceDepthWrite{false}
@@ -91,21 +86,17 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , fogEnabled{this, &Material::get_fogEnabled, &Material::set_fogEnabled}
     , pointSize{1.f}
     , zOffset{0.f}
-    , zOffsetUnits{0.f}
     , wireframe{this, &Material::get_wireframe, &Material::set_wireframe}
     , pointsCloud{this, &Material::get_pointsCloud, &Material::set_pointsCloud}
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
-    , stencil{MaterialStencilState::New()}
+    , _effect{nullptr}
     , _indexInSceneMaterialArray{-1}
-    , _parentContainer{nullptr}
     , transparencyMode{this, &Material::get_transparencyMode, &Material::set_transparencyMode}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
-    , _cullBackFaces{true}
-    , _materialContext{nullptr}
-    , _drawWrapper{nullptr}
+    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
     , _forceAlphaTest{false}
     , _transparencyMode{std::nullopt}
     , _disableAlphaBlending{this, &Material::get__disableAlphaBlending}
@@ -115,20 +106,21 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
-    , _needToBindSceneUbo{false}
     , _fillMode{Material::TriangleFillMode}
     , _cachedDepthWriteState{false}
     , _cachedColorWriteState{false}
     , _cachedDepthFunctionState{0}
 {
-  name   = iName;
-  _scene = scene ? scene : Engine::LastCreatedScene();
+  name             = iName;
+  auto idSubscript = 1u;
+  _scene           = scene ? scene : Engine::LastCreatedScene();
 
-  id                            = !iName.empty() ? iName : Tools::RandomId();
-  uniqueId                      = _scene->getUniqueId();
-  _materialContext              = _scene->getEngine()->createMaterialContext();
-  _drawWrapper                  = std::make_shared<DrawWrapper>(_scene->getEngine(), false);
-  _drawWrapper->materialContext = _materialContext;
+  id = !iName.empty() ? iName : GUID::RandomId();
+  while (_scene->getMaterialByID(id)) {
+    id = name + " " + std::to_string(idSubscript++);
+  }
+
+  uniqueId = _scene->getUniqueId();
 
   if (_scene->useRightHandedSystem()) {
     sideOrientation = Material::ClockWiseSideOrientation;
@@ -137,8 +129,6 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     sideOrientation = Material::CounterClockWiseSideOrientation;
   }
 
-  _uniformBuffer
-    = std::make_unique<UniformBuffer>(scene->getEngine(), Float32Array(), std::nullopt, name);
   _useUBO = getScene()->getEngine()->supportsUniformBuffers();
 
   if (!doNotAdd) {
@@ -185,20 +175,6 @@ void Material::set_backFaceCulling(bool value)
 bool Material::get_backFaceCulling() const
 {
   return _backFaceCulling;
-}
-
-void Material::set_cullBackFaces(bool value)
-{
-  if (_cullBackFaces == value) {
-    return;
-  }
-  _cullBackFaces = value;
-  markAsDirty(Material::TextureDirtyFlag);
-}
-
-bool Material::get_cullBackFaces() const
-{
-  return _cullBackFaces;
 }
 
 bool Material::get_hasRenderTargetTextures() const
@@ -260,11 +236,6 @@ void Material::set_needDepthPrePass(bool value)
   if (_needDepthPrePass) {
     checkReadyOnEveryCall = true;
   }
-}
-
-bool Material::get_isPrePassCapable() const
-{
-  return false;
 }
 
 bool Material::get_fogEnabled() const
@@ -377,11 +348,6 @@ unsigned int Material::get_fillMode() const
   return _fillMode;
 }
 
-DrawWrapperPtr& Material::_getDrawWrapper()
-{
-  return _drawWrapper;
-}
-
 std::string Material::toString(bool fullDetails) const
 {
   std::ostringstream oss;
@@ -413,7 +379,7 @@ void Material::unfreeze()
   checkReadyOnlyOnce = false;
 }
 
-bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/, SubMesh* /*subMesh*/)
+bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
 {
   return true;
 }
@@ -426,7 +392,7 @@ bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, SubMesh* /*subMesh*/,
 
 EffectPtr& Material::getEffect()
 {
-  return _drawWrapper->effect;
+  return _effect;
 }
 
 Scene* Material::getScene() const
@@ -531,27 +497,7 @@ bool Material::_preBind(const EffectPtr& effect, std::optional<unsigned int> ove
   const auto orientation = overrideOrientation.value_or(static_cast<unsigned>(sideOrientation));
   const auto reverse     = orientation == Material::ClockWiseSideOrientation;
 
-  if (effect) {
-    engine->enableEffect(effect);
-  }
-  else {
-    engine->enableEffect(_getDrawWrapper());
-  }
-  engine->setState(backFaceCulling(), zOffset, false, reverse, cullBackFaces(), stencil,
-                   zOffsetUnits);
-
-  return reverse;
-}
-
-bool Material::_preBind(const DrawWrapperPtr& effect,
-                        std::optional<unsigned int> overrideOrientation)
-{
-  auto engine = _scene->getEngine();
-
-  const auto orientation = overrideOrientation.value_or(static_cast<unsigned>(sideOrientation));
-  const auto reverse     = orientation == Material::ClockWiseSideOrientation;
-
-  engine->enableEffect(effect ? effect : _getDrawWrapper());
+  engine->enableEffect(effect ? effect : _effect);
   engine->setState(backFaceCulling(), zOffset, false, reverse);
 
   return reverse;
@@ -569,13 +515,18 @@ void Material::bindOnlyWorldMatrix(Matrix& /*world*/, const EffectPtr& /*effectO
 {
 }
 
+void Material::bindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo)
+{
+  sceneUbo->bindToEffect(effect, "Scene");
+}
+
 void Material::bindView(Effect* effect)
 {
   if (!_useUBO) {
     effect->setMatrix("view", getScene()->getViewMatrix());
   }
   else {
-    _needToBindSceneUbo = true;
+    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
   }
 }
 
@@ -583,33 +534,15 @@ void Material::bindViewProjection(const EffectPtr& effect)
 {
   if (!_useUBO) {
     effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
-    effect->setMatrix("projection", getScene()->getProjectionMatrix());
   }
   else {
-    _needToBindSceneUbo = true;
+    bindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
   }
 }
 
-void Material::bindEyePosition(Effect* effect, const std::string& variableName)
-{
-  if (!_useUBO) {
-    _scene->bindEyePosition(effect, variableName);
-  }
-  else {
-    _needToBindSceneUbo = true;
-  }
-}
-
-void Material::_afterBind(Mesh* mesh, const EffectPtr& effect)
+void Material::_afterBind(Mesh* mesh, const EffectPtr& /*effect*/)
 {
   _scene->_cachedMaterial = this;
-  if (_needToBindSceneUbo) {
-    if (effect) {
-      _needToBindSceneUbo = false;
-      _scene->finalizeSceneUbo();
-      MaterialHelper::BindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
-    }
-  }
   if (mesh) {
     _scene->_cachedVisibility = mesh->visibility();
   }
@@ -920,11 +853,6 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, b
   // Remove from scene
   scene.removeMaterial(this);
 
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->materials, this);
-    _parentContainer = nullptr;
-  }
-
   if (!notBoundToMesh) {
     // Remove from meshes
     if (meshMap.empty()) {
@@ -954,12 +882,12 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/, b
 
   // Shader are kept in cache for further use but we can get rid of this by
   // using forceDisposeEffect
-  if (forceDisposeEffect && _drawWrapper->effect) {
+  if (forceDisposeEffect && _effect) {
     if (!_storeEffectOnSubMeshes) {
-      _drawWrapper->effect->dispose();
+      _effect->dispose();
     }
 
-    _drawWrapper->effect = nullptr;
+    _effect = nullptr;
   }
 
   // Callback
@@ -985,7 +913,7 @@ void Material::releaseVertexArrayObject(const AbstractMeshPtr& iMesh, bool force
       }
     }
     else {
-      geometry->_releaseVertexArrayObject(_drawWrapper->effect);
+      geometry->_releaseVertexArrayObject(_effect);
     }
   }
 }

@@ -4,7 +4,6 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/engines/constants.h>
-#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/matrix.h>
 
@@ -24,8 +23,6 @@ FWD_CLASS_SPTR(RenderTargetTexture)
 class BABYLON_SHARED_EXPORT DepthRenderer {
 
 public:
-  static size_t _Counter;
-
   /**
    * @brief Instantiates a depth renderer.
    * @param scene The scene the renderer belongs to
@@ -33,11 +30,9 @@ public:
    * @param camera The camera to be used to render the depth map (default: scene's active camera)
    * @param storeNonLinearDepth Defines whether the depth is stored linearly like in Babylon Shadows
    * or directly like glFragCoord.z
-   * @param samplingMode The sampling mode to be used with the render target (Linear, Nearest...)
    */
   DepthRenderer(Scene* scene, unsigned int type = Constants::TEXTURETYPE_FLOAT,
-                const CameraPtr& camera = nullptr, bool storeNonLinearDepth = false,
-                unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
+                const CameraPtr& camera = nullptr, bool storeNonLinearDepth = false);
   virtual ~DepthRenderer(); // = default
 
   /**
@@ -78,11 +73,6 @@ public:
   bool enabled;
 
   /**
-   *  Force writing the transparent objects into the depth map
-   */
-  bool forceDepthWriteTransparentMeshes;
-
-  /**
    * Specifies that the depth renderer will only be used within the camera it is created for.
    * This can help forcing its rendering during the camera processing.
    */
@@ -91,10 +81,11 @@ public:
 private:
   Scene* _scene;
   RenderTargetTexturePtr _depthMap;
-  std::string _nameForDrawWrapper;
+  EffectPtr _effect;
   bool _storeNonLinearDepth;
   Color4 _clearColor;
 
+  std::string _cachedDefines;
   CameraPtr _camera;
 
 }; // end of class DepthRenderer

@@ -152,7 +152,7 @@ void GradientBlock::_deserialize(const json& /*serializationObject*/, Scene* /*s
 
 std::string GradientBlock::_dumpPropertiesCode()
 {
-  std::string codeString = NodeMaterialBlock::_dumpPropertiesCode();
+  std::string codeString = "";
 
   codeString += StringTools::printf("%s.colorSteps = {};\r\n", _codeVariableName.c_str());
 

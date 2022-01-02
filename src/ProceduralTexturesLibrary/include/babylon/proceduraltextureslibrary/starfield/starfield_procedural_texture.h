@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_STARFIELD_STARFIELD_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-FWD_CLASS_SPTR(StarfieldProceduralTexture)
+class StarfieldProceduralTexture;
+using StarfieldProceduralTexturePtr = std::shared_ptr<StarfieldProceduralTexture>;
 
 class BABYLON_SHARED_EXPORT StarfieldProceduralTexture : public ProceduralTexture {
 
@@ -34,10 +34,12 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Starfield Procedural Texture from parsed startfield procedural texture data.
+   * @brief Creates a Starfield Procedural Texture from parsed startfield
+   * procedural texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing startfield procedural texture information
+   * @param rootUrl defines the root URL containing startfield procedural
+   * texture information
    * @returns a parsed Starfield Procedural Texture
    */
   static std::unique_ptr<StarfieldProceduralTexture> Parse(const json& parsedTexture, Scene* scene,

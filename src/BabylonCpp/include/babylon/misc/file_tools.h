@@ -112,20 +112,6 @@ public:
    */
   static Image StringToImage(const std::string& uri, bool flipVertically = false);
 
-  /**
-   * @brief Test if the given uri is a valid base64 data url.
-   * @param uri The uri to test
-   * @return True if the uri is a base64 data url or false otherwise
-   */
-  static bool IsBase64DataUrl(const std::string& uri);
-
-  /**
-   * @brief Decode the given base64 uri.
-   * @param uri The uri to decode
-   * @return The decoded base64 data.
-   */
-  static ArrayBuffer DecodeBase64UrlToBinary(const std::string& uri);
-
 private:
   /**
    * @brief Removes unwanted characters from an url.

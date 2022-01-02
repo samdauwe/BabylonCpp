@@ -7,12 +7,12 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 struct ProcessingOptions;
-FWD_STRUCT_SPTR(ShaderCodeNode)
+struct ShaderCodeNode;
+using ShaderCodeNodePtr = std::shared_ptr<ShaderCodeNode>;
 
 /**
  * @brief Hidden
@@ -24,7 +24,8 @@ struct BABYLON_SHARED_EXPORT ShaderCodeNode {
   std::string additionalDefineKey;
   std::string additionalDefineValue;
 
-  virtual bool isValid(const std::unordered_map<std::string, std::string>& preprocessors) const;
+  [[nodiscard]] virtual bool
+  isValid(const std::unordered_map<std::string, std::string>& preprocessors) const;
   virtual std::string process(std::unordered_map<std::string, std::string>& preprocessors,
                               ProcessingOptions& options);
 

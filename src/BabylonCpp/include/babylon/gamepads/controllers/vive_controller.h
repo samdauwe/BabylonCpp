@@ -2,13 +2,13 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_VIVE_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(ViveController)
+class ViveController;
+using ViveControllerPtr = std::shared_ptr<ViveController>;
 
 /**
  * @brief Vive Controller factory.
@@ -19,14 +19,14 @@ struct ViveControllerFactory : public _GamePadFactory {
    * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns true if it can be created, otherwise false
    */
-  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+  [[nodiscard]] bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
 
   /**
    * @brief Creates a new instance of the Gamepad.
    * @param gamepadInfo Defines the gamepad info as receveid from the controller APIs.
    * @returns the new gamepad instance
    */
-  WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
+  [[nodiscard]] WebVRControllerPtr create(const IBrowserGamepadPtr& gamepadInfo) const override;
 }; // end of struct ViveControllerFactory
 
 /**

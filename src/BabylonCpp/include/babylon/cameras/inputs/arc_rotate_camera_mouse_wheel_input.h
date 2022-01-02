@@ -6,12 +6,9 @@
 #include <babylon/cameras/icamera_input.h>
 #include <babylon/core/structs.h>
 #include <babylon/events/pointer_info.h>
-#include <babylon/maths/plane.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
-
-struct IWheelEvent;
 
 /**
  * @brief Manage the mouse wheel inputs to control an arc rotate camera.
@@ -60,35 +57,15 @@ public:
    */
   [[nodiscard]] std::string getSimpleName() const override;
 
-protected:
-  float computeDeltaFromMouseWheelLegacyEvent(float mouseWheelDelta, float radius);
-  void _updateHitPlane();
-  // Get position on the hit plane
-  Vector3 _getPosition() const;
-  void _zoomToMouse(float delta);
-  // Sets x y or z of passed in vector to zero if less than Epsilon.
-  void _zeroIfClose(Vector3& vec);
+private:
+  [[nodiscard]] float computeDeltaFromMouseWheelLegacyEvent(float mouseWheelDelta,
+                                                            float radius) const;
 
 public:
-  /**
-   * Firefox uses a different scheme to report scroll distances to other
-   * browsers. Rather than use complicated methods to calculate the exact
-   * multiple we need to apply, let's just cheat and use a constant.
-   * https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/deltaMode
-   * https://stackoverflow.com/questions/20110224/what-is-the-height-of-a-line-in-a-wheel-event-deltamode-dom-delta-line
-   */
-  static const float ffMultiplier;
-
   /**
    * Gets or Set the mouse wheel precision or how fast is the camera zooming.
    */
   float wheelPrecision;
-
-  /**
-   * Gets or Set the boolean value that controls whether or not the mouse wheel
-   * zooms to the location of the mouse pointer or not.  The default is false.
-   */
-  bool zoomToMouseLocation;
 
   /**
    * wheelDeltaPercentage will be used instead of wheelPrecision if different from 0.
@@ -96,20 +73,10 @@ public:
    */
   float wheelDeltaPercentage;
 
-  /**
-   * If set, this function will be used to set the radius delta that will be added to the current
-   * camera radius
-   */
-  std::function<float(float wheelDelta, ArcRotateCameraMouseWheelInput* input,
-                      const IWheelEvent& event)>
-    customComputeDeltaFromMouseWheel;
-
 private:
   bool _noPreventDefault;
   std::function<void(PointerInfo* p, EventState& es)> _wheel;
   Observer<PointerInfo>::Ptr _observer;
-  std::optional<Plane> _hitPlane;
-  Vector3 _inertialPanning;
 
 }; // end of class ArcRotateCameraMouseWheelInput
 

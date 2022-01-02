@@ -12,11 +12,10 @@
 
 namespace BABYLON {
 
-class Effect;
 class ICanvas;
 class Node;
 class SubMesh;
-FWD_STRUCT_SPTR(DrawWrapper)
+FWD_CLASS_SPTR(Effect)
 
 struct Bounds {
   Vector2 min;
@@ -58,11 +57,11 @@ struct DeviceOrientationEvent {
   float beta  = 0.f;
 }; // end of struct DeviceOrientationEvent
 
-struct DepthWrapper {
-  DrawWrapperPtr depthWrapper = nullptr;
-  std::string depthDefines    = "";
-  std::string token           = "";
-}; // end of struct DepthWrapper
+struct DepthEffect {
+  EffectPtr depthEffect    = nullptr;
+  std::string depthDefines = "";
+  std::string token        = "";
+}; // end of struct DepthEffect
 
 struct DragMoveEvent {
   Vector3 delta;
@@ -205,19 +204,18 @@ struct NodeCache {
   unsigned int billboardMode = 0;
   bool infiniteDistance      = false;
   // Camera
-  unsigned int mode         = 0;
-  float minZ                = 0.f;
-  float maxZ                = 0.f;
-  float fov                 = 0.f;
-  unsigned int fovMode      = 0;
-  float aspectRatio         = 0.f;
-  float orthoLeft           = 0.f;
-  float orthoRight          = 0.f;
-  float orthoTop            = 0.f;
-  float orthoBottom         = 0.f;
-  float projectionPlaneTilt = 0.f;
-  int renderWidth           = 0;
-  int renderHeight          = 0;
+  unsigned int mode    = 0;
+  float minZ           = 0.f;
+  float maxZ           = 0.f;
+  float fov            = 0.f;
+  unsigned int fovMode = 0;
+  float aspectRatio    = 0.f;
+  float orthoLeft      = 0.f;
+  float orthoRight     = 0.f;
+  float orthoTop       = 0.f;
+  float orthoBottom    = 0.f;
+  int renderWidth      = 0;
+  int renderHeight     = 0;
   // TargetCamera
   std::unique_ptr<Vector3> lockedTarget = nullptr;
   // ArcRotateCamera
@@ -275,7 +273,7 @@ struct PointerTouch {
   int x                   = 0;
   int y                   = 0;
   int pointerId           = 0;
-  std::string pointerType = "";
+  PointerType pointerType = PointerType::UNDEFINED;
   bool isPaning           = false;
   bool isPinching         = false;
 }; // end of struct PointerTouch

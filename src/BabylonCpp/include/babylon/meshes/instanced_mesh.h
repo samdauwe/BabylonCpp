@@ -53,7 +53,7 @@ public:
    * @brief Returns a positive integer : the total number of indices in this mesh geometry.
    * @returns the numner of indices or zero if the mesh has no geometry.
    */
-  size_t getTotalIndices() const override;
+  size_t getTotalIndices() const;
 
   /**
    * @brief Creates a new InstancedMesh object from the mesh model.
@@ -171,10 +171,9 @@ public:
    * @brief This method recomputes and sets a new BoundingInfo to the mesh unless it is locked.
    * This means the mesh underlying bounding box and sphere are recomputed.
    * @param applySkeleton defines whether to apply the skeleton before computing the bounding info
-   * @param applyMorph  defines whether to apply the morph target before computing the bounding info
    * @returns the current mesh
    */
-  InstancedMesh& refreshBoundingInfo(bool applySkeleton = false, bool applyMorph = false);
+  InstancedMesh& refreshBoundingInfo(bool applySkeleton = false);
 
   /**
    * @brief Hidden
@@ -276,10 +275,6 @@ protected:
 public:
   /** Hidden */
   int _indexInSourceMeshInstanceArray;
-  /** Hidden */
-  float _distanceToCamera;
-  /** Hidden */
-  std::optional<Matrix> _previousWorldMatrix;
 
   /**
    * The source mesh of the instance.
@@ -289,7 +284,6 @@ public:
 private:
   MeshPtr _sourceMesh;
   Mesh* _currentLOD;
-  Matrix _billboardWorldMatrix;
 
 }; // end of class InstancedMesh
 

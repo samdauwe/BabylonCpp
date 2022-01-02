@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
@@ -39,67 +38,42 @@ NullEngine::NullEngine(const NullEngineOptions& options) : Engine{nullptr}
   // Init caps
   // We consider we are on a webgl1 capable device
 
-  {
-    _caps                                 = EngineCapabilities();
-    _caps.maxTexturesImageUnits           = 16;
-    _caps.maxVertexTextureImageUnits      = 16;
-    _caps.maxCombinedTexturesImageUnits   = 32;
-    _caps.maxTextureSize                  = 512;
-    _caps.maxCubemapTextureSize           = 512;
-    _caps.maxRenderTextureSize            = 512;
-    _caps.maxVertexAttribs                = 16;
-    _caps.maxVaryingVectors               = 16;
-    _caps.maxFragmentUniformVectors       = 16;
-    _caps.maxVertexUniformVectors         = 16;
-    _caps.standardDerivatives             = false;
-    _caps.astc                            = nullptr;
-    _caps.pvrtc                           = nullptr;
-    _caps.etc1                            = nullptr;
-    _caps.etc2                            = nullptr;
-    _caps.bptc                            = nullptr;
-    _caps.maxAnisotropy                   = 0;
-    _caps.uintIndices                     = false;
-    _caps.fragmentDepthSupported          = false;
-    _caps.highPrecisionShaderSupported    = true;
-    _caps.colorBufferFloat                = false;
-    _caps.textureFloat                    = false;
-    _caps.textureFloatLinearFiltering     = false;
-    _caps.textureFloatRender              = false;
-    _caps.textureHalfFloat                = false;
-    _caps.textureHalfFloatLinearFiltering = false;
-    _caps.textureHalfFloatRender          = false;
-    _caps.textureLOD                      = false;
-    _caps.drawBuffersExtension            = false;
-    _caps.depthTextureExtension           = false;
-    _caps.vertexArrayObject               = false;
-    _caps.instancedArrays                 = false;
-    _caps.canUseTimestampForTimerQuery    = false;
-    _caps.maxMSAASamples                  = 1;
-    _caps.blendMinMax                     = false;
-    _caps.canUseGLInstanceID              = false;
-    _caps.canUseGLVertexID                = false;
-  }
-
-  {
-    _features.forceBitmapOverHTMLImageElement           = false;
-    _features.supportRenderAndCopyToLodForFloatTextures = false;
-    _features.supportDepthStencilTexture                = false;
-    _features.supportShadowSamplers                     = false;
-    _features.uniformBufferHardCheckMatrix              = false;
-    _features.allowTexturePrefiltering                  = false;
-    _features.trackUbosInFrame                          = false;
-    _features.supportCSM                                = false;
-    _features.basisNeedsPOT                             = false;
-    _features.support3DTextures                         = false;
-    _features.needTypeSuffixInShaderConstants           = false;
-    _features.supportMSAA                               = false;
-    _features.supportSSAO2                              = false;
-    _features.supportExtendedTextureFormats             = false;
-    _features.supportSwitchCaseInShader                 = false;
-    _features.supportSyncTextureRead                    = false;
-    _features.needsInvertingBitmap                      = false;
-    _features._collectUbosUpdatedInFrame                = false;
-  }
+  _caps                                 = EngineCapabilities();
+  _caps.maxTexturesImageUnits           = 16;
+  _caps.maxVertexTextureImageUnits      = 16;
+  _caps.maxCombinedTexturesImageUnits   = 32;
+  _caps.maxTextureSize                  = 512;
+  _caps.maxCubemapTextureSize           = 512;
+  _caps.maxRenderTextureSize            = 512;
+  _caps.maxVertexAttribs                = 16;
+  _caps.maxVaryingVectors               = 16;
+  _caps.maxFragmentUniformVectors       = 16;
+  _caps.maxVertexUniformVectors         = 16;
+  _caps.standardDerivatives             = false;
+  _caps.astc                            = nullptr;
+  _caps.pvrtc                           = nullptr;
+  _caps.etc1                            = nullptr;
+  _caps.etc2                            = nullptr;
+  _caps.bptc                            = nullptr;
+  _caps.maxAnisotropy                   = 0;
+  _caps.uintIndices                     = false;
+  _caps.fragmentDepthSupported          = false;
+  _caps.highPrecisionShaderSupported    = true;
+  _caps.colorBufferFloat                = false;
+  _caps.textureFloat                    = false;
+  _caps.textureFloatLinearFiltering     = false;
+  _caps.textureFloatRender              = false;
+  _caps.textureHalfFloat                = false;
+  _caps.textureHalfFloatLinearFiltering = false;
+  _caps.textureHalfFloatRender          = false;
+  _caps.textureLOD                      = false;
+  _caps.drawBuffersExtension            = false;
+  _caps.depthTextureExtension           = false;
+  _caps.vertexArrayObject               = false;
+  _caps.instancedArrays                 = false;
+  _caps.canUseTimestampForTimerQuery    = false;
+  _caps.maxMSAASamples                  = 1;
+  _caps.blendMinMax                     = false;
 
   BABYLON_LOGF_INFO("Engine", "Babylon.js v%s - Null engine", Engine::Version().c_str())
 }
@@ -163,14 +137,14 @@ NullEngine::createShaderProgram(const IPipelineContextPtr& /*pipelineContext*/,
   return program;
 }
 
-std::vector<WebGLUniformLocationPtr>
-NullEngine::getUniforms(IPipelineContext* /*pipelineContext*/,
+std::unordered_map<std::string, WebGLUniformLocationPtr>
+NullEngine::getUniforms(const IPipelineContextPtr& /*pipelineContext*/,
                         const std::vector<std::string>& /*uniformsNames*/)
 {
   return {};
 }
 
-Int32Array NullEngine::getAttributes(IPipelineContext* /*pipelineContext*/,
+Int32Array NullEngine::getAttributes(const IPipelineContextPtr& /*pipelineContext*/,
                                      const std::vector<std::string>& /*attributesNames*/)
 {
   return {};
@@ -184,9 +158,6 @@ void NullEngine::bindSamplers(Effect& /*effect*/)
 void NullEngine::enableEffect(const EffectPtr& effect)
 {
   _currentEffect = effect;
-  if (!effect) {
-    return;
-  }
 
   if (effect->onBind) {
     effect->onBind(effect.get());
@@ -196,15 +167,7 @@ void NullEngine::enableEffect(const EffectPtr& effect)
   }
 }
 
-void NullEngine::enableEffect(const DrawWrapperPtr& effect)
-{
-  // get only the effect, we don't need a Wrapper in the WebGL engine
-  enableEffect(effect->effect);
-}
-
-void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/,
-                          bool /*cullBackFaces*/, const IStencilStatePtr& /*stencil*/,
-                          float /*zOffsetUnits*/)
+void NullEngine::setState(bool /*culling*/, float /*zOffset*/, bool /*force*/, bool /*reverseSide*/)
 {
 }
 
@@ -340,8 +303,7 @@ void NullEngine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
 
 void NullEngine::bindBuffers(
   const std::unordered_map<std::string, VertexBufferPtr>& /*vertexBuffers*/,
-  const WebGLDataBufferPtr& /*indexBuffer*/, const EffectPtr& /*effect*/,
-  const std::unordered_map<std::string, VertexBufferPtr>& /*overrideVertexBuffers*/)
+  const WebGLDataBufferPtr& /*indexBuffer*/, const EffectPtr& /*effect*/)
 {
 }
 
@@ -397,8 +359,7 @@ InternalTexturePtr NullEngine::createTexture(
   const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& /*buffer*/,
   const InternalTexturePtr& /*fallBack*/, const std::optional<unsigned int>& format,
   const std::string& /*forcedExtension*/, const std::string& /*mimeType*/,
-  const LoaderOptionsPtr& /*loaderOptions*/, const std::optional<unsigned int>& /*creationFlags*/,
-  const std::optional<bool>& /*useSRGBBuffer*/)
+  const LoaderOptionsPtr& /*loaderOptions*/)
 {
   auto texture = InternalTexture::New(this, InternalTextureSource::Url);
 
@@ -575,8 +536,7 @@ bool NullEngine::_bindTextureDirectly(unsigned int /*target*/, const InternalTex
   return false;
 }
 
-void NullEngine::_bindTexture(int channel, const InternalTexturePtr& texture,
-                              const std::string& /*name*/)
+void NullEngine::_bindTexture(int channel, const InternalTexturePtr& texture)
 {
   if (channel < 0) {
     return;

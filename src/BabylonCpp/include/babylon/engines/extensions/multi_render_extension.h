@@ -6,16 +6,14 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
-#include <babylon/maths/color4.h>
 
 namespace BABYLON {
 
 struct IMultiRenderTargetOptions;
+class InternalTexture;
 struct ISize;
 class ThinEngine;
-FWD_CLASS_SPTR(InternalTexture)
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 /**
  * @brief Hidden
@@ -42,27 +40,22 @@ public:
    * @see https://doc.babylonjs.com/features/webgl2#multiple-render-target
    * @param size defines the size of the texture
    * @param options defines the creation options
-   * @param initializeBuffers if set to true, the engine will make an initializing call of
-   * drawBuffers
    * @returns the cube texture as an InternalTexture
    */
   std::vector<InternalTexturePtr>
-  createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options,
-                             bool initializeBuffers = true);
+  createMultipleRenderTarget(ISize size, const IMultiRenderTargetOptions& options);
 
   /**
    * @brief Update the sample count for a given multiple render target texture.
    * @see https://doc.babylonjs.com/features/webgl2#multisample-render-targets
    * @param textures defines the textures to update
    * @param samples defines the sample count to set
-   * @param initializeBuffers if set to true, the engine will make an initializing call of
-   * drawBuffers
    * @returns the effective sample count (could be 0 if multisample render targets are not
    * supported)
    */
   unsigned int
   updateMultipleRenderTargetTextureSampleCount(const std::vector<InternalTexturePtr>& textures,
-                                               unsigned int samples, bool initializeBuffers = true);
+                                               unsigned int samples);
 
   /**
    * @brief Select a subsets of attachments to draw to.
@@ -79,15 +72,8 @@ public:
 
   /**
    * @brief Restores the webgl state to only draw on the main color attachment.
-   * when the frame buffer associated is the canvas frame buffer
    */
   void restoreSingleAttachment();
-
-  /**
-   * @brief Restores the webgl state to only draw on the main color attachment.
-   * when the frame buffer associated is not the canvas frame buffer
-   */
-  void restoreSingleAttachmentForRenderTarget();
 
 private:
   ThinEngine* _this;

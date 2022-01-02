@@ -131,11 +131,8 @@ BackgroundMaterialDefines::BackgroundMaterialDefines()
     {"FOG", false},        //
     {"NORMAL", false},     //
 
-    {"INSTANCES", false},         //
-    {"SHADOWFLOAT", false},       //
-    {"LOGARITHMICDEPTH", false},  //
-    {"NONUNIFORMSCALING", false}, //
-    {"ALPHATEST", false},         //
+    {"INSTANCES", false},   //
+    {"SHADOWFLOAT", false}, //
   };
 
   intDef = {

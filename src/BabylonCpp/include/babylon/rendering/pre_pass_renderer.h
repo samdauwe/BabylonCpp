@@ -10,7 +10,6 @@
 
 namespace BABYLON {
 
-class Camera;
 class Effect;
 class Engine;
 class Scene;
@@ -22,14 +21,12 @@ FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(MultiRenderTarget)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
-FWD_CLASS_SPTR(PrePassRenderTarget)
-FWD_CLASS_SPTR(RenderTargetTexture)
+FWD_STRUCT_SPTR(PrePassRenderTarget)
 FWD_CLASS_SPTR(SubSurfaceConfiguration)
 
 struct TextureFormatMapping {
   unsigned int type   = 0;
   unsigned int format = 0;
-  std::string name    = "";
 }; // end of struct TextureFormatMapping
 
 /**
@@ -49,30 +46,11 @@ public:
   ~PrePassRenderer() = default;
 
   /**
-   * @brief Creates a new PrePassRenderTarget.
-   * This should be the only way to instanciate a `PrePassRenderTarget`
-   * @param name Name of the `PrePassRenderTarget`
-   * @param renderTargetTexture RenderTarget the `PrePassRenderTarget` will be attached to.
-   * Can be `null` if the created `PrePassRenderTarget` is attached to the scene (default
-   * framebuffer).
-   * @hidden
-   */
-  PrePassRenderTargetPtr _createRenderTarget(const std::string& name,
-                                             const RenderTargetTexturePtr& renderTargetTexture);
-
-  /**
    * @return the prepass render target for the rendering pass.
    * If we are currently rendering a render target, it returns the PrePassRenderTarget
    * associated with that render target. Otherwise, it returns the scene default PrePassRenderTarget
    */
-  PrePassRenderTargetPtr& getRenderTarget();
-
-  /**
-   * @hidden
-   * @brief Managed by the scene component
-   * @param prePassRenderTarget
-   */
-  void _setRenderTarget(const PrePassRenderTargetPtr& prePassRenderTarget);
+  MultiRenderTargetPtr& getRenderTarget();
 
   /**
    * @brief Sets the proper output textures to draw in the engine.
@@ -87,23 +65,23 @@ public:
   void restoreAttachments();
 
   /**
-   * @hidden
+   * @brief Hidden
    */
-  void _beforeDraw(Camera* camera = nullptr, int faceIndex = -1, int layer = -1);
+  void _beforeCameraDraw();
 
   /**
    * @brief Hidden
    */
-  void _afterDraw(int faceIndex = -1, int layer = -1);
+  void _afterCameraDraw();
 
   /**
    * @brief Clears the scene render target (in the sense of settings pixels to the scene clear color
    * value).
    */
-  void _clear();
+  void clear();
 
   /**
-   * @brief Adds an effect configuration to the prepass render target.
+   * @brief Adds an effect configuration to the prepass.
    * If an effect has already been added, it won't add it twice and will return the configuration
    * already present.
    * @param cfg the effect configuration
@@ -119,11 +97,6 @@ public:
   int getIndex(unsigned int type);
 
   /**
-   *  @brief Hidden
-   */
-  void _unlinkInternalTexture(const PrePassRenderTargetPtr& prePassRenderTarget);
-
-  /**
    * @brief Marks the prepass renderer as dirty, triggering a check if the prepass is necessary for
    * the next rendering.
    */
@@ -136,6 +109,11 @@ public:
 
 protected:
   /**
+   * @brief Indicates if the prepass is enabled.
+   */
+  bool get_enabled() const;
+
+  /**
    * @brief Gets How many samples are used for MSAA of the scene render target.
    */
   unsigned int get_samples() const;
@@ -146,15 +124,20 @@ protected:
   void set_samples(unsigned int n);
 
   /**
-   * @brief Returns true if the currently rendered prePassRenderTarget is the one
-   * associated with the scene.
+   * @brief Returns true if the currently rendered prePassRenderTarget is the one associated with
+   * the scene.
    */
   bool get_currentRTisSceneRT() const;
 
   /**
-   * @brief Indicates if the prepass is enabled.
+   * @brief Uses the geometry buffer renderer as a fallback for non prepass capable effects.
    */
-  bool get_enabled() const;
+  bool get_useGeometryBufferFallback() const;
+
+  /**
+   * @brief Uses the geometry buffer renderer as a fallback for non prepass capable effects.
+   */
+  void set_useGeometryBufferFallback(bool value);
 
   /**
    * @brief Indicates if rendering a prepass is supported.
@@ -162,40 +145,24 @@ protected:
   bool get_isSupported() const;
 
 private:
-  void _refreshGeometryBufferRendererLink();
-  void _reinitializeAttachments();
-  void _resetLayout();
+  void _initializeAttachments();
+  void _createCompositionEffect();
+  void _checkRTSize();
+  void _bindFrameBuffer();
+  void _setState(bool enabled);
   void _updateGeometryBufferLayout();
-  void _prepareFrame(const PrePassRenderTargetPtr& prePassRenderTarget, int faceIndex = -1,
-                     int layer = -1);
-  void _renderPostProcesses(const PrePassRenderTargetPtr& prePassRenderTarget, int faceIndex = -1);
-  void _bindFrameBuffer(const PrePassRenderTargetPtr& prePassRenderTarget);
-  void _setEnabled(bool enabled);
-  void _setRenderTargetEnabled(const PrePassRenderTargetPtr& prePassRenderTarget, bool enabled);
   void _enable();
   void _disable();
-  std::vector<PostProcessPtr>
-  _getPostProcessesSource(const PrePassRenderTargetPtr& prePassRenderTarget,
-                          Camera* camera = nullptr);
-  void _setupOutputForThisPass(const PrePassRenderTargetPtr& prePassRenderTarget,
-                               Camera* camera = nullptr);
-  void _linkInternalTexture(const PrePassRenderTargetPtr& prePassRenderTarget,
-                            const PostProcessPtr& postProcess);
-  bool _needsImageProcessing() const;
-  bool _hasImageProcessing(const std::vector<PostProcessPtr>& postProcesses) const;
-
-  /**
-   * @brief Internal, gets the first post proces.
-   * @returns the first post process to be run on this camera.
-   */
-  PostProcessPtr _getFirstPostProcess(const std::vector<PostProcessPtr>& postProcesses);
+  void _resetLayout();
+  void _resetPostProcessChain();
+  void _bindPostProcessChain();
+  void _update();
 
   /**
    * @brief Enables a texture on the MultiRenderTarget for prepass.
    */
   void _enableTextures(const std::vector<unsigned int>& types);
 
-  void _update();
   void _markAllMaterialsAsPrePassDirty();
 
 public:
@@ -217,6 +184,21 @@ public:
   size_t mrtCount;
 
   /**
+   * The render target where the scene is directly rendered
+   */
+  MultiRenderTargetPtr prePassRT;
+
+  /**
+   * Image processing post process for composition
+   */
+  ImageProcessingPostProcessPtr imageProcessingPostProcess;
+
+  /**
+   * Indicates if the prepass is enabled
+   */
+  ReadOnlyProperty<PrePassRenderer, bool> enabled;
+
+  /**
    * How many samples are used for MSAA of the scene render target
    */
   Property<PrePassRenderer, unsigned int> samples;
@@ -233,19 +215,9 @@ public:
   ReadOnlyProperty<PrePassRenderer, bool> currentRTisSceneRT;
 
   /**
-   * Prevents the PrePassRenderer from using the GeometryBufferRenderer as a fallback
+   * Uses the geometry buffer renderer as a fallback for non prepass capable effects
    */
-  bool doNotUseGeometryRendererFallback;
-
-  /**
-   * All the render targets generated by prepass
-   */
-  std::vector<PrePassRenderTargetPtr> renderTargets;
-
-  /**
-   * Indicates if the prepass is enabled
-   */
-  ReadOnlyProperty<PrePassRenderer, bool> enabled;
+  Property<PrePassRenderer, bool> useGeometryBufferFallback;
 
   /**
    * Set to true to disable gamma transform in PrePass.
@@ -260,31 +232,30 @@ public:
   ReadOnlyProperty<PrePassRenderer, bool> isSupported;
 
 private:
+  static std::vector<TextureFormatMapping> _textureFormats;
+  std::vector<int> _textureIndices;
   Scene* _scene;
   Engine* _engine;
-  static std::vector<TextureFormatMapping> _textureFormats;
+  bool _isDirty;
   Uint32Array _multiRenderAttachments;
   Uint32Array _defaultAttachments;
   Uint32Array _clearAttachments;
-  bool _isDirty;
+
+  std::vector<PostProcessPtr> _postProcesses;
+
+  const Color4 _clearColor;
 
   /**
    * Configuration for prepass effects
    */
   std::vector<PrePassEffectConfigurationPtr> _effectConfigurations;
 
-  Uint32Array _mrtFormats;
-  Uint32Array _mrtLayout;
-  std::vector<std::string> _mrtNames;
-  Int32Array _textureIndices;
-
+  std::vector<unsigned int> _mrtFormats;
+  std::vector<unsigned int> _mrtLayout;
+  bool _enabled;
   GeometryBufferRendererPtr _geometryBuffer;
   PrePassRenderTargetPtr _currentTarget;
-
-  const Color4 _clearColor;
-  bool _enabled;
-  bool _needsCompositionForThisPass = false;
-  std::vector<PostProcessPtr> _postProcessesSourceForThisPass;
+  bool _useGeometryBufferFallback;
 
 }; // end of class PrePassRenderer
 

@@ -1,10 +1,10 @@
-#include <babylon/buffers/buffer.h>
+#include <babylon/meshes/buffer.h>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 
 namespace BABYLON {
@@ -67,7 +67,7 @@ std::unique_ptr<VertexBuffer> Buffer::createVertexBuffer(const std::string& kind
   const auto _byteStride
     = stride.has_value() ? (useBytes ? *stride : *stride * sizeof(float)) : byteStride;
 
-  // a lot of these parameters are ignored as they are overridden by the buffer
+  // a lot of these parameters are ignored as they are overriden by the buffer
   return std::make_unique<VertexBuffer>(
     _engine, shared_from_this(), kind, _updatable, true, _byteStride,
     !instanced.has_value() ? _instanced : *instanced, _byteOffset, size, std::nullopt, false, true,
@@ -169,7 +169,7 @@ void Buffer::_increaseReferences()
     return;
   }
 
-  ++_buffer->references;
+  _buffer->references++;
 }
 
 void Buffer::dispose()

@@ -24,7 +24,7 @@ class BABYLON_SHARED_EXPORT Octree : public IOctreeContainer<T> {
 
 public:
   /**
-   * @brief Creates a octree.
+   * @brief Creates a octree
    * @see https://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
    * @param creationFunc function to be used to instantiate the octree
    * @param maxBlockCapacity defines the maximum number of meshes you want on your octree's leaves
@@ -41,7 +41,7 @@ public:
 
   // clang-format off
   /**
-   * @brief Updates the octree by adding blocks for the passed in meshes within the min and max world parameters.
+   * @brief Updates the octree by adding blocks for the passed in meshes within the min and max world parameters
    * @param worldMin worldMin for the octree blocks var blockSize = new Vector3((worldMax.x - worldMin.x) / 2, (worldMax.y - worldMin.y) / 2, (worldMax.z - worldMin.z) / 2);
    * @param worldMax worldMax for the octree blocks var blockSize = new Vector3((worldMax.x - worldMin.x) / 2, (worldMax.y - worldMin.y) / 2, (worldMax.z - worldMin.z) / 2);
    * @param entries meshes to be added to the octree blocks

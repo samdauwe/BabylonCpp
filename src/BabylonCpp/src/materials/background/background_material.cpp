@@ -1,7 +1,6 @@
 #include <babylon/materials/background/background_material.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
@@ -19,6 +18,7 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 
@@ -608,7 +608,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<BackgroundMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<BackgroundMaterialDefines>();
   }
 
   auto scene      = getScene();
@@ -892,8 +892,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
-    const auto effect = scene->getEngine()->createEffect("background", options, engine);
-    subMesh->setEffect(effect, definesPtr, _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect("background", options, engine), definesPtr);
 
     buildUniformLayout();
   }
@@ -1095,12 +1094,13 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   if (mustRebind || !isFrozen()) {
     if (scene->lightsEnabled()) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights);
+      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights,
+                                 false);
     }
 
     // View

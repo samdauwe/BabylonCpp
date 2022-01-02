@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/engine.h>
@@ -18,6 +17,7 @@
 #include <babylon/materialslibrary/fire/fire_vertex_fx.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -109,18 +109,18 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<FireMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<FireMaterialDefines>();
   }
 
-  const auto definesPtr = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
-  auto& defines         = *definesPtr.get();
-  const auto scene      = getScene();
+  auto definesPtr = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -204,8 +204,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
     options.onError               = onError;
     options.maxSimultaneousLights = 4;
 
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -262,7 +261,7 @@ void FireMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);

@@ -18,7 +18,6 @@ class Mesh;
 class PointsGroup;
 class Scene;
 FWD_CLASS_SPTR(CloudPoint)
-FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(PointsGroup)
 
@@ -70,11 +69,9 @@ public:
   /**
    * @brief Builds the PCS underlying mesh. Returns a standard Mesh.
    * If no points were added to the PCS, the returned mesh is just a single point.
-   * @param material The material to use to render the mesh. If not provided, will create a default
-   * one
    * @returns a promise for the created mesh
    */
-  MeshPtr buildMeshSync(const MaterialPtr& material = nullptr);
+  MeshPtr buildMeshSync();
 
   /**
    * @brief Adds points to the PCS in random positions within a unit sphere.
@@ -284,7 +281,7 @@ private:
   /**
    * @hidden
    */
-  MeshPtr _buildMesh(const MaterialPtr& material);
+  MeshPtr _buildMesh();
 
   /**
    * @brief Adds a new particle object in the particles array.
@@ -303,7 +300,7 @@ private:
 
   /**
    * @brief Stores mesh texture in dynamic texture for color pixel retrievalwhen pointColor type is
-   * color for surface points.
+   * color for surface points
    */
   void _colorFromTexture(const MeshPtr& mesh, const PointsGroupPtr& pointsGroup, bool isVolume);
 

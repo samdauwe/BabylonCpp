@@ -10,7 +10,6 @@
 #include <unordered_map>
 
 #include <babylon/babylon_common.h>
-#include <babylon/utils/base64.h>
 
 namespace BABYLON {
 
@@ -189,34 +188,6 @@ inline uint8_t charCodeAt(const std::string& str, size_t index)
   }
 
   return 0;
-}
-
-/**
- * @brief Converts a given base64 string as an ASCII encoded stream of data.
- * @param base64Data The base64 encoded string to decode
- * @returns Decoded ASCII string
- */
-inline std::string DecodeBase64ToString(const std::string& base64Data)
-{
-  return Base64::atob(base64Data);
-}
-
-/**
- * @brief Converts a given base64 string into an ArrayBuffer of raw byte data.
- * @param base64Data The base64 encoded string to decode
- * @returns ArrayBuffer of byte data
- */
-inline Uint8Array DecodeBase64ToBinary(const std::string& base64Data)
-{
-  const auto decodedString = StringTools::DecodeBase64ToString(base64Data);
-  const auto bufferLength  = decodedString.size();
-  Uint8Array buffer        = Uint8Array(bufferLength);
-
-  for (size_t i = 0; i < bufferLength; ++i) {
-    buffer[i] = decodedString[i];
-  }
-
-  return buffer;
 }
 
 /**

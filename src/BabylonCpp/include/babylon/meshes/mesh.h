@@ -98,7 +98,8 @@ public:
   static constexpr unsigned int CAP_END = 2;
 
   /**
-   * Mesh cap setting : two caps, one at the beginning  and one at the end of the mesh
+   * Mesh cap setting : two caps, one at the beginning  and one at the end of
+   * the mesh
    */
   static constexpr unsigned int CAP_ALL = 3;
 
@@ -108,12 +109,14 @@ public:
   static constexpr unsigned int NO_FLIP = 0;
 
   /**
-   * Mesh pattern setting : flip (reflect in y axis) alternate tiles on each row or column
+   * Mesh pattern setting : flip (reflect in y axis) alternate tiles on each row
+   * or column
    */
   static constexpr unsigned int FLIP_TILE = 1;
 
   /**
-   * Mesh pattern setting : rotate (180degs) alternate tiles on each row or column
+   * Mesh pattern setting : rotate (180degs) alternate tiles on each row or
+   * column
    */
   static constexpr unsigned int ROTATE_TILE = 2;
 
@@ -128,7 +131,8 @@ public:
   static constexpr unsigned int ROTATE_ROW = 4;
 
   /**
-   * Mesh pattern setting : flip and rotate alternate tiles on each row or column
+   * Mesh pattern setting : flip and rotate alternate tiles on each row or
+   * column
    */
   static constexpr unsigned int FLIP_N_ROTATE_TILE = 5;
 
@@ -396,7 +400,7 @@ public:
    * mesh geometry.
    * @returns the numner of indices or zero if the mesh has no geometry.
    */
-  size_t getTotalIndices() const override;
+  size_t getTotalIndices() const;
 
   /**
    * @brief Returns an array of integers or a typed array (Int32Array,
@@ -802,12 +806,6 @@ public:
   /**
    * @brief Hidden
    */
-  BufferPtr _thinInstanceCreateMatrixBuffer(const std::string& kind, const Float32Array& buffer,
-                                            bool staticBuffer = false);
-
-  /**
-   * @brief Hidden
-   */
   void _renderWithThinInstances(SubMesh* subMesh, unsigned int fillMode, const EffectPtr& effect,
                                 Engine* engine);
 
@@ -844,7 +842,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild(bool dispose = false) override;
+  void _rebuild() override;
 
   /**
    * @brief Hidden
@@ -1168,7 +1166,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _syncGeometryWithMorphTargetManager() override;
+  void _syncGeometryWithMorphTargetManager();
 
   /**
    * @brief Creates points inside a mesh. This utility enables you to create and
@@ -1451,28 +1449,34 @@ public:
                                 bool updatable               = false,
                                 unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
-  // clang-format off
   /**
-   * @brief Creates an extruded shape mesh. The extrusion is a parametric shape. It has no predefined shape. Its final shape will depend on the input parameters.
-   * * The parameter `shape` is a required array of successive Vector3. This array depicts the shape to be extruded in its local space : the shape must be designed in the xOy plane and will be extruded along the Z axis.
-   * * The parameter `path` is a required array of successive Vector3. This is the axis curve the shape is extruded along.
-   * * The parameter `rotation` (float, default 0 radians) is the angle value to rotate the shape each step (each path point), from the former step (so rotation added each step) along the curve.
-   * * The parameter `scale` (float, default 1) is the value to scale the shape.
-   * * The parameter `cap` sets the way the extruded shape is capped. Possible values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START, BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * * The optional parameter `instance` is an instance of an existing ExtrudedShape object to be updated with the passed `shape`, `path`, `scale` or `rotation` parameters : https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape
-   * * Remember you can only change the shape or path point positions, not their number when updating an extruded shape.
-   * * You can also set the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the texture image to crop and stick respectively on the front and the back sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here : https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The optional parameter `invertUV` (boolean, default false) swaps in the geometry the U and V coordinates to apply a texture.
-   * * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if its internal geometry is supposed to change once created.
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the extruded shape mesh
+   * @brief Creates an extruded shape mesh.
+   * The extrusion is a parametric shape. It has no predefined shape. Its final
+   * shape will depend on the input parameters. Please consider using the same
+   * method from the MeshBuilder class instead.
    * @see https://doc.babylonjs.com/how_to/parametric_shapes
    * @see https://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+   * @param name defines the name of the mesh to create
+   * @param shape is a required array of successive Vector3. This array depicts
+   * the shape to be extruded in its local space : the shape must be designed in
+   * the xOy plane and will be extruded along the Z axis
+   * @param path is a required array of successive Vector3. This is the axis
+   * curve the shape is extruded along
+   * @param scale is the value to scale the shape
+   * @param rotation is the angle value to rotate the shape each step (each path
+   * point), from the former step (so rotation added each step) along the curve
+   * @param cap sets the way the extruded shape is capped. Possible values :
+   * BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
+   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
+   * @param scene defines the hosting scene
+   * @param updatable defines if the mesh must be flagged as updatable
+   * @param sideOrientation defines the mesh side orientation
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * @param instance is an instance of an existing ExtrudedShape object to be
+   * updated with the passed `shape`, `path`, `scale` or `rotation` parameters
+   * (https://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#extruded-shape)
+   * @returns a new Mesh
    */
-  // clang-format on
   static MeshPtr ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
                               const std::vector<Vector3>& path, float scale, float rotation,
                               unsigned int cap, Scene*,
@@ -1480,34 +1484,39 @@ public:
                               const std::optional<unsigned int>& sideOrientation = std::nullopt,
                               const MeshPtr& instance                            = nullptr);
 
-  // clang-format off
   /**
    * @brief Creates an custom extruded shape mesh.
-   * The custom extrusion is a parametric shape. It has no predefined shape. Its final shape will depend on the input parameters.
-   * * The parameter `shape` is a required array of successive Vector3. This array depicts the shape to be extruded in its local space : the shape must be designed in the xOy plane and will be extruded along the Z axis.
-   * * The parameter `path` is a required array of successive Vector3. This is the axis curve the shape is extruded along.
-   * * The parameter `rotationFunction` (JS function) is a custom Javascript function called on each path point. This function is passed the position i of the point in the path and the distance of this point from the beginning of the path
-   * * It must returns a float value that will be the rotation in radians applied to the shape on each path point.
-   * * The parameter `scaleFunction` (JS function) is a custom Javascript function called on each path point. This function is passed the position i of the point in the path and the distance of this point from the beginning of the path
-   * * It must returns a float value that will be the scale value applied to the shape on each path point
-   * * The parameter `ribbonClosePath` (boolean, default false) forces the extrusion underlying ribbon to close all the paths in its `pathArray`
-   * * The parameter `ribbonCloseArray` (boolean, default false) forces the extrusion underlying ribbon to close its `pathArray`
-   * * The parameter `cap` sets the way the extruded shape is capped. Possible values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START, BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * * The optional parameter `instance` is an instance of an existing ExtrudedShape object to be updated with the passed `shape`, `path`, `scale` or `rotation` parameters : https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape
-   * * Remember you can only change the shape or path point positions, not their number when updating an extruded shape
-   * * You can also set the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE
-   * * If you create a double-sided mesh, you can choose what parts of the texture image to crop and stick respectively on the front and the back sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here : https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
-   * * The optional parameter `invertUV` (boolean, default false) swaps in the geometry the U and V coordinates to apply a texture
-   * * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if its internal geometry is supposed to change once created
-   * @param name defines the name of the mesh
-   * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
-   * @returns the custom extruded shape mesh
-   * @see https://doc.babylonjs.com/how_to/parametric_shapes#custom-extruded-shapes
-   * @see https://doc.babylonjs.com/how_to/parametric_shapes
+   * The custom extrusion is a parametric shape.
+   * It has no predefined shape. Its final shape will depend on the input
+   * parameters. Please consider using the same method from the MeshBuilder
+   * class instead.
    * @see https://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+   * @param name defines the name of the mesh to create
+   * @param shape is a required array of successive Vector3. This array depicts
+   * the shape to be extruded in its local space : the shape must be designed in
+   * the xOy plane and will be extruded along the Z axis
+   * @param path is a required array of successive Vector3. This is the axis
+   * curve the shape is extruded along
+   * @param scaleFunction is a custom Javascript function called on each path
+   * point
+   * @param rotationFunction is a custom Javascript function called on each path
+   * point
+   * @param ribbonCloseArray forces the extrusion underlying ribbon to close all
+   * the paths in its `pathArray`
+   * @param ribbonClosePath forces the extrusion underlying ribbon to close its
+   * `pathArray`
+   * @param cap sets the way the extruded shape is capped. Possible values :
+   * BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
+   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
+   * @param scene defines the hosting scene
+   * @param updatable defines if the mesh must be flagged as updatable
+   * @param sideOrientation defines the mesh side orientation
+   * (https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
+   * @param instance is an instance of an existing ExtrudedShape object to be
+   * updated with the passed `shape`, `path`, `scale` or `rotation` parameters
+   * (https://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh#extruded-shape)
+   * @returns a new Mesh
    */
-  // clang-format on
   static MeshPtr
   ExtrudeShapeCustom(const std::string& name, const std::vector<Vector3>& shape,
                      const std::vector<Vector3>& path,
@@ -1873,11 +1882,6 @@ protected:
   Observable<Mesh>& get_onAfterRenderObservable();
 
   /**
-   * @brief An event triggeredbetween rendering pass when using separateCullingPass = true
-   */
-  Observable<SubMesh>& get_onBetweenPassObservable();
-
-  /**
    * @brief An event triggered before drawing the mesh.
    */
   Observable<Mesh>& get_onBeforeDrawObservable();
@@ -2036,11 +2040,6 @@ public:
    * An event triggered after rendering the mesh
    */
   ReadOnlyProperty<Mesh, Observable<Mesh>> onAfterRenderObservable;
-
-  /**
-   * An event triggeredbetween rendering pass when using separateCullingPass = true
-   */
-  ReadOnlyProperty<Mesh, Observable<SubMesh>> onBetweenPassObservable;
 
   /**
    * An event triggered before drawing the mesh
@@ -2210,9 +2209,6 @@ public:
    */
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
 
-  /** @hidden */
-  std::optional<UserInstancedBuffersStorage> _userInstancedBuffersStorage;
-
 private:
   // Internal data
   std::unique_ptr<_InternalMeshDataInfo> _internalMeshDataInfo;
@@ -2224,6 +2220,8 @@ private:
   std::unique_ptr<_UserThinInstanceBuffersStorage> _userThinInstanceBuffersStorage;
   MaterialPtr _effectiveMaterial;
   // Instances
+  /** @hidden */
+  std::optional<UserInstancedBuffersStorage> _userInstancedBuffersStorage;
   // For extrusion and tube
   Path3D _path3D;
   std::vector<std::vector<Vector3>> _pathArray;

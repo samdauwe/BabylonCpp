@@ -1,6 +1,5 @@
 #include <babylon/materials/node/blocks/vertex/morph_targets_block.h>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -10,6 +9,7 @@
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 
@@ -136,21 +136,9 @@ void MorphTargetsBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr
                                        NodeMaterialDefines& defines, bool /*useInstances*/,
                                        SubMesh* /*subMesh*/)
 {
-  const auto iMesh = static_cast<Mesh*>(mesh);
-  if (iMesh->morphTargetManager()) {
-    const auto morphTargetManager = iMesh->morphTargetManager();
-
-    if (morphTargetManager && morphTargetManager->isUsingTextureForTargets()
-        && morphTargetManager->numInfluencers()
-             != static_cast<size_t>(defines.intDef["NUM_MORPH_INFLUENCERS"])) {
-      defines.markAsAttributesDirty();
-    }
-  }
-
   if (!defines._areAttributesDirty) {
     return;
   }
-
   MaterialHelper::PrepareDefinesForMorphTargets(mesh, defines);
 }
 
@@ -159,11 +147,9 @@ void MorphTargetsBlock::bind(Effect* effect, const NodeMaterialPtr& /*nodeMateri
 {
   if (mesh && mesh->morphTargetManager() && mesh->morphTargetManager()->numInfluencers() > 0) {
     MaterialHelper::BindMorphTargetParameters(mesh, effect);
-
-    if (mesh->morphTargetManager()->isUsingTextureForTargets()) {
-      mesh->morphTargetManager()->_bind(effect);
-    }
   }
+
+  MaterialHelper::BindBonesParameters(mesh, effect);
 }
 
 void MorphTargetsBlock::replaceRepeatableContent(
@@ -188,78 +174,37 @@ void MorphTargetsBlock::replaceRepeatableContent(
 
   std::string injectionCode = "";
 
-  if (manager && manager->isUsingTextureForTargets() && repeatCount > 0) {
-    injectionCode += "float vertexID;\r\n";
-  }
-
   for (size_t index = 0; index < repeatCount; index++) {
     injectionCode += "#ifdef MORPHTARGETS\r\n";
-    if (manager && manager->isUsingTextureForTargets()) {
-      injectionCode += "vertexID = float(gl_VertexID) * morphTargetTextureInfo.x;\r\n";
-      injectionCode += StringTools::printf(
-        "%s += (readVector3FromRawSampler(%zu, vertexID) - %s) * morphTargetInfluences[%zu];\r\n",
-        _positionOutput->associatedVariableName().c_str(), index,
-        _position->associatedVariableName().c_str(), index);
-      injectionCode += "vertexID += 1.0;\r\n";
-    }
-    else {
-      injectionCode
-        += StringTools::printf("%s += (position%zu - %s) * morphTargetInfluences[%zu];\r\n",
-                               _positionOutput->associatedVariableName().c_str(), index,
-                               _position->associatedVariableName().c_str(), index);
-    }
+    injectionCode
+      += StringTools::printf("%s += (position%zu - %s) * morphTargetInfluences[%zu];\r\n",
+                             _positionOutput->associatedVariableName().c_str(), index,
+                             _position->associatedVariableName().c_str(), index);
 
     if (hasNormals) {
       injectionCode += "#ifdef MORPHTARGETS_NORMAL\r\n";
-      if (manager && manager->isUsingTextureForTargets()) {
-        injectionCode += StringTools::printf(
-          "%s += (readVector3FromRawSampler(%zu, vertexID) - %s) * morphTargetInfluences[%zu];\r\n",
-          _normalOutput->associatedVariableName().c_str(), index,
-          _normal->associatedVariableName().c_str(), index);
-        injectionCode += "vertexID += 1.0;\r\n";
-      }
-      else {
-        injectionCode
-          += StringTools::printf("%s += (normal%zu - %s) * morphTargetInfluences[%zu];\r\n",
-                                 _normalOutput->associatedVariableName().c_str(), index,
-                                 _normal->associatedVariableName().c_str(), index);
-      }
-      injectionCode += "#endif\r\n";
-    }
-
-    if (hasUVs) {
-      injectionCode += "#ifdef MORPHTARGETS_UV\r\n";
-      if (manager && manager->isUsingTextureForTargets()) {
-        injectionCode += StringTools::printf(
-          "%s += (readVector3FromRawSampler(%zu, vertexID).xy - %s) * "
-          "morphTargetInfluences[%zu];\r\n",
-          _uvOutput->associatedVariableName().c_str(), index, _uv->associatedVariableName().c_str(),
-          index);
-        injectionCode += "vertexID += 1.0;\r\n";
-      }
-      else {
-        injectionCode
-          += StringTools::printf("%s.xy += (uv_%zu - %s.xy) * morphTargetInfluences[%zu];\r\n",
-                                 _uvOutput->associatedVariableName().c_str(), index,
-                                 _uv->associatedVariableName().c_str(), index);
-      }
+      injectionCode
+        += StringTools::printf("%s += (normal%zu - %s) * morphTargetInfluences[%zu];\r\n",
+                               _normalOutput->associatedVariableName().c_str(), index,
+                               _normal->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
     if (hasTangents) {
       injectionCode += "#ifdef MORPHTARGETS_TANGENT\r\n";
-      if (manager && manager->isUsingTextureForTargets()) {
-        injectionCode += StringTools::printf(
-          "%s += (readVector3FromRawSampler(%zu, vertexID) - %s) * morphTargetInfluences[%zu];\r\n",
-          _tangentOutput->associatedVariableName().c_str(), index,
-          _tangent->associatedVariableName().c_str(), index);
-      }
-      else {
-        injectionCode += StringTools::printf(
-          "%s.xyz += (tangent%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
-          _tangentOutput->associatedVariableName().c_str(), index,
-          _tangent->associatedVariableName().c_str(), index);
-      }
+      injectionCode
+        += StringTools::printf("%s.xyz += (tangent%zu - %s.xyz) * morphTargetInfluences[%zu];\r\n",
+                               _tangentOutput->associatedVariableName().c_str(), index,
+                               _tangent->associatedVariableName().c_str(), index);
+      injectionCode += "#endif\r\n";
+    }
+
+    if (hasUVs) {
+      injectionCode += "#ifdef MORPHTARGETS_UV\r\n";
+      injectionCode
+        += StringTools::printf("%s.xy += (uv_%zu - %s.xy) * morphTargetInfluences[%zu];\r\n",
+                               _uvOutput->associatedVariableName().c_str(), index,
+                               _uv->associatedVariableName().c_str(), index);
       injectionCode += "#endif\r\n";
     }
 
@@ -316,9 +261,6 @@ MorphTargetsBlock& MorphTargetsBlock::_buildBlock(NodeMaterialBuildState& state)
   auto iComments              = StringTools::printf("//%s", name().c_str());
 
   state.uniforms.emplace_back("morphTargetInfluences");
-  state.uniforms.emplace_back("morphTargetTextureInfo");
-  state.uniforms.emplace_back("morphTargetTextureIndices");
-  state.samplers.emplace_back("morphTargets");
 
   state._emitFunctionFromInclude("morphTargetsVertexGlobalDeclaration", iComments);
   state._emitFunctionFromInclude("morphTargetsVertexDeclaration", iComments,

@@ -1,4 +1,3 @@
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
@@ -6,6 +5,7 @@
 #include <babylon/materials/textures/mirror_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {

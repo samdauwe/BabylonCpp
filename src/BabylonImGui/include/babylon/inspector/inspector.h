@@ -25,7 +25,7 @@ public:
   Inspector(GLFWwindow* glfwWindow = nullptr, Scene* scene = nullptr);
   ~Inspector(); // = default
 
-  Scene* scene() const;
+  [[nodiscard]] Scene* scene() const;
   void setScene(Scene* scene);
   void render();
 

@@ -1,7 +1,6 @@
 #include <babylon/lights/spot_light.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
@@ -39,9 +38,6 @@ SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition, const V
     , projectionTextureUpDirection{this, &SpotLight::get_projectionTextureUpDirection,
                                    &SpotLight::set_projectionTextureUpDirection}
     , projectionTexture{this, &SpotLight::get_projectionTexture, &SpotLight::set_projectionTexture}
-    , projectionTextureProjectionLightMatrix{this,
-                                             &SpotLight::get_projectionTextureProjectionLightMatrix,
-                                             &SpotLight::set_projectionTextureProjectionLightMatrix}
     , _projectionTextureLightNear{1e-6f}
     , _projectionTextureLightFar{1000.f}
     , _projectionTextureUpDirection{Vector3::Up()}
@@ -193,18 +189,6 @@ bool SpotLight::_IsTexture(const BaseTexturePtr& texture)
   return std::static_pointer_cast<Texture>(texture) != nullptr;
 }
 
-Matrix& SpotLight::get_projectionTextureProjectionLightMatrix()
-{
-  return _projectionTextureProjectionLightMatrix;
-}
-
-void SpotLight::set_projectionTextureProjectionLightMatrix(const Matrix& projection)
-{
-  _projectionTextureProjectionLightMatrix = projection;
-  _projectionTextureProjectionLightDirty  = false;
-  _projectionTextureDirty                 = true;
-}
-
 void SpotLight::_setDirection(const Vector3& value)
 {
   ShadowLight::_setDirection(value);
@@ -229,14 +213,8 @@ void SpotLight::_setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& 
   _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1.f;
   auto iAngle       = *_shadowAngleScale * _angle;
 
-  const auto minZ = shadowMinZ().value_or(activeCamera->minZ);
-  const auto maxZ = shadowMaxZ().value_or(activeCamera->maxZ);
-
-  const auto useReverseDepthBuffer = getScene()->getEngine()->useReverseDepthBuffer;
-
-  Matrix::PerspectiveFovLHToRef(iAngle, 1.f, useReverseDepthBuffer ? maxZ : minZ,
-                                useReverseDepthBuffer ? minZ : maxZ, matrix, true,
-                                _scene->getEngine()->isNDCHalfZRange);
+  Matrix::PerspectiveFovLHToRef(iAngle, 1.f, getDepthMinZ(*activeCamera),
+                                getDepthMaxZ(*activeCamera), matrix);
 }
 
 void SpotLight::_computeProjectionTextureViewLightMatrix()
@@ -399,24 +377,6 @@ void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   if (_projectionTexture) {
     _projectionTexture->dispose();
   }
-}
-
-float SpotLight::getDepthMinZ(const Camera& activeCamera) const
-{
-  const auto engine = _scene->getEngine();
-  const auto minZ   = shadowMinZ().value_or(activeCamera.minZ);
-
-  return engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? minZ :
-         _scene->getEngine()->isNDCHalfZRange                     ? 0.f :
-                                                                    minZ;
-}
-
-float SpotLight::getDepthMaxZ(const Camera& activeCamera) const
-{
-  const auto engine = _scene->getEngine();
-  const auto maxZ   = shadowMaxZ().value_or(activeCamera.maxZ);
-
-  return engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : maxZ;
 }
 
 void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines, unsigned int lightIndex)

@@ -1,7 +1,6 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/core/time.h>
@@ -14,7 +13,8 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(StandardMaterial)
+class StandardMaterial;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
 
 namespace Samples {
 
@@ -105,7 +105,7 @@ public:
 
     // Creation of a manual animation with box 2
     //------------------------------------------
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
       auto currentTimestamp = Time::highresTimepointNow();
       auto diffMillis = Time::fpTimeDiff<size_t, std::milli>(_previousTimestamp, currentTimestamp);
       if (diffMillis >= 1000ul) {

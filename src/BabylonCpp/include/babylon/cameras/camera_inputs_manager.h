@@ -82,7 +82,7 @@ public:
   void rebuildInputCheck();
 
   /**
-   * @brief Remove all attached input methods from a camera.
+   * @brief Remove all attached input methods from a camera
    */
   void clear();
 

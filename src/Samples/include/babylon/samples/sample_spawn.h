@@ -5,26 +5,31 @@
 #include <string>
 #include <vector>
 
+
 namespace BABYLON {
 namespace Samples {
 
 struct BABYLON_SHARED_EXPORT SpawnOptions {
-  bool InheritEnvironment            = true;
-  bool MixStdOutStdErr               = true;
-  double MaxExecutionTimeSeconds     = -1;
-  bool CopyOutputToMainProgramOutput = false;
+  bool        InheritEnvironment = true;
+  bool        MixStdOutStdErr = true;
+  double      MaxExecutionTimeSeconds = -1;
+  bool        CopyOutputToMainProgramOutput  = false;
 };
 
-struct BABYLON_SHARED_EXPORT SpawnResult {
-  int ExitStatus              = -99;
+struct BABYLON_SHARED_EXPORT SpawnResult
+{
+  int ExitStatus = -99;
   bool MaxExecutionTimePassed = false;
-  std::string StdOutErr       = "";
+  std::string StdOutErr = "";
 };
 
-BABYLON_SHARED_EXPORT SpawnResult SpawnWaitSubProcess(const std::vector<std::string>& command,
-                                                      const SpawnOptions& spawnOptions);
+BABYLON_SHARED_EXPORT SpawnResult SpawnWaitSubProcess(
+  const std::vector<std::string> & command,
+  const SpawnOptions& spawnOptions
+);
 
-BABYLON_SHARED_EXPORT bool ReadScreenshot_IsImageEmpty(const std::string& sampleName);
+
+BABYLON_SHARED_EXPORT bool ReadScreenshot_IsImageEmpty(const std::string & sampleName);
 
 } // namespace Samples
 } // namespace BABYLON

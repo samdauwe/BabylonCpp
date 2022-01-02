@@ -19,7 +19,6 @@ namespace BABYLON {
 
 class Mesh;
 class SolidParticleSystem;
-FWD_CLASS_SPTR(BoundingInfo)
 FWD_CLASS_SPTR(ModelShape)
 
 /**
@@ -52,12 +51,6 @@ public:
   ~SolidParticle(); // = default
 
   /**
-   * @brief Particle BoundingInfo object.
-   * @returns a BoundingInfo
-   */
-  BoundingInfoPtr& getBoundingInfo();
-
-  /**
    * @brief Copies the particle property values into the existing target : position, rotation,
    * scaling, uvs, colors, pivot, parent, visibility, alive
    * @param target the particle target
@@ -88,12 +81,6 @@ public:
    * @hidden
    */
   void getRotationMatrix(Matrix& m) const;
-
-protected:
-  /**
-   * @brief Returns true if there is already a bounding info.
-   */
-  bool get_hasBoundingInfo() const;
 
 public:
   /**
@@ -178,9 +165,10 @@ public:
    */
   std::unique_ptr<BoundingInfo> _modelBoundingInfo;
   /**
-   * Returns true if there is already a bounding info
+   * Particle BoundingInfo object (Internal use)
+   * Hidden
    */
-  ReadOnlyProperty<SolidParticle, bool> hasBoundingInfo;
+  std::shared_ptr<BoundingInfo> _boundingInfo;
   /**
    * Reference to the SPS what the particle belongs to (Internal use)
    * Hidden
@@ -229,9 +217,6 @@ public:
   Vector3 _globalPosition;
 
   std::unordered_map<std::string, float> extraFields;
-
-private:
-  BoundingInfoPtr _boundingInfo;
 
 }; // end of class SolidParticle
 

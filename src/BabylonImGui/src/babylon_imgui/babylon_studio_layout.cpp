@@ -1,8 +1,8 @@
 #include "babylon/babylon_imgui/babylon_studio_layout.h"
 
 #include "imgui_internal.h"
-#include "imgui_utils/icons_font_awesome_5.h"
 #include "imgui_utils/imgui_runner_babylon/runner_babylon.h"
+#include "imgui_utils/icons_font_awesome_5.h"
 
 namespace BABYLON {
 
@@ -98,23 +98,17 @@ const char* BabylonStudioLayout::Label_c(DockableWindowId id)
   return _dockableWindowsInfos.at(id).Label.c_str();
 }
 
-void BabylonStudioLayout::DoDock(DockableWindowId /*id*/, ImGuiID /*dockId*/)
+void BabylonStudioLayout::DoDock(DockableWindowId id, ImGuiID dockId)
 {
-#if 0
   ImGui::DockBuilderDockWindow(Label_c(id), dockId);
-#endif
 }
 
-ImGuiID BabylonStudioLayout::DoSplit(ImGuiID* /*io_dockToSplit*/, ImGuiDir_ /*splitDirection*/,
-                                     float /*ratio*/)
+
+ImGuiID BabylonStudioLayout::DoSplit(ImGuiID* io_dockToSplit, ImGuiDir_ splitDirection, float ratio)
 {
-#if 0
   ImGuiID new_dock
     = ImGui::DockBuilderSplitNode(*io_dockToSplit, splitDirection, ratio, nullptr, io_dockToSplit);
   return new_dock;
-#else
-  return 0;
-#endif
 }
 
 bool BabylonStudioLayout::IsShowingSceneOnly()
@@ -129,16 +123,14 @@ bool BabylonStudioLayout::IsShowingSceneOnly()
 
 void BabylonStudioLayout::PrepareLayout(ImGuiID fullDockSpaceId)
 {
-#if 0
   ImGui::DockBuilderRemoveNode(fullDockSpaceId); // Clear out existing layout
   ImGui::DockBuilderAddNode(fullDockSpaceId);    // Add empty node
   ImGui::DockBuilderSetNodeSize(fullDockSpaceId, ImGui::GetIO().DisplaySize);
-#endif
 
-  ImGuiID dock_main_id   = fullDockSpaceId;
+  ImGuiID dock_main_id = fullDockSpaceId;
   ImGuiID dock_id_bottom = DoSplit(&dock_main_id, ImGuiDir_Down, 0.25f);
-  ImGuiID dock_id_left   = DoSplit(&dock_main_id, ImGuiDir_Left, 0.33f);
-  ImGuiID dock_id_right  = DoSplit(&dock_main_id, ImGuiDir_Right, 0.45f);
+  ImGuiID dock_id_left = DoSplit(&dock_main_id, ImGuiDir_Left, 0.33f);
+  ImGuiID dock_id_right = DoSplit(&dock_main_id, ImGuiDir_Right, 0.45f);
 
 #ifdef BABYLON_BUILD_PLAYGROUND
   DoDock(DockableWindowId::PlaygroundEditor, dock_main_id);
@@ -157,9 +149,7 @@ void BabylonStudioLayout::PrepareLayout(ImGuiID fullDockSpaceId)
   DoDock(DockableWindowId::Scene3d, dock_id_right);
   DoDock(DockableWindowId::Logs, dock_id_bottom);
 
-#if 0
   ImGui::DockBuilderFinish(fullDockSpaceId);
-#endif
 }
 
 void BabylonStudioLayout::FocusWindow(DockableWindowId id)

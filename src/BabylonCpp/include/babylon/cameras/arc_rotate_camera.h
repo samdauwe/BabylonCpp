@@ -70,7 +70,7 @@ public:
   Camera& storeState() override;
 
   /**
-   * @brief Restored camera state. You must call storeState() first.
+   * @brief Restored camera state. You must call storeState() first
    * Hidden
    */
   bool _restoreStateValues() override;
@@ -91,7 +91,7 @@ public:
    * @param panningMouseButton Defines whether panning is allowed through mouse click button
    */
   void attachControl(bool noPreventDefault = false, bool useCtrlForPanning = true,
-                     int panningMouseButton = 2) override;
+                     MouseButtonType panningMouseButton = MouseButtonType::RIGHT) override;
 
   /**
    * @brief Detach the current controls from the specified dom element.
@@ -107,7 +107,8 @@ public:
   void _checkInputs() override;
 
   /**
-   * @brief Rebuilds angles (alpha, beta) and radius from the give position and target.
+   * @brief Rebuilds angles (alpha, beta) and radius from the give position and
+   * target.
    */
   void rebuildAnglesAndRadius();
 
@@ -136,8 +137,8 @@ public:
   Matrix _getViewMatrix() override;
 
   /**
-   * @brief Zooms on a mesh to be at the min distance where we could see it fully in the current
-   * viewport.
+   * @brief Zooms on a mesh to be at the min distance where we could see it
+   * fully in the current viewport.
    * @param meshes Defines the mesh to zoom on
    * @param doNotUpdateMaxZ Defines whether or not maxZ should be updated whilst zooming on the mesh
    * (this can happen if the mesh is big and the maxradius pretty small for instance)
@@ -402,7 +403,7 @@ public:
   /**
    * Hidden
    */
-  int _panningMouseButton;
+  MouseButtonType _panningMouseButton;
 
   /**
    * Defines the input associated to the camera.

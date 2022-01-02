@@ -11,8 +11,7 @@
 namespace BABYLON {
 
 AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
-    : _parentContainer{nullptr}
-    , name{iName}
+    : name{iName}
     , from{this, &AnimationGroup::get_from}
     , to{this, &AnimationGroup::get_to}
     , isStarted{this, &AnimationGroup::get_isStarted}
@@ -384,14 +383,7 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTex
 {
   _targetedAnimations.clear();
   _animatables.clear();
-
-  // Remove from scene
   stl_util::remove_vector_elements_equal_sharedptr(_scene->animationGroups, this);
-
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->animationGroups, this);
-    _parentContainer = nullptr;
-  }
 
   onAnimationEndObservable.clear();
   onAnimationGroupEndObservable.clear();

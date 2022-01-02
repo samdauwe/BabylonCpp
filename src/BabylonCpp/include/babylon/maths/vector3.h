@@ -25,10 +25,6 @@ class BABYLON_SHARED_EXPORT Vector3 {
 
 private:
   static const Vector3 _UpReadOnly;
-  static const Vector3 _LeftHandedForwardReadOnly;
-  static const Vector3 _RightHandedForwardReadOnly;
-  static const Vector3 _RightReadOnly;
-  static const Vector3 _ZeroReadOnly;
 
 public:
   /**
@@ -593,37 +589,6 @@ public:
                                       const Vector3& normal);
 
   /**
-   * @brief Get angle between two vectors projected on a plane.
-   * @param vector0 angle between vector0 and vector1
-   * @param vector1 angle between vector0 and vector1
-   * @param normal Normal of the projection plane
-   * @returns the angle between vector0 and vector1 projected on the plane with the specified normal
-   */
-  static float GetAngleBetweenVectorsOnPlane(const Vector3& vector0, const Vector3& vector1,
-                                             const Vector3& normal);
-
-  /**
-   * @brief Slerp between two vectors. See also `SmoothToRef`.
-   * @param vector0 Start vector
-   * @param vector1 End vector
-   * @param slerp amount (will be clamped between 0 and 1)
-   * @param result The slerped vector
-   */
-  static void SlerpToRef(const Vector3& vector0, const Vector3& vector1, float slerp,
-                         Vector3& result);
-
-  /**
-   * @brief Smooth interpolation between two vectors using Slerp.
-   * @param source source vector
-   * @param goal goal vector
-   * @param deltaTime current interpolation frame
-   * @param lerpTime total interpolation time
-   * @param result the smoothed vector
-   */
-  static void SmoothToRef(const Vector3& source, const Vector3& goal, float deltaTime,
-                          float lerpTime, Vector3& result);
-
-  /**
    * @brief Returns a new Vector3 set from the index "offset" of the given array.
    * @param array defines the source array
    * @param offset defines the offset in the source array
@@ -702,26 +667,6 @@ public:
    * @brief Gets a up Vector3 that must not be updated.
    */
   static Vector3 UpReadOnly();
-
-  /**
-   * @brief Gets a right Vector3 that must not be updated.
-   */
-  static Vector3 RightReadOnly();
-
-  /**
-   * @brief Gets a forward Vector3 that must not be updated.
-   */
-  static Vector3 LeftHandedForwardReadOnly();
-
-  /**
-   * @brief Gets a forward Vector3 that must not be updated.
-   */
-  static Vector3 RightHandedForwardReadOnly();
-
-  /**
-   * @brief Gets a zero Vector3 that must not be updated.
-   */
-  static Vector3 ZeroReadOnly();
 
   /**
    * @brief Returns a new Vector3 set to (0.0, -1.0, 0.0).
@@ -884,33 +829,6 @@ public:
    */
   static Vector3 Hermite(const Vector3& value1, const Vector3& tangent1, const Vector3& value2,
                          const Vector3& tangent2, float amount);
-
-  /**
-   * @brief Returns a new Vector3 which is the 1st derivative of the Hermite spline defined by the
-   * vectors "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @returns 1st derivative
-   */
-  static Vector3 Hermite1stDerivative(const Vector3& value1, const Vector3& tangent1,
-                                      const Vector3& value2, const Vector3& tangent2, float time);
-
-  /**
-   * @brief Update a Vector3 with the 1st derivative of the Hermite spline defined by the vectors
-   * "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @param result define where to store the derivative
-   */
-  static void Hermite1stDerivativeToRef(const Vector3& value1, const Vector3& tangent1,
-                                        const Vector3& value2, const Vector3& tangent2, float time,
-                                        Vector3& result);
 
   /**
    * @brief Returns a new Vector3 located for "amount" (float) on the linear interpolation between
@@ -1086,21 +1004,6 @@ public:
    * @returns the squared distance
    */
   static float DistanceSquared(const Vector3& value1, const Vector3& value2);
-
-  /**
-   * @brief Projects "vector" on the triangle determined by its extremities "p0", "p1" and "p2",
-   * stores the result in "ref". and returns the distance to the projected point. From
-   * http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.104.4264&rep=rep1&type=pdf
-   *
-   * @param vector the vector to get distance from
-   * @param p0 extremity of the triangle
-   * @param p1 extremity of the triangle
-   * @param p2 extremity of the triangle
-   * @param ref variable to store the result to
-   * @returns The distance between "ref" and "vector"
-   */
-  static float ProjectOnTriangleToRef(const Vector3& vector, const Vector3& p0, const Vector3& p1,
-                                      const Vector3& p2, Vector3& ref);
 
   /**
    * @brief Returns a new Vector3 located at the center between "value1" and

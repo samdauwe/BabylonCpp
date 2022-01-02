@@ -2,14 +2,14 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_MARBLE_MARBLE_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-FWD_CLASS_SPTR(MarbleProceduralTexture)
+class MarbleProceduralTexture;
+using MarbleProceduralTexturePtr = std::shared_ptr<MarbleProceduralTexture>;
 
 class BABYLON_SHARED_EXPORT MarbleProceduralTexture : public ProceduralTexture {
 
@@ -34,10 +34,12 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Marble Procedural Texture from parsed marble procedural texture data.
+   * @brief Creates a Marble Procedural Texture from parsed marble procedural
+   * texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing marble procedural texture information
+   * @param rootUrl defines the root URL containing marble procedural texture
+   * information
    * @returns a parsed Marble Procedural Texture
    */
   static std::unique_ptr<MarbleProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
@@ -74,4 +76,5 @@ private:
 } // end of namespace ProceduralTexturesLibrary
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_MARBLE_MARBLE_PROCEDURAL_TEXTURE_H
+#endif // end of
+       // BABYLON_PROCEDURAL_TEXTURES_LIBRARY_MARBLE_MARBLE_PROCEDURAL_TEXTURE_H

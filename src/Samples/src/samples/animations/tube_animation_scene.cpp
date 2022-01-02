@@ -56,10 +56,10 @@ struct TubeAnimationScene : public IRenderableScene {
     mat->backFaceCulling = false;
     mat->wireframe       = true;
 
-    const auto curvePoints = [](float l, float t) -> std::vector<Vector3> {
+    const auto curvePoints = [](float l, float t) {
       std::vector<Vector3> path;
       float step = l / t;
-      for (auto i = -l / 2.f; i < l / 2.f; i += step) {
+      for (float i = -l / 2.f; i < l / 2.f; i += step) {
         path.emplace_back(Vector3(5.f * std::sin(i * t / 400.f), i, 5.f * std::cos(i * t / 400.f)));
       }
       return path;
@@ -68,7 +68,7 @@ struct TubeAnimationScene : public IRenderableScene {
     auto curve = curvePoints(40.f, 200.f);
 
     // Create tube
-    auto tube = Mesh::CreateTube("tube", curve, 5.f, 60, nullptr, 0, scene, false, Mesh::FRONTSIDE);
+    auto tube = Mesh::CreateTube("tube", curve, 5, 60, nullptr, 0, scene, false, Mesh::FRONTSIDE);
     tube->material = mat;
 
     auto mat1          = StandardMaterial::New("mat1", scene);
@@ -105,7 +105,7 @@ struct TubeAnimationScene : public IRenderableScene {
     // Animation keys
     std::vector<IAnimationKey> rotationKeys;
     frame = 0;
-    for (auto index = 0u; index < curve.size() - 1; ++index) {
+    for (unsigned int index = 0; index < curve.size() - 1; ++index) {
       auto pointToRotateTo = curve[index + 1];
       auto axis1           = curve[index].subtract(pointToRotateTo).normalize();
       auto axis2           = Vector3::Cross(axis1, Vector3(0.f, 1.f, 0.f)).normalize();

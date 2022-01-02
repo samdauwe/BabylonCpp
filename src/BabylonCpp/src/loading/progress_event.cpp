@@ -2,8 +2,8 @@
 
 namespace BABYLON {
 
-ProgressEvent::ProgressEvent(const std::string& type, bool lengthComputable, size_t loaded,
-                             size_t total)
+ProgressEvent::ProgressEvent(const std::string& type, bool lengthComputable,
+                             size_t loaded, size_t total)
     : type{this, &ProgressEvent::get_type}
     , lengthComputable{this, &ProgressEvent::get_lengthComputable}
     , loaded{this, &ProgressEvent::get_loaded}

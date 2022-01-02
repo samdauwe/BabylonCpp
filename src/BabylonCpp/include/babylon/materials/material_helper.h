@@ -47,6 +47,25 @@ struct BABYLON_SHARED_EXPORT PrepareDefinesForLightsState {
 struct BABYLON_SHARED_EXPORT MaterialHelper {
 
   /**
+   * @brief Bind the current view position to an effect.
+   * @param effect The effect to be bound
+   * @param scene The scene the eyes position is used from
+   * @param variableName name of the shader variable that will hold the eye position
+   * @param isVector3 true to indicates that variableName is a Vector3 and not a Vector4
+   * @return the computed eye position
+   */
+  static Vector4 BindEyePosition(Effect* effect, Scene* scene,
+                                 const std::string& variableName = "vEyePosition",
+                                 bool isVector3                  = false);
+
+  /**
+   * @brief Update the scene ubo before it can be used in rendering processing.
+   * @param scene the scene to retrieve the ubo from
+   * @returns the scene UniformBuffer
+   */
+  static UniformBuffer* FinalizeSceneUbo(Scene* scene);
+
+  /**
    * @brief Binds the scene's uniform buffer to the effect.
    * @param effect defines the effect to bind to the scene uniform buffer
    * @param sceneUbo defines the uniform buffer storing scene data
@@ -54,8 +73,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void BindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo);
 
   /**
-   * @brief Helps preparing the defines values about the UVs in used in the effect.
-   * UVs are shared as much as we can across channels in the shaders.
+   * @brief Helps preparing the defines values about the UVs in used in the effect. UVs are shared
+   * as much as we can accross channels in the shaders.
    * @param texture The texture we are preparing the UVs for
    * @param defines The defines to update
    * @param key The channel key "diffuse", "specular"... used in the shader
@@ -64,9 +83,9 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                         const std::string& key);
 
   /**
-   * @brief Binds a texture matrix value to its corresponding uniform.
+   * @brief Binds a texture matrix value to its corrsponding uniform
    * @param texture The texture to bind the matrix for
-   * @param uniformBuffer The uniform buffer receiving the data
+   * @param uniformBuffer The uniform buffer receivin the data
    * @param key The channel key "diffuse", "specular"... used in the shader
    */
   static void BindTextureMatrix(BaseTexture& texture, UniformBuffer& uniformBuffer,
@@ -156,14 +175,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void PrepareDefinesForPrePass(Scene* scene, MaterialDefines& defines, bool canRenderToMRT);
 
   /**
-   * @brief Prepares the defines related to the light information passed in parameter.
+   * @brief Prepares the defines related to the light information passed in parameter
    * @param scene The scene we are intending to draw
    * @param mesh The mesh the effect is compiling for
+   * @param light The light the effect is compiling for
+   * @param lightIndex The index of the light
    * @param defines The defines to update
    * @param specularSupported Specifies whether specular is supported or not (override lights data)
-   * @param maxSimultaneousLights Specifies how manuy lights can be added to the effect at max
-   * @param disableLighting Specifies whether the lighting is disabled (override scene and light)
-   * @returns true if normals will be required for the rest of the effect
+   * @param state Defines the current state regarding what is needed (normals, etc...)
    */
   static void PrepareDefinesForLight(Scene* scene, AbstractMesh* mesh, const LightPtr& light,
                                      unsigned int lightIndex, MaterialDefines& defines,
@@ -222,7 +241,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * containing the list and extra information
    * @param samplersList The sampler list
    * @param defines The defines helping in the list generation
-   * @param maxSimultaneousLights The maximum number of simultaneous light allowed in the effect
+   * @param maxSimultaneousLights The maximum number of simultanous light allowed in the effect
    */
   static void PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
                                              std::vector<std::string>& samplersList,
@@ -280,7 +299,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param attribs The current list of supported attribs
    * @param mesh The mesh to prepare the bones attributes for
    * @param defines The current Defines of the effect
-   * @param fallbacks The current effect fallback strategy
+   * @param fallbacks The current efffect fallback strategy
    */
   static void PrepareAttributesForBones(std::vector<std::string>& attribs, AbstractMesh* mesh,
                                         MaterialDefines& defines, EffectFallbacks& fallbacks);
@@ -297,10 +316,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   /**
    * @brief Add the list of attributes required for instances to the attribs array.
    * @param attribs The current list of supported attribs
-   * @param needsPreviousMatrices If the shader needs previous matrices
    */
-  static void PushAttributesForInstances(std::vector<std::string>& attribs,
-                                         bool needsPreviousMatrices = false);
+  static void PushAttributesForInstances(std::vector<std::string>& attribs);
 
   /**
    * @brief Binds the light information to the effect.
@@ -317,10 +334,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param scene The scene where the light belongs to
    * @param effect The effect we are binding the data to
    * @param useSpecular Defines if specular is supported
-   * @param receiveShadows Defines if the effect (mesh) we bind the light for receives shadows
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                        Effect* effect, bool useSpecular, bool receiveShadows = true);
+                        Effect* effect, bool useSpecular, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -329,9 +346,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param defines The generated defines for the effect
    * @param maxSimultaneousLights The maximum number of light that can be bound to the effect
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, bool defines,
-                         unsigned int maxSimultaneousLights = 4);
+                         unsigned int maxSimultaneousLights = 4, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the lights information from the scene to the effect for the given mesh.
@@ -340,9 +358,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param defines The generated defines for the effect
    * @param maxSimultaneousLights The maximum number of light that can be bound to the effect
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, MaterialDefines& defines,
-                         unsigned int maxSimultaneousLights = 4);
+                         unsigned int maxSimultaneousLights = 4, bool rebuildInParallel = false);
 
   /**
    * @brief Binds the fog information from the scene to the effect for the given mesh.

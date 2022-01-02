@@ -61,7 +61,7 @@ void CloudPoint::set_quaternion(const std::unique_ptr<Quaternion>& q)
 
 bool CloudPoint::intersectsMesh(const MeshPtr& target, bool isSphere) const
 {
-  if (!target->hasBoundingInfo()) {
+  if (!target->_boundingInfo) {
     return false;
   }
   isSphere = isSphere ? isSphere : false;

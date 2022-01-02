@@ -4,7 +4,8 @@
 
 namespace BABYLON {
 
-std::ostream& operator<<(std::ostream& os, const IImageProcessingConfigurationDefines& ipcd)
+std::ostream& operator<<(std::ostream& os,
+                         const IImageProcessingConfigurationDefines& ipcd)
 {
   if (ipcd.IMAGEPROCESSING) {
     os << "#define IMAGEPROCESSING\n";

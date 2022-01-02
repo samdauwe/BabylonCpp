@@ -2,16 +2,16 @@
 #define BABYLON_HEMISPHERIC_LIGHT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/lights/light.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(HemisphericLight)
+class HemisphericLight;
+using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
 
 /**
- * @brief The HemisphericLight simulates the ambient environment light, so the passed direction is
- * the light reflection direction, not the incoming direction.
+ * @brief The HemisphericLight simulates the ambient environment light,
+ * so the passed direction is the light reflection direction, not the incoming direction.
  */
 class BABYLON_SHARED_EXPORT HemisphericLight : public Light {
 

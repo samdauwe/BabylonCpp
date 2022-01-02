@@ -11,7 +11,7 @@ FWD_CLASS_SPTR(MultiviewRenderTarget)
 
 /**
  * @brief Renders to multiple views with a single draw call.
- * @see https://www.khronos.org/registry/webgl/extensions/OVR_multiview2/
+ * @see https://www.khronos.org/registry/webgl/extensions/WEBGL_multiview/
  */
 class BABYLON_SHARED_EXPORT MultiviewRenderTarget : public RenderTargetTexture {
 
@@ -34,8 +34,8 @@ public:
   void _bindFrameBuffer(unsigned int faceIndex = 0);
 
   /**
-   * @brief Gets the number of views the corresponding to the texture (eg. a MultiviewRenderTarget
-   * will have > 1)
+   * @brief Gets the number of views the corresponding to the texture (eg. a
+   * MultiviewRenderTarget will have > 1)
    * @returns the view count
    */
   unsigned int getViewCount() const;

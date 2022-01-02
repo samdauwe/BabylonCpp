@@ -16,10 +16,11 @@
 namespace BABYLON {
 
 /**
- * @brief Helper class to PreProcess a cubemap in order to generate mipmap according to the level of
- * blur required by the glossinees of a material.
+ * Helper class to PreProcess a cubemap in order to generate mipmap according
+ * to the level of blur required by the glossinees of a material.
  *
- * This only supports the cosine drop power as well as Warp fixup generation method.
+ * This only supports the cosine drop power as well as Warp fixup generation
+ * method.
  *
  * This is using the process from CubeMapGen described here:
  * https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/

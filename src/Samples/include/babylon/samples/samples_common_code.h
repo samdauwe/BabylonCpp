@@ -4,14 +4,14 @@
 #include <memory>
 #include <vector>
 
-#include <babylon/babylon_fwd.h>
-
 namespace BABYLON {
 
+class AbstractMesh;
+class Mesh;
 class Scene;
 class Vector2;
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Mesh)
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
 
 namespace Samples {
 

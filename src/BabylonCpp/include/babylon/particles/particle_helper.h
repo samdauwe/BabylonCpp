@@ -45,17 +45,14 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
 
   /**
    * @brief This is the main static method (one-liner) of this helper to create different particle
-   * systems
+   * systems.
    * @param type This string represents the type to the particle system to create
    * @param scene The scene where the particle system should live
    * @param gpu If the system will use gpu
-   * @param capacity defines the system capacity (if null or undefined the sotred capacity will be
-   * used)
    * @returns the ParticleSystemSet created
    */
   static ParticleSystemSet* CreateAsync(const std::string& type, Scene* scene = nullptr,
-                                        bool gpu                              = false,
-                                        const std::optional<size_t>& capacity = std::nullopt);
+                                        bool gpu = false);
 
   /**
    * @brief Static function used to export a particle system to a ParticleSystemSet variable. Please

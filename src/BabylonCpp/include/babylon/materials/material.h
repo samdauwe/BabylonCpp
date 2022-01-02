@@ -19,7 +19,6 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractScene;
 struct MaterialDefines;
 class Mesh;
 class Scene;
@@ -27,11 +26,8 @@ class SubMesh;
 class UniformBuffer;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(BaseTexture)
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
-FWD_STRUCT_SPTR(IMaterialContext)
 FWD_CLASS_SPTR(Material)
-FWD_CLASS_SPTR(MaterialStencilState)
 FWD_CLASS_SPTR(MultiMaterial)
 FWD_CLASS_SPTR(PrePassRenderer)
 FWD_CLASS_SPTR(RenderTargetTexture)
@@ -219,11 +215,6 @@ public:
                    const AnimationValue& value) override;
 
   /**
-   * @brief Hidden
-   */
-  DrawWrapperPtr& _getDrawWrapper();
-
-  /**
    * @param Returns a string representation of the current material.
    * @param fullDetails defines a boolean indicating which levels of logging is
    * desired
@@ -256,11 +247,9 @@ public:
    * @brief Specifies if the material is ready to be used.
    * @param mesh defines the mesh to check
    * @param useInstances specifies if instances should be used
-   * @param subMesh defines which submesh to render
    * @returns a boolean indicating if the material is ready to be used
    */
-  virtual bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false,
-                       SubMesh* subMesh = nullptr);
+  virtual bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false);
 
   /**
    * @brief Specifies that the submesh is ready to be used.
@@ -334,9 +323,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _preBind(const EffectPtr& effect,
-                std::optional<unsigned int> overrideOrientation = std::nullopt);
-  bool _preBind(const DrawWrapperPtr& effect,
+  bool _preBind(const EffectPtr& effect                         = nullptr,
                 std::optional<unsigned int> overrideOrientation = std::nullopt);
 
   /**
@@ -363,23 +350,23 @@ public:
   virtual void bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectOverride = nullptr);
 
   /**
+   * @brief Binds the scene's uniform buffer to the effect.
+   * @param effect defines the effect to bind to the scene uniform buffer
+   * @param sceneUbo defines the uniform buffer storing scene data
+   */
+  void bindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo);
+
+  /**
    * @brief Binds the view matrix to the effect.
    * @param effect defines the effect to bind the view matrix to
    */
   void bindView(Effect* effect);
 
   /**
-   * @brief Binds the view projection and projection matrices to the effect.
-   * @param effect defines the effect to bind the view projection and projection matrices to
+   * @brief Binds the view projection matrix to the effect.
+   * @param effect defines the effect to bind the view projection matrix to
    */
   void bindViewProjection(const EffectPtr& effect);
-
-  /**
-   * @brief  Binds the view matrix to the effect.
-   * @param effect defines the effect to bind the view matrix to
-   * @param variableName name of the shader variable that will hold the eye position
-   */
-  void bindEyePosition(Effect* effect, const std::string& variableName = "");
 
   /**
    * @brief Unbinds the material from the mesh.
@@ -515,25 +502,14 @@ protected:
   [[nodiscard]] float get_alpha() const;
 
   /**
-   * @brief Sets the culling state (true to enable culling, false to disable).
+   * @brief Sets the back-face culling state.
    */
   void set_backFaceCulling(bool value);
 
   /**
-   * @brief Gets the culling state.
+   * @brief Gets the back-face culling state.
    */
   [[nodiscard]] bool get_backFaceCulling() const;
-
-  /**
-   * @brief Sets the type of faces that should be culled (true for back faces, false for front
-   * faces).
-   */
-  void set_cullBackFaces(bool value);
-
-  /**
-   * @brief Gets the type of faces that should be culled.
-   */
-  bool get_cullBackFaces() const;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
@@ -602,17 +578,12 @@ protected:
   [[nodiscard]] bool get_needDepthPrePass() const;
 
   /**
-   * @brief Can this material render to prepass.
-   */
-  virtual bool get_isPrePassCapable() const;
-
-  /**
-   * @brief Sets the state specifying if fog should be enabled.
+   * @brief Sets the state for enabling fog.
    */
   void set_fogEnabled(bool value);
 
   /**
-   * @brief Gets the state specifying if fog should be enabled.
+   * @brief Gets the value of the fog enabled state.
    */
   [[nodiscard]] bool get_fogEnabled() const;
 
@@ -820,11 +791,6 @@ public:
   Property<Material, bool> backFaceCulling;
 
   /**
-   * The type of faces that should be culled (true for back faces, false for front faces)
-   */
-  Property<Material, bool> cullBackFaces;
-
-  /**
    * Gets a boolean indicating that current material needs to register RTT
    */
   ReadOnlyProperty<Material, bool> hasRenderTargetTextures;
@@ -900,11 +866,6 @@ public:
   Property<Material, bool> needDepthPrePass;
 
   /**
-   * Can this material render to prepass
-   */
-  ReadOnlyProperty<Material, bool> isPrePassCapable;
-
-  /**
    * Specifies if depth writing should be disabled
    */
   bool disableDepthWrite;
@@ -940,14 +901,9 @@ public:
   float pointSize;
 
   /**
-   * Stores the z offset Factor value
+   * Stores the z offset value
    */
   float zOffset;
-
-  /**
-   * Stores the z offset Units value
-   */
-  float zOffsetUnits;
 
   /**
    * The state of wireframe mode
@@ -965,9 +921,10 @@ public:
   Property<Material, unsigned int> fillMode;
 
   /**
-   * Gives access to the stencil properties of the material
+   * Stores the effects for the material
+   * Hidden
    */
-  MaterialStencilStatePtr stencil;
+  EffectPtr _effect;
 
   /**
    * Hidden
@@ -978,11 +935,6 @@ public:
    * Hidden
    */
   std::unordered_map<std::string, AbstractMeshPtr> meshMap;
-
-  /**
-   * Hidden
-   */
-  AbstractScene* _parentContainer;
 
   /**
    * Gets or sets the current transparency mode.
@@ -1006,22 +958,9 @@ protected:
   bool _backFaceCulling;
 
   /**
-   * Specifies if back or front faces should be culled (when culling is enabled)
-   */
-  bool _cullBackFaces;
-
-  /**
    * An event triggered when the effect is (re)created
    */
   Observable<OnCreatedEffectParameters> _onEffectCreatedObservable;
-
-  /**
-   * @hidden
-   * Stores the effects for the material
-   */
-  IMaterialContextPtr _materialContext;
-
-  DrawWrapperPtr _drawWrapper;
 
   /**
    * Stores the uniform buffer
@@ -1071,7 +1010,7 @@ private:
   bool _needDepthPrePass;
 
   /**
-   * Stores the state specifying if fog should be enabled
+   * Stores the state specifing if fog should be enabled
    */
   bool _fogEnabled;
 
@@ -1084,11 +1023,6 @@ private:
    * Stores a reference to the scene
    */
   Scene* _scene;
-
-  /**
-   * Hidden
-   */
-  bool _needToBindSceneUbo;
 
   /**
    * Stores the fill mode state

@@ -3,7 +3,6 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/engine.h>
@@ -20,6 +19,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -97,7 +97,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
   _imageProcessingConfiguration = scene->imageProcessingConfiguration();
   if (_imageProcessingConfiguration) {
     _imageProcessingObserver = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration* /*ic*/, EventState& /*es*/) -> void {
+      [this](ImageProcessingConfiguration* /*ic*/, EventState & /*es*/) -> void {
         _markAllSubMeshesAsImageProcessingDirty();
       });
   }
@@ -272,18 +272,18 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<WaterMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<WaterMaterialDefines>();
   }
 
-  const auto definesPtr = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
-  auto& defines         = *definesPtr.get();
-  const auto scene      = getScene();
+  auto definesPtr = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -429,8 +429,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool
     options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -453,7 +452,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   }
   auto defines = *_defines;
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect || !_mesh) {
     return;
   }
@@ -483,7 +482,7 @@ void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
@@ -636,7 +635,7 @@ void WaterMaterial::_createRenderTargets(Scene* scene, const Vector2& renderTarg
     // Transform
     auto projectionMatrix = scene->getProjectionMatrix();
     scene->setTransformMatrix(_savedViewMatrix, projectionMatrix);
-    scene->getEngine()->cullBackFaces = std::nullopt;
+    scene->getEngine()->cullBackFaces = true;
     scene->_mirroredCameraPosition    = nullptr;
   };
 }

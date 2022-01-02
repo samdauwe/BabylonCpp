@@ -4,7 +4,6 @@
 
 #include <babylon/maths/color3.h>
 #include <babylon/maths/spherical_polynomial.h>
-#include <babylon/maths/tmp_vectors.h>
 
 namespace BABYLON {
 
@@ -24,24 +23,34 @@ const std::array<float, 9> SphericalHarmonics::SH3ylmBasisConstants{
 
 const std::array<SphericalHarmonics::Vector3Callback, 9>
   SphericalHarmonics::SH3ylmBasisTrigonometricTerms{
-    [](const Vector3& /*direction*/) -> float { return 1.f; }, // l00
+    [](const Vector3 & /*direction*/) -> float { return 1.f; }, // l00
 
     [](const Vector3& direction) -> float { return direction.y; }, // l1_1
     [](const Vector3& direction) -> float { return direction.z; }, // l10
     [](const Vector3& direction) -> float { return direction.x; }, // l11
 
-    [](const Vector3& direction) -> float { return direction.x * direction.y; },             // l2_2
-    [](const Vector3& direction) -> float { return direction.y * direction.z; },             // l2_1
-    [](const Vector3& direction) -> float { return 3.f * direction.z * direction.z - 1.f; }, // l20
-    [](const Vector3& direction) -> float { return direction.x * direction.z; },             // l21
+    [](const Vector3& direction) -> float {
+      return direction.x * direction.y;
+    }, // l2_2
+    [](const Vector3& direction) -> float {
+      return direction.y * direction.z;
+    }, // l2_1
+    [](const Vector3& direction) -> float {
+      return 3.f * direction.z * direction.z - 1.f;
+    }, // l20
+    [](const Vector3& direction) -> float {
+      return direction.x * direction.z;
+    }, // l21
     [](const Vector3& direction) -> float {
       return direction.x * direction.x - direction.y * direction.y;
     }, // l22
   };
 
-const std::function<float(unsigned int lm, const Vector3& direction)> SphericalHarmonics::applySH3
+const std::function<float(unsigned int lm, const Vector3& direction)>
+  SphericalHarmonics::applySH3
   = [](unsigned int lm, const Vector3& direction) -> float {
-  return SH3ylmBasisConstants[lm] * SH3ylmBasisTrigonometricTerms[lm](direction);
+  return SH3ylmBasisConstants[lm]
+         * SH3ylmBasisTrigonometricTerms[lm](direction);
 };
 
 const std::array<float, 9> SphericalHarmonics::SHCosKernelConvolution{
@@ -95,31 +104,20 @@ std::unique_ptr<SphericalHarmonics> SphericalHarmonics::clone() const
 void SphericalHarmonics::addLight(const Vector3& direction, const Color3& color,
                                   float deltaSolidAngle)
 {
-  TmpVectors::Vector3Array[0].set(color.r, color.g, color.b);
-  auto& colorVector = TmpVectors::Vector3Array[0];
-  auto& c           = TmpVectors::Vector3Array[1];
-  colorVector.scaleToRef(deltaSolidAngle, c);
+  Vector3 colorVector(color.r, color.g, color.b);
+  const auto c = colorVector.scale(deltaSolidAngle);
 
-  c.scaleToRef(applySH3(0, direction), TmpVectors::Vector3Array[2]);
-  l00.addInPlace(TmpVectors::Vector3Array[2]);
+  l00 = l00.add(c.scale(applySH3(0, direction)));
 
-  c.scaleToRef(applySH3(1, direction), TmpVectors::Vector3Array[2]);
-  l1_1.addInPlace(TmpVectors::Vector3Array[2]);
-  c.scaleToRef(applySH3(2, direction), TmpVectors::Vector3Array[2]);
-  l10.addInPlace(TmpVectors::Vector3Array[2]);
-  c.scaleToRef(applySH3(3, direction), TmpVectors::Vector3Array[2]);
-  l11.addInPlace(TmpVectors::Vector3Array[2]);
+  l1_1 = l1_1.add(c.scale(applySH3(1, direction)));
+  l10  = l10.add(c.scale(applySH3(2, direction)));
+  l11  = l11.add(c.scale(applySH3(3, direction)));
 
-  c.scaleToRef(applySH3(4, direction), TmpVectors::Vector3Array[2]);
-  l2_2.addInPlace(TmpVectors::Vector3Array[2]);
-  c.scaleToRef(applySH3(5, direction), TmpVectors::Vector3Array[2]);
-  l2_1.addInPlace(TmpVectors::Vector3Array[2]);
-  c.scaleToRef(applySH3(6, direction), TmpVectors::Vector3Array[2]);
-  l20.addInPlace(TmpVectors::Vector3Array[2]);
-  c.scaleToRef(applySH3(7, direction), TmpVectors::Vector3Array[2]);
-  l21.addInPlace(TmpVectors::Vector3Array[2]);
-  c.scaleToRef(applySH3(8, direction), TmpVectors::Vector3Array[2]);
-  l22.addInPlace(TmpVectors::Vector3Array[2]);
+  l2_2 = l2_2.add(c.scale(applySH3(4, direction)));
+  l2_1 = l2_1.add(c.scale(applySH3(5, direction)));
+  l20  = l20.add(c.scale(applySH3(6, direction)));
+  l21  = l21.add(c.scale(applySH3(7, direction)));
+  l22  = l22.add(c.scale(applySH3(8, direction)));
 }
 
 void SphericalHarmonics::scaleInPlace(float scale)
@@ -179,45 +177,28 @@ void SphericalHarmonics::preScaleForRendering()
   l22.scaleInPlace(SH3ylmBasisConstants[8]);
 }
 
-SphericalHarmonics& SphericalHarmonics::updateFromArray(const std::vector<Float32Array>& data)
-{
-  Vector3::FromArrayToRef(data[0], 0, l00);
-  Vector3::FromArrayToRef(data[1], 0, l1_1);
-  Vector3::FromArrayToRef(data[2], 0, l10);
-  Vector3::FromArrayToRef(data[3], 0, l11);
-  Vector3::FromArrayToRef(data[4], 0, l2_2);
-  Vector3::FromArrayToRef(data[5], 0, l2_1);
-  Vector3::FromArrayToRef(data[6], 0, l20);
-  Vector3::FromArrayToRef(data[7], 0, l21);
-  Vector3::FromArrayToRef(data[8], 0, l22);
-  return *this;
-}
-
-SphericalHarmonics& SphericalHarmonics::updateFromFloatsArray(const Float32Array& data)
-{
-  Vector3::FromFloatsToRef(data[0], data[1], data[2], l00);
-  Vector3::FromFloatsToRef(data[3], data[4], data[5], l1_1);
-  Vector3::FromFloatsToRef(data[6], data[7], data[8], l10);
-  Vector3::FromFloatsToRef(data[9], data[10], data[11], l11);
-  Vector3::FromFloatsToRef(data[12], data[13], data[14], l2_2);
-  Vector3::FromFloatsToRef(data[15], data[16], data[17], l2_1);
-  Vector3::FromFloatsToRef(data[18], data[19], data[20], l20);
-  Vector3::FromFloatsToRef(data[21], data[22], data[23], l21);
-  Vector3::FromFloatsToRef(data[24], data[25], data[26], l22);
-  return *this;
-}
-
-SphericalHarmonics SphericalHarmonics::FromArray(const std::vector<Float32Array>& data)
+SphericalHarmonics
+SphericalHarmonics::FromArray(const std::vector<Float32Array>& data)
 {
   SphericalHarmonics sh;
   if (data.size() < 9) {
     return sh;
   }
 
-  return sh.updateFromArray(data);
+  Vector3::FromArrayToRef(data[0], 0, sh.l00);
+  Vector3::FromArrayToRef(data[1], 0, sh.l1_1);
+  Vector3::FromArrayToRef(data[2], 0, sh.l10);
+  Vector3::FromArrayToRef(data[3], 0, sh.l11);
+  Vector3::FromArrayToRef(data[4], 0, sh.l2_2);
+  Vector3::FromArrayToRef(data[5], 0, sh.l2_1);
+  Vector3::FromArrayToRef(data[6], 0, sh.l20);
+  Vector3::FromArrayToRef(data[7], 0, sh.l21);
+  Vector3::FromArrayToRef(data[8], 0, sh.l22);
+  return sh;
 }
 
-SphericalHarmonics SphericalHarmonics::FromPolynomial(const SphericalPolynomial& polynomial)
+SphericalHarmonics
+SphericalHarmonics::FromPolynomial(const SphericalPolynomial& polynomial)
 {
   SphericalHarmonics result;
 
@@ -233,7 +214,8 @@ SphericalHarmonics SphericalHarmonics::FromPolynomial(const SphericalPolynomial&
                  .subtract(polynomial.xx.scale(0.672834f))
                  .subtract(polynomial.yy.scale(0.672834f));
   result.l21 = polynomial.zx.scale(1.16538f);
-  result.l22 = polynomial.xx.scale(1.16538f).subtract(polynomial.yy.scale(1.16538f));
+  result.l22
+    = polynomial.xx.scale(1.16538f).subtract(polynomial.yy.scale(1.16538f));
 
   result.l1_1.scaleInPlace(-1.f);
   result.l11.scaleInPlace(-1.f);

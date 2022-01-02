@@ -1,17 +1,16 @@
 #include <babylon/layers/layer.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/layer_scene_component.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/maths/matrix.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 
@@ -24,7 +23,6 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
     , alphaBlendingMode{Constants::ALPHA_COMBINE}
     , layerMask{0x0FFFFFFF}
     , renderOnlyInRenderTargetTextures{false}
-    , isEnabled{true}
     , onDispose{this, &Layer::set_onDispose}
     , onBeforeRender{this, &Layer::set_onBeforeRender}
     , onAfterRender{this, &Layer::set_onAfterRender}
@@ -44,9 +42,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene, b
   }
   _scene->layers.emplace_back(shared_from_this());
 
-  const auto engine = _scene->getEngine();
-
-  _drawWrapper = std::make_shared<DrawWrapper>(engine);
+  auto engine = _scene->getEngine();
 
   // VBO
   const Float32Array vertices{
@@ -90,7 +86,7 @@ void Layer::set_onAfterRender(const LayerCallbackType& callback)
 
 void Layer::_createIndexBuffer()
 {
-  const auto engine = _scene->getEngine();
+  auto engine = _scene->getEngine();
 
   // Indices
   Uint32Array indices{
@@ -107,7 +103,7 @@ void Layer::_createIndexBuffer()
 
 void Layer::_rebuild()
 {
-  const auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
+  auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
 
   if (vb) {
     vb->_rebuild();
@@ -118,11 +114,7 @@ void Layer::_rebuild()
 
 void Layer::render()
 {
-  if (!isEnabled) {
-    return;
-  }
-
-  const auto engine = _scene->getEngine();
+  auto engine = _scene->getEngine();
 
   std::string defines = "";
 
@@ -143,9 +135,9 @@ void Layer::render()
     options.samplers      = {"textureSampler"};
     options.defines       = defines;
 
-    _drawWrapper->effect = engine->createEffect("layer", options, engine);
+    _effect = engine->createEffect("layer", options, engine);
   }
-  const auto currentEffect = _drawWrapper->effect;
+  auto currentEffect = _effect;
 
   // Check
   if (!currentEffect || !currentEffect->isReady() || !texture || !texture->isReady()) {
@@ -155,7 +147,7 @@ void Layer::render()
   onBeforeRenderObservable.notifyObservers(this);
 
   // Render
-  engine->enableEffect(_drawWrapper);
+  engine->enableEffect(currentEffect);
   engine->setState(false);
 
   // Texture
@@ -188,7 +180,7 @@ void Layer::render()
 void Layer::dispose()
 {
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
-    const auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
+    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (vertexBuffer) {
       vertexBuffer->dispose();
       _vertexBuffers.erase(VertexBuffer::PositionKind);

@@ -1,7 +1,6 @@
 #ifndef BABYLON_MATERIALS_NODE_NODE_MATERIAL_DECORATOR_H
 #define BABYLON_MATERIALS_NODE_NODE_MATERIAL_DECORATOR_H
 
-#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
@@ -9,8 +8,6 @@
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
-
-class Scene;
 
 /**
  * @brief Enum defining the type of properties that can be edited in the property pages in the NME.
@@ -50,10 +47,6 @@ struct BABYLON_SHARED_EXPORT IEditablePropertyOption {
     std::optional<bool> rebuild = std::nullopt;
     /** the preview should be updated */
     std::optional<bool> update = std::nullopt;
-    /** the onPreviewCommandActivated observer of the preview manager should be triggered */
-    std::optional<bool> activatePreviewCommand = std::nullopt;
-    /** a callback to trigger */
-    std::function<void(Scene* scene)> callback = nullptr;
   };
   std::optional<Notifiers> notifiers = std::nullopt;
   /** list of the options for a variable of type list */

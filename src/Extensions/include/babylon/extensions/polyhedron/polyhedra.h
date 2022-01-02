@@ -8,14 +8,16 @@ namespace BABYLON {
 namespace Extensions {
 
 /**
- * @brief Contains the data from the website "Virtual Polyhedra: The Encyclopedia of Polyhedra" by
- * George W. Hart : http://www.georgehart.com/virtual-polyhedra/vp.html George Hart Wikipedia
- * article : https://en.wikipedia.org/wiki/George_W._Hart These data were stored by George Hart in
- * WRL files, so please read the terms of use :
- * http://www.georgehart.com/virtual-polyhedra/copyright.html
+ * @brief Contains the data from the website "Virtual Polyhedra: The
+ * Encyclopedia of Polyhedra" by George W. Hart :
+ * http://www.georgehart.com/virtual-polyhedra/vp.html
+ * George Hart Wikipedia article : https://en.wikipedia.org/wiki/George_W._Hart
+ * These data were stored by George Hart in WRL files, so please read the terms
+ * of use : http://www.georgehart.com/virtual-polyhedra/copyright.html
  *
- * These data were then converted to JSON by Lee Stemkoski for this ThreeJS demo :
- * http://stemkoski.github.io/Three.js/Polyhedra.html Stemkoski's original data file is here :
+ * These data were then converted to JSON by Lee Stemkoski
+ * for this ThreeJS demo : http://stemkoski.github.io/Three.js/Polyhedra.html
+ * Stemkoski's original data file is here :
  * http://stemkoski.github.io/Three.js/js/polyhedra.js
  *
  * This file contains a list of 126 Polyhedron objects.

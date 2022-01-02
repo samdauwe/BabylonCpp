@@ -1,13 +1,11 @@
-﻿#include <babylon/buffers/vertex_buffer.h>
+﻿#include <babylon/meshes/vertex_buffer.h>
 
-#include <babylon/buffers/buffer.h>
 #include <babylon/core/data_view.h>
 #include <babylon/engines/thin_engine.h>
+#include <babylon/meshes/buffer.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
-
-size_t VertexBuffer::_Counter = 0;
 
 VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, BufferPtr>& data,
                            const std::string& kind, bool updatable,
@@ -16,8 +14,7 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
                            const std::optional<size_t>& offset, const std::optional<size_t>& size,
                            std::optional<unsigned int> iType, bool iNormalized, bool useBytes,
                            unsigned int divisor, bool takeBufferOwnership)
-    : _validOffsetRange{false}
-    , instanceDivisor{this, &VertexBuffer::get_instanceDivisor, &VertexBuffer::set_instanceDivisor}
+    : instanceDivisor{this, &VertexBuffer::get_instanceDivisor, &VertexBuffer::set_instanceDivisor}
 {
   if (std::holds_alternative<BufferPtr>(data)) {
     _buffer      = std::get<BufferPtr>(data);
@@ -37,8 +34,7 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
     _ownsBuffer = true;
   }
 
-  uniqueId = VertexBuffer::_Counter++;
-  _kind    = kind;
+  _kind = kind;
 
   if (!iType.has_value()) {
     type = VertexBuffer::FLOAT;
@@ -49,7 +45,7 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
 
   const auto typeByteLength = VertexBuffer::GetTypeByteLength(type);
 
-  const auto buffer = _buffer ? _buffer.get() : _ownedBuffer.get();
+  auto buffer = _buffer ? _buffer.get() : _ownedBuffer.get();
   if (useBytes) {
     _size      = size.has_value() ?
                    *size :
@@ -71,8 +67,6 @@ VertexBuffer::VertexBuffer(ThinEngine* engine, const std::variant<Float32Array, 
 
   _instanced       = instanced.has_value() ? *instanced : false;
   _instanceDivisor = _instanced ? divisor : 0;
-
-  _computeHashCode();
 }
 
 VertexBuffer::~VertexBuffer() = default;
@@ -86,18 +80,6 @@ void VertexBuffer::set_instanceDivisor(unsigned int value)
 {
   _instanceDivisor = value;
   _instanced       = value != 0;
-  _computeHashCode();
-}
-
-void VertexBuffer::_computeHashCode()
-{
-  hashCode = (((type - 5120) << 0) +        //
-              ((normalized ? 1 : 0) << 3) + //
-              (_size << 4) +                //
-              ((_instanced ? 1 : 0) << 6) + //
-              /* keep 5 bits free */
-              (byteStride << 12) //
-  );
 }
 
 void VertexBuffer::_rebuild()
@@ -134,29 +116,6 @@ Float32Array& VertexBuffer::getData()
   return _getBuffer()->getData();
 }
 
-Float32Array VertexBuffer::getFloatData(size_t totalVertices, const std::optional<bool>& forceCopy)
-{
-  auto data = getData();
-  if (data.empty()) {
-    return Float32Array();
-  }
-
-  const auto tightlyPackedByteStride = getSize() * VertexBuffer::GetTypeByteLength(type);
-  const auto count                   = totalVertices * getSize();
-
-  if (type != VertexBuffer::FLOAT || byteStride != tightlyPackedByteStride) {
-    Float32Array copy(count);
-    forEach(count, [&](float value, size_t index) { copy[index] = value; });
-    return copy;
-  }
-
-  if (forceCopy.value_or(false)) {
-    return Float32Array(data);
-  }
-
-  return data;
-}
-
 WebGLDataBufferPtr& VertexBuffer::getBuffer()
 {
   return _getBuffer()->getBuffer();
@@ -172,9 +131,9 @@ size_t VertexBuffer::getOffset() const
   return byteOffset / VertexBuffer::GetTypeByteLength(type);
 }
 
-size_t VertexBuffer::getSize(bool sizeInBytes) const
+size_t VertexBuffer::getSize() const
 {
-  return sizeInBytes ? _size * VertexBuffer::GetTypeByteLength(type) : _size;
+  return _size;
 }
 
 bool VertexBuffer::getIsInstanced() const

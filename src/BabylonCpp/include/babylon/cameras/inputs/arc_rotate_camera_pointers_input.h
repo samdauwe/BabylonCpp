@@ -53,13 +53,13 @@ public:
    * @brief Called each time a new POINTERDOWN event occurs. Ie, for each button press.
    * Override this method to provide functionality.
    */
-  void onButtonDown(IPointerEvent& evt) override;
+  void onButtonDown(PointerEvent& evt) override;
 
   /**
    * @brief Called each time a new POINTERUP event occurs. Ie, for each button release.
    * Override this method to provide functionality.
    */
-  void onButtonUp(IPointerEvent& evt) override;
+  void onButtonUp(PointerEvent& evt) override;
 
   /**
    * @brief Called when window becomes inactive.
@@ -80,11 +80,6 @@ private:
   void _computePinchZoom(float previousPinchSquaredDistance, float pinchSquaredDistance);
 
 public:
-  /**
-   * The minimum radius used for pinch, to avoid radius lock at 0
-   */
-  static float MinimumRadiusForPinch;
-
   /**
    * Defines the pointer angular sensibility  along the X axis or how fast is the camera rotating.
    */

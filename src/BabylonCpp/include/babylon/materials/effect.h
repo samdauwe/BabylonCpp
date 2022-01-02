@@ -1,4 +1,4 @@
-﻿#ifndef BABYLON_MATERIALS_EFFECT_H
+#ifndef BABYLON_MATERIALS_EFFECT_H
 #define BABYLON_MATERIALS_EFFECT_H
 
 #include <unordered_map>
@@ -28,7 +28,6 @@ FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(IPipelineContext)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(RenderTargetTexture)
-FWD_STRUCT_SPTR(ShaderProcessingContext)
 FWD_CLASS_SPTR(ThinTexture)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 
@@ -50,8 +49,7 @@ public:
   /**
    * Gets or sets the relative url used to load shaders if using the engine in non-minified mode
    */
-  static std::string ShadersRepository();
-  static void setShadersRepository(const std::string& repo);
+  static std::string ShadersRepository;
 
   /**
    * Enable logging of the shader code when a compilation error occurs
@@ -123,7 +121,7 @@ public:
 
   /**
    * @brief The number of attributes.
-   * @returns the number of attributes.
+   * @returns the numnber of attributes.
    */
   size_t getAttributesCount();
 
@@ -180,8 +178,8 @@ public:
   /** Methods **/
 
   /**
-   * @brief Adds a callback to the onCompiled observable and call the callback immediately if
-   * already ready.
+   * @brief Adds a callback to the onCompiled observable and call the callback immediatly if already
+   * ready.
    * @param func The callback to be used.
    */
   void executeWhenCompiled(const std::function<void(Effect* effect)>& func);
@@ -266,6 +264,11 @@ public:
   void setTextureFromPostProcessOutput(const std::string& channel,
                                        const PostProcessPtr& postProcess);
 
+  bool _cacheMatrix(const std::string& uniformName, const Matrix& matrix);
+  bool _cacheFloat2(const std::string& uniformName, float x, float y);
+  bool _cacheFloat3(const std::string& uniformName, float x, float y, float z);
+  bool _cacheFloat4(const std::string& uniformName, float x, float y, float z, float w);
+
   /**
    * @brief Binds a buffer to a uniform.
    * @param buffer Buffer to bind.
@@ -281,7 +284,7 @@ public:
   void bindUniformBlock(const std::string& blockName, unsigned index);
 
   /**
-   * @brief Sets an integer value on a uniform variable.
+   * @brief Sets an interger value on a uniform variable.
    * @param uniformName Name of the variable.
    * @param value Value to be set.
    * @returns this effect.
@@ -296,27 +299,6 @@ public:
    * @returns this effect.
    */
   Effect& setInt2(const std::string& uniformName, int x, int y);
-
-  /**
-   * @brief Sets an int3 value on a uniform variable.
-   * @param uniformName Name of the variable.
-   * @param x First int in int3.
-   * @param y Second int in int3.
-   * @param z Third int in int3.
-   * @returns this effect.
-   */
-  Effect& setInt3(const std::string& uniformName, int x, int y, int z);
-
-  /**
-   * @brief Sets an int4 value on a uniform variable.
-   * @param uniformName Name of the variable.
-   * @param x First int in int4.
-   * @param y Second int in int4.
-   * @param z Third int in int4.
-   * @param w Fourth int in int4.
-   * @returns this effect.
-   */
-  Effect& setInt4(const std::string& uniformName, int x, int y, int z, int w);
 
   /**
    * @brief Sets an int array on a uniform variable.
@@ -440,8 +422,8 @@ public:
   Effect& setMatrix(const std::string& uniformName, const Matrix& matrix);
 
   /**
-   * @brief Sets a 3x3 matrix on a uniform variable. (Specified as [1,2,3,4,5,6,7,8,9] will result
-   * in [1,2,3][4,5,6][7,8,9] matrix).
+   * @brief Sets a 3x3 matrix on a uniform variable. (Speicified as [1,2,3,4,5,6,7,8,9] will result
+   * in [1,2,3][4,5,6][7,8,9] matrix)
    * @param uniformName Name of the variable.
    * @param matrix matrix to be set.
    * @returns this effect.
@@ -449,8 +431,8 @@ public:
   Effect& setMatrix3x3(const std::string& uniformName, const Float32Array& matrix);
 
   /**
-   * @brief Sets a 2x2 matrix on a uniform variable. (Specified as [1,2,3,4] will result in
-   * [1,2][3,4] matrix).
+   * @brief Sets a 2x2 matrix on a uniform variable. (Speicified as [1,2,3,4] will result in
+   * [1,2][3,4] matrix)
    * @param uniformName Name of the variable.
    * @param matrix matrix to be set.
    * @returns this effect.
@@ -591,7 +573,6 @@ protected:
    * @param onError Callback that will be called if an error occurs during shader compilation.
    * @param indexParameters Parameters to be used with Babylons include syntax to iterate over an
    * array (eg. {lights: 10})
-   * @param key Effect Key identifying uniquely compiled shader variants
    */
   Effect(const std::variant<std::string, std::unordered_map<std::string, std::string>>& baseName,
          IEffectCreationOptions& options, ThinEngine* engine);
@@ -684,10 +665,6 @@ public:
 
   /** Hidden */
   bool _bonesComputationForcedToCPU;
-  /** Hidden */
-  std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
-  /** Hidden */
-  std::vector<std::string> _uniformBuffersNamesList;
   /** @hidden */
   bool _multiTarget;
   /**
@@ -704,16 +681,6 @@ public:
    * Hidden
    */
   IPipelineContextPtr _pipelineContext;
-
-  /** @hidden */
-  std::string _vertexSourceCode;
-  /** @hidden */
-  std::string _fragmentSourceCode;
-
-  /** @hidden */
-  std::string _rawVertexSourceCode;
-  /** @hidden */
-  std::string _rawFragmentSourceCode;
 
   /**
    * Gets the vertex shader source code of this effect
@@ -739,6 +706,8 @@ private:
   Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
   ThinEngine* _engine;
+  std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
+  std::vector<std::string> _uniformBuffersNamesList;
   std::vector<std::string> _uniformsNames;
   std::vector<std::string> _samplerList;
   std::unordered_map<std::string, int> _samplers;
@@ -751,11 +720,15 @@ private:
   std::unordered_map<std::string, WebGLUniformLocationPtr> _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
   std::unique_ptr<IEffectFallbacks> _fallbacks;
+  std::string _vertexSourceCode;
+  std::string _fragmentSourceCode;
   std::string _vertexSourceCodeOverride;
   std::string _fragmentSourceCodeOverride;
   std::vector<std::string> _transformFeedbackVaryings;
+  std::string _rawVertexSourceCode;
+  std::string _rawFragmentSourceCode;
+  std::unordered_map<std::string, Float32Array> _valueCache;
   static std::unordered_map<unsigned int, WebGLDataBufferPtr> _baseCache;
-  ShaderProcessingContextPtr _processingContext;
 
 }; // end of class Effect
 

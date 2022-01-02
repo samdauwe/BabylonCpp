@@ -1,7 +1,6 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/scene.h>
@@ -15,7 +14,8 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(MorphTarget)
+class MorphTarget;
+using MorphTargetPtr = std::shared_ptr<MorphTarget>;
 
 namespace Samples {
 
@@ -63,7 +63,7 @@ public:
                     const std::vector<AnimationGroupPtr>& /*animationGroups*/,
                     const std::vector<TransformNodePtr>& /*transformNodes*/,
                     const std::vector<GeometryPtr>& /*geometries*/,
-                    const std::vector<LightPtr>& /*lights*/) -> void {
+                    const std::vector<LightPtr>& /*lights*/) {
         auto test = std::static_pointer_cast<Mesh>(scene->getMeshByName("Sphere Default"));
         test->convertToFlatShadedMesh();
         test->position = Vector3::Zero();
@@ -92,7 +92,7 @@ public:
         test->morphTargetManager = testManager;
       });
 
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
       auto currentTimestamp = Time::highresTimepointNow();
       auto diffMillis = Time::fpTimeDiff<size_t, std::milli>(_previousTimestamp, currentTimestamp);
       if (diffMillis >= 5000ul) {

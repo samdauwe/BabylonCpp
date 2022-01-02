@@ -4,7 +4,6 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/multi_render_target.h>
-#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
 #include <babylon/rendering/pre_pass_renderer.h>
@@ -43,13 +42,11 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
     , smoothSteps{this, &ScreenSpaceReflectionPostProcess::get_smoothSteps,
                   &ScreenSpaceReflectionPostProcess::set_smoothSteps}
     , _forceGeometryBuffer{false}
-    , _geometryBufferRenderer{this, &ScreenSpaceReflectionPostProcess::get__geometryBufferRenderer}
-    , _prePassRenderer{this, &ScreenSpaceReflectionPostProcess::get__prePassRenderer}
+    , _geometryBufferRenderer{nullptr}
+    , _prePassRenderer{nullptr}
     , _enableSmoothReflections{false}
     , _reflectionSamples{64}
     , _smoothSteps{5}
-    , _nullGeometryBufferRenderer{nullptr}
-    , _nullPrePassRenderer{nullptr}
 {
   _forceGeometryBuffer = forceGeometryBuffer;
 
@@ -60,14 +57,13 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
       if (geometryBufferRenderer->isSupported()) {
         geometryBufferRenderer->enablePosition     = true;
         geometryBufferRenderer->enableReflectivity = true;
+        _geometryBufferRenderer                    = geometryBufferRenderer;
       }
     }
   }
   else {
-    const auto prePassRenderer = scene->enablePrePassRenderer();
-    if (prePassRenderer) {
-      prePassRenderer->markAsDirty();
-    }
+    _prePassRenderer = scene->enablePrePassRenderer();
+    _prePassRenderer->markAsDirty();
     _prePassEffectConfiguration = std::make_shared<ScreenSpaceReflectionsConfiguration>();
   }
 
@@ -75,8 +71,8 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
 
   // On apply, send uniforms
   onApply = [this, scene](Effect* effect, EventState&) -> void {
-    const auto geometryBufferRenderer = _geometryBufferRenderer();
-    const auto prePassRenderer        = _prePassRenderer();
+    const auto& geometryBufferRenderer = _geometryBufferRenderer;
+    const auto& prePassRenderer        = _prePassRenderer;
 
     if (!prePassRenderer && !geometryBufferRenderer) {
       return;
@@ -95,14 +91,13 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
       effect->setTexture("reflectivitySampler",
                          geometryBufferRenderer->getGBuffer()->textures()[roughnessIndex]);
     }
-    else if (prePassRenderer) {
+    else {
       // Samplers
       const auto positionIndex
         = prePassRenderer->getIndex(Constants::PREPASS_POSITION_TEXTURE_TYPE);
       const auto roughnessIndex
         = prePassRenderer->getIndex(Constants::PREPASS_REFLECTIVITY_TEXTURE_TYPE);
-      const auto normalIndex
-        = prePassRenderer->getIndex(Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE);
+      const auto normalIndex = prePassRenderer->getIndex(Constants::PREPASS_NORMAL_TEXTURE_TYPE);
 
       effect->setTexture("normalSampler",
                          prePassRenderer->getRenderTarget()->textures()[normalIndex]);
@@ -113,7 +108,7 @@ ScreenSpaceReflectionPostProcess::ScreenSpaceReflectionPostProcess(
     }
 
     // Uniforms
-    const auto camera = scene->activeCamera();
+    auto camera = scene->activeCamera();
     if (!camera) {
       return;
     }
@@ -136,24 +131,6 @@ ScreenSpaceReflectionPostProcess::~ScreenSpaceReflectionPostProcess() = default;
 std::string ScreenSpaceReflectionPostProcess::getClassName() const
 {
   return "ScreenSpaceReflectionPostProcess";
-}
-
-GeometryBufferRendererPtr& ScreenSpaceReflectionPostProcess::get__geometryBufferRenderer()
-{
-  if (!_forceGeometryBuffer) {
-    return _nullGeometryBufferRenderer;
-  }
-
-  return _scene->geometryBufferRenderer();
-}
-
-PrePassRendererPtr& ScreenSpaceReflectionPostProcess::get__prePassRenderer()
-{
-  if (_forceGeometryBuffer) {
-    return _nullPrePassRenderer;
-  }
-
-  return _scene->prePassRenderer();
 }
 
 bool ScreenSpaceReflectionPostProcess::get_enableSmoothReflections() const
@@ -204,7 +181,7 @@ void ScreenSpaceReflectionPostProcess::set_smoothSteps(unsigned int steps)
 void ScreenSpaceReflectionPostProcess::_updateEffectDefines()
 {
   std::vector<std::string> defines;
-  if (_geometryBufferRenderer() || _prePassRenderer()) {
+  if (_geometryBufferRenderer || _prePassRenderer) {
     defines.emplace_back("#define SSR_SUPPORTED");
   }
   if (_enableSmoothReflections) {

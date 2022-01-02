@@ -216,25 +216,25 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height, int d
   return stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
 }
 
-Uint8Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
-                                                    size_t dataLength,
-                                                    const Uint8Array& arrayBuffer, int lod)
+Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                      size_t dataLength,
+                                                      const Uint8Array& arrayBuffer, int lod)
 {
-  Uint8Array destArray(dataLength);
+  Float32Array destArray(dataLength);
   const Float32Array srcData(
     stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
       auto srcPos          = static_cast<size_t>((x + y * width) * 4);
-      destArray[index]     = static_cast<uint8_t>(Scalar::Clamp(srcData[srcPos]) * 255);
-      destArray[index + 1] = static_cast<uint8_t>(Scalar::Clamp(srcData[srcPos + 1]) * 255);
-      destArray[index + 2] = static_cast<uint8_t>(Scalar::Clamp(srcData[srcPos + 2]) * 255);
+      destArray[index]     = Scalar::Clamp(srcData[srcPos]) * 255;
+      destArray[index + 1] = Scalar::Clamp(srcData[srcPos + 1]) * 255;
+      destArray[index + 2] = Scalar::Clamp(srcData[srcPos + 2]) * 255;
       if (DDSTools::StoreLODInAlphaChannel) {
-        destArray[index + 3] = static_cast<uint8_t>(lod);
+        destArray[index + 3] = static_cast<float>(lod);
       }
       else {
-        destArray[index + 3] = static_cast<uint8_t>(Scalar::Clamp(srcData[srcPos + 3]) * 255);
+        destArray[index + 3] = Scalar::Clamp(srcData[srcPos + 3]) * 255;
       }
       index += 4;
     }
@@ -243,11 +243,11 @@ Uint8Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height, i
   return destArray;
 }
 
-Uint8Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
-                                                        size_t dataLength,
-                                                        const Uint8Array& arrayBuffer, int lod)
+Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                                          size_t dataLength,
+                                                          const Uint8Array& arrayBuffer, int lod)
 {
-  Uint8Array destArray(dataLength);
+  Float32Array destArray(dataLength);
   const Uint16Array srcData(
     stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
@@ -255,18 +255,14 @@ Uint8Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(float width, float heigh
     for (float x = 0; x < width; ++x) {
       auto srcPos = static_cast<size_t>((x + y * width) * 4);
 
-      destArray[index]
-        = static_cast<uint8_t>(Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255);
-      destArray[index + 1]
-        = static_cast<uint8_t>(Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 1])) * 255);
-      destArray[index + 2]
-        = static_cast<uint8_t>(Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 2])) * 255);
+      destArray[index]     = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255;
+      destArray[index + 1] = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 1])) * 255;
+      destArray[index + 2] = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 2])) * 255;
       if (DDSTools::StoreLODInAlphaChannel) {
-        destArray[index + 3] = static_cast<uint8_t>(lod);
+        destArray[index + 3] = static_cast<float>(lod);
       }
       else {
-        destArray[index + 3] = static_cast<uint8_t>(
-          Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 3])) * 255);
+        destArray[index + 3] = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 3])) * 255;
       }
       index += 4;
     }

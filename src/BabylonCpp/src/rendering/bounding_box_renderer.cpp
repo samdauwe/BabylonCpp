@@ -1,7 +1,6 @@
 #include <babylon/rendering/bounding_box_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -9,6 +8,7 @@
 #include <babylon/materials/shader_material.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
@@ -131,7 +131,7 @@ void BoundingBoxRenderer::render(int renderingGroupId)
 
   auto engine = scene->getEngine();
   engine->setDepthWrite(false);
-  _colorShader->_preBind(EffectPtr{nullptr});
+  _colorShader->_preBind();
 
   for (auto& boundingBox : renderList) {
     if (boundingBox._tag != renderingGroupId) {
@@ -152,16 +152,9 @@ void BoundingBoxRenderer::render(int renderingGroupId)
     // VBOs
     engine->bindBuffers(_vertexBuffers, _indexBuffer, _colorShader->getEffect());
 
-    const auto useReverseDepthBuffer = engine->useReverseDepthBuffer;
-
     if (showBackLines) {
       // Back
-      if (useReverseDepthBuffer) {
-        engine->setDepthFunctionToLessOrEqual();
-      }
-      else {
-        engine->setDepthFunctionToGreaterOrEqual();
-      }
+      engine->setDepthFunctionToGreaterOrEqual();
       scene->resetCachedMaterial();
       _colorShader->setColor4("color", backColor.toColor4());
       _colorShader->bind(worldMatrix, nullptr);
@@ -171,12 +164,7 @@ void BoundingBoxRenderer::render(int renderingGroupId)
     }
 
     // Front
-    if (useReverseDepthBuffer) {
-      engine->setDepthFunctionToGreater();
-    }
-    else {
-      engine->setDepthFunctionToLess();
-    }
+    engine->setDepthFunctionToLess();
     scene->resetCachedMaterial();
     _colorShader->setColor4("color", frontColor.toColor4());
     _colorShader->bind(worldMatrix);
@@ -206,7 +194,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
 
   engine->setDepthWrite(false);
   engine->setColorWrite(false);
-  _colorShader->_preBind(EffectPtr{nullptr});
+  _colorShader->_preBind();
 
   auto& boundingBox = mesh->_boundingInfo->boundingBox;
   auto min          = boundingBox.minimum;

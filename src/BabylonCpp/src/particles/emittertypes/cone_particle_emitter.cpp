@@ -2,8 +2,6 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/uniform_buffer.h>
-#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -60,7 +58,7 @@ void ConeParticleEmitter::_buildHeight()
 
 void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Vector3& directionToUpdate, Particle* particle,
-                                                 bool isLocal, const Matrix& /*inverseWorldMatrix*/)
+                                                 bool isLocal)
 {
   if (std::abs(std::cos(_angle)) == 1.f) {
     if (isLocal) {
@@ -120,20 +118,12 @@ std::unique_ptr<IParticleEmitterType> ConeParticleEmitter::clone() const
   return newOne;
 }
 
-void ConeParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
+void ConeParticleEmitter::applyToShader(Effect* effect)
 {
-  uboOrEffect->setFloat2("radius", _radius, radiusRange, "");
-  uboOrEffect->setFloat("coneAngle", _angle);
-  uboOrEffect->setFloat2("height", _height, heightRange, "");
-  uboOrEffect->setFloat("directionRandomizer", directionRandomizer);
-}
-
-void ConeParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
-{
-  ubo->addUniform("radius", 2);
-  ubo->addUniform("coneAngle", 1);
-  ubo->addUniform("height", 2);
-  ubo->addUniform("directionRandomizer", 1);
+  effect->setFloat2("radius", _radius, radiusRange);
+  effect->setFloat("coneAngle", _angle);
+  effect->setFloat2("height", _height, heightRange);
+  effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
 std::string ConeParticleEmitter::getEffectDefines() const

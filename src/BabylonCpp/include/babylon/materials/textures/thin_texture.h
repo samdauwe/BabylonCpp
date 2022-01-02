@@ -27,7 +27,7 @@ public:
    * @param internalTexture Define the internalTexture to wrap
    */
   ThinTexture(const InternalTexturePtr& internalTexture);
-  virtual ~ThinTexture(); // = default
+  ~ThinTexture(); // = default
 
   /**
    * @brief Get the class name of the texture.
@@ -117,11 +117,6 @@ protected:
   virtual bool get_is2DArray() const;
   virtual void set_is2DArray(bool value);
 
-  /**
-   * @brief Get the current sampling mode associated with the texture.
-   */
-  unsigned int get_samplingMode() const;
-
 public:
   /**
    * | Value | Type               | Description |
@@ -188,16 +183,10 @@ public:
    */
   InternalTexturePtr _texture;
 
-  /**
-   * Get the current sampling mode associated with the texture.
-   */
-  ReadOnlyProperty<ThinTexture, unsigned int> samplingMode;
-
 protected:
   unsigned int _wrapU;
   unsigned int _wrapV;
   ThinEngine* _engine;
-  unsigned int _initialSamplingMode;
 
 private:
   ISize _cachedSize;

@@ -1,8 +1,6 @@
 #ifndef BABYLON_GIZMOS_GIZMO_H
 #define BABYLON_GIZMOS_GIZMO_H
 
-#include <unordered_map>
-
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/events/pointer_info.h>
@@ -18,7 +16,6 @@ class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(Node)
-FWD_CLASS_SPTR(PointerDragBehavior)
 FWD_CLASS_SPTR(StandardMaterial)
 FWD_CLASS_SPTR(UtilityLayerRenderer)
 
@@ -39,8 +36,6 @@ struct BABYLON_SHARED_EXPORT GizmoAxisCache {
   StandardMaterialPtr disableMaterial = nullptr;
   /** Used to indicate Active state of the Gizmo */
   bool active = false;
-  /** DragBehavior */
-  PointerDragBehaviorPtr dragBehavior = nullptr;
 }; // end of struct GizmoAxisCache
 
 /**
@@ -134,18 +129,6 @@ protected:
   [[nodiscard]] virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
 
   /**
-   * @brief Gets the poseture that the gizmo will be display.
-   * * When set null, default value will be used (Quaternion(0, 0, 0, 1))
-   */
-  std::optional<Quaternion>& get_customRotationQuaternion();
-
-  /**
-   * @brief Sets the poseture that the gizmo will be display.
-   * * When set null, default value will be used (Quaternion(0, 0, 0, 1))
-   */
-  void set_customRotationQuaternion(const std::optional<Quaternion>& customRotationQuaternion);
-
-  /**
    * @brief Hidden
    */
   virtual void _attachedNodeChanged(const NodePtr& value);
@@ -157,23 +140,11 @@ protected:
   void _update();
 
   /**
-   * @brief Handle position/translation when using an attached node using pivot.
-   */
-  void _handlePivot();
-
-  /**
    * @brief computes the rotation/scaling/position of the transform once the Node world matrix has
    * changed.
    * @param value Node, TransformNode or mesh
    */
   void _matrixChanged();
-
-  /**
-   * @brief Refresh gizmo mesh material.
-   * @param material material to apply
-   */
-  void _setGizmoMeshMaterial(const std::vector<MeshPtr>& gizmoMeshes,
-                             const StandardMaterialPtr& material);
 
 public:
   /**
@@ -227,12 +198,6 @@ public:
    */
   bool updateScale;
 
-  /**
-   * Poseture that the gizmo will be display
-   * * When set null, default value will be used (Quaternion(0, 0, 0, 1))
-   */
-  Property<Gizmo, std::optional<Quaternion>> customRotationQuaternion;
-
 protected:
   /**
    * Ratio for the scale of the gizmo (Default: 1)
@@ -260,7 +225,6 @@ protected:
 private:
   AbstractMeshPtr _attachedMesh;
   NodePtr _attachedNode;
-  std::optional<Quaternion> _customRotationQuaternion;
   Matrix _tmpMatrix;
   Observer<Scene>::Ptr _beforeRenderObserver;
   std::optional<Quaternion> _tempQuaternion;

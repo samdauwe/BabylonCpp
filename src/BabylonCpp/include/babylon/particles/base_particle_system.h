@@ -429,19 +429,15 @@ public:
    */
   bool _isSubEmitter;
 
-  /**
-   * Hidden
-   */
-  bool _isAnimationSheetEnabled;
-
-  /**
-   * Hidden
-   */
-  bool _isBillboardBased;
-
 protected:
   /** Hidden */
   std::string _rootUrl;
+
+  /** Hidden */
+  bool _isAnimationSheetEnabled;
+
+  /** Hidden */
+  bool _isBillboardBased;
 
   /**
    * The scene the particle system belongs to.

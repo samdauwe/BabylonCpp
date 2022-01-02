@@ -10,10 +10,6 @@ StandardMaterialDefines::StandardMaterialDefines()
   boolDef = {
     {"MAINUV1", false},                                     //
     {"MAINUV2", false},                                     //
-    {"MAINUV3", false},                                     //
-    {"MAINUV4", false},                                     //
-    {"MAINUV5", false},                                     //
-    {"MAINUV6", false},                                     //
     {"DIFFUSE", false},                                     //
     {"DETAIL", false},                                      //
     {"AMBIENT", false},                                     //
@@ -45,13 +41,8 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"EMISSIVEFRESNEL", false},                             //
     {"FRESNEL", false},                                     //
     {"NORMAL", false},                                      //
-    {"TANGENT", false},                                     //
     {"UV1", false},                                         //
     {"UV2", false},                                         //
-    {"UV3", false},                                         //
-    {"UV4", false},                                         //
-    {"UV5", false},                                         //
-    {"UV6", false},                                         //
     {"VERTEXCOLOR", false},                                 //
     {"VERTEXALPHA", false},                                 //
     {"BONETEXTURE", false},                                 //
@@ -71,14 +62,12 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"REFLECTIONMAP_PLANAR", false},                        //
     {"REFLECTIONMAP_CUBIC", false},                         //
     {"USE_LOCAL_REFLECTIONMAP_CUBIC", false},               //
-    {"USE_LOCAL_REFRACTIONMAP_CUBIC", false},               //
     {"REFLECTIONMAP_PROJECTION", false},                    //
     {"REFLECTIONMAP_SKYBOX", false},                        //
     {"REFLECTIONMAP_EXPLICIT", false},                      //
     {"REFLECTIONMAP_EQUIRECTANGULAR", false},               //
     {"REFLECTIONMAP_EQUIRECTANGULAR_FIXED", false},         //
     {"REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED", false}, //
-    {"REFLECTIONMAP_OPPOSITEZ", false},                     //
     {"INVERTCUBICMAP", false},                              //
     {"LOGARITHMICDEPTH", false},                            //
     {"REFRACTION", false},                                  //
@@ -90,7 +79,6 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"MORPHTARGETS_NORMAL", false},                         //
     {"MORPHTARGETS_TANGENT", false},                        //
     {"MORPHTARGETS_UV", false},                             //
-    {"MORPHTARGETS_TEXTURE", false},                        //
     {"NONUNIFORMSCALING", false},                   // https://playground.babylonjs.com#V6DWIH
     {"PREMULTIPLYALPHA", false},                    // https://playground.babylonjs.com#LNVJJ7
     {"ALPHATEST_AFTERALLALPHACOMPUTATIONS", false}, //
@@ -99,8 +87,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"PREPASS", false},              //
     {"PREPASS_IRRADIANCE", false},   //
     {"PREPASS_ALBEDO", false},       //
-    {"PREPASS_DEPTH", false},        //
-    {"PREPASS_NORMAL", false},       //
+    {"PREPASS_DEPTHNORMAL", false},  //
     {"PREPASS_POSITION", false},     //
     {"PREPASS_VELOCITY", false},     //
     {"PREPASS_REFLECTIVITY", false}, //
@@ -151,8 +138,7 @@ StandardMaterialDefines::StandardMaterialDefines()
     {"NUM_MORPH_INFLUENCERS", 0},       //
     {"PREPASS_IRRADIANCE_INDEX", -1},   //
     {"PREPASS_ALBEDO_INDEX", -1},       //
-    {"PREPASS_DEPTH_INDEX", -1},        //
-    {"PREPASS_NORMAL_INDEX", -1},       //
+    {"PREPASS_DEPTHNORMAL_INDEX", -1},  //
     {"PREPASS_POSITION_INDEX", -1},     //
     {"PREPASS_VELOCITY_INDEX", -1},     //
     {"PREPASS_REFLECTIVITY_INDEX", -1}, //

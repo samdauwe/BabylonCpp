@@ -83,7 +83,8 @@ struct EasingFunctionsScene : public IRenderableScene {
     // 12.   BezierCurveEase(x1, y1, x2, y2)
     auto easingFunction = CircleEase::New();
 
-    // For each easing function, you can choose beetween EASEIN (default), EASEOUT, EASEINOUT
+    // For each easing function, you can choose beetween EASEIN (default),
+    // EASEOUT, EASEINOUT
     easingFunction->setEasingMode(EasingFunction::EASINGMODE_EASEINOUT);
 
     // Adding easing function to my animation
@@ -118,9 +119,9 @@ struct EasingFunctionsScene : public IRenderableScene {
     bezierTorus->animations.emplace_back(animationBezierTorus);
     scene->beginAnimation(bezierTorus, 0, 120, true);
 
-    // --------------------------------------------------
+    // ------------------------------------------
     // Create a simple animation without easing functions
-    // --------------------------------------------------
+    // ------------------------------------------
     auto torus0                  = Mesh::CreateTorus("torus", 8, 2, 32, scene, false);
     torus0->position().x         = 25.f;
     torus0->position().z         = -30.f;

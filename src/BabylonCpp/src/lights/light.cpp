@@ -3,7 +3,6 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
-#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -287,10 +286,14 @@ Light& Light::transferTexturesToEffect(Effect* /*effect*/, const std::string& /*
 }
 
 void Light::_bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bool useSpecular,
-                       bool receiveShadows)
+                       bool rebuildInParallel)
 {
   auto iAsString  = std::to_string(lightIndex);
   auto needUpdate = false;
+
+  if (rebuildInParallel && _uniformBuffer->_alreadyBound) {
+    return;
+  }
 
   _uniformBuffer->bindToEffect(effect, "Light" + iAsString);
 
@@ -314,7 +317,7 @@ void Light::_bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bo
   transferTexturesToEffect(effect, iAsString);
 
   // Shadows
-  if (scene->shadowsEnabled() && shadowEnabled() && receiveShadows) {
+  if (scene->shadowsEnabled() && shadowEnabled()) {
     auto shadowGenerator = getShadowGenerator();
     if (shadowGenerator) {
       shadowGenerator->bindShadowLight(iAsString, effect);
@@ -379,7 +382,7 @@ void Light::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   getScene()->stopAnimation(this);
 
   // Remove from meshes
-  for (const auto& mesh : getScene()->meshes) {
+  for (auto& mesh : getScene()->meshes) {
     mesh->_removeLightSource(this, true);
   }
 

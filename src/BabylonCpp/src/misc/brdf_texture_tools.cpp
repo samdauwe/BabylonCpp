@@ -38,17 +38,6 @@ BaseTexturePtr BRDFTextureTools::GetEnvironmentBRDFTexture(Scene* scene)
     scene->useDelayedTextureLoading = useDelayedTextureLoading;
 
     RGBDTextureTools::ExpandRGBDTexture(texture);
-
-    scene->getEngine()->onContextRestoredObservable.add(
-      [texture](ThinEngine* /*thinEngine*/, EventState& /*es*/) -> void {
-        texture->isRGBD       = true;
-        const auto checkReady = [texture]() -> void {
-          if (texture->isReady()) {
-            RGBDTextureTools::ExpandRGBDTexture(texture);
-          }
-        };
-        checkReady();
-      });
   }
 
   return scene->environmentBRDFTexture;

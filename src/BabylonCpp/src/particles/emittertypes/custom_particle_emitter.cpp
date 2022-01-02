@@ -18,8 +18,7 @@ CustomParticleEmitter::~CustomParticleEmitter()
 
 void CustomParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                    Vector3& directionToUpdate, Particle* particle,
-                                                   bool isLocal,
-                                                   const Matrix& /*inverseWorldMatrix*/)
+                                                   bool isLocal)
 {
   auto& tmpVector = TmpVectors::Vector3Array[0];
 
@@ -72,11 +71,7 @@ std::unique_ptr<IParticleEmitterType> CustomParticleEmitter::clone() const
   return newOne;
 }
 
-void CustomParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* /*uboOrEffect*/)
-{
-}
-
-void CustomParticleEmitter::buildUniformLayout(UniformBuffer* /*ubo*/)
+void CustomParticleEmitter::applyToShader(Effect* /*effect*/)
 {
 }
 

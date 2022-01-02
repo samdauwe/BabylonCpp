@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 /**
- * @brief Defines the options associated with the creation of a custom shader for a shadow
- * generator.
+ * @brief Defines the options associated with the creation of a custom shader
+ * for a shadow generator.
  */
 struct BABYLON_SHARED_EXPORT ICustomShaderOptions {
 
@@ -25,7 +25,7 @@ struct BABYLON_SHARED_EXPORT ICustomShaderOptions {
   std::vector<std::string> attributes;
 
   /**
-   * The list of uniform names used in the shader
+   * The list of unifrom names used in the shader
    */
   std::vector<std::string> uniforms;
 

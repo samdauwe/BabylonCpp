@@ -1,7 +1,6 @@
 #include <babylon/gizmos/light_gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -27,7 +26,6 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     , _attachedMeshParent{nullptr}
     , _pointerObserver{nullptr}
     , _light{nullptr}
-    , _tmpAttachedNode{nullptr}
 {
   attachedMesh        = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _attachedMeshParent = TransformNode::New("parent", gizmoLayer->utilityLayerScene.get());
@@ -45,7 +43,7 @@ LightGizmo::LightGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
 
       const auto childMeshes = _rootMesh->getChildMeshes();
       _isHovered = (stl_util::index_of(childMeshes, pointerInfo->pickInfo.pickedMesh) != -1);
-      if (_isHovered && pointerInfo->pointerEvent.button == 0) {
+      if (_isHovered && pointerInfo->pointerEvent.button == MouseButtonType::LEFT) {
         onClickedObservable.notifyObservers(_light.get());
       }
     },
@@ -108,18 +106,6 @@ void LightGizmo::set_light(const LightPtr& iLight)
   }
 }
 
-NodePtr& LightGizmo::get_attachedNode()
-{
-  _tmpAttachedNode = std::static_pointer_cast<Node>(attachedMesh());
-  return _tmpAttachedNode;
-}
-
-void LightGizmo::set_attachedNode(const NodePtr& /*value*/)
-{
-  BABYLON_LOG_WARN("LightGizmo",
-                   "Nodes cannot be attached to LightGizmo. Attach to a mesh instead.");
-}
-
 LightPtr& LightGizmo::get_light()
 {
   return _light;
@@ -141,16 +127,12 @@ void LightGizmo::_update()
     _attachedMeshParent->freezeWorldMatrix(_light->parent()->getWorldMatrix());
   }
 
-  // For light positon and direction, a dirty flag is set to true in the setter
-  // It means setting values individualy or copying values willl not call setter and
-  // dirty flag will not be set to true. Hence creating a new Vector3.
-  const auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
+  auto shadowLight = std::static_pointer_cast<ShadowLight>(_light);
   if (shadowLight) {
     // If the gizmo is moved update the light otherwise update the gizmo to match the light
     if (!attachedMesh()->position().equals(_cachedPosition)) {
       // update light to match gizmo
-      const auto& position  = attachedMesh()->position();
-      shadowLight->position = Vector3(position.x, position.y, position.z);
+      shadowLight->position().copyFrom(attachedMesh()->position());
       _cachedPosition.copyFrom(attachedMesh()->position());
     }
     else {
@@ -164,8 +146,7 @@ void LightGizmo::_update()
     // If the gizmo is moved update the light otherwise update the gizmo to match the light
     if (Vector3::DistanceSquared(attachedMesh()->forward(), _cachedForward) > 0.0001f) {
       // update light to match gizmo
-      const auto& direction  = attachedMesh()->forward();
-      shadowLight->direction = Vector3(direction.x, direction.y, direction.z);
+      shadowLight->direction().copyFrom(attachedMesh()->forward);
       _cachedForward.copyFrom(attachedMesh()->forward);
     }
     else if (Vector3::DistanceSquared(attachedMesh()->forward, shadowLight->direction())

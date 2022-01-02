@@ -2,8 +2,6 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
-#include <babylon/materials/uniform_buffer.h>
-#include <babylon/materials/uniform_buffer_effect_common_accessor.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/particles/particle_system.h>
@@ -22,7 +20,7 @@ BoxParticleEmitter::~BoxParticleEmitter() = default;
 
 void BoxParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                 Vector3& directionToUpdate, Particle* /*particle*/,
-                                                bool isLocal, const Matrix& /*inverseWorldMatrix*/)
+                                                bool isLocal)
 {
   const auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);
@@ -62,20 +60,12 @@ std::unique_ptr<IParticleEmitterType> BoxParticleEmitter::clone() const
   return newOne;
 }
 
-void BoxParticleEmitter::applyToShader(UniformBufferEffectCommonAccessor* uboOrEffect)
+void BoxParticleEmitter::applyToShader(Effect* effect)
 {
-  uboOrEffect->setVector3("direction1", direction1);
-  uboOrEffect->setVector3("direction2", direction2);
-  uboOrEffect->setVector3("minEmitBox", minEmitBox);
-  uboOrEffect->setVector3("maxEmitBox", maxEmitBox);
-}
-
-void BoxParticleEmitter::buildUniformLayout(UniformBuffer* ubo)
-{
-  ubo->addUniform("direction1", 3);
-  ubo->addUniform("direction2", 3);
-  ubo->addUniform("minEmitBox", 3);
-  ubo->addUniform("maxEmitBox", 3);
+  effect->setVector3("direction1", direction1);
+  effect->setVector3("direction2", direction2);
+  effect->setVector3("minEmitBox", minEmitBox);
+  effect->setVector3("maxEmitBox", maxEmitBox);
 }
 
 std::string BoxParticleEmitter::getEffectDefines() const

@@ -16,8 +16,6 @@ struct BABYLON_SHARED_EXPORT IRenderTargetOptions {
   std::optional<unsigned int> type          = std::nullopt;
   std::optional<unsigned int> format        = std::nullopt;
   std::optional<unsigned int> samplingMode  = std::nullopt;
-  std::optional<unsigned int> samples       = std::nullopt;
-  std::optional<unsigned int> creationFlags = std::nullopt;
 }; // end of struct RenderTargetOptions
 
 } // end of namespace BABYLON

@@ -6,13 +6,14 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(IBrowserGamepad)
-FWD_CLASS_SPTR(WebVRController)
+class IBrowserGamepad;
+class WebVRController;
+using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+using WebVRControllerPtr = std::shared_ptr<WebVRController>;
 
 /**
  * @brief Defines the PoseEnabledControllerHelper object that is used initialize a gamepad as the

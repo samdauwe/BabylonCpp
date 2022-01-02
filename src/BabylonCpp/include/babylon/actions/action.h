@@ -30,7 +30,8 @@ public:
 
   /**
    * @brief Creates a new Action.
-   * @param triggerOptions the trigger, with or without parameters, for the action
+   * @param triggerOptions the trigger, with or without parameters, for the
+   * action
    * @param condition an optional determinant of action
    */
   Action(unsigned int triggerOptions, Condition* condition = nullptr);
@@ -57,21 +58,15 @@ public:
   void setTriggerParameter(const std::string& value);
 
   /**
-   * @brief  Internal only - Returns if the current condition allows to run the action
-   * @hidden
-   */
-  bool _evaluateConditionForCurrentFrame();
-
-  /**
    * @brief Internal only - executes current action event.
    */
-  void _executeCurrent(const IActionEventPtr& evt) override;
+  void _executeCurrent(const std::optional<IActionEvent>& evt) override;
 
   /**
    * @brief Execute placeholder for child classes.
    * @param evt optional action event
    */
-  virtual void execute(const IActionEventPtr& evt);
+  virtual void execute(const std::optional<IActionEvent>& evt);
 
   /**
    * @brief Skips to next active action.

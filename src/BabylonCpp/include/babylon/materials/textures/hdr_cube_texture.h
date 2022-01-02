@@ -13,7 +13,7 @@ FWD_CLASS_SPTR(HDRCubeTexture)
  * @brief This represents a texture coming from an HDR input.
  *
  * The only supported format is currently panorama picture stored in RGBE format.
- * Example of such files can be found on Poly Haven: https://polyhaven.com/hdris
+ * Example of such files can be found on HDRLib: http://hdrlib.com/
  */
 class BABYLON_SHARED_EXPORT HDRCubeTexture : public BaseTexture {
 

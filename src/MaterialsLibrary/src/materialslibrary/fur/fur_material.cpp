@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/time.h>
 #include <babylon/engines/engine.h>
@@ -19,6 +18,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -163,7 +163,7 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool u
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<FurMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<FurMaterialDefines>();
   }
 
   auto definesPtr = std::static_pointer_cast<FurMaterialDefines>(subMesh->_materialDefines);
@@ -290,8 +290,7 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool u
     options.indexParameters       = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -349,7 +348,7 @@ void FurMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);

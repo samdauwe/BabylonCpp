@@ -1,10 +1,11 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/base_texture.h>
-#include <babylon/materials/textures/itexture_creation_options.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/maths/matrix.h>
 #include <babylon/misc/iinspectable.h>
@@ -14,7 +15,6 @@ namespace BABYLON {
 
 FWD_STRUCT_SPTR(LoaderOptions)
 FWD_CLASS_SPTR(MirrorTexture)
-FWD_CLASS_SPTR(RenderTargetTexture)
 FWD_CLASS_SPTR(Texture)
 
 /**
@@ -39,11 +39,6 @@ public:
    * internal webgl data.
    */
   static bool ForceSerializeBuffers;
-
-  /**
-   * This observable will notify when any texture had a loading error
-   */
-  static Observable<BaseTexture> OnTextureLoadErrorObservable;
 
   /**
    * @brief Hidden
@@ -120,8 +115,8 @@ public:
   TexturePtr clone() const;
 
   /**
-   * @brief Serialize the texture to a JSON representation we can easily use in the respective Parse
-   * function.
+   * @brief Serialize the texture to a JSON representation we can easily use in the resepective
+   * Parse function.
    * @returns The JSON representation of the texture
    */
   json serialize() const;
@@ -147,40 +142,28 @@ public:
    */
   static BaseTexturePtr Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
-  // clang-format off
   /**
    * @brief Creates a texture from its base 64 representation.
    * @param data Define the base64 payload without the data: prefix
    * @param name Define the name of the texture in the scene useful fo caching purpose for instance
    * @param scene Define the scene the texture should belong to
-   * @param noMipmapOrOptions defines if the texture will require mip maps or not or set of all options to create the texture
+   * @param noMipmap Forces the texture to not create mip map information if true
    * @param invertY define if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode define the sampling mode we want for the texture while fetching from it (Texture.NEAREST_SAMPLINGMODE...)
+   * @param samplingMode define the sampling mode we want for the texture while fectching from it
+   * (Texture.NEAREST_SAMPLINGMODE...)
    * @param onLoad define a callback triggered when the texture has been loaded
    * @param onError define a callback triggered when an error occurred during the loading session
-   * @param format define the format of the texture we are trying to load (Engine.TEXTUREFORMAT_RGBA...)
-   * @param creationFlags specific flags to use when creating the texture (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
+   * @param format define the format of the texture we are trying to load
+   * (Engine.TEXTUREFORMAT_RGBA...)
    * @returns the created texture
    */
-  // clang-format on
   static TexturePtr CreateFromBase64String(
-    const std::string& data, const std::string& name, Scene* scene,
-    const std::optional<std::variant<bool, ITextureCreationOptions>>& noMipmapOrOptions
-    = std::nullopt,
+    const std::string& data, const std::string& name, Scene* scene, bool noMipmap = false,
     bool invertY = false, unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
-    unsigned int format                              = Constants::TEXTUREFORMAT_RGBA,
-    const std::optional<unsigned int>& creationFlags = std::nullopt);
-
-  /**
-   * @brief Hidden
-   */
-  static RenderTargetTexturePtr
-  _CreateRenderTargetTexture(const std::string& name, int renderTargetSize, Scene* scene,
-                             bool generateMipMaps,
-                             const std::optional<bool>& creationFlags = std::nullopt);
+    unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Creates a texture from its data: representation. (data: will be added in case only the
@@ -192,33 +175,28 @@ public:
    * @param scene Define the scene the texture should belong to
    * @param deleteBuffer define if the buffer we are loading the texture from should be deleted
    * after load
-   * @param noMipmapOrOptions defines if the texture will require mip maps or not or set of all
-   * options to create the texture
+   * @param noMipmap Forces the texture to not create mip map information if true
    * @param invertY define if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode define the sampling mode we want for the texture while fetching from it
+   * @param samplingMode define the sampling mode we want for the texture while fectching from it
    * (Texture.NEAREST_SAMPLINGMODE...)
    * @param onLoad define a callback triggered when the texture has been loaded
    * @param onError define a callback triggered when an error occurred during the loading session
    * @param format define the format of the texture we are trying to load
    * (Engine.TEXTUREFORMAT_RGBA...)
-   * @param creationFlags specific flags to use when creating the texture
-   * (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
    * @returns the created texture
    */
   static TexturePtr LoadFromDataString(
     const std::string& name,
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer,
-    Scene* scene, bool deleteBuffer = false,
-    const std::optional<std::variant<bool, ITextureCreationOptions>>& noMipmapOrOptions
-    = std::nullopt,
-    bool invertY = true, unsigned int samplingMode = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+    Scene* scene, bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
+    unsigned int samplingMode           = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
-    unsigned int format                              = Constants::TEXTUREFORMAT_RGBA,
-    const std::optional<unsigned int>& creationFlags = std::nullopt);
+    unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
 protected:
+  //  clang-format off
   /**
    * @brief Instantiates a new texture.
    * This represents a texture in babylon. It can be easily loaded from a network, base64 or html
@@ -226,10 +204,9 @@ protected:
    * @see https://doc.babylonjs.com/babylon101/materials#texture
    * @param url defines the url of the picture to load as a texture
    * @param sceneOrEngine defines the scene or engine the texture will belong to
-   * @param noMipmapOrOptions defines if the texture will require mip maps or not or set of all
-   * options to create the texture
+   * @param noMipmap defines if the texture will require mip maps or not
    * @param invertY defines if the texture needs to be inverted on the y axis during loading
-   * @param samplingMode defines the sampling mode we want for the texture while fetching from it
+   * @param samplingMode defines the sampling mode we want for the texture while fectching from it
    * (Texture.NEAREST_SAMPLINGMODE...)
    * @param onLoad defines a callback triggered when the texture has been loaded
    * @param onError defines a callback triggered when an error occurred during the loading session
@@ -241,23 +218,19 @@ protected:
    * (Engine.TEXTUREFORMAT_RGBA...)
    * @param mimeType defines an optional mime type information
    * @param loaderOptions options to be passed to the loader
-   * @param creationFlags specific flags to use when creating the texture
-   * (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
    */
+  //  clang-format on
   Texture(
     const std::string& url, const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
-    const std::optional<std::variant<bool, ITextureCreationOptions>>& noMipmapOrOptions
-    = std::nullopt,
-    std::optional<bool> invertY              = true,
-    std::optional<unsigned int> samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad      = nullptr,
+    bool noMipmap = false, const std::optional<bool>& invertY = true,
+    unsigned int samplingMode           = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::function<void()>& onLoad = nullptr,
     const std::function<void(const std::string& message, const std::string& exception)>& onError
     = nullptr,
     const std::optional<std::variant<std::string, ArrayBuffer, ArrayBufferView, Image>>& buffer
     = std::nullopt,
     bool deleteBuffer = false, const std::optional<unsigned int>& format = std::nullopt,
-    std::string mimeType = "", const LoaderOptionsPtr& loaderOptions = nullptr,
-    const std::optional<unsigned int>& creationFlags = std::nullopt);
+    const std::string& mimeType = "", const LoaderOptionsPtr& loaderOptions = nullptr);
 
   bool get_noMipmap() const override;
 
@@ -268,6 +241,11 @@ protected:
    */
   void set_isBlocking(bool value) override;
   bool get_isBlocking() const override;
+
+  /**
+   * @brief Get the current sampling mode associated with the texture.
+   */
+  unsigned int get_samplingMode() const;
 
   /**
    * @brief Gets a boolean indicating if the texture needs to be inverted on the y axis during
@@ -390,6 +368,11 @@ public:
   ReadOnlyProperty<Texture, Observable<Texture>> onLoadObservable;
 
 protected:
+  /**
+   * Get the current sampling mode associated with the texture.
+   */
+  unsigned int _initialSamplingMode;
+
   std::optional<unsigned int> _format;
   Observable<Texture> _onLoadObservable;
   bool _isBlocking;
@@ -422,8 +405,6 @@ private:
   std::function<void(const std::string& message, const std::string& exception)> _delayedOnError;
   std::string _mimeType;
   LoaderOptionsPtr _loaderOptions;
-  std::optional<unsigned int> _creationFlags;
-  std::optional<bool> _useSRGBBuffer;
 
   std::function<void()> _onLoad;
   std::function<void(InternalTexture*, EventState&)> _load;

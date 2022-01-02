@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 /**
- * @brief Interface for attribute information associated with buffer instantiation.
+ * @brief Interface for attribute information associated with buffer instanciation.
  */
 struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   /**

@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_COLOR_MERGER_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(ColorMergerBlock)
+class ColorMergerBlock;
+using ColorMergerBlockPtr = std::shared_ptr<ColorMergerBlock>;
 
 /**
  * @brief Block used to create a Color3/4 out of individual inputs (one for each component).
@@ -69,11 +69,6 @@ protected:
    * @brief Gets the rgb component (output).
    */
   NodeMaterialConnectionPointPtr& get_rgbOut();
-
-  /**
-   * @brief Hidden
-   */
-  std::string _inputRename(const std::string& name) override;
 
   /**
    * @brief Hidden

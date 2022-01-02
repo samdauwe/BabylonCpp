@@ -35,9 +35,9 @@ struct CamerasTypesScene : public IRenderableScene {
     auto box1 = Mesh::CreateBox("b1", 1.f, scene);
     box1->position().x += 0.f;
     auto box2          = Mesh::CreateBox("b2", 1.f, scene);
-    box2->position().x = -3.f;
+    box2->position().x = -3;
     auto box3          = Mesh::CreateBox("b3", 1.f, scene);
-    box3->position().x = 3.f;
+    box3->position().x = 3;
 
     // ArcRotateCamera >> Camera rotating around a 3D point (here Vector zero)
     // Parameters : name, alpha, beta, radius, target, scene
@@ -46,10 +46,10 @@ struct CamerasTypesScene : public IRenderableScene {
     arcCamera->setPosition(Vector3(0.f, 0.f, 50.f));
     arcCamera->target = Vector3(3.f, 0.f, 0.f);
 
-    // FreeCamera >> You can move around the world with mouse and keyboard (LEFT/RIGHT/UP/DOWN)
-    // Parameters : name, position, scene
+    // FreeCamera >> You can move around the world with mouse and keyboard
+    // (LEFT/RIGHT/UP/DOWN) Parameters : name, position, scene
     auto freeCamera      = FreeCamera::New("FreeCamera", Vector3(0.f, 0.f, 5.f), scene);
-    freeCamera->rotation = Vector3(0.f, Math::PI, 0.f);
+    freeCamera->rotation = Vector3(0, Math::PI, 0);
 
     // Attach a camera to the scene and the canvas
     scene->activeCamera = freeCamera;

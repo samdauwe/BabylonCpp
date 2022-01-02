@@ -2,13 +2,14 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_VERTEX_LIGHT_INFORMATION_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(Light)
-FWD_CLASS_SPTR(LightInformationBlock)
+class Light;
+class LightInformationBlock;
+using LightPtr                 = std::shared_ptr<Light>;
+using LightInformationBlockPtr = std::shared_ptr<LightInformationBlock>;
 
 /**
  * @brief Block used to get data information from a light.

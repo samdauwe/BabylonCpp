@@ -45,13 +45,11 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _position{Vector3::Zero()}
     , position{this, &Camera::get_position, &Camera::set_position}
     , upVector{this, &Camera::get_upVector, &Camera::set_upVector}
-    , screenArea{this, &Camera::get_screenArea}
-    , orthoLeft{std::nullopt}
-    , orthoRight{std::nullopt}
-    , orthoBottom{std::nullopt}
-    , orthoTop{std::nullopt}
+    , orthoLeft{0.f}
+    , orthoRight{0.f}
+    , orthoBottom{0.f}
+    , orthoTop{0.f}
     , fov{0.8f}
-    , projectionPlaneTilt{0.f}
     , minZ{1.f}
     , maxZ{10000.f}
     , inertia{0.9f}
@@ -82,7 +80,6 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}
     , _refreshFrustumPlanes{true}
-    , _absoluteRotation{Quaternion::Identity()}
     , _setActiveOnSceneIfNoneActive{setActiveOnSceneIfNoneActive}
 {
   position = iPosition;
@@ -137,31 +134,6 @@ void Camera::set_upVector(const Vector3& vec)
   _upVector = vec;
 }
 
-float Camera::get_screenArea() const
-{
-  auto x = 0.f;
-  auto y = 0.f;
-  if (mode == Camera::PERSPECTIVE_CAMERA) {
-    if (fovMode == Camera::FOVMODE_VERTICAL_FIXED) {
-      y = minZ * 2 * std::tan(fov / 2.f);
-      x = getEngine()->getAspectRatio(*this) * y;
-    }
-    else {
-      x = minZ * 2 * std::tan(fov / 2);
-      y = x / getEngine()->getAspectRatio(*this);
-    }
-  }
-  else {
-    const auto halfWidth  = getEngine()->getRenderWidth() / 2.f;
-    const auto halfHeight = getEngine()->getRenderHeight() / 2.f;
-
-    x = orthoRight.value_or(halfWidth) - orthoLeft.value_or(-halfWidth);
-    y = orthoTop.value_or(halfHeight) - orthoBottom.value_or(-halfHeight);
-  }
-
-  return x * y;
-}
-
 Camera& Camera::storeState()
 {
   _stateStored = true;
@@ -210,13 +182,6 @@ std::string Camera::toString(bool fullDetails) const
   if (fullDetails) {
   }
   return oss.str();
-}
-
-void Camera::applyVerticalCorrection()
-{
-  const auto rot = absoluteRotation().toEulerAngles();
-
-  projectionPlaneTilt = _scene->useRightHandedSystem() ? -rot.x : rot.x;
 }
 
 Vector3& Camera::get_globalPosition()
@@ -311,15 +276,13 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
   if (mode == Camera::PERSPECTIVE_CAMERA) {
     check = stl_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
-            && stl_util::almost_equal(_cache.aspectRatio, engine->getAspectRatio(*this))
-            && _cache.projectionPlaneTilt == projectionPlaneTilt;
-    ;
+            && stl_util::almost_equal(_cache.aspectRatio, engine->getAspectRatio(*this));
   }
   else {
-    check = (orthoLeft && stl_util::almost_equal(_cache.orthoLeft, *orthoLeft))
-            && (orthoRight && stl_util::almost_equal(_cache.orthoRight, *orthoRight))
-            && (orthoBottom && stl_util::almost_equal(_cache.orthoBottom, *orthoBottom))
-            && (orthoTop && stl_util::almost_equal(_cache.orthoTop, *orthoTop))
+    check = stl_util::almost_equal(_cache.orthoLeft, orthoLeft)
+            && stl_util::almost_equal(_cache.orthoRight, orthoRight)
+            && stl_util::almost_equal(_cache.orthoBottom, orthoBottom)
+            && stl_util::almost_equal(_cache.orthoTop, orthoTop)
             && _cache.renderWidth == engine->getRenderWidth()
             && _cache.renderHeight == engine->getRenderHeight();
   }
@@ -329,7 +292,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
 // Controls
 void Camera::attachControl(bool /*noPreventDefault*/, bool /*useCtrlForPanning*/,
-                           int /*panningMouseButton*/)
+                           MouseButtonType /*panningMouseButton*/)
 {
 }
 
@@ -540,10 +503,9 @@ Matrix& Camera::getProjectionMatrix(bool force)
   auto engine = getEngine();
   auto scene  = getScene();
   if (mode == Camera::PERSPECTIVE_CAMERA) {
-    _cache.fov                 = fov;
-    _cache.fovMode             = fovMode;
-    _cache.aspectRatio         = engine->getAspectRatio(*this);
-    _cache.projectionPlaneTilt = projectionPlaneTilt;
+    _cache.fov         = fov;
+    _cache.fovMode     = fovMode;
+    _cache.aspectRatio = engine->getAspectRatio(*this);
 
     if (minZ <= 0.f) {
       minZ = 0.1f;
@@ -551,71 +513,59 @@ Matrix& Camera::getProjectionMatrix(bool force)
 
     const auto reverseDepth = engine->useReverseDepthBuffer;
     std::function<void(float fov, float aspect, float znear, float zfar, Matrix& result,
-                       bool isVerticalFovFixed, bool halfZRange, float projectionPlaneTilt)>
+                       bool isVerticalFovFixed)>
       getProjectionMatrix = nullptr;
     if (scene->useRightHandedSystem()) {
       getProjectionMatrix = [reverseDepth](float iFov, float aspect, float znear, float zfar,
-                                           Matrix& result, bool isVerticalFovFixed, bool halfZRange,
-                                           float projectionPlaneTilt) -> void {
+                                           Matrix& result, bool isVerticalFovFixed) -> void {
         if (reverseDepth) {
           Matrix::PerspectiveFovReverseRHToRef(iFov, aspect, znear, zfar, result,
-                                               isVerticalFovFixed, halfZRange, projectionPlaneTilt);
+                                               isVerticalFovFixed);
         }
         else {
-          Matrix::PerspectiveFovRHToRef(iFov, aspect, znear, zfar, result, isVerticalFovFixed,
-                                        halfZRange, projectionPlaneTilt);
+          Matrix::PerspectiveFovRHToRef(iFov, aspect, znear, zfar, result, isVerticalFovFixed);
         }
       };
     }
     else {
       getProjectionMatrix = [reverseDepth](float iFov, float aspect, float znear, float zfar,
-                                           Matrix& result, bool isVerticalFovFixed, bool halfZRange,
-                                           float projectionPlaneTilt) -> void {
+                                           Matrix& result, bool isVerticalFovFixed) -> void {
         if (reverseDepth) {
           Matrix::PerspectiveFovReverseLHToRef(iFov, aspect, znear, zfar, result,
-                                               isVerticalFovFixed, halfZRange, projectionPlaneTilt);
+                                               isVerticalFovFixed);
         }
         else {
-          Matrix::PerspectiveFovLHToRef(iFov, aspect, znear, zfar, result, isVerticalFovFixed,
-                                        halfZRange, projectionPlaneTilt);
+          Matrix::PerspectiveFovLHToRef(iFov, aspect, znear, zfar, result, isVerticalFovFixed);
         }
       };
     }
-    getProjectionMatrix(fov, engine->getAspectRatio(*this), reverseDepth ? maxZ : minZ,
-                        reverseDepth ? minZ : maxZ, _projectionMatrix,
-                        fovMode == Camera::FOVMODE_VERTICAL_FIXED, engine->isNDCHalfZRange,
-                        projectionPlaneTilt);
+    getProjectionMatrix(fov, engine->getAspectRatio(*this), minZ, maxZ, _projectionMatrix,
+                        fovMode == Camera::FOVMODE_VERTICAL_FIXED);
   }
   else {
     auto halfWidth  = static_cast<float>(engine->getRenderWidth()) / 2.f;
     auto halfHeight = static_cast<float>(engine->getRenderHeight()) / 2.f;
     if (scene->useRightHandedSystem()) {
-      Matrix::OrthoOffCenterRHToRef(orthoLeft.value_or(-halfWidth),    //
-                                    orthoRight.value_or(halfWidth),    //
-                                    orthoBottom.value_or(-halfHeight), //
-                                    orthoTop.value_or(halfHeight),     //
-                                    minZ,                              //
-                                    maxZ,                              //
-                                    _projectionMatrix,                 //
-                                    engine->isNDCHalfZRange            //
-      );
+      Matrix::OrthoOffCenterRHToRef(
+        !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
+        !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
+        !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
+        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ, maxZ,
+        _projectionMatrix);
     }
     else {
-      Matrix::OrthoOffCenterLHToRef(orthoLeft.value_or(-halfWidth),    //
-                                    orthoRight.value_or(halfWidth),    //
-                                    orthoBottom.value_or(-halfHeight), //
-                                    orthoTop.value_or(halfHeight),     //
-                                    minZ,                              //
-                                    maxZ,                              //
-                                    _projectionMatrix,                 //
-                                    engine->isNDCHalfZRange            //
-      );
+      Matrix::OrthoOffCenterLHToRef(
+        !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
+        !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
+        !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
+        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ, maxZ,
+        _projectionMatrix);
     }
 
-    _cache.orthoLeft    = orthoLeft.value_or(0.f);
-    _cache.orthoRight   = orthoRight.value_or(0.f);
-    _cache.orthoBottom  = orthoBottom.value_or(0.f);
-    _cache.orthoTop     = orthoTop.value_or(0.f);
+    _cache.orthoLeft    = orthoLeft;
+    _cache.orthoRight   = orthoRight;
+    _cache.orthoBottom  = orthoBottom;
+    _cache.orthoTop     = orthoTop;
     _cache.renderWidth  = engine->getRenderWidth();
     _cache.renderHeight = engine->getRenderHeight();
   }
@@ -725,11 +675,6 @@ void Camera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     }
   }
   _rigCameras.clear();
-
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->cameras, this);
-    _parentContainer = nullptr;
-  }
 
   // Postprocesses
   if (_rigPostProcess) {
@@ -845,14 +790,6 @@ void Camera::setCameraRigMode(unsigned int iMode, const RigParamaters& rigParams
     }
   }
 
-  _setRigMode(rigParams);
-
-  _cascadePostProcessesToRigCams();
-  update();
-}
-
-void Camera::_setRigMode(const RigParamaters& rigParams)
-{
   switch (cameraRigMode) {
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
       Camera::_setStereoscopicAnaglyphRigMode(*this);
@@ -870,6 +807,9 @@ void Camera::_setRigMode(const RigParamaters& rigParams)
       Camera::_setWebVRRigMode(*this, rigParams);
       break;
   }
+
+  _cascadePostProcessesToRigCams();
+  update();
 }
 
 void Camera::_setStereoscopicRigMode(Camera& camera)
@@ -917,7 +857,7 @@ Matrix& Camera::_getVRProjectionMatrix()
 {
   Matrix::PerspectiveFovLHToRef(_cameraRigParams.vrMetrics.aspectRatioFov,
                                 _cameraRigParams.vrMetrics.aspectRatio, minZ, maxZ,
-                                _cameraRigParams.vrWorkMatrix, true, getEngine()->isNDCHalfZRange);
+                                _cameraRigParams.vrWorkMatrix);
   _cameraRigParams.vrWorkMatrix.multiplyToRef(_cameraRigParams.vrHMatrix, _projectionMatrix);
   return _projectionMatrix;
 }
@@ -997,14 +937,12 @@ Vector3 Camera::getDirection(const Vector3& localAxis)
 Quaternion Camera::absoluteRotation()
 {
   std::optional<Vector3> iScale       = std::nullopt;
-  std::optional<Quaternion> result    = _absoluteRotation;
+  std::optional<Quaternion> result    = Quaternion::Zero();
   std::optional<Vector3> iTranslation = std::nullopt;
 
   getWorldMatrix().decompose(iScale, result, iTranslation);
 
-  _absoluteRotation = *result;
-
-  return _absoluteRotation;
+  return *result;
 }
 
 void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)

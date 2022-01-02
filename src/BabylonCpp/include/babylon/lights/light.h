@@ -197,10 +197,10 @@ public:
    * @param scene The scene where the light belongs to
    * @param effect The effect we are binding the data to
    * @param useSpecular Defines if specular is supported
-   * @param receiveShadows Defines if the effect (mesh) we bind the light for receives shadows
+   * @param rebuildInParallel Specifies whether the shader is rebuilding in parallel
    */
   void _bindLight(unsigned int lightIndex, Scene* scene, Effect* effect, bool useSpecular,
-                  bool receiveShadows = true);
+                  bool rebuildInParallel = false);
 
   /**
    * @brief Sets the passed Effect "effect" with the Light information.
@@ -453,7 +453,8 @@ private:
   void _computePhotometricScale();
 
   /**
-   * @brief Returns the Photometric Scale according to the light type and intensity mode.
+   * @brief Returns the Photometric Scale according to the light type and
+   * intensity mode.
    */
   float _getPhotometricScale();
 
@@ -470,14 +471,14 @@ public:
 
   /**
    * Specular produces a highlight color on an object.
-   * Note: This is not affecting PBR materials.
+   * Note: This is note affecting PBR materials.
    */
   Color3 specular;
 
   /**
    * Defines how far from the source the light is impacting in scene units.
-   * Note: Unused in PBR material as the distance light falloff is defined following the inverse
-   * squared falloff.
+   * Note: Unused in PBR material as the distance light falloff is defined
+   * following the inverse squared falloff.
    */
   Property<Light, float> range;
 
@@ -494,8 +495,8 @@ public:
   /**
    * Strength of the light.
    * Note: By default it is define in the framework own unit.
-   * Note: In PBR materials the intensityMode can be use to chose what unit the intensity is defined
-   * in.
+   * Note: In PBR materials the intensityMode can be use to chose what unit the
+   * intensity is defined in.
    */
   float intensity;
 
@@ -584,7 +585,8 @@ private:
 
   /**
    * Cached photometric scale default to 1.0 as the automatic intensity mode
-   * defaults to 1.0 for every type of light.
+   * defaults to 1.0 for every type
+   * of light.
    */
   float _photometricScale;
   unsigned int _intensityMode;

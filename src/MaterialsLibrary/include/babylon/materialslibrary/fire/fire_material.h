@@ -2,18 +2,19 @@
 #define BABYLON_MATERIALS_LIBRARY_FIRE_FIRE_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fire/fire_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(IAnimatable)
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(FireMaterial)
+class FireMaterial;
+using FireMaterialPtr = std::shared_ptr<FireMaterial>;
 
 class BABYLON_SHARED_EXPORT FireMaterial : public PushMaterial {
 
@@ -31,27 +32,29 @@ public:
   }
   ~FireMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-  std::string getClassName() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static FireMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
-   * @brief Constructor.
-   * @param name The name given to the material in order to identify it afterwards.
+   * Constructor
+   * @param name The name given to the material in order to identify it
+   * afterwards.
    * @param scene The scene the material is used in.
    */
   FireMaterial(const std::string& name, Scene* scene);

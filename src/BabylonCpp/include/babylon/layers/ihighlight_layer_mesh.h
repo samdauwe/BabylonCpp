@@ -39,7 +39,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerMesh {
    * If it exists, the emissive color of the material will be used to generate the glow.
    * Else it falls back to the current color.
    */
-  bool glowEmissiveOnly = false;
+  bool glowEmissiveOnly;
 
 }; // end of struct IHighlightLayerMesh
 

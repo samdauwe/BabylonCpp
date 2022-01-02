@@ -5,12 +5,12 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class ThinEngine;
-FWD_CLASS_SPTR(WebGLDataBuffer)
+class WebGLDataBuffer;
+using WebGLDataBufferPtr = std::shared_ptr<WebGLDataBuffer>;
 
 /**
  * @brief Hidden

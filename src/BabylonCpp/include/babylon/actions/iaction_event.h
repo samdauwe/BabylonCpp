@@ -10,7 +10,6 @@ namespace BABYLON {
 class Scene;
 class Sprite;
 FWD_CLASS_SPTR(AbstractMesh)
-FWD_STRUCT_SPTR(IEvent)
 FWD_CLASS_SPTR(Sprite)
 
 /**
@@ -19,7 +18,7 @@ FWD_CLASS_SPTR(Sprite)
 struct BABYLON_SHARED_EXPORT IActionEvent {
 
   IActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-               const AbstractMeshPtr& meshUnderPointer, const IEventPtr& sourceEvent,
+               const AbstractMeshPtr& meshUnderPointer, const std::optional<Event>& sourceEvent,
                const std::string& additionalData = "");
   IActionEvent(const IActionEvent& other);
   IActionEvent(IActionEvent&& other);
@@ -38,7 +37,7 @@ struct BABYLON_SHARED_EXPORT IActionEvent {
   /** The mesh that is currently pointed at (can be null) */
   AbstractMeshPtr meshUnderPointer;
   /** The original (browser) event that triggered the ActionEvent */
-  IEventPtr sourceEvent;
+  std::optional<Event> sourceEvent;
   /** Additional data for the event */
   std::string additionalData;
 

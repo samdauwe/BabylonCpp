@@ -28,10 +28,9 @@
 #ifndef BABYLON_UTILS_BASE64_H
 #define BABYLON_UTILS_BASE64_H
 
+#include <babylon/babylon_api.h>
 #include <iostream>
 #include <string>
-
-#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

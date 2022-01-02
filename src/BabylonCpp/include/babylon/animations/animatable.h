@@ -43,9 +43,10 @@ public:
   /** Methods **/
 
   /**
-   * @brief Synchronize and normalize current Animatable with a source Animatable.
-   * This is useful when using animation weights and when animations are not of the same length
-   * @param root defines the root Animatable to synchronize with (null to stop synchronizing)
+   * @brief Synchronize and normalize current Animatable with a source
+   * Animatable. This is useful when using animation weights and when animations
+   * are not of the same length.
+   * @param root defines the root Animatable to synchronize with
    * @returns the current Animatable
    */
   Animatable& syncWith(Animatable* root);
@@ -269,14 +270,12 @@ public:
 private:
   std::optional<millisecond_t> _localDelayOffset;
   std::optional<millisecond_t> _pausedDelay;
-  std::optional<millisecond_t> _manualJumpDelay;
   std::vector<RuntimeAnimationPtr> _runtimeAnimations;
   bool _paused;
   Scene* _scene;
   float _speedRatio;
   float _weight;
   Animatable* _syncRoot;
-  std::optional<int> _frameToSyncFromJump;
 
 }; // end of class Animatable
 

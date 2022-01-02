@@ -3,7 +3,6 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
-#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/gizmos/gizmo_manager.h>
 #include <babylon/gizmos/plane_rotation_gizmo.h>
 #include <babylon/gizmos/position_gizmo.h>
@@ -11,39 +10,27 @@
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
 
 namespace BABYLON {
 
 RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer, unsigned int tessellation,
-                             bool useEulerRotation, float thickness, GizmoManager* gizmoManager,
-                             const std::optional<RotationGizmoOptions>& options)
+                             bool useEulerRotation, float thickness, GizmoManager* gizmoManager)
     : Gizmo{iGizmoLayer}
     , snapDistance{this, &RotationGizmo::get_snapDistance, &RotationGizmo::set_snapDistance}
 {
-  const auto xColor = options && options->xOptions && options->xOptions->color ?
-                        *options->xOptions->color :
-                        Color3::Red().scale(0.5f);
-  const auto yColor = options && options->yOptions && options->yOptions->color ?
-                        *options->yOptions->color :
-                        Color3::Green().scale(0.5f);
-  const auto zColor = options && options->zOptions && options->zOptions->color ?
-                        *options->zOptions->color :
-                        Color3::Blue().scale(0.5f);
-  xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f), xColor, iGizmoLayer,
-                                                tessellation, this, useEulerRotation, thickness);
-  yGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f), yColor, iGizmoLayer,
-                                                tessellation, this, useEulerRotation, thickness);
-  zGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f), zColor, iGizmoLayer,
-                                                tessellation, this, useEulerRotation, thickness);
+  xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f),
+                                                iGizmoLayer, tessellation, this, useEulerRotation,
+                                                thickness);
+  yGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f),
+                                                iGizmoLayer, tessellation, this, useEulerRotation,
+                                                thickness);
+  zGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f),
+                                                iGizmoLayer, tessellation, this, useEulerRotation,
+                                                thickness);
 
   // Relay drag events
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
-    // must set updateScale on each gizmo, as setting it on root RotationGizmo doesnt prevent
-    // individual gizmos from updating currently updateScale is a property with no getter/setter, so
-    // no good way to override behavior at runtime, so we will at least set it on startup
-    if (options && options->updateScale.has_value()) {
-      gizmo->updateScale = *options->updateScale;
-    }
     gizmo->dragBehavior->onDragStartObservable.add(
       [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
         onDragStartObservable.notifyObservers(nullptr);
@@ -112,8 +99,7 @@ void RotationGizmo::_checkBillboardTransform()
 {
   if (_nodeAttached && std::static_pointer_cast<TransformNode>(_nodeAttached)
       && std::static_pointer_cast<TransformNode>(_nodeAttached)->billboardMode()) {
-    BABYLON_LOG_ERROR("RotationGizmo",
-                      "Rotation Gizmo will not work with transforms in billboard mode.");
+    BABYLON_LOG_ERROR("Rotation Gizmo will not work with transforms in billboard mode.");
   }
 }
 

@@ -2,12 +2,12 @@
 #define BABYLON_SPRITES_SPRITE_PACKED_MANAGER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(SpritePackedManager)
+class SpritePackedManager;
+using SpritePackedManagerPtr = std::shared_ptr<SpritePackedManager>;
 
 /**
  * @brief Class used to manage multiple sprites of different sizes on the same spritesheet.
@@ -36,7 +36,7 @@ protected:
    * @param scene defines the hosting scene
    * @param spriteJSON null otherwise a JSON object defining sprite sheet data
    * @param epsilon defines the epsilon value to align texture (0.01 by default)
-   * @param samplingMode defines the sampling mode to use with spritesheet
+   * @param samplingMode defines the smapling mode to use with spritesheet
    * @param fromPacked set to true; do not alter
    */
   SpritePackedManager(const std::string& name, const std::string& imgUrl, unsigned int capacity,

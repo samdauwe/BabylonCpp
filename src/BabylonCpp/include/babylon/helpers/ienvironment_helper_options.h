@@ -4,18 +4,19 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(BaseTexture)
+class BaseTexture;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
  * @brief Represents the different options available during the creation of a Environment helper.
  *
- * This can control the default ground, skybox and image processing setup of your scene.
+ * This can control the default ground, skybox and image processing setup of
+ * your scene.
  */
 struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
 

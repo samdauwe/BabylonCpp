@@ -106,8 +106,6 @@ protected:
 
 private:
   void _updateEffectDefines();
-  GeometryBufferRendererPtr& get__geometryBufferRenderer();
-  PrePassRendererPtr& get__prePassRenderer();
 
 public:
   /**
@@ -160,15 +158,11 @@ public:
 
 private:
   bool _forceGeometryBuffer;
-  ReadOnlyProperty<ScreenSpaceReflectionPostProcess, GeometryBufferRendererPtr>
-    _geometryBufferRenderer;
-  ReadOnlyProperty<ScreenSpaceReflectionPostProcess, PrePassRendererPtr> _prePassRenderer;
+  GeometryBufferRendererPtr _geometryBufferRenderer;
+  PrePassRendererPtr _prePassRenderer;
   bool _enableSmoothReflections;
   unsigned int _reflectionSamples;
   unsigned int _smoothSteps;
-
-  GeometryBufferRendererPtr _nullGeometryBufferRenderer;
-  PrePassRendererPtr _nullPrePassRenderer;
 
 }; // end of class ScreenSpaceReflectionPostProcess
 

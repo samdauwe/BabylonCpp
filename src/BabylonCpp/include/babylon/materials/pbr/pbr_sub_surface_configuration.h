@@ -18,7 +18,6 @@ class EffectFallbacks;
 class Engine;
 struct MaterialDefines;
 class Scene;
-class SubMesh;
 class UniformBuffer;
 FWD_CLASS_SPTR(IAnimatable)
 FWD_CLASS_SPTR(BaseTexture)
@@ -74,11 +73,9 @@ public:
    * @param lodBasedMicrosurface defines whether the material relies on lod based microsurface or
    * not.
    * @param realTimeFiltering defines whether the textures should be filtered on the fly.
-   * @param subMesh the submesh to bind data for
    */
   void bindForSubMesh(UniformBuffer& uniformBuffer, Scene* scene, Engine* engine, bool isFrozen,
-                      bool lodBasedMicrosurface, bool realTimeFiltering,
-                      SubMesh* subMesh = nullptr);
+                      bool lodBasedMicrosurface, bool realTimeFiltering);
 
   /**
    * @brief Unbinds the material from the mesh.
@@ -206,12 +203,8 @@ protected:
   void set_linkRefractionWithTransparency(bool value);
   bool get_useMaskFromThicknessTexture() const;
   void set_useMaskFromThicknessTexture(bool value);
-  BaseTexturePtr& get_refractionIntensityTexture();
-  void set_refractionIntensityTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& get_translucencyIntensityTexture();
-  void set_translucencyIntensityTexture(const BaseTexturePtr& value);
-  bool get_useGltfStyleTextures() const;
-  void set_useGltfStyleTextures(bool value);
+  bool get_useMaskFromThicknessTextureGltf() const;
+  void set_useMaskFromThicknessTextureGltf(bool value);
 
 private:
   /**
@@ -265,17 +258,10 @@ public:
   bool useAlbedoToTintRefraction;
 
   /**
-   * When enabled, translucent surfaces will be tinted with the albedo colour (independent of
-   * thickness)
-   */
-  bool useAlbedoToTintTranslucency;
-
-  /**
    * Stores the average thickness of a mesh in a texture (The texture is holding the values
-   * linearly). The red (or green if useGltfStyleTextures=true) channel of the texture should
-   * contain the thickness remapped between 0 and 1. 0 would mean minimumThickness 1 would mean
-   * maximumThickness The other channels might be use as a mask to vary the different effects
-   * intensity.
+   * linearly). The red channel of the texture should contain the thickness remapped between 0
+   * and 1. 0 would mean minimumThickness 1 would mean maximumThickness The other channels might be
+   * use as a mask to vary the different effects intensity.
    */
   Property<PBRSubSurfaceConfiguration, BaseTexturePtr> thicknessTexture;
 
@@ -327,11 +313,6 @@ public:
   float maximumThickness;
 
   /**
-   * Defines that the thickness should be used as a measure of the depth volume.
-   */
-  bool useThicknessAsDepth;
-
-  /**
    * Defines the volume tint of the material.
    * This is used for both translucency and scattering.
    */
@@ -351,36 +332,19 @@ public:
 
   /**
    * Stores the intensity of the different subsurface effects in the thickness texture.
-   * Note that if refractionIntensityTexture and/or translucencyIntensityTexture is provided it
-   * takes precedence over thicknessTexture + useMaskFromThicknessTexture
-   * * the green (red if useGltfStyleTextures = true) channel is the refraction intensity.
-   * * the blue channel is the translucency intensity.
+   * * the green channel is the translucency intensity.
+   * * the blue channel is the scattering intensity.
+   * * the alpha channel is the refraction intensity.
    */
   Property<PBRSubSurfaceConfiguration, bool> useMaskFromThicknessTexture;
 
   /**
-   * Stores the intensity of the refraction. If provided, it takes precedence over thicknessTexture
-   * + useMaskFromThicknessTexture
-   * * the green (red if useGltfStyleTextures = true) channel is the refraction intensity.
+   * Stores the intensity of the different subsurface effects in the thickness texture. This
+   * variation matches the channel-packing that is used by glTF.
+   * * the red channel is the transmission/translucency intensity.
+   * * the green channel is the thickness.
    */
-  Property<PBRSubSurfaceConfiguration, BaseTexturePtr> refractionIntensityTexture;
-
-  /**
-   * Stores the intensity of the translucency. If provided, it takes precedence over
-   * thicknessTexture + useMaskFromThicknessTexture
-   * * the blue channel is the translucency intensity.
-   */
-  Property<PBRSubSurfaceConfiguration, BaseTexturePtr> translucencyIntensityTexture;
-
-  /**
-   * Use channels layout used by glTF:
-   * * thicknessTexture: the green (instead of red) channel is the thickness
-   * * thicknessTexture/refractionIntensityTexture: the red (instead of green) channel is the
-   * refraction intensity
-   * * thicknessTexture/translucencyIntensityTexture: no change, use the blue channel for the
-   * translucency intensity
-   */
-  Property<PBRSubSurfaceConfiguration, bool> useGltfStyleTextures;
+  Property<PBRSubSurfaceConfiguration, bool> useMaskFromThicknessTextureGltf;
 
 private:
   bool _isRefractionEnabled;
@@ -395,10 +359,8 @@ private:
   bool _invertRefractionY;
   bool _linkRefractionWithTransparency;
   bool _useMaskFromThicknessTexture;
-  BaseTexturePtr _refractionIntensityTexture;
-  BaseTexturePtr _translucencyIntensityTexture;
   Scene* _scene;
-  bool _useGltfStyleTextures;
+  bool _useMaskFromThicknessTextureGltf;
 
   /** Hidden */
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;

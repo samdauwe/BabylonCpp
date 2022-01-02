@@ -134,20 +134,6 @@ public:
   void preScaleForRendering();
 
   /**
-   * @brief Update the spherical harmonics coefficients from the given array.
-   * @param data defines the 9x3 coefficients (l00, l1-1, l10, l11, l2-2, l2-1, l20, l21, l22)
-   * @returns the spherical harmonics (this)
-   */
-  SphericalHarmonics& updateFromArray(const std::vector<Float32Array>& data);
-
-  /**
-   * @brief Update the spherical harmonics coefficients from the given floats array.
-   * @param data defines the 9x3 coefficients (l00, l1-1, l10, l11, l2-2, l2-1, l20, l21, l22)
-   * @returns the spherical harmonics (this)
-   */
-  SphericalHarmonics& updateFromFloatsArray(const Float32Array& data);
-
-  /**
    * @brief Constructs a spherical harmonics from an array.
    * @param data defines the 9x3 coefficients (l00, l1-1, l10, l11, l2-2, l2-1,
    * l20, l21, l22)

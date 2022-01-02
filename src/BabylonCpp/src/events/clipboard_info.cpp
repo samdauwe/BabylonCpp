@@ -11,7 +11,7 @@ ClipboardInfo::~ClipboardInfo() = default;
 
 int ClipboardInfo::GetTypeFromCharacter(int keyCode)
 {
-  const auto charCode = keyCode;
+  auto charCode = keyCode;
   // TODO: add codes for extended ASCII
   switch (charCode) {
     case 67:

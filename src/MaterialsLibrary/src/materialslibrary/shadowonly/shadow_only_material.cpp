@@ -3,7 +3,6 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -19,6 +18,7 @@
 #include <babylon/materialslibrary/shadowonly/shadow_only_fragment_fx.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_vertex_fx.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -83,13 +83,12 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<ShadowOnlyMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<ShadowOnlyMaterialDefines>();
   }
 
-  const auto definesPtr
-    = std::static_pointer_cast<ShadowOnlyMaterialDefines>(subMesh->_materialDefines);
-  auto& defines    = *definesPtr.get();
-  const auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<ShadowOnlyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -106,8 +105,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
           break; // We are good
         }
 
-        const auto it
-          = std::find(mesh->lightSources().begin(), mesh->lightSources().end(), iActiveLight);
+        auto it = std::find(mesh->lightSources().begin(), mesh->lightSources().end(), iActiveLight);
 
         if (it != mesh->lightSources().end()) {
           mesh->lightSources().erase(it);
@@ -187,8 +185,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     options.onError               = onError;
     options.indexParameters       = {{"maxSimultaneousLights", 1}};
 
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -203,14 +200,14 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
 void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  const auto scene = getScene();
+  auto scene = getScene();
 
   auto defines = static_cast<ShadowOnlyMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -235,7 +232,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subM
     _activeEffect->setFloat("alpha", alpha);
     _activeEffect->setColor3("shadowColor", shadowColor);
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   // Lights

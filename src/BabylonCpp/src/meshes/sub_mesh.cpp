@@ -1,14 +1,12 @@
 #include <babylon/meshes/sub_mesh.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/collisions/intersection_info.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/standard_material_defines.h>
@@ -19,6 +17,7 @@
 #include <babylon/meshes/instanced_lines_mesh.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/transform_node.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -31,7 +30,6 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
     , _effectOverride{nullptr}
     , materialDefines{this, &SubMesh::get_materialDefines, &SubMesh::set_materialDefines}
     , effect{this, &SubMesh::get_effect}
-    , _drawWrapper{this, &SubMesh::get__drawWrapper}
     , materialIndex{iMaterialIndex}
     , verticesStart{iVerticesStart}
     , verticesCount{iVerticesCount}
@@ -43,8 +41,6 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart, size_
     , _renderId{0}
     , _alphaIndex{0}
     , _distanceToCamera{0.f}
-    , _mainDrawWrapper{nullptr}
-    , _mainDrawWrapperOverride{nullptr}
     , _boundingInfo{nullptr}
     , _linesIndexBuffer{nullptr}
     , _currentMaterial{nullptr}
@@ -73,11 +69,6 @@ void SubMesh::set_materialDefines(const MaterialDefinesPtr& defines)
   _materialDefines = defines;
 }
 
-DrawWrapperPtr SubMesh::_getDrawWrapper(const std::string& /*name*/, bool /*createIfNotExisting*/)
-{
-  return nullptr;
-}
-
 std::optional<ICustomEffect> SubMesh::_getCustomEffect(const std::string& name,
                                                        bool createIfNotExisting)
 {
@@ -99,18 +90,7 @@ EffectPtr& SubMesh::get_effect()
   return _effectOverride ? _effectOverride : _materialEffect;
 }
 
-DrawWrapperPtr& SubMesh::get__drawWrapper()
-{
-  return _mainDrawWrapperOverride ? _mainDrawWrapperOverride : _mainDrawWrapper;
-}
-
-void SubMesh::_setMainDrawWrapperOverride(const DrawWrapperPtr& wrapper)
-{
-  _mainDrawWrapperOverride = wrapper;
-}
-
-void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines,
-                        const IMaterialContextPtr& /*materialContext*/)
+void SubMesh::setEffect(const EffectPtr& iEffect, const MaterialDefinesPtr& defines)
 {
   if (_materialEffect == iEffect) {
     if (!iEffect) {
@@ -183,14 +163,14 @@ AbstractMeshPtr SubMesh::getEffectiveMesh() const
 
 MaterialPtr SubMesh::getMaterial()
 {
-  const auto rootMaterial = _renderingMesh->getMaterial();
+  auto rootMaterial = _renderingMesh->getMaterial();
 
   if (!rootMaterial) {
     return _mesh->getScene()->defaultMaterial();
   }
   else if (rootMaterial && _IsMultiMaterial(*rootMaterial)) {
-    const auto multiMaterial     = std::static_pointer_cast<MultiMaterial>(rootMaterial);
-    const auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
+    auto multiMaterial     = std::static_pointer_cast<MultiMaterial>(rootMaterial);
+    auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
 
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;

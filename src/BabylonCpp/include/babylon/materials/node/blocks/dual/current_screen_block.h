@@ -2,13 +2,14 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_DUAL_CURRENT_SHEEN_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(BaseTexture)
-FWD_CLASS_SPTR(CurrentScreenBlock)
+class BaseTexture;
+class CurrentScreenBlock;
+using BaseTexturePtr        = std::shared_ptr<BaseTexture>;
+using CurrentScreenBlockPtr = std::shared_ptr<CurrentScreenBlock>;
 
 /**
  * @brief Base block used as input for post process.

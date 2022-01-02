@@ -3,28 +3,18 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/misc/observer.h>
 #include <babylon/morph/morph_target.h>
 
 namespace BABYLON {
 
-class AbstractScene;
-FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(MorphTargetManager)
-FWD_CLASS_SPTR(RawTexture2DArray)
 
 /**
  * @brief This class is used to deform meshes using morphing between different targets.
  * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
-class BABYLON_SHARED_EXPORT MorphTargetManager : public IDisposable {
-
-public:
-  /**
-   *  Enable storing morph target data into textures when set to true (true by default)
-   */
-  static bool EnableTextureStorage;
+class BABYLON_SHARED_EXPORT MorphTargetManager {
 
 public:
   template <typename... Ts>
@@ -68,11 +58,6 @@ public:
   void removeTarget(MorphTarget* target);
 
   /**
-   * @brief hidden
-   */
-  void _bind(Effect* effect);
-
-  /**
    * @brief Clone the current manager.
    * @returns a new MorphTargetManager
    */
@@ -85,23 +70,11 @@ public:
   json serialize();
 
   /**
-   * @brief Synchronize the targets with all the meshes using this morph target manager
+   * @brief Synchronize the targets with all the meshes using this morph target manager.
    */
   void synchronize();
 
-  /**
-   * @brief Release all resources.
-   */
-  void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
-
   // Statics
-
-  /**
-   * @brief Creates a new MorphTargetManager from serialized data.
-   * @param serializationObject defines the serialized data
-   * @param scene defines the hosting scene
-   * @returns the new MorphTargetManager
-   */
   static MorphTargetManagerPtr Parse(const json& serializationObject, Scene* scene);
 
 protected:
@@ -110,18 +83,6 @@ protected:
    * @param scene defines the current scene
    */
   MorphTargetManager(Scene* scene = nullptr);
-
-  /**
-   * @brief Gets a boolean indicating that adding new target will or will not update the underlying
-   * data buffers
-   */
-  bool get_areUpdatesFrozen() const;
-
-  /**
-   * @brief Sets a boolean indicating that adding new target will or will not update the underlying
-   * data buffers
-   */
-  void set_areUpdatesFrozen(bool block);
 
   /**
    * @brief Gets the unique ID of this manager.
@@ -163,41 +124,9 @@ protected:
    */
   Float32Array& get_influences();
 
-  /**
-   * @brief Gets a boolean indicating that targets should be stored as a texture instead of using
-   * vertex attributes (default is true). Please note that this option is not available if the
-   * hardware does not support it
-   */
-  bool get_useTextureToStoreTargets() const;
-
-  /**
-   * @brief Sets a boolean indicating that targets should be stored as a texture instead of using
-   * vertex attributes (default is true). Please note that this option is not available if the
-   * hardware does not support it
-   */
-  void set_useTextureToStoreTargets(bool value);
-
-  /**
-   * @brief Gets a boolean indicating that the targets are stored into a texture (instead of as
-   * attributes)
-   */
-  bool get_isUsingTextureForTargets() const;
-
   void _syncActiveTargets(bool needUpdate);
 
 public:
-  /** @hidden */
-  AbstractScene* _parentContainer;
-
-  /** @hidden */
-  RawTexture2DArrayPtr _targetStoreTexture;
-
-  /**
-   * Gets or sets a boolean indicating if influencers must be optimized (eg. recompiling the shader
-   * if less influencers are used)
-   */
-  bool optimizeInfluencers;
-
   /**
    * Gets or sets a boolean indicating if normals must be morphed
    */
@@ -212,12 +141,6 @@ public:
    * Gets or sets a boolean indicating if UV must be morphed
    */
   bool enableUVMorphing;
-
-  /**
-   * Gets or sets a boolean indicating that adding new target will or will not update the underlying
-   * data buffers
-   */
-  Property<MorphTargetManager, bool> areUpdatesFrozen;
 
   /**
    * Unique ID of this manager
@@ -260,18 +183,6 @@ public:
    */
   ReadOnlyProperty<MorphTargetManager, Float32Array> influences;
 
-  /**
-   * Gets or sets a boolean indicating that targets should be stored as a texture instead of using
-   * vertex attributes (default is true). Please note that this option is not available if the
-   * hardware does not support it
-   */
-  Property<MorphTargetManager, bool> useTextureToStoreTargets;
-
-  /**
-   * Gets a boolean indicating that the targets are stored into a texture (instead of as attributes)
-   */
-  ReadOnlyProperty<MorphTargetManager, bool> isUsingTextureForTargets;
-
 private:
   std::vector<MorphTargetPtr> _targets;
   std::vector<Observer<bool>::Ptr> _targetInfluenceChangedObservers;
@@ -279,19 +190,12 @@ private:
   std::vector<MorphTargetPtr> _activeTargets;
   Scene* _scene;
   Float32Array _influences;
-  Float32Array _morphTargetTextureIndices;
   bool _supportsNormals;
   bool _supportsTangents;
   bool _supportsUVs;
   size_t _vertexCount;
-  int _textureVertexStride;
-  int _textureWidth;
-  int _textureHeight;
   size_t _uniqueId;
   Float32Array _tempInfluences;
-  bool _canUseTextureForTargets;
-  int _blockCounter;
-  bool _useTextureToStoreTargets;
 
 }; // end of class MorphTargetManager
 

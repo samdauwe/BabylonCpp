@@ -3,7 +3,6 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/engine.h>
@@ -23,7 +22,6 @@
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/material_stencil_state.h>
 #include <babylon/materials/pre_pass_configuration.h>
 #include <babylon/materials/standard_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -35,8 +33,8 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/serialization_helper.h>
-#include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
@@ -127,7 +125,6 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , imageProcessingConfiguration{this, &StandardMaterial::get_imageProcessingConfiguration,
                                    &StandardMaterial::set_imageProcessingConfiguration}
     , prePassConfiguration{nullptr}
-    , isPrePassCapable{this, &StandardMaterial::get_isPrePassCapable}
     , cameraColorCurvesEnabled{this, &StandardMaterial::get_cameraColorCurvesEnabled,
                                &StandardMaterial::set_cameraColorCurvesEnabled}
     , cameraColorGradingEnabled{this, &StandardMaterial::get_cameraColorGradingEnabled,
@@ -147,6 +144,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
+    , _rebuildInParallel{false}
     , _imageProcessingConfiguration{nullptr}
     , _diffuseTexture{nullptr}
     , _ambientTexture{nullptr}
@@ -269,7 +267,6 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
                        &StandardMaterial::set_twoSidedLighting}
     , imageProcessingConfiguration{this, &StandardMaterial::get_imageProcessingConfiguration,
                                    &StandardMaterial::set_imageProcessingConfiguration}
-    , isPrePassCapable{this, &StandardMaterial::get_isPrePassCapable}
     , cameraColorCurvesEnabled{this, &StandardMaterial::get_cameraColorCurvesEnabled,
                                &StandardMaterial::set_cameraColorCurvesEnabled}
     , cameraColorGradingEnabled{this, &StandardMaterial::get_cameraColorGradingEnabled,
@@ -433,7 +430,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<StandardMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<StandardMaterialDefines>();
   }
 
   auto scene      = getScene();
@@ -457,10 +454,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
   // Textures
   if (defines._areTexturesDirty) {
-    defines._needUVs = false;
-    for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
-      defines.boolDef["MAINUV" + std::to_string(i)] = false;
-    }
+    defines._needUVs           = false;
+    defines.boolDef["MAINUV1"] = false;
+    defines.boolDef["MAINUV2"] = false;
     if (scene->texturesEnabled()) {
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReadyOrNotBlocking()) {
@@ -511,11 +507,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
           defines.boolDef["REFLECTIONOVERALPHA"] = _useReflectionOverAlpha;
           defines.boolDef["INVERTCUBICMAP"]
             = (_reflectionTexture->coordinatesMode() == TextureConstants::INVCUBIC_MODE);
-          defines.boolDef["REFLECTIONMAP_3D"]        = _reflectionTexture->isCube();
-          defines.boolDef["RGBDREFLECTION"]          = _reflectionTexture->isRGBD();
-          defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
-                                                         !_reflectionTexture->invertZ :
-                                                         _reflectionTexture->invertZ;
+          defines.boolDef["REFLECTIONMAP_3D"] = _reflectionTexture->isCube();
+          defines.boolDef["RGBDREFLECTION"]   = _reflectionTexture->isRGBD();
 
           switch (_reflectionTexture->coordinatesMode()) {
             case TextureConstants::EXPLICIT_MODE:
@@ -553,8 +546,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
         }
       }
       else {
-        defines.boolDef["REFLECTION"]              = false;
-        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = false;
+        defines.boolDef["REFLECTION"] = false;
       }
 
       if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
@@ -598,7 +590,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && StandardMaterial::BumpTextureEnabled()) {
-        // Bump texture can not be not blocking.
+        // Bump texure can not be not blocking.
         if (!_bumpTexture->isReady()) {
           return false;
         }
@@ -625,8 +617,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
           defines.boolDef["REFRACTIONMAP_3D"] = _refractionTexture->isCube();
           defines.boolDef["RGBDREFRACTION"]   = _refractionTexture->isRGBD();
-          defines.boolDef["USE_LOCAL_REFRACTIONMAP_CUBIC"]
-            = _refractionTexture->boundingBoxSize() ? true : false;
         }
       }
       else {
@@ -810,15 +800,12 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
       attribs.emplace_back(VertexBuffer::NormalKind);
     }
 
-    if (defines["TANGENT"]) {
-      attribs.emplace_back(VertexBuffer::TangentKind);
+    if (defines["UV1"]) {
+      attribs.emplace_back(VertexBuffer::UVKind);
     }
 
-    for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
-      const auto iStr = std::to_string(i);
-      if (defines["UV" + iStr]) {
-        attribs.emplace_back(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str()));
-      }
+    if (defines["UV2"]) {
+      attribs.emplace_back(VertexBuffer::UV2Kind);
     }
 
     if (defines["VERTEXCOLOR"]) {
@@ -881,27 +868,22 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
                                       "refractionRightColor",
                                       "vReflectionPosition",
                                       "vReflectionSize",
-                                      "vRefractionPosition",
-                                      "vRefractionSize",
                                       "logarithmicDepthConstant",
                                       "vTangentSpaceParams",
                                       "alphaCutOff",
-                                      "boneTextureWidth",
-                                      "morphTargetTextureInfo",
-                                      "morphTargetTextureIndices"};
+                                      "boneTextureWidth"};
     std::vector<std::string> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
       "specularSampler",       "bumpSampler",         "lightmapSampler",
-      "refractionCubeSampler", "refraction2DSampler", "boneSampler",
-      "morphTargets"};
-    std::vector<std::string> uniformBuffers{"Material", "Scene", "Mesh"};
+      "refractionCubeSampler", "refraction2DSampler", "boneSampler"};
+    std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
     DetailMapConfiguration::AddUniforms(uniforms);
     DetailMapConfiguration::AddSamplers(samplers);
 
     PrePassConfiguration::AddUniforms(uniforms);
-    PrePassConfiguration::AddSamplers(samplers);
+    PrePassConfiguration::AddSamplers(uniforms);
 
     /* if (ImageProcessingConfiguration) */ {
       ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
@@ -948,7 +930,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
       // Use previous effect while new one is compiling
       if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
-        effect = previousEffect;
+        effect             = previousEffect;
+        _rebuildInParallel = true;
         defines.markAsUnprocessed();
 
         if (lightDisposed) {
@@ -958,8 +941,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
         }
       }
       else {
+        _rebuildInParallel = false;
         scene->resetCachedMaterial();
-        subMesh->setEffect(effect, definesPtr, _materialContext);
+        subMesh->setEffect(effect, definesPtr);
         buildUniformLayout();
       }
     }
@@ -1010,15 +994,12 @@ void StandardMaterial::buildUniformLayout()
   ubo.addUniform("bumpMatrix", 16);
   ubo.addUniform("vTangentSpaceParams", 2);
   ubo.addUniform("pointSize", 1);
-  ubo.addUniform("alphaCutOff", 1);
   ubo.addUniform("refractionMatrix", 16);
   ubo.addUniform("vRefractionInfos", 4);
-  ubo.addUniform("vRefractionPosition", 3);
-  ubo.addUniform("vRefractionSize", 3);
   ubo.addUniform("vSpecularColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
+  ubo.addUniform("visibility", 1);
   ubo.addUniform("vDiffuseColor", 4);
-  ubo.addUniform("vAmbientColor", 3);
 
   DetailMapConfiguration::PrepareUniformBuffer(ubo);
 
@@ -1063,9 +1044,10 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
   }
   _activeEffect = effect;
 
-  // Matrices Mesh.
-  mesh->getMeshUniformBuffer()->bindToEffect(effect.get(), "Mesh");
-  mesh->transferToEffect(world);
+  // Matrices
+  if (!defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
+    bindOnlyWorldMatrix(world);
+  }
 
   // PrePass
   prePassConfiguration->bindForSubMesh(_activeEffect, scene, mesh, world, isFrozen());
@@ -1147,7 +1129,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
         }
 
         if (_hasAlphaChannel()) {
-          ubo.updateFloat("alphaCutOff", alphaCutOff);
+          effect->setFloat("alphaCutOff", alphaCutOff);
         }
 
         if (_reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
@@ -1207,13 +1189,6 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
           }
           ubo.updateFloat4("vRefractionInfos", _refractionTexture->level, indexOfRefraction, depth,
                            invertRefractionY ? -1.f : 1.f, "");
-
-          if (_refractionTexture->boundingBoxSize()) {
-            const auto cubeTexture = std::static_pointer_cast<CubeTexture>(_refractionTexture);
-
-            ubo.updateVector3("vRefractionPosition", cubeTexture->boundingBoxPosition);
-            ubo.updateVector3("vRefractionSize", *cubeTexture->boundingBoxSize());
-          }
         }
       }
 
@@ -1229,11 +1204,12 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
         "vEmissiveColor",
         StandardMaterial::EmissiveTextureEnabled() ? emissiveColor : Color3::BlackReadOnly(), "");
 
+      // Diffuse
       ubo.updateColor4("vDiffuseColor", diffuseColor, alpha(), "");
-
-      scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
-      ubo.updateColor3("vAmbientColor", _globalAmbientColor, "");
     }
+
+    // Visibility
+    ubo.updateFloat("visibility", mesh->visibility());
 
     // Textures
     if (scene->texturesEnabled()) {
@@ -1291,18 +1267,22 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     MaterialHelper::BindClipPlane(effect, scene);
 
     // Colors
-    bindEyePosition(effect.get());
+    scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
+
+    MaterialHelper::BindEyePosition(effect.get(), scene);
+    effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, effect.get(), defines, _maxSimultaneousLights);
+      MaterialHelper::BindLights(scene, mesh, effect.get(), defines, _maxSimultaneousLights,
+                                 _rebuildInParallel);
     }
 
     // View
     if ((scene->fogEnabled() && mesh->applyFog() && (scene->fogMode() != Scene::FOGMODE_NONE))
-        || _reflectionTexture || _refractionTexture || mesh->receiveShadows()) {
+        || _reflectionTexture || _refractionTexture) {
       bindView(effect.get());
     }
 
@@ -1325,8 +1305,8 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
     }
   }
 
-  _afterBind(mesh, _activeEffect);
   ubo.update();
+  _afterBind(mesh, _activeEffect);
 }
 
 std::vector<IAnimatablePtr> StandardMaterial::getAnimatables()
@@ -1516,14 +1496,10 @@ void StandardMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTexture
 
 MaterialPtr StandardMaterial::clone(const std::string& _name, bool /*cloneChildren*/) const
 {
-  auto result = StandardMaterial::New(*this);
-
-  result->name = _name;
-  result->id   = _name;
-
-  stencil->copyTo(*result->stencil);
-
-  return result;
+  auto standardMaterial  = StandardMaterial::New(*this);
+  standardMaterial->name = _name;
+  standardMaterial->id   = _name;
+  return standardMaterial;
 }
 
 json StandardMaterial::serialize() const
@@ -2058,11 +2034,6 @@ void StandardMaterial::_attachImageProcessingConfiguration(
   }
 }
 
-bool StandardMaterial::get_isPrePassCapable() const
-{
-  return true;
-}
-
 bool StandardMaterial::get_cameraColorCurvesEnabled() const
 {
   return imageProcessingConfiguration()->colorCurvesEnabled();
@@ -2143,13 +2114,7 @@ StandardMaterialPtr StandardMaterial::Parse(const json& source, Scene* scene,
 {
   return SerializationHelper::Parse(
     [source, scene, rootUrl]() {
-      const auto material = StandardMaterial::New(json_util::get_string(source, "name"), scene);
-
-      if (json_util::has_valid_key_value(source, "stencil")) {
-        material->stencil->parse(source["stencil"], scene, rootUrl);
-      }
-
-      return material;
+      return StandardMaterial::New(json_util::get_string(source, "name"), scene);
     },
     source, scene, rootUrl);
 }

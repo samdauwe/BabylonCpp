@@ -21,11 +21,6 @@ MinMaxReducer::MinMaxReducer(const CameraPtr& camera)
 {
   _camera             = camera;
   _postProcessManager = std::make_unique<PostProcessManager>(camera->getScene());
-
-  _onContextRestoredObserver = camera->getEngine()->onContextRestoredObservable.add(
-    [this](ThinEngine* /*thinEngine*/, EventState& /*es*/) -> void {
-      _postProcessManager->_rebuild();
-    });
 }
 
 MinMaxReducer::~MinMaxReducer() = default;
@@ -51,7 +46,7 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
   auto scene = _camera->getScene();
 
   // create the first step
-  const auto reductionInitial = PostProcess::New(
+  auto reductionInitial = PostProcess::New(
     "Initial reduction phase",                                                  // name
     "minmaxRedux",                                                              // shader
     {"texSize"},                                                                // parameters
@@ -92,26 +87,25 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
     const auto _w = static_cast<int>(w);
     const auto _h = static_cast<int>(h);
 
-    const auto reduction
-      = PostProcess::New("Reduction phase " + std::to_string(index), // name
-                         "minmaxRedux",                              // shader
-                         {"texSize"},                                // parameters
-                         {},                                         // textures
-                         PostProcessOptions{_w, _h},                 // options
-                         nullptr,                                    // camera
-                         Constants::TEXTURE_NEAREST_NEAREST,         // sampling
-                         scene->getEngine(),                         // engine
-                         false,                                      // reusable
-                         "#define "
-                           + std::string((_w == 1 && _h == 1) ? "LAST" :
-                                         (_w == 1 || _h == 1) ? "ONEBEFORELAST" :
-                                                                "MAIN"), // defines
-                         type,                                           // textureType
-                         "",                                             // vertexUrl
-                         {},                                             // indexParameters
-                         false,                                          // blockCompilation
-                         Constants::TEXTUREFORMAT_RG                     // textureFormat
-      );
+    auto reduction = PostProcess::New("Reduction phase " + std::to_string(index), // name
+                                      "minmaxRedux",                              // shader
+                                      {"texSize"},                                // parameters
+                                      {},                                         // textures
+                                      PostProcessOptions{_w, _h},                 // options
+                                      nullptr,                                    // camera
+                                      Constants::TEXTURE_NEAREST_NEAREST,         // sampling
+                                      scene->getEngine(),                         // engine
+                                      false,                                      // reusable
+                                      "#define "
+                                        + std::string((_w == 1 && _h == 1) ? "LAST" :
+                                                      (_w == 1 || _h == 1) ? "ONEBEFORELAST" :
+                                                                             "MAIN"), // defines
+                                      type,                                           // textureType
+                                      "",                                             // vertexUrl
+                                      {},                         // indexParameters
+                                      false,                      // blockCompilation
+                                      Constants::TEXTUREFORMAT_RG // textureFormat
+    );
 
     reduction->autoClear               = false;
     reduction->forceFullscreenViewport = forceFullscreenViewport;
@@ -135,7 +129,7 @@ void MinMaxReducer::setSourceTexture(const RenderTargetTexturePtr& sourceTexture
           = [this, scene, reduction, w, h](Effect* /*effect*/, EventState /*es*/) -> void {
           Float32Array buffer(4 * static_cast<size_t>(w * h));
           MinMaxFloats minmax{0.f, 0.f};
-          scene->getEngine()->_readTexturePixels(reduction->inputTexture(), w, h, -1, 0, buffer,
+          scene->getEngine()->_readTexturePixels(reduction->inputTexture, w, h, -1, 0, buffer,
                                                  false);
           minmax.min = buffer[0];
           minmax.max = buffer[1];
@@ -206,11 +200,6 @@ void MinMaxReducer::dispose(bool disposeAll)
 {
   if (disposeAll) {
     onAfterReductionPerformed.clear();
-
-    if (_onContextRestoredObserver) {
-      _camera->getEngine()->onContextRestoredObservable.remove(_onContextRestoredObserver);
-      _onContextRestoredObserver = nullptr;
-    }
   }
 
   deactivate();

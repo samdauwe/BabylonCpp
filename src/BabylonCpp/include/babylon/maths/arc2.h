@@ -17,7 +17,8 @@ class BABYLON_SHARED_EXPORT Arc2 {
 
 public:
   /**
-   * @brief Creates an Arc object from the three given points : start, middle and end.
+   * @brief Creates an Arc object from the three given points : start, middle
+   * and end.
    * @param startPoint Defines the start point of the arc
    * @param midPoint Defines the midlle point of the arc
    * @param endPoint Defines the end point of the arc

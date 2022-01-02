@@ -1,9 +1,9 @@
 #include <babylon/meshes/builders/lines_builder.h>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/meshes/_creation_data_storage.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
@@ -51,7 +51,7 @@ LinesMeshPtr LinesBuilder::CreateLineSystem(const std::string& name, LineSystemO
   // line system creation
   const auto useVertexColor = !colors.empty();
   const auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true, useVertexColor,
-                                         options.useVertexAlpha.value_or(true), options.material);
+                                         options.useVertexAlpha.value_or(true));
   const auto vertexData     = VertexData::CreateLineSystem(options);
   vertexData->applyToMesh(*lineSystem, options.updatable);
   return lineSystem;
@@ -120,7 +120,7 @@ LinesMeshPtr LinesBuilder::CreateDashedLines(const std::string& name, DashedLine
   }
   // dashed lines creation
   const auto dashedLines = LinesMesh::New(name, scene, nullptr, nullptr, true, false,
-                                          options.useVertexAlpha.value_or(false), options.material);
+                                          options.useVertexAlpha.value_or(false));
   const auto vertexData  = VertexData::CreateDashedLines(options);
   vertexData->applyToMesh(*dashedLines, options.updatable);
 

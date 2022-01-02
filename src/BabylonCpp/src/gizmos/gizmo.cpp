@@ -1,12 +1,10 @@
 #include <babylon/gizmos/gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/engines/scene.h>
-#include <babylon/lights/shadow_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
@@ -25,8 +23,6 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
                                              &Gizmo::set_updateGizmoRotationToMatchAttachedMesh}
     , updateGizmoPositionToMatchAttachedMesh{true}
     , updateScale{true}
-    , customRotationQuaternion{this, &Gizmo::get_customRotationQuaternion,
-                               &Gizmo::set_customRotationQuaternion}
     , _scaleRatio{1.f}
     , _isHovered{false}
     , _customMeshSet{false}
@@ -34,7 +30,6 @@ Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     , _interactionsEnabled{true}
     , _attachedMesh{nullptr}
     , _attachedNode{nullptr}
-    , _customRotationQuaternion{std::nullopt}
     , _beforeRenderObserver{nullptr}
     , _tempQuaternion{Quaternion(0.f, 0.f, 0.f, 1.f)}
     , _tempVector{Vector3()}
@@ -121,16 +116,6 @@ void Gizmo::_attachedNodeChanged(const NodePtr& /*value*/)
 {
 }
 
-std::optional<Quaternion>& Gizmo::get_customRotationQuaternion()
-{
-  return _customRotationQuaternion;
-}
-
-void Gizmo::set_customRotationQuaternion(const std::optional<Quaternion>& iCustomRotationQuaternion)
-{
-  _customRotationQuaternion = iCustomRotationQuaternion;
-}
-
 void Gizmo::_update()
 {
   if (attachedNode()) {
@@ -156,12 +141,7 @@ void Gizmo::_update()
                                                 translation);
     }
     else {
-      if (_customRotationQuaternion) {
-        _rootMesh->rotationQuaternion()->copyFrom(*_customRotationQuaternion);
-      }
-      else {
-        _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
-      }
+      _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
     }
 
     // Scale
@@ -181,10 +161,6 @@ void Gizmo::_update()
       _rootMesh->scaling().setAll(scaleRatio());
     }
   }
-}
-
-void Gizmo::_handlePivot()
-{
 }
 
 void Gizmo::_matrixChanged()
@@ -233,7 +209,6 @@ void Gizmo::_matrixChanged()
       targetCamera->rotation = _tempQuaternion->toEulerAngles();
       if (targetCamera->rotationQuaternion) {
         targetCamera->rotationQuaternion->copyFrom(*_tempQuaternion);
-        targetCamera->rotationQuaternion->normalize();
       }
     }
 
@@ -264,10 +239,10 @@ void Gizmo::_matrixChanged()
       transform->scaling  = *iScaling;
       transform->position = *iPosition;
     }
+
     if (!transform->billboardMode()) {
       if (transform->rotationQuaternion()) {
         transform->rotationQuaternion()->copyFrom(*_tempQuaternion);
-        transform->rotationQuaternion()->normalize();
       }
       else {
         transform->rotation = _tempQuaternion->toEulerAngles();
@@ -291,47 +266,6 @@ void Gizmo::_matrixChanged()
       lmat.copyFrom(bone->getWorldMatrix());
     }
     bone->markAsDirty();
-  }
-  else {
-    const auto light = std::static_pointer_cast<ShadowLight>(_attachedNode);
-    if (light && light->getTypeID()) {
-      const auto type = light->getTypeID();
-      if (type == Light::LIGHTTYPEID_DIRECTIONALLIGHT || type == Light::LIGHTTYPEID_SPOTLIGHT
-          || type == Light::LIGHTTYPEID_POINTLIGHT) {
-        const auto parent = light->parent();
-
-        if (parent) {
-          std::optional<Vector3> scale = std::nullopt;
-          auto& invParent              = _tempMatrix1;
-          auto& nodeLocalMatrix        = _tempMatrix2;
-          parent->getWorldMatrix().invertToRef(invParent);
-          light->getWorldMatrix().multiplyToRef(invParent, nodeLocalMatrix);
-          nodeLocalMatrix.decompose(scale, _tempQuaternion, _tempVector);
-        }
-        else {
-          std::optional<Vector3> scale = std::nullopt;
-          _attachedNode->_worldMatrix.decompose(scale, _tempQuaternion, _tempVector);
-        }
-        // setter doesn't copy values. Need a new Vector3
-        light->position = Vector3(_tempVector->x, _tempVector->y, _tempVector->z);
-        Vector3::Backward(false).rotateByQuaternionToRef(*_tempQuaternion, *_tempVector);
-        light->direction = Vector3(_tempVector->x, _tempVector->y, _tempVector->z);
-      }
-    }
-  }
-}
-
-void Gizmo::_setGizmoMeshMaterial(const std::vector<MeshPtr>& gizmoMeshes,
-                                  const StandardMaterialPtr& material)
-{
-  if (!gizmoMeshes.empty()) {
-    for (const auto& m : gizmoMeshes) {
-      m->material         = material;
-      const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
-      if (lineMesh) {
-        lineMesh->color = material->diffuseColor;
-      }
-    }
   }
 }
 
@@ -363,10 +297,7 @@ Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
               = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
             const auto isHovered
               = (pickedMesh && stl_util::index_of(cache.colliderMeshes, pickedMesh) != -1);
-            const auto material
-              = cache.dragBehavior && cache.dragBehavior->enabled ?
-                  (isHovered || cache.active ? cache.hoverMaterial : cache.material) :
-                  cache.disableMaterial;
+            const auto material = isHovered || cache.active ? cache.hoverMaterial : cache.material;
             for (const auto& m : cache.gizmoMeshes) {
               m->material         = material;
               const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
@@ -393,9 +324,7 @@ Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
             const auto isHovered
               = (pickedMesh && stl_util::index_of(cache.colliderMeshes, pickedMesh) != -1);
             const auto material
-              = ((isHovered || cache.active) && cache.dragBehavior && cache.dragBehavior->enabled) ?
-                  cache.hoverMaterial :
-                  cache.disableMaterial;
+              = isHovered || cache.active ? cache.hoverMaterial : cache.disableMaterial;
             for (const auto& m : cache.gizmoMeshes) {
               m->material         = material;
               const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
@@ -414,8 +343,7 @@ Gizmo::GizmoAxisPointerObserver(const UtilityLayerRendererPtr& gizmoLayer,
           cache.active = false;
           dragging     = false;
           for (const auto& m : cache.gizmoMeshes) {
-            m->material = cache.dragBehavior && cache.dragBehavior->enabled ? cache.material :
-                                                                              cache.disableMaterial;
+            m->material         = cache.material;
             const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
             if (lineMesh /* && lineMesh->color */) {
               lineMesh->color = cache.material->diffuseColor;

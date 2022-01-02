@@ -9,7 +9,6 @@ FreeCameraTouchInput::FreeCameraTouchInput(bool iAllowMouse)
     : allowMouse{iAllowMouse}
     , touchAngularSensibility{200000.f}
     , touchMoveSensibility{250.f}
-    , singleFingerRotate{false}
     , _offsetX{std::nullopt}
     , _offsetY{std::nullopt}
     , _pointerInput{nullptr}
@@ -36,7 +35,7 @@ void FreeCameraTouchInput::attachControl(bool iNoPreventDefault)
     _pointerInput = [this](PointerInfo* p, EventState& /*es*/) -> void {
       auto& evt = p->pointerEvent;
 
-      if (!allowMouse && evt.pointerType == "mouse") {
+      if (!allowMouse && evt.pointerType == PointerType::MOUSE) {
         return;
       }
 
@@ -139,10 +138,7 @@ void FreeCameraTouchInput::checkInputs()
 
   camera->cameraRotation->y = _offsetX.value() / touchAngularSensibility;
 
-  const auto rotateCamera = (singleFingerRotate && _pointerPressed.size() == 1)
-                            || (!singleFingerRotate && _pointerPressed.size() > 1);
-
-  if (rotateCamera) {
+  if (_pointerPressed.size() > 1) {
     camera->cameraRotation->x = -_offsetY.value() / touchAngularSensibility;
   }
   else {

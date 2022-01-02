@@ -73,7 +73,7 @@ public:
 
     // Update scene model
     scene->onBeforeCameraRenderObservable.add(
-      [this](Camera*, EventState&) -> void { _crowdSimulation->update(); });
+      [this](Camera*, EventState&) { _crowdSimulation->update(); });
   }
 
 private:
@@ -90,7 +90,7 @@ private:
     _crowdSimulation->setTimeStep(0.3f);
 
     // Create agents
-    for (const auto& agentMesh : _agentMeshes) {
+    for (auto agentMesh : _agentMeshes) {
       auto agentId = _crowdSimulation->addAgent(agentMesh);
       _crowdSimulation->setAgentGoal(agentId,
                                      Vector2(-agentMesh->position().x, -agentMesh->position().z));

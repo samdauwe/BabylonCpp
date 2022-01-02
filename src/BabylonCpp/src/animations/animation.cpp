@@ -22,8 +22,6 @@
 
 namespace BABYLON {
 
-size_t Animation::_UniqueIdGenerator = 0;
-
 bool Animation::_AllowMatricesInterpolation = false;
 
 bool Animation::_AllowMatrixDecomposeForInterpolation = true;
@@ -182,7 +180,6 @@ Animation::Animation(const std::string& iName, const std::string& iTargetPropert
   dataType       = iDataType;
   loopMode       = iLoopMode;
   enableBlending = iEnableBlending;
-  uniqueId       = Animation::_UniqueIdGenerator++;
 }
 
 Animation::~Animation() = default;
@@ -369,16 +366,6 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
   return value;
 }
 
-AnimationValue Animation::evaluate(float currentFrame)
-{
-  _IAnimationState state;
-  state.key         = 0;
-  state.repeatCount = 0;
-  state.loopMode    = Animation::ANIMATIONLOOPMODE_CONSTANT;
-
-  return _interpolate(currentFrame, state);
-}
-
 AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& state)
 {
   if (state.loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT && state.repeatCount > 0) {
@@ -409,7 +396,7 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
     }
   }
 
-  for (auto key = static_cast<size_t>(startKeyIndex); key < keys.size() - 1; ++key) {
+  for (auto key = static_cast<size_t>(startKeyIndex); key < keys.size(); ++key) {
     const auto& endKey = keys[key + 1];
 
     if (endKey.frame >= currentFrame) {
@@ -463,10 +450,10 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
         case Animation::ANIMATIONTYPE_QUATERNION: {
           const auto quatValue
             = useTangent ? quaternionInterpolateFunctionWithTangents(
-                startValue.get<Quaternion>(),
-                (*startKey.outTangent).get<Quaternion>().scale(frameDelta),
-                endValue.get<Quaternion>(), (*endKey.inTangent).get<Quaternion>().scale(frameDelta),
-                gradient) :
+                             startValue.get<Quaternion>(),
+                             (*startKey.outTangent).get<Quaternion>().scale(frameDelta),
+                             endValue.get<Quaternion>(),
+                             (*endKey.inTangent).get<Quaternion>().scale(frameDelta), gradient) :
                            quaternionInterpolateFunction(startValue.get<Quaternion>(),
                                                          endValue.get<Quaternion>(), gradient);
           switch (state.loopMode.value()) {
@@ -485,12 +472,13 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
         // Vector3
         case Animation::ANIMATIONTYPE_VECTOR3: {
           const auto vec3Value
-            = useTangent ? vector3InterpolateFunctionWithTangents(
-                startValue.get<Vector3>(), (*startKey.outTangent).get<Vector3>().scale(frameDelta),
-                endValue.get<Vector3>(), (*endKey.inTangent).get<Vector3>().scale(frameDelta),
-                gradient) :
-                           vector3InterpolateFunction(startValue.get<Vector3>(),
-                                                      endValue.get<Vector3>(), gradient);
+            = useTangent ?
+                vector3InterpolateFunctionWithTangents(
+                  startValue.get<Vector3>(),
+                  (*startKey.outTangent).get<Vector3>().scale(frameDelta), endValue.get<Vector3>(),
+                  (*endKey.inTangent).get<Vector3>().scale(frameDelta), gradient) :
+                vector3InterpolateFunction(startValue.get<Vector3>(), endValue.get<Vector3>(),
+                                           gradient);
           switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
@@ -507,12 +495,13 @@ AnimationValue Animation::_interpolate(float currentFrame, _IAnimationState& sta
         // Vector2
         case Animation::ANIMATIONTYPE_VECTOR2: {
           const auto vec2Value
-            = useTangent ? vector2InterpolateFunctionWithTangents(
-                startValue.get<Vector2>(), (*startKey.outTangent).get<Vector2>().scale(frameDelta),
-                endValue.get<Vector2>(), (*endKey.inTangent).get<Vector2>().scale(frameDelta),
-                gradient) :
-                           vector2InterpolateFunction(startValue.get<Vector2>(),
-                                                      endValue.get<Vector2>(), gradient);
+            = useTangent ?
+                vector2InterpolateFunctionWithTangents(
+                  startValue.get<Vector2>(),
+                  (*startKey.outTangent).get<Vector2>().scale(frameDelta), endValue.get<Vector2>(),
+                  (*endKey.inTangent).get<Vector2>().scale(frameDelta), gradient) :
+                vector2InterpolateFunction(startValue.get<Vector2>(), endValue.get<Vector2>(),
+                                           gradient);
           switch (state.loopMode.value()) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:

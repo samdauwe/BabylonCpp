@@ -79,20 +79,6 @@ public:
   void dispose(bool doNotRecurse = false, bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief Gets the minZ used for shadow according to both the scene and the light.
-   * @param activeCamera The camera we are returning the min for
-   * @returns the depth min z
-   */
-  float getDepthMinZ(const Camera& activeCamera) const override;
-
-  /**
-   * @brief Gets the maxZ used for shadow according to both the scene and the light.
-   * @param activeCamera The camera we are returning the max for
-   * @returns the depth max z
-   */
-  float getDepthMaxZ(const Camera& activeCamera) const override;
-
-  /**
    * @brief Prepares the list of defines specific to the light type.
    * @param defines the list of defines
    * @param lightIndex defines the index of the light for the effect
@@ -192,16 +178,6 @@ protected:
   void set_projectionTexture(const BaseTexturePtr& value);
 
   /**
-   * @brief Gets the light projection matrix as used by the projection texture.
-   */
-  Matrix& get_projectionTextureProjectionLightMatrix();
-
-  /**
-   * @brief Sets the light projection matrix as used by the projection texture.
-   */
-  void set_projectionTextureProjectionLightMatrix(const Matrix& projection);
-
-  /**
    * @brief Overrides the direction setter to recompute the projection texture view light Matrix.
    */
   void _setDirection(const Vector3& value) override;
@@ -280,11 +256,6 @@ public:
    * The projection texture of the light
    */
   Property<SpotLight, BaseTexturePtr> projectionTexture;
-
-  /**
-   * Gets or sets the light projection matrix as used by the projection texture
-   */
-  Property<SpotLight, Matrix> projectionTextureProjectionLightMatrix;
 
 protected:
   float _projectionTextureLightNear;

@@ -10,11 +10,12 @@ namespace BABYLON {
 namespace CSG {
 
 /**
- * @brief Represents a vertex of a polygon. Use your own vertex class instead of this one to provide
- * additional features like texture coordinates and vertex colors. Custom vertex classes need to
- * provide a `pos` property and `clone()`, `flip()`, and `interpolate()` methods that behave
- * analogous to the ones defined by `BABYLON.CSG.Vertex`. This class provides `normal` so
- * convenience functions like `BABYLON.CSG.sphere()` can return a smooth vertex normal, but `normal`
+ * @brief Represents a vertex of a polygon. Use your own vertex class instead of this
+ * one to provide additional features like texture coordinates and vertex
+ * colors. Custom vertex classes need to provide a `pos` property and `clone()`,
+ * `flip()`, and `interpolate()` methods that behave analogous to the ones
+ * defined by `BABYLON.CSG.Vertex`. This class provides `normal` so convenience
+ * functions like `BABYLON.CSG.sphere()` can return a smooth vertex normal, but `normal`
  * is not used anywhere else.
  * Same goes for uv, it allows to keep the original vertex uv coordinates of the 2 meshes
  */
@@ -46,8 +47,8 @@ public:
   [[nodiscard]] std::string toString() const;
 
   /**
-   * @brief Invert all orientation-specific data (e.g. vertex normal). Called when the orientation
-   * of a polygon is flipped.
+   * @brief Invert all orientation-specific data (e.g. vertex normal). Called
+   * when the orientation of a polygon is flipped.
    */
   void flip();
 

@@ -19,29 +19,16 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractScene;
 class Animation;
 class Engine;
-struct IRenderTargetOptions;
-struct RenderTargetSize;
 class Scene;
 FWD_CLASS_SPTR(Camera)
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(NodeMaterial)
 FWD_CLASS_SPTR(PostProcess)
 FWD_STRUCT_SPTR(PrePassEffectConfiguration)
 FWD_CLASS_SPTR(PrePassRenderer)
-
-/**
- * @brief Represents a TextureCache item.
- */
-struct TextureCache {
-  InternalTexturePtr texture      = nullptr;
-  unsigned int postProcessChannel = 0;
-  int lastUsedRenderId            = -1;
-}; // end of struct TextureCache
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has been rendered
@@ -124,9 +111,9 @@ public:
   PostProcess& shareOutputWith(const PostProcessPtr& postProcess);
 
   /**
-   * @brief Reverses the effect of calling shareOutputWith and returns the post process back to its
-   * original state. This should be called if the post process that shares output with this post
-   * process is disabled/disposed.
+   * @brief Reverses the effect of calling shareOutputWith and returns the post
+   * process back to its original state. This should be called if the post
+   * process that shares output with this post process is disabled/disposed.
    */
   void useOwnOutput();
 
@@ -177,7 +164,7 @@ public:
    * specified in the post process constructor. (default: null)
    * @param forceDepthStencil If true, a depth and stencil buffer will be generated. (default:
    * false)
-   * @returns The render target wrapper that was bound to be written to.
+   * @returns The target texture that was bound to be written to.
    */
   InternalTexturePtr activate(const CameraPtr& camera,
                               const InternalTexturePtr& sourceTexture = nullptr,
@@ -211,16 +198,10 @@ public:
   virtual void dispose(Camera* camera = nullptr);
 
   /**
-   * @brief Serializes the post process to a JSON object.
+   * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
   json serialize() const;
-
-  /**
-   * @brief Clones this post process.
-   * @returns a new post process similar to this one
-   */
-  PostProcessPtr clone() const;
 
   /**
    * @brief Creates a material from parsed material data.
@@ -327,21 +308,7 @@ protected:
    */
   float get_aspectRatio() const;
 
-private:
-  InternalTexturePtr _createRenderTargetTexture(const RenderTargetSize& textureSize,
-                                                const IRenderTargetOptions& textureOptions,
-                                                unsigned int channel = 0);
-  void _flushTextureCache();
-  void _resize(int width, int height, Camera* camera, bool needMipMaps,
-               bool forceDepthStencil = false);
-  void _disposeTextureCache();
-
 public:
-  /**
-   * Hidden
-   */
-  AbstractScene* _parentContainer;
-
   /**
    * Gets or sets the unique id of the post process
    */
@@ -514,11 +481,6 @@ public:
   std::vector<InternalTexturePtr> _textures;
 
   /**
-   * Hidden
-   */
-  InternalTexturePtr _forcedOutputTexture;
-
-  /**
    * The index in _textures that corresponds to the output texture.
    * Hidden
    */
@@ -559,7 +521,6 @@ public:
 
 protected:
   Scene* _scene;
-  std::string _postProcessDefines;
   std::unordered_map<std::string, unsigned int> _indexParameters;
 
 private:
@@ -569,17 +530,9 @@ private:
   float _renderRatio;
   std::variant<float, PostProcessOptions> _options;
   bool _reusable;
-  size_t _renderId;
   unsigned int _textureType;
   unsigned int _textureFormat;
-
-  /**
-   * Smart array of input and output textures for the post process.
-   * @hidden
-   */
-  std::vector<TextureCache> _textureCache;
-
-  DrawWrapperPtr _drawWrapper;
+  EffectPtr _effect;
   std::vector<std::string> _samplers;
   std::string _fragmentUrl;
   std::string _vertexUrl;
@@ -587,6 +540,7 @@ private:
   Vector2 _scaleRatio;
   PostProcessPtr _shareOutputWithPostProcess;
   Vector2 _texelSize;
+  InternalTexturePtr _forcedOutputTexture;
   bool _blockCompilation;
   std::string _defines;
   // Events

@@ -6,13 +6,11 @@
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
-#include <babylon/misc/string_tools.h>
 #include <babylon/rendering/pre_pass_effect_configuration.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 
@@ -27,8 +25,7 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
                          unsigned int textureType, const std::string& vertexUrl,
                          const std::unordered_map<std::string, unsigned int>& indexParameters,
                          bool blockCompilation, unsigned int textureFormat)
-    : _parentContainer{nullptr}
-    , width{-1}
+    : width{-1}
     , height{-1}
     , nodeMaterialSource{nullptr}
     , _outputTexture{nullptr}
@@ -49,7 +46,6 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     , isSupported{this, &PostProcess::get_isSupported}
     , aspectRatio{this, &PostProcess::get_aspectRatio}
     , adaptScaleToCurrentViewport{false}
-    , _forcedOutputTexture{nullptr}
     , _currentRenderTextureInd{0}
     , _prePassEffectConfiguration{nullptr}
     , _scene{nullptr}
@@ -58,11 +54,11 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
     , _engine{nullptr}
     , _renderRatio{1.f}
     , _reusable{false}
-    , _renderId{0}
     , _parameters{parameters}
     , _scaleRatio{Vector2(1.f, 1.f)}
     , _shareOutputWithPostProcess{nullptr}
     , _texelSize{Vector2::Zero()}
+    , _forcedOutputTexture{nullptr}
     , _blockCompilation{blockCompilation}
     , _defines{defines}
     , _onActivateObserver{nullptr}
@@ -97,7 +93,6 @@ PostProcess::PostProcess(const std::string& iName, const std::string& fragmentUr
   _parameters.emplace_back("scale");
 
   _indexParameters = indexParameters;
-  _drawWrapper     = std::make_shared<DrawWrapper>(_engine);
 }
 
 PostProcess::~PostProcess() = default;
@@ -197,10 +192,7 @@ void PostProcess::set_inputTexture(const InternalTexturePtr& value)
 
 void PostProcess::restoreDefaultInputTexture()
 {
-  if (_forcedOutputTexture) {
-    _forcedOutputTexture = nullptr;
-    markTextureDirty();
-  }
+  _forcedOutputTexture = nullptr;
 }
 
 CameraPtr& PostProcess::getCamera()
@@ -239,7 +231,7 @@ Engine* PostProcess::getEngine()
 
 const EffectPtr& PostProcess::getEffect() const
 {
-  return _drawWrapper->effect;
+  return _effect;
 }
 
 PostProcess& PostProcess::shareOutputWith(const PostProcessPtr& postProcess)
@@ -267,8 +259,6 @@ void PostProcess::updateEffect(
   const std::function<void(Effect* effect, const std::string& errors)>& onError,
   const std::string& vertexUrl, const std::string& fragmentUrl)
 {
-  _postProcessDefines = defines;
-
   std::unordered_map<std::string, std::string> baseName{
     {"vertex", !vertexUrl.empty() ? vertexUrl : _vertexUrl},
     {"fragment", !fragmentUrl.empty() ? fragmentUrl : _fragmentUrl}};
@@ -282,8 +272,7 @@ void PostProcess::updateEffect(
   options.onError         = onError;
   options.indexParameters = !indexParameters.empty() ? indexParameters : _indexParameters;
 
-  _drawWrapper->effect
-    = _engine->createEffect(baseName, options, _scene ? _scene->getEngine() : _engine);
+  _effect = _engine->createEffect(baseName, options, _scene ? _scene->getEngine() : _engine);
 }
 
 bool PostProcess::isReusable() const
@@ -296,112 +285,30 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-InternalTexturePtr
-PostProcess::_createRenderTargetTexture(const RenderTargetSize& textureSize,
-                                        const IRenderTargetOptions& textureOptions,
-                                        unsigned int channel)
-{
-  for (const auto& textureCacheItem : _textureCache) {
-    if (textureCacheItem.texture->width == textureSize.width
-        && textureCacheItem.texture->height == textureSize.height
-        && textureCacheItem.postProcessChannel == channel) {
-      return textureCacheItem.texture;
-    }
-  }
-
-  const auto tex = _engine->createRenderTargetTexture(textureSize, textureOptions);
-  _textureCache.emplace_back(TextureCache{
-    tex,     // texture
-    channel, // postProcessChannel
-    -1,      // lastUsedRenderId
-  });
-
-  return tex;
-}
-
-void PostProcess::_flushTextureCache()
-{
-  const auto currentRenderId = _renderId;
-
-  for (auto it = _textureCache.begin(); it != _textureCache.end();) {
-    const auto& textureCacheItem = *it;
-    if (currentRenderId - textureCacheItem.lastUsedRenderId > 100) {
-      auto currentlyUsed = false;
-      for (auto j = 0ull; j < _textures.size(); ++j) {
-        if (_textures[j] == textureCacheItem.texture) {
-          currentlyUsed = true;
-          break;
-        }
-      }
-
-      if (!currentlyUsed) {
-        _engine->_releaseTexture(textureCacheItem.texture);
-        it = _textureCache.erase(it);
-      }
-      else {
-        ++it;
-      }
-    }
-  }
-}
-
-void PostProcess::_resize(int iWidth, int iHeight, Camera* camera, bool needMipMaps,
-                          bool forceDepthStencil)
-{
-  if (!_textures.empty()) {
-    _textures.clear();
-  }
-
-  width  = iWidth;
-  height = iHeight;
-
-  auto textureSize = RenderTargetSize{width, height};
-  IRenderTargetOptions textureOptions;
-  textureOptions.generateMipMaps = needMipMaps;
-  textureOptions.generateDepthBuffer
-    = forceDepthStencil || (stl_util::index_of_raw_ptr(camera->_postProcesses, this) == 0);
-  textureOptions.generateStencilBuffer
-    = (forceDepthStencil || (stl_util::index_of_raw_ptr(camera->_postProcesses, this) == 0))
-      && _engine->isStencilEnable();
-  textureOptions.samplingMode = renderTargetSamplingMode;
-  textureOptions.type         = _textureType;
-  textureOptions.format       = _textureFormat;
-
-  _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions /*, 0*/));
-
-  if (_reusable) {
-    _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions /*, 1*/));
-  }
-
-  _texelSize.copyFromFloats(1.f / width, 1.f / height);
-
-  onSizeChangedObservable.notifyObservers(this);
-}
-
 InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
                                          const InternalTexturePtr& sourceTexture,
                                          bool forceDepthStencil)
 {
   auto pCamera = camera ? camera : _camera;
 
-  auto scene         = pCamera->getScene();
-  auto engine        = scene->getEngine();
-  const auto maxSize = engine->getCaps().maxTextureSize;
+  auto scene        = pCamera->getScene();
+  auto engine       = scene->getEngine();
+  const int maxSize = engine->getCaps().maxTextureSize;
 
-  const auto requiredWidth = static_cast<int>(
+  const int requiredWidth = static_cast<int>(
     static_cast<float>(sourceTexture ? sourceTexture->width : _engine->getRenderingCanvas()->width)
     * _renderRatio);
-  const auto requiredHeight
+  const int requiredHeight
     = static_cast<int>(static_cast<float>(sourceTexture ? sourceTexture->height :
                                                           _engine->getRenderingCanvas()->height)
                        * _renderRatio);
 
-  auto desiredWidth  = std::holds_alternative<PostProcessOptions>(_options) ?
-                         std::get<PostProcessOptions>(_options).width :
-                         requiredWidth;
-  auto desiredHeight = std::holds_alternative<PostProcessOptions>(_options) ?
-                         std::get<PostProcessOptions>(_options).height :
-                         requiredHeight;
+  int desiredWidth = std::holds_alternative<PostProcessOptions>(_options) ?
+                       std::get<PostProcessOptions>(_options).width :
+                       requiredWidth;
+  int desiredHeight = std::holds_alternative<PostProcessOptions>(_options) ?
+                        std::get<PostProcessOptions>(_options).height :
+                        requiredHeight;
 
   const auto needMipMaps = renderTargetSamplingMode != Constants::TEXTURE_NEAREST_LINEAR
                            && renderTargetSamplingMode != Constants::TEXTURE_NEAREST_NEAREST
@@ -433,17 +340,43 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
     }
 
     if (width != desiredWidth || height != desiredHeight) {
-      _resize(desiredWidth, desiredHeight, pCamera.get(), needMipMaps, forceDepthStencil);
+      if (!_textures.empty()) {
+        for (const auto& texture : _textures) {
+          _engine->_releaseTexture(texture);
+        }
+        _textures.clear();
+      }
+      width  = desiredWidth;
+      height = desiredHeight;
+
+      auto textureSize = RenderTargetSize{width, height};
+      IRenderTargetOptions textureOptions;
+      textureOptions.generateMipMaps = needMipMaps;
+      textureOptions.generateDepthBuffer
+        = forceDepthStencil || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0);
+      textureOptions.generateStencilBuffer
+        = (forceDepthStencil || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0))
+          && _engine->isStencilEnable();
+      textureOptions.samplingMode = renderTargetSamplingMode;
+      textureOptions.type         = _textureType;
+      textureOptions.format       = _textureFormat;
+
+      _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions));
+
+      if (_reusable) {
+        _textures.emplace_back(_engine->createRenderTargetTexture(textureSize, textureOptions));
+      }
+
+      _texelSize.copyFromFloats(1.f / width, 1.f / height);
+
+      onSizeChangedObservable.notifyObservers(this);
     }
 
-    for (const auto& texture : _textures) {
+    for (auto& texture : _textures) {
       if (texture->samples != samples) {
         _engine->updateRenderTargetTextureSampleCount(texture, samples);
       }
     }
-
-    _flushTextureCache();
-    _renderId++;
   }
 
   InternalTexturePtr target = nullptr;
@@ -452,24 +385,11 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
   }
   else if (_forcedOutputTexture) {
     target = _forcedOutputTexture;
-
     width  = _forcedOutputTexture->width;
     height = _forcedOutputTexture->height;
   }
   else {
     target = inputTexture();
-
-    std::optional<TextureCache> cache = std::nullopt;
-    for (const auto& textureCacheItem : _textureCache) {
-      if (textureCacheItem.texture == target) {
-        cache = textureCacheItem;
-        break;
-      }
-    }
-
-    if (cache) {
-      cache->lastUsedRenderId = static_cast<int>(_renderId);
-    }
   }
 
   // Bind the input of this post process to be used as the output of the previous post process.
@@ -483,8 +403,6 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
     _scaleRatio.copyFromFloats(1.f, 1.f);
     _engine->bindFramebuffer(target, 0u, std::nullopt, std::nullopt, forceFullscreenViewport);
   }
-
-  _engine->_debugInsertMarker(StringTools::printf("post process %s input", name.c_str()));
 
   onActivateObservable.notifyObservers(camera.get());
 
@@ -502,7 +420,7 @@ InternalTexturePtr PostProcess::activate(const CameraPtr& camera,
 
 bool PostProcess::get_isSupported() const
 {
-  return _drawWrapper->effect ? _drawWrapper->effect->isSupported() : false;
+  return _effect->isSupported();
 }
 
 float PostProcess::get_aspectRatio() const
@@ -522,18 +440,18 @@ float PostProcess::get_aspectRatio() const
 
 bool PostProcess::isReady() const
 {
-  return _drawWrapper->effect ? _drawWrapper->effect->isReady() : false;
+  return _effect && _effect->isReady();
 }
 
 EffectPtr PostProcess::apply()
 {
   // Check
-  if (!_drawWrapper->effect || !_drawWrapper->effect->isReady()) {
+  if (!_effect || !_effect->isReady()) {
     return nullptr;
   }
 
   // States
-  _engine->enableEffect(_drawWrapper);
+  _engine->enableEffect(_effect);
   _engine->setState(false);
   _engine->setDepthBuffer(false);
   _engine->setDepthWrite(false);
@@ -559,33 +477,28 @@ EffectPtr PostProcess::apply()
       source = inputTexture();
     }
   }
-  _drawWrapper->effect->_bindTexture("textureSampler", source);
+  _effect->_bindTexture("textureSampler", source);
 
   // Parameters
-  _drawWrapper->effect->setVector2("scale", _scaleRatio);
-  onApplyObservable.notifyObservers(_drawWrapper->effect.get());
+  _effect->setVector2("scale", _scaleRatio);
+  onApplyObservable.notifyObservers(_effect.get());
 
-  return _drawWrapper->effect;
+  return _effect;
 }
 
 void PostProcess::_disposeTextures()
 {
   if (_shareOutputWithPostProcess || _forcedOutputTexture) {
-    _disposeTextureCache();
     return;
   }
 
-  _disposeTextureCache();
-  _textures.clear();
-}
-
-void PostProcess::_disposeTextureCache()
-{
-  for (auto i = _textureCache.size(); i-- > 0;) {
-    _engine->_releaseTexture(_textureCache[i].texture);
+  if (!_textures.empty()) {
+    for (const auto& texture : _textures) {
+      _engine->_releaseTexture(texture);
+    }
   }
 
-  _textureCache.clear();
+  _textures.clear();
 }
 
 bool PostProcess::setPrePassRenderer(const PrePassRendererPtr& prePassRenderer)
@@ -613,11 +526,6 @@ void PostProcess::dispose(Camera* camera)
     stl_util::remove_vector_elements_equal_sharedptr(_engine->postProcesses, this);
   }
 
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->postProcesses, this);
-    _parentContainer = nullptr;
-  }
-
   if (!pCamera) {
     return;
   }
@@ -639,11 +547,6 @@ void PostProcess::dispose(Camera* camera)
 }
 
 json PostProcess::serialize() const
-{
-  return nullptr;
-}
-
-PostProcessPtr PostProcess::clone() const
 {
   return nullptr;
 }

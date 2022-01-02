@@ -79,8 +79,7 @@ void UniformBufferExtension::bindUniformBuffer(const WebGLDataBufferPtr& buffer)
 }
 
 void UniformBufferExtension::bindUniformBufferBase(const WebGLDataBufferPtr& buffer,
-                                                   unsigned int location,
-                                                   const std::string& /*name*/)
+                                                   unsigned int location)
 {
   _this->_gl->bindBufferBase(GL::UNIFORM_BUFFER, location,
                              buffer ? buffer->underlyingResource().get() : nullptr);

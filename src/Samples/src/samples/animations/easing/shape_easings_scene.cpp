@@ -3,7 +3,6 @@
 #include <babylon/animations/easing/cubic_ease.h>
 #include <babylon/animations/easing/quadratic_ease.h>
 #include <babylon/animations/ianimation_key.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
@@ -14,7 +13,8 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(ArcRotateCamera)
+class ArcRotateCamera;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 namespace Samples {
 
@@ -248,9 +248,8 @@ public:
     scene->beginAnimation(shape7, 0, 120, true);
 
     // create the camera animation
-    scene->onBeforeCameraRenderObservable.add([this](Camera*, EventState&) -> void {
-      _camera->alpha += 0.01f * getScene()->getAnimationRatio();
-    });
+    scene->onBeforeCameraRenderObservable.add(
+      [this](Camera*, EventState&) { _camera->alpha += 0.01f * getScene()->getAnimationRatio(); });
   }
 
 private:

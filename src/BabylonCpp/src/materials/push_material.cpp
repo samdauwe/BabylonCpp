@@ -31,7 +31,7 @@ EffectPtr& PushMaterial::getEffect()
   return _activeEffect;
 }
 
-bool PushMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* /*subMesh*/)
+bool PushMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
   if (!mesh) {
     return false;
@@ -77,7 +77,7 @@ void PushMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& /*effectOver
 
 void PushMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
 {
-  Material::_afterBind(mesh, effect);
+  Material::_afterBind(mesh);
   getScene()->_cachedEffect = effect;
 }
 

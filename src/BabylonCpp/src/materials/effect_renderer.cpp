@@ -1,7 +1,6 @@
 #include <babylon/materials/effect_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_wrapper.h>
@@ -9,6 +8,7 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/states/depth_culling_state.h>
 #include <babylon/states/stencil_state.h>
 
@@ -20,10 +20,7 @@ IEffectRendererOptions EffectRenderer::_DefaultOptions = IEffectRendererOptions{
 };
 
 EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions& options)
-    : engine{iEngine}
-    , _indices{options.indices}
-    , _fullscreenViewport{std::make_unique<Viewport>(0.f, 0.f, 1.f, 1.f)}
-    , _onContextRestoredObserver{nullptr}
+    : engine{iEngine}, _fullscreenViewport{std::make_unique<Viewport>(0.f, 0.f, 1.f, 1.f)}
 {
   _vertexBuffers = {
     {VertexBuffer::PositionKind,
@@ -31,15 +28,6 @@ EffectRenderer::EffectRenderer(ThinEngine* iEngine, const IEffectRendererOptions
                                     VertexBuffer::PositionKind, false, false, 2)},
   };
   _indexBuffer = engine->createIndexBuffer(options.indices);
-
-  _onContextRestoredObserver = engine->onContextRestoredObservable.add(
-    [this](ThinEngine* /*engine*/, EventState& /*es*/) -> void {
-      _indexBuffer = engine->createIndexBuffer(_indices);
-
-      for (const auto& [key, vertexBuffer] : _vertexBuffers) {
-        vertexBuffer->_rebuild();
-      }
-    });
 }
 
 EffectRenderer::~EffectRenderer() = default;
@@ -63,7 +51,7 @@ void EffectRenderer::applyEffectWrapper(const EffectWrapperPtr& effectWrapper)
 {
   engine->depthCullingState()->depthTest = false;
   engine->stencilState()->stencilTest    = false;
-  engine->enableEffect(effectWrapper->_drawWrapper);
+  engine->enableEffect(effectWrapper->effect);
   bindBuffers(effectWrapper->effect);
   effectWrapper->onApplyObservable.notifyObservers(nullptr);
 }
@@ -90,7 +78,7 @@ void EffectRenderer::render(
   const std::optional<std::variant<InternalTexturePtr, RenderTargetTexturePtr>>& outputTexture)
 {
   // Ensure effect is ready
-  if (!effectWrapper->effect()->isReady()) {
+  if (!effectWrapper->effect->isReady()) {
     return;
   }
 
@@ -130,11 +118,6 @@ void EffectRenderer::dispose()
 
   if (_indexBuffer) {
     engine->_releaseBuffer(_indexBuffer);
-  }
-
-  if (_onContextRestoredObserver) {
-    engine->onContextRestoredObservable.remove(_onContextRestoredObserver);
-    _onContextRestoredObserver = nullptr;
   }
 }
 

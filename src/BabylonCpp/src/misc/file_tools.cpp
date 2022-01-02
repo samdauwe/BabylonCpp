@@ -524,27 +524,4 @@ void FileTools::LoadFile(
   // std::cout << "WaitAll finished\n";
 }
 
-bool FileTools::IsBase64DataUrl(const std::string& uri)
-{
-  return uri.size() < 5 ? false : uri.substr(0, 5) == "data:";
-}
-
-ArrayBuffer FileTools::DecodeBase64UrlToBinary(const std::string& uri)
-{
-  const auto uriSplit = StringTools::split(uri, ',');
-  if (uriSplit.size() < 2) {
-    return ArrayBuffer();
-  }
-
-  const auto decodedString = Base64::atob(uriSplit[1]);
-  const auto bufferLength  = decodedString.size();
-  Uint8Array bufferView(bufferLength);
-
-  for (size_t i = 0; i < bufferLength; ++i) {
-    bufferView[i] = StringTools::charCodeAt(decodedString, i);
-  }
-
-  return bufferView;
-}
-
 } // end of namespace BABYLON

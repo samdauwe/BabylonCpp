@@ -2,18 +2,19 @@
 #define BABYLON_MATERIALS_LIBRARY_SKY_SKY_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/sky/sky_material_defines.h>
 #include <babylon/maths/vector3.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(IAnimatable)
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(SkyMaterial)
+class SkyMaterial;
+using SkyMaterialPtr = std::shared_ptr<SkyMaterial>;
 
 /**
  * @brief This is the sky material which allows to create dynamic and texture free effects for
@@ -35,15 +36,15 @@ public:
 
   /**
    * @brief Specifies if the material will require alpha blending.
-   * @returns a boolean specifying if alpha blending is needed.
+   * @returns a boolean specifying if alpha blending is needed
    */
-  bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
    * @returns false as the sky material doesn't need alpha testing.
    */
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
 
   /**
    * @brief Get the texture used for alpha test purpose.
@@ -80,7 +81,7 @@ public:
    * Mainly use in serialization.
    * @returns the class name
    */
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Disposes the material.
@@ -94,13 +95,14 @@ public:
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this material in a JSON representation.
    * @returns the serialized material object
    */
-  json serialize() const;
+  [[nodiscard]] json serialize() const;
 
   /**
    * @brief Creates a sky material from parsed material data.
@@ -114,8 +116,8 @@ public:
 protected:
   /**
    * @brief Instantiates a new sky material.
-   * This material allows to create dynamic and texture free effects for skyboxes by taking care of
-   * the atmosphere state.
+   * This material allows to create dynamic and texture free
+   * effects for skyboxes by taking care of the atmosphere state.
    * @see https://doc.babylonjs.com/extensions/sky
    * @param name Define the name of the material in the scene
    * @param scene Define the scene the material belong to
@@ -185,16 +187,8 @@ public:
    */
   Vector3 cameraOffset;
 
-  /**
-   * Defines the vector the skyMaterial should consider as up. (default is Vector3(0, 1, 0) as
-   * returned by Vector3.Up())
-   */
-  Vector3 up;
-
 private:
-  // Private members
   Vector3 _cameraPosition;
-  Quaternion _skyOrientation;
 
 }; // end of class SkyMaterial
 

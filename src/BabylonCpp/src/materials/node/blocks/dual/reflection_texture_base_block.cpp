@@ -2,8 +2,6 @@
 
 #include <babylon/core/json_util.h>
 #include <babylon/engines/constants.h>
-#include <babylon/engines/engine.h>
-#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/node/blocks/input/input_block.h>
 #include <babylon/materials/node/node_material.h>
@@ -12,55 +10,23 @@
 #include <babylon/materials/node/node_material_connection_point.h>
 #include <babylon/materials/node/node_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
-#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
 
 ReflectionTextureBaseBlock::ReflectionTextureBaseBlock(const std::string& iName)
     : NodeMaterialBlock{iName, NodeMaterialBlockTargets::VertexAndFragment}
-    , texture{this, &ReflectionTextureBaseBlock::get_texture,
-              &ReflectionTextureBaseBlock::set_texture}
+    , texture{nullptr}
     , position{this, &ReflectionTextureBaseBlock::get_position}
     , worldPosition{this, &ReflectionTextureBaseBlock::get_worldPosition}
     , worldNormal{this, &ReflectionTextureBaseBlock::get_worldNormal}
     , world{this, &ReflectionTextureBaseBlock::get_world}
     , cameraPosition{this, &ReflectionTextureBaseBlock::get_cameraPosition}
     , view{this, &ReflectionTextureBaseBlock::get_view}
-    , _texture{nullptr}
 {
 }
 
 ReflectionTextureBaseBlock::~ReflectionTextureBaseBlock() = default;
-
-BaseTexturePtr& ReflectionTextureBaseBlock::get_texture()
-{
-  return _texture;
-}
-
-void ReflectionTextureBaseBlock::set_texture(const BaseTexturePtr& iTexture)
-{
-  if (_texture == iTexture) {
-    return;
-  }
-
-  const auto scene
-    = iTexture && iTexture->getScene() ? iTexture->getScene() : Engine::LastCreatedScene();
-
-  if (!iTexture && scene) {
-    scene->markAllMaterialsAsDirty(
-      Constants::MATERIAL_TextureDirtyFlag,
-      [this](Material* mat) -> bool { return _texture && mat->hasTexture(_texture); });
-  }
-
-  _texture = iTexture;
-
-  if (iTexture && scene) {
-    scene->markAllMaterialsAsDirty(
-      Constants::MATERIAL_TextureDirtyFlag,
-      [iTexture](Material* mat) -> bool { return mat->hasTexture(iTexture); });
-  }
-}
 
 std::string ReflectionTextureBaseBlock::getClassName() const
 {
@@ -184,12 +150,6 @@ void ReflectionTextureBaseBlock::bind(Effect* effect, const NodeMaterialPtr& /*n
   else {
     effect->setTexture(_2DSamplerName, iTexture);
   }
-
-  if (iTexture->boundingBoxSize()) {
-    const auto cubeTexture = std::static_pointer_cast<CubeTexture>(iTexture);
-    effect->setVector3(_reflectionPositionName, cubeTexture->boundingBoxPosition);
-    effect->setVector3(_reflectionSizeName, *cubeTexture->boundingBoxSize());
-  }
 }
 
 std::string ReflectionTextureBaseBlock::handleVertexSide(NodeMaterialBuildState& state)
@@ -274,7 +234,6 @@ void ReflectionTextureBaseBlock::handleFragmentSideInits(NodeMaterialBuildState&
 
   const auto iComments = StringTools::printf("//%s", name().c_str());
   state._emitFunction("ReciprocalPI", "#define RECIPROCAL_PI2 0.15915494", "");
-  state._emitFunctionFromInclude("helperFunctions", iComments);
   EmitFunctionFromIncludeOptions emitFunctionFromIncludeOptions;
   emitFunctionFromIncludeOptions.replaceStrings
     = {{"vec3 computeReflectionCoords", "void DUMMYFUNC"}};
@@ -283,12 +242,6 @@ void ReflectionTextureBaseBlock::handleFragmentSideInits(NodeMaterialBuildState&
   _reflectionColorName  = state._getFreeVariableName("reflectionColor");
   _reflectionVectorName = state._getFreeVariableName("reflectionUVW");
   _reflectionCoordsName = state._getFreeVariableName("reflectionCoords");
-
-  _reflectionPositionName = state._getFreeVariableName("vReflectionPosition");
-  state._emitUniformFromString(_reflectionPositionName, "vec3");
-
-  _reflectionSizeName = state._getFreeVariableName("vReflectionPosition");
-  state._emitUniformFromString(_reflectionSizeName, "vec3");
 }
 
 std::string ReflectionTextureBaseBlock::handleFragmentSideCodeReflectionCoords(
@@ -329,7 +282,7 @@ std::string ReflectionTextureBaseBlock::handleFragmentSideCodeReflectionCoords(
 
       #ifdef %s
           #ifdef %s
-              vec3 %s = computeCubicLocalCoords(%s, %s, %s.xyz, %s, %s, %s);
+              vec3 %s = computeCubicLocalCoords(%s, %s, %s.xyz, %s, vReflectionSize, vReflectionPosition);
           #else
           vec3 %s = computeCubicCoords(%s, %s, %s.xyz, %s);
           #endif
@@ -369,8 +322,7 @@ std::string ReflectionTextureBaseBlock::handleFragmentSideCodeReflectionCoords(
     _defineCubicName.c_str(),                       //
     _defineLocalCubicName.c_str(),                  //
     _reflectionVectorName.c_str(), worldPos.c_str(), worldNormalVarName.c_str(),
-    vEyePosition.c_str(), reflectionMatrix.c_str(), _reflectionSizeName.c_str(),
-    _reflectionPositionName.c_str(), //
+    vEyePosition.c_str(), reflectionMatrix.c_str(), //
     _reflectionVectorName.c_str(), worldPos.c_str(), worldNormalVarName.c_str(),
     vEyePosition.c_str(), reflectionMatrix.c_str(),                                           //
     _defineProjectionName.c_str(),                                                            //
@@ -478,32 +430,22 @@ ReflectionTextureBaseBlock& ReflectionTextureBaseBlock::_buildBlock(NodeMaterial
 
 std::string ReflectionTextureBaseBlock::_dumpPropertiesCode()
 {
-  auto codeString = NodeMaterialBlock::_dumpPropertiesCode();
-
-  const auto iTexture = texture();
-  if (!iTexture) {
-    return codeString;
+  if (!texture) {
+    return "";
   }
 
-  if (iTexture->isCube()) {
-    const auto iCubeTexture = std::static_pointer_cast<CubeTexture>(iTexture);
-    if (iCubeTexture) {
-      const auto forcedExtension = iCubeTexture->forcedExtension();
-      codeString += StringTools::printf(
-        "%s.texture = CubeTexture::New(\"%s\", std::nullopt, {}, %s, {}, nullptr, nullptr, "
-        "Constants::TEXTUREFORMAT_RGBA, %s, %s);\r\n",
-        _codeVariableName.c_str(), iTexture->name.c_str(), iTexture->noMipmap() ? "true" : "false",
-        iTexture->_prefiltered ? "true" : "false",
-        !forcedExtension.empty() ? StringTools::printf("\"%s\"", forcedExtension.c_str()).c_str() :
-                                   "");
-    }
+  std::string codeString;
+
+  if (texture->isCube()) {
+    codeString = StringTools::printf("%s.texture = CubeTexture::New(\"%s\");\r\n",
+                                     _codeVariableName.c_str(), texture->name.c_str());
   }
   else {
-    codeString += StringTools::printf("%s.texture = Texture::New(\"%s\", std::nullopt);\r\n",
-                                      _codeVariableName.c_str(), iTexture->name.c_str());
+    codeString = StringTools::printf("%s.texture = Texture::New(\"%s\");\r\n",
+                                     _codeVariableName.c_str(), texture->name.c_str());
   }
   codeString += StringTools::printf("%s.texture.coordinatesMode = %u;\r\n",
-                                    _codeVariableName.c_str(), iTexture->coordinatesMode());
+                                    _codeVariableName.c_str(), texture->coordinatesMode());
 
   return codeString;
 }

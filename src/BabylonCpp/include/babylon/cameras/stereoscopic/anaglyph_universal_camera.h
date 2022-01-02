@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_UNIVERSAL_CAMERA_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/universal_camera.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AnaglyphUniversalCamera)
+class AnaglyphUniversalCamera;
+using AnaglyphUniversalCameraPtr = std::shared_ptr<AnaglyphUniversalCamera>;
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on UniversalCamera).
@@ -46,9 +46,6 @@ protected:
    */
   AnaglyphUniversalCamera(const std::string& name, const Vector3& position,
                           float interaxialDistance, Scene* scene);
-
-protected:
-  std::function<void(Camera& camera)> _setRigMode;
 
 private:
   static bool NodeConstructorAdded;

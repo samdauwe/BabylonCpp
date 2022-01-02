@@ -15,7 +15,7 @@ namespace BABYLON {
 class Engine;
 class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
-FWD_STRUCT_SPTR(DrawWrapper)
+FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(PrePassRenderer)
@@ -110,7 +110,8 @@ public:
   void _linkInternalTexture(const InternalTexturePtr& internalTexture);
 
   /**
-   * @brief Returns the index of the given texture type in the G-Buffer textures array.
+   * @brief Returns the index of the given texture type in the G-Buffer textures
+   * array.
    * @param textureType The texture type constant. For example
    * GeometryBufferRenderer.POSITION_TEXTURE_INDEX
    * @returns the index of the given texture type in the G-Buffer textures array
@@ -118,7 +119,8 @@ public:
   int getTextureIndex(unsigned int textureType);
 
   /**
-   * @brief Checks whether everything is ready to render a submesh to the G buffer.
+   * @brief Checks wether everything is ready to render a submesh to the G
+   * buffer.
    * @param subMesh the submesh to check readiness for
    * @param useInstances is the mesh drawn using instance or not
    * @returns true if ready otherwise false
@@ -148,7 +150,7 @@ protected:
   void set_renderList(const std::vector<AbstractMesh*>& meshes);
 
   /**
-   * @brief Gets whether or not G buffer are supported by the running hardware.
+   * @brief Gets wether or not G buffer are supported by the running hardware.
    * This requires draw buffer supports
    */
   [[nodiscard]] bool get_isSupported() const;
@@ -171,7 +173,7 @@ protected:
   [[nodiscard]] bool get_enableVelocity() const;
 
   /**
-   * @brief Sets whether or not objects velocities are enabled for the G buffer.
+   * @brief Sets wether or not objects velocities are enabled for the G buffer.
    */
   void set_enableVelocity(bool enable);
 
@@ -181,7 +183,7 @@ protected:
   bool get_enableReflectivity() const;
 
   /**
-   * @brief Sets whether or not objects roughness are enabled for the G buffer.
+   * @brief Sets wether or not objects roughness are enabled for the G buffer.
    */
   void set_enableReflectivity(bool enable);
 
@@ -223,7 +225,7 @@ private:
   /**
    * @brief Hidden
    */
-  std::pair<int, std::vector<std::string>> _assignRenderTargetIndices();
+  int _assignRenderTargetIndices();
 
   /**
    * @brief _Copies the bones transformation matrices into the target array and
@@ -268,18 +270,18 @@ public:
   Property<GeometryBufferRenderer, std::vector<AbstractMesh*>> renderList;
 
   /**
-   * Whether or not G buffer are supported by the running hardware.
+   * Wether or not G buffer are supported by the running hardware.
    * This requires draw buffer supports
    */
   ReadOnlyProperty<GeometryBufferRenderer, bool> isSupported;
 
   /**
-   * Whether or not position are enabled for the G buffer.
+   * Wether or not position are enabled for the G buffer.
    */
   Property<GeometryBufferRenderer, bool> enablePosition;
 
   /**
-   * Whether or not objects velocities are enabled for the G buffer.
+   * Wether or not objects velocities are enabled for the G buffer.
    */
   Property<GeometryBufferRenderer, bool> enableVelocity;
 
@@ -305,7 +307,7 @@ public:
   Property<GeometryBufferRenderer, unsigned int> samples;
 
 protected:
-  DrawWrapperPtr _drawWrapper;
+  EffectPtr _effect;
   std::string _cachedDefines;
 
 private:
@@ -322,11 +324,11 @@ private:
   int _reflectivityIndex;
   int _depthIndex;
   int _normalIndex;
+  int _depthNormalIndex;
 
   bool _linkedWithPrePass;
   PrePassRendererPtr _prePassRenderer;
   std::vector<unsigned int> _attachments;
-  bool _useUbo;
 
 }; // end of class GeometryBufferRenderer
 

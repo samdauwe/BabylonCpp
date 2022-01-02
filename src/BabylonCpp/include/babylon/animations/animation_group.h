@@ -13,7 +13,6 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractScene;
 struct TargetedAnimation;
 class Scene;
 FWD_CLASS_SPTR(Animatable)
@@ -118,7 +117,7 @@ public:
 
   /**
    * @brief Synchronize and normalize all animatables with a source animatable.
-   * @param root defines the root animatable to synchronize with (null to stop synchronizing)
+   * @param root defines the root animatable to synchronize with
    * @return the animationGroup
    * @see https://doc.babylonjs.com/babylon101/animations#animation-weights
    */
@@ -279,11 +278,6 @@ private:
   void _checkAnimationGroupEnded(const AnimatablePtr& animatable);
 
 public:
-  /**
-   * Hidden
-   */
-  AbstractScene* _parentContainer;
-
   /**
    * Gets or sets the unique id of the node
    */

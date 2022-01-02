@@ -31,9 +31,7 @@ void BaseCameraMouseWheelInput::attachControl(bool noPreventDefault)
 
     const auto& event = pointer->mouseWheelEvent;
 
-    // If this happens to be set to DOM_DELTA_LINE, adjust accordingly
-    const auto platformScale
-      = event.deltaMode == EventConstants::DOM_DELTA_LINE ? _ffMultiplier : 1.f;
+    const auto platformScale = event.deltaMode == WheelEvent::DOM_DELTA_LINE ? _ffMultiplier : 1.f;
 
     if (event.deltaY != 0.f) {
       // Most recent browsers versions have delta properties.
@@ -45,7 +43,6 @@ void BaseCameraMouseWheelInput::attachControl(bool noPreventDefault)
       _wheelDeltaY -= (wheelPrecisionY * platformScale * event.deltaY) / _normalize;
       _wheelDeltaZ += (wheelPrecisionZ * platformScale * event.deltaZ) / _normalize;
     }
-#if 0
     else if (event.wheelDeltaY != 0.f) {
       // Unsure whether these catch anything more. Documentation
       // online is contradictory.
@@ -58,7 +55,6 @@ void BaseCameraMouseWheelInput::attachControl(bool noPreventDefault)
       // Maybe others?
       _wheelDeltaY -= (wheelPrecisionY * event.wheelDelta) / _normalize;
     }
-#endif
 
     /* if (event.preventDefault) */ {
       if (!noPreventDefault) {

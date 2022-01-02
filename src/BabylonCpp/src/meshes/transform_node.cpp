@@ -61,7 +61,6 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene, bool isPure
     , _rotation{Vector3::Zero()}
     , _rotationQuaternion{std::nullopt}
     , _transformToBoneReferal{nullptr}
-    , _currentParentWhenAttachingToBone{nullptr}
     , _isAbsoluteSynced{false}
     , _billboardMode{TransformNode::BILLBOARDMODE_NONE}
     , _preserveParentRotationForBillboard(false)
@@ -232,11 +231,6 @@ void TransformNode::set_position(const Vector3& newPosition)
 {
   _position = newPosition;
   _isDirty  = true;
-}
-
-bool TransformNode::isUsingPivotMatrix() const
-{
-  return _usePivotMatrix;
 }
 
 Vector3& TransformNode::get_rotation()
@@ -450,26 +444,10 @@ TransformNodePtr TransformNode::instantiateHierarchy(
   return cloneTransformNode;
 }
 
-TransformNode& TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix,
-                                                bool decompose)
+TransformNode& TransformNode::freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix)
 {
   if (newWorldMatrix) {
-    if (decompose) {
-      _rotation.setAll(0.f);
-      _rotationQuaternion              = _rotationQuaternion.value_or(Quaternion::Identity());
-      std::optional<Vector3> iScaling  = _scaling;
-      std::optional<Vector3> iPosition = _position;
-      newWorldMatrix->decompose(iScaling, _rotationQuaternion, iPosition);
-      _scaling  = *iScaling;
-      _position = *iPosition;
-      computeWorldMatrix(true);
-    }
-    else {
-      _worldMatrix = *newWorldMatrix;
-      _absolutePosition.copyFromFloats(_worldMatrix.m()[12], _worldMatrix.m()[13],
-                                       _worldMatrix.m()[14]);
-      _afterComputeWorldMatrix();
-    }
+    _worldMatrix = *newWorldMatrix;
   }
   else {
     _isWorldMatrixFrozen = false; // no guarantee world is not already frozen,
@@ -728,8 +706,7 @@ bool TransformNode::_updateNonUniformScalingState(bool value)
 
 TransformNode& TransformNode::attachToBone(Bone* bone, TransformNode* affectedTransformNode)
 {
-  _currentParentWhenAttachingToBone = parent();
-  _transformToBoneReferal           = affectedTransformNode;
+  _transformToBoneReferal = affectedTransformNode;
   Node::set_parent(bone);
 
   bone->getSkeleton()->prepare();
@@ -740,12 +717,9 @@ TransformNode& TransformNode::attachToBone(Bone* bone, TransformNode* affectedTr
   return *this;
 }
 
-TransformNode& TransformNode::detachFromBone(bool resetToPreviousParent)
+TransformNode& TransformNode::detachFromBone()
 {
   if (!parent()) {
-    if (resetToPreviousParent) {
-      parent = _currentParentWhenAttachingToBone;
-    }
     return *this;
   }
 
@@ -753,12 +727,7 @@ TransformNode& TransformNode::detachFromBone(bool resetToPreviousParent)
     scalingDeterminant *= -1.f;
   }
   _transformToBoneReferal = nullptr;
-  if (resetToPreviousParent) {
-    parent = _currentParentWhenAttachingToBone;
-  }
-  else {
-    parent = nullptr;
-  }
+  setParent(nullptr);
   return *this;
 }
 
@@ -981,7 +950,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/
   // Parent
   if (iParent) {
     if (force) {
-      iParent->computeWorldMatrix(force);
+      iParent->computeWorldMatrix();
     }
     if (useBillboardPath) {
       if (_transformToBoneReferal) {
@@ -1120,7 +1089,7 @@ void TransformNode::resetLocalMatrix(bool independentOfChildren)
         tmpRotationQuaternion = *iRotationQuaternion;
         child->position       = *iPosition;
         if (child->rotationQuaternion()) {
-          child->rotationQuaternion()->copyFrom(tmpRotationQuaternion);
+          child->rotationQuaternion = tmpRotationQuaternion;
         }
         else {
           tmpRotationQuaternion.toEulerAnglesToRef(child->rotation());
@@ -1213,11 +1182,6 @@ void TransformNode::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Remove from scene
   getScene()->removeTransformNode(this);
-
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->transformNodes, this);
-    _parentContainer = nullptr;
-  }
 
   onAfterWorldMatrixUpdateObservable.clear();
 

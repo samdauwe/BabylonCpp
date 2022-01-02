@@ -25,7 +25,7 @@ void EffectLayerSceneComponent::_register()
 {
   scene->_isReadyForMeshStage.registerStep(
     SceneComponentConstants::STEP_ISREADYFORMESH_EFFECTLAYER, this,
-    [this](AbstractMesh* mesh, bool hardwareInstancedRendering) -> bool {
+    [this](AbstractMesh* mesh, bool hardwareInstancedRendering) {
       return _isReadyForMesh(mesh, hardwareInstancedRendering);
     });
 
@@ -38,24 +38,24 @@ void EffectLayerSceneComponent::_register()
 
   scene->_beforeCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORECAMERADRAW_EFFECTLAYER, this,
-    [this](Camera* /*camera*/) -> bool {
+    [this](Camera * /*camera*/) -> bool {
       _setStencil();
       return true;
     });
 
   scene->_afterRenderingGroupDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW, this,
-    [this](int renderingGroupId) -> void { _drawRenderingGroup(renderingGroupId); });
+    [this](int renderingGroupId) { _drawRenderingGroup(renderingGroupId); });
 
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER, this,
-    [this](Camera* /*camera*/) -> bool {
+    [this](Camera * /*camera*/) -> bool {
       _setStencilBack();
       return true;
     });
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER_DRAW, this,
-    [this](Camera* /*camera*/) -> bool {
+    [this](Camera * /*camera*/) -> bool {
       _drawCamera();
       return true;
     });
@@ -179,7 +179,7 @@ void EffectLayerSceneComponent::_draw(int renderingGroupId)
   if (_renderEffects) {
     _engine->setDepthBuffer(false);
 
-    const auto& layers = scene->effectLayers;
+    auto& layers = scene->effectLayers;
     for (const auto& effectLayer : layers) {
       if (effectLayer->renderingGroupId() == renderingGroupId) {
         if (effectLayer->shouldRender()) {

@@ -1,4 +1,3 @@
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
@@ -14,8 +13,10 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(Mesh)
-FWD_CLASS_SPTR(FollowCamera)
+class Mesh;
+class FollowCamera;
+using MeshPtr         = std::shared_ptr<Mesh>;
+using FollowCameraPtr = std::shared_ptr<FollowCamera>;
 
 namespace Samples {
 
@@ -50,7 +51,8 @@ public:
     // The goal height of camera above local origin (centre) of target
     _camera->heightOffset = 10.f;
 
-    // The goal rotation of camera around local origin (centre) of target in x y plane
+    // The goal rotation of camera around local origin (centre) of target in x y
+    // plane
     _camera->rotationOffset = 0.f;
 
     // Acceleration of camera in moving from current to goal position
@@ -79,10 +81,10 @@ public:
     unsigned int vSpriteNb = 4; // 4 sprite rows
 
     std::array<std::optional<Vector4>, 6> faceUV;
-    for (auto i = 0u; i < 6; i++) {
+    for (unsigned int i = 0; i < 6; i++) {
       faceUV[i]
         = Vector4(i / static_cast<float>(hSpriteNb), 0.f, (i + 1) / static_cast<float>(hSpriteNb),
-                  1.f / static_cast<float>(vSpriteNb));
+                  1 / static_cast<float>(vSpriteNb));
     }
 
     // Shape to follow
@@ -104,7 +106,7 @@ public:
     auto box        = MeshBuilder::CreateBox("box_0", boxOptions, scene);
     box->position   = getRandomPosition();
 
-    for (auto i = 1u; i < 400; ++i) {
+    for (unsigned int i = 1; i < 400; ++i) {
       const auto iStr       = std::to_string(i);
       auto boxInstance      = box->createInstance("box_" + iStr);
       boxInstance->position = getRandomPosition();
@@ -114,7 +116,7 @@ public:
     _camera->lockedTarget = _box;
 
     // Move the box to see that the camera follows it
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
       _alpha += 0.01f;
       _box->position().x = _orbitRadius * std::cos(_alpha);
       _box->position().y = _orbitRadius * std::sin(_alpha);

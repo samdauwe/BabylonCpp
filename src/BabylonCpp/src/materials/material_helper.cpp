@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -21,9 +20,10 @@
 #include <babylon/materials/thin_material_helper.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/plane.h>
+#include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/misc/string_tools.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>
@@ -33,6 +33,50 @@ namespace BABYLON {
 std::unique_ptr<MaterialDefines> MaterialHelper::_TmpMorphInfluencers
   = std::make_unique<MaterialDefines>();
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
+
+Vector4 MaterialHelper::BindEyePosition(Effect* effect, Scene* scene,
+                                        const std::string& variableName, bool isVector3)
+{
+  const auto eyePosition = scene->_forcedViewPosition     ? *scene->_forcedViewPosition :
+                           scene->_mirroredCameraPosition ? *scene->_mirroredCameraPosition :
+                           scene->activeCamera() ? scene->activeCamera()->globalPosition() :
+                                                   Vector3();
+
+  const auto invertNormal
+    = (scene->useRightHandedSystem() == (scene->_mirroredCameraPosition != nullptr));
+
+  TmpVectors::Vector4Array[0].set(eyePosition.x, eyePosition.y, eyePosition.z,
+                                  invertNormal ? -1.f : 1.f);
+
+  if (effect) {
+    if (isVector3) {
+      effect->setFloat3(variableName, TmpVectors::Vector4Array[0].x, TmpVectors::Vector4Array[0].y,
+                        TmpVectors::Vector4Array[0].z);
+    }
+    else {
+      effect->setVector4(variableName, TmpVectors::Vector4Array[0]);
+    }
+  }
+
+  return TmpVectors::Vector4Array[0];
+}
+
+UniformBuffer* MaterialHelper::FinalizeSceneUbo(Scene* scene)
+{
+  const auto ubo         = scene->getSceneUniformBuffer();
+  const auto eyePosition = MaterialHelper::BindEyePosition(nullptr, scene);
+  ubo->updateFloat4("vEyePosition", //
+                    eyePosition.x,  //
+                    eyePosition.y,  //
+                    eyePosition.z,  //
+                    eyePosition.w,  //
+                    ""              //
+  );
+
+  ubo->update();
+
+  return ubo;
+}
 
 void MaterialHelper::BindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo)
 {
@@ -48,7 +92,12 @@ void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
   defines.boolDef[key] = true;
   if (texture->getTextureMatrix()->isIdentityAs3x2()) {
     defines.intDef[key + "DIRECTUV"] = texture->coordinatesIndex + 1;
-    defines.boolDef["MAINUV" + std::to_string(texture->coordinatesIndex + 1)] = true;
+    if (texture->coordinatesIndex == 0) {
+      defines.boolDef["MAINUV1"] = true;
+    }
+    else {
+      defines.boolDef["MAINUV2"] = true;
+    }
   }
   else {
     defines.intDef[key + "DIRECTUV"] = 0;
@@ -204,8 +253,6 @@ void MaterialHelper::PrepareDefinesForMorphTargets(AbstractMesh* mesh, MaterialD
     defines.boolDef["MORPHTARGETS_NORMAL"]  = manager->supportsNormals() && defines["NORMAL"];
     defines.boolDef["MORPHTARGETS"]         = (manager->numInfluencers() > 0);
     defines.intDef["NUM_MORPH_INFLUENCERS"] = static_cast<unsigned int>(manager->numInfluencers());
-
-    defines.boolDef["MORPHTARGETS_TEXTURE"] = manager->isUsingTextureForTargets();
   }
   else {
     defines.boolDef["MORPHTARGETS_UV"]      = false;
@@ -235,12 +282,13 @@ bool MaterialHelper::PrepareDefinesForAttributes(AbstractMesh* mesh, MaterialDef
     defines.boolDef["TANGENT"] = true;
   }
 
-  for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
-    const auto iStr = std::to_string(i);
-    defines.boolDef["UV" + iStr]
-      = defines._needUVs ?
-          mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str())) :
-          false;
+  if (defines._needUVs) {
+    defines.boolDef["UV1"] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
+    defines.boolDef["UV2"] = mesh->isVerticesDataPresent(VertexBuffer::UV2Kind);
+  }
+  else {
+    defines.boolDef["UV1"] = false;
+    defines.boolDef["UV2"] = false;
   }
 
   if (useVertexColor) {
@@ -321,9 +369,9 @@ void MaterialHelper::PrepareDefinesForPrePass(Scene* scene, MaterialDefines& def
          "PREPASS_DEPTH_INDEX",                 // index
        },
        {
-         Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE, // type
-         "PREPASS_NORMAL",                            // define
-         "PREPASS_NORMAL_INDEX",                      // index
+         Constants::PREPASS_NORMAL_TEXTURE_TYPE, // type
+         "PREPASS_NORMAL",                       // define
+         "PREPASS_NORMAL_INDEX",                 // index
        }};
 
   if (scene->prePassRenderer() && scene->prePassRenderer()->enabled() && canRenderToMRT) {
@@ -691,12 +739,9 @@ void MaterialHelper::PrepareAttributesForMorphTargets(std::vector<std::string>& 
   if (influencers > 0 && engine && _mesh) {
     auto maxAttributesCount = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
     auto manager            = _mesh->morphTargetManager();
-    if (manager && manager->isUsingTextureForTargets()) {
-      return;
-    }
-    auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
-    auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
-    auto uv      = manager && manager->supportsUVs() && defines["UV1"];
+    auto normal             = manager && manager->supportsNormals() && defines["NORMAL"];
+    auto tangent            = manager && manager->supportsNormals() && defines["TANGENT"];
+    auto uv                 = manager && manager->supportsUVs() && defines["UV1"];
     for (auto index = 0u; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
       attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
@@ -741,23 +786,16 @@ void MaterialHelper::PrepareAttributesForInstances(std::vector<std::string>& att
                                                    MaterialDefines& defines)
 {
   if (defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
-    PushAttributesForInstances(attribs, !!defines["PREPASS_VELOCITY"]);
+    PushAttributesForInstances(attribs);
   }
 }
 
-void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attribs,
-                                                bool needsPreviousMatrices)
+void MaterialHelper::PushAttributesForInstances(std::vector<std::string>& attribs)
 {
   attribs.emplace_back(VertexBuffer::World0Kind);
   attribs.emplace_back(VertexBuffer::World1Kind);
   attribs.emplace_back(VertexBuffer::World2Kind);
   attribs.emplace_back(VertexBuffer::World3Kind);
-  if (needsPreviousMatrices) {
-    attribs.emplace_back("previousWorld0");
-    attribs.emplace_back("previousWorld1");
-    attribs.emplace_back("previousWorld2");
-    attribs.emplace_back("previousWorld3");
-  }
 }
 
 void MaterialHelper::BindLightProperties(Light& light, Effect* effect, unsigned int lightIndex)
@@ -766,32 +804,33 @@ void MaterialHelper::BindLightProperties(Light& light, Effect* effect, unsigned 
 }
 
 void MaterialHelper::BindLight(const LightPtr& light, unsigned int lightIndex, Scene* scene,
-                               Effect* effect, bool useSpecular, bool receiveShadows)
+                               Effect* effect, bool useSpecular, bool rebuildInParallel)
 {
-  light->_bindLight(lightIndex, scene, effect, useSpecular, receiveShadows);
+  light->_bindLight(lightIndex, scene, effect, useSpecular, rebuildInParallel);
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect, bool defines,
-                                unsigned int maxSimultaneousLights)
+                                unsigned int maxSimultaneousLights, bool rebuildInParallel)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, effect, defines, mesh->receiveShadows());
+    BindLight(light, i, scene, effect, defines, rebuildInParallel);
   }
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
-                                MaterialDefines& defines, unsigned int maxSimultaneousLights)
+                                MaterialDefines& defines, unsigned int maxSimultaneousLights,
+                                bool rebuildInParallel)
 {
   auto len = std::min(mesh->lightSources().size(), static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned i = 0u; i < len; ++i) {
 
     auto& light = mesh->lightSources()[i];
-    BindLight(light, i, scene, effect, defines["SPECULARTERM"], mesh->receiveShadows());
+    BindLight(light, i, scene, effect, defines["SPECULARTERM"], rebuildInParallel);
   }
 }
 

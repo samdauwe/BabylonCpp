@@ -1,7 +1,6 @@
 #include "babylon/samples/babylon_register_sample.h"
 
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/irenderable_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -15,7 +14,8 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(MorphTarget)
+class MorphTarget;
+using MorphTargetPtr = std::shared_ptr<MorphTarget>;
 
 namespace Samples {
 

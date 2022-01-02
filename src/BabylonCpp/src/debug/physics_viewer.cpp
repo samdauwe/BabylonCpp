@@ -5,7 +5,6 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/builders/box_builder.h>
-#include <babylon/meshes/builders/capsule_builder.h>
 #include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/builders/sphere_builder.h>
@@ -26,11 +25,10 @@ PhysicsViewer::PhysicsViewer(Scene* scene)
     , _utilityLayer{nullptr}
     , _debugBoxMesh{nullptr}
     , _debugSphereMesh{nullptr}
-    , _debugCapsuleMesh{nullptr}
     , _debugCylinderMesh{nullptr}
     , _debugMaterial{nullptr}
 {
-  const auto physicEngine = _scene->getPhysicsEngine();
+  auto physicEngine = _scene->getPhysicsEngine();
 
   if (physicEngine) {
     _physicsEnginePlugin = physicEngine->getPhysicsPlugin();
@@ -180,21 +178,7 @@ AbstractMeshPtr PhysicsViewer::_getDebugSphereMesh(Scene* scene)
     _debugSphereMesh->setEnabled(false);
   }
 
-  return _debugSphereMesh->createInstance("physicsBodySphereViewInstance");
-}
-
-AbstractMeshPtr PhysicsViewer::_getDebugCapsuleMesh(Scene* scene)
-{
-  if (!_debugCapsuleMesh) {
-    ICreateCapsuleOptions options;
-    options.height    = 1.f;
-    _debugCapsuleMesh = CapsuleBuilder::CreateCapsule("physicsBodyCapsuleViewMesh", options, scene);
-    _debugCapsuleMesh->rotationQuaternion = Quaternion::Identity();
-    _debugCapsuleMesh->material           = _getDebugMaterial(scene);
-    _debugCapsuleMesh->setEnabled(false);
-  }
-
-  return _debugCapsuleMesh->createInstance("physicsBodyCapsuleViewInstance");
+  return _debugSphereMesh->createInstance("physicsBodyBoxViewInstance");
 }
 
 AbstractMeshPtr PhysicsViewer::_getDebugCylinderMesh(Scene* scene)
@@ -211,7 +195,7 @@ AbstractMeshPtr PhysicsViewer::_getDebugCylinderMesh(Scene* scene)
     _debugCylinderMesh->setEnabled(false);
   }
 
-  return _debugCylinderMesh->createInstance("physicsBodyCylinderViewInstance");
+  return _debugCylinderMesh->createInstance("physicsBodyBoxViewInstance");
 }
 
 AbstractMeshPtr PhysicsViewer::_getDebugMeshMesh(const MeshPtr& mesh, Scene* scene)
@@ -253,16 +237,6 @@ AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor, const Me
       mesh->scaling().y = radius * 2.f;
       mesh->scaling().z = radius * 2.f;
     } break;
-    case PhysicsImpostor::CapsuleImpostor: {
-      mesh              = _getDebugCapsuleMesh(utilityLayerScene);
-      const auto& bi    = impostor->object->getBoundingInfo();
-      mesh->scaling().x = (bi->boundingBox.maximum.x - bi->boundingBox.minimum.x) * 2
-                          * impostor->object->scaling().x;
-      mesh->scaling().y
-        = (bi->boundingBox.maximum.y - bi->boundingBox.minimum.y) * impostor->object->scaling().y;
-      mesh->scaling().z = (bi->boundingBox.maximum.z - bi->boundingBox.minimum.z) * 2
-                          * impostor->object->scaling().z;
-    } break;
     case PhysicsImpostor::MeshImpostor:
       if (targetMesh) {
         mesh = _getDebugMeshMesh(targetMesh, utilityLayerScene);
@@ -278,45 +252,17 @@ AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor, const Me
           }
         }
         for (const auto& m : filteredChildMeshes) {
-          const auto& boundingInfo = m->getBoundingInfo();
-          const auto& min          = boundingInfo->boundingBox.minimum;
-          const auto& max          = boundingInfo->boundingBox.maximum;
-          switch (m->physicsImpostor()->physicsImposterType) {
-            case PhysicsImpostor::BoxImpostor:
-              mesh = _getDebugBoxMesh(utilityLayerScene);
-              mesh->position().copyFrom(min);
-              mesh->position().addInPlace(max);
-              mesh->position().scaleInPlace(0.5f);
-              break;
-            case PhysicsImpostor::SphereImpostor:
-              mesh = _getDebugSphereMesh(utilityLayerScene);
-              break;
-            case PhysicsImpostor::CylinderImpostor:
-              mesh = _getDebugCylinderMesh(utilityLayerScene);
-              break;
-            default:
-              mesh = nullptr;
-              break;
-          }
-          if (mesh) {
-            mesh->scaling().x = max.x - min.x;
-            mesh->scaling().y = max.y - min.y;
-            mesh->scaling().z = max.z - min.z;
-            mesh->parent      = m.get();
-          }
+          auto a    = _getDebugBoxMesh(utilityLayerScene);
+          a->parent = m.get();
         }
       }
-      mesh = nullptr;
       break;
     case PhysicsImpostor::CylinderImpostor: {
-      mesh    = _getDebugCylinderMesh(utilityLayerScene);
-      auto bi = impostor->object->getBoundingInfo();
-      mesh->scaling().x
-        = (bi->boundingBox.maximum.x - bi->boundingBox.minimum.x) * impostor->object->scaling().x;
-      mesh->scaling().y
-        = (bi->boundingBox.maximum.y - bi->boundingBox.minimum.y) * impostor->object->scaling().y;
-      mesh->scaling().z
-        = (bi->boundingBox.maximum.z - bi->boundingBox.minimum.z) * impostor->object->scaling().z;
+      mesh              = _getDebugCylinderMesh(utilityLayerScene);
+      auto bi           = impostor->object->getBoundingInfo();
+      mesh->scaling().x = bi->boundingBox.maximum.x - bi->boundingBox.minimum.x;
+      mesh->scaling().y = bi->boundingBox.maximum.y - bi->boundingBox.minimum.y;
+      mesh->scaling().z = bi->boundingBox.maximum.z - bi->boundingBox.minimum.z;
     } break;
   }
   return mesh;

@@ -2,12 +2,12 @@
 #define BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_UNIVERSAL_CAMERA_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/universal_camera.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(StereoscopicUniversalCamera)
+class StereoscopicUniversalCamera;
+using StereoscopicUniversalCameraPtr = std::shared_ptr<StereoscopicUniversalCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on UniversalCamera).
@@ -48,9 +48,6 @@ protected:
   StereoscopicUniversalCamera(const std::string& name, const Vector3& position,
                               float interaxialDistance, bool isStereoscopicSideBySide,
                               Scene* scene);
-
-protected:
-  std::function<void(Camera& camera)> _setRigMode;
 
 private:
   static bool NodeConstructorAdded;

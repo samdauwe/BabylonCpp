@@ -2,14 +2,12 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
@@ -20,6 +18,7 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 
 namespace BABYLON {
@@ -52,14 +51,12 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   auto scene_ = (camera == nullptr) ? scene : camera->getScene();
 
   auto engine_ = scene_->getEngine();
-  _viewPort
-    = Viewport(0.f, 0.f, 1.f, 1.f).toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
+  _viewPort = Viewport(0, 0, 1, 1).toGlobal(engine_->getRenderWidth(), engine_->getRenderHeight());
 
   // Configure mesh
-  mesh                           = (iMesh != nullptr) ? iMesh :
-                                                        VolumetricLightScatteringPostProcess::CreateDefaultMesh(
+  mesh = (iMesh != nullptr) ? iMesh :
+                              VolumetricLightScatteringPostProcess::CreateDefaultMesh(
                                 "VolumetricLightScatteringMesh", scene);
-  _volumetricLightScatteringPass = std::make_shared<DrawWrapper>(engine);
 
   // Configure
   _createPass(scene, ratio);
@@ -155,11 +152,11 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh, bool useIn
     options.defines         = std::move(join);
     options.indexParameters = {{"maxSimultaneousMorphTargets", mesh->numBoneInfluencers()}};
 
-    _volumetricLightScatteringPass->effect = mesh->getScene()->getEngine()->createEffect(
+    _volumetricLightScatteringPass = mesh->getScene()->getEngine()->createEffect(
       "volumetricLightScatteringPass", options, mesh->getScene()->getEngine());
   }
 
-  return _volumetricLightScatteringPass->effect->isReady();
+  return _volumetricLightScatteringPass->isReady();
 }
 
 void VolumetricLightScatteringPostProcess::setCustomMeshPosition(const Vector3& position)
@@ -219,7 +216,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
   }
 
   // Custom render function for submeshes
-  const auto renderSubMesh = [this](SubMesh* subMesh) {
+  auto renderSubMesh = [this](SubMesh* subMesh) {
     auto renderingMesh = subMesh->getRenderingMesh();
     auto effectiveMesh = subMesh->getEffectiveMesh();
     if (_meshExcluded(renderingMesh)) {
@@ -238,7 +235,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
     auto engine_ = scene_->getEngine();
 
     // Culling
-    engine_->setState(material->backFaceCulling(), 0.f, false, false, material->cullBackFaces());
+    engine_->setState(material->backFaceCulling());
 
     // Managing instances
     auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id,
@@ -255,53 +252,46 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene, float ratio
             || renderingMesh->hasThinInstances());
 
     if (_isReady(subMesh, hardwareInstancedRendering)) {
-      auto drawWrapper = _volumetricLightScatteringPass;
+      auto effect = _volumetricLightScatteringPass;
       if (renderingMesh == mesh) {
-        if (subMesh->effect()) {
-          drawWrapper = subMesh->_drawWrapper();
-        }
-        else {
-          drawWrapper = material->_getDrawWrapper();
-        }
+        effect = material->getEffect();
       }
 
-      const auto effect = drawWrapper->effect;
-
-      engine_->enableEffect(drawWrapper);
-      if (!hardwareInstancedRendering) {
-        renderingMesh->_bind(subMesh, effect, material->fillMode());
-      }
+      engine_->enableEffect(effect);
+      renderingMesh->_bind(subMesh, effect, material->fillMode());
 
       if (renderingMesh == mesh) {
         material->bind(effectiveMesh->getWorldMatrix(), renderingMesh.get());
       }
       else {
-        effect->setMatrix("viewProjection", scene_->getTransformMatrix());
+        auto iMterial = subMesh->getMaterial();
+
+        _volumetricLightScatteringPass->setMatrix("viewProjection", scene_->getTransformMatrix());
 
         // Alpha test
-        auto iMaterial = subMesh->getMaterial();
-        if (iMaterial && iMaterial->needAlphaTesting()) {
-          auto alphaTexture = iMaterial->getAlphaTestTexture();
+        if (iMterial && iMterial->needAlphaTesting()) {
+          auto alphaTexture = iMterial->getAlphaTestTexture();
 
-          effect->setTexture("diffuseSampler", alphaTexture);
+          _volumetricLightScatteringPass->setTexture("diffuseSampler", alphaTexture);
 
           if (alphaTexture) {
-            effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+            _volumetricLightScatteringPass->setMatrix("diffuseMatrix",
+                                                      *alphaTexture->getTextureMatrix());
           }
         }
 
         // Bones
         if (renderingMesh->useBones() && renderingMesh->computeBonesUsingShaders()
             && renderingMesh->skeleton()) {
-          effect->setMatrices("mBones",
-                              renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
+          _volumetricLightScatteringPass->setMatrices(
+            "mBones", renderingMesh->skeleton()->getTransformMatrices(renderingMesh.get()));
         }
       }
 
       // Draw
       renderingMesh->_processRendering(
-        effectiveMesh.get(), subMesh, effect, Material::TriangleFillMode, batch,
-        hardwareInstancedRendering,
+        effectiveMesh.get(), subMesh, _volumetricLightScatteringPass, Material::TriangleFillMode,
+        batch, hardwareInstancedRendering,
         [effect](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) -> void {
           effect->setMatrix("world", world);
         });

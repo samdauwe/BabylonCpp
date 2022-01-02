@@ -4,7 +4,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/collisions/intersection_info.h>
@@ -22,16 +21,15 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/frustum.h>
 #include <babylon/maths/functions.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
-#include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/particles/solid_particle.h>
 #include <babylon/physics/joint/physics_joint.h>
@@ -55,11 +53,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
                           &AbstractMesh::set_mustDepthSortFacets}
     , facetDepthSortFrom{this, &AbstractMesh::get_facetDepthSortFrom,
                          &AbstractMesh::set_facetDepthSortFrom}
-    , collisionRetryCount{this, &AbstractMesh::get_collisionRetryCount,
-                          &AbstractMesh::set_collisionRetryCount}
     , isFacetDataEnabled{this, &AbstractMesh::get_isFacetDataEnabled}
-    , morphTargetManager{this, &AbstractMesh::get_morphTargetManager,
-                         &AbstractMesh::set_morphTargetManager}
     , onCollide{this, &AbstractMesh::set_onCollide}
     , onCollisionPositionChange{this, &AbstractMesh::set_onCollisionPositionChange}
     , definedFacingForward{true} // orientation for POV movement & rotation
@@ -79,7 +73,6 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , isVisible{true}
     , isPickable{true}
     , showBoundingBox{this, &AbstractMesh::get_showBoundingBox, &AbstractMesh::set_showBoundingBox}
-    , isNearGrabbable{false}
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , enablePointerMoveEvents{false}
@@ -137,7 +130,6 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}
-    , hasBoundingInfo{this, &AbstractMesh::get_hasBoundingInfo}
     , useBones{this, &AbstractMesh::get_useBones}
     , isAnInstance{this, &AbstractMesh::get_isAnInstance}
     , hasInstances{this, &AbstractMesh::get_hasInstances}
@@ -156,11 +148,6 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _showBoundingBox{false}
 {
   _resyncLightSources();
-
-  // Mesh Uniform Buffer.
-  _uniformBuffer
-    = std::make_unique<UniformBuffer>(getScene()->getEngine(), Float32Array(), std::nullopt, iName);
-  _buildUniformLayout();
 }
 
 AbstractMesh::~AbstractMesh() = default;
@@ -228,37 +215,9 @@ void AbstractMesh::set_facetDepthSortFrom(const Vector3& location)
   _internalAbstractMeshDataInfo._facetData.facetDepthSortFrom = location;
 }
 
-unsigned int AbstractMesh::get_collisionRetryCount() const
-{
-  return _internalAbstractMeshDataInfo._collisionRetryCount;
-}
-
-void AbstractMesh::set_collisionRetryCount(unsigned int retryCount)
-{
-  _internalAbstractMeshDataInfo._collisionRetryCount = retryCount;
-}
-
 bool AbstractMesh::get_isFacetDataEnabled() const
 {
   return _internalAbstractMeshDataInfo._facetData.facetDataEnabled;
-}
-
-MorphTargetManagerPtr& AbstractMesh::get_morphTargetManager()
-{
-  return _internalAbstractMeshDataInfo._morphTargetManager;
-}
-
-void AbstractMesh::set_morphTargetManager(const MorphTargetManagerPtr& value)
-{
-  if (_internalAbstractMeshDataInfo._morphTargetManager == value) {
-    return;
-  }
-  _internalAbstractMeshDataInfo._morphTargetManager = value;
-  _syncGeometryWithMorphTargetManager();
-}
-
-void AbstractMesh::_syncGeometryWithMorphTargetManager()
-{
 }
 
 bool AbstractMesh::_updateNonUniformScalingState(bool value)
@@ -498,13 +457,8 @@ void AbstractMesh::set_visibility(float value)
     return;
   }
 
-  const auto oldValue = _internalAbstractMeshDataInfo._visibility;
-
   _internalAbstractMeshDataInfo._visibility = value;
-
-  if ((oldValue == 1.f && value != 1.f) || (oldValue != 1.f && value == 1.f)) {
-    _markSubMeshesAsMiscDirty();
-  }
+  _markSubMeshesAsMiscDirty();
 }
 
 bool AbstractMesh::get_showBoundingBox() const
@@ -576,28 +530,6 @@ std::vector<LightPtr>& AbstractMesh::get_lightSources()
   return _lightSources;
 }
 
-void AbstractMesh::_buildUniformLayout()
-{
-  _uniformBuffer->addUniform("world", 16);
-  _uniformBuffer->addUniform("visibility", 1);
-  _uniformBuffer->create();
-}
-
-void AbstractMesh::transferToEffect(const Matrix& world)
-{
-  const auto& ubo = _uniformBuffer;
-
-  ubo->updateMatrix("world", world);
-  ubo->updateFloat("visibility", _internalAbstractMeshDataInfo._visibility);
-
-  ubo->update();
-}
-
-UniformBufferPtr& AbstractMesh::getMeshUniformBuffer()
-{
-  return _uniformBuffer;
-}
-
 std::string AbstractMesh::getClassName() const
 {
   return "AbstractMesh";
@@ -663,7 +595,7 @@ AbstractMesh::_getActionManagerForTrigger(const std::optional<unsigned int>& tri
   return TransformNode::_getActionManagerForTrigger(trigger, false);
 }
 
-void AbstractMesh::_rebuild(bool /*dispose*/)
+void AbstractMesh::_rebuild()
 {
   onRebuildObservable.notifyObservers(this);
 
@@ -878,11 +810,6 @@ size_t AbstractMesh::getTotalVertices() const
   return 0;
 }
 
-size_t AbstractMesh::getTotalIndices() const
-{
-  return 0;
-}
-
 Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/, bool /*forceCopy*/)
 {
   return Uint32Array();
@@ -933,13 +860,6 @@ BoundingInfoPtr& AbstractMesh::getBoundingInfo()
   return _boundingInfo;
 }
 
-BoundingInfoPtr& AbstractMesh::buildBoundingInfo(const Vector3& minimum, const Vector3& maximum,
-                                                 const std::optional<Matrix>& worldMatrix)
-{
-  _boundingInfo = std::make_unique<BoundingInfo>(minimum, maximum, worldMatrix);
-  return _boundingInfo;
-}
-
 AbstractMesh&
 AbstractMesh::normalizeToUnitCube(bool includeDescendants, bool ignoreRotation,
                                   const std::function<bool(const AbstractMeshPtr& node)>& predicate)
@@ -952,11 +872,6 @@ AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
   _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
-}
-
-bool AbstractMesh::get_hasBoundingInfo() const
-{
-  return _boundingInfo != nullptr;
 }
 
 bool AbstractMesh::get_useBones() const
@@ -1063,13 +978,13 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise, float 
   return Vector3(flipBack * defForwardMult, twirlClockwise, tiltRight * defForwardMult);
 }
 
-AbstractMesh& AbstractMesh::refreshBoundingInfo(bool applySkeleton, bool applyMorph)
+AbstractMesh& AbstractMesh::refreshBoundingInfo(bool applySkeleton)
 {
   if (_boundingInfo && _boundingInfo->isLocked()) {
     return *this;
   }
 
-  _refreshBoundingInfo(_getPositionData(applySkeleton, applyMorph), std::nullopt);
+  _refreshBoundingInfo(_getPositionData(applySkeleton), std::nullopt);
   return *this;
 }
 
@@ -1095,26 +1010,12 @@ void AbstractMesh::_refreshBoundingInfo(const Float32Array& data,
   _updateBoundingInfo();
 }
 
-Float32Array AbstractMesh::_getPositionData(bool applySkeleton, bool applyMorph)
+Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
 {
   auto data = getVerticesData(VertexBuffer::PositionKind);
 
-  if (!_internalAbstractMeshDataInfo._positions.empty()) {
-    _internalAbstractMeshDataInfo._positions = {};
-  }
-
-  if (!data.empty() && ((applySkeleton && skeleton()) || (applyMorph && morphTargetManager()))) {
-    _generatePointsArray();
-    if (!_positions().empty()) {
-      const auto& pos = _positions();
-      _internalAbstractMeshDataInfo._positions.resize(pos.size());
-      for (size_t i = 0; i < pos.size(); ++i) {
-        _internalAbstractMeshDataInfo._positions[i] = pos[i];
-      }
-    }
-  }
-
   if (!data.empty() && applySkeleton && skeleton()) {
+    _generatePointsArray();
     auto matricesIndicesData = getVerticesData(VertexBuffer::MatricesIndicesKind);
     auto matricesWeightsData = getVerticesData(VertexBuffer::MatricesWeightsKind);
     if (!matricesWeightsData.empty() && !matricesIndicesData.empty()) {
@@ -1168,34 +1069,6 @@ Float32Array AbstractMesh::_getPositionData(bool applySkeleton, bool applyMorph)
         if ((index / 3) < _positions().size()) {
           _positions()[index / 3].copyFrom(tempVector);
         }
-      }
-    }
-  }
-  if (!data.empty() && applyMorph && morphTargetManager()) {
-    auto faceIndexCount = 0ull;
-    auto positionIndex  = 0ull;
-    for (size_t vertexCount = 0; vertexCount < data.size(); ++vertexCount) {
-      for (size_t targetCount = 0; targetCount < morphTargetManager()->numTargets();
-           ++targetCount) {
-        const auto targetMorph = morphTargetManager()->getTarget(targetCount);
-        const auto influence   = targetMorph->influence();
-        if (influence > 0.f) {
-          const auto morphTargetPositions = targetMorph->getPositions();
-          if (!morphTargetPositions.empty()) {
-            data[vertexCount]
-              += (morphTargetPositions[vertexCount] - data[vertexCount]) * influence;
-          }
-        }
-      }
-
-      ++faceIndexCount;
-
-      if (!_positions().empty()
-          && faceIndexCount
-               == 3) { // We want to merge into positions every 3 indices starting (but not 0)
-        faceIndexCount   = 0;
-        const auto index = positionIndex * 3;
-        _positions()[positionIndex++].copyFromFloats(data[index], data[index + 1], data[index + 2]);
       }
     }
   }
@@ -1281,11 +1154,11 @@ bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise, bool include
 
 bool AbstractMesh::intersectsMesh(SolidParticle& sp, bool precise, bool includeDescendants)
 {
-  if (!_boundingInfo || !sp.hasBoundingInfo()) {
+  if (!_boundingInfo || !sp._boundingInfo) {
     return false;
   }
 
-  if (_boundingInfo->intersects(*sp.getBoundingInfo(), precise)) {
+  if (_boundingInfo->intersects(*sp._boundingInfo, precise)) {
     return true;
   }
 
@@ -1424,8 +1297,8 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   _meshCollisionData._collider->_radius = ellipsoid;
 
   coordinator->getNewPosition(
-    _meshCollisionData._oldPositionForCollisions, displacement, _meshCollisionData._collider,
-    collisionRetryCount(), shared_from_base<AbstractMesh>(),
+    _meshCollisionData._oldPositionForCollisions, displacement, _meshCollisionData._collider, 3,
+    shared_from_base<AbstractMesh>(),
     [this](size_t collisionId, Vector3& newPosition, const AbstractMeshPtr& collidedMesh) {
       _onCollisionPositionChange(static_cast<int>(collisionId), newPosition, collidedMesh);
     },
@@ -1601,10 +1474,11 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
     if (!iMaterial) {
       continue;
     }
-    if (iMaterial->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
-        || iMaterial->fillMode() == Constants::MATERIAL_TriangleFillMode
-        || iMaterial->fillMode() == Constants::MATERIAL_WireFrameFillMode
-        || iMaterial->fillMode() == Constants::MATERIAL_PointFillMode) {
+    if (!getIndices().empty()
+        && (iMaterial->fillMode() == Constants::MATERIAL_TriangleStripDrawMode
+            || iMaterial->fillMode() == Constants::MATERIAL_TriangleFillMode
+            || iMaterial->fillMode() == Constants::MATERIAL_WireFrameFillMode
+            || iMaterial->fillMode() == Constants::MATERIAL_PointFillMode)) {
       anySubmeshSupportIntersect = true;
       break;
     }
@@ -1646,8 +1520,8 @@ PickingInfo AbstractMesh::intersects(Ray& ray, const std::optional<bool>& iFastC
   if (intersectInfo) {
     // Get picked point
     auto world        = worldToUse.value_or((skeleton() && skeleton()->overrideMesh ?
-                                               skeleton()->overrideMesh->getWorldMatrix() :
-                                               getWorldMatrix()));
+                                        skeleton()->overrideMesh->getWorldMatrix() :
+                                        getWorldMatrix()));
     auto& worldOrigin = TmpVectors::Vector3Array[0];
     auto& direction   = TmpVectors::Vector3Array[1];
     Vector3::TransformCoordinatesToRef(ray.origin, world, worldOrigin);
@@ -1806,6 +1680,8 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   onCollisionPositionChangeObservable.clear();
   onRebuildObservable.clear();
 
+  _isDisposed = true;
+
   TransformNode::dispose(doNotRecurse, disposeMaterialAndTextures);
 
   // Remove from scene
@@ -1885,15 +1761,15 @@ AbstractMesh& AbstractMesh::updateFacetData()
     data.facetDepthSortOrigin = Vector3::Zero();
   }
 
-  data.bbSize.x   = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
-                      bInfo.maximum().x - bInfo.minimum().x :
-                      Math::Epsilon;
-  data.bbSize.y   = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
-                      bInfo.maximum().y - bInfo.minimum().y :
-                      Math::Epsilon;
-  data.bbSize.z   = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
-                      bInfo.maximum().z - bInfo.minimum().z :
-                      Math::Epsilon;
+  data.bbSize.x = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
+                    bInfo.maximum().x - bInfo.minimum().x :
+                    Math::Epsilon;
+  data.bbSize.y = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
+                    bInfo.maximum().y - bInfo.minimum().y :
+                    Math::Epsilon;
+  data.bbSize.z = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
+                    bInfo.maximum().z - bInfo.minimum().z :
+                    Math::Epsilon;
   auto bbSizeMax  = (data.bbSize.x > data.bbSize.y) ? data.bbSize.x : data.bbSize.y;
   bbSizeMax       = (bbSizeMax > data.bbSize.z) ? bbSizeMax : data.bbSize.z;
   data.subDiv.max = data.partitioningSubdivisions;
@@ -2045,7 +1921,7 @@ int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z, Vector
   closest = getClosestFacetAtLocalCoordinates(invVect.x, invVect.y, invVect.z, projected, checkFace,
                                               facing);
   if (projectedSet) {
-    // transform the local computed projected vector to world coordinates
+    // tranform the local computed projected vector to world coordinates
     Vector3::TransformCoordinatesFromFloatsToRef(projected.x, projected.y, projected.z, world,
                                                  projected);
   }

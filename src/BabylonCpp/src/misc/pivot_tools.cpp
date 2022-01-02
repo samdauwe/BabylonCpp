@@ -1,6 +1,6 @@
 #include <babylon/misc/pivot_tools.h>
 
-#include <babylon/meshes/transform_node.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
@@ -10,7 +10,7 @@ Vector3 PivotTools::_PivotTranslation          = Vector3();
 Vector3 PivotTools::_PivotTmpVector            = Vector3();
 bool PivotTools::_PivotPostMultiplyPivotMatrix = false;
 
-void PivotTools::_RemoveAndStorePivotPoint(const TransformNodePtr& mesh)
+void PivotTools::_RemoveAndStorePivotPoint(const AbstractMeshPtr& mesh)
 {
   if (mesh && PivotTools::_PivotCached == 0) {
     // Save old pivot and set pivot to 0,0,0
@@ -29,7 +29,7 @@ void PivotTools::_RemoveAndStorePivotPoint(const TransformNodePtr& mesh)
   PivotTools::_PivotCached++;
 }
 
-void PivotTools::_RestorePivotPoint(const TransformNodePtr& mesh)
+void PivotTools::_RestorePivotPoint(const AbstractMeshPtr& mesh)
 {
   if (mesh && !PivotTools::_OldPivotPoint.equalsToFloats(0.f, 0.f, 0.f)
       && PivotTools::_PivotCached == 1) {

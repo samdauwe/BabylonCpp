@@ -17,7 +17,6 @@ class RenderingManager;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Camera)
 FWD_CLASS_SPTR(PostProcess)
-FWD_CLASS_SPTR(PrePassRenderTarget)
 FWD_CLASS_SPTR(RenderTargetTexture)
 FWD_CLASS_SPTR(SubMesh)
 
@@ -37,7 +36,7 @@ public:
   static constexpr unsigned int REFRESHRATE_RENDER_ONCE = 0;
 
   /**
-   * The texture will only be rendered rendered every frame and is recommended for dynamic contents.
+   * The texture will only be rendered rendered every frame and is recomended for dynamic contents.
    */
   static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME = 1;
 
@@ -66,10 +65,9 @@ public:
    * undefined, the texture is not in comparison mode
    * @param bilinearFiltering Specifies whether or not bilinear filtering is enable on the texture
    * @param generateStencil Specifies whether or not a stencil should be allocated in the texture
-   * @param samples sample count of the depth/stencil texture
    */
   void createDepthStencilTexture(int comparisonFunction = 0, bool bilinearFiltering = true,
-                                 bool generateStencil = false, unsigned int samples = 1);
+                                 bool generateStencil = false);
 
   void _onRatioRescale();
 
@@ -132,12 +130,6 @@ public:
   int getRenderLayers() const;
 
   /**
-   * @brief Don't allow this render target texture to rescale. Mainly used to prevent rescaling by
-   * the scene optimizer.
-   */
-  void disableRescaling();
-
-  /**
    * @brief Get if the texture can be rescaled or not.
    */
   bool canRescale() const;
@@ -155,8 +147,8 @@ public:
   Matrix* getReflectionTextureMatrix() override;
 
   /**
-   * @briefResize the texture to a new desired size.
-   * Be careful as it will recreate all the data in the new texture.
+   * @brief Resize the texture to a new desired size.
+   * Be carrefull as it will recreate all the data in the new texture.
    * @param size Define the new size. It can be:
    *   - a number for squared texture,
    *   - an object containing { width: number, height: number }
@@ -180,14 +172,8 @@ public:
   void _bindFrameBuffer(unsigned int faceIndex = 0, unsigned int layer = 0);
 
   /**
-   * @brief @hidden
-   */
-  void _prepareFrame(Scene* scene, unsigned int faceIndex = 0, unsigned int layer = 0,
-                     bool useCameraPostProcess = false);
-
-  /**
-   * @brief Overrides the default sort function applied in the rendering group to prepare the
-   * meshes. This allowed control for front to back rendering or reversely depending of the special
+   * @brief Overrides the default sort function applied in the renderging group to prepare the
+   * meshes. This allowed control for front to back rendering or reversly depending of the special
    * needs.
    *
    * @param renderingGroupId The rendering group id corresponding to its index
@@ -218,8 +204,8 @@ public:
   RenderTargetTexturePtr clone();
 
   /**
-   * @brief Serialize the texture to a JSON representation we can easily use in the respective Parse
-   * function.
+   * @brief Serialize the texture to a JSON representation we can easily use in
+   * the resepective Parse function.
    * @returns The JSON representation of the texture
    */
   json serialize() const;
@@ -238,8 +224,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild(bool forceFullRebuild                        = false,
-                const std::vector<std::string>& textureNames = {}) override;
+  void _rebuild(bool forceFullRebuild = false) override;
 
   /**
    * @brief Clear the info related to rendering groups preventing retention point in material
@@ -257,7 +242,7 @@ public:
 protected:
   /**
    * @brief Instantiate a render target texture. This is mainly used to render of screen the scene
-   * to for instance apply post process or used a shadow, depth texture...
+   * to for instance apply post processse or used a shadow, depth texture...
    * @param name The friendly name of the texture
    * @param size The size of the RTT (number if square, or {width: number, height:number} or
    * {ratio:} to define a ratio from the main scene)
@@ -273,35 +258,21 @@ protected:
    * @param isMulti True if multiple textures need to be created (Draw Buffers)
    * @param format The internal format of the buffer in the RTT (RED, RG, RGB, RGBA, ALPHA...)
    * @param delayAllocation if the texture allocation should be delayed (default: false)
-   * @param samples sample count to use when creating the RTT
-   * @param creationFlags specific flags to use when creating the texture
-   * (Constants.TEXTURE_CREATIONFLAG_STORAGE for storage textures, for eg)
    */
   RenderTargetTexture(const std::string& name,
                       const std::variant<int, RenderTargetSize, float>& size, Scene* scene,
                       bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
-                      const std::optional<unsigned int>& type = Constants::TEXTURETYPE_UNSIGNED_INT,
-                      const std::optional<bool>& isCube       = false,
-                      const std::optional<unsigned int>& samplingMode
-                      = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                      const std::optional<bool>& generateDepthBuffer   = true,
-                      const std::optional<bool>& generateStencilBuffer = false,
-                      const std::optional<bool>& isMulti               = false,
-                      const std::optional<unsigned int>& format  = Constants::TEXTUREFORMAT_RGBA,
-                      const std::optional<bool>& delayAllocation = false,
-                      const std::optional<unsigned int>& samples = std::nullopt,
-                      const std::optional<unsigned int>& creationFlags = std::nullopt);
+                      unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT, bool isCube = false,
+                      unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                      bool generateDepthBuffer = true, bool generateStencilBuffer = false,
+                      bool isMulti = false, unsigned int format = Constants::TEXTUREFORMAT_RGBA,
+                      bool delayAllocation = false);
 
   /**
    * @brief Use this list to define the list of mesh you want to render.
    */
   std::vector<AbstractMesh*>& get_renderList();
   void set_renderList(const std::vector<AbstractMesh*>& value);
-
-  /**
-   * @brief Gets the post-processes for this render target.
-   */
-  std::vector<PostProcessPtr>& get_postProcesses();
 
   /**
    * @brief Gets or sets the size of the bounding box associated with the texture (when in cube
@@ -334,7 +305,6 @@ protected:
   void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
 
 private:
-  bool _prePassEnabled() const;
   void _processSizeParameter(const std::variant<int, RenderTargetSize, float>& size);
   int _bestReflectionRenderTargetDimension(int renderDimension, float scale) const;
   void _prepareRenderingManager(const std::vector<AbstractMesh*>& currentRenderList,
@@ -357,12 +327,14 @@ public:
 
   /**
    * Use this function to overload the renderList array at rendering time.
-   * Return null to render with the current renderList, else return the list of meshes to use for
+   * Return null to render with the curent renderList, else return the list of meshes to use for
    * rendering. For 2DArray RTT, layerOrFace is the index of the layer that is going to be rendered,
-   * else it is the faceIndex of the cube (if the RTT is a cube, else layerOrFace=0). The renderList
+   * else it is the faceIndex of the cube (if the RTT is a cube, else layerOrFace=0).
+   * The renderList
    * passed to the function is the current render list (the one that will be used if the function
-   * returns null). The length of this list is passed through renderListLength: don't use
-   * renderList.length directly because the array can hold dummy elements!
+   * returns null).
+   * The length of this list is passed through renderListLength: don't use renderList.length
+   * directly because the array can hold dummy elements!
    */
   std::function<std::vector<AbstractMesh*>(unsigned int layerOrFace,
                                            const std::vector<AbstractMesh*>& renderList,
@@ -406,11 +378,6 @@ public:
   bool ignoreCameraViewport;
 
   /**
-   * Post-processes for this render target
-   */
-  ReadOnlyProperty<RenderTargetTexture, std::vector<PostProcessPtr>> postProcesses;
-
-  /**
    * Define the clear color of the Render Target if it should be different from the scene.
    */
   std::optional<Color4> clearColor;
@@ -419,11 +386,6 @@ public:
    * Hidden
    */
   bool _generateMipMaps;
-
-  /**
-   * Hidden
-   */
-  bool _cleared;
 
   /**
    * Hidden
@@ -513,9 +475,6 @@ public:
    */
   Property<RenderTargetTexture, int> refreshRate;
 
-  /** @hidden */
-  PrePassRenderTargetPtr _prePassRenderTarget;
-
 protected:
   IRenderTargetOptions _renderTargetOptions;
   RenderTargetSize _size;
@@ -540,7 +499,6 @@ private:
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
   int _faceIndex;
-  bool _canRescale;
   std::optional<Vector3> _boundingBoxSize;
   bool _defaultRenderListPrepared;
   InternalTexturePtr _nullInternalTexture;

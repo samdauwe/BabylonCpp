@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -16,6 +15,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -95,19 +95,18 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<GradientMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<GradientMaterialDefines>();
   }
 
-  const auto definesPtr
-    = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
-  auto& defines    = *definesPtr.get();
-  const auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<GradientMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines, useInstances);
 
@@ -191,8 +190,7 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
@@ -206,14 +204,14 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, b
 
 void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  const auto scene = getScene();
+  auto scene = getScene();
 
   auto defines = static_cast<GradientMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -236,7 +234,7 @@ void GradientMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMes
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   if (scene->lightsEnabled() && !disableLighting) {

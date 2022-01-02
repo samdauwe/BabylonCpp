@@ -121,7 +121,7 @@ public:
    * The id of the pointer that is currently interacting with the behavior (-1 when no pointer is
    * active)
    */
-  int currentDraggingPointerId;
+  int currentDraggingPointerID;
 
   /**
    * The last position where the pointer hit the drag plane in world space
@@ -162,11 +162,6 @@ public:
    * Fires each time a drag ends (eg. mouse release after drag)
    */
   Observable<DragStartOrEndEvent> onDragEndObservable;
-
-  /**
-   *  Fires each time behavior enabled state changes
-   */
-  Observable<bool> onEnabledObservable;
 
   /**
    * If the attached mesh should be moved when dragged

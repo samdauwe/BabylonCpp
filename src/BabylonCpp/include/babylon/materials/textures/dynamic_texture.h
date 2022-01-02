@@ -103,8 +103,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _rebuild(bool forceFullRebuild                        = false,
-                const std::vector<std::string>& textureNames = {}) override;
+  void _rebuild(bool forceFullRebuild = false) override;
 
 protected:
   /**
@@ -120,7 +119,7 @@ protected:
    * @param invertY defines if the texture needs to be inverted on the y axis during loading
    */
   DynamicTexture(const std::string& name, const DynamicTextureOptions& options, Scene* scene,
-                 bool generateMipMaps               = false,
+                 bool generateMipMaps,
                  unsigned int samplingMode          = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                  unsigned int format                = Constants::TEXTUREFORMAT_RGBA,
                  const std::optional<bool>& invertY = std::nullopt);

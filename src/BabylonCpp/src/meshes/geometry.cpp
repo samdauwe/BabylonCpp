@@ -4,7 +4,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
@@ -17,6 +16,7 @@
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
 #include <babylon/misc/guid.h>
@@ -26,7 +26,6 @@ namespace BABYLON {
 Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData, bool updatable,
                    Mesh* mesh)
     : delayLoadState{Constants::DELAYLOADSTATE_NONE}
-    , _parentContainer{nullptr}
     , boundingBias(this, &Geometry::get_boundingBias, &Geometry::set_boundingBias)
     , meshes(this, &Geometry::get_meshes)
     , useBoundingInfoFromGeometry{false}
@@ -155,7 +154,7 @@ void Geometry::_rebuild()
 
   // Index buffer
   if (!_meshes.empty()) {
-    _indexBuffer = _engine->createIndexBuffer(_indices, _updatable);
+    _indexBuffer = _engine->createIndexBuffer(_indices);
   }
 
   // Vertex buffers
@@ -188,18 +187,13 @@ void Geometry::removeVerticesData(const std::string& kind)
     _vertexBuffers[kind] = nullptr;
     _vertexBuffers.erase(kind);
   }
-
-  if (!_vertexArrayObjects.empty()) {
-    _disposeVertexArrayObjects();
-  }
 }
 
 void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
-                                 const std::optional<size_t>& totalVertices,
-                                 bool disposeExistingBuffer)
+                                 const std::optional<size_t>& totalVertices)
 {
   auto kind = buffer->getKind();
-  if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind] && disposeExistingBuffer) {
+  if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind]) {
     _vertexBuffers[kind]->dispose();
     _vertexBuffers.erase(kind);
   }
@@ -208,14 +202,13 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
 
   if (kind == VertexBuffer::PositionKind) {
     auto& data = buffer->getData();
+
     if (totalVertices.has_value()) {
       _totalVertices = *totalVertices;
     }
     else {
       if (!data.empty()) {
-        _totalVertices
-          = data.size()
-            / (buffer->type == VertexBuffer::BYTE ? buffer->byteStride : buffer->byteStride / 4);
+        _totalVertices = data.size() / (buffer->byteStride / 4);
       }
     }
 
@@ -223,14 +216,19 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
     _resetPointsArrayCache();
 
     for (const auto& mesh : _meshes) {
-      mesh->buildBoundingInfo(extend().min, extend().max);
+      mesh->_boundingInfo = std::make_unique<BoundingInfo>(extend().min, extend().max);
       mesh->_createGlobalSubMesh(false);
       mesh->computeWorldMatrix(true);
-      mesh->synchronizeInstances();
     }
   }
 
   notifyUpdate(kind);
+
+  if (!_vertexArrayObjects.empty()) {
+    _disposeVertexArrayObjects();
+    // Will trigger a rebuild of the VAO if supported
+    _vertexArrayObjects.clear();
+  }
 }
 
 void Geometry::updateVerticesDataDirectly(const std::string& kind, const Float32Array& data,
@@ -275,11 +273,11 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
 
   if (updateExtends) {
     for (const auto& mesh : _meshes) {
-      if (mesh->hasBoundingInfo()) {
-        mesh->getBoundingInfo()->reConstruct(extend().min, extend().max);
+      if (mesh->_boundingInfo) {
+        mesh->_boundingInfo->reConstruct(extend().min, extend().max);
       }
       else {
-        mesh->buildBoundingInfo(extend().min, extend().max);
+        mesh->_boundingInfo = std::make_unique<BoundingInfo>(extend().min, extend().max);
       }
 
       for (const auto& subMesh : mesh->subMeshes) {
@@ -290,16 +288,6 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
 }
 
 void Geometry::_bind(const EffectPtr& effect, WebGLDataBufferPtr indexToBind)
-{
-  std::unordered_map<std::string, VertexBufferPtr> overrideVertexBuffers{};
-  std::unordered_map<std::string, WebGLVertexArrayObjectPtr> overrideVertexArrayObjects{};
-  _bind(effect, indexToBind, overrideVertexBuffers, overrideVertexArrayObjects);
-}
-
-void Geometry::_bind(
-  const EffectPtr& effect, WebGLDataBufferPtr indexToBind,
-  const std::unordered_map<std::string, VertexBufferPtr>& overrideVertexBuffers,
-  std::unordered_map<std::string, WebGLVertexArrayObjectPtr>& overrideVertexArrayObjects)
 {
   if (!effect) {
     return;
@@ -315,22 +303,17 @@ void Geometry::_bind(
     return;
   }
 
-  if (indexToBind != _indexBuffer
-      || (_vertexArrayObjects.empty() && overrideVertexArrayObjects.empty())) {
-    _engine->bindBuffers(vbs, indexToBind, effect, overrideVertexBuffers);
+  if (indexToBind != _indexBuffer /*|| _vertexArrayObjects.empty()*/) {
+    _engine->bindBuffers(vbs, indexToBind, effect);
     return;
   }
 
-  auto& vaos
-    = !overrideVertexArrayObjects.empty() ? overrideVertexArrayObjects : _vertexArrayObjects;
-
   // Using VAO
-  if (!stl_util::contains(vaos, effect->key()) || !vaos[effect->key()]) {
-    vaos[effect->key()]
-      = _engine->recordVertexArrayObject(vbs, indexToBind, effect, overrideVertexBuffers);
+  if (!stl_util::contains(_vertexArrayObjects, effect->key())) {
+    _vertexArrayObjects[effect->key()] = _engine->recordVertexArrayObject(vbs, indexToBind, effect);
   }
 
-  _engine->bindVertexArrayObject(vaos[effect->key()], indexToBind);
+  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()], indexToBind);
 }
 
 size_t Geometry::getTotalVertices() const
@@ -349,8 +332,27 @@ Float32Array Geometry::getVerticesData(const std::string& kind, bool copyWhenSha
     return Float32Array();
   }
 
-  return vertexBuffer->getFloatData(_totalVertices,
-                                    forceCopy || (copyWhenShared && _meshes.size() != 1));
+  auto data = vertexBuffer->getData();
+  if (data.empty()) {
+    return Float32Array();
+  }
+
+  const auto tightlyPackedByteStride
+    = vertexBuffer->getSize() * VertexBuffer::GetTypeByteLength(vertexBuffer->type);
+  const auto count = _totalVertices * vertexBuffer->getSize();
+
+  if (vertexBuffer->type != VertexBuffer::FLOAT
+      || vertexBuffer->byteStride != tightlyPackedByteStride) {
+    Float32Array copy(count);
+    vertexBuffer->forEach(count, [&](float value, size_t index) { copy[index] = value; });
+    return copy;
+  }
+
+  if (forceCopy || (copyWhenShared && _meshes.size() != 1)) {
+    return data;
+  }
+
+  return data;
 }
 
 bool Geometry::isVertexBufferUpdatable(const std::string& kind) const
@@ -439,6 +441,8 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
     _engine->_releaseBuffer(_indexBuffer);
   }
 
+  _disposeVertexArrayObjects();
+
   _indices                = indices;
   _indexBufferIsUpdatable = updatable;
   if (!_meshes.empty()) {
@@ -452,7 +456,6 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVert
 
   for (const auto& mesh : _meshes) {
     mesh->_createGlobalSubMesh(true);
-    mesh->synchronizeInstances();
   }
 
   notifyUpdate();
@@ -505,16 +508,12 @@ void Geometry::_releaseVertexArrayObject(const EffectPtr& effect)
 
 void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 {
-  const auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
+  auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
   if (it == _meshes.end()) {
     return;
   }
 
   _meshes.erase(it);
-
-  if (!_vertexArrayObjects.empty()) {
-    mesh->_invalidateInstanceVertexArrayObject();
-  }
 
   mesh->_geometry = nullptr;
 
@@ -529,19 +528,14 @@ void Geometry::applyToMesh(Mesh* mesh)
     return;
   }
 
-  const auto previousGeometry = mesh->geometry();
+  auto previousGeometry = mesh->geometry();
   if (previousGeometry) {
     previousGeometry->releaseForMesh(mesh);
-  }
-
-  if (!_vertexArrayObjects.empty()) {
-    mesh->_invalidateInstanceVertexArrayObject();
   }
 
   // must be done before setting vertexBuffers because of
   // mesh->_createGlobalSubMesh()
   mesh->setGeometry(shared_from_this());
-  // mesh->_internalAbstractMeshDataInfo._positions = nullptr;
 
   // Geometry is already in scene when constructed
   // _scene->pushGeometry(this);
@@ -551,8 +545,8 @@ void Geometry::applyToMesh(Mesh* mesh)
   if (isReady()) {
     _applyToMesh(mesh);
   }
-  else if (_boundingInfo) {
-    mesh->setBoundingInfo(*_boundingInfo.get());
+  else {
+    mesh->_boundingInfo = std::unique_ptr<BoundingInfo>(_boundingInfo.get());
   }
 }
 
@@ -575,7 +569,7 @@ void Geometry::_updateExtend(Float32Array data)
 
 void Geometry::_applyToMesh(Mesh* mesh)
 {
-  const auto numOfMeshes = _meshes.size();
+  auto numOfMeshes = _meshes.size();
 
   // vertexBuffers
   for (const auto& item : _vertexBuffers) {
@@ -593,18 +587,19 @@ void Geometry::_applyToMesh(Mesh* mesh)
       if (!_extend) {
         _updateExtend(Float32Array());
       }
-      mesh->buildBoundingInfo(extend().min, extend().max);
+      mesh->_boundingInfo = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       mesh->_createGlobalSubMesh(false);
 
-      // bounding info was just created again, world matrix should be applied again.
+      // bounding info was just created again, world matrix should be applied
+      // again.
       mesh->_updateBoundingInfo();
     }
   }
 
   // indexBuffer
   if (numOfMeshes == 1 && !_indices.empty()) {
-    _indexBuffer = _engine->createIndexBuffer(_indices, _updatable);
+    _indexBuffer = _engine->createIndexBuffer(_indices);
   }
   if (_indexBuffer) {
     _indexBuffer->references = numOfMeshes;
@@ -621,10 +616,6 @@ void Geometry::notifyUpdate(const std::string& kind)
 {
   if (onGeometryUpdated) {
     onGeometryUpdated(this, kind);
-  }
-
-  if (!_vertexArrayObjects.empty()) {
-    _disposeVertexArrayObjects();
   }
 
   for (const auto& mesh : _meshes) {
@@ -735,12 +726,7 @@ void Geometry::_disposeVertexArrayObjects()
     for (const auto& item : _vertexArrayObjects) {
       _engine->releaseVertexArrayObject(item.second);
     }
-
-    _vertexArrayObjects = {}; // Will trigger a rebuild of the VAO if supported
-
-    for (const auto& mesh : _meshes) {
-      mesh->_invalidateInstanceVertexArrayObject();
-    }
+    _vertexArrayObjects.clear();
   }
 }
 
@@ -774,11 +760,6 @@ void Geometry::dispose()
   _boundingInfo = nullptr;
 
   _scene->removeGeometry(this);
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->geometries, this);
-    _parentContainer = nullptr;
-  }
-
   _isDisposed = true;
 }
 

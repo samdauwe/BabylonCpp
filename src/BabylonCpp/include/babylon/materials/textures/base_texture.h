@@ -14,16 +14,10 @@
 
 namespace BABYLON {
 
-class AbstractScene;
 class ThinEngine;
 FWD_CLASS_SPTR(BaseTexture)
 FWD_CLASS_SPTR(InternalTexture)
 FWD_CLASS_SPTR(SphericalPolynomial)
-
-struct ErrorObject {
-  std::string message;
-  std::string exception;
-};
 
 /**
  * @brief Base class of all the textures in babylon.
@@ -86,7 +80,7 @@ public:
   virtual bool checkTransformsAreIdentical(const BaseTexturePtr& texture) const;
 
   /**
-   * @brief Get the texture transform matrix used to offset tile the texture for instance.
+   * @brief Get the texture transform matrix used to offset tile the texture for istance.
    * @returns the transformation matrix
    */
   virtual Matrix* getTextureMatrix(int uBase = 1);
@@ -115,24 +109,14 @@ public:
   bool canRescale();
 
   /**
-   * @brief Force recomputation of spherical polynomials.
-   * Can be useful if you generate a cubemap multiple times (from a probe for eg) and you need the
-   * proper polynomials each time
-   */
-  void forceSphericalPolynomialsRecompute();
-
-  /**
    * @brief Hidden
    */
   InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap, unsigned int sampling = 0,
-                                   const std::optional<bool>& invertY       = std::nullopt,
-                                   const std::optional<bool>& useSRGBBuffer = std::nullopt);
-
+                                   const std::optional<bool>& invertY = std::nullopt);
   /**
    * @brief Hidden
    */
-  virtual void _rebuild(bool forceFullRebuild                        = false,
-                        const std::vector<std::string>& textureNames = {});
+  virtual void _rebuild(bool forceFullRebuild = false);
 
   /**
    * @brief Hidden
@@ -146,29 +130,16 @@ public:
   std::unique_ptr<BaseTexture> clone() const;
 
   /**
-   * @brief Reads the pixels stored in the webgl texture and returns them as an ArrayBuffer.
-   * This will returns an RGBA array buffer containing either in values (0-255) or
-   * float values (0-1) depending of the underlying buffer type.
+   * @brief Reads the pixels stored in the webgl texture and returns them as an ArrayBuffer. This
+   * will returns an RGBA array buffer containing either in values (0-255) or float values (0-1)
+   * depending of the underlying buffer type.
    * @param faceIndex defines the face of the texture to read (in case of cube texture)
    * @param level defines the LOD level of the texture to read (in case of Mip Maps)
    * @param buffer defines a user defined buffer to fill with data (can be null)
-   * @param flushRenderer true to flush the renderer from the pending commands before reading the
-   * pixels
-   * @param noDataConversion false to convert the data to Uint8Array (if texture type is
-   * UNSIGNED_BYTE) or to Float32Array (if texture type is anything but UNSIGNED_BYTE). If true, the
-   * type of the generated buffer (if buffer==null) will depend on the type of the texture
-   * @returns The Array buffer promise containing the pixels data.
+   * @returns The Array buffer containing the pixels data.
    */
   ArrayBufferView readPixels(unsigned int faceIndex = 0, int level = 0,
-                             std::optional<ArrayBufferView> buffer = std::nullopt,
-                             bool flushRenderer = true, bool noDataConversion = false);
-
-  /**
-   * @brief Hidden
-   */
-  ArrayBufferView _readPixelsSync(unsigned int faceIndex = 0, int level = 0,
-                                  std::optional<ArrayBufferView> buffer = std::nullopt,
-                                  bool flushRenderer = true, bool noDataConversion = false);
+                             std::optional<ArrayBufferView> buffer = std::nullopt);
 
   /**
    * @brief Dispose the texture and release its associated resources.
@@ -195,7 +166,7 @@ protected:
    * Base class of all the textures in babylon.
    * It groups all the common properties the materials, post process, lights... might need
    * in order to make a correct use of the texture.
-   * @param sceneOrEngine Define the scene or engine the texture belongs to
+   * @param sceneOrEngine Define the scene or engine the texture blongs to
    */
   BaseTexture(const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine);
 
@@ -293,7 +264,7 @@ public:
   float level;
 
   /**
-   * Define the UV channel to use starting from 0 and defaulting to 0.
+   * Define the UV chanel to use starting from 0 and defaulting to 0.
    * This is part of the texture as textures usually maps to one uv set.
    */
   unsigned int coordinatesIndex;
@@ -394,11 +365,6 @@ public:
   Property<BaseTexture, bool> isBlocking;
 
   /**
-   * Hidden
-   */
-  AbstractScene* _parentContainer;
-
-  /**
    * Size of the bounding box associated with the texture (when in cube mode)
    */
   Property<BaseTexture, std::optional<Vector3>> boundingBoxSize;
@@ -432,8 +398,6 @@ public:
 protected:
   unsigned int _coordinatesMode;
   Scene* _scene;
-  bool _loadingError;
-  ErrorObject _errorObject;
 
 private:
   bool _hasAlpha;

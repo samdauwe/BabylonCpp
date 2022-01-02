@@ -40,7 +40,7 @@ Node::Node(const std::string& iName, Scene* scene)
     : name{iName}
     , id{iName}
     , doNotSerialize{this, &Node::get_doNotSerialize, &Node::set_doNotSerialize}
-    , _parentContainer{nullptr}
+    , _isDisposed{false}
     , onReady{nullptr}
     , _currentRenderId{-1}
     , _childUpdateId{-1}
@@ -48,12 +48,15 @@ Node::Node(const std::string& iName, Scene* scene)
     , _worldMatrixDeterminant{0.f}
     , _worldMatrixDeterminantIsDirty{true}
     , onDispose{this, &Node::set_onDispose}
-    , onEnabledStateChangedObservable{this, &Node::get_onEnabledStateChangedObservable}
-    , onClonedObservable{this, &Node::get_onClonedObservable}
     , behaviors{this, &Node::get_behaviors}
     , _isNode{true}
+    , _doNotSerialize{false}
+    , _isEnabled{true}
+    , _isParentEnabled{true}
+    , _isReady{true}
     , _parentUpdateId{-1}
     , _parentNode{nullptr}
+    , _sceneRootNodesIndex{-1}
     , _animationPropertiesOverride{nullptr}
     , _onDisposeObserver{nullptr}
 {
@@ -80,12 +83,12 @@ Type Node::type() const
 
 bool Node::isDisposed() const
 {
-  return _nodeDataStorage._isDisposed;
+  return _isDisposed;
 }
 
 bool Node::get_doNotSerialize() const
 {
-  if (_nodeDataStorage._doNotSerialize) {
+  if (_doNotSerialize) {
     return true;
   }
 
@@ -98,7 +101,7 @@ bool Node::get_doNotSerialize() const
 
 void Node::set_doNotSerialize(bool value)
 {
-  _nodeDataStorage._doNotSerialize = value;
+  _doNotSerialize = value;
 }
 
 void Node::set_parent(Node* const& iParent)
@@ -113,7 +116,7 @@ void Node::set_parent(Node* const& iParent)
   if (_parentNode && !_parentNode->_children.empty()) {
     stl_util::remove_vector_elements_equal_sharedptr(_parentNode->_children, this);
 
-    if (!iParent && !_nodeDataStorage._isDisposed) {
+    if (!iParent && !_isDisposed) {
       _addToSceneRootNodes();
     }
   }
@@ -141,23 +144,22 @@ Node*& Node::get_parent()
 
 void Node::_addToSceneRootNodes()
 {
-  if (_nodeDataStorage._sceneRootNodesIndex == -1) {
-    _nodeDataStorage._sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
+  if (_sceneRootNodesIndex == -1) {
+    _sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
     _scene->rootNodes.emplace_back(shared_from_this());
   }
 }
 
 void Node::_removeFromSceneRootNodes()
 {
-  if (_nodeDataStorage._sceneRootNodesIndex != -1) {
-    auto& rootNodes                                                       = _scene->rootNodes;
-    auto lastIdx                                                          = rootNodes.size() - 1;
-    rootNodes[static_cast<size_t>(_nodeDataStorage._sceneRootNodesIndex)] = rootNodes[lastIdx];
-    rootNodes[static_cast<size_t>(_nodeDataStorage._sceneRootNodesIndex)]
-      ->_nodeDataStorage._sceneRootNodesIndex
-      = _nodeDataStorage._sceneRootNodesIndex;
+  if (_sceneRootNodesIndex != -1) {
+    auto& rootNodes                                      = _scene->rootNodes;
+    auto lastIdx                                         = rootNodes.size() - 1;
+    rootNodes[static_cast<size_t>(_sceneRootNodesIndex)] = rootNodes[lastIdx];
+    rootNodes[static_cast<size_t>(_sceneRootNodesIndex)]->_sceneRootNodesIndex
+      = _sceneRootNodesIndex;
     _scene->rootNodes.pop_back();
-    _nodeDataStorage._sceneRootNodesIndex = -1;
+    _sceneRootNodesIndex = -1;
   }
 }
 
@@ -187,27 +189,12 @@ void Node::set_onDispose(const std::function<void(Node* node, EventState& es)>& 
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-Observable<bool>& Node::get_onEnabledStateChangedObservable()
-{
-  return _nodeDataStorage._onEnabledStateChangedObservable;
-}
-
-Observable<Node>& Node::get_onClonedObservable()
-{
-  return _nodeDataStorage._onClonedObservable;
-}
-
 Scene* Node::getScene() const
 {
   return _scene;
 }
 
 Engine* Node::getEngine()
-{
-  return _scene->getEngine();
-}
-
-const Engine* Node::getEngine() const
 {
   return _scene->getEngine();
 }
@@ -364,25 +351,25 @@ bool Node::isSynchronized()
 
 bool Node::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
 {
-  return _nodeDataStorage._isReady;
+  return _isReady;
 }
 
 bool Node::isEnabled(bool checkAncestors)
 {
   if (!checkAncestors) {
-    return _nodeDataStorage._isEnabled;
+    return _isEnabled;
   }
 
-  if (!_nodeDataStorage._isEnabled) {
+  if (!_isEnabled) {
     return false;
   }
 
-  return _nodeDataStorage._isParentEnabled;
+  return _isParentEnabled;
 }
 
 void Node::_syncParentEnabledState()
 {
-  _nodeDataStorage._isParentEnabled = _parentNode ? _parentNode->isEnabled() : true;
+  _isParentEnabled = _parentNode ? _parentNode->isEnabled() : true;
 
   if (!_children.empty()) {
     for (auto& c : _children) {
@@ -393,7 +380,7 @@ void Node::_syncParentEnabledState()
 
 void Node::setEnabled(bool value)
 {
-  _nodeDataStorage._isEnabled = value;
+  _isEnabled = value;
 
   _syncParentEnabledState();
 }
@@ -459,21 +446,20 @@ std::vector<NodePtr> Node::getChildren(const std::function<bool(const NodePtr& n
 
 void Node::_setReady(bool iState)
 {
-  if (iState == _nodeDataStorage._isReady) {
+  if (iState == _isReady) {
     return;
   }
 
   if (!iState) {
-    _nodeDataStorage._isReady = false;
+    _isReady = false;
     return;
   }
 
-  _nodeDataStorage._isReady = true;
+  _isReady = true;
   if (onReady) {
     onReady(this);
   }
-
-  _nodeDataStorage._isReady = true;
+  _isReady = true;
 }
 
 std::vector<AnimationPtr> Node::getAnimations()
@@ -559,7 +545,7 @@ Matrix& Node::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 
 void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  _nodeDataStorage._isDisposed = true;
+  _isDisposed = true;
 
   if (!doNotRecurse) {
     auto nodes = getDescendants(true);
@@ -578,9 +564,6 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
-
-  onEnabledStateChangedObservable().clear();
-  onClonedObservable().clear();
 
   // Behaviors
   for (auto& behavior : _behaviors) {

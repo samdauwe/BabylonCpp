@@ -108,8 +108,8 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject, unsigned int iT
       _options.damping            = _options.damping.value_or(0.f);
     }
     _joints = {};
-    // If the mesh has a parent, don't initialize the physicsBody. Instead wait for the parent to do
-    // that.
+    // If the mesh has a parent, don't initialize the physicsBody. Instead wait
+    // for the parent to do that.
     if (!object->getParent() || _options.ignoreParent) {
       _init();
     }
@@ -207,10 +207,8 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
     }
     const auto& boundingInfo = *object->getBoundingInfo();
     // get the global scaling of the object
-    auto size = boundingInfo.boundingBox.extendSizeWorld.scale(2.f).multiplyInPlace(scaling);
-    size.x    = std::abs(size.x);
-    size.y    = std::abs(size.y);
-    size.z    = std::abs(size.z);
+    const auto size = boundingInfo.boundingBox.extendSizeWorld.scale(2.f).multiplyInPlace(scaling);
+
     // bring back the rotation
     object->rotationQuaternion = *q;
     // calculate the world matrix with the new rotation

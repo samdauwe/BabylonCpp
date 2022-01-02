@@ -262,16 +262,6 @@ Vector2 Vector2::fract() const
   return Vector2(x - std::floor(x), y - std::floor(y));
 }
 
-Vector2& Vector2::rotateToRef(float angle, Vector2& result)
-{
-  const auto cos = std::cos(angle);
-  const auto sin = std::sin(angle);
-  result.x       = cos * x - sin * y;
-  result.y       = sin * x + cos * y;
-
-  return *this;
-}
-
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Vector2& vector)
 {
@@ -420,7 +410,14 @@ float Vector2::lengthSquared() const
 /** Methods **/
 Vector2& Vector2::normalize()
 {
-  Vector2::NormalizeToRef(*this, *this);
+  const float len = length();
+
+  if (stl_util::almost_equal(len, 0.f)) {
+    return *this;
+  }
+
+  x /= len;
+  y /= len;
 
   return *this;
 }
@@ -501,28 +498,6 @@ Vector2 Vector2::Hermite(const Vector2& value1, const Vector2& tangent1, const V
   return Vector2(x, y);
 }
 
-Vector2 Vector2::Hermite1stDerivative(const Vector2& value1, const Vector2& tangent1,
-                                      const Vector2& value2, const Vector2& tangent2, float time)
-{
-  auto result = Vector2::Zero();
-
-  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
-
-  return result;
-}
-
-void Vector2::Hermite1stDerivativeToRef(const Vector2& value1, const Vector2& tangent1,
-                                        const Vector2& value2, const Vector2& tangent2, float time,
-                                        Vector2& result)
-{
-  const auto t2 = time * time;
-
-  result.x = (t2 - time) * 6.f * value1.x + (3.f * t2 - 4.f * time + 1.f) * tangent1.x
-             + (-t2 + time) * 6.f * value2.x + (3.f * t2 - 2.f * time) * tangent2.x;
-  result.y = (t2 - time) * 6.f * value1.y + (3.f * t2 - 4.f * time + 1.f) * tangent1.y
-             + (-t2 + time) * 6.f * value2.y + (3.f * t2 - 2.f * time) * tangent2.y;
-}
-
 Vector2 Vector2::Lerp(const Vector2& start, const Vector2& end, float amount)
 {
   const float x = start.x + ((end.x - start.x) * amount);
@@ -538,21 +513,9 @@ float Vector2::Dot(const Vector2& left, const Vector2& right)
 
 Vector2 Vector2::Normalize(Vector2& vector)
 {
-  auto newVector = Vector2::Zero();
-  NormalizeToRef(vector, newVector);
+  Vector2 newVector{vector};
+  newVector.normalize();
   return newVector;
-}
-
-void Vector2::NormalizeToRef(const Vector2& vector, Vector2& result)
-{
-  const auto len = vector.length();
-
-  if (len == 0.f) {
-    return;
-  }
-
-  result.x = vector.x / len;
-  result.y = vector.y / len;
 }
 
 Vector2 Vector2::Minimize(const Vector2& left, const Vector2& right)

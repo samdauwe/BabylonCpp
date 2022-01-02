@@ -1,4 +1,3 @@
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engines/scene.h>
@@ -14,8 +13,10 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Mesh)
+class AbstractMesh;
+class Mesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
 
 namespace Samples {
 
@@ -122,7 +123,7 @@ public:
 
     _platforms.emplace_back(platform);
     for (int i = 1; i < platformNb; ++i) {
-      const auto instance = platform->createInstance("platform" + std::to_string(i));
+      auto instance = platform->createInstance("platform" + std::to_string(i));
       instance->position
         = Vector3((0.5f - Math::random()) * platformLimit, (0.5f - Math::random()) * platformLimit,
                   (0.5f - Math::random()) * platformLimit);
@@ -132,7 +133,7 @@ public:
       _platforms.emplace_back(instance);
     }
 
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
       _applyForces();
       _checkCollisions();
       _moveMario();

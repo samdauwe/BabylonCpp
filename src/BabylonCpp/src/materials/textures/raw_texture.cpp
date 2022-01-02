@@ -17,14 +17,6 @@ RawTexture::RawTexture(const ArrayBufferView& data, int width, int height, unsig
     return;
   }
 
-  if (!_engine->_caps.textureFloatLinearFiltering && type == Constants::TEXTURETYPE_FLOAT) {
-    iSamplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
-  }
-  if (!_engine->_caps.textureHalfFloatLinearFiltering
-      && type == Constants::TEXTURETYPE_HALF_FLOAT) {
-    iSamplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
-  }
-
   _texture = _engine->createRawTexture(data.uint8Array(), width, height, format, generateMipMaps,
                                        iInvertY, iSamplingMode, "", iType);
 

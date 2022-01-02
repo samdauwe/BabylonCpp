@@ -212,9 +212,9 @@ Color3& Color3::set(float red, float green, float blue)
 
 std::string Color3::toHexString() const
 {
-  const int intR = static_cast<int>(round(r * 255));
-  const int intG = static_cast<int>(round(g * 255));
-  const int intB = static_cast<int>(round(b * 255));
+  const int intR = static_cast<int>(r * 255) | 0;
+  const int intG = static_cast<int>(g * 255) | 0;
+  const int intB = static_cast<int>(b * 255) | 0;
 
   std::ostringstream ostream;
   ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG) << Scalar::ToHex(intB);
@@ -425,30 +425,6 @@ void Color3::LerpToRef(const Color3& left, const Color3& right, float amount, Co
   result.r = left.r + ((right.r - left.r) * amount);
   result.g = left.g + ((right.g - left.g) * amount);
   result.b = left.b + ((right.b - left.b) * amount);
-}
-
-Color3 Color3::Hermite1stDerivative(const Color3& value1, const Color3& tangent1,
-                                    const Color3& value2, const Color3& tangent2, float time)
-{
-  auto result = Color3::Black();
-
-  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
-
-  return result;
-}
-
-void Color3::Hermite1stDerivativeToRef(const Color3& value1, const Color3& tangent1,
-                                       const Color3& value2, const Color3& tangent2, float time,
-                                       Color3& result)
-{
-  const auto t2 = time * time;
-
-  result.r = (t2 - time) * 6.f * value1.r + (3.f * t2 - 4.f * time + 1.f) * tangent1.r
-             + (-t2 + time) * 6.f * value2.r + (3.f * t2 - 2.f * time) * tangent2.r;
-  result.g = (t2 - time) * 6.f * value1.g + (3.f * t2 - 4.f * time + 1.f) * tangent1.g
-             + (-t2 + time) * 6.f * value2.g + (3.f * t2 - 2.f * time) * tangent2.g;
-  result.b = (t2 - time) * 6.f * value1.b + (3.f * t2 - 4.f * time + 1.f) * tangent1.b
-             + (-t2 + time) * 6.f * value2.b + (3.f * t2 - 2.f * time) * tangent2.b;
 }
 
 Color3 Color3::Red()

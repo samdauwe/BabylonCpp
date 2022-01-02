@@ -12,8 +12,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/buffer.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
@@ -47,7 +45,6 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
-#include <babylon/materials/effect.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
@@ -55,17 +52,18 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
-#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/frustum.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh_simplification_scene_component.h>
 #include <babylon/meshes/simplification/simplification_queue.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/guid.h>
 #include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
@@ -142,8 +140,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , fogDensity{0.1f}
     , fogStart{0.f}
     , fogEnd{1000.f}
-    , prePass{this, &Scene::get_prePass}
-    , needsPreviousWorldMatrices{false}
+    , prePass{false}
     , shadowsEnabled{this, &Scene::get_shadowsEnabled, &Scene::set_shadowsEnabled}
     , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
     , _activeCamera{nullptr}
@@ -530,48 +527,6 @@ void Scene::setStepId(unsigned int newStepId)
   _currentStepId = newStepId;
 }
 
-Vector4& Scene::bindEyePosition(Effect* effect, const std::string& variableName, bool isVector3)
-{
-  const auto eyePosition = _forcedViewPosition     ? *_forcedViewPosition :
-                           _mirroredCameraPosition ? *_mirroredCameraPosition :
-                           activeCamera()          ? activeCamera()->globalPosition :
-                                                     Vector3::Zero();
-
-  const auto invertNormal = (useRightHandedSystem() == (_mirroredCameraPosition != nullptr));
-
-  TmpVectors::Vector4Array[0].set(eyePosition.x, eyePosition.y, eyePosition.z,
-                                  invertNormal ? -1.f : 1.f);
-
-  if (effect) {
-    if (isVector3) {
-      effect->setFloat3(variableName, TmpVectors::Vector4Array[0].x, TmpVectors::Vector4Array[0].y,
-                        TmpVectors::Vector4Array[0].z);
-    }
-    else {
-      effect->setVector4(variableName, TmpVectors::Vector4Array[0]);
-    }
-  }
-
-  return TmpVectors::Vector4Array[0];
-}
-
-UniformBuffer* Scene::finalizeSceneUbo()
-{
-  const auto ubo         = getSceneUniformBuffer();
-  const auto eyePosition = bindEyePosition(nullptr);
-  ubo->updateFloat4("vEyePosition", //
-                    eyePosition.x,  //
-                    eyePosition.y,  //
-                    eyePosition.z,  //
-                    eyePosition.w,  //
-                    ""              //
-  );
-
-  ubo->update();
-
-  return ubo;
-}
-
 unsigned int Scene::getStepId() const
 {
   return _currentStepId;
@@ -678,11 +633,6 @@ void Scene::set_fogMode(unsigned int value)
 unsigned int Scene::get_fogMode() const
 {
   return _fogMode;
-}
-
-bool Scene::get_prePass() const
-{
-  return !!prePassRenderer() && prePassRenderer()->defaultRT->enabled;
 }
 
 void Scene::set_shadowsEnabled(bool value)
@@ -1087,11 +1037,9 @@ void Scene::_updatePointerPosition(const PointerEvent& evt)
 
 void Scene::_createUbo()
 {
-  _sceneUbo = std::make_unique<UniformBuffer>(_engine, Float32Array(), false, "scene");
+  _sceneUbo = std::make_unique<UniformBuffer>(_engine, Float32Array(), true);
   _sceneUbo->addUniform("viewProjection", 16);
   _sceneUbo->addUniform("view", 16);
-  _sceneUbo->addUniform("projection", 16);
-  _sceneUbo->addUniform("vEyePosition", 4);
 }
 
 void Scene::_createAlternateUbo()
@@ -1121,14 +1069,14 @@ void Scene::_setRayOnPointerInfo(PointerInfo& pointerInfo)
     if (!pointerInfo.pickInfo.ray) {
       auto identityMatrix = Matrix::Identity();
       if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
-        pointerInfo.pickInfo.ray = createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
-                                                    pointerInfo.mouseWheelEvent.offsetY,
-                                                    identityMatrix, _activeCamera.get());
+        pointerInfo.pickInfo.ray
+          = createPickingRay(pointerInfo.mouseWheelEvent.offsetX,
+                             pointerInfo.mouseWheelEvent.offsetY, identityMatrix, _activeCamera);
       }
       else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
         pointerInfo.pickInfo.ray
           = createPickingRay(pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
-                             identityMatrix, _activeCamera.get());
+                             identityMatrix, _activeCamera);
       }
     }
   }
@@ -1188,13 +1136,12 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const 
     }
 
     if (onPointerObservable.hasObservers()) {
-#if 0
       auto iType = evt.type == EventType::MOUSE_WHEEL || evt.type == EventType::DOM_MOUSE_SCROLL ?
                      PointerEventTypes::POINTERWHEEL :
                      PointerEventTypes::POINTERMOVE;
 
       if (iType == PointerEventTypes::POINTERWHEEL) {
-        PointerInfo pi(iType, *static_cast<IMouseWheelEvent const*>(&evt), *pickResult);
+        PointerInfo pi(iType, *static_cast<MouseWheelEvent const*>(&evt), *pickResult);
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
@@ -1203,17 +1150,15 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult, const 
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
-#endif
     }
   }
 
   return *this;
 }
 
-bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& /*pickResult*/,
-                                       const PointerEvent& /*evt*/, PointerEventTypes /*type*/)
+bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
+                                       const PointerEvent& evt, PointerEventTypes type)
 {
-#if 0
   PointerInfoPre pi(type, evt, static_cast<float>(_unTranslatedPointerX),
                     static_cast<float>(_unTranslatedPointerY));
   if (pickResult) {
@@ -1221,9 +1166,6 @@ bool Scene::_checkPrePointerObservable(const std::optional<PickingInfo>& /*pickR
   }
   onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
   return pi.skipOnPointerObservable;
-#else
-  return false;
-#endif
 }
 
 Scene& Scene::simulatePointerDown(std::optional<PickingInfo>& pickResult)
@@ -1302,11 +1244,9 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult, const 
     }
   }
   else {
-#if 0
     for (const auto& step : _pointerDownStage) {
       pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
     }
-#endif
   }
 
   if (pickResult) {
@@ -1317,11 +1257,9 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult, const 
     }
 
     if (onPointerObservable.hasObservers()) {
-#if 0
       PointerInfo pi(type, evt, *pickResult);
       _setRayOnPointerInfo(pi);
       onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
-#endif
     }
   }
 
@@ -1353,12 +1291,10 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
         onPointerPick(evt, pickResult);
       }
       if (clickInfo.singleClick() && !clickInfo.ignore() && onPointerObservable.hasObservers()) {
-#if 0
         auto type = PointerEventTypes::POINTERPICK;
         PointerInfo pi(type, evt, *pickResult);
         _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
-#endif
       }
     }
     if (_pickedUpMesh->actionManager) {
@@ -1386,11 +1322,9 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
   }
   else {
     if (!clickInfo.ignore) {
-#if 0
       for (const auto& step : _pointerUpStage) {
         pickResult = step.action(_unTranslatedPointerX, _unTranslatedPointerY, pickResult, evt);
       }
-#endif
     }
   }
 
@@ -1403,7 +1337,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
       ActionEvent::CreateNew(_pickedDownMesh, evt));
 #endif
   }
-#if 0
+
   auto type = PointerEventTypes::POINTERUP;
   if (onPointerObservable.hasObservers()) {
     if (!clickInfo.ignore()) {
@@ -1437,7 +1371,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult, const Po
   if (onPointerUp) {
     onPointerUp(evt, pickResult, type);
   }
-#endif
+
   return *this;
 }
 
@@ -1827,24 +1761,20 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
     });
 }
 
-void Scene::_onKeyDownEvent(KeyboardEvent&& /*evt*/)
+void Scene::_onKeyDownEvent(KeyboardEvent&& evt)
 {
-  // auto type = KeyboardEventTypes::KEYDOWN;
+  auto type = KeyboardEventTypes::KEYDOWN;
   if (onPreKeyboardObservable.hasObservers()) {
-#if 0
     KeyboardInfoPre pi(type, evt);
     onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
     if (pi.skipOnPointerObservable) {
       return;
     }
-#endif
   }
 
   if (onKeyboardObservable.hasObservers()) {
-#if 0
     KeyboardInfo pi(type, evt);
     onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
-#endif
   }
 
   if (actionManager) {
@@ -1855,24 +1785,20 @@ void Scene::_onKeyDownEvent(KeyboardEvent&& /*evt*/)
   }
 }
 
-void Scene::_onKeyUpEvent(KeyboardEvent&& /*evt*/)
+void Scene::_onKeyUpEvent(KeyboardEvent&& evt)
 {
-  // auto type = KeyboardEventTypes::KEYUP;
+  auto type = KeyboardEventTypes::KEYUP;
   if (onPreKeyboardObservable.hasObservers()) {
-#if 0
     KeyboardInfoPre pi(type, evt);
     onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
     if (pi.skipOnPointerObservable) {
       return;
     }
-#endif
   }
 
   if (onKeyboardObservable.hasObservers()) {
-#if 0
     KeyboardInfo pi(type, evt);
     onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
-#endif
   }
 
   if (actionManager) {
@@ -2462,7 +2388,7 @@ void Scene::setTransformMatrix(Matrix& viewL, Matrix& projectionL,
   else if (_sceneUbo->useUbo()) {
     _sceneUbo->updateMatrix("viewProjection", _transformMatrix);
     _sceneUbo->updateMatrix("view", _viewMatrix);
-    _sceneUbo->updateMatrix("projection", _projectionMatrix);
+    _sceneUbo->update();
   }
 }
 
@@ -2623,15 +2549,7 @@ int Scene::removeSkeleton(Skeleton* toRemove)
 
 int Scene::removeMorphTargetManager(const MorphTargetManagerPtr& toRemove)
 {
-  return removeMorphTargetManager(toRemove.get());
-}
-
-int Scene::removeMorphTargetManager(MorphTargetManager* toRemove)
-{
-  auto it    = std::find_if(morphTargetManagers.begin(), morphTargetManagers.end(),
-                         [toRemove](const MorphTargetManagerPtr& morphTargetManager) {
-                           return morphTargetManager.get() == toRemove;
-                         });
+  auto it    = std::find(morphTargetManagers.begin(), morphTargetManagers.end(), toRemove);
   auto index = static_cast<int>(it - morphTargetManagers.begin());
   if (it != morphTargetManagers.end()) {
     // Remove from the scene if found
@@ -4245,7 +4163,7 @@ void Scene::render(bool updateCameras, bool ignoreAnimations)
   }
 
   // Clear
-  if (autoClearDepthAndStencil || autoClear) {
+  if ((autoClearDepthAndStencil || autoClear) && !prePass) {
     _engine->clear(clearColor, autoClear || forceWireframe() || forcePointsCloud(),
                    autoClearDepthAndStencil, autoClearDepthAndStencil);
   }
@@ -4809,7 +4727,8 @@ Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity, 
 }
 
 /** Picking **/
-Ray Scene::createPickingRay(int x, int y, Matrix& world, Camera* camera, bool cameraViewSpace)
+Ray Scene::createPickingRay(int x, int y, Matrix& world, const CameraPtr& camera,
+                            bool cameraViewSpace)
 {
   auto result = Ray::Zero();
 
@@ -4819,7 +4738,7 @@ Ray Scene::createPickingRay(int x, int y, Matrix& world, Camera* camera, bool ca
 }
 
 Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& world, Ray& result,
-                                    Camera* camera, bool cameraViewSpace)
+                                    CameraPtr camera, bool cameraViewSpace)
 {
   auto engine = _engine;
 
@@ -4828,7 +4747,7 @@ Scene& Scene::createPickingRayToRef(int x, int y, const std::optional<Matrix>& w
       return *this;
     }
 
-    camera = _activeCamera.get();
+    camera = _activeCamera;
   }
 
   auto& cameraViewport = camera->viewport;
@@ -5083,13 +5002,13 @@ Scene::pickWithBoundingInfo(int x, int y,
         _tempPickingRay = std::make_unique<Ray>(Ray::Zero());
       }
 
-      createPickingRayToRef(x, y, world, *_tempPickingRay, camera ? camera.get() : nullptr);
+      createPickingRayToRef(x, y, world, *_tempPickingRay, camera ? camera : nullptr);
       return *_tempPickingRay;
     },
     predicate, fastCheck, true);
   if (result) {
     auto world  = Matrix::Identity();
-    result->ray = createPickingRay(x, y, world, camera ? camera.get() : nullptr);
+    result->ray = createPickingRay(x, y, world, camera ? camera : nullptr);
   }
   return result;
 }
@@ -5101,14 +5020,14 @@ Scene::pick(int x, int y, const std::function<bool(const AbstractMeshPtr& mesh)>
 {
   auto result = _internalPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
-      createPickingRayToRef(x, y, world, *_tempPickingRay, camera.get());
+      createPickingRayToRef(x, y, world, *_tempPickingRay, camera);
       return *_tempPickingRay;
     },
     predicate, fastCheck, false, trianglePredicate);
   if (result) {
     auto _result     = *result;
     auto identityMat = Matrix::Identity();
-    _result.ray      = createPickingRay(x, y, identityMat, camera ? camera.get() : nullptr);
+    _result.ray      = createPickingRay(x, y, identityMat, camera ? camera : nullptr);
     result           = _result;
   }
   return result;
@@ -5124,12 +5043,7 @@ std::optional<PickingInfo> Scene::pickSprite(int x, int y,
 
   createPickingRayInCameraSpaceToRef(x, y, *_tempPickingRay, camera);
 
-  auto result = _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
-  if (result) {
-    result->ray = createPickingRayInCameraSpace(x, y, camera);
-  }
-
-  return result;
+  return _internalPickSprites(*_tempPickingRay, predicate, fastCheck, camera);
 }
 
 std::optional<PickingInfo>
@@ -5149,12 +5063,7 @@ Scene::pickSpriteWithRay(const Ray& ray, const std::function<bool(Sprite* sprite
 
   Ray::TransformToRef(ray, camera->getViewMatrix(), *_tempSpritePickingRay);
 
-  auto result = _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
-  if (result) {
-    result->ray = ray;
-  }
-
-  return result;
+  return _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck, camera);
 }
 
 std::vector<PickingInfo> Scene::_internalMultiPickSprites(
@@ -5250,9 +5159,7 @@ Scene::multiPick(int x, int y, const std::function<bool(AbstractMesh* mesh)>& pr
                  const CameraPtr& camera)
 {
   return _internalMultiPick(
-    [this, x, y, &camera](Matrix& world) -> Ray {
-      return createPickingRay(x, y, world, camera.get());
-    },
+    [this, x, y, &camera](Matrix& world) -> Ray { return createPickingRay(x, y, world, camera); },
     predicate);
 }
 
@@ -5281,8 +5188,7 @@ AbstractMeshPtr& Scene::getPointerOverMesh()
   return _pointerOverMesh;
 }
 
-void Scene::setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& /*pointerId*/,
-                               const std::optional<PickingInfo>& /*pickResult*/)
+void Scene::setPointerOverMesh(AbstractMesh* mesh, const std::optional<int>& /*pointerId*/)
 {
   if (_pointerOverMesh.get() == mesh) {
     return;
@@ -5308,7 +5214,7 @@ void Scene::setPointerOverSprite(const SpritePtr& sprite)
   if (_pointerOverSprite == sprite) {
     return;
   }
-#if 0
+
   if (_pointerOverSprite && _pointerOverSprite->actionManager) {
     Event evt;
     _pointerOverSprite->actionManager->processTrigger(
@@ -5323,7 +5229,6 @@ void Scene::setPointerOverSprite(const SpritePtr& sprite)
       Constants::ACTION_OnPointerOverTrigger,
       ActionEvent::CreateNewFromSprite(_pointerOverSprite, this, evt));
   }
-#endif
 }
 
 SpritePtr& Scene::getPointerOverSprite()
@@ -5639,13 +5544,10 @@ Scene::_loadFileAsync(const std::string& /*url*/, const std::optional<bool>& /*u
 
 void Scene::_createMultiviewUbo()
 {
-  _multiviewSceneUbo
-    = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true, "scene_multiview");
+  _multiviewSceneUbo = std::make_unique<UniformBuffer>(getEngine(), Float32Array(), true);
   _multiviewSceneUbo->addUniform("viewProjection", 16);
   _multiviewSceneUbo->addUniform("viewProjectionR", 16);
   _multiviewSceneUbo->addUniform("view", 16);
-  _multiviewSceneUbo->addUniform("projection", 16);
-  _multiviewSceneUbo->addUniform("viewPosition", 4);
 }
 
 void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR, std::optional<Matrix> projectionR)
@@ -5665,16 +5567,16 @@ void Scene::_updateMultiviewUbo(std::optional<Matrix> viewR, std::optional<Matri
     _multiviewSceneUbo->updateMatrix("viewProjection", getTransformMatrix());
     _multiviewSceneUbo->updateMatrix("viewProjectionR", _transformMatrixR);
     _multiviewSceneUbo->updateMatrix("view", _viewMatrix);
-    _multiviewSceneUbo->updateMatrix("projection", _projectionMatrix);
+    _multiviewSceneUbo->update();
   }
 }
 
 void Scene::_renderMultiviewToSingleView(const CameraPtr& camera)
 {
   // Multiview is only able to be displayed directly for API's such as webXR
-  // This displays a multiview image by rendering to the multiview image and then
-  // copying the result into the sub cameras instead of rendering them and proceeding as normal
-  // from there
+  // This displays a multiview image by rendering to the multiview image and
+  // then copying the result into the sub cameras instead of rendering them and
+  // proceeding as normal from there
 
   // Render to a multiview texture
   camera->_resizeOrCreateMultiviewTexture(

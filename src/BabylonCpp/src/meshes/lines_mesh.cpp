@@ -1,8 +1,6 @@
 #include <babylon/meshes/lines_mesh.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
-#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engines/engine.h>
@@ -12,13 +10,13 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_lines_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/rendering/line_edges_renderer.h>
 
 namespace BABYLON {
 
 LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, LinesMesh* iSource,
-                     bool doNotCloneChildren, bool iUseVertexColor, bool iUseVertexAlpha,
-                     const MaterialPtr& iMaterial)
+                     bool doNotCloneChildren, bool iUseVertexColor, bool iUseVertexAlpha)
     : Mesh(iName, scene, iParent, iSource, doNotCloneChildren)
     , dashSize{0.f}
     , gapSize{0.f}
@@ -26,7 +24,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
     , alpha{1.f}
     , useVertexColor{false}
     , useVertexAlpha{false}
-    , _lineMaterial{nullptr}
+    , _colorShaderMaterial{nullptr}
 {
   if (_source) {
     color          = iSource->color;
@@ -39,7 +37,9 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
 
   std::vector<std::string> defines;
   IShaderMaterialOptions options;
-  options.attributes        = {VertexBuffer::PositionKind};
+  options.attributes
+    = {VertexBuffer::PositionKind, VertexBuffer::World0Kind, VertexBuffer::World1Kind,
+       VertexBuffer::World2Kind, VertexBuffer::World3Kind};
   options.uniforms          = {"vClipPlane",  "vClipPlane2", "vClipPlane3", "vClipPlane4",
                       "vClipPlane5", "vClipPlane6", "world",       "viewProjection"};
   options.needAlphaBlending = true;
@@ -57,54 +57,34 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent, Line
     options.attributes.emplace_back(VertexBuffer::ColorKind);
   }
 
-  if (iMaterial) {
-    material = iMaterial;
-  }
-  else {
-    _lineMaterial = ShaderMaterial::New("colorShader", getScene(), "color", options);
-  }
+  _colorShader = ShaderMaterial::New("colorShader", getScene(), "color", options);
 }
 
 LinesMesh::~LinesMesh() = default;
 
-bool LinesMesh::_isShaderMaterial(const MaterialPtr& shader) const
-{
-  return shader->getClassName() == "ShaderMaterial";
-}
-
 void LinesMesh::_addClipPlaneDefine(const std::string& label)
 {
-  if (!_isShaderMaterial(_lineMaterial)) {
-    return;
-  }
-
-  const auto _lineShaderMaterial = std::static_pointer_cast<ShaderMaterial>(_lineMaterial);
-  const auto define              = "#define " + label;
-  const auto hasDefine = stl_util::contains(_lineShaderMaterial->options().defines, define);
+  const auto define    = "#define " + label;
+  const auto hasDefine = stl_util::contains(_colorShader->options().defines, define);
 
   if (hasDefine) {
     return;
   }
 
-  _lineShaderMaterial->options().defines.emplace_back(define);
+  _colorShader->options().defines.emplace_back(define);
 }
 
 void LinesMesh::_removeClipPlaneDefine(const std::string& label)
 {
-  if (!_isShaderMaterial(_lineMaterial)) {
+  const auto define = "#define " + label;
+  const auto index  = std::find(_colorShader->options().defines.begin(),
+                               _colorShader->options().defines.end(), define);
+
+  if (index == _colorShader->options().defines.end()) {
     return;
   }
 
-  const auto _lineShaderMaterial = std::static_pointer_cast<ShaderMaterial>(_lineMaterial);
-  const auto define              = "#define " + label;
-  const auto index               = std::find(_lineShaderMaterial->options().defines.begin(),
-                               _lineShaderMaterial->options().defines.end(), define);
-
-  if (index == _lineShaderMaterial->options().defines.end()) {
-    return;
-  }
-
-  _lineShaderMaterial->options().defines.erase(index);
+  _colorShader->options().defines.erase(index);
 }
 
 bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
@@ -119,7 +99,7 @@ bool LinesMesh::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
   scene.clipPlane5 ? _addClipPlaneDefine("CLIPPLANE5") : _removeClipPlaneDefine("CLIPPLANE5");
   scene.clipPlane6 ? _addClipPlaneDefine("CLIPPLANE6") : _removeClipPlaneDefine("CLIPPLANE6");
 
-  if (!_lineMaterial->isReady(this)) {
+  if (!_colorShader->isReady(this)) {
     return false;
   }
 
@@ -138,12 +118,13 @@ Type LinesMesh::type() const
 
 MaterialPtr& LinesMesh::get_material()
 {
-  return _lineMaterial;
+  _colorShaderMaterial = std::static_pointer_cast<Material>(_colorShader);
+  return _colorShaderMaterial;
 }
 
-void LinesMesh::set_material(const MaterialPtr& value)
+void LinesMesh::set_material(const MaterialPtr& /*material*/)
 {
-  _lineMaterial = value;
+  // Do nothing
 }
 
 bool LinesMesh::get_checkCollisions() const
@@ -151,32 +132,21 @@ bool LinesMesh::get_checkCollisions() const
   return false;
 }
 
-void LinesMesh::set_checkCollisions()
-{
-  // Just ignore it
-}
-
 void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/, unsigned int /*fillMode*/)
 {
   if (!_geometry) {
     return;
   }
-  const auto& colorEffect = _lineMaterial->getEffect();
+  const auto& colorEffect = _colorShader->getEffect();
 
   // VBOs
   const auto indexToBind = isUnIndexed ? nullptr : _geometry->getIndexBuffer();
-  if (!_userInstancedBuffersStorage) {
-    _geometry->_bind(colorEffect, indexToBind);
-  }
-  else {
-    _geometry->_bind(colorEffect, indexToBind, _userInstancedBuffersStorage->vertexBuffers,
-                     *_userInstancedBuffersStorage->vertexArrayObjects);
-  }
+  _geometry->_bind(colorEffect, indexToBind);
 
   // Color
-  if (!useVertexColor && _isShaderMaterial(_lineMaterial)) {
+  if (!useVertexColor) {
     color4.set(color.r, color.g, color.b, alpha);
-    std::static_pointer_cast<ShaderMaterial>(_lineMaterial)->setColor4("color", color4);
+    _colorShader->setColor4("color", color4);
   }
 
   // Clip planes
@@ -216,7 +186,7 @@ PickingInfo LinesMesh::intersects(Ray& /*ray*/, const std::optional<bool>& /*fas
 
 void LinesMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  _lineMaterial->dispose(false, false, true);
+  _colorShader->dispose(false, false, true);
 
   Mesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
@@ -229,20 +199,6 @@ LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent, bool do
 InstancedLinesMeshPtr LinesMesh::createInstance(const std::string& iName)
 {
   return InstancedLinesMesh::New(iName, shared_from_base<LinesMesh>());
-}
-
-void LinesMesh::serialize(json& /*serializationObject*/) const
-{
-}
-
-LinesMeshPtr LinesMesh::Parse(const json& parsedMesh, Scene* scene)
-{
-  auto result = LinesMesh::New(json_util::get_string(parsedMesh, "name"), scene);
-
-  result->color = Color3::FromArray(json_util::get_array<float>(parsedMesh, "color"));
-  result->alpha = json_util::get_number<float>(parsedMesh, "alpha");
-
-  return result;
 }
 
 AbstractMeshPtr LinesMesh::enableEdgesRendering(const AbstractMeshPtr& iSource, float epsilon,

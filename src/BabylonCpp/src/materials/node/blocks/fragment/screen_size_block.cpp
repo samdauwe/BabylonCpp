@@ -53,7 +53,7 @@ void ScreenSizeBlock::bind(Effect* effect, const NodeMaterialPtr& /*nodeMaterial
   const auto engine = _scene->getEngine();
 
   effect->setFloat2(_varName, static_cast<float>(engine->getRenderWidth()),
-                    static_cast<float>(engine->getRenderHeight()));
+                    static_cast<float>(engine->getRenderWidth()));
 }
 
 std::string ScreenSizeBlock::writeOutputs(NodeMaterialBuildState& state, const std::string& varName)

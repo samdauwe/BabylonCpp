@@ -1,6 +1,5 @@
 #include <babylon/engines/engine.h>
 
-#include <babylon/audio/audio_engine.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
@@ -18,7 +17,6 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/webgl/webgl_data_buffer.h>
-#include <babylon/misc/perf_counter.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/particles/iparticle_system.h>
 #include <babylon/particles/particle_system.h>
@@ -71,7 +69,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , loadingUIBackgroundColor{this, &Engine::set_loadingUIBackgroundColor}
     , _rescalePostProcess{nullptr}
     , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
-    , _gpuFrameTime{std::make_unique<PerfCounter>()}
     , _multiviewExtension{std::make_unique<MultiviewExtension>(this)}
     , _occlusionQueryExtension{std::make_unique<OcclusionQueryExtension>(this)}
     , _transformFeedbackExtension{std::make_unique<TransformFeedbackExtension>(this)}
@@ -82,25 +79,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     return;
   }
 
-  _sharedInit(canvas, !!options.doNotHandleTouchAction, options.audioEngine);
+  _onCanvasFocus = [this]() { onCanvasFocusObservable.notifyObservers(this); };
 
-  _deterministicLockstep = options.deterministicLockstep;
-  _lockstepMaxSteps      = options.lockstepMaxSteps;
-  _timeStep              = options.timeStep.value_or(1.f / 60.f);
-}
-
-Engine::~Engine()
-{
-  stl_util::remove_vector_elements_equal(EngineStore::Instances, this);
-}
-
-void Engine::_sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool iAudioEngine)
-{
-  ThinEngine::_sharedInit(canvas, doNotHandleTouchAction, iAudioEngine);
-
-  _onCanvasFocus = [this]() -> void { onCanvasFocusObservable.notifyObservers(this); };
-
-  _onCanvasBlur = [this]() -> void { onCanvasBlurObservable.notifyObservers(this); };
+  _onCanvasBlur = [this]() { onCanvasBlurObservable.notifyObservers(this); };
 
   _onBlur = [this]() -> void {
     if (disablePerformanceMonitorInBackground) {
@@ -117,11 +98,16 @@ void Engine::_sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool iAud
   };
 
   _onCanvasPointerOut
-    = [this](IPointerEvent* ev) -> void { onCanvasPointerOutObservable.notifyObservers(ev); };
+    = [this](PointerEvent* ev) -> void { onCanvasPointerOutObservable.notifyObservers(ev); };
 
-  if (!doNotHandleTouchAction) {
-    _disableTouchAction();
-  }
+  _deterministicLockstep = options.deterministicLockstep;
+  _lockstepMaxSteps      = options.lockstepMaxSteps;
+  _timeStep              = options.timeStep.value_or(1.f / 60.f);
+}
+
+Engine::~Engine()
+{
+  stl_util::remove_vector_elements_equal(EngineStore::Instances, this);
 }
 
 bool Engine::get__supportsHardwareTextureRescaling() const
@@ -139,7 +125,7 @@ ICanvas* Engine::getInputElement() const
   return _renderingCanvas;
 }
 
-float Engine::getAspectRatio(const Camera& camera, bool useScreen) const
+float Engine::getAspectRatio(const Camera& camera, bool useScreen)
 {
   const auto& viewport = camera.viewport;
   return static_cast<float>(getRenderWidth(useScreen) * viewport.width)
@@ -196,9 +182,7 @@ void Engine::generateMipMapsForCubemap(const InternalTexturePtr& texture, bool u
   }
 }
 
-void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide,
-                      bool /*iCullBackFaces*/, const IStencilStatePtr& /*stencil*/,
-                      float /*zOffsetUnits*/)
+void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
 {
   // Culling
   if (_depthCullingState->cull() != culling || force) {
@@ -231,22 +215,6 @@ void Engine::setZOffset(float value)
 float Engine::getZOffset() const
 {
   return _depthCullingState->zOffset();
-}
-
-bool Engine::getDepthBuffer() const
-{
-  return _depthCullingState->depthTest();
-}
-
-void Engine::setZOffsetUnits(float value)
-{
-  _depthCullingState->zOffsetUnits = useReverseDepthBuffer ? -value : value;
-}
-
-float Engine::getZOffsetUnits() const
-{
-  const auto zOffsetUnits = _depthCullingState->zOffsetUnits();
-  return useReverseDepthBuffer ? -zOffsetUnits : zOffsetUnits;
 }
 
 void Engine::setDepthBuffer(bool enable)
@@ -376,22 +344,22 @@ void Engine::setDepthFunction(int depthFunc)
 
 void Engine::setDepthFunctionToGreater()
 {
-  _depthCullingState->depthFunc = Constants::GREATER;
+  _depthCullingState->depthFunc = GL::GREATER;
 }
 
 void Engine::setDepthFunctionToGreaterOrEqual()
 {
-  _depthCullingState->depthFunc = Constants::GEQUAL;
+  _depthCullingState->depthFunc = GL::GEQUAL;
 }
 
 void Engine::setDepthFunctionToLess()
 {
-  _depthCullingState->depthFunc = Constants::LESS;
+  _depthCullingState->depthFunc = GL::LESS;
 }
 
 void Engine::setDepthFunctionToLessOrEqual()
 {
-  _depthCullingState->depthFunc = Constants::LEQUAL;
+  _depthCullingState->depthFunc = GL::LEQUAL;
 }
 
 void Engine::cacheStencilState()
@@ -508,7 +476,7 @@ std::string Engine::getFragmentShaderSource(const WebGLProgramPtr& program)
 }
 
 void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                                    const RenderTargetTexturePtr& texture, const std::string& name)
+                                    const RenderTargetTexturePtr& texture)
 {
   if (channel < 0) {
     return;
@@ -519,34 +487,22 @@ void Engine::setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& 
   }
 
   if (!texture || !texture->depthStencilTexture()) {
-    _setTexture(channel, nullptr, false, false, name);
+    _setTexture(channel, nullptr);
   }
   else {
-    _setTexture(channel, std::static_pointer_cast<BaseTexture>(texture), false, true, name);
+    _setTexture(channel, std::static_pointer_cast<BaseTexture>(texture), false, true);
   }
 }
 
-void Engine::setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess,
-                                       const std::string& name)
+void Engine::setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess)
 {
-  InternalTexturePtr postProcessInput = nullptr;
-  if (postProcess) {
-    if (postProcess->_currentRenderTextureInd < postProcess->_textures.size()
-        && postProcess->_textures[postProcess->_currentRenderTextureInd]) {
-      postProcessInput = postProcess->_textures[postProcess->_currentRenderTextureInd];
-    }
-    else if (postProcess->_forcedOutputTexture) {
-      postProcessInput = postProcess->_forcedOutputTexture;
-    }
-  }
-
-  _bindTexture(channel, postProcessInput, name);
+  const auto _ind = static_cast<size_t>(postProcess->_currentRenderTextureInd);
+  _bindTexture(channel, postProcess ? postProcess->_textures[_ind] : nullptr);
 }
 
-void Engine::setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess,
-                                             const std::string& name)
+void Engine::setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess)
 {
-  _bindTexture(channel, postProcess ? postProcess->_outputTexture : nullptr, name);
+  _bindTexture(channel, postProcess ? postProcess->_outputTexture : nullptr);
 }
 
 void Engine::_rebuildBuffers()
@@ -659,23 +615,23 @@ void Engine::endFrame()
   onEndFrameObservable.notifyObservers(this);
 }
 
-void Engine::resize(bool forceSetSize)
+void Engine::resize()
 {
   // We're not resizing the size of the canvas while in VR mode & presenting
   if (isVRPresenting()) {
     return;
   }
 
-  ThinEngine::resize(forceSetSize);
+  ThinEngine::resize();
 }
 
-bool Engine::setSize(int width, int height, bool forceSetSize)
+bool Engine::setSize(int width, int height)
 {
   if (!_renderingCanvas) {
     return false;
   }
 
-  if (!ThinEngine::setSize(width, height, forceSetSize)) {
+  if (!ThinEngine::setSize(width, height)) {
     return false;
   }
 
@@ -1076,12 +1032,6 @@ void Engine::dispose()
   }
   scenes.clear();
 
-  // Release audio engine
-  if (Engine::Instances().size() == 1 && Engine::audioEngine) {
-    Engine::audioEngine->dispose();
-    Engine::audioEngine = nullptr;
-  }
-
   // WebVR
   disableVR();
 
@@ -1095,14 +1045,6 @@ void Engine::dispose()
   }
 
   // Observables
-  if (_onBeginFrameObserver) {
-    onBeginFrameObservable.remove(_onBeginFrameObserver);
-    _onBeginFrameObserver = nullptr;
-  }
-  if (_onEndFrameObserver) {
-    onEndFrameObservable.remove(_onEndFrameObserver);
-    _onEndFrameObserver = nullptr;
-  }
   onResizeObservable.clear();
   onCanvasBlurObservable.clear();
   onCanvasFocusObservable.clear();
@@ -1168,52 +1110,6 @@ void Engine::_RequestFullscreen(ICanvas* /*element*/)
 
 void Engine::_ExitFullscreen()
 {
-}
-
-//------------------------------------------------------------------------------------------------
-//                              GPU Frame Time Extension
-//------------------------------------------------------------------------------------------------
-
-std::unique_ptr<PerfCounter>& Engine::getGPUFrameTimeCounter()
-{
-  return _gpuFrameTime;
-}
-
-void Engine::captureGPUFrameTime(bool value)
-{
-  if (value == _captureGPUFrameTime) {
-    return;
-  }
-
-  _captureGPUFrameTime = value;
-
-  if (value) {
-    _onBeginFrameObserver
-      = onBeginFrameObservable.add([this](Engine* /*engine*/, EventState& /*es*/) {
-          if (!_gpuFrameTimeToken) {
-            _gpuFrameTimeToken = startTimeQuery();
-          }
-        });
-
-    _onEndFrameObserver = onEndFrameObservable.add([this](Engine* /*engine*/, EventState& /*es*/) {
-      if (!_gpuFrameTimeToken) {
-        return;
-      }
-      const auto time = endTimeQuery(_gpuFrameTimeToken);
-
-      if (time > -1) {
-        _gpuFrameTimeToken = std::nullopt;
-        _gpuFrameTime->fetchNewFrame();
-        _gpuFrameTime->addCount(static_cast<size_t>(time), true);
-      }
-    });
-  }
-  else {
-    onBeginFrameObservable.remove(_onBeginFrameObserver);
-    _onBeginFrameObserver = nullptr;
-    onEndFrameObservable.remove(_onEndFrameObserver);
-    _onEndFrameObserver = nullptr;
-  }
 }
 
 //--------------------------------------------------------------------------------------------------

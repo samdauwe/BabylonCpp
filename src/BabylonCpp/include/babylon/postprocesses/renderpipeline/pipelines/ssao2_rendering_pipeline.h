@@ -7,7 +7,6 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/babylon_fwd.h>
-#include <babylon/engines/constants.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
 
@@ -18,7 +17,6 @@ namespace BABYLON {
 class Scene;
 class Vector3;
 FWD_CLASS_SPTR(DynamicTexture)
-FWD_CLASS_SPTR(GeometryBufferRenderer)
 FWD_CLASS_SPTR(PassPostProcess)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(SSAO2RenderingPipeline)
@@ -92,7 +90,7 @@ public:
   void _rebuild() override;
 
   /**
-   * @brief Removes the internal pipeline assets and detaches the pipeline from the scene cameras.
+   * @brief Removes the internal pipeline assets and detatches the pipeline from the scene cameras.
    */
   void dispose(bool disableGeometryBufferRenderer = false,
                bool disposeMaterialAndTextures    = false) override;
@@ -116,40 +114,34 @@ public:
 protected:
   /**
    * @brief Constructor
-   * @param name The rendering pipeline name
+   * @param name The rendering pipeline name.
    * @param scene The scene linked to this pipeline
    * @param ratio The size of the postprocesses. Can be a number shared between passes or an object
    * for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
    * @param cameras The array of cameras that the rendering pipeline will be attached to
    * @param forceGeometryBuffer Set to true if you want to use the legacy geometry buffer renderer
-   * @param textureType The texture type used by the different post processes created by SSAO
-   * (default: Constants.TEXTURETYPE_UNSIGNED_INT)
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false,
-                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = true);
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
-                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = false,
-                         unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT);
+                         const std::vector<CameraPtr>& cameras, bool forceGeometryBuffer = true);
 
 private:
   void set_samples(unsigned int n);
   [[nodiscard]] unsigned int get_samples() const;
   void set_textureSamples(unsigned int n);
   [[nodiscard]] unsigned int get_textureSamples() const;
-  GeometryBufferRendererPtr& get__geometryBufferRenderer();
-  PrePassRendererPtr& get__prePassRenderer();
   void set_expensiveBlur(bool b);
   [[nodiscard]] bool get_expensiveBlur() const;
-  void _createBlurPostProcess(float ssaoRatio, float blurRatio, unsigned int textureType);
+  void _createBlurPostProcess(float ssaoRatio, float blurRatio);
   // Van der Corput radical inverse
   float _radicalInverse_VdC(uint32_t i);
   std::array<float, 2> _hammersley(uint32_t i, uint32_t n);
   Vector3 _hemisphereSample_uniform(float u, float v);
   Float32Array _generateHemisphere();
   std::string _getDefinesForSSAO();
-  void _createSSAOPostProcess(float ratio, unsigned int textureType);
-  void _createSSAOCombinePostProcess(float ratio, unsigned int textureType);
+  void _createSSAOPostProcess(float ratio);
+  void _createSSAOCombinePostProcess(float ratio);
   void _createRandomTexture();
 
 public:
@@ -227,16 +219,6 @@ private:
   bool _forceGeometryBuffer;
 
   /**
-   * Hidden
-   */
-  ReadOnlyProperty<SSAO2RenderingPipeline, GeometryBufferRendererPtr> _geometryBufferRenderer;
-
-  /**
-   * Hidden
-   */
-  ReadOnlyProperty<SSAO2RenderingPipeline, PrePassRendererPtr> _prePassRenderer;
-
-  /**
    * Ratio object used for SSAO ratio and blur ratio
    */
   SSAO2Ratio _ratio;
@@ -267,13 +249,9 @@ private:
   PostProcessPtr _blurVPostProcess;
   PostProcessPtr _ssaoCombinePostProcess;
 
+  PrePassRendererPtr _prePassRenderer;
+
   Uint32Array _bits;
-
-  GeometryBufferRendererPtr _nullGeometryBuffer;
-  PrePassRendererPtr _nullPrePassRenderer;
-
-  static const Float32Array ORTHO_DEPTH_PROJECTION;
-  static const Float32Array PERSPECTIVE_DEPTH_PROJECTION;
 
 }; // end of class SSAORenderingPipeline
 

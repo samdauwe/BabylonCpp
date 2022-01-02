@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -15,6 +14,7 @@
 #include <babylon/meshes/builders/shape_builder.h>
 #include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
@@ -89,7 +89,7 @@ ShaderMaterialPtr SkeletonViewer::CreateBoneWeightShader(const IBoneWeightShader
           color = mix(color, colorFull, smoothstep(0.75, 1.0, totalWeight));
           vColor = color;
 
-          gl_Position = projection * view * worldPos;
+      gl_Position = projection * view * worldPos;
       }
   )ShaderCode";
 
@@ -263,7 +263,7 @@ SkeletonViewer::SkeletonViewer(const SkeletonPtr& iSkeleton, const AbstractMeshP
     , renderingGroupId{iRenderingGroupId}
     , isEnabled{this, &SkeletonViewer::get_isEnabled, &SkeletonViewer::set_isEnabled}
     , _debugMesh{nullptr}
-    , _isEnabled{true}
+    , _isEnabled{false}
     , _obs{nullptr}
     , _utilityLayer{nullptr}
 {

@@ -9,30 +9,17 @@ namespace BABYLON {
 MultiRenderTarget::MultiRenderTarget(const std::string& iName,
                                      const std::variant<int, RenderTargetSize, float>& size,
                                      std::size_t count, Scene* scene,
-                                     const std::optional<IMultiRenderTargetOptions>& options,
-                                     const std::vector<std::string>& textureNames)
-    : RenderTargetTexture{iName, // name
-                          size,  // size
-                          scene, // scene
+                                     const std::optional<IMultiRenderTargetOptions>& options)
+    : RenderTargetTexture{iName, size, scene,
                           options && (*options).generateMipMaps ? *(*options).generateMipMaps :
-                                                                  false, // generateMipMaps
+                                                                  false,
                           options && (*options).doNotChangeAspectRatio ?
                             *(*options).doNotChangeAspectRatio :
-                            true, // doNotChangeAspectRatio
-                          std::nullopt, // type
-                          std::nullopt, // isCube
-                          std::nullopt, // samplingMode
-                          std::nullopt, // generateDepthBuffer
-                          std::nullopt, // generateStencilBuffer
-                          std::nullopt, // isMulti
-                          std::nullopt, // format
-                          true // delayAllocation
-    }
+                            true}
     , isSupported{this, &MultiRenderTarget::get_isSupported}
     , textures{this, &MultiRenderTarget::get_textures}
     , count{this, &MultiRenderTarget::get_count}
     , depthTexture{this, &MultiRenderTarget::get_depthTexture}
-    , _drawOnlyOnFirstAttachmentByDefault{false}
     , _nullTexture{nullptr}
 {
   auto generateMipMaps
@@ -41,10 +28,6 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
     = options && (*options).generateDepthTexture ? *(*options).generateDepthTexture : false;
   auto doNotChangeAspectRatio
     = options && (*options).doNotChangeAspectRatio ? *(*options).doNotChangeAspectRatio : true;
-  auto drawOnlyOnFirstAttachmentByDefault
-    = options && (*options).drawOnlyOnFirstAttachmentByDefault ?
-        *(*options).drawOnlyOnFirstAttachmentByDefault :
-        false;
 
   if (!isSupported()) {
     dispose();
@@ -74,20 +57,17 @@ MultiRenderTarget::MultiRenderTarget(const std::string& iName,
     Constants::TEXTURETYPE_UNSIGNED_INT // defaultType
   };
 
-  _count                              = count;
-  _drawOnlyOnFirstAttachmentByDefault = drawOnlyOnFirstAttachmentByDefault;
+  _count = count;
 
-  if (count > 0) {
-    _createInternalTextures();
-    _createTextures(textureNames);
-  }
+  _createInternalTextures();
+  _createInternalTextures();
 }
 
 MultiRenderTarget::~MultiRenderTarget() = default;
 
 bool MultiRenderTarget::get_isSupported() const
 {
-  return _engine ? _engine->getCaps().drawBuffersExtension : false;
+  return (_getEngine()->webGLVersion() > 1.f) || (_getEngine()->getCaps().drawBuffersExtension);
 }
 
 std::vector<TexturePtr>& MultiRenderTarget::get_textures()
@@ -145,19 +125,13 @@ void MultiRenderTarget::_initTypes(size_t iCount, std::vector<unsigned int>& typ
   }
 }
 
-void MultiRenderTarget::_rebuild(bool forceFullRebuild,
-                                 const std::vector<std::string>& textureNames)
+void MultiRenderTarget::_rebuild(bool forceFullRebuild)
 {
-  if (_count < 1) {
-    return;
-  }
-
   releaseInternalTextures();
   _createInternalTextures();
 
   if (forceFullRebuild) {
-    _releaseTextures();
-    _createTextures(textureNames);
+    _createTextures();
   }
 
   for (auto i = 0ull; i < _internalTextures.size(); ++i) {
@@ -165,45 +139,32 @@ void MultiRenderTarget::_rebuild(bool forceFullRebuild,
     texture->_texture   = _internalTextures[i];
   }
 
+  // Keeps references to frame buffer and stencil/depth buffer
+  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
+
   if (samples() != 1) {
-    _getEngine()->updateMultipleRenderTargetTextureSampleCount(
-      _internalTextures, samples(), !_drawOnlyOnFirstAttachmentByDefault);
+    _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, samples());
   }
 }
 
 void MultiRenderTarget::_createInternalTextures()
 {
-  _internalTextures = _getEngine()->createMultipleRenderTarget(
-    ISize{_size.width, _size.height}, _multiRenderTargetOptions,
-    !_drawOnlyOnFirstAttachmentByDefault);
 
-  // Keeps references to frame buffer and stencil/depth buffer
-  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
+  _internalTextures = _getEngine()->createMultipleRenderTarget(ISize{_size.width, _size.height},
+                                                               _multiRenderTargetOptions);
 }
 
-void MultiRenderTarget::_releaseTextures()
-{
-  if (!_textures.empty()) {
-    for (const auto& texture : _textures) {
-      texture->_texture
-        = nullptr; // internal textures are released by a call to releaseInternalTextures()
-      texture->dispose();
-    }
-  }
-}
-
-void MultiRenderTarget::_createTextures(const std::vector<std::string>& textureNames)
+void MultiRenderTarget::_createTextures()
 {
   _textures.clear();
-  auto i = 0ull;
   for (const auto& internalTexture : _internalTextures) {
-    auto texture = Texture::New("", getScene());
-    if (i < textureNames.size()) {
-      texture->name = textureNames[i++];
-    }
+    auto texture      = Texture::New("", getScene());
     texture->_texture = internalTexture;
     _textures.emplace_back(texture);
   }
+
+  // Keeps references to frame buffer and stencil/depth buffer
+  _texture = !_internalTextures.empty() ? _internalTextures[0] : nullptr;
 }
 
 void MultiRenderTarget::replaceTexture(const TexturePtr& texture, unsigned int index)
@@ -214,9 +175,6 @@ void MultiRenderTarget::replaceTexture(const TexturePtr& texture, unsigned int i
     }
     _textures[index]         = texture;
     _internalTextures[index] = texture->_texture;
-    if (index == 0) {
-      _texture = _internalTextures[index];
-    }
   }
 }
 
@@ -231,13 +189,7 @@ void MultiRenderTarget::set_samples(unsigned int value)
     return;
   }
 
-  if (!_internalTextures.empty()) {
-    _samples = _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
-  }
-  else {
-    // In case samples are set with 0 textures created, we must save the desired samples value
-    _samples = value;
-  }
+  _samples = _getEngine()->updateMultipleRenderTargetTextureSampleCount(_internalTextures, value);
 }
 
 void MultiRenderTarget::resize(Size size)
@@ -247,8 +199,7 @@ void MultiRenderTarget::resize(Size size)
 }
 
 void MultiRenderTarget::updateCount(size_t iCount,
-                                    const std::optional<IMultiRenderTargetOptions>& options,
-                                    const std::vector<std::string>& textureNames)
+                                    const std::optional<IMultiRenderTargetOptions>& options)
 {
   _multiRenderTargetOptions.textureCount = iCount;
   _count                                 = iCount;
@@ -259,7 +210,7 @@ void MultiRenderTarget::updateCount(size_t iCount,
   _initTypes(iCount, types, samplingModes, options);
   _multiRenderTargetOptions.types         = types;
   _multiRenderTargetOptions.samplingModes = samplingModes;
-  _rebuild(true, textureNames);
+  _rebuild(true);
 }
 
 void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex)
@@ -272,7 +223,6 @@ void MultiRenderTarget::unbindFrameBuffer(Engine* engine, unsigned int faceIndex
 
 void MultiRenderTarget::dispose()
 {
-  _releaseTextures();
   releaseInternalTextures();
 
   RenderTargetTexture::dispose();
@@ -288,7 +238,6 @@ void MultiRenderTarget::releaseInternalTextures()
     if (_internalTextures[i] != nullptr) {
       _internalTextures[i]->dispose();
     }
-    _textures[i]->_texture = nullptr;
   }
   _internalTextures.clear();
 }

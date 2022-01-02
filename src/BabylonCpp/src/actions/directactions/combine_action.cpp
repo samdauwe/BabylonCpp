@@ -4,11 +4,10 @@
 
 namespace BABYLON {
 
-CombineAction::CombineAction(unsigned int iTriggerOptions, const std::vector<Action*>& iChildren,
-                             Condition* condition, bool iEnableChildrenConditions)
-    : Action(iTriggerOptions, condition)
-    , children{iChildren}
-    , enableChildrenConditions{iEnableChildrenConditions}
+CombineAction::CombineAction(unsigned int iTriggerOptions,
+                             const std::vector<Action*>& iChildren,
+                             Condition* condition)
+    : Action(iTriggerOptions, condition), children{iChildren}
 {
 }
 
@@ -22,12 +21,10 @@ void CombineAction::_prepare()
   }
 }
 
-void CombineAction::execute(const IActionEventPtr& evt)
+void CombineAction::execute(const std::optional<IActionEvent>& evt)
 {
-  for (const auto& action : children) {
-    if (!enableChildrenConditions || action->_evaluateConditionForCurrentFrame()) {
-      action->execute(evt);
-    }
+  for (auto& child : children) {
+    child->execute(evt);
   }
 }
 

@@ -13,7 +13,6 @@ VectorSplitterBlock::VectorSplitterBlock(const std::string& iName)
     , xyIn{this, &VectorSplitterBlock::get_xyIn}
     , xyzOut{this, &VectorSplitterBlock::get_xyzOut}
     , xyOut{this, &VectorSplitterBlock::get_xyOut}
-    , zw{this, &VectorSplitterBlock::get_zw}
     , x{this, &VectorSplitterBlock::get_x}
     , y{this, &VectorSplitterBlock::get_y}
     , z{this, &VectorSplitterBlock::get_z}
@@ -25,7 +24,6 @@ VectorSplitterBlock::VectorSplitterBlock(const std::string& iName)
 
   registerOutput("xyz", NodeMaterialBlockConnectionPointTypes::Vector3);
   registerOutput("xy", NodeMaterialBlockConnectionPointTypes::Vector2);
-  registerOutput("zw", NodeMaterialBlockConnectionPointTypes::Vector2);
   registerOutput("x", NodeMaterialBlockConnectionPointTypes::Float);
   registerOutput("y", NodeMaterialBlockConnectionPointTypes::Float);
   registerOutput("z", NodeMaterialBlockConnectionPointTypes::Float);
@@ -66,29 +64,24 @@ NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_xyOut()
   return _outputs[1];
 }
 
-NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_zw()
+NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_x()
 {
   return _outputs[2];
 }
 
-NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_x()
+NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_y()
 {
   return _outputs[3];
 }
 
-NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_y()
+NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_z()
 {
   return _outputs[4];
 }
 
-NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_z()
-{
-  return _outputs[5];
-}
-
 NodeMaterialConnectionPointPtr& VectorSplitterBlock::get_w()
 {
-  return _outputs[6];
+  return _outputs[5];
 }
 
 std::string VectorSplitterBlock::_inputRename(const std::string& iName)
@@ -121,11 +114,10 @@ VectorSplitterBlock& VectorSplitterBlock::_buildBlock(NodeMaterialBuildState& st
 
   const auto& xyzOutput = _outputs[0];
   const auto& xyOutput  = _outputs[1];
-  const auto& zwOutput  = _outputs[2];
-  const auto& xOutput   = _outputs[3];
-  const auto& yOutput   = _outputs[4];
-  const auto& zOutput   = _outputs[5];
-  const auto& wOutput   = _outputs[6];
+  const auto& xOutput   = _outputs[2];
+  const auto& yOutput   = _outputs[3];
+  const auto& zOutput   = _outputs[4];
+  const auto& wOutput   = _outputs[5];
 
   if (xyzOutput->hasEndpoints()) {
     if (input == xyIn()) {
@@ -138,11 +130,6 @@ VectorSplitterBlock& VectorSplitterBlock::_buildBlock(NodeMaterialBuildState& st
         += _declareOutput(xyzOutput, state)
            + StringTools::printf(" = %s.xyz;\r\n", input->associatedVariableName().c_str());
     }
-  }
-  if (zwOutput->hasEndpoints() && xyzw()->isConnected()) {
-    state.compilationString
-      += _declareOutput(zwOutput, state)
-         + StringTools::printf(" = %s.zw;\r\n", xyzw()->associatedVariableName().c_str());
   }
   if (xyOutput->hasEndpoints()) {
     state.compilationString

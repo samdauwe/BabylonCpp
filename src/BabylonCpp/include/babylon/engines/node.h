@@ -7,7 +7,6 @@
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/behaviors/ibehavior_aware.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
@@ -19,36 +18,27 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractScene;
+class AbstractActionManager;
+class AbstractMesh;
+class Animatable;
 struct AnimationPropertiesOverride;
+class AnimationRange;
 class Engine;
+class Node;
 class Scene;
-FWD_CLASS_SPTR(AbstractActionManager)
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Animatable)
-FWD_CLASS_SPTR(AnimationRange)
-FWD_CLASS_SPTR(Node)
-FWD_CLASS_SPTR(TransformNode)
+class TransformNode;
+using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
+using AbstractMeshPtr          = std::shared_ptr<AbstractMesh>;
+using AnimatablePtr            = std::shared_ptr<Animatable>;
+using AnimationRangePtr        = std::shared_ptr<AnimationRange>;
+using NodePtr                  = std::shared_ptr<Node>;
+using TransformNodePtr         = std::shared_ptr<TransformNode>;
 
 /**
  * Defines how a node can be built from a string name.
  */
 using NodeConstructor = std::function<NodePtr(const std::string& name, Scene* scene,
                                               const std::optional<json>& options)>;
-
-/**
- * Hidden
- */
-struct _InternalNodeDataInfo {
-  bool _doNotSerialize     = false;
-  bool _isDisposed         = false;
-  int _sceneRootNodesIndex = -1;
-  bool _isEnabled          = true;
-  bool _isParentEnabled    = true;
-  bool _isReady            = true;
-  Observable<bool> _onEnabledStateChangedObservable;
-  Observable<Node> _onClonedObservable;
-}; // end of struct _InternalNodeDataInfo
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera.)
@@ -136,7 +126,6 @@ public:
    * @returns a {BABYLON.Engine}
    */
   Engine* getEngine();
-  const Engine* getEngine() const;
 
   // Behaviors
   /**
@@ -455,16 +444,6 @@ protected:
   void set_onDispose(const std::function<void(Node* node, EventState& es)>& callback);
 
   /**
-   * @brief An event triggered when the enabled state of the node changes.
-   */
-  Observable<bool>& get_onEnabledStateChangedObservable();
-
-  /**
-   * @brief An event triggered when the node is cloned.
-   */
-  Observable<Node>& get_onClonedObservable();
-
-  /**
    * @brief Gets the list of attached behaviors.
    * @see https://doc.babylonjs.com/features/behaviour
    */
@@ -510,10 +489,8 @@ public:
    */
   Property<Node, bool> doNotSerialize;
 
-  /**
-   * Hidden
-   */
-  AbstractScene* _parentContainer;
+  /** Hidden */
+  bool _isDisposed;
 
   /**
    * Gets a list of Animations associated with the node.
@@ -554,16 +531,6 @@ public:
   WriteOnlyProperty<Node, std::function<void(Node* node, EventState& es)>> onDispose;
 
   /**
-   * An event triggered when the enabled state of the node changes
-   */
-  ReadOnlyProperty<Node, Observable<bool>> onEnabledStateChangedObservable;
-
-  /**
-   * An event triggered when the node is cloned
-   */
-  ReadOnlyProperty<Node, Observable<Node>> onClonedObservable;
-
-  /**
    * Gets the list of attached behaviors
    * @see https://doc.babylonjs.com/features/behaviour
    */
@@ -576,10 +543,14 @@ protected:
   std::unordered_map<std::string, AnimationRangePtr> _ranges;
 
 private:
-  _InternalNodeDataInfo _nodeDataStorage;
+  bool _doNotSerialize;
+  bool _isEnabled;
+  bool _isParentEnabled;
+  bool _isReady;
   int _parentUpdateId;
   Node* _parentNode;
   std::vector<NodePtr> _children;
+  int _sceneRootNodesIndex;
   AnimationPropertiesOverridePtr _animationPropertiesOverride;
   Observer<Node>::Ptr _onDisposeObserver;
 

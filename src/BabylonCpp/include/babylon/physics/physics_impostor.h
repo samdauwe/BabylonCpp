@@ -111,7 +111,8 @@ public:
   /**
    * @brief This function will completely initialize this impostor.
    * It will create a new body - but only if this mesh has no parent.
-   * If it has, this impostor will not be used other than to define the impostor of the child mesh.
+   * If it has, this impostor will not be used other than to define the impostor
+   * of the child mesh.
    * @hidden
    */
   void _init();

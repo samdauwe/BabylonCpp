@@ -4,7 +4,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -18,6 +17,7 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/glow_blur_post_process.h>
@@ -169,14 +169,12 @@ void HighlightLayer::_createTextureAndPostProcesses()
       = PassPostProcess::New("HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
                              TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _downSamplePostprocess->onApplyObservable.add(
-      [_mainTexture = this->_mainTexture](Effect* effect, EventState&) -> void {
-        effect->setTexture("textureSampler", _mainTexture);
-      });
+      [&](Effect* effect, EventState&) { effect->setTexture("textureSampler", _mainTexture); });
 
     _horizontalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
+    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) {
       effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                         static_cast<float>(blurTextureHeight));
     });
@@ -184,7 +182,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
     _verticalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
+    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) {
       effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                         static_cast<float>(blurTextureHeight));
     });
@@ -199,16 +197,15 @@ void HighlightLayer::_createTextureAndPostProcesses()
       textureType*/);
     _horizontalBlurPostprocess->width  = blurTextureWidth;
     _horizontalBlurPostprocess->height = blurTextureHeight;
-    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
-      effect->setTexture("textureSampler", _mainTexture);
-    });
+    _horizontalBlurPostprocess->onApplyObservable.add(
+      [&](Effect* effect, EventState&) { effect->setTexture("textureSampler", _mainTexture); });
 
     _verticalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize,
       1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine()/*, false,
       textureType*/);
-    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) -> void {
+    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect, EventState&) {
       effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                         static_cast<float>(blurTextureHeight));
     });
@@ -217,7 +214,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
   }
 
   _mainTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) -> void {
+    [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) {
       onBeforeBlurObservable.notifyObservers(this);
 
       auto internalTexture = _blurTexture->getInternalTexture();
@@ -242,8 +239,8 @@ bool HighlightLayer::needStencil() const
 
 bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances)
 {
-  const auto material = subMesh->getMaterial();
-  const auto mesh     = subMesh->getRenderingMesh();
+  auto material = subMesh->getMaterial();
+  auto mesh     = subMesh->getRenderingMesh();
 
   if (!material || !mesh || _meshes.empty()) {
     return false;
@@ -264,7 +261,7 @@ void HighlightLayer::_internalRender(const EffectPtr& effect)
   effect->setTexture("textureSampler", _blurTexture);
 
   // Cache
-  const auto engine = _engine;
+  auto engine = _engine;
   engine->cacheStencilState();
 
   // Stencil operations
@@ -370,9 +367,9 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh       = mesh;
     meshExcluded.beforeBind = mesh->onBeforeBindObservable().add(
-      [](Mesh* mesh, EventState&) -> void { mesh->getEngine()->setStencilBuffer(false); });
+      [](Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(false); });
     meshExcluded.afterRender = mesh->onAfterRenderObservable().add(
-      [](Mesh* mesh, EventState&) -> void { mesh->getEngine()->setStencilBuffer(true); });
+      [](Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(true); });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }
@@ -457,7 +454,7 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   }
 
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
-    const auto& meshHighlight = _meshes[mesh->uniqueId];
+    auto& meshHighlight = _meshes[mesh->uniqueId];
     if (meshHighlight.observerHighlight) {
       mesh->onBeforeBindObservable().remove(meshHighlight.observerHighlight);
     }
@@ -469,7 +466,7 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   }
 
   _shouldRender = false;
-  for (const auto& meshHighlightToCheck : _meshes) {
+  for (auto& meshHighlightToCheck : _meshes) {
     if (_meshes.find(meshHighlightToCheck.first) != _meshes.end()) {
       _shouldRender = true;
       break;

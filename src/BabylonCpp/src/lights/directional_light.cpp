@@ -4,7 +4,6 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
-#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
@@ -33,10 +32,6 @@ DirectionalLight::DirectionalLight(const std::string& iName, const Vector3& iDir
                        &DirectionalLight::set_shadowOrthoScale}
     , autoUpdateExtends{true}
     , autoCalcShadowZBounds{false}
-    , orthoLeft{this, &DirectionalLight::get_orthoLeft, &DirectionalLight::set_orthoLeft}
-    , orthoRight{this, &DirectionalLight::get_orthoRight, &DirectionalLight::set_orthoRight}
-    , orthoTop{this, &DirectionalLight::get_orthoTop, &DirectionalLight::set_orthoTop}
-    , orthoBottom{this, &DirectionalLight::get_orthoBottom, &DirectionalLight::set_orthoBottom}
     , _shadowFrustumSize{0.f}
     , _shadowOrthoScale{0.1f}
     , _orthoLeft{std::numeric_limits<float>::max()}
@@ -87,46 +82,6 @@ void DirectionalLight::set_shadowOrthoScale(float value)
   forceProjectionMatrixCompute();
 }
 
-float DirectionalLight::get_orthoLeft() const
-{
-  return _orthoLeft;
-}
-
-void DirectionalLight::set_orthoLeft(float left)
-{
-  _orthoLeft = left;
-}
-
-float DirectionalLight::get_orthoRight() const
-{
-  return _orthoRight;
-}
-
-void DirectionalLight::set_orthoRight(float right)
-{
-  _orthoRight = right;
-}
-
-float DirectionalLight::get_orthoTop() const
-{
-  return _orthoTop;
-}
-
-void DirectionalLight::set_orthoTop(float top)
-{
-  _orthoTop = top;
-}
-
-float DirectionalLight::get_orthoBottom() const
-{
-  return _orthoBottom;
-}
-
-void DirectionalLight::set_orthoBottom(float bottom)
-{
-  _orthoBottom = bottom;
-}
-
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix, const std::vector<AbstractMesh*>& renderList)
 {
@@ -148,8 +103,7 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(Matrix& mat
 
   Matrix::OrthoLHToRef(shadowFrustumSize(), shadowFrustumSize(),
                        shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix,
-                       getScene()->getEngine()->isNDCHalfZRange);
+                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
 }
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
@@ -218,16 +172,10 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   const auto xOffset = _orthoRight - _orthoLeft;
   const auto yOffset = _orthoTop - _orthoBottom;
 
-  const auto minZ = shadowMinZ() ? *shadowMinZ() : activeCamera->minZ;
-  const auto maxZ = shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ;
-
-  const auto useReverseDepthBuffer = getScene()->getEngine()->useReverseDepthBuffer;
-
   Matrix::OrthoOffCenterLHToRef(
     _orthoLeft - xOffset * shadowOrthoScale(), _orthoRight + xOffset * shadowOrthoScale(),
     _orthoBottom - yOffset * shadowOrthoScale(), _orthoTop + yOffset * shadowOrthoScale(),
-    useReverseDepthBuffer ? maxZ : minZ, useReverseDepthBuffer ? minZ : maxZ, matrix,
-    getScene()->getEngine()->isNDCHalfZRange);
+    shadowMinZ().value_or(activeCamera->minZ), shadowMaxZ().value_or(activeCamera->maxZ), matrix);
 }
 
 void DirectionalLight::_buildUniformLayout()
@@ -272,14 +220,12 @@ DirectionalLight::transferToNodeMaterialEffect(Effect* effect,
 
 float DirectionalLight::getDepthMinZ(const Camera& /*activeCamera*/) const
 {
-  const auto engine = _scene->getEngine();
-  return !engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : 1.f;
+  return 1.f;
 }
 
 float DirectionalLight::getDepthMaxZ(const Camera& /*activeCamera*/) const
 {
-  const auto engine = _scene->getEngine();
-  return engine->useReverseDepthBuffer && engine->isNDCHalfZRange ? 0.f : 1.f;
+  return 1.f;
 }
 
 void DirectionalLight::prepareLightSpecificDefines(MaterialDefines& defines,

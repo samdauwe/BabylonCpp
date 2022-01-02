@@ -122,16 +122,6 @@ protected:
 
 private:
   /**
-   * @brief Hidden
-   */
-  GeometryBufferRendererPtr& get__geometryBufferRenderer();
-
-  /**
-   * @brief Hidden
-   */
-  PrePassRendererPtr& get__prePassRenderer();
-
-  /**
    * @brief Called on the mode changed (object based or screen based).
    */
   void _applyMode();
@@ -173,14 +163,11 @@ private:
   unsigned int _motionBlurSamples;
   bool _isObjectBased;
   bool _forceGeometryBuffer;
-  ReadOnlyProperty<MotionBlurPostProcess, GeometryBufferRendererPtr> _geometryBufferRenderer;
-  ReadOnlyProperty<MotionBlurPostProcess, PrePassRendererPtr> _prePassRenderer;
+  GeometryBufferRendererPtr _geometryBufferRenderer;
+  PrePassRendererPtr _prePassRenderer;
 
   std::optional<Matrix> _invViewProjection;
   std::optional<Matrix> _previousViewProjection;
-
-  GeometryBufferRendererPtr _nullGeometryBufferRenderer;
-  PrePassRendererPtr _nullPrePassRenderer;
 
 }; // end of class VRDistortionCorrectionPostProcess
 

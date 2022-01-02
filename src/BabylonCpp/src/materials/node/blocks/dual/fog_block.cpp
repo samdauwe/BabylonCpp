@@ -107,7 +107,7 @@ void FogBlock::prepareDefines(AbstractMesh* mesh, const NodeMaterialPtr& nodeMat
                               NodeMaterialDefines& defines, bool /*useInstances*/,
                               SubMesh* /*subMesh*/)
 {
-  const auto scene = mesh->getScene();
+  auto scene = mesh->getScene();
   defines.setValue("FOG", nodeMaterial->fogEnabled() && MaterialHelper::GetFogState(mesh, scene));
 }
 
@@ -145,11 +145,11 @@ FogBlock& FogBlock::_buildBlock(NodeMaterialBuildState& state)
         }}                                                         // replaceStrings
       });
 
-    const auto tempFogVariablename = state._getFreeVariableName("fog");
-    const auto& color              = input();
-    const auto& _fogColor          = fogColor();
-    _fogParameters                 = state._getFreeVariableName("fogParameters");
-    const auto& iOutput            = _outputs[0];
+    auto tempFogVariablename = state._getFreeVariableName("fog");
+    const auto& color        = input();
+    const auto& _fogColor    = fogColor();
+    _fogParameters           = state._getFreeVariableName("fogParameters");
+    const auto& iOutput      = _outputs[0];
 
     state._emitUniformFromString(_fogParameters, "vec4");
 

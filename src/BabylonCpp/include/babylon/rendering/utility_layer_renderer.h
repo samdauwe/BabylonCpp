@@ -10,7 +10,6 @@
 
 namespace BABYLON {
 
-struct IPointerEvent;
 class PickingInfo;
 class PointerInfo;
 class PointerInfoPre;
@@ -18,7 +17,6 @@ class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Camera)
 FWD_CLASS_SPTR(HemisphericLight)
-FWD_CLASS_SPTR(UtilityLayerRenderer)
 
 /**
  * @brief Renders a layer on top of an existing scene.
@@ -89,7 +87,7 @@ protected:
 
 private:
   void _notifyObservers(const PointerInfoPre& prePointerInfo, const PickingInfo& pickInfo,
-                        const IPointerEvent& pointerEvent);
+                        const PointerEvent& pointerEvent);
   void _updateCamera();
 
 public:
@@ -131,7 +129,7 @@ public:
   bool handleEvents;
 
   /**
-   * Observable raised when the pointer moves from the utility layer scene to the main scene
+   * Observable raised when the pointer move from the utility layer scene to the main scene
    */
   Observable<int> onPointerOutObservable;
 
@@ -140,11 +138,9 @@ public:
    */
   std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
 
-public:
-  /** @hidden */
-  static UtilityLayerRendererPtr _DefaultUtilityLayer;
-  /** @hidden */
-  static UtilityLayerRendererPtr _DefaultKeepDepthUtilityLayer;
+private:
+  static std::shared_ptr<UtilityLayerRenderer> _DefaultUtilityLayer;
+  static std::shared_ptr<UtilityLayerRenderer> _DefaultKeepDepthUtilityLayer;
 
 private:
   std::unordered_map<int, bool> _pointerCaptures;

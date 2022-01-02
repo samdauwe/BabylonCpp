@@ -2,19 +2,15 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material_helper.h>
-#include <babylon/materials/material_stencil_state.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/materials/uniform_buffer.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/color4.h>
 #include <babylon/maths/vector2.h>
@@ -23,9 +19,9 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/misc/tools.h>
-#include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {
 
@@ -278,24 +274,23 @@ bool ShaderMaterial::_checkCache(AbstractMesh* mesh, bool useInstances)
     return true;
   }
 
-  const auto effect = getEffect();
-  if (effect && (effect->defines.find("#define INSTANCES") != std::string::npos) != useInstances) {
+  if (_effect
+      && (_effect->defines.find("#define INSTANCES") != std::string::npos) != useInstances) {
     return false;
   }
 
   return true;
 }
 
-bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances)
+bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* /*subMesh*/, bool useInstances)
 {
-  return isReady(mesh, useInstances, subMesh);
+  return isReady(mesh, useInstances);
 }
 
-bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* subMesh)
+bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
-  auto effect = getEffect();
-  if (effect && isFrozen()) {
-    if (effect->_wasPreviouslyReady) {
+  if (_effect && isFrozen()) {
+    if (_effect->_wasPreviouslyReady) {
       return true;
     }
   }
@@ -316,11 +311,6 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
   std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
 
-  auto& shaderName     = _shaderPath;
-  auto uniforms        = _options.uniforms;
-  auto& uniformBuffers = _options.uniformBuffers;
-  auto& samplers       = _options.samplers;
-
   // global multiview
   if (engine->getCaps().multiview && scene->activeCamera()
       && scene->activeCamera()->outputRenderTarget
@@ -334,10 +324,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
   }
 
   for (const auto& _define : _options.defines) {
-    const auto defineToAdd = StringTools::startsWith(_define, "#define") == 0 ?
-                               _define :
-                               StringTools::printf("#define %s", _define.c_str());
-    defines.emplace_back(defineToAdd);
+    defines.emplace_back(_define);
   }
 
   for (const auto& _attrib : _options.attributes) {
@@ -358,6 +345,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
   }
 
   // Bones
+  auto numInfluencers = 0u;
+
   if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders() && mesh->skeleton()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
@@ -368,8 +357,9 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
 
     const auto& skeleton = mesh->skeleton();
 
-    defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
+    numInfluencers = mesh->numBoneInfluencers();
+
+    defines.emplace_back("#define NUM_BONE_INFLUENCERS " + std::to_string(numInfluencers));
     fallbacks->addCPUSkinningFallback(0, mesh);
 
     if (skeleton->isUsingTextureForMatrices()) {
@@ -395,67 +385,6 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
-  // Morph
-  auto numInfluencers = 0ull;
-  const MorphTargetManagerPtr manager
-    = mesh ? static_cast<Mesh*>(mesh)->morphTargetManager() : nullptr;
-  if (manager) {
-    const auto uv = manager->supportsUVs() && stl_util::index_of(defines, "#define UV1") != -1;
-    const auto tangent
-      = manager->supportsTangents() && stl_util::index_of(defines, "#define TANGENT") != -1;
-    const auto normal
-      = manager->supportsNormals() && stl_util::index_of(defines, "#define NORMAL") != -1;
-    numInfluencers = manager->numInfluencers();
-    if (uv) {
-      defines.emplace_back("#define MORPHTARGETS_UV");
-    }
-    if (tangent) {
-      defines.emplace_back("#define MORPHTARGETS_TANGENT");
-    }
-    if (normal) {
-      defines.emplace_back("#define MORPHTARGETS_NORMAL");
-    }
-    if (numInfluencers > 0ull) {
-      defines.emplace_back("#define MORPHTARGETS");
-    }
-    if (manager->isUsingTextureForTargets()) {
-      defines.emplace_back("#define MORPHTARGETS_TEXTURE");
-
-      if (stl_util::index_of(_options.uniforms, "morphTargetTextureIndices") == -1) {
-        _options.uniforms.emplace_back("morphTargetTextureIndices");
-      }
-
-      if (stl_util::index_of(_options.samplers, "morphTargets") == -1) {
-        _options.samplers.emplace_back("morphTargets");
-      }
-    }
-    defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(numInfluencers));
-    for (size_t index = 0; index < numInfluencers; index++) {
-      const auto indexStr = std::to_string(index);
-      attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
-
-      if (normal) {
-        attribs.emplace_back(VertexBuffer::NormalKind + indexStr);
-      }
-
-      if (tangent) {
-        attribs.emplace_back(VertexBuffer::TangentKind + indexStr);
-      }
-
-      if (uv) {
-        attribs.emplace_back(StringTools::printf("%s_%s", VertexBuffer::UVKind, indexStr.c_str()));
-      }
-    }
-    if (numInfluencers > 0ull) {
-      uniforms.emplace_back("morphTargetInfluences");
-      uniforms.emplace_back("morphTargetTextureInfo");
-      uniforms.emplace_back("morphTargetTextureIndices");
-    }
-  }
-  else {
-    defines.emplace_back("#define NUM_MORPH_INFLUENCERS 0");
-  }
-
   // Textures
   for (const auto& item : _textures) {
     if (!item.second->isReady()) {
@@ -468,61 +397,17 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
     defines.emplace_back("#define ALPHATEST");
   }
 
-  // Clip planes
-  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane.has_value())
-      || _options.useClipPlane.value_or(false)) {
-    defines.emplace_back("#define CLIPPLANE");
-    if (stl_util::index_of(uniforms, "vClipPlane") == -1) {
-      uniforms.emplace_back("vClipPlane");
-    }
-  }
-
-  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane2.has_value())
-      || _options.useClipPlane.value_or(false)) {
-    defines.emplace_back("#define CLIPPLANE2");
-    if (stl_util::index_of(uniforms, "vClipPlane2") == -1) {
-      uniforms.emplace_back("vClipPlane2");
-    }
-  }
-
-  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane3.has_value())
-      || _options.useClipPlane.value_or(false)) {
-    defines.emplace_back("#define CLIPPLANE3");
-    if (stl_util::index_of(uniforms, "vClipPlane3") == -1) {
-      uniforms.emplace_back("vClipPlane3");
-    }
-  }
-
-  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane4.has_value())
-      || _options.useClipPlane.value_or(false)) {
-    defines.emplace_back("#define CLIPPLANE4");
-    if (stl_util::index_of(uniforms, "vClipPlane4") == -1) {
-      uniforms.emplace_back("vClipPlane4");
-    }
-  }
-
-  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane5.has_value())
-      || _options.useClipPlane.value_or(false)) {
-    defines.emplace_back("#define CLIPPLANE5");
-    if (stl_util::index_of(uniforms, "vClipPlane5") == -1) {
-      uniforms.emplace_back("vClipPlane5");
-    }
-  }
-
-  if ((!_options.useClipPlane.has_value() && !!scene->clipPlane6.has_value())
-      || _options.useClipPlane.value_or(false)) {
-    defines.emplace_back("#define CLIPPLANE6");
-    if (stl_util::index_of(uniforms, "vClipPlane6") == -1) {
-      uniforms.emplace_back("vClipPlane6");
-    }
-  }
+  auto shaderName     = _shaderPath;
+  auto uniforms       = _options.uniforms;
+  auto uniformBuffers = _options.uniformBuffers;
+  auto samplers       = _options.samplers;
 
   if (customShaderNameResolve) {
     shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers, samplers, nullptr,
                                          &defines, attribs, nullptr);
   }
 
-  auto previousEffect = effect;
+  auto previousEffect = _effect;
   auto join           = StringTools::join(defines, '\n');
 
   if (_cachedDefines != join) {
@@ -537,32 +422,26 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances, SubMesh* sub
     options.fallbacks           = std::move(fallbacks);
     options.onCompiled          = onCompiled;
     options.onError             = onError;
-    options.indexParameters
-      = {{"maxSimultaneousMorphTargets", static_cast<unsigned int>(numInfluencers)}};
+    options.indexParameters     = {{"maxSimultaneousMorphTargets", numInfluencers}};
 
-    effect = engine->createEffect(shaderName, options, engine);
-
-    _drawWrapper->effect = effect;
+    _effect = engine->createEffect(shaderName, options, engine);
 
     /* if (_onEffectCreatedObservable()) */ {
-      onCreatedEffectParameters.effect = effect.get();
-      onCreatedEffectParameters.subMesh
-        = subMesh ? subMesh :
-                    ((mesh && !mesh->subMeshes.empty()) ? mesh->subMeshes[0].get() : nullptr);
+      onCreatedEffectParameters.effect = _effect.get();
       _onEffectCreatedObservable.notifyObservers(&onCreatedEffectParameters);
     }
   }
 
-  if (!effect->isReady()) {
+  if (!_effect->isReady()) {
     return false;
   }
 
-  if (previousEffect != effect) {
+  if (previousEffect != _effect) {
     scene->resetCachedMaterial();
   }
 
-  _renderId                   = scene->getRenderId();
-  effect->_wasPreviouslyReady = true;
+  _renderId                    = scene->getRenderId();
+  _effect->_wasPreviouslyReady = true;
 
   return true;
 }
@@ -571,7 +450,7 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectO
 {
   auto scene = getScene();
 
-  auto effect = effectOverride ? effectOverride : getEffect();
+  auto effect = effectOverride ? effectOverride : _effect;
 
   if (!effect) {
     return;
@@ -594,7 +473,7 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world, const EffectPtr& effectO
 
 void ShaderMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  bind(world, mesh, subMesh->_drawWrapperOverride->effect);
+  bind(world, mesh, subMesh->_effectOverride);
 }
 
 void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOverride)
@@ -602,40 +481,18 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
   // Std values
   bindOnlyWorldMatrix(world, effectOverride);
 
-  const auto effect = effectOverride ? effectOverride : getEffect();
+  auto effect = effectOverride ? effectOverride : _effect;
 
-  const auto& uniformBuffers = _options.uniformBuffers;
-
-  auto useSceneUBO = false;
-
-  if (effect && !uniformBuffers.empty() && getScene()->getEngine()->supportsUniformBuffers()) {
-    for (const auto& bufferName : uniformBuffers) {
-      if (bufferName == "Mesh") {
-        if (mesh) {
-          mesh->getMeshUniformBuffer()->bindToEffect(effect.get(), "Mesh");
-          mesh->transferToEffect(world);
-        }
-      }
-      if (bufferName == "Scene") {
-        getScene()->finalizeSceneUbo();
-        MaterialHelper::BindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
-        useSceneUBO = true;
-      }
-    }
-  }
-
-  const auto mustRebind = getScene()->getCachedMaterial() != this;
-
-  if (effect && mustRebind) {
-    if (!useSceneUBO && stl_util::contains(_options.uniforms, "view")) {
+  if (effect && getScene()->getCachedMaterial() != this) {
+    if (stl_util::contains(_options.uniforms, "view")) {
       effect->setMatrix("view", getScene()->getViewMatrix());
     }
 
-    if (!useSceneUBO && stl_util::contains(_options.uniforms, "projection")) {
+    if (stl_util::contains(_options.uniforms, "projection")) {
       effect->setMatrix("projection", getScene()->getProjectionMatrix());
     }
 
-    if (!useSceneUBO && stl_util::contains(_options.uniforms, "viewProjection")) {
+    if (stl_util::contains(_options.uniforms, "viewProjection")) {
       effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
       if (_multiview) {
         effect->setMatrix("viewProjectionR", getScene()->_transformMatrixR);
@@ -648,9 +505,6 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
 
     // Bones
     MaterialHelper::BindBonesParameters(mesh, effect.get());
-
-    // Clip plane
-    MaterialHelper::BindClipPlane(effect, getScene());
 
     // Texture
     for (const auto& [channel, texture] : _textures) {
@@ -753,26 +607,18 @@ void ShaderMaterial::bind(Matrix& world, Mesh* mesh, const EffectPtr& effectOver
     }
   }
 
-  if (effect && mesh && (mustRebind || !isFrozen())) {
-    // Morph targets
-    const auto manager = static_cast<Mesh*>(mesh)->morphTargetManager();
-    if (manager && manager->numInfluencers() > 0u) {
-      MaterialHelper::BindMorphTargetParameters(static_cast<Mesh*>(mesh), effect.get());
-    }
-  }
+  const auto seffect = _effect;
 
-  const auto seffect = getEffect();
-
-  _drawWrapper->effect = effect; // make sure the active effect is the right one if there are some
-                                 // observers for onBind that would need to get the current effect
-  _afterBind(mesh, effect);
-  _drawWrapper->effect = seffect;
+  _effect = effect; // make sure the active effect is the right one if there are some observers for
+                    // onBind that would need to get the current effect
+  _afterBind(mesh);
+  _effect = seffect;
 }
 
-void ShaderMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
+void ShaderMaterial::_afterBind(Mesh* mesh, const EffectPtr& /*effect*/)
 {
-  Material::_afterBind(mesh, effect);
-  getScene()->_cachedEffect = effect;
+  Material::_afterBind(mesh);
+  getScene()->_cachedEffect = _effect;
 }
 
 std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
@@ -821,9 +667,6 @@ MaterialPtr ShaderMaterial::clone(const std::string& iName, bool /*cloneChildren
 
   result->name = name;
   result->id   = name;
-
-  // Stencil
-  stencil->copyTo(*result->stencil);
 
   // Texture
   for (const auto& [channel, texture] : _textures) {

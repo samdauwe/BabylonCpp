@@ -172,10 +172,6 @@ void EnvironmentTextureTools::_OnImageReadySync(
           effect->setFloat2("scale", 1.f, 1.f);
         };
 
-        if (engine->scenes.empty()) {
-          return;
-        }
-
         engine->scenes[0]->postProcessManager->directRender({rgbdPostProcess}, cubeRtt, true, face,
                                                             static_cast<int>(i));
 
@@ -204,7 +200,7 @@ void EnvironmentTextureTools::UploadLevelsSync(
     throw std::runtime_error("Texture size must be a power of two");
   }
 
-  const auto mipmapsCount = static_cast<size_t>(Scalar::ILog2(texture->width) + 1);
+  const auto mipmapsCount = static_cast<size_t>(std::round(Scalar::Log2(texture->width)) + 1);
 
   // Gets everything ready.
   auto engine                    = static_cast<Engine*>(texture->getEngine());
@@ -228,7 +224,7 @@ void EnvironmentTextureTools::UploadLevelsSync(
   }
   // in webgl 1 there are no ways to either render or copy lod level information
   // for float textures.
-  else if (!engine->_features.supportRenderAndCopyToLodForFloatTextures) {
+  else if (engine->webGLVersion() < 2.f) {
     expandTexture = false;
   }
   // If half float available we can uncompress the texture
@@ -367,6 +363,7 @@ void EnvironmentTextureTools::UploadLevelsSync(
 
   // Release temp RTT.
   if (cubeRtt) {
+    engine->_releaseFramebufferObjects(cubeRtt);
     engine->_releaseTexture(texture);
     cubeRtt->_swapAndDie(texture);
   }

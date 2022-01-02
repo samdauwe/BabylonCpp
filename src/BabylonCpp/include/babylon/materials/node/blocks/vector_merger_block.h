@@ -2,12 +2,12 @@
 #define BABYLON_MATERIALS_NODE_BLOCKS_VECTOR_MERGER_BLOCK_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/node/node_material_block.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(VectorMergerBlock)
+class VectorMergerBlock;
+using VectorMergerBlockPtr = std::shared_ptr<VectorMergerBlock>;
 
 /**
  * @brief Block used to create a Vector2/3/4 out of individual inputs (one for each component).
@@ -46,11 +46,6 @@ protected:
   NodeMaterialConnectionPointPtr& get_xyIn();
 
   /**
-   * @brief Gets the zw component (input).
-   */
-  NodeMaterialConnectionPointPtr& get_zwIn();
-
-  /**
    * @brief Gets the x component (input).
    */
   NodeMaterialConnectionPointPtr& get_x();
@@ -86,16 +81,6 @@ protected:
   NodeMaterialConnectionPointPtr& get_xyOut();
 
   /**
-   * @brief Gets the zw component (output).
-   */
-  NodeMaterialConnectionPointPtr& get_zwOut();
-
-  /**
-   * @brief Hidden
-   */
-  std::string _inputRename(const std::string& name) override;
-
-  /**
    * @brief Hidden
    */
   VectorMergerBlock& _buildBlock(NodeMaterialBuildState& state) override;
@@ -110,11 +95,6 @@ public:
    * Gets the xy component (input)
    */
   ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyIn;
-
-  /**
-   * Gets the zw component (input)
-   */
-  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> zwIn;
 
   /**
    * Gets the x component (input)
@@ -150,11 +130,6 @@ public:
    * Gets the xy component (output)
    */
   ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> xyOut;
-
-  /**
-   * Gets the zw component (output)
-   */
-  ReadOnlyProperty<VectorMergerBlock, NodeMaterialConnectionPointPtr> zwOut;
 
 }; // end of class VectorMergerBlock
 

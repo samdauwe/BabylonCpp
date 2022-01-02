@@ -38,20 +38,13 @@ void PrePassConfiguration::bindForSubMesh(const EffectPtr& effect, Scene* scene,
 
       if (!previousViewProjection) {
         previousViewProjection = scene->getTransformMatrix();
-        currentViewProjection  = scene->getTransformMatrix();
-      }
-
-      if (currentViewProjection.updateFlag != scene->getTransformMatrix().updateFlag) {
-        // First update of the prepass configuration for this rendering pass
-        previousViewProjection->copyFrom(currentViewProjection);
-        currentViewProjection.copyFrom(scene->getTransformMatrix());
-        currentViewProjection.updateFlag = scene->getTransformMatrix().updateFlag;
       }
 
       effect->setMatrix("previousWorld", previousWorldMatrices[mesh->uniqueId]);
       effect->setMatrix("previousViewProjection", *previousViewProjection);
 
       previousWorldMatrices[mesh->uniqueId] = world;
+      previousViewProjection                = scene->getTransformMatrix();
     }
   }
 }

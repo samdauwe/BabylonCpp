@@ -50,25 +50,25 @@ struct BABYLON_SHARED_EXPORT CommonCameraPropertyGridComponent {
         SliderLineComponent::render("Field of view", camera->fov, 0.1f, Math::PI, 0.1f, "%.2f");
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        valueChange = FloatLineComponent::render("Left", camera->orthoLeft.value_or(0.f));
+        valueChange = FloatLineComponent::render("Left", camera->orthoLeft);
         if (valueChange) {
           camera->orthoLeft = valueChange.value();
         }
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        valueChange = FloatLineComponent::render("Top", camera->orthoTop.value_or(0.f));
+        valueChange = FloatLineComponent::render("Top", camera->orthoTop);
         if (valueChange) {
           camera->orthoTop = valueChange.value();
         }
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        valueChange = FloatLineComponent::render("Right", camera->orthoRight.value_or(0.f));
+        valueChange = FloatLineComponent::render("Right", camera->orthoRight);
         if (valueChange) {
           camera->orthoRight = valueChange.value();
         }
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        valueChange = FloatLineComponent::render("Bottom", camera->orthoBottom.value_or(0.f));
+        valueChange = FloatLineComponent::render("Bottom", camera->orthoBottom);
         if (valueChange) {
           camera->orthoBottom = valueChange.value();
         }

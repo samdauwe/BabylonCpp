@@ -4,13 +4,13 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
-#include <babylon/buffers/data_buffer.h>
+#include <babylon/meshes/data_buffer.h>
 
 namespace BABYLON {
 
 namespace GL {
-FWD_CLASS_SPTR(IGLBuffer)
+class IGLBuffer;
+using IGLBufferPtr = std::shared_ptr<IGLBuffer>;
 } // end of namespace GL
 
 /**
@@ -27,7 +27,7 @@ public:
 private:
   GL::IGLBufferPtr _buffer;
 
-}; // end of class WebGLDataBuffer
+}; // end of class ISimplifier
 
 } // end of namespace BABYLON
 

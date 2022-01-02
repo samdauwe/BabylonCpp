@@ -53,7 +53,7 @@ CSG::Node::clipPolygons(const std::vector<BABYLON::CSG::Polygon>& polygons)
     return polygons;
   }
   std::vector<Polygon> front, back;
-  for (const auto& polygon : polygons) {
+  for (auto& polygon : polygons) {
     _plane->splitPolygon(polygon, front, back, front, back);
   }
   if (_front) {
@@ -92,7 +92,8 @@ std::vector<BABYLON::CSG::Polygon> BABYLON::CSG::Node::allPolygons()
   return polygons;
 }
 
-void BABYLON::CSG::Node::build(const std::vector<BABYLON::CSG::Polygon>& polygons)
+void BABYLON::CSG::Node::build(
+  const std::vector<BABYLON::CSG::Polygon>& polygons)
 {
   if (polygons.empty()) {
     return;
@@ -101,7 +102,7 @@ void BABYLON::CSG::Node::build(const std::vector<BABYLON::CSG::Polygon>& polygon
     _plane = polygons[0].plane.second.cloneToNewObject();
   }
   std::vector<Polygon> front, back;
-  for (const auto& polygon : polygons) {
+  for (auto& polygon : polygons) {
     _plane->splitPolygon(polygon, _polygons, _polygons, front, back);
   }
   if (!front.empty()) {

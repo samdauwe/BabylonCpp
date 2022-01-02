@@ -1,4 +1,3 @@
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
@@ -11,10 +10,13 @@
 
 namespace BABYLON {
 
+class ArcRotateCamera;
+class Mesh;
+class PointLight;
 class Vector3;
-FWD_CLASS_SPTR(ArcRotateCamera)
-FWD_CLASS_SPTR(Mesh)
-FWD_CLASS_SPTR(PointLight)
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using PointLightPtr      = std::shared_ptr<PointLight>;
 
 namespace Samples {
 
@@ -60,7 +62,6 @@ public:
   {
     return "Cannon Ball Scene";
   }
-
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     // Change the scene clear color
@@ -108,7 +109,7 @@ public:
     _ball->position().y  = 5.f;
 
     // Animation
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
       if (_t < _startBuggling) {
         _nothing(_t);
       }

@@ -41,12 +41,14 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   void markAsUnprocessed() override;
 
   /**
-   * @brief Marks the material to indicate all of its defines need to be re-calculated.
+   * @brief Marks the material to indicate all of its defines need to be
+   * re-calculated.
    */
   void markAllAsDirty() override;
 
   /**
-   * @brief Marks the material to indicate that image processing needs to be re-calculated.
+   * @brief Marks the material to indicate that image processing needs to be
+   * re-calculated.
    */
   void markAsImageProcessingDirty() override;
 
@@ -89,7 +91,8 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   /**
    * @brief Specifies if two material defines are equal.
    * @param other - A material define instance to compare to.
-   * @returns - Boolean indicating if the material defines are equal (true) or not (false).
+   * @returns - Boolean indicating if the material defines are equal (true) or
+   * not (false).
    */
   bool isEqual(const MaterialDefines& other) const override;
 

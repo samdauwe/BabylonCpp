@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 3> BoundingSphere::TmpVector3{Vector3::Zero(), Vector3::Zero(),
-                                                  Vector3::Zero()};
+std::array<Vector3, 3> BoundingSphere::TmpVector3{
+  Vector3::Zero(), Vector3::Zero(), Vector3::Zero()};
 
 BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max,
                                const std::optional<Matrix>& worldMatrix)
@@ -24,7 +24,7 @@ BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max,
 }
 
 BoundingSphere::BoundingSphere(const BoundingSphere& other) = default;
-BoundingSphere::BoundingSphere(BoundingSphere&& other)      = default;
+BoundingSphere::BoundingSphere(BoundingSphere&& other) = default;
 BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other) = default;
 BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other) = default;
 
@@ -49,8 +49,8 @@ BoundingSphere& BoundingSphere::scale(float factor)
   const auto newRadius   = radius * factor;
   auto& tmpVectors       = BoundingSphere::TmpVector3;
   auto& tempRadiusVector = tmpVectors[0].setAll(newRadius);
-  auto& min              = center.subtractToRef(tempRadiusVector, tmpVectors[1]);
-  auto& max              = center.addToRef(tempRadiusVector, tmpVectors[2]);
+  auto& min = center.subtractToRef(tempRadiusVector, tmpVectors[1]);
+  auto& max = center.addToRef(tempRadiusVector, tmpVectors[2]);
 
   reConstruct(min, max, _worldMatrix);
 
@@ -67,9 +67,11 @@ void BoundingSphere::_update(Matrix worldMatrix)
   if (!worldMatrix.isIdentity()) {
     Vector3::TransformCoordinatesToRef(center, worldMatrix, centerWorld);
     auto& tempVector = BoundingSphere::TmpVector3[0];
-    Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, worldMatrix, tempVector);
+    Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, worldMatrix,
+                                            tempVector);
     radiusWorld
-      = std::max(std::max(std::abs(tempVector.x), std::abs(tempVector.y)), std::abs(tempVector.z))
+      = std::max(std::max(std::abs(tempVector.x), std::abs(tempVector.y)),
+                 std::abs(tempVector.z))
         * radius;
   }
   else {
@@ -78,7 +80,8 @@ void BoundingSphere::_update(Matrix worldMatrix)
   }
 }
 
-bool BoundingSphere::isInFrustum(const std::array<Plane, 6>& frustumPlanes) const
+bool BoundingSphere::isInFrustum(
+  const std::array<Plane, 6>& frustumPlanes) const
 {
   const auto& iCenter = centerWorld;
   const auto& iRadius = radiusWorld;
@@ -90,7 +93,8 @@ bool BoundingSphere::isInFrustum(const std::array<Plane, 6>& frustumPlanes) cons
   return true;
 }
 
-bool BoundingSphere::isCenterInFrustum(const std::array<Plane, 6>& frustumPlanes) const
+bool BoundingSphere::isCenterInFrustum(
+  const std::array<Plane, 6>& frustumPlanes) const
 {
   const auto& iCenter = centerWorld;
   for (unsigned i = 0u; i < 6; ++i) {
@@ -107,33 +111,14 @@ bool BoundingSphere::intersectsPoint(const Vector3& point)
   return radiusWorld * radiusWorld >= squareDistance;
 }
 
-bool BoundingSphere::Intersects(const BoundingSphere& sphere0, const BoundingSphere& sphere1)
+bool BoundingSphere::Intersects(const BoundingSphere& sphere0,
+                                const BoundingSphere& sphere1)
 {
-  const auto squareDistance = Vector3::DistanceSquared(sphere0.centerWorld, sphere1.centerWorld);
-  const auto radiusSum      = sphere0.radiusWorld + sphere1.radiusWorld;
+  const auto squareDistance
+    = Vector3::DistanceSquared(sphere0.centerWorld, sphere1.centerWorld);
+  const auto radiusSum = sphere0.radiusWorld + sphere1.radiusWorld;
 
   return radiusSum * radiusSum >= squareDistance;
-}
-
-BoundingSphere BoundingSphere::CreateFromCenterAndRadius(const Vector3& center, float radius,
-                                                         const std::optional<Matrix>& matrix)
-{
-  TmpVector3[0].copyFrom(center);
-  TmpVector3[1].copyFromFloats(0.0f, 0.0f, radius);
-  TmpVector3[2].copyFrom(center);
-  TmpVector3[0].addInPlace(TmpVector3[1]);
-  TmpVector3[2].subtractInPlace(TmpVector3[1]);
-
-  BoundingSphere sphere(TmpVector3[0], TmpVector3[2]);
-
-  if (matrix) {
-    sphere._worldMatrix = *matrix;
-  }
-  else {
-    sphere._worldMatrix = Matrix::Identity();
-  }
-
-  return sphere;
 }
 
 } // end of namespace BABYLON

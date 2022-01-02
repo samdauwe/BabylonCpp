@@ -4,7 +4,6 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
@@ -22,6 +21,7 @@
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

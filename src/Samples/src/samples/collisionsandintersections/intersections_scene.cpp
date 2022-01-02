@@ -43,7 +43,6 @@ public:
   {
     return "Intersections Scene";
   }
-
   void initializeScene(ICanvas* canvas, Scene* scene) override
   {
     auto camera = ArcRotateCamera::New("Camera", 1.f, 0.8f, 70.f, Vector3::Zero(), scene);
@@ -106,7 +105,7 @@ public:
     _balloon3->position = Vector3(-30.f, 5.f, 0.f);
 
     // Animation
-    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) -> void {
+    scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
       // Balloon 1 intersection -- Precise = false
       if (_balloon1->intersectsMesh(*_plane1, false)) {
         _balloon1Material->emissiveColor = Color3(1.f, 0.f, 0.f);

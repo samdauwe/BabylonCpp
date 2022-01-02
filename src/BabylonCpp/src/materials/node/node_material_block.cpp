@@ -26,9 +26,6 @@ NodeMaterialBlock::NodeMaterialBlock(const std::string& iName, NodeMaterialBlock
     , target{this, &NodeMaterialBlock::get_target, &NodeMaterialBlock::set_target}
     , inputs{this, &NodeMaterialBlock::get_inputs}
     , outputs{this, &NodeMaterialBlock::get_outputs}
-    , willBeGeneratedIntoVertexShaderFromFragmentShader{this,
-                                                        &NodeMaterialBlock::
-                                                          get_willBeGeneratedIntoVertexShaderFromFragmentShader}
     , _isUnique{false}
     , _target{NodeMaterialBlockTargets::Undefined}
 {
@@ -177,8 +174,8 @@ NodeMaterialBlock::registerInput(const std::string& iName,
                                  const std::optional<NodeMaterialBlockTargets>& iTarget,
                                  const NodeMaterialConnectionPointPtr& point)
 {
-  auto iPoint = point ? point :
-                        NodeMaterialConnectionPoint::New(
+  auto iPoint        = point ? point :
+                               NodeMaterialConnectionPoint::New(
                           iName, shared_from_this(), NodeMaterialConnectionPointDirection::Input);
   iPoint->type       = type;
   iPoint->isOptional = isOptional;
@@ -197,8 +194,8 @@ NodeMaterialBlock::registerOutput(const std::string& iName,
                                   const std::optional<NodeMaterialBlockTargets>& iTarget,
                                   const NodeMaterialConnectionPointPtr& point)
 {
-  auto iPoint = point ? point :
-                        NodeMaterialConnectionPoint::New(
+  auto iPoint  = point ? point :
+                         NodeMaterialConnectionPoint::New(
                           iName, shared_from_this(), NodeMaterialConnectionPointDirection::Output);
   iPoint->type = type;
   if (iTarget.has_value()) {
@@ -249,26 +246,6 @@ NodeMaterialBlock::getSiblingOutput(const NodeMaterialConnectionPointPtr& curren
   }
 
   return _outputs[static_cast<size_t>(index + 1)];
-}
-
-bool NodeMaterialBlock::isAnAncestorOf(const NodeMaterialBlockPtr& block) const
-{
-  for (const auto& output : _outputs) {
-    if (!output->hasEndpoints()) {
-      continue;
-    }
-
-    for (const auto& endpoint : output->endpoints()) {
-      if (endpoint->ownerBlock() == block) {
-        return true;
-      }
-      if (endpoint->ownerBlock()->isAnAncestorOf(block)) {
-        return true;
-      }
-    }
-  }
-
-  return false;
 }
 
 NodeMaterialBlock&
@@ -350,34 +327,6 @@ void NodeMaterialBlock::replaceRepeatableContent(
   // Do nothing
 }
 
-bool NodeMaterialBlock::get_willBeGeneratedIntoVertexShaderFromFragmentShader() const
-{
-  if (isInput() || isFinalMerger()) {
-    return false;
-  }
-
-  for (const auto& o : _outputs) {
-    if (o->isDirectlyConnectedToVertexOutput()) {
-      return false;
-    }
-  }
-
-  if (target() == NodeMaterialBlockTargets::Vertex) {
-    return true;
-  }
-
-  if (target() == NodeMaterialBlockTargets::VertexAndFragment
-      || target() == NodeMaterialBlockTargets::Neutral) {
-    for (const auto& o : _outputs) {
-      if (o->isConnectedInVertexShader()) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
 bool NodeMaterialBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& /*nodeMaterial*/,
                                 const NodeMaterialDefines& /*defines*/, bool /*useInstances*/)
 {
@@ -436,26 +385,22 @@ void NodeMaterialBlock::_processBuild(const NodeMaterialBlockPtr& block,
 bool NodeMaterialBlock::validateBlockName(const std::string& newName) const
 {
   static const std::vector<std::string> reservedNames{
-    "position",             //
-    "normal",               //
-    "tangent",              //
-    "particle_positionw",   //
-    "uv",                   //
-    "uv2",                  //
-    "uv3",                  //
-    "uv4",                  //
-    "uv5",                  //
-    "uv6",                  //
-    "position2d",           //
-    "particle_uv",          //
-    "matricesIndices",      //
-    "matricesWeights",      //
-    "world0",               //
-    "world1",               //
-    "world2",               //
-    "world3",               //
-    "particle_color",       //
-    "particle_texturemask", //
+    "position",            //
+    "normal",              //
+    "tangent",             //
+    "particle_positionw",  //
+    "uv",                  //
+    "uv2",                 //
+    "position2d",          //
+    "particle_uv",         //
+    "matricesIndices",     //
+    "matricesWeights",     //
+    "world0",              //
+    "world1",              //
+    "world2",              //
+    "world3",              //
+    "particle_color",      //
+    "particle_texturemask" //
   };
   return stl_util::contains(reservedNames, newName) ? false : true;
 }
@@ -567,11 +512,9 @@ std::string NodeMaterialBlock::_outputRename(const std::string& iName)
 std::string NodeMaterialBlock::_dumpPropertiesCode()
 {
   const auto& variableName = _codeVariableName;
-  return StringTools::printf(
-    "%s.visibleInInspector = %s;\r\n%s.visibleOnFrame = %s;\r\n%s.target = "
-    "static_cast<NodeMaterialBlockTargets>(%d);\r\n",
-    variableName.c_str(), visibleInInspector ? "true" : "false", variableName.c_str(),
-    visibleOnFrame ? "true" : "false", variableName.c_str(), static_cast<int>(target()));
+  return StringTools::printf("%s.visibleInInspector = %s;\r\n %s.visibleOnFrame = %s;\r\n",
+                             variableName.c_str(), visibleInInspector ? "true" : "false",
+                             variableName.c_str(), visibleOnFrame ? "true" : "false");
 }
 
 std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
@@ -584,8 +527,8 @@ std::string NodeMaterialBlock::_dumpCode(std::vector<std::string>& uniqueNames,
   // Get unique name
   auto nameAsVariableName = StringTools::regexReplace(name(), "[^A-Za-z_]+", "");
   _codeVariableName       = !nameAsVariableName.empty() ?
-                        nameAsVariableName :
-                        StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
+                              nameAsVariableName :
+                              StringTools::printf("%s_%zu", getClassName().c_str(), uniqueId);
 
   if (stl_util::contains(uniqueNames, _codeVariableName)) {
     auto index = 0;

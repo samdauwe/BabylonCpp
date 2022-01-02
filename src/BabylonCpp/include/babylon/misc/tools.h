@@ -72,14 +72,6 @@ struct BABYLON_SHARED_EXPORT Tools {
   static bool IsExponentOfTwo(size_t value);
 
   /**
-   * @brief Returns the nearest 32-bit single precision float representation of a Number.
-   * @param value A Number.  If the parameter is of a different type, it will get converted
-   * to a number or to NaN if it cannot be converted
-   * @returns number
-   */
-  static float FloatRound(float value);
-
-  /**
    * @brief Extracts the filename from a path.
    * @param path defines the path to use
    * @returns the filename
@@ -130,18 +122,7 @@ struct BABYLON_SHARED_EXPORT Tools {
   static std::string DecodeURIComponent(const std::string& s);
 
   /**
-   * @brief Implementation from
-   * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#answer-2117523
-   * Be aware Math.random() could cause collisions, but:
-   * "All but 6 of the 128 bits of the ID are randomly generated, which means that for any two ids,
-   * there's a 1 in 2^^122 (or 5.3x10^^36) chance they'll collide"
-   * @returns a pseudo random id
-   */
-  static std::string RandomId();
-
-  /**
    * @brief Test if the given uri is a base64 string.
-   * @deprecated Please use FileTools.IsBase64DataUrl instead.
    * @param uri The uri to test
    * @return True if the uri is a base64 string or false otherwise
    */
@@ -149,7 +130,6 @@ struct BABYLON_SHARED_EXPORT Tools {
 
   /**
    * @brief Decode the given base64 uri.
-   * @deprecated Please use FileTools.DecodeBase64UrlToBinary instead.
    * @param uri The uri to decode
    * @return The decoded base64 data.
    */

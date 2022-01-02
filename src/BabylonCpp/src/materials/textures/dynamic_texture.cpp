@@ -41,14 +41,9 @@ DynamicTexture::DynamicTexture(const std::string& iName, const DynamicTextureOpt
 
   if (_canvas) {
     const auto textureSize = getSize();
-
-    if (_canvas->width != textureSize.width) {
-      _canvas->width = textureSize.width;
-    }
-    if (_canvas->height != textureSize.height) {
-      _canvas->height = textureSize.height;
-    }
-    _context = _canvas->getContext2d();
+    _canvas->width   = textureSize.width;
+    _canvas->height  = textureSize.height;
+    _context         = _canvas->getContext2d();
   }
 }
 
@@ -173,8 +168,7 @@ json DynamicTexture::serialize() const
   return nullptr;
 }
 
-void DynamicTexture::_rebuild(bool /*forceFullRebuild*/,
-                              const std::vector<std::string>& /*textureNames*/)
+void DynamicTexture::_rebuild(bool /*forceFullRebuild*/)
 {
   update();
 }

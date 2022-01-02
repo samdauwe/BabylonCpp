@@ -104,28 +104,31 @@ public:
   static CubeTexturePtr Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
-  // clang-format off
   /**
-   * @brief Creates a cube texture to use with reflection for instance. It can be based upon dds or six images as well
-   * as prefiltered data.
+   * @brief Creates a cube texture to use with reflection for instance. It can be based upon dds or
+   * six images as well as prefiltered data.
    * @param rootUrl defines the url of the texture or the root name of the six images
    * @param null defines the scene or engine the texture is attached to
-   * @param extensions defines the suffixes add to the picture name in case six images are in use like _px.jpg...
+   * @param extensions defines the suffixes add to the picture name in case six images are in use
+   * like _px.jpg...
    * @param noMipmap defines if mipmaps should be created or not
-   * @param files defines the six files to load for the different faces in that order: px, py, pz, nx, ny, nz
+   * @param files defines the six files to load for the different faces in that order: px, py, pz,
+   * nx, ny, nz
    * @param onLoad defines a callback triggered at the end of the file load if no errors occurred
    * @param onError defines a callback triggered in case of error during load
    * @param format defines the internal format to use for the texture once loaded
    * @param prefiltered defines whether or not the texture is created from prefiltered data
-   * @param forcedExtension defines the extensions to use (force a special type of file to load) in case it is different from the file name
-   * @param createPolynomials defines whether or not to create polynomial harmonics from the texture data if necessary
-   * @param lodScale defines the scale applied to environment texture. This manages the range of LOD level used for IBL according to the roughness
-   * @param lodOffset defines the offset applied to environment texture. This manages first LOD level used for IBL according to the roughness
+   * @param forcedExtension defines the extensions to use (force a special type of file to load) in
+   * case it is different from the file name
+   * @param createPolynomials defines whether or not to create polynomial harmonics from the texture
+   * data if necessary
+   * @param lodScale defines the scale applied to environment texture. This manages the range of LOD
+   * level used for IBL according to the roughness
+   * @param lodOffset defines the offset applied to environment texture. This manages first LOD
+   * level used for IBL according to the roughness
    * @param loaderOptions options to be passed to the loader
-   * @param useSRGBBuffer Defines if the texture must be loaded in a sRGB GPU buffer (if supported by the GPU) (default: false)
    * @return the cube texture
    */
-  // clang-format on
   CubeTexture(
     const std::string& rootUrl, const std::variant<Scene*, ThinEngine*>& sceneOrEngine,
     const std::vector<std::string>& extensions = {}, bool noMipmap = false,
@@ -135,8 +138,7 @@ protected:
     = nullptr,
     unsigned int format = Constants::TEXTUREFORMAT_RGBA, bool prefiltered = false,
     const std::string& forcedExtension = "", bool createPolynomials = false, float lodScale = 0.8f,
-    float lodOffset = 0.f, const LoaderOptionsPtr& loaderOptions = nullptr,
-    const std::optional<bool>& useSRGBBuffer = std::nullopt);
+    float lodOffset = 0.f, const LoaderOptionsPtr& loaderOptions = nullptr);
 
   /**
    * @brief Gets or sets the size of the bounding box associated with the cube
@@ -170,11 +172,6 @@ protected:
    */
   bool get_noMipmap() const override;
 
-  /**
-   * @brief Gets the forced extension (if any).
-   */
-  std::string get_forcedExtension() const;
-
 public:
   /**
    * Observable triggered once the texture has been loaded.
@@ -203,11 +200,6 @@ public:
    */
   ReadOnlyProperty<CubeTexture, bool> noMipmap;
 
-  /**
-   * Gets the forced extension (if any)
-   */
-  ReadOnlyProperty<CubeTexture, std::string> forcedExtension;
-
 protected:
   std::string _forcedExtension;
 
@@ -223,7 +215,6 @@ private:
   unsigned int _format;
   bool _createPolynomials;
   LoaderOptionsPtr _loaderOptions;
-  std::optional<bool> _useSRGBBuffer;
   float _lodScale;
   float _lodOffset;
 

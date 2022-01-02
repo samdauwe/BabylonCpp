@@ -227,8 +227,8 @@ public:
 
   /**
    * @brief Returns a new Vector3 set with the Euler angles translated from the current quaternion.
+   * @param order is a reserved parameter and is ignored for now
    * @returns a new Vector3 containing the Euler angles
-   * @see https://doc.babylonjs.com/divingDeeper/mesh/transforms/center_origin/rotation_conventions
    */
   [[nodiscard]] Vector3 toEulerAngles(const std::string& order = "YZX") const;
 
@@ -237,7 +237,6 @@ public:
    * quaternion.
    * @param result defines the vector which will be filled with the Euler angles
    * @returns the current unchanged quaternion
-   * @see https://doc.babylonjs.com/divingDeeper/mesh/transforms/center_origin/rotation_conventions
    */
   const Quaternion& toEulerAnglesToRef(Vector3& result, const std::string& order = "YZX") const;
 
@@ -299,18 +298,6 @@ public:
    * @returns true if the two quaternions are close to each other
    */
   static bool AreClose(const Quaternion& quat0, const Quaternion& quat1);
-
-  /**
-   * @brief Smooth interpolation between two quaternions using Slerp.
-   *
-   * @param source source quaternion
-   * @param goal goal quaternion
-   * @param deltaTime current interpolation frame
-   * @param lerpTime total interpolation time
-   * @param result the smoothed quaternion
-   */
-  static void SmoothToRef(const Quaternion& source, const Quaternion& goal, float deltaTime,
-                          float lerpTime, Quaternion& result);
 
   /**
    * @brief Creates an empty quaternion.
@@ -489,44 +476,6 @@ public:
                                               Quaternion& ref);
 
   /**
-   * @brief Creates a new rotation value to orient an object to look towards the given forward
-   * direction, the up direction being oriented like "up". This function works in left handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @returns A new quaternion oriented toward the specified forward and up.
-   */
-  static Quaternion FromLookDirectionLH(const Vector3& forward, const Vector3& up);
-
-  /**
-   * @brief Creates a new rotation value to orient an object to look towards the given forward
-   * direction with the up direction being oriented like "up", and stores it in the target
-   * quaternion. This function works in left handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @param ref defines the target quaternion.
-   */
-  static void FromLookDirectionLHToRef(const Vector3& forward, const Vector3& up, Quaternion& ref);
-
-  /**
-   * @brief Creates a new rotation value to orient an object to look towards the given forward
-   * direction, the up direction being oriented like "up". This function works in right handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @returns A new quaternion oriented toward the specified forward and up.
-   */
-  static Quaternion FromLookDirectionRH(const Vector3& forward, const Vector3& up);
-
-  /**
-   * @brief Creates a new rotation value to orient an object to look towards the given forward
-   * direction with the up direction being oriented like "up", and stores it in the target
-   * quaternion. This function works in right handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @param ref defines the target quaternion.
-   */
-  static void FromLookDirectionRHToRef(const Vector3& forward, const Vector3& up, Quaternion& ref);
-
-  /**
    * @brief Interpolates between two quaternions.
    * @param left defines first quaternion
    * @param right defines second quaternion
@@ -557,34 +506,6 @@ public:
    */
   static Quaternion Hermite(const Quaternion& value1, const Quaternion& tangent1,
                             const Quaternion& value2, const Quaternion& tangent2, float amount);
-
-  /**
-   * @brief Returns a new Quaternion which is the 1st derivative of the Hermite spline defined by
-   * the quaternions "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @returns 1st derivative
-   */
-  static Quaternion Hermite1stDerivative(const Quaternion& value1, const Quaternion& tangent1,
-                                         const Quaternion& value2, const Quaternion& tangent2,
-                                         float time);
-
-  /**
-   * @brief Update a Quaternion with the 1st derivative of the Hermite spline defined by the
-   * quaternions "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @param result define where to store the derivative
-   */
-  static void Hermite1stDerivativeToRef(const Quaternion& value1, const Quaternion& tangent1,
-                                        const Quaternion& value2, const Quaternion& tangent2,
-                                        float time, Quaternion& result);
 
 public:
   /**

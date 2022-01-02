@@ -3,8 +3,6 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/buffer.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/random.h>
@@ -22,6 +20,8 @@
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/color3_gradient.h>
 #include <babylon/misc/gradient_helper.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
@@ -45,16 +45,8 @@ GPUParticleSystem::GPUParticleSystem(
   const std::optional<std::variant<Scene*, ThinEngine*>>& sceneOrEngine,
   bool iIsAnimationSheetEnabled, const EffectPtr& customEffect)
     : BaseParticleSystem{iName}
-    , _randomTexture{nullptr}
-    , _randomTexture2{nullptr}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
-    , _colorGradientsTexture{nullptr}
-    , _angularSpeedGradientsTexture{nullptr}
-    , _sizeGradientsTexture{nullptr}
-    , _velocityGradientsTexture{nullptr}
-    , _limitVelocityGradientsTexture{nullptr}
-    , _dragGradientsTexture{nullptr}
     , _accumulatedCount{0}
     , _renderEffect{nullptr}
     , _updateEffect{nullptr}
@@ -65,15 +57,22 @@ GPUParticleSystem::GPUParticleSystem(
     , _sourceBuffer{nullptr}
     , _targetBuffer{nullptr}
     , _currentRenderId{-1}
-    , _currentRenderingCameraUniqueId{-1}
     , _started{false}
     , _stopped{false}
     , _timeDelta{0}
+    , _randomTexture{nullptr}
+    , _randomTexture2{nullptr}
     , _attributesStrideSize{21}
     , _actualFrame{0}
     , _zeroVector3{Vector3::Zero()}
     , _rawTextureWidth{256}
     , _preWarmDone{false}
+    , _colorGradientsTexture{nullptr}
+    , _angularSpeedGradientsTexture{nullptr}
+    , _sizeGradientsTexture{nullptr}
+    , _velocityGradientsTexture{nullptr}
+    , _limitVelocityGradientsTexture{nullptr}
+    , _dragGradientsTexture{nullptr}
 {
   if (!sceneOrEngine || std::holds_alternative<Scene*>(*sceneOrEngine)) {
     _scene = sceneOrEngine ? std::get<Scene*>(*sceneOrEngine) : EngineStore::LastCreatedScene();
@@ -157,7 +156,6 @@ GPUParticleSystem::GPUParticleSystem(
     ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA,
     sceneOrEngine, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
     Constants::TEXTURETYPE_FLOAT);
-  _randomTexture->name  = "GPUParticleSystem_random1";
   _randomTexture->wrapU = Constants::TEXTURE_WRAP_ADDRESSMODE;
   _randomTexture->wrapV = Constants::TEXTURE_WRAP_ADDRESSMODE;
 
@@ -172,7 +170,6 @@ GPUParticleSystem::GPUParticleSystem(
     ArrayBufferView(d), static_cast<int>(maxTextureSize), 1, Constants::TEXTUREFORMAT_RGBA,
     sceneOrEngine, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
     Constants::TEXTURETYPE_FLOAT);
-  _randomTexture2->name  = "GPUParticleSystem_random2";
   _randomTexture2->wrapU = Constants::TEXTURE_WRAP_ADDRESSMODE;
   _randomTexture2->wrapV = Constants::TEXTURE_WRAP_ADDRESSMODE;
 
@@ -908,8 +905,7 @@ void GPUParticleSystem::_initialize(bool force)
       }
     }
 
-    if (noiseTexture()) {
-      // Random coordinates for reading into noise texture
+    if (noiseTexture()) { // Random coordinates for reading into noise texture
       data.emplace_back(Math::random());
       data.emplace_back(Math::random());
       data.emplace_back(Math::random());
@@ -1038,11 +1034,6 @@ void GPUParticleSystem::_recreateUpdateEffect()
 
   _updateEffectOptions->defines = std::move(defines);
   _updateEffect                 = Effect::New("gpuUpdateParticles", *_updateEffectOptions, _engine);
-}
-
-DrawWrapperPtr GPUParticleSystem::_getWrapper(unsigned int /*blendMode*/)
-{
-  return nullptr;
 }
 
 EffectPtr GPUParticleSystem::_getEffect()
@@ -1330,18 +1321,11 @@ size_t GPUParticleSystem::render(bool preWarm)
       _preWarmDone = true;
     }
 
-    if (_currentRenderId == _scene->getFrameId()
-        && (!_scene->activeCamera()
-            || (_scene->activeCamera()
-                && _currentRenderingCameraUniqueId
-                     == static_cast<int>(_scene->activeCamera()->uniqueId)))) {
+    if (_currentRenderId == _scene->getFrameId()) {
       return 0;
     }
 
     _currentRenderId = _scene->getFrameId();
-    if (_scene->activeCamera()) {
-      _currentRenderingCameraUniqueId = static_cast<int>(_scene->activeCamera()->uniqueId);
-    }
   }
 
   // Get everything ready to render
@@ -1369,7 +1353,6 @@ size_t GPUParticleSystem::render(bool preWarm)
   _updateEffect->setFloat("currentCount", static_cast<float>(_currentActiveCount));
   _updateEffect->setFloat("timeDelta", _timeDelta);
   _updateEffect->setFloat("stopFactor", _stopped ? 0.f : 1.f);
-  _updateEffect->setInt("randomTextureSize", _randomTextureSize);
   _updateEffect->setTexture("randomSampler", _randomTexture);
   _updateEffect->setTexture("randomSampler2", _randomTexture2);
   _updateEffect->setFloat2("lifeTime", minLifeTime, maxLifeTime);
@@ -1406,12 +1389,11 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
 
   if (particleEmitterType) {
-    // particleEmitterType->applyToShader(_updateEffect.get());
+    particleEmitterType->applyToShader(_updateEffect.get());
   }
   if (_isAnimationSheetEnabled) {
-    _updateEffect->setFloat4("cellInfos", static_cast<float>(startSpriteCellID),
-                             static_cast<float>(endSpriteCellID), spriteCellChangeSpeed,
-                             spriteCellLoop ? 1.f : 0.f);
+    _updateEffect->setFloat3("cellInfos", static_cast<float>(startSpriteCellID),
+                             static_cast<float>(endSpriteCellID), spriteCellChangeSpeed);
   }
 
   if (noiseTexture()) {
@@ -1664,8 +1646,7 @@ json GPUParticleSystem::serialize(bool /*serializeTexture*/) const
 }
 
 IParticleSystem* GPUParticleSystem::Parse(const json& /*parsedParticleSystem*/, Scene* /*scene*/,
-                                          const std::string& /*rootUrl*/, bool /*doNotStart*/,
-                                          const std::optional<size_t>& /*capacity*/)
+                                          const std::string& /*rootUrl*/, bool /*doNotStart*/)
 {
   return nullptr;
 }

@@ -74,7 +74,6 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
 
   dragBehavior->onDragObservable.add([this](DragMoveEvent* event, EventState& /*es*/) -> void {
     if (attachedNode()) {
-      _handlePivot();
       // Keep world translation and use it to update world transform
       // if the node has parent, the local transform properties (position, rotation, scale)
       // will be recomputed in _matrixChanged function
@@ -124,7 +123,6 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
-  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(_gizmoMesh.get()), _cache);
   }
@@ -139,16 +137,12 @@ PlaneDragGizmo::PlaneDragGizmo(const Vector3& dragPlaneNormal, const Color3& col
       _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
 
       if (!_parent) {
-        const auto material = _cache.dragBehavior->enabled ?
-                                (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
-                                _disableMaterial;
-        _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
+        const auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        for (const auto& m : _cache.gizmoMeshes) {
+          m->material = material;
+        }
       }
     });
-
-  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
-    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _coloredMaterial : _disableMaterial);
-  });
 }
 
 PlaneDragGizmo::~PlaneDragGizmo() = default;

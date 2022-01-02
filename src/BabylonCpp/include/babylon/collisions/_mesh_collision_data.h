@@ -5,14 +5,15 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/maths/vector3.h>
 #include <babylon/misc/observer.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Collider)
+class AbstractMesh;
+class Collider;
+using ColliderPtr     = std::shared_ptr<Collider>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Hidden

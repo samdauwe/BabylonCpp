@@ -17,7 +17,6 @@ namespace BABYLON {
 
 FWD_CLASS_SPTR(GroundMesh)
 FWD_CLASS_SPTR(LinesMesh)
-FWD_CLASS_SPTR(Material)
 FWD_CLASS_SPTR(Mesh)
 FWD_CLASS_SPTR(Plane)
 
@@ -107,7 +106,6 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
-  MaterialPtr material;
 
 }; // end of class DashedLinesOptions
 
@@ -129,7 +127,6 @@ public:
   std::optional<Vector3> normal;
   std::optional<Vector3> size;
   std::optional<float> angle;
-  std::optional<bool> captureUVS;
 
 }; // end of class DecalOptions
 
@@ -358,9 +355,6 @@ public:
   /** Overwrite for the bottom capSubdivisions. */
   std::optional<unsigned int> bottomCapSubdivisions;
 
-  /** Internal geometry is supposed to change once created. */
-  std::optional<bool> updatable;
-
 }; // end of class IcoSphereOptions
 
 //--------------------------------------------------------------------------------------------------
@@ -411,7 +405,6 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
-  MaterialPtr material;
 
 }; // end of class LinesOptions
 
@@ -435,7 +428,6 @@ public:
   std::optional<bool> updatable;
   std::optional<bool> useVertexAlpha;
   LinesMeshPtr instance;
-  MaterialPtr material;
 
 }; // end of class LineSystemOptions
 

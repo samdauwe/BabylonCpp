@@ -10,11 +10,6 @@ NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
     {"NORMAL", false},  //
     {"TANGENT", false}, //
     {"UV1", false},     //
-    {"UV2", false},     //
-    {"UV3", false},     //
-    {"UV4", false},     //
-    {"UV5", false},     //
-    {"UV6", false},     //
 
     /** BONES */
     {"BONETEXTURE", false}, //
@@ -24,7 +19,6 @@ NodeMaterialDefines::NodeMaterialDefines() : MaterialDefines{}
     {"MORPHTARGETS_NORMAL", false},  //
     {"MORPHTARGETS_TANGENT", false}, //
     {"MORPHTARGETS_UV", false},      //
-    {"MORPHTARGETS_TEXTURE", false}, //
 
     /** IMAGE PROCESSING */
     {"IMAGEPROCESSING", false},            //

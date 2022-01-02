@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_LIBRARY_FUR_FUR_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fur/fur_material_defines.h>
 #include <babylon/maths/color3.h>
@@ -10,14 +9,19 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(DynamicTexture)
-FWD_CLASS_SPTR(IAnimatable)
-FWD_CLASS_SPTR(Mesh)
+class AbstractMesh;
+class DynamicTexture;
+class IAnimatable;
+class Mesh;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
+using MeshPtr           = std::shared_ptr<Mesh>;
 
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(FurMaterial)
+class FurMaterial;
+using FurMaterialPtr = std::shared_ptr<FurMaterial>;
 
 class BABYLON_SHARED_EXPORT FurMaterial : public PushMaterial {
 
@@ -32,20 +36,21 @@ public:
   }
   ~FurMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   void updateFur();
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-  std::string getClassName() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static FurMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
@@ -69,11 +74,11 @@ protected:
   void set_diffuseTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_heightTexture();
   void set_heightTexture(const BaseTexturePtr& value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  float get_furTime() const;
+  [[nodiscard]] float get_furTime() const;
   void set_furTime(float newFurTime);
 
 public:

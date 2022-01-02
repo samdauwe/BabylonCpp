@@ -81,20 +81,6 @@ public:
   InstancedLinesMeshPtr createInstance(const std::string& name);
 
   /**
-   * @brief Serializes this lines mesh.
-   * @param serializationObject object to write serialization to
-   */
-  void serialize(json& serializationObject) const override;
-
-  /**
-   * @brief Parses a serialized lines mesh.
-   * @param parsedMesh the serialized mesh
-   * @param scene the scene to create the ground mesh in
-   * @returns the created lines mesh
-   */
-  static LinesMeshPtr Parse(const json& parsedMesh, Scene* scene);
-
-  /**
    * @brief Enables the edge rendering mode on the mesh.
    * This mode makes the mesh edges visible
    * @param epsilon defines the maximal distance between two angles to detect a face
@@ -118,12 +104,10 @@ protected:
    * This will make creation of children, recursive.
    * @param useVertexColor defines if this LinesMesh supports vertex color
    * @param useVertexAlpha defines if this LinesMesh supports vertex alpha
-   * @param material material to use to draw the line. If not provided, will create a new one
    */
   LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
-            bool useVertexColor = false, bool useVertexAlpha = false,
-            const MaterialPtr& material = nullptr);
+            bool useVertexColor = false, bool useVertexAlpha = false);
 
   /**
    * Hidden
@@ -140,13 +124,7 @@ protected:
    */
   bool get_checkCollisions() const override;
 
-  /**
-   * Hidden
-   */
-  void set_checkCollisions();
-
 private:
-  bool _isShaderMaterial(const MaterialPtr& shader) const;
   void _addClipPlaneDefine(const std::string& label);
   void _removeClipPlaneDefine(const std::string& label);
 
@@ -182,7 +160,8 @@ public:
   bool useVertexAlpha;
 
 private:
-  MaterialPtr _lineMaterial;
+  MaterialPtr _colorShaderMaterial;
+  ShaderMaterialPtr _colorShader;
   Color4 color4;
 
 }; // end of class LinesMesh

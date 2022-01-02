@@ -16,8 +16,6 @@ namespace BABYLON {
 InstancedMesh::InstancedMesh(const std::string& iName, const MeshPtr& source)
     : AbstractMesh(iName, source->getScene())
     , _indexInSourceMeshInstanceArray{-1}
-    , _distanceToCamera{0.f}
-    , _previousWorldMatrix{std::nullopt}
     , sourceMesh{this, &InstancedMesh::get_sourceMesh}
     , _currentLOD{nullptr}
 {
@@ -196,7 +194,7 @@ std::vector<Vector3>& InstancedMesh::_positions()
   return _sourceMesh->_positions();
 }
 
-InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton, bool applyMorph)
+InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton)
 {
   if (_boundingInfo && _boundingInfo->isLocked()) {
     return *this;
@@ -204,7 +202,7 @@ InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton, bool apply
 
   const auto bias
     = _sourceMesh->geometry() ? _sourceMesh->geometry()->boundingBias() : std::nullopt;
-  _refreshBoundingInfo(_sourceMesh->_getPositionData(applySkeleton, applyMorph), bias);
+  _refreshBoundingInfo(_sourceMesh->_getPositionData(applySkeleton), bias);
   return *this;
 }
 
@@ -273,11 +271,10 @@ Matrix& InstancedMesh::getWorldMatrix()
     _currentLOD->_masterMesh = this;
     TmpVectors::Vector3Array[7].copyFrom(_currentLOD->position());
     _currentLOD->position().set(0.f, 0.f, 0.f);
-    _billboardWorldMatrix.copyFrom(_currentLOD->computeWorldMatrix(true));
+    TmpVectors::MatrixArray[0].copyFrom(_currentLOD->computeWorldMatrix(true));
     _currentLOD->position().copyFrom(TmpVectors::Vector3Array[7]);
     _currentLOD->_masterMesh = tempMaster;
-
-    return _billboardWorldMatrix;
+    return TmpVectors::MatrixArray[0];
   }
 
   return AbstractMesh::getWorldMatrix();

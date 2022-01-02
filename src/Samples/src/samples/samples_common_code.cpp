@@ -38,8 +38,8 @@ std::vector<AbstractMeshPtr> CrowdSimulationUtils::createAgentMeshes(Scene* scen
 
 AbstractMeshPtr CrowdSimulationUtils::createWayPointMesh(Scene* scene, const Vector2& position)
 {
-  const auto mesh = Mesh::CreateSphere("", 8, 5.f, scene);
-  mesh->position  = Vector3(position.x, 2, position.y);
+  auto mesh      = Mesh::CreateSphere("", 8, 5.f, scene);
+  mesh->position = Vector3(position.x, 2, position.y);
 
   return mesh;
 }

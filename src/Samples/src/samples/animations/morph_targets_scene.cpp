@@ -1,7 +1,5 @@
 #include "imgui.h"
 
-#include <babylon/babylon_fwd.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/interfaces/irenderable_scene_with_hud.h>
@@ -9,19 +7,20 @@
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/hdr_cube_texture.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/samples/babylon_register_sample.h>
 
 namespace BABYLON {
-
-FWD_CLASS_SPTR(Mesh)
-FWD_CLASS_SPTR(MorphTarget)
-
 namespace Samples {
 
+using MeshPtr        = std::shared_ptr<Mesh>;
+using MorphTargetPtr = std::shared_ptr<MorphTarget>;
+
 /**
- * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between multiple targets
+ * @brief Morph Targets Scene. Example demonstrating how to morph a mesh between
+ * multiple targets
  * @see https://www.babylonjs-playground.com/#2JDN66#7
  * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
  */
@@ -114,12 +113,12 @@ struct MorphTargetsScene : public IRenderableSceneWithHud {
     _target3->influence = 1.00f;
 
     hudGui = [=]() {
-      auto addSlider = [](const std::string& label, auto& floatProperty, float min = 0.f,
-                          float max = 1.f) -> void {
-        float currentValue = floatProperty;
-        if (ImGui::SliderFloat(label.c_str(), &currentValue, min, max))
-          floatProperty = currentValue;
-      };
+      auto addSlider
+        = [](const std::string& label, auto& floatProperty, float min = 0.f, float max = 1.f) {
+            float currentValue = floatProperty;
+            if (ImGui::SliderFloat(label.c_str(), &currentValue, min, max))
+              floatProperty = currentValue;
+          };
       addSlider("Influence #1", _target0->influence);
       addSlider("Influence #2", _target1->influence);
       addSlider("Influence #3", _target2->influence);
@@ -155,6 +154,9 @@ private:
   }
 
 private:
+  using MeshPtr        = std::shared_ptr<Mesh>;
+  using MorphTargetPtr = std::shared_ptr<MorphTarget>;
+
   MorphTargetPtr _target0;
   MorphTargetPtr _target1;
   MorphTargetPtr _target2;

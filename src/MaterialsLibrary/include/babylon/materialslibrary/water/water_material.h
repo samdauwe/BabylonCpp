@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_LIBRARY_WATER_WATER_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/water/water_material_defines.h>
 #include <babylon/maths/color3.h>
@@ -12,14 +11,19 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(IAnimatable)
-FWD_CLASS_SPTR(ImageProcessingConfiguration)
-FWD_CLASS_SPTR(Mesh)
+class AbstractMesh;
+class IAnimatable;
+class ImageProcessingConfiguration;
+class Mesh;
+using AbstractMeshPtr                 = std::shared_ptr<AbstractMesh>;
+using IAnimatablePtr                  = std::shared_ptr<IAnimatable>;
+using ImageProcessingConfigurationPtr = std::shared_ptr<ImageProcessingConfiguration>;
+using MeshPtr                         = std::shared_ptr<Mesh>;
 
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(WaterMaterial)
+class WaterMaterial;
+using WaterMaterialPtr = std::shared_ptr<WaterMaterial>;
 
 class BABYLON_SHARED_EXPORT WaterMaterial : public PushMaterial {
 
@@ -38,58 +42,53 @@ public:
   void addToRenderList(const AbstractMeshPtr& node);
   void enableRenderTargets(bool enable);
   std::vector<AbstractMesh*>& getRenderList();
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::vector<BaseTexturePtr> getActiveTextures() const override;
-  bool hasTexture(const BaseTexturePtr& texture) const override;
-  std::string getClassName() const override;
+  [[nodiscard]] std::vector<BaseTexturePtr> getActiveTextures() const override;
+  [[nodiscard]] bool hasTexture(const BaseTexturePtr& texture) const override;
+  [[nodiscard]] std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static WaterMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
   static MeshPtr CreateDefaultMesh(const std::string& name, Scene* scene);
 
 protected:
-  /**
-   * @brief Constructor
-   * @param name The name given to the material in order to identify it afterwards.
-   * @param scene The scene the material is used in.
-   * @param renderTargetSize The size of the render target.
-   */
   WaterMaterial(const std::string& name, Scene* scene,
                 const Vector2& renderTargetSize = Vector2(512.f, 512.f));
 
   BaseTexturePtr& get_bumpTexture();
   void set_bumpTexture(const BaseTexturePtr& value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  bool get_bumpSuperimpose() const;
+  [[nodiscard]] bool get_bumpSuperimpose() const;
   void set_bumpSuperimpose(bool value);
-  bool get_fresnelSeparate() const;
+  [[nodiscard]] bool get_fresnelSeparate() const;
   void set_fresnelSeparate(bool value);
-  bool get_bumpAffectsReflection() const;
+  [[nodiscard]] bool get_bumpAffectsReflection() const;
   void set_bumpAffectsReflection(bool value);
-  bool get_useLogarithmicDepth() const override;
+  [[nodiscard]] bool get_useLogarithmicDepth() const override;
   void set_useLogarithmicDepth(bool value) override;
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const override;
+  [[nodiscard]] bool get_hasRenderTargetTextures() const override;
 
   RenderTargetTexturePtr& get_refractionTexture();
   RenderTargetTexturePtr& get_reflectionTexture();
-  bool get_renderTargetsEnabled() const;
+  [[nodiscard]] bool get_renderTargetsEnabled() const;
   float get_lastTime() const;
 
 private:

@@ -8,8 +8,6 @@
 
 namespace BABYLON {
 
-float ArcRotateCameraPointersInput::MinimumRadiusForPinch = 0.001f;
-
 ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
     : angularSensibilityX{1000.f}
     , angularSensibilityY{1000.f}
@@ -49,15 +47,13 @@ void ArcRotateCameraPointersInput::_computeMultiTouchPanning(
 void ArcRotateCameraPointersInput::_computePinchZoom(float previousPinchSquaredDistance,
                                                      float pinchSquaredDistance)
 {
-  const auto radius
-    = camera->radius != 0.f ? camera->radius : ArcRotateCameraPointersInput::MinimumRadiusForPinch;
   if (useNaturalPinchZoom) {
     camera->radius
-      = radius * std::sqrt(previousPinchSquaredDistance) / std::sqrt(pinchSquaredDistance);
+      = camera->radius * std::sqrt(previousPinchSquaredDistance) / std::sqrt(pinchSquaredDistance);
   }
   else if (pinchDeltaPercentage) {
     camera->inertialRadiusOffset += (pinchSquaredDistance - previousPinchSquaredDistance) * 0.001f
-                                    * radius * pinchDeltaPercentage;
+                                    * camera->radius * pinchDeltaPercentage;
   }
   else {
     camera->inertialRadiusOffset += (pinchSquaredDistance - previousPinchSquaredDistance)
@@ -138,12 +134,12 @@ void ArcRotateCameraPointersInput::onMultiTouch(
   }
 }
 
-void ArcRotateCameraPointersInput::onButtonDown(IPointerEvent& evt)
+void ArcRotateCameraPointersInput::onButtonDown(PointerEvent& evt)
 {
   _isPanClick = evt.button == camera->_panningMouseButton;
 }
 
-void ArcRotateCameraPointersInput::onButtonUp(IPointerEvent& /*evt*/)
+void ArcRotateCameraPointersInput::onButtonUp(PointerEvent& /*evt*/)
 {
   _twoFingerActivityCount = 0;
   _isPinching             = false;

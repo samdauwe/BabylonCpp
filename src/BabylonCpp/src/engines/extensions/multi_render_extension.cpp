@@ -48,7 +48,7 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
     for (size_t i = 0; i < count; i++) {
       const auto iStr = std::to_string(i);
       attachments[i]  = gl[_this->webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
-                                                         "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+                                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
     }
     gl.drawBuffers(attachments);
   }
@@ -73,8 +73,9 @@ void MultiRenderExtension::unBindMultiColorAttachmentFramebuffer(
   _this->_bindUnboundFramebuffer(nullptr);
 }
 
-std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget(
-  ISize size, const IMultiRenderTargetOptions& options, bool initializeBuffers)
+std::vector<InternalTexturePtr>
+MultiRenderExtension::createMultipleRenderTarget(ISize size,
+                                                 const IMultiRenderTargetOptions& options)
 {
   auto generateMipMaps       = options.generateMipMaps.value_or(false);
   auto generateDepthBuffer   = options.generateDepthBuffer.value_or(true);
@@ -133,9 +134,7 @@ std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget
     attachments.emplace_back(attachment);
 
     gl.activeTexture(gl["TEXTURE" + iStr]);
-    gl.bindTexture(GL::TEXTURE_2D, texture->_hardwareTexture ?
-                                     texture->_hardwareTexture->underlyingResource().get() :
-                                     nullptr);
+    gl.bindTexture(GL::TEXTURE_2D, texture->_webGLTexture.get());
 
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
@@ -146,10 +145,8 @@ std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget
                   static_cast<int>(_this->_getRGBABufferInternalSizedFormat(type)), width, height,
                   0, GL::RGBA, _this->_getWebGLTextureType(type), nullptr);
 
-    gl.framebufferTexture2D(
-      GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
-      texture->_hardwareTexture ? texture->_hardwareTexture->underlyingResource().get() : nullptr,
-      0);
+    gl.framebufferTexture2D(GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
+                            texture->_webGLTexture.get(), 0);
 
     if (generateMipMaps) {
       gl.generateMipmap(GL::TEXTURE_2D);
@@ -180,13 +177,9 @@ std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget
   if (generateDepthTexture && _this->_caps.depthTextureExtension) {
     // Depth texture
     auto depthTexture = InternalTexture::New(_this, InternalTextureSource::MultiRenderTarget);
-    GL::IGLTexture* depthTextureHardwareTexture
-      = depthTexture->_hardwareTexture ?
-          depthTexture->_hardwareTexture->underlyingResource().get() :
-          nullptr;
 
     gl.activeTexture(GL::TEXTURE0);
-    gl.bindTexture(GL::TEXTURE_2D, depthTextureHardwareTexture);
+    gl.bindTexture(GL::TEXTURE_2D, depthTexture->_webGLTexture.get());
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
     gl.texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
@@ -202,11 +195,11 @@ std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget
                   nullptr                                                                    //
     );
 
-    gl.framebufferTexture2D(GL::FRAMEBUFFER,             //
-                            GL::DEPTH_ATTACHMENT,        //
-                            GL::TEXTURE_2D,              //
-                            depthTextureHardwareTexture, //
-                            0                            //
+    gl.framebufferTexture2D(GL::FRAMEBUFFER,                   //
+                            GL::DEPTH_ATTACHMENT,              //
+                            GL::TEXTURE_2D,                    //
+                            depthTexture->_webGLTexture.get(), //
+                            0                                  //
     );
 
     depthTexture->_framebuffer           = std::move(framebuffer);
@@ -225,10 +218,7 @@ std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget
     _this->_internalTexturesCache.emplace_back(depthTexture);
   }
 
-  if (initializeBuffers) {
-    gl.drawBuffers(attachments);
-  }
-
+  gl.drawBuffers(attachments);
   _this->_bindUnboundFramebuffer(nullptr);
 
   _this->resetTextureCache();
@@ -237,7 +227,7 @@ std::vector<InternalTexturePtr> MultiRenderExtension::createMultipleRenderTarget
 }
 
 unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
-  const std::vector<InternalTexturePtr>& textures, unsigned int samples, bool initializeBuffers)
+  const std::vector<InternalTexturePtr>& textures, unsigned int samples)
 {
   if (_this->webGLVersion() < 2.f || textures.empty()) {
     return 1;
@@ -318,9 +308,7 @@ unsigned int MultiRenderExtension::updateMultipleRenderTargetTextureSampleCount(
       gl.bindRenderbuffer(GL::RENDERBUFFER, nullptr);
       attachments.emplace_back(attachment);
     }
-    if (initializeBuffers) {
-      gl.drawBuffers(attachments);
-    }
+    gl.drawBuffers(attachments);
   }
   else {
     _this->_bindUnboundFramebuffer(textures[0]->_framebuffer);
@@ -336,6 +324,11 @@ void MultiRenderExtension::bindAttachments(const std::vector<unsigned int>& atta
   auto& gl = *_this->_gl;
 
   gl.drawBuffers(attachments);
+}
+
+void MultiRenderExtension::restoreSingleAttachment()
+{
+  bindAttachments({GL::BACK});
 }
 
 std::vector<unsigned int>
@@ -355,16 +348,6 @@ MultiRenderExtension::buildTextureLayout(const std::vector<bool>& textureStatus)
   }
 
   return result;
-}
-
-void MultiRenderExtension::restoreSingleAttachment()
-{
-  bindAttachments({GL::BACK});
-}
-
-void MultiRenderExtension::restoreSingleAttachmentForRenderTarget()
-{
-  bindAttachments({GL::COLOR_ATTACHMENT0});
 }
 
 } // end of namespace BABYLON

@@ -541,35 +541,6 @@ Vector4& Vector4::CenterToRef(const Vector4& value1, const Vector4& value2, Vect
                             (value1.z + value2.z) / 2.f, (value1.w + value2.w) / 2.f);
 }
 
-Vector4 Vector4::TransformCoordinates(const Vector3& vector, const Matrix& transformation)
-{
-  auto result = Vector4::Zero();
-  Vector4::TransformCoordinatesToRef(vector, transformation, result);
-  return result;
-}
-
-void Vector4::TransformCoordinatesToRef(const Vector3& vector, const Matrix& transformation,
-                                        Vector4& result)
-{
-  Vector4::TransformCoordinatesFromFloatsToRef(vector.x, vector.y, vector.z, transformation,
-                                               result);
-}
-
-void Vector4::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
-                                                  const Matrix& transformation, Vector4& result)
-{
-  const auto& m = transformation.m();
-  const auto rx = x * m[0] + y * m[4] + z * m[8] + m[12];
-  const auto ry = x * m[1] + y * m[5] + z * m[9] + m[13];
-  const auto rz = x * m[2] + y * m[6] + z * m[10] + m[14];
-  const auto rw = x * m[3] + y * m[7] + z * m[11] + m[15];
-
-  result.x = rx;
-  result.y = ry;
-  result.z = rz;
-  result.w = rw;
-}
-
 Vector4 Vector4::TransformNormal(const Vector4& vector, const Matrix& transformation)
 {
   auto result = Vector4::Zero();

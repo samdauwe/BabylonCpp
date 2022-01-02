@@ -2,7 +2,6 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_common.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
@@ -19,11 +18,15 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
+class Animatable;
 class EventState;
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Animatable)
-FWD_CLASS_SPTR(PBRMetallicRoughnessMateria)
-FWD_CLASS_SPTR(TransformNode)
+class PBRMetallicRoughnessMaterial;
+class TransformNode;
+using AbstractMeshPtr                 = std::shared_ptr<AbstractMesh>;
+using AnimatablePtr                   = std::shared_ptr<Animatable>;
+using TransformNodePtr                = std::shared_ptr<TransformNode>;
+using PBRMetallicRoughnessMaterialPtr = std::shared_ptr<PBRMetallicRoughnessMaterial>;
 
 namespace Samples {
 
@@ -62,7 +65,7 @@ public:
     scene->clearColor = Color4(0.f, 0.f, 0.f, 1.f);
     scene->autoClear  = true;
 
-    // Materials
+    // materials
     _mat0            = PBRMetallicRoughnessMaterial::New("mat0", scene);
     _mat0->metallic  = 0.f;
     _mat0->roughness = 1.f;
@@ -82,7 +85,7 @@ public:
     _mat2->animations    = {};
 
     //
-    // Meshes
+    // meshes
     //
 
     _mesh0 = TransformNode::New("mesh0", scene);
@@ -95,7 +98,7 @@ public:
 
     auto N    = 16u;
     auto size = 1.f;
-    for (auto i = 1u; i <= N; ++i) {
+    for (unsigned i = 1u; i <= N; ++i) {
       TorusKnotOptions torusKnotOptions;
       torusKnotOptions.radius = size;
       const auto istr         = std::to_string(i);
@@ -112,10 +115,10 @@ public:
     }
 
     //
-    // Animations
+    // animations
     //
 
-    // Kind #1 ---- complex-animation
+    // kind #1 ---- complex-animation
     _animY = [this](Scene*, EventState&) {
       if (_animYEnabled) {
         auto i = 0u;
@@ -128,12 +131,12 @@ public:
     };
     scene->registerAfterRender(_animY);
 
-    // Kind #2 ---- helper-function -> Animatable{}
+    // kind #2 ---- helper-function -> Animatable{}
     _anim0 = Animation::CreateAndStartAnimation("anim0", _mesh0, "rotation.y", 10 /*fps*/,
                                                 180.f /*totalFrame*/, 0.f, 2.f * Math::PI,
                                                 Animation::ANIMATIONLOOPMODE_CYCLE);
 
-    // Kind #3 ---- Animation{}
+    // kind #3 ---- Animation{}
     auto animColor = Animation::New("anim", "baseColor", 60, Animation::ANIMATIONTYPE_COLOR3,
                                     Animation::ANIMATIONLOOPMODE_CYCLE);
     std::vector<IAnimationKey> colorAnimation{// yoyo
@@ -148,7 +151,7 @@ public:
     _animatableColor->pause();
 
     //
-    // Light and shadow
+    // light and shadow
     //
 
     auto light0       = SpotLight::New("light0", Vector3(10.f, 20.f, 0.f), Vector3(-1.f, -2.f, 0.f),
@@ -171,7 +174,7 @@ public:
     ground->receiveShadows = true;
 
     //
-    // Camera
+    // camera
     //
 
     auto camera0 = ArcRotateCamera::New("camera0", Math::PI / 180.f * -140.f,
@@ -183,7 +186,7 @@ public:
     camera0->wheelPrecision   = 100.f;
 
     //
-    // Events
+    // events
     //
     scene->registerBeforeRender([this](Scene*, EventState&) {
       auto result = _scene->pick(_scene->pointerX, _scene->pointerY);

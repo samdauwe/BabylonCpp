@@ -10,18 +10,11 @@
 #include <babylon/maths/vector3.h>
 #include <babylon/maths/vector4.h>
 #include <babylon/maths/viewport.h>
-#include <babylon/meshes/transform_node.h>
 
 namespace BABYLON {
 
 int Matrix::_updateFlagSeed      = 0;
 Matrix Matrix::_identityReadOnly = Matrix::Identity();
-
-static const auto mtxConvertNDCToHalfZRange = Matrix::FromValues(1.f, 0.f, 0.f, 0.f,  //
-                                                                 0.f, 1.f, 0.f, 0.f,  //
-                                                                 0.f, 0.f, 0.5f, 0.f, //
-                                                                 0.f, 0.f, 0.5f, 1.f  //
-);
 
 Matrix::Matrix()
     : updateFlag{-1}
@@ -32,8 +25,6 @@ Matrix::Matrix()
 {
   std::fill(_m.begin(), _m.end(), 0.f);
   _updateIdentityStatus(false);
-
-  _markAsUpdated();
 }
 
 Matrix::Matrix(const Matrix& otherMatrix) = default;
@@ -88,6 +79,7 @@ void Matrix::_markAsUpdated()
 void Matrix::_updateIdentityStatus(bool isIdentity, bool isIdentityDirty, bool isIdentity3x2,
                                    bool isIdentity3x2Dirty)
 {
+  updateFlag          = Matrix::_updateFlagSeed++;
   _isIdentity         = isIdentity;
   _isIdentity3x2      = isIdentity || isIdentity3x2;
   _isIdentityDirty    = _isIdentity ? false : isIdentityDirty;
@@ -406,7 +398,6 @@ Matrix& Matrix::copyFrom(const Matrix& other)
 {
   other.copyToArray(_m);
   const auto& o = other;
-  updateFlag    = o.updateFlag;
   _updateIdentityStatus(o._isIdentity, o._isIdentityDirty, o._isIdentity3x2, o._isIdentity3x2Dirty);
   return *this;
 }
@@ -568,19 +559,6 @@ bool Matrix::equals(const Matrix& value) const
           && stl_util::almost_equal(m[10], om[10]) && stl_util::almost_equal(m[11], om[11])
           && stl_util::almost_equal(m[12], om[12]) && stl_util::almost_equal(m[13], om[13])
           && stl_util::almost_equal(m[14], om[14]) && stl_util::almost_equal(m[15], om[15]));
-}
-
-bool Matrix::decomposeToTransformNode(TransformNode& node) const
-{
-  node.rotationQuaternion            = node.rotationQuaternion().value_or(Quaternion());
-  std::optional<Vector3> scale       = node.scaling();
-  std::optional<Quaternion> rotation = node.rotationQuaternion();
-  std::optional<Vector3> translation = node.position();
-  const auto result                  = decompose(scale, rotation, translation);
-  node.scaling                       = *scale;
-  node.rotationQuaternion            = *rotation;
-  node.position                      = *translation;
-  return result;
 }
 
 bool Matrix::decompose(std::optional<Vector3>& scale, std::optional<Quaternion>& rotation,
@@ -1079,38 +1057,27 @@ void Matrix::RotationAxisToRef(Vector3& axis, float angle, Matrix& result)
 
 void Matrix::RotationAlignToRef(const Vector3& from, const Vector3& to, Matrix& result)
 {
+  const auto v = Vector3::Cross(to, from);
   const auto c = Vector3::Dot(to, from);
-  auto& m      = result._m;
-  if (c < (-1.f + Math::Epsilon)) {
-    // from and to are colinear and opposite direction.
-    // compute a PI rotation on Z axis
-    // clang-format off
-    m[0] = -1.f; m[1] =  0.f; m[2] =  0.f; m[3] =  0.f;
-    m[4] =  0.f; m[5] = -1.f; m[6] =  0.f; m[7] =  0.f;
-    m[8] =  0.f; m[9] =  0.f; m[10] = 1.f; m[11] = 0.f;
-    // clang-format on
-  }
-  else {
-    const auto v = Vector3::Cross(to, from);
-    const auto k = 1.f / (1.f + c);
+  const auto k = 1.f / (1.f + c);
 
-    m[0]  = v.x * v.x * k + c;
-    m[1]  = v.y * v.x * k - v.z;
-    m[2]  = v.z * v.x * k + v.y;
-    m[3]  = 0.f;
-    m[4]  = v.x * v.y * k + v.z;
-    m[5]  = v.y * v.y * k + c;
-    m[6]  = v.z * v.y * k - v.x;
-    m[7]  = 0.f;
-    m[8]  = v.x * v.z * k - v.y;
-    m[9]  = v.y * v.z * k + v.x;
-    m[10] = v.z * v.z * k + c;
-    m[11] = 0.f;
-  }
-  m[12] = 0.f;
-  m[13] = 0.f;
-  m[14] = 0.f;
-  m[15] = 1.f;
+  auto& m = result._m;
+  m[0]    = v.x * v.x * k + c;
+  m[1]    = v.y * v.x * k - v.z;
+  m[2]    = v.z * v.x * k + v.y;
+  m[3]    = 0.f;
+  m[4]    = v.x * v.y * k + v.z;
+  m[5]    = v.y * v.y * k + c;
+  m[6]    = v.z * v.y * k - v.x;
+  m[7]    = 0.f;
+  m[8]    = v.x * v.z * k - v.y;
+  m[9]    = v.y * v.z * k + v.x;
+  m[10]   = v.z * v.z * k + c;
+  m[11]   = 0.f;
+  m[12]   = 0.f;
+  m[13]   = 0.f;
+  m[14]   = 0.f;
+  m[15]   = 1.f;
 
   result._markAsUpdated();
 }
@@ -1304,60 +1271,14 @@ void Matrix::LookAtRHToRef(const Vector3& eye, const Vector3& target, const Vect
                           result);
 }
 
-Matrix Matrix::LookDirectionLH(const Vector3& forward, const Vector3& up)
-{
-  Matrix result;
-  Matrix::LookDirectionLHToRef(forward, up, result);
-  return result;
-}
-
-void Matrix::LookDirectionLHToRef(const Vector3& forward, const Vector3& up, Matrix& result)
-{
-  auto& back = MathTmp::Vector3Array[0];
-  back.copyFrom(forward);
-  back.scaleInPlace(-1.f);
-  auto& left = MathTmp::Vector3Array[1];
-  Vector3::CrossToRef(up, back, left);
-
-  // Generate the rotation matrix.
-  Matrix::FromValuesToRef(left.x, left.y, left.z, 0.f, //
-                          up.x, up.y, up.z, 0.f,       //
-                          back.x, back.y, back.z, 0.f, //
-                          0.f, 0.f, 0.f, 1.f,          //
-                          result                       //
-  );
-}
-
-Matrix Matrix::LookDirectionRH(const Vector3& forward, const Vector3& up)
-{
-  Matrix result;
-  Matrix::LookDirectionRHToRef(forward, up, result);
-  return result;
-}
-
-void Matrix::LookDirectionRHToRef(const Vector3& forward, const Vector3& up, Matrix& result)
-{
-  auto& right = MathTmp::Vector3Array[2];
-  Vector3::CrossToRef(up, forward, right);
-
-  // Generate the rotation matrix.
-  Matrix::FromValuesToRef(right.x, right.y, right.z, 0.f,       //
-                          up.x, up.y, up.z, 0.f,                //
-                          forward.x, forward.y, forward.z, 0.f, //
-                          0.f, 0.f, 0.f, 1.f,                   //
-                          result                                //
-  );
-}
-
-Matrix Matrix::OrthoLH(float width, float height, float znear, float zfar, bool halfZRange)
+Matrix Matrix::OrthoLH(float width, float height, float znear, float zfar)
 {
   Matrix matrix;
-  Matrix::OrthoLHToRef(width, height, znear, zfar, matrix, halfZRange);
+  Matrix::OrthoLHToRef(width, height, znear, zfar, matrix);
   return matrix;
 }
 
-void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar, Matrix& result,
-                          bool halfZRange)
+void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar, Matrix& result)
 {
   const auto n = znear;
   const auto f = zfar;
@@ -1373,23 +1294,19 @@ void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar, Ma
                           0.f, 0.f, d, 1.f, //
                           result);
 
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
-
   result._updateIdentityStatus(a == 1.f && b == 1.f && c == 1.f && d == 0.f);
 }
 
 Matrix Matrix::OrthoOffCenterLH(float left, float right, float bottom, float top, float znear,
-                                float zfar, bool halfZRange)
+                                float zfar)
 {
   Matrix matrix;
-  Matrix::OrthoOffCenterLHToRef(left, right, bottom, top, znear, zfar, matrix, halfZRange);
+  Matrix::OrthoOffCenterLHToRef(left, right, bottom, top, znear, zfar, matrix);
   return matrix;
 }
 
 void Matrix::OrthoOffCenterLHToRef(float left, float right, float bottom, float top, float znear,
-                                   float zfar, Matrix& result, bool halfZRange)
+                                   float zfar, Matrix& result)
 {
   const auto n = znear;
   const auto f = zfar;
@@ -1407,128 +1324,100 @@ void Matrix::OrthoOffCenterLHToRef(float left, float right, float bottom, float 
                           i0, i1, d, 1.f,   //
                           result);
 
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
-
   result._markAsUpdated();
 }
 
 Matrix Matrix::OrthoOffCenterRH(float left, float right, float bottom, float top, float znear,
-                                float zfar, bool halfZRange)
+                                float zfar)
 {
   Matrix matrix;
-  Matrix::OrthoOffCenterRHToRef(left, right, bottom, top, znear, zfar, matrix, halfZRange);
+  Matrix::OrthoOffCenterRHToRef(left, right, bottom, top, znear, zfar, matrix);
   return matrix;
 }
 
 void Matrix::OrthoOffCenterRHToRef(float left, float right, float bottom, float top, float znear,
-                                   float zfar, Matrix& result, bool halfZRange)
+                                   float zfar, Matrix& result)
 {
-  Matrix::OrthoOffCenterLHToRef(left, right, bottom, top, znear, zfar, result, halfZRange);
+  Matrix::OrthoOffCenterLHToRef(left, right, bottom, top, znear, zfar, result);
   result._m[10] *= -1.f; // No need to call _markAsUpdated as previous function
                          // already called it and let _isIdentityDirty to true
 }
 
-Matrix Matrix::PerspectiveLH(float width, float height, float znear, float zfar, bool halfZRange,
-                             float projectionPlaneTilt)
+Matrix Matrix::PerspectiveLH(float width, float height, float znear, float zfar)
 {
   Matrix matrix;
 
   const auto n = znear;
   const auto f = zfar;
 
-  const auto a   = 2.f * n / width;
-  const auto b   = 2.f * n / height;
-  const auto c   = (f + n) / (f - n);
-  const auto d   = -2.f * f * n / (f - n);
-  const auto rot = std::tan(projectionPlaneTilt);
+  const auto a = 2.f * n / width;
+  const auto b = 2.f * n / height;
+  const auto c = (f + n) / (f - n);
+  const auto d = -2.f * f * n / (f - n);
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
-                          0.f, b, 0.f, rot, //
+                          0.f, b, 0.f, 0.f, //
                           0.f, 0.f, c, 1.f, //
                           0.f, 0.f, d, 0.f, //
                           matrix);
-
-  if (halfZRange) {
-    matrix.multiplyToRef(mtxConvertNDCToHalfZRange, matrix);
-  }
 
   matrix._updateIdentityStatus(false);
   return matrix;
 }
 
-Matrix Matrix::PerspectiveFovLH(float fov, float aspect, float znear, float zfar, bool halfZRange,
-                                float projectionPlaneTilt)
+Matrix Matrix::PerspectiveFovLH(float fov, float aspect, float znear, float zfar)
 {
   Matrix matrix;
-  Matrix::PerspectiveFovLHToRef(fov, aspect, znear, zfar, matrix, true, halfZRange,
-                                projectionPlaneTilt);
+  Matrix::PerspectiveFovLHToRef(fov, aspect, znear, zfar, matrix);
   return matrix;
 }
 
 void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear, float zfar, Matrix& result,
-                                   bool isVerticalFovFixed, bool halfZRange,
-                                   float projectionPlaneTilt)
+                                   bool isVerticalFovFixed)
 {
   const auto n = znear;
   const auto f = zfar;
 
-  const auto t   = 1.f / (std::tan(fov * 0.5f));
-  const auto a   = isVerticalFovFixed ? (t / aspect) : t;
-  const auto b   = isVerticalFovFixed ? t : (t * aspect);
-  const auto c   = f != 0.f ? (f + n) / (f - n) : 1.f;
-  const auto d   = f != 0.f ? -2.f * f * n / (f - n) : -2.f * n;
-  const auto rot = std::tan(projectionPlaneTilt);
+  const auto t = 1.f / (std::tan(fov * 0.5f));
+  const auto a = isVerticalFovFixed ? (t / aspect) : t;
+  const auto b = isVerticalFovFixed ? t : (t * aspect);
+  const auto c = f != 0.f ? (f + n) / (f - n) : 1.f;
+  const auto d = f != 0.f ? -2.f * f * n / (f - n) : -2.f * n;
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
-                          0.f, b, 0.f, rot, //
+                          0.f, b, 0.f, 0.f, //
                           0.f, 0.f, c, 1.f, //
                           0.f, 0.f, d, 0.f, //
                           result);
-
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
-
   result._updateIdentityStatus(false);
 }
 
 void Matrix::PerspectiveFovReverseLHToRef(float fov, float aspect, float znear, float /*zfar*/,
-                                          Matrix& result, bool isVerticalFovFixed, bool halfZRange,
-                                          float projectionPlaneTilt)
+                                          Matrix& result, bool isVerticalFovFixed)
 {
-  const auto t   = 1.f / (std::tan(fov * 0.5f));
-  const auto a   = isVerticalFovFixed ? (t / aspect) : t;
-  const auto b   = isVerticalFovFixed ? t : (t * aspect);
-  const auto rot = std::tan(projectionPlaneTilt);
-
+  const auto t = 1.f / (std::tan(fov * 0.5f));
+  const auto a = isVerticalFovFixed ? (t / aspect) : t;
+  const auto b = isVerticalFovFixed ? t : (t * aspect);
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,      //
-                          0.f, b, 0.f, rot,      //
+                          0.f, b, 0.f, 0.f,      //
                           0.f, 0.f, -znear, 1.f, //
                           0.f, 0.f, 1.f, 0.f,    //
                           result                 //
   );
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
   result._updateIdentityStatus(false);
 }
 
-Matrix Matrix::PerspectiveFovRH(float fov, float aspect, float znear, float zfar, bool halfZRange,
-                                float projectionPlaneTilt)
+Matrix Matrix::PerspectiveFovRH(float fov, float aspect, float znear, float zfar)
 {
   Matrix matrix = Matrix::Zero();
 
-  Matrix::PerspectiveFovRHToRef(fov, aspect, znear, zfar, matrix, true, halfZRange,
-                                projectionPlaneTilt);
+  Matrix::PerspectiveFovRHToRef(fov, aspect, znear, zfar, matrix);
 
   return matrix;
 }
 
 void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear, float zfar, Matrix& result,
-                                   bool isVerticalFovFixed, bool halfZRange,
-                                   float projectionPlaneTilt)
+                                   bool isVerticalFovFixed)
 {
   // alternatively this could be expressed as:
   //    m = PerspectiveFovLHToRef
@@ -1538,78 +1427,64 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear, float z
   const auto n = znear;
   const auto f = zfar;
 
-  const auto t   = 1.f / (std::tan(fov * 0.5f));
-  const auto a   = isVerticalFovFixed ? (t / aspect) : t;
-  const auto b   = isVerticalFovFixed ? t : (t * aspect);
-  const auto c   = f != 0.f ? -(f + n) / (f - n) : -1.f;
-  const auto d   = f != 0.f ? -2.f * f * n / (f - n) : -2.f * n;
-  const auto rot = std::tan(projectionPlaneTilt);
+  const auto t = 1.f / (std::tan(fov * 0.5f));
+  const auto a = isVerticalFovFixed ? (t / aspect) : t;
+  const auto b = isVerticalFovFixed ? t : (t * aspect);
+  const auto c = f != 0.f ? -(f + n) / (f - n) : -1.f;
+  const auto d = f != 0.f ? -2.f * f * n / (f - n) : -2.f * n;
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,  //
-                          0.f, b, 0.f, rot,  //
+                          0.f, b, 0.f, 0.f,  //
                           0.f, 0.f, c, -1.f, //
                           0.f, 0.f, d, 0.f,  //
                           result);
-
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
 
   result._updateIdentityStatus(false);
 }
 
 void Matrix::PerspectiveFovReverseRHToRef(float fov, float aspect, float znear, float /*zfar*/,
-                                          Matrix& result, bool isVerticalFovFixed, bool halfZRange,
-                                          float projectionPlaneTilt)
+                                          Matrix& result, bool isVerticalFovFixed)
 {
-  const auto t   = 1.f / (std::tan(fov * 0.5f));
-  const auto a   = isVerticalFovFixed ? (t / aspect) : t;
-  const auto b   = isVerticalFovFixed ? t : (t * aspect);
-  const auto rot = std::tan(projectionPlaneTilt);
+  // alternatively this could be expressed as:
+  //    m = PerspectiveFovLHToRef
+  //    m[10] *= -1.0;
+  //    m[11] *= -1.0;
+
+  const auto t = 1.f / (std::tan(fov * 0.5f));
+  const auto a = isVerticalFovFixed ? (t / aspect) : t;
+  const auto b = isVerticalFovFixed ? t : (t * aspect);
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,       //
-                          0.f, b, 0.f, rot,       //
+                          0.f, b, 0.f, 0.f,       //
                           0.f, 0.f, -znear, -1.f, //
                           0.f, 0.f, -1.f, 0.f,    //
                           result                  //
   );
 
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
-
   result._updateIdentityStatus(false);
 }
 
 void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar, Matrix& result,
-                                      bool rightHanded, bool halfZRange, float projectionPlaneTilt)
+                                      bool rightHanded)
 {
   const float rightHandedFactor = rightHanded ? -1.f : 1.f;
-
-  const auto upTan    = std::tan(fov.upDegrees * Math::PI / 180.f);
-  const auto downTan  = std::tan(fov.downDegrees * Math::PI / 180.f);
-  const auto leftTan  = std::tan(fov.leftDegrees * Math::PI / 180.f);
-  const auto rightTan = std::tan(fov.rightDegrees * Math::PI / 180.f);
-  const auto xScale   = 2.f / (leftTan + rightTan);
-  const auto yScale   = 2.f / (upTan + downTan);
-  const auto rot      = std::tan(projectionPlaneTilt);
-
-  auto& m = result._m;
-  m[0]    = xScale;
+  const float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
+  const float downTan           = std::tan(fov.downDegrees * Math::PI / 180.f);
+  const float leftTan           = std::tan(fov.leftDegrees * Math::PI / 180.f);
+  const float rightTan          = std::tan(fov.rightDegrees * Math::PI / 180.f);
+  const float xScale            = 2.f / (leftTan + rightTan);
+  const float yScale            = 2.f / (upTan + downTan);
+  auto& m                       = result._m;
+  m[0]                          = xScale;
   m[1] = m[2] = m[3] = m[4] = 0.f;
   m[5]                      = yScale;
-  m[6]                      = 0.f;
-  m[7]                      = rot;
-  m[8]                      = ((leftTan - rightTan) * xScale * 0.5f);
-  m[9]                      = -((upTan - downTan) * yScale * 0.5f);
-  m[10]                     = -zfar / (znear - zfar);
-  m[11]                     = 1.f * rightHandedFactor;
+  m[6] = m[7] = 0.f;
+  m[8]        = ((leftTan - rightTan) * xScale * 0.5f);
+  m[9]        = -((upTan - downTan) * yScale * 0.5f);
+  m[10]       = -zfar / (znear - zfar);
+  m[11]       = 1.f * rightHandedFactor;
   m[12] = m[13] = m[15] = 0.f;
   m[14]                 = -(2.f * zfar * znear) / (zfar - znear);
-
-  if (halfZRange) {
-    result.multiplyToRef(mtxConvertNDCToHalfZRange, result);
-  }
 
   result._markAsUpdated();
 }
@@ -1682,9 +1557,6 @@ void Matrix::TransposeToRef(const Matrix& matrix, Matrix& result)
   rm[13] = mm[7];
   rm[14] = mm[11];
   rm[15] = mm[15];
-
-  result._markAsUpdated();
-
   // identity-ness does not change when transposing
   result._updateIdentityStatus((matrix)._isIdentity, (matrix)._isIdentityDirty);
 }

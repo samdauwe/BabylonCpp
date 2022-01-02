@@ -20,7 +20,6 @@ struct ISize;
 class Matrix;
 class Scene;
 class ThinEngine;
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(ThinSprite)
 FWD_CLASS_SPTR(ThinTexture)
@@ -63,18 +62,13 @@ public:
          = nullptr);
 
   /**
-   * @brief Rebuilds the renderer (after a context lost, for eg).
-   */
-  void rebuild();
-
-  /**
    * @brief Release associated resources.
    */
   void dispose();
 
 protected:
   /**
-   * @brief Gets the capacity of the manager.
+   * @brief Gets the capacity of the manager
    */
   size_t get_capacity() const;
 
@@ -83,7 +77,6 @@ private:
     size_t index, const ThinSpritePtr& sprite, int offsetX, int offsetY, const ISize& baseSize,
     bool useRightHandedSystem,
     const std::function<void(ThinSprite* sprite, const ISize& baseSize)>& customSpriteUpdate);
-  void _buildIndexBuffer();
 
 public:
   /**
@@ -146,8 +139,8 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<Buffer> _spriteBuffer;
   WebGLDataBufferPtr _indexBuffer;
-  DrawWrapperPtr _drawWrapperBase;
-  DrawWrapperPtr _drawWrapperFog;
+  EffectPtr _effectBase;
+  EffectPtr _effectFog;
   WebGLVertexArrayObjectPtr _vertexArrayObject;
 
 }; // end of class SpriteRenderer

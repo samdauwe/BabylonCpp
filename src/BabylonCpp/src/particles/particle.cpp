@@ -28,7 +28,6 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , _initialDirection{std::nullopt}
     , _initialStartSpriteCellID{0}
     , _initialEndSpriteCellID{0}
-    , _initialSpriteCellLoop{true}
     , _currentColorGradient{std::nullopt}
     , _currentColor1{Color4(0.f, 0.f, 0.f, 0.f)}
     , _currentColor2{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -103,13 +102,8 @@ void Particle::updateCellIndex()
   }
 
   auto dist  = (_initialEndSpriteCellID - _initialStartSpriteCellID);
-  auto ratio = 0.f;
-  if (_initialSpriteCellLoop) {
-    ratio = Scalar::Clamp(std::fmod((offsetAge * changeSpeed), lifeTime) / lifeTime);
-  }
-  else {
-    ratio = Scalar::Clamp((offsetAge * changeSpeed) / lifeTime);
-  }
+  auto ratio = Scalar::Clamp(std::fmod((offsetAge * changeSpeed), lifeTime) / lifeTime);
+
   cellIndex = static_cast<unsigned int>(_initialStartSpriteCellID + (ratio * dist));
 }
 
@@ -225,7 +219,6 @@ void Particle::copyTo(Particle& other)
   if (particleSystem->isAnimationSheetEnabled) {
     other._initialStartSpriteCellID = _initialStartSpriteCellID;
     other._initialEndSpriteCellID   = _initialEndSpriteCellID;
-    other._initialSpriteCellLoop    = _initialSpriteCellLoop;
   }
   if (particleSystem->useRampGradients) {
     if (other.remapData && remapData) {

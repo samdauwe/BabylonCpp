@@ -27,12 +27,12 @@ struct BABYLON_SHARED_EXPORT SSAO2Configuration : public PrePassEffectConfigurat
   }
 
   /**
-   * @brief Textures that should be present in the MRT for this effect to work.
+   * @brief Textures that should be present in the MRT for this effect to work
    */
   std::vector<uint32_t> texturesRequired() const override
   {
     return {
-      Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE,
+      Constants::PREPASS_NORMAL_TEXTURE_TYPE,
       Constants::PREPASS_DEPTH_TEXTURE_TYPE,
     };
   };

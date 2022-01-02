@@ -38,20 +38,20 @@ void InterpolateValueAction::_prepare()
   _property        = _getProperty(propertyPath);
 }
 
-void InterpolateValueAction::execute(const IActionEventPtr& /*evt*/)
+void InterpolateValueAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
-  const auto scene = _actionManager->getScene();
+  auto scene = _actionManager->getScene();
   std::vector<IAnimationKey> keys{IAnimationKey(0, _effectiveTarget->getProperty({_property})), //
                                   IAnimationKey(100, *value)};
 
-  const auto dataType = value->animationType();
+  auto dataType = value->animationType();
   if (!dataType.has_value()) {
     BABYLON_LOG_WARN("InterpolateValueAction", "InterpolateValueAction: Unsupported type")
   }
 
-  const auto animation = Animation::New("InterpolateValueAction", _property,
-                                        static_cast<size_t>(100.f * (1000.f / float(duration))),
-                                        dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT);
+  auto animation = Animation::New("InterpolateValueAction", _property,
+                                  static_cast<size_t>(100 * (1000.f / float(duration))),
+                                  dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT);
 
   animation->setKeys(keys);
 

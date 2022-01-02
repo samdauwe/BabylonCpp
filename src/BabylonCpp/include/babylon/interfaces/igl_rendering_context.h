@@ -638,10 +638,6 @@ struct BABYLON_SHARED_EXPORT WEBGL_compressed_texture_s3tc {
 
 }; // end of struct WEBGL_compressed_texture_s3tc
 
-struct BABYLON_SHARED_EXPORT WEBGL_compressed_texture_s3tc_srgb {
-
-}; // end of struct WEBGL_compressed_texture_s3tc_srgb
-
 class BABYLON_SHARED_EXPORT IGLRenderbuffer {
 
 public:

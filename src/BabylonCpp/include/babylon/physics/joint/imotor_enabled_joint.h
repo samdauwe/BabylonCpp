@@ -12,7 +12,6 @@ class PhysicsJoint;
  * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 struct BABYLON_SHARED_EXPORT IMotorEnabledJoint {
-
   virtual ~IMotorEnabledJoint() = default;
   /**
    * Physics joint

@@ -8,7 +8,6 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
-#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/fragment/perturb_normal_block.h>
@@ -110,10 +109,10 @@ PBRMetallicRoughnessBlock::PBRMetallicRoughnessBlock(const std::string& iName)
     , specularDir{this, &PBRMetallicRoughnessBlock::get_specularDir}
     , clearcoatDir{this, &PBRMetallicRoughnessBlock::get_clearcoatDir}
     , sheenDir{this, &PBRMetallicRoughnessBlock::get_sheenDir}
-    , diffuseInd{this, &PBRMetallicRoughnessBlock::get_diffuseInd}
-    , specularInd{this, &PBRMetallicRoughnessBlock::get_specularInd}
-    , clearcoatInd{this, &PBRMetallicRoughnessBlock::get_clearcoatInd}
-    , sheenInd{this, &PBRMetallicRoughnessBlock::get_sheenInd}
+    , diffuseIndirect{this, &PBRMetallicRoughnessBlock::get_diffuseIndirect}
+    , specularIndirect{this, &PBRMetallicRoughnessBlock::get_specularIndirect}
+    , clearcoatIndirect{this, &PBRMetallicRoughnessBlock::get_clearcoatIndirect}
+    , sheenIndirect{this, &PBRMetallicRoughnessBlock::get_sheenIndirect}
     , refraction{this, &PBRMetallicRoughnessBlock::get_refraction}
     , lighting{this, &PBRMetallicRoughnessBlock::get_lighting}
     , shadow{this, &PBRMetallicRoughnessBlock::get_shadow}
@@ -405,22 +404,22 @@ NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenDir()
   return _outputs[4];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_diffuseInd()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_diffuseIndirect()
 {
   return _outputs[5];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specularInd()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_specularIndirect()
 {
   return _outputs[6];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatInd()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_clearcoatIndirect()
 {
   return _outputs[7];
 }
 
-NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenInd()
+NodeMaterialConnectionPointPtr& PBRMetallicRoughnessBlock::get_sheenIndirect()
 {
   return _outputs[8];
 }
@@ -536,9 +535,7 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
                    true);
   defines.setValue("REALTIME_FILTERING", realTimeFiltering, true);
 
-  const auto scene = mesh->getScene();
-
-  if (scene->getEngine()->_features.needTypeSuffixInShaderConstants) {
+  if (_scene->getEngine()->webGLVersion > 1) {
     defines.setValue("NUM_SAMPLES", realTimeFilteringQuality, true);
   }
   else {
@@ -562,13 +559,11 @@ void PBRMetallicRoughnessBlock::prepareDefines(AbstractMesh* mesh,
     defines.setValue("ENVIRONMENTBRDF_RGBD", false);
   }
 
-  if (defines._areImageProcessingDirty && nodeMaterial->imageProcessingConfiguration()) {
-    nodeMaterial->imageProcessingConfiguration()->prepareDefines(defines);
-  }
-
   if (!defines._areLightsDirty) {
     return;
   }
+
+  const auto scene = mesh->getScene();
 
   if (!light) {
     // Lights
@@ -601,7 +596,8 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
                                                          const NodeMaterialDefines& defines,
                                                          std::vector<std::string>& uniformBuffers)
 {
-  for (auto lightIndex = 0u; lightIndex < nodeMaterial->maxSimultaneousLights; ++lightIndex) {
+  for (unsigned int lightIndex = 0; lightIndex < nodeMaterial->maxSimultaneousLights;
+       ++lightIndex) {
     const auto lightIndexStr = std::to_string(lightIndex);
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
@@ -612,22 +608,6 @@ void PBRMetallicRoughnessBlock::updateUniformsAndSamples(NodeMaterialBuildState&
       lightIndex, state.uniforms, state.samplers, uniformBuffers, true,
       defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr], onlyUpdateBuffersList);
   }
-}
-
-bool PBRMetallicRoughnessBlock::isReady(AbstractMesh* /*mesh*/, const NodeMaterialPtr& nodeMaterial,
-                                        const NodeMaterialDefines& defines, bool /*useInstances*/)
-{
-  if (_environmentBRDFTexture && !_environmentBRDFTexture->isReady()) {
-    return false;
-  }
-
-  if (defines._areImageProcessingDirty && nodeMaterial->imageProcessingConfiguration()) {
-    if (!nodeMaterial->imageProcessingConfiguration()->isReady()) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& nodeMaterial,
@@ -682,10 +662,6 @@ void PBRMetallicRoughnessBlock::bind(Effect* effect, const NodeMaterialPtr& node
   const auto metallicF90 = _metallicF0Factor;
 
   effect->setColor4(_vMetallicReflectanceFactorsName, TmpVectors::Color3Array[0], metallicF90);
-
-  if (nodeMaterial->imageProcessingConfiguration()) {
-    nodeMaterial->imageProcessingConfiguration()->bind(effect);
-  }
 }
 
 void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
@@ -697,8 +673,8 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
   if (!light) { // Emit for all lights
     EmitFunctionFromIncludeOptions options;
     options.repeatKey = "maxSimultaneousLights";
-    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightVxUboDeclaration" :
-                                                                 "lightVxFragmentDeclaration",
+    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
+                                                                 "lightFragmentDeclaration",
                                    iComments, options);
     _lightId = 0;
 
@@ -712,8 +688,8 @@ void PBRMetallicRoughnessBlock::_injectVertexCode(NodeMaterialBuildState& state)
 
     EmitFunctionFromIncludeOptions options;
     options.replaceStrings = {{R"({X})", std::to_string(_lightId)}};
-    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightVxUboDeclaration" :
-                                                                 "lightVxFragmentDeclaration",
+    state._emitFunctionFromInclude(state.supportUniformBuffers ? "lightUboDeclaration" :
+                                                                 "lightFragmentDeclaration",
                                    iComments, options, std::to_string(_lightId));
   }
 
@@ -895,7 +871,6 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   // Fragment
   state.sharedData->bindableBlocks.emplace_back(shared_from_this());
   state.sharedData->blocksWithDefines.emplace_back(shared_from_this());
-  state.sharedData->blockingBlocks.emplace_back(shared_from_this());
 
   const auto iComments       = StringTools::printf("//%s", name().c_str());
   const auto worldPosVarName = "v_" + worldPosition()->associatedVariableName();
@@ -913,18 +888,6 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state._emitExtension("lod", "#extension GL_EXT_shader_texture_lod : enable",
                        "defined(LODBASEDMICROSFURACE)");
   state._emitExtension("derivatives", "#extension GL_OES_standard_derivatives : enable");
-
-  // Image processing uniforms
-  state.uniforms.emplace_back("exposureLinear");
-  state.uniforms.emplace_back("contrast");
-  state.uniforms.emplace_back("vInverseScreenSize");
-  state.uniforms.emplace_back("vignetteSettings1");
-  state.uniforms.emplace_back("vignetteSettings2");
-  state.uniforms.emplace_back("vCameraColorCurveNegative");
-  state.uniforms.emplace_back("vCameraColorCurveNeutral");
-  state.uniforms.emplace_back("vCameraColorCurvePositive");
-  state.uniforms.emplace_back("txColorTransform");
-  state.uniforms.emplace_back("colorTransformSettings");
 
   //
   // Includes
@@ -947,7 +910,6 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
   state._emitFunctionFromInclude("helperFunctions", iComments);
   state._emitFunctionFromInclude("importanceSampling", iComments);
   state._emitFunctionFromInclude("pbrHelperFunctions", iComments);
-  state._emitFunctionFromInclude("imageProcessingDeclaration", iComments);
   state._emitFunctionFromInclude("imageProcessingFunctions", iComments);
 
   EmitFunctionFromIncludeOptions functionOptions, functionOptionsRefl;
@@ -1329,7 +1291,7 @@ PBRMetallicRoughnessBlock& PBRMetallicRoughnessBlock::_buildBlock(NodeMaterialBu
 
 std::string PBRMetallicRoughnessBlock::_dumpPropertiesCode()
 {
-  std::string codeString = NodeMaterialBlock::_dumpPropertiesCode();
+  std::string codeString;
 
   codeString
     += StringTools::printf("%s.lightFalloff = %u;\r\n", _codeVariableName.c_str(), lightFalloff);

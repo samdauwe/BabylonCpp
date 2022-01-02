@@ -3,8 +3,6 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/buffer.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
@@ -33,6 +31,7 @@
 #include <babylon/meshes/_internal_mesh_data_info.h>
 #include <babylon/meshes/_thin_instance_data_storage.h>
 #include <babylon/meshes/_visible_instances.h>
+#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/builders/box_builder.h>
 #include <babylon/meshes/builders/capsule_builder.h>
 #include <babylon/meshes/builders/cylinder_builder.h>
@@ -57,6 +56,7 @@
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh_lod_level.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
@@ -81,7 +81,6 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , onBeforeRenderObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeBindObservable{this, &Mesh::get_onBeforeBindObservable}
     , onAfterRenderObservable{this, &Mesh::get_onAfterRenderObservable}
-    , onBetweenPassObservable{this, &Mesh::get_onBetweenPassObservable}
     , onBeforeDrawObservable{this, &Mesh::get_onBeforeDrawObservable}
     , onBeforeDraw{this, &Mesh::set_onBeforeDraw}
     , delayLoadState{Constants::DELAYLOADSTATE_NONE}
@@ -109,12 +108,12 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , thinInstanceEnablePicking{false}
     , thinInstanceCount{this, &Mesh::get_thinInstanceCount, &Mesh::set_thinInstanceCount}
     , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
-    , _userInstancedBuffersStorage{std::nullopt}
     , _internalMeshDataInfo{std::make_unique<_InternalMeshDataInfo>()}
     , _onBeforeDrawObserver{nullptr}
     , _thinInstanceDataStorage{std::make_unique<_ThinInstanceDataStorage>()}
     , _userThinInstanceBuffersStorage{nullptr}
     , _effectiveMaterial{nullptr}
+    , _userInstancedBuffersStorage{std::nullopt}
     , _tessellation{0}
     , _arc{1.f}
 {
@@ -363,11 +362,6 @@ Observable<Mesh>& Mesh::get_onAfterRenderObservable()
   return _internalMeshDataInfo->_onAfterRenderObservable;
 }
 
-Observable<SubMesh>& Mesh::get_onBetweenPassObservable()
-{
-  return _internalMeshDataInfo->_onBetweenPassObservable;
-}
-
 Observable<Mesh>& Mesh::get_onBeforeDrawObservable()
 {
   return _internalMeshDataInfo->_onBeforeDrawObservable;
@@ -448,16 +442,16 @@ std::vector<MeshLODLevelPtr>& Mesh::getLODLevels()
 void Mesh::_sortLODLevels()
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
-  BABYLON::stl_util::sort_js_style(
-    _LODLevels, [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
-      if (a->distanceOrScreenCoverage < b->distanceOrScreenCoverage) {
-        return 1;
-      }
-      if (a->distanceOrScreenCoverage > b->distanceOrScreenCoverage) {
-        return -1;
-      }
-      return 0;
-    });
+  BABYLON::stl_util::sort_js_style(_LODLevels,
+                                   [](const MeshLODLevelPtr& a, const MeshLODLevelPtr& b) {
+                                     if (a->distance < b->distance) {
+                                       return 1;
+                                     }
+                                     if (a->distance > b->distance) {
+                                       return -1;
+                                     }
+                                     return 0;
+                                   });
 }
 
 Mesh& Mesh::addLODLevel(float distance, const MeshPtr& mesh)
@@ -484,7 +478,7 @@ MeshPtr Mesh::getLODLevelAtDistance(float distance)
 {
   auto& _LODLevels = _internalMeshDataInfo->_LODLevels;
   for (const auto& level : _LODLevels) {
-    if (stl_util::almost_equal(level->distanceOrScreenCoverage, distance)) {
+    if (stl_util::almost_equal(level->distance, distance)) {
       return level->mesh;
     }
   }
@@ -527,7 +521,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphe
 
   auto distanceToCamera = bSphere->centerWorld.subtract(camera->globalPosition()).length();
 
-  if (_LODLevels.back()->distanceOrScreenCoverage > distanceToCamera) {
+  if (_LODLevels.back()->distance > distanceToCamera) {
     if (onLODLevelSelection) {
       onLODLevelSelection(distanceToCamera, this, this);
     }
@@ -535,7 +529,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera, BoundingSphere* boundingSphe
   }
 
   for (const auto& level : _LODLevels) {
-    if (level->distanceOrScreenCoverage < distanceToCamera) {
+    if (level->distance < distanceToCamera) {
       if (level->mesh) {
         if (level->mesh->delayLoadState == Constants::DELAYLOADSTATE_NOTLOADED) {
           level->mesh->_checkDelayState();
@@ -846,12 +840,12 @@ void Mesh::_postActivate()
 
 Mesh& Mesh::refreshBoundingInfo(bool applySkeleton)
 {
-  if (hasBoundingInfo() && getBoundingInfo()->isLocked()) {
+  if (_boundingInfo && _boundingInfo->isLocked()) {
     return *this;
   }
 
   std::optional<Vector2> bias = geometry() ? geometry()->boundingBias() : std::nullopt;
-  _refreshBoundingInfo(_getPositionData(applySkeleton, false), bias);
+  _refreshBoundingInfo(_getPositionData(applySkeleton), bias);
   return *this;
 }
 
@@ -1087,11 +1081,6 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect, unsigned int fillMod
   }
 
   auto engine = getScene()->getEngine();
-
-  // Morph targets
-  if (morphTargetManager() && morphTargetManager()->isUsingTextureForTargets()) {
-    morphTargetManager()->_bind(effect.get());
-  }
 
   // Wireframe
   WebGLDataBufferPtr indexToBind = nullptr;
@@ -1425,8 +1414,16 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
 
     if (!buffer.empty()) {
       _thinInstanceDataStorage->instancesCount = buffer.size() / stride;
-      _thinInstanceDataStorage->matrixBuffer
-        = _thinInstanceCreateMatrixBuffer("world", buffer, staticBuffer);
+
+      const auto matrixBuffer
+        = std::make_shared<Buffer>(getEngine(), buffer, !staticBuffer, stride, false, true);
+
+      _thinInstanceDataStorage->matrixBuffer = matrixBuffer;
+
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world0", 0, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world1", 4, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world2", 8, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world3", 12, 4));
 
       if (!doNotSyncBoundingInfo) {
         thinInstanceRefreshBoundingInfo(false);
@@ -1439,15 +1436,6 @@ void Mesh::thinInstanceSetBuffer(const std::string& kind, const Float32Array& bu
         // regular mesh that will now be displayed
         refreshBoundingInfo(true);
       }
-    }
-  }
-  else if (kind == "previousMatrix") {
-    _thinInstanceDataStorage->previousMatrixBuffer->dispose();
-    _thinInstanceDataStorage->previousMatrixBuffer = nullptr;
-    _thinInstanceDataStorage->previousMatrixData   = buffer;
-    if (!buffer.empty()) {
-      _thinInstanceDataStorage->previousMatrixBuffer
-        = _thinInstanceCreateMatrixBuffer("previousWorld", buffer, staticBuffer);
     }
   }
   else {
@@ -1603,16 +1591,18 @@ void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInst
 
     if (kindIsMatrix) {
       _thinInstanceDataStorage->matrixBuffer->dispose();
-      _thinInstanceDataStorage->matrixBuffer
-        = _thinInstanceCreateMatrixBuffer("world", data, false);
+
+      const auto matrixBuffer
+        = std::make_shared<Buffer>(getEngine(), data, true, stride, false, true);
+
+      _thinInstanceDataStorage->matrixBuffer     = matrixBuffer;
       _thinInstanceDataStorage->matrixData       = data;
       _thinInstanceDataStorage->matrixBufferSize = newSize;
-      if (_scene->needsPreviousWorldMatrices
-          && _thinInstanceDataStorage->previousMatrixData.empty()) {
-        _thinInstanceDataStorage->previousMatrixBuffer->dispose();
-        _thinInstanceDataStorage->previousMatrixBuffer
-          = _thinInstanceCreateMatrixBuffer("previousWorld", data, false);
-      }
+
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world0", 0, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world1", 4, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world2", 8, 4));
+      setVerticesBuffer(matrixBuffer->createVertexBuffer("world3", 12, 4));
     }
     else {
       _userThinInstanceBuffersStorage->vertexBuffers[kind]->dispose();
@@ -1625,20 +1615,6 @@ void Mesh::_thinInstanceUpdateBufferSize(const std::string& kind, size_t numInst
       setVerticesBuffer(_userThinInstanceBuffersStorage->vertexBuffers[kind]);
     }
   }
-}
-
-BufferPtr Mesh::_thinInstanceCreateMatrixBuffer(const std::string& kind, const Float32Array& buffer,
-                                                bool staticBuffer)
-{
-  const auto matrixBuffer
-    = std::make_shared<Buffer>(getEngine(), buffer, !staticBuffer, 16, false, true);
-
-  for (unsigned int i = 0; i < 4; i++) {
-    setVerticesBuffer(
-      matrixBuffer->createVertexBuffer(StringTools::printf("%s%u", kind.c_str(), i), i * 4, 4));
-  }
-
-  return matrixBuffer;
 }
 
 void Mesh::_thinInstanceInitializeUserStorage()
@@ -1778,7 +1754,7 @@ Mesh& Mesh::_processRendering(
   return *this;
 }
 
-void Mesh::_rebuild(bool /*dispose*/)
+void Mesh::_rebuild()
 {
   if (_instanceDataStorage->instancesBuffer) {
     // Dispose instance buffer to be recreated in _renderWithInstances when rendered
@@ -1950,10 +1926,6 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode,
       },
       _effectiveMaterial.get());
     engine->setState(true, _effectiveMaterial->zOffset, false, reverse);
-
-    if (_internalMeshDataInfo->_onBetweenPassObservable) {
-      _internalMeshDataInfo->_onBetweenPassObservable.notifyObservers(subMesh);
-    }
   }
 
   // Draw
@@ -2400,25 +2372,9 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   auto& internalDataInfo = *_internalMeshDataInfo;
 
-  if (internalDataInfo._onBeforeDrawObservable) {
-    internalDataInfo._onBeforeDrawObservable.clear();
-  }
-
-  if (internalDataInfo._onBeforeBindObservable) {
-    internalDataInfo._onBeforeBindObservable.clear();
-  }
-
-  if (internalDataInfo._onBeforeRenderObservable) {
-    internalDataInfo._onBeforeRenderObservable.clear();
-  }
-
-  if (internalDataInfo._onAfterRenderObservable) {
-    internalDataInfo._onAfterRenderObservable.clear();
-  }
-
-  if (internalDataInfo._onBetweenPassObservable) {
-    internalDataInfo._onBetweenPassObservable.clear();
-  }
+  internalDataInfo._onBeforeDrawObservable.clear();
+  internalDataInfo._onBeforeRenderObservable.clear();
+  internalDataInfo._onAfterRenderObservable.clear();
 
   // Sources
   if (_scene->useClonedMeshMap) {
@@ -2572,7 +2528,6 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer, unsigned int
   if (forceUpdate) {
     setVerticesData(VertexBuffer::PositionKind, positions);
     setVerticesData(VertexBuffer::NormalKind, normals);
-    setVerticesData(VertexBuffer::UVKind, uvs);
   }
   else {
     updateVerticesData(VertexBuffer::PositionKind, positions);
@@ -2777,10 +2732,6 @@ void Mesh::increaseVertices(size_t numberPerEdge)
     BABYLON_LOG_WARN("Mesh", "VertexData contains null entries")
   }
   else {
-    vertex_data->indices   = currentIndices;
-    vertex_data->positions = positions;
-    vertex_data->normals   = normals;
-
     auto segments
       = numberPerEdge + 1; // segments per current facet edge, become sides of new facets
     std::vector<Uint32Array> tempIndices;
@@ -3112,10 +3063,6 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       return;
     }
 
-    if (iMorphTargetManager->isUsingTextureForTargets()) {
-      return;
-    }
-
     std::string indexStr;
     for (unsigned int index = 0; index < iMorphTargetManager->numInfluencers(); ++index) {
       indexStr         = std::to_string(index);
@@ -3431,7 +3378,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
   if (json_util::has_valid_key_value(parsedMesh, "delayLoadingFile")) {
     mesh->delayLoadState   = Constants::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile = rootUrl + json_util::get_string(parsedMesh, "delayLoadingFile");
-    mesh->buildBoundingInfo(
+    mesh->_boundingInfo    = std::make_unique<BoundingInfo>(
       Vector3::FromArray(json_util::get_array<float>(parsedMesh, "boundingBoxMinimum")),
       Vector3::FromArray(json_util::get_array<float>(parsedMesh, "boundingBoxMaximum")));
 
@@ -3620,8 +3567,6 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene, const std::string& roo
   // Thin instances
   if (json_util::has_valid_key_value(parsedMesh, "thinInstances")) {
     const auto thinInstances = parsedMesh["thinInstances"];
-
-    mesh->thinInstanceEnablePicking = json_util::get_bool(thinInstances, "enablePicking");
 
     if (json_util::has_valid_key_value(thinInstances, "matrixData")) {
 #if 0
@@ -3843,7 +3788,7 @@ MeshPtr Mesh::ExtrudeShape(const std::string& iName, const std::vector<Vector3>&
   options.path            = path;
   options.scale           = scale;
   options.rotation        = iRotation;
-  options.cap             = cap == 0 ? 0 : Mesh::NO_CAP;
+  options.cap             = (cap == 0) ? 0 : Mesh::NO_CAP;
   options.sideOrientation = sideOrientation;
   options.instance        = instance;
   options.updatable       = updatable;
@@ -3865,7 +3810,7 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   options.rotationFunction = rotationFunction;
   options.ribbonCloseArray = ribbonCloseArray;
   options.ribbonClosePath  = ribbonClosePath;
-  options.cap              = cap == 0 ? 0 : Mesh::NO_CAP;
+  options.cap              = (cap == 0) ? 0 : Mesh::NO_CAP;
   options.sideOrientation  = sideOrientation;
   options.instance         = instance;
   options.updatable        = updatable;

@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -18,6 +17,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -206,18 +206,17 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<TriPlanarMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<TriPlanarMaterialDefines>();
   }
 
-  const auto definesPtr
-    = std::static_pointer_cast<TriPlanarMaterialDefines>(subMesh->_materialDefines);
-  auto& defines    = *definesPtr.get();
-  const auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<TriPlanarMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
-  const auto engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   // Textures
   if (defines._areTexturesDirty) {
@@ -227,7 +226,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
                                                _diffuseTextureZ};
         const std::vector<std::string> textureDefines{"DIFFUSEX", "DIFFUSEY", "DIFFUSEZ"};
 
-        for (auto i = 0ull; i < textures.size(); ++i) {
+        for (unsigned int i = 0; i < textures.size(); i++) {
           if (textures[i]) {
             if (!textures[i]->isReady()) {
               return false;
@@ -242,7 +241,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
         const std::vector<TexturePtr> textures{_normalTextureX, _normalTextureY, _normalTextureZ};
         const std::vector<std::string> textureDefines{"BUMPX", "BUMPY", "BUMPZ"};
 
-        for (auto i = 0ull; i < textures.size(); ++i) {
+        for (unsigned int i = 0; i < textures.size(); i++) {
           if (textures[i]) {
             if (!textures[i]->isReady()) {
               return false;
@@ -332,8 +331,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
     options.indexParameters       = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -348,15 +346,15 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, 
 
 void TriPlanarMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
-  const auto scene = getScene();
+  auto scene = getScene();
 
-  const auto _defines = static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get());
+  auto _defines = static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get());
   if (!_defines) {
     return;
   }
   auto defines = *_defines;
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -399,7 +397,7 @@ void TriPlanarMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMe
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    scene->bindEyePosition(effect.get());
+    MaterialHelper::BindEyePosition(effect.get(), scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);

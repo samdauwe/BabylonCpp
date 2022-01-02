@@ -92,14 +92,14 @@ protected:
    * press.
    * Override this method to provide functionality.
    */
-  virtual void onButtonDown(IPointerEvent& evt);
+  virtual void onButtonDown(PointerEvent& evt);
 
   /**
    * @brief Called each time a new POINTERUP event occurs. Ie, for each button
    * release.
    * Override this method to provide functionality.
    */
-  virtual void onButtonUp(IPointerEvent& evt);
+  virtual void onButtonUp(PointerEvent& evt);
 
   /**
    * @brief Called when window becomes inactive.
@@ -111,7 +111,7 @@ public:
   /**
    * Defines the buttons associated with the input to handle camera move.
    */
-  std::array<int, 3> buttons;
+  std::array<MouseButtonType, 3> buttons;
 
 protected:
   /**
@@ -126,11 +126,9 @@ protected:
    * Which mouse buttons were pressed at time of last mouse event.
    * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
    */
-  int _buttonsPressed;
+  MouseButtonType _buttonsPressed;
 
 private:
-  int _currentActiveButton;
-  bool _usingSafari;
   std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
   Observer<PointerInfo>::Ptr _observer;
   std::function<void(FocusEvent& e)> _onLostFocus;

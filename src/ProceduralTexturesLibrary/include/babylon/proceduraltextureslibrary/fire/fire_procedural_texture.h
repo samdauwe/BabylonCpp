@@ -2,7 +2,6 @@
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_FIRE_FIRE_PROCEDURAL_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/maths/color3.h>
 #include <babylon/maths/vector2.h>
@@ -10,7 +9,8 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
-FWD_CLASS_SPTR(FireProceduralTexture)
+class FireProceduralTexture;
+using FireProceduralTexturePtr = std::shared_ptr<FireProceduralTexture>;
 
 class BABYLON_SHARED_EXPORT FireProceduralTexture : public ProceduralTexture {
 
@@ -41,10 +41,12 @@ public:
   json serialize() const;
 
   /**
-   * @brief Creates a Fire Procedural Texture from parsed fire procedural texture data.
+   * @brief Creates a Fire Procedural Texture from parsed fire procedural
+   * texture data.
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing fire procedural texture information
+   * @param rootUrl defines the root URL containing fire procedural texture
+   * information
    * @returns a parsed Fire Procedural Texture
    */
   static std::unique_ptr<FireProceduralTexture> Parse(const json& parsedTexture, Scene* scene,
@@ -84,4 +86,5 @@ private:
 } // end of namespace ProceduralTexturesLibrary
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_PROCEDURAL_TEXTURES_LIBRARY_FIRE_FIRE_PROCEDURAL_TEXTURE_H
+#endif // end of
+       // BABYLON_PROCEDURAL_TEXTURES_LIBRARY_FIRE_FIRE_PROCEDURAL_TEXTURE_H

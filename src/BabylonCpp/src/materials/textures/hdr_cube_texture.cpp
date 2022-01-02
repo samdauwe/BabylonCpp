@@ -13,7 +13,6 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
 #include <babylon/misc/highdynamicrange/hdr_tools.h>
-#include <babylon/misc/texture_tools.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
@@ -137,15 +136,6 @@ void HDRCubeTexture::loadTexture()
 {
   const auto callback = [this](const ArrayBuffer& buffer) -> std::vector<ArrayBufferView> {
     const auto engine = _getEngine();
-    const auto& caps  = engine->getCaps();
-
-    auto textureType = Constants::TEXTURETYPE_UNSIGNED_BYTE;
-    if (caps.textureFloat && caps.textureFloatLinearFiltering) {
-      textureType = Constants::TEXTURETYPE_FLOAT;
-    }
-    else if (caps.textureHalfFloat && caps.textureHalfFloatLinearFiltering) {
-      textureType = Constants::TEXTURETYPE_HALF_FLOAT;
-    }
 
     lodGenerationOffset = 0.f;
     lodGenerationScale  = 0.8f;
@@ -161,25 +151,21 @@ void HDRCubeTexture::loadTexture()
     }
 
     std::vector<ArrayBufferView> results;
-    Uint16Array shortArray;
     Uint8Array byteArray;
 
     // Push each faces.
     for (unsigned int j = 0; j < 6; ++j) {
 
-      // Create fallback array
-      if (textureType == Constants::TEXTURETYPE_HALF_FLOAT) {
-        shortArray = Uint16Array(_size * _size * 3);
-      }
-      else if (textureType == Constants::TEXTURETYPE_UNSIGNED_BYTE) {
+      // Create uintarray fallback.
+      if (!engine->getCaps().textureFloat) {
         // 3 channels of 1 bytes per pixel in bytes.
-        byteArray = Uint8Array(_size * _size * 3);
+        byteArray.resize(_size * _size * 3);
       }
 
       auto dataFace = data[HDRCubeTexture::_facesMapping[j]].float32Array();
 
       // If special cases.
-      if (gammaSpace || !shortArray.empty() || !byteArray.empty()) {
+      if (gammaSpace || !byteArray.empty()) {
         for (size_t i = 0; i < _size * _size; ++i) {
 
           // Put in gamma space if requested.
@@ -187,16 +173,6 @@ void HDRCubeTexture::loadTexture()
             dataFace[(i * 3) + 0] = std::pow(dataFace[(i * 3) + 0], Math::ToGammaSpace);
             dataFace[(i * 3) + 1] = std::pow(dataFace[(i * 3) + 1], Math::ToGammaSpace);
             dataFace[(i * 3) + 2] = std::pow(dataFace[(i * 3) + 2], Math::ToGammaSpace);
-          }
-
-          // Convert to half float texture for fallback.
-          if (!shortArray.empty()) {
-            shortArray[(i * 3) + 0]
-              = static_cast<uint16_t>(TextureTools::ToHalfFloat(dataFace[(i * 3) + 0]));
-            shortArray[(i * 3) + 1]
-              = static_cast<uint16_t>(TextureTools::ToHalfFloat(dataFace[(i * 3) + 1]));
-            shortArray[(i * 3) + 2]
-              = static_cast<uint16_t>(TextureTools::ToHalfFloat(dataFace[(i * 3) + 2]));
           }
 
           // Convert to int texture for fallback.
@@ -208,7 +184,7 @@ void HDRCubeTexture::loadTexture()
             // May use luminance instead if the result is not accurate.
             const auto max = std::max(std::max(r, g), b);
             if (max > 255) {
-              const auto scale = 255.f / max;
+              auto scale = 255.f / max;
               r *= scale;
               g *= scale;
               b *= scale;
@@ -221,10 +197,7 @@ void HDRCubeTexture::loadTexture()
         }
       }
 
-      if (!shortArray.empty()) {
-        results.emplace_back(shortArray);
-      }
-      else if (!byteArray.empty()) {
+      if (!byteArray.empty()) {
         results.emplace_back(byteArray);
       }
       else {
@@ -244,8 +217,10 @@ void HDRCubeTexture::loadTexture()
   }
 
   _texture = _getEngine()->createRawCubeTextureFromUrl(
-    url, getScene(), static_cast<int>(_size), Constants::TEXTUREFORMAT_RGB, textureType, _noMipmap,
-    callback, nullptr, _onLoad, _onError);
+    url, getScene(), static_cast<int>(_size), Constants::TEXTUREFORMAT_RGB,
+    _getEngine()->getCaps().textureFloat ? Constants::TEXTURETYPE_FLOAT :
+                                           Constants::TEXTURETYPE_UNSIGNED_INT,
+    _noMipmap, callback, nullptr, _onLoad, _onError);
 }
 
 HDRCubeTexturePtr HDRCubeTexture::clone() const

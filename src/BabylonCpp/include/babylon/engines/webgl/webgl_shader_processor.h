@@ -10,10 +10,9 @@ namespace BABYLON {
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT WebGLShaderProcessor : public IShaderProcessor {
-  WebGLShaderProcessor();
-  std::string _postProcessor(std::string code, const std::vector<std::string>& defines,
-                             bool isFragment, const ShaderProcessingContextPtr&,
-                             ThinEngine* engine);
+  ~WebGLShaderProcessor() override; // = default
+  std::string postProcessor(std::string code, const std::vector<std::string>& defines,
+                            bool isFragment, ThinEngine* engine) override;
 }; // end of struct WebGLShaderProcessor
 
 } // end of namespace BABYLON

@@ -21,7 +21,6 @@ class VertexBuffer;
 class Viewport;
 FWD_CLASS_SPTR(AbstractMesh)
 FWD_CLASS_SPTR(Camera)
-FWD_STRUCT_SPTR(DrawWrapper)
 FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(IShadowLight)
 FWD_CLASS_SPTR(LensFlare)
@@ -34,7 +33,7 @@ FWD_CLASS_SPTR(WebGLDataBuffer)
 
 /**
  * @brief This represents a Lens Flare System or the shiny effect created by the light reflection on
- * the camera lenses. It is usually composed of several `lensFlare`.
+ * the  camera lenses. It is usually composed of several `lensFlare`.
  * @see https://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
 class BABYLON_SHARED_EXPORT LensFlareSystem {
@@ -98,12 +97,7 @@ public:
   bool render();
 
   /**
-   * @brief Rebuilds the lens flare system.
-   */
-  void rebuild();
-
-  /**
-   * @brief Dispose and release the lens flare with its associated resources.
+   * Dispose and release the lens flare with its associated resources.
    */
   void dispose();
 
@@ -139,11 +133,9 @@ protected:
    */
   LensFlareSystem(const std::string& name, const LensFlareEmitterType& emitter, Scene* scene);
 
+private:
   [[nodiscard]] bool get_isEnabled() const;
   void set_isEnabled(bool value);
-
-private:
-  void _createIndexBuffer();
 
 public:
   /**
@@ -190,9 +182,11 @@ public:
 private:
   Scene* _scene;
   LensFlareEmitterType _emitter;
+  // Float32Array _vertexDeclaration;
+  // int _vertexStrideSize;
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   WebGLDataBufferPtr _indexBuffer;
-  DrawWrapperPtr _drawWrapper;
+  EffectPtr _effect;
   float _positionX;
   float _positionY;
   bool _isEnabled;

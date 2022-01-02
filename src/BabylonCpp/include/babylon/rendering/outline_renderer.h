@@ -25,8 +25,6 @@ FWD_CLASS_SPTR(OutlineRenderer)
 class BABYLON_SHARED_EXPORT OutlineRenderer : public ISceneComponent {
 
 private:
-  static size_t _Counter;
-
   /**
    * Stencil value used to avoid outline being seen within the mesh when the mesh is transparent
    */
@@ -97,19 +95,15 @@ private:
 
 public:
   /**
-   * Defines a zOffset default Factor to prevent zFighting between the overlay and the mesh.
+   * Defines a zOffset to prevent zFighting between the overlay and the mesh.
    */
   float zOffset;
 
-  /**
-   * Defines a zOffset default Unit to prevent zFighting between the overlay and the mesh.
-   */
-  float zOffsetUnits;
-
 private:
   Engine* _engine;
+  EffectPtr _effect;
+  std::string _cachedDefines;
   bool _savedDepthWrite;
-  std::string _nameForDrawWrapper;
 
 }; // end of class OutlineRenderer
 

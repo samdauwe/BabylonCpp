@@ -2,19 +2,16 @@
 #define BABYLON_GIZMOS_PLANE_ROTATION_GIZMO_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/maths/color3.h>
-#include <babylon/maths/vector3.h>
 #include <babylon/misc/observable.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
+class PointerDragBehavior;
 class RotationGizmo;
-FWD_CLASS_SPTR(PointerDragBehavior)
-FWD_CLASS_SPTR(ShaderMaterial)
 
 /**
  * @brief Single axis scale gizmo.
@@ -70,7 +67,7 @@ public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
    */
-  PointerDragBehaviorPtr dragBehavior;
+  std::unique_ptr<PointerDragBehavior> dragBehavior;
 
   /**
    * Rotation distance in radians that the gizmo will snap to (Default: 0)
@@ -82,17 +79,6 @@ public:
    * * snapDistance is the the change in distance
    */
   Observable<SnapEvent> onSnapObservable;
-
-  /**
-   * The maximum angle between the camera and the rotation allowed for interaction
-   * If a rotation plane appears 'flat', a lower value allows interaction.
-   */
-  static float MaxDragAngle;
-
-  /**
-   * Acumulated relative angle value for rotation on the axis. Reset to 0 when a dragStart occurs
-   */
-  float angle;
 
   /**
    * If the gizmo is enabled
@@ -111,8 +97,6 @@ private:
   MeshPtr _rotationMesh;
   MeshPtr _collider;
   bool _dragging;
-  Vector3 _angles;
-  ShaderMaterialPtr _rotationShaderMaterial;
   bool _useEulerRotation;
   GizmoAxisCache _cache;
 

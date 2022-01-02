@@ -6,7 +6,6 @@
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
-#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/misc/string_tools.h>
@@ -14,15 +13,13 @@
 namespace BABYLON {
 
 ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Scene* scene,
-                                 bool generateMipMaps, bool useFloat, bool iLinearSpace)
+                                 bool generateMipMaps, bool useFloat)
     : name{iName}
     , position{Vector3::Zero()}
-    , _parentContainer{nullptr}
     , samples{this, &ReflectionProbe::get_samples, &ReflectionProbe::set_samples}
     , refreshRate{this, &ReflectionProbe::get_refreshRate, &ReflectionProbe::set_refreshRate}
     , cubeTexture{this, &ReflectionProbe::get_cubeTexture}
     , renderList{this, &ReflectionProbe::get_renderList}
-    , linearSpace{iLinearSpace}
     , _scene{scene}
     , _renderTargetTexture{nullptr}
     , _viewMatrix{Matrix::Identity()}
@@ -30,7 +27,6 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
     , _add{Vector3::Zero()}
     , _attachedMesh{nullptr}
     , _invertYAxis{false}
-    , _currentApplyByPostProcess{false}
 {
   auto textureType = Constants::TEXTURETYPE_UNSIGNED_BYTE;
   if (useFloat) {
@@ -44,76 +40,69 @@ ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size, Sc
   }
   _renderTargetTexture = RenderTargetTexture::New(iName, RenderTargetSize{size.width, size.height},
                                                   scene, generateMipMaps, true, textureType, true);
-  _renderTargetTexture->gammaSpace = !iLinearSpace;
 
-  _renderTargetTexture->onBeforeRenderObservable.add(
-    [scene, this](const int* faceIndex, EventState&) {
-      const auto useReverseDepthBuffer = scene->getEngine()->useReverseDepthBuffer;
+  _renderTargetTexture->onBeforeRenderObservable.add([scene, this](const int* faceIndex,
+                                                                   EventState&) {
+    switch (*faceIndex) {
+      case 0:
+        _add.copyFromFloats(1.f, 0.f, 0.f);
+        break;
+      case 1:
+        _add.copyFromFloats(-1.f, 0.f, 0.f);
+        break;
+      case 2:
+        _add.copyFromFloats(0.f, _invertYAxis ? 1.f : -1.f, 0.f);
+        break;
+      case 3:
+        _add.copyFromFloats(0.f, _invertYAxis ? -1.f : 1.f, 0.f);
+        break;
+      case 4:
+        _add.copyFromFloats(0.f, 0.f, scene->useRightHandedSystem() ? -1.f : 1.f);
+        break;
+      case 5:
+        _add.copyFromFloats(0.f, 0.f, scene->useRightHandedSystem() ? 1.f : -1.f);
+        break;
+      default:
+        break;
+    }
 
-      switch (*faceIndex) {
-        case 0:
-          _add.copyFromFloats(1.f, 0.f, 0.f);
-          break;
-        case 1:
-          _add.copyFromFloats(-1.f, 0.f, 0.f);
-          break;
-        case 2:
-          _add.copyFromFloats(0.f, _invertYAxis ? 1.f : -1.f, 0.f);
-          break;
-        case 3:
-          _add.copyFromFloats(0.f, _invertYAxis ? -1.f : 1.f, 0.f);
-          break;
-        case 4:
-          _add.copyFromFloats(0.f, 0.f, scene->useRightHandedSystem() ? -1.f : 1.f);
-          break;
-        case 5:
-          _add.copyFromFloats(0.f, 0.f, scene->useRightHandedSystem() ? 1.f : -1.f);
-          break;
-        default:
-          break;
-      }
+    if (_attachedMesh) {
+      position.copyFrom(_attachedMesh->getAbsolutePosition());
+    }
 
-      if (_attachedMesh) {
-        position.copyFrom(_attachedMesh->getAbsolutePosition());
-      }
+    position.addToRef(_add, _target);
 
-      position.addToRef(_add, _target);
-
-      const auto lookAtFunction
-        = scene->useRightHandedSystem() ? Matrix::LookAtRHToRef : Matrix::LookAtLHToRef;
-      const auto perspectiveFunction
-        = scene->useRightHandedSystem ? Matrix::PerspectiveFovRH : Matrix::PerspectiveFovLH;
-
-      lookAtFunction(position, _target, Vector3::Up(), _viewMatrix);
+    if (scene->useRightHandedSystem()) {
+      Matrix::LookAtRHToRef(position, _target, Vector3::Up(), _viewMatrix);
 
       if (scene->activeCamera()) {
-        _projectionMatrix = perspectiveFunction(
-          Math::PI / 2, 1.f,
-          useReverseDepthBuffer ? scene->activeCamera()->maxZ : scene->activeCamera()->minZ,
-          useReverseDepthBuffer ? scene->activeCamera()->minZ : scene->activeCamera()->maxZ,
-          _scene->getEngine()->isNDCHalfZRange, false);
+        _projectionMatrix = Matrix::PerspectiveFovRH(
+          Math::PI / 2.f, 1.f, scene->activeCamera()->minZ, scene->activeCamera()->maxZ);
         scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
-        if (scene->activeCamera()->isRigCamera && !_renderTargetTexture->activeCamera) {
-          _renderTargetTexture->activeCamera = scene->activeCamera()->rigParent;
-        }
       }
-      _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
-    });
+    }
+    else {
+      Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
+
+      if (_scene->activeCamera()) {
+        _projectionMatrix = Matrix::PerspectiveFovLH(Math::PI_2, 1.f, _scene->activeCamera()->minZ,
+                                                     _scene->activeCamera()->maxZ);
+        _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+      }
+    }
+
+    _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
+  });
 
   _renderTargetTexture->onBeforeBindObservable.add(
     [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
       _scene->getEngine()->_debugPushGroup(
         StringTools::printf("reflection probe generation for %s", name.c_str()), 1);
-      _currentApplyByPostProcess = _scene->imageProcessingConfiguration()->applyByPostProcess();
-      if (linearSpace) {
-        _scene->imageProcessingConfiguration()->applyByPostProcess = true;
-      }
     });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture* /*texture*/, EventState& /*es*/) -> void {
-      _scene->imageProcessingConfiguration()->applyByPostProcess = _currentApplyByPostProcess;
-      _scene->_forcedViewPosition                                = nullptr;
+      _scene->_forcedViewPosition = nullptr;
       _scene->updateTransformMatrix(true);
       _scene->getEngine()->_debugPopGroup(1);
     });
@@ -176,11 +165,6 @@ void ReflectionProbe::dispose()
 {
   // Remove from the scene if found
   stl_util::remove_vector_elements_equal_sharedptr(_scene->reflectionProbes, this);
-
-  if (_parentContainer) {
-    stl_util::remove_vector_elements_equal_sharedptr(_parentContainer->reflectionProbes, this);
-    _parentContainer = nullptr;
-  }
 
   if (_renderTargetTexture) {
     _renderTargetTexture->dispose();

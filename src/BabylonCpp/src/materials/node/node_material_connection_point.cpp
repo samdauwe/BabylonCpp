@@ -48,7 +48,6 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     : _ownerBlock{nullptr}
     , _connectedPoint{nullptr}
     , _typeConnectionSource{nullptr}
-    , _defaultConnectionPointType{std::nullopt}
     , _linkedConnectionSource{nullptr}
     , _acceptedConnectionPointType{nullptr}
     , _enforceAssociatedVariableName{false}
@@ -73,8 +72,6 @@ NodeMaterialConnectionPoint::NodeMaterialConnectionPoint(
     , connectedBlocks{this, &NodeMaterialConnectionPoint::get_connectedBlocks}
     , endpoints{this, &NodeMaterialConnectionPoint::get_endpoints}
     , hasEndpoints{this, &NodeMaterialConnectionPoint::get_hasEndpoints}
-    , isDirectlyConnectedToVertexOutput{this, &NodeMaterialConnectionPoint::
-                                                get_isDirectlyConnectedToVertexOutput}
     , isConnectedInVertexShader{this, &NodeMaterialConnectionPoint::get_isConnectedInVertexShader}
     , isConnectedInFragmentShader{this,
                                   &NodeMaterialConnectionPoint::get_isConnectedInFragmentShader}
@@ -141,16 +138,8 @@ NodeMaterialBlockConnectionPointTypes& NodeMaterialConnectionPoint::get_type()
     }
   }
 
-  if (_type == NodeMaterialBlockConnectionPointTypes::BasedOnInput) {
-    if (_typeConnectionSource) {
-      if (!_typeConnectionSource->isConnected() && _defaultConnectionPointType) {
-        return *_defaultConnectionPointType;
-      }
-      return _typeConnectionSource->type();
-    }
-    else if (_defaultConnectionPointType) {
-      return *_defaultConnectionPointType;
-    }
+  if (_type == NodeMaterialBlockConnectionPointTypes::BasedOnInput && _typeConnectionSource) {
+    return _typeConnectionSource->type();
   }
 
   return _type;
@@ -251,30 +240,6 @@ bool NodeMaterialConnectionPoint::get_hasEndpoints() const
   return !_endpoints.empty();
 }
 
-bool NodeMaterialConnectionPoint::get_isDirectlyConnectedToVertexOutput() const
-{
-  if (!hasEndpoints()) {
-    return false;
-  }
-
-  for (const auto& endpoint : _endpoints) {
-    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Vertex) {
-      return true;
-    }
-
-    if (endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::Neutral
-        || endpoint->ownerBlock()->target() == NodeMaterialBlockTargets::VertexAndFragment) {
-      for (const auto& o : endpoint->ownerBlock()->outputs()) {
-        if (o->isDirectlyConnectedToVertexOutput()) {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
 bool NodeMaterialConnectionPoint::get_isConnectedInVertexShader() const
 {
   if (target() == NodeMaterialBlockTargets::Vertex) {
@@ -356,18 +321,17 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
   const NodeMaterialConnectionPoint& connectionPoint)
 {
   const auto& iOwnerBlock = _ownerBlock;
-  const auto& otherBlock  = connectionPoint.ownerBlock();
 
   if (iOwnerBlock->target() == NodeMaterialBlockTargets::Fragment) {
     // Let's check we are not going reverse
+    const auto& otherBlock = connectionPoint.ownerBlock();
 
     if (otherBlock->target() == NodeMaterialBlockTargets::Vertex) {
       return NodeMaterialConnectionPointCompatibilityStates::TargetIncompatible;
     }
 
     for (const auto& output : otherBlock->outputs()) {
-      if (output->ownerBlock()->target() != NodeMaterialBlockTargets::Neutral
-          && output->isConnectedInVertexShader()) {
+      if (output->isConnectedInVertexShader()) {
         return NodeMaterialConnectionPointCompatibilityStates::TargetIncompatible;
       }
     }
@@ -399,18 +363,6 @@ NodeMaterialConnectionPointCompatibilityStates NodeMaterialConnectionPoint::chec
     return NodeMaterialConnectionPointCompatibilityStates::TypeIncompatible;
   }
 
-  // Check hierarchy
-  auto targetBlock  = otherBlock;
-  auto iSourceBlock = ownerBlock();
-  if (direction() == NodeMaterialConnectionPointDirection::Input) {
-    targetBlock  = ownerBlock();
-    iSourceBlock = otherBlock;
-  }
-
-  if (targetBlock->isAnAncestorOf(iSourceBlock)) {
-    return NodeMaterialConnectionPointCompatibilityStates::HierarchyIssue;
-  }
-
   return NodeMaterialConnectionPointCompatibilityStates::Compatible;
 }
 
@@ -436,7 +388,7 @@ NodeMaterialConnectionPoint::connectTo(const NodeMaterialConnectionPointPtr& con
 NodeMaterialConnectionPoint&
 NodeMaterialConnectionPoint::disconnectFrom(const NodeMaterialConnectionPointPtr& endpoint)
 {
-  const auto index = stl_util::index_of(_endpoints, endpoint);
+  auto index = stl_util::index_of(_endpoints, endpoint);
 
   if (index == -1) {
     return *this;

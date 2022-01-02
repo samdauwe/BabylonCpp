@@ -1,7 +1,6 @@
 #include <babylon/extensions/dynamicterrain/dynamic_terrain.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
@@ -9,6 +8,7 @@
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/misc/file_tools.h>
 
@@ -186,9 +186,9 @@ DynamicTerrain::DynamicTerrain(const std::string& iName, DynamicTerrainOptions& 
   float deltaNbSubX = (_terrain->position().x - _mapData[0]) / _averageSubSizeX;
   float deltaNbSubZ = (_terrain->position().z - _mapData[2]) / _averageSubSizeZ;
   _deltaSubX        = (deltaNbSubX > 0.f) ? static_cast<unsigned>(std::floor(deltaNbSubX)) :
-                                            static_cast<unsigned>(std::ceil(deltaNbSubX));
-  _deltaSubZ        = (deltaNbSubZ > 0.f) ? static_cast<unsigned>(std::floor(deltaNbSubZ)) :
-                                            static_cast<unsigned>(std::ceil(deltaNbSubZ));
+                                     static_cast<unsigned>(std::ceil(deltaNbSubX));
+  _deltaSubZ = (deltaNbSubZ > 0.f) ? static_cast<unsigned>(std::floor(deltaNbSubZ)) :
+                                     static_cast<unsigned>(std::ceil(deltaNbSubZ));
   _scene->registerBeforeRender([this](Scene*, EventState&) {
     beforeUpdate(_refreshEveryFrame);
     update(_refreshEveryFrame);

@@ -4,9 +4,9 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
-#include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/node/blocks/input/input_value.h>
 #include <babylon/materials/node/enums/node_material_system_values.h>
 #include <babylon/materials/node/node_material_build_state.h>
@@ -118,8 +118,7 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
         _type = NodeMaterialBlockConnectionPointTypes::Vector3;
         return _type;
       }
-      else if (iName == "uv" || iName == "uv2" || iName == "uv3" || iName == "uv4" || iName == "uv5"
-               || iName == "uv6" || iName == "position2d" || iName == "particle_uv") {
+      else if (iName == "uv" || iName == "uv2" || iName == "position2d" || iName == "particle_uv") {
         _type = NodeMaterialBlockConnectionPointTypes::Vector2;
         return _type;
       }
@@ -152,9 +151,6 @@ NodeMaterialBlockConnectionPointTypes& InputBlock::get_type()
           return _type;
         case NodeMaterialSystemValues::DeltaTime:
           _type = NodeMaterialBlockConnectionPointTypes::Float;
-          return _type;
-        case NodeMaterialSystemValues::CameraParameters:
-          _type = NodeMaterialBlockConnectionPointTypes::Vector4;
           return _type;
       }
     }
@@ -581,21 +577,13 @@ void InputBlock::_transmit(Effect* effect, Scene* scene)
         effect->setMatrix(variableName, scene->getTransformMatrix());
         break;
       case NodeMaterialSystemValues::CameraPosition:
-        scene->bindEyePosition(effect, variableName, true);
+        MaterialHelper::BindEyePosition(effect, scene, variableName, true);
         break;
       case NodeMaterialSystemValues::FogColor:
         effect->setColor3(variableName, scene->fogColor);
         break;
       case NodeMaterialSystemValues::DeltaTime:
         effect->setFloat(variableName, scene->deltaTime / 1000.f);
-        break;
-      case NodeMaterialSystemValues::CameraParameters:
-        if (scene->activeCamera()) {
-          effect->setFloat4(variableName, scene->getEngine()->hasOriginBottomLeft ? -1.f : 1.f,
-                            scene->activeCamera()->minZ, scene->activeCamera()->maxZ,
-                            1.f / scene->activeCamera()->maxZ);
-        }
-        break;
     }
     return;
   }
@@ -670,14 +658,12 @@ std::string InputBlock::_dumpPropertiesCode()
   const auto& variableName = _codeVariableName;
 
   if (isAttribute()) {
-    return NodeMaterialBlock::_dumpPropertiesCode()
-           + StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", variableName.c_str(),
-                                 name().c_str());
+    return StringTools::printf("%s.setAsAttribute(\"%s\");\r\n", variableName.c_str(),
+                               name().c_str());
   }
   if (isSystemValue()) {
-    return NodeMaterialBlock::_dumpPropertiesCode()
-           + StringTools::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",
-                                 variableName.c_str(), static_cast<unsigned int>(*_systemValue));
+    return StringTools::printf("%s.setAsSystemValue(NodeMaterialSystemValues(%u));\r\n",
+                               variableName.c_str(), static_cast<unsigned int>(*_systemValue));
   }
   if (isUniform()) {
     std::vector<std::string> codes;
@@ -754,10 +740,9 @@ std::string InputBlock::_dumpPropertiesCode()
     stl_util::concat(codes, {StringTools::printf("%s.isConstant = %s;\r\n", variableName.c_str(),
                                                  isConstant ? "true" : "false")});
 
-    return NodeMaterialBlock::_dumpPropertiesCode() + StringTools::join(codes, ";\r\n");
+    return StringTools::join(codes, ";\r\n");
   }
-
-  return NodeMaterialBlock::_dumpPropertiesCode();
+  return "";
 }
 
 void InputBlock::dispose()

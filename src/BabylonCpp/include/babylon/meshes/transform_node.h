@@ -102,12 +102,6 @@ public:
   std::string getClassName() const override;
 
   /**
-   * @brief return true if a pivot has been set.
-   * @returns true if a pivot matrix is used
-   */
-  bool isUsingPivotMatrix() const;
-
-  /**
    * @brief Copies the parameter passed Matrix into the mesh Pose matrix.
    * @param matrix the matrix to copy the pose from
    * @returns this TransformNode.
@@ -191,11 +185,9 @@ public:
   /**
    * @brief Prevents the World matrix to be computed any longer.
    * @param newWorldMatrix defines an optional matrix to use as world matrix
-   * @param decompose defines whether to decompose the given newWorldMatrix or directly assign
    * @returns the TransformNode.
    */
-  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix = std::nullopt,
-                                   bool decompose                              = false);
+  TransformNode& freezeWorldMatrix(const std::optional<Matrix>& newWorldMatrix = std::nullopt);
 
   /**
    * @brief Allows back the World matrix computation.
@@ -339,11 +331,9 @@ public:
 
   /**
    * @brief Detach the transform node if its associated with a bone.
-   * @param resetToPreviousParent Indicates if the parent that was in effect when attachToBone was
-   * called should be set back or if we should set parent to null instead (defaults to the latter)
    * @returns this object
    */
-  TransformNode& detachFromBone(bool resetToPreviousParent = false);
+  TransformNode& detachFromBone();
 
   /**
    * @brief Rotates the mesh around the axis vector for the passed angle (amount) expressed in
@@ -819,7 +809,6 @@ private:
   Vector3 _rotation;
   std::optional<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;
-  Node* _currentParentWhenAttachingToBone;
   bool _isAbsoluteSynced;
   unsigned int _billboardMode;
   bool _preserveParentRotationForBillboard;

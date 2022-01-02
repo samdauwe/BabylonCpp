@@ -58,28 +58,12 @@ def fileComparisonToStr(fileComparisonDict):
 
 def main():
     # Versions to compare
-    current, previous = "5.0.0-alpha.6", "4.2.0"
-    current, previous = "5.0.0-alpha.12", "5.0.0-alpha.6"
-    current, previous = "5.0.0-alpha.15", "5.0.0-alpha.12"
-    current, previous = "5.0.0-alpha.19", "5.0.0-alpha.15"
-    current, previous = "5.0.0-alpha.30", "5.0.0-alpha.19"
-    current, previous = "5.0.0-alpha.37", "5.0.0-alpha.30"
-    current, previous = "5.0.0-alpha.44", "5.0.0-alpha.37"
-    current, previous = "5.0.0-alpha.47", "5.0.0-alpha.44"
-    current, previous = "5.0.0-alpha.57", "5.0.0-alpha.47"
+    current, previous = "4.1.0", "4.1.0-beta.23"
+    current, previous = "4.2.0", "4.2.0-beta.12"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
-        "4.1.0"          : "4.1.0_2020_02_27",
-        "4.2.0"          : "4.2.0_2020_11_12",
-        "5.0.0-alpha.6"  : "5.0.0-alpha.6_2021_01_05",
-        "5.0.0-alpha.12" : "5.0.0-alpha.12_2021_02_26",
-        "5.0.0-alpha.15" : "5.0.0-alpha.15_2021_03_17",
-        "5.0.0-alpha.19" : "5.0.0-alpha.19_2021_04_27",
-        "5.0.0-alpha.30" : "5.0.0-alpha.30_2021_06_28",
-        "5.0.0-alpha.37" : "5.0.0-alpha.37_2021_08_04",
-        "5.0.0-alpha.44" : "5.0.0-alpha.44_2021_09_10",
-        "5.0.0-alpha.47" : "5.0.0-alpha.47_2021_09_23",
-        "5.0.0-alpha.57" : "5.0.0-alpha.57_2021_10_20",
+        "4.1.0"         : "4.1.0_2020_02_27",
+        "4.2.0"         : "4.2.0_2020_11_12",
     }
     # List containing the files to ignore
     whiteList = [
@@ -109,56 +93,27 @@ def main():
         # Cameras / XR / features
         "WebXRAnchorSystem.ts", "WebXRBackgroundRemover.ts",
         "WebXRHitTestLegacy.ts", "WebXRPlaneDetector.ts",
-        # Compute
-        "computeEffect.ts", "computeShader.ts", "IComputeContext.ts",
-        "IComputePipelineContext.ts",
         # Debug
         "debugLayer.ts",
         # DeviceInput
         "deviceInputSystem.ts", "deviceSourceManager.ts", "deviceTypes.ts",
         # Engines
-        "nativeEngine.ts", "performanceConfigurator.ts", "webgpuEngine.ts",
+        "nativeEngine.ts", "performanceConfigurator.ts",
         # Engines / Extensions
         "engine.videoTexture.ts", "engine.views.ts", "engine.webVR.ts",
         # Engines / Native
-        "nativeShaderProcessor.ts", "nativeShaderProcessors.ts",
-        # Engines / WebGPU
-        "webgpuBufferManager.ts", "webgpuBundleList.ts",
-        "webgpuCacheRenderPipeline.ts", "webgpuCacheRenderPipelineString.ts",
-        "webgpuCacheRenderPipelineTree.ts", "webgpuCacheBindGroups.ts",
-        "webgpuCacheSampler.ts", "webgpuClearQuad.ts", "webgpuComputeContext.ts",
-        "webgpuComputePipelineContext.ts", "webgpuConstants.ts",
-        "webgpuDepthCullingState.ts", "webgpuDrawContext.ts",
-        "webgpuExternalTexture.ts", "webgpuHardwareTexture.ts",
-        "webgpuOcclusionQuery.ts", "webgpuMaterialContext.ts",
-        "webgpuPipelineContext.ts", "webgpuRenderPassWrapper.ts",
-        "webgpuShaderManager.ts", "webgpuShaderProcessingContext.ts",
-        "webgpuQuerySet.ts", "webgpuShaderProcessor.ts",
-        "webgpuShaderProcessors.ts", "webgpuShaderProcessorsGLSL.ts",
-        "webgpuShaderProcessorsWGSL.ts", "webgpuStencilState.ts",
-        "webgpuStencilStateComposer.ts", "webgpuTextureHelper.ts",
-        "webgpuTimestampQuery.ts", "webgpuTintWASM.ts",
-        # Engines / WebGPU / Extensions
-        "engine.alpha.ts", "engine.cubeTexture.ts", "engine.computeShader.ts",
-        "engine.debugging.ts", "engine.dynamicBuffer.ts",
-        "engine.dynamicTexture.ts", "engine.externalTexture.ts",
-        "engine.multiRender.ts", "engine.query.ts", "engine.rawTexture.ts",
-        "engine.readTexture.ts", "engine.renderTarget.ts",
-        "engine.renderTargetCube.ts", "engine.storageBuffer.ts",
-        "engine.textureSampler.ts", "engine.uniformBuffer.ts",
+        "nativeShaderProcessor.ts",
         # Helpers
         "videoDome.ts",
         # LibDeclarations
-        "browser.d.ts", "webgl.d.ts", "webgl2.d.ts", "webgpu.d.ts","webvr.d.ts",
-        "webxr.d.ts", "webxr.nativeextensions.d.ts",
+        "browser.d.ts", "webgl.d.ts", "webgl2.d.ts", "webvr.d.ts", "webxr.d.ts",
+        "webxr.nativeextensions.d.ts",
         # Loading
         "loadingScreen.ts",
         # Materials / Textures
         "basisTextureLoader.ts", "htmlElementTexture.ts", "videoTexture.ts",
         # Materials / Textures / Packer
         "frame.ts", "packer.ts",
-        # Meshes
-        "WebGPU/webgpuDataBuffer.ts",
         # Meshes / Compression
         "dracoCompression.ts",
         # Misc
@@ -168,56 +123,29 @@ def main():
         "deferred.ts", "domManagement.ts", "fileRequest.ts", "filesInput.ts",
         "filesInputStore.ts", "instantiationTools.ts",
         "khronosTextureContainer2.ts", "logger.ts", "loadFileError.ts",
-        "precisionDate.ts", "promise.ts", "reflector.ts", "retryStrategy.ts",
+        "precisionDate.ts", "promise.ts", "retryStrategy.ts",
         "sceneRecorder.ts", "sceneSerializer.ts", "screenshotTools.ts",
         "smartArray.ts", "stringDictionary.ts", "tags.ts", "timer.ts",
         "trajectoryClassifier.ts", "typeStore.ts", "videoRecorder.ts",
         "virtualJoystick.ts", "webRequest.ts", "workerPool.ts",
         # Offline
         "database.ts", "IOfflineProvider.ts",
-        # Particles
-        "computeShaderParticleSystem.ts",
         # Physics / Plugins
         "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts",
         # XR
         "webXRInputSource.ts",
         # XR / features
-        "WebXRAbstractFeature.ts", "WebXRControllerMovement.ts",
-        "WebXRControllerPhysics.ts", "WebXRControllerPointerSelection.ts",
-        "WebXRControllerTeleportation.ts", "WebXRDOMOverlay.ts",
-        "WebXREyeTracking.ts", "WebXRHitTest.ts", "WebXRLightEstimation.ts",
-        "WebXRNearInteraction.ts", "WebXRWalkingLocomotion.ts",
+        "WebXRAbstractFeature.ts", "WebXRControllerPhysics.ts",
+        "WebXRControllerPointerSelection.ts", "WebXRControllerTeleportation.ts",
+        "WebXRHitTest.ts",
         # XR / motionController
         "webXRAbstractMotionController.ts", "webXRControllerComponent.ts",
-        "WebXRFeaturePointSystem.ts", "webXRGenericHandController.ts",
-        "webXRGenericMotionController.ts", "WebXRHandTracking.ts",
-        "webXRHTCViveMotionController.ts", "WebXRImageTracking.ts",
-        "WebXRMeshDetector.ts", "webXRMicrosoftMixedRealityController.ts",
+        "WebXRFeaturePointSystem.ts", "WebXRHandTracking.ts",
+        "webXRHTCViveMotionController.ts", "webXRGenericMotionController.ts",
+        "webXRMicrosoftMixedRealityController.ts",
         "webXRMotionControllerManager.ts",
         "webXROculusTouchMotionController.ts",
         "webXRProfiledMotionController.ts",
-        # Unit Tests
-        # Loading
-        "babylon.sceneLoader.tests.ts", "babylon.sceneLoader.testData.ts",
-        "babylon.example.tests.ts", "babylon.node.tests.ts",
-        "babylon.postProcess.tests.ts", "babylon.material.tests.ts",
-        "babylon.fresnelParameters.tests.ts", "babylon.animationGroup.tests.ts",
-        "babylon.animation.tests.ts", "Culling/babylon.ray.tests.ts",
-        "babylon.dictionaryMode.tests.ts", "babylon.geometry.tests.ts",
-        "babylon.positionAndRotation.tests.ts",
-        "babylon.mesh.vertexData.tests.ts",
-        "babylon.pointerInput.tests.ts", "babylon.glTFSerializer.tests.ts",
-        # Misc
-        "babylon.promise.tests.ts",
-        # Physics
-        "babylon.physicsComponents.tests.ts",
-        # XR
-        "webXRFeaturesManager.tests.ts",
-        # Inspector
-        "canvasGraphService.ts", "context.ts", "curve.ts", "eyedropper.ts",
-        "floodfill.ts", "globalState.ts", "graphSupportingTypes.ts",
-        "rectangleSelect.ts", "replayRecorder.ts", "textureCanvasManager.ts",
-        "textureHelper.ts"
     ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:

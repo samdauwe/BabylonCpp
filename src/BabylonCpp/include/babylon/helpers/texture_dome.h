@@ -224,14 +224,9 @@ protected:
   unsigned int _textureMode;
 
   /**
-   * Observable raised when an error occurred while loading the texture
+   * Observable raised when an error occured while loading the 360 image
    */
   Observable<std::string> onLoadErrorObservable;
-
-  /**
-   * Observable raised when the texture finished loading
-   */
-  Observable<void> onLoadObservable;
 
   /**
    * Hidden

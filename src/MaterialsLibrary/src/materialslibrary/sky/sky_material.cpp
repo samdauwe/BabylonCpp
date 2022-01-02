@@ -2,7 +2,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -16,6 +15,7 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -33,7 +33,6 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
     , sunPosition{Vector3(0.f, 100.f, 0.f)}
     , useSunPosition{false}
     , cameraOffset{Vector3::Zero()}
-    , up{Vector3::Up()}
     , _cameraPosition{Vector3::Zero()}
 {
   // Vertex shader
@@ -69,12 +68,12 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<SkyMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<SkyMaterialDefines>();
   }
 
-  const auto definesPtr = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
-  auto& defines         = *definesPtr.get();
-  const auto scene      = getScene();
+  auto definesPtr = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines   = *definesPtr.get();
+  auto scene      = getScene();
 
   if (_isReadyForSubMesh(subMesh)) {
     return true;
@@ -87,11 +86,6 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, false);
-
-  if (defines["IMAGEPROCESSINGPOSTPROCESS"]
-      != scene->imageProcessingConfiguration()->applyByPostProcess()) {
-    defines.markAsMiscDirty();
-  }
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -117,13 +111,11 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
 
     const std::string shaderName{"sky"};
     auto join = defines.toString();
-    const std::vector<std::string> uniforms{"world",          "viewProjection",  "view",
-                                            "vFogInfos",      "vFogColor",       "pointSize",
-                                            "vClipPlane",     "vClipPlane2",     "vClipPlane3",
-                                            "vClipPlane4",    "vClipPlane5",     "vClipPlane6",
-                                            "luminance",      "turbidity",       "rayleigh",
-                                            "mieCoefficient", "mieDirectionalG", "sunPosition",
-                                            "cameraPosition", "cameraOffset",    "up"};
+    const std::vector<std::string> uniforms{
+      "world",          "viewProjection",  "view",        "vFogInfos",      "vFogColor",
+      "pointSize",      "vClipPlane",      "vClipPlane2", "vClipPlane3",    "vClipPlane4",
+      "vClipPlane5",    "vClipPlane6",     "luminance",   "turbidity",      "rayleigh",
+      "mieCoefficient", "mieDirectionalG", "sunPosition", "cameraPosition", "cameraOffset"};
     const std::vector<std::string> samplers{};
     const std::vector<std::string> uniformBuffers{};
 
@@ -138,8 +130,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool /
     options.onCompiled          = onCompiled;
     options.onError             = onError;
 
-    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr,
-                       _materialContext);
+    subMesh->setEffect(scene->getEngine()->createEffect(shaderName, options, engine), definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -156,12 +147,12 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  const auto defines = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
+  auto defines = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
   if (!defines) {
     return;
   }
 
-  const auto effect = subMesh->effect();
+  auto effect = subMesh->effect();
   if (!effect) {
     return;
   }
@@ -201,8 +192,6 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   _activeEffect->setVector3("cameraOffset", cameraOffset);
 
-  _activeEffect->setVector3("up", up);
-
   if (luminance > 0.f) {
     _activeEffect->setFloat("luminance", luminance);
   }
@@ -213,15 +202,12 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setFloat("mieDirectionalG", mieDirectionalG);
 
   if (!useSunPosition) {
-    const auto theta = Math::PI * (inclination - 0.5f);
-    const auto phi   = Math::PI2 * (azimuth - 0.5f);
+    auto theta = Math::PI * (inclination - 0.5f);
+    auto phi   = 2.f * Math::PI * (azimuth - 0.5f);
 
     sunPosition.x = distance * std::cos(phi);
     sunPosition.y = distance * std::sin(phi) * std::sin(theta);
     sunPosition.z = distance * std::sin(phi) * std::cos(theta);
-
-    Quaternion::FromUnitVectorsToRef(Vector3::UpReadOnly(), up, _skyOrientation);
-    sunPosition.rotateByQuaternionToRef(_skyOrientation, sunPosition);
   }
 
   _activeEffect->setVector3("sunPosition", sunPosition);

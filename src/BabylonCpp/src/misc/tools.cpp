@@ -7,8 +7,6 @@
 #include <babylon/maths/color4.h>
 #include <babylon/maths/isize.h>
 #include <babylon/maths/vector3.h>
-#include <babylon/misc/file_tools.h>
-#include <babylon/misc/guid.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/utils/base64.h>
 
@@ -48,23 +46,18 @@ void Tools::FetchToRef(int u, int v, int width, int height, const Uint8Array& pi
 
 float Tools::Mix(float a, float b, float alpha)
 {
-  return a * (1.f - alpha) + b * alpha;
+  return a * (1 - alpha) + b * alpha;
 }
 
 bool Tools::IsExponentOfTwo(size_t value)
 {
-  auto count = 1ull;
+  size_t count = 1;
 
   do {
     count *= 2;
   } while (count < value);
 
   return count == value;
-}
-
-static float FloatRound(float value)
-{
-  return std::roundf(value);
 }
 
 std::string Tools::GetFilename(const std::string& path)
@@ -168,19 +161,27 @@ std::string Tools::DecodeURIComponent(const std::string& s)
   return s;
 }
 
-std::string Tools::RandomId()
-{
-  return GUID::RandomId();
-}
-
 bool Tools::IsBase64(const std::string& uri)
 {
-  return FileTools::IsBase64DataUrl(uri);
+  return uri.size() < 5 ? false : uri.substr(0, 5) == "data:";
 }
 
 ArrayBuffer Tools::DecodeBase64(const std::string& uri)
 {
-  return FileTools::DecodeBase64UrlToBinary(uri);
+  const auto uriSplit = StringTools::split(uri, ',');
+  if (uriSplit.size() < 2) {
+    return ArrayBuffer();
+  }
+
+  const auto decodedString = Base64::atob(uriSplit[1]);
+  const auto bufferLength  = decodedString.size();
+  Uint8Array bufferView(bufferLength);
+
+  for (size_t i = 0; i < bufferLength; ++i) {
+    bufferView[i] = StringTools::charCodeAt(decodedString, i);
+  }
+
+  return bufferView;
 }
 
 void Tools::SetImmediate(const std::function<void()>& immediate)

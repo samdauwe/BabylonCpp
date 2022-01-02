@@ -2,14 +2,15 @@
 #define BABYLON_GAMEPADS_CONTROLLERS_DAYDREAM_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/gamepads/controllers/_game_pad_factory.h>
 #include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(DaydreamController)
-FWD_CLASS_SPTR(IBrowserGamepad)
+class DaydreamController;
+class IBrowserGamepad;
+using DaydreamControllerPtr = std::shared_ptr<DaydreamController>;
+using IBrowserGamepadPtr    = std::shared_ptr<IBrowserGamepad>;
 
 /**
  * @brief Google Daydream controller factory.

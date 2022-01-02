@@ -7,15 +7,12 @@
 #include <babylon/gizmos/rotation_gizmo.h>
 #include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/materials/shader_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
-
-float PlaneRotationGizmo::MaxDragAngle = Math::PI * 9.f / 20.f;
 
 PlaneRotationGizmo::CircleConstants PlaneRotationGizmo::_CircleConstants = {
   0.3f,           // radius
@@ -31,7 +28,6 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
     : Gizmo{iGizmoLayer}
     , dragBehavior{nullptr}
     , snapDistance{0.f}
-    , angle{0.f}
     , isEnabled{this, &PlaneRotationGizmo::get_isEnabled, &PlaneRotationGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
     , _isEnabled{true}
@@ -42,7 +38,6 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
     , _gizmoMesh{nullptr}
     , _rotationCircle{nullptr}
     , _dragging{false}
-    , _rotationShaderMaterial{nullptr}
     , _useEulerRotation{useEulerRotation}
     , _dragDistance{0.f}
     , _tmpSnapEvent{0.f}
@@ -77,7 +72,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
   options.dragPlaneNormal    = planeNormal;
   dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
-  dragBehavior->maxDragAngle = PlaneRotationGizmo::MaxDragAngle;
+  dragBehavior->maxDragAngle = Math::PI * 9.f / 20.f;
   dragBehavior->_useAlternatePickedPointAboveMaxDragAngle = true;
   // _rootMesh->addBehavior(dragBehavior.get());
 
@@ -99,11 +94,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       const auto originalRotationPoint
         = _rotationCircle->getAbsolutePosition().clone()->addInPlace(direction);
       const auto dragStartPoint = e->dragPlanePoint;
-      const auto iAngle
+      const auto angle
         = Vector3::GetAngleBetweenVectors(originalRotationPoint.subtract(origin),
                                           dragStartPoint.subtract(origin), _rotationCircle->up());
 
-      _rotationCircle->addRotation(0.f, iAngle, 0.f);
+      _rotationCircle->addRotation(0.f, angle, 0.f);
       _dragging = true;
     }
   });
@@ -124,14 +119,13 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       std::optional<Vector3> nodeScale         = Vector3(1.f, 1.f, 1.f);
       std::optional<Quaternion> nodeQuaternion = Quaternion(0.f, 0.f, 0.f, 1.f);
       std::optional<Vector3> nodeTranslation   = Vector3(0.f, 0.f, 0.f);
-      _handlePivot();
       attachedNode()->getWorldMatrix().decompose(nodeScale, nodeQuaternion, nodeTranslation);
 
       auto newVector      = event->dragPlanePoint.subtract(*nodeTranslation).normalize();
       auto originalVector = _lastDragPosition.subtract(*nodeTranslation).normalize();
       auto cross          = Vector3::Cross(newVector, originalVector);
       auto dot            = Vector3::Dot(newVector, originalVector);
-      auto iAngle         = std::atan2(cross.length(), dot);
+      auto angle          = std::atan2(cross.length(), dot);
       _planeNormalTowardsCamera.copyFrom(planeNormal);
       _localPlaneNormalTowardsCamera.copyFrom(planeNormal);
       if (updateGizmoRotationToMatchAttachedMesh) {
@@ -152,37 +146,37 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       }
       auto halfCircleSide = Vector3::Dot(_localPlaneNormalTowardsCamera, cross) > 0.f;
       if (halfCircleSide) {
-        iAngle = -iAngle;
+        angle = -angle;
       }
 
       // Snapping logic
       auto snapped = false;
       if (snapDistance != 0.f) {
-        _currentSnapDragDistance += iAngle;
+        _currentSnapDragDistance += angle;
         if (std::abs(_currentSnapDragDistance) > snapDistance) {
           auto dragSteps = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
           if (_currentSnapDragDistance < 0.f) {
             dragSteps *= -1.f;
           }
           _currentSnapDragDistance = std::fmod(_currentSnapDragDistance, snapDistance);
-          iAngle                   = snapDistance * dragSteps;
+          angle                    = snapDistance * dragSteps;
           snapped                  = true;
         }
         else {
-          iAngle = 0.f;
+          angle = 0.f;
         }
       }
 
-      _dragDistance += cameraFlipped ? -iAngle : iAngle;
+      _dragDistance += cameraFlipped ? -angle : angle;
       updateRotationCircle(_rotationCircle, rotationCirclePaths, _dragDistance, _dragPlanePoint);
 
       // Convert angle and axis to quaternion
       // (http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm)
-      auto quaternionCoefficient = std::sin(iAngle / 2.f);
+      auto quaternionCoefficient = std::sin(angle / 2.f);
       _amountToRotate.set(_planeNormalTowardsCamera.x * quaternionCoefficient,
                           _planeNormalTowardsCamera.y * quaternionCoefficient,
                           _planeNormalTowardsCamera.z * quaternionCoefficient,
-                          std::cos(iAngle / 2.f));
+                          std::cos(angle / 2.f));
 
       // If the meshes local scale is inverted (eg. loaded gltf file parent with z scale of -1) the
       // rotation needs to be inverted on the y axis
@@ -208,13 +202,10 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
 
       _lastDragPosition.copyFrom(event->dragPlanePoint);
       if (snapped) {
-        _tmpSnapEvent.snapDistance = iAngle;
+        _tmpSnapEvent.snapDistance = angle;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
       }
-      _angles.y += iAngle;
 
-      iAngle += cameraFlipped ? -iAngle : iAngle;
-      _rotationShaderMaterial->setVector3("angles", _angles);
       _matrixChanged();
     }
   });
@@ -229,7 +220,6 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
-  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(_gizmoMesh.get()), _cache);
   }
@@ -242,16 +232,16 @@ PlaneRotationGizmo::PlaneRotationGizmo(const Vector3& planeNormal, const Color3&
       auto pickedMesh = std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh);
       _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
       if (!_parent) {
-        const auto material = _cache.dragBehavior->enabled ?
-                                (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
-                                _disableMaterial;
-        _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
+        auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        for (auto& m : _cache.gizmoMeshes) {
+          m->material         = material;
+          const auto lineMesh = std::static_pointer_cast<LinesMesh>(m);
+          if (lineMesh) {
+            lineMesh->color = material->diffuseColor;
+          }
+        }
       }
     });
-
-  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
-    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _coloredMaterial : _disableMaterial);
-  });
 }
 
 PlaneRotationGizmo::~PlaneRotationGizmo() = default;

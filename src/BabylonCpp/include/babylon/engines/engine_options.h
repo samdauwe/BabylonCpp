@@ -12,6 +12,10 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT EngineOptions {
   /**
+   * Defines whether to adapt to the device's viewport characteristics (default: false)
+   */
+  bool adaptToDeviceRatio = false;
+  /**
    * Defines enable antialiasing (default: false)
    */
   bool antialias = true;
@@ -84,11 +88,6 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    * cannot be created
    */
   bool failIfMajorPerformanceCaveat = false;
-
-  /**
-   * Defines whether to adapt to the device's viewport characteristics (default: false)
-   */
-  bool adaptToDeviceRatio = false;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON

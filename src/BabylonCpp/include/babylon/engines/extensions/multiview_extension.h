@@ -4,12 +4,12 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
 class Engine;
-FWD_CLASS_SPTR(InternalTexture)
+class InternalTexture;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 /**
  * @brief Hidden

@@ -2,18 +2,19 @@
 #define ABYLON_MATERIALS_LIBRARY_SHADOW_ONLY_SHADOW_ONLY_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_material_defines.h>
 #include <babylon/maths/color3.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(IShadowLight)
+class IShadowLight;
+using IShadowLightPtr = std::shared_ptr<IShadowLight>;
 
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(ShadowOnlyMaterial)
+class ShadowOnlyMaterial;
+using ShadowOnlyMaterialPtr = std::shared_ptr<ShadowOnlyMaterial>;
 
 class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
 
@@ -29,24 +30,20 @@ public:
   }
   ~ShadowOnlyMaterial() override; // = default
 
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  std::string getClassName() const override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] std::string getClassName() const override;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static ShadowOnlyMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
-  /**
-   * @brief Constructor
-   * @param name The name given to the material in order to identify it afterwards.
-   * @param scene The scene the material is used in.
-   */
   ShadowOnlyMaterial(const std::string& name, Scene* scene);
 
   IShadowLightPtr& get_activeLight();

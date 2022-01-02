@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_LIBRARY_GRID_GRID_MATERIAL_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/grid/grid_material_defines.h>
 #include <babylon/maths/color3.h>
@@ -11,7 +10,8 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(GridMaterial)
+class GridMaterial;
+using GridMaterialPtr = std::shared_ptr<GridMaterial>;
 
 /**
  * @brief The grid materials allows you to wrap any shape with a grid.
@@ -33,11 +33,11 @@ public:
   /**
    * @brief Returns whether or not the grid requires alpha blending.
    */
-  bool needAlphaBlending() const override;
-  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
 
   /**
    * @brief Dispose the material and its associated resources.
@@ -46,8 +46,9 @@ public:
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
 
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static GridMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
@@ -55,7 +56,8 @@ public:
 protected:
   /**
    * @brief Constructor
-   * @param name The name given to the material in order to identify it afterwards.
+   * @param name The name given to the material in order to identify it
+   * afterwards.
    * @param scene The scene the material is used in.
    */
   GridMaterial(const std::string& name, Scene* scene);

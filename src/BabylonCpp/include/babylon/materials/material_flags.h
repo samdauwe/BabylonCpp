@@ -119,18 +119,6 @@ public:
   static bool ThicknessTextureEnabled();
   static void setThicknessTextureEnabled(bool value);
 
-  /**
-   * Are refraction intensity textures enabled in the application.
-   */
-  static bool RefractionIntensityTextureEnabled();
-  static void setRefractionIntensityTextureEnabled(bool value);
-
-  /**
-   * Are translucency intensity textures enabled in the application.
-   */
-  static bool TranslucencyIntensityTextureEnabled();
-  static void setTranslucencyIntensityTextureEnabled(bool value);
-
 private:
   // Flags used to enable or disable a type of texture for all Standard Materials
   static bool _DiffuseTextureEnabled;
@@ -151,8 +139,6 @@ private:
   static bool _SheenTextureEnabled;
   static bool _AnisotropicTextureEnabled;
   static bool _ThicknessTextureEnabled;
-  static bool _RefractionIntensityTextureEnabled;
-  static bool _TranslucencyIntensityTextureEnabled;
 
 }; // end of struct MaterialFlags
 

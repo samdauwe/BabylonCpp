@@ -104,29 +104,9 @@ protected:
   NodeMaterialConnectionPointPtr& get_strength();
 
   /**
-   * @brief Gets the view direction input component.
-   */
-  NodeMaterialConnectionPointPtr& get_viewDirection();
-
-  /**
-   * @brief Gets the parallax scale input component.
-   */
-  NodeMaterialConnectionPointPtr& get_parallaxScale();
-
-  /**
-   * @brief Gets the parallax height input component.
-   */
-  NodeMaterialConnectionPointPtr& get_parallaxHeight();
-
-  /**
    * @brief Gets the output component.
    */
   NodeMaterialConnectionPointPtr& get_output();
-
-  /**
-   * @brief Gets the uv offset output component.
-   */
-  NodeMaterialConnectionPointPtr& get_uvOffset();
 
   /**
    * @brief Hidden
@@ -152,12 +132,6 @@ public:
   // @editableInPropertyPage("Invert Y axis", PropertyTypeForEdition.Boolean, "PROPERTIES", {
   // "notifiers": { "update": false }})
   bool invertY;
-
-  /**
-   * Gets or sets a boolean indicating that parallax occlusion should be enabled
-   */
-  // @editableInPropertyPage("Use parallax occlusion", PropertyTypeForEdition.Boolean)
-  bool useParallaxOcclusion;
 
   /**
    * Gets the world position input component
@@ -190,29 +164,9 @@ public:
   ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> strength;
 
   /**
-   * Gets the view direction input component
-   */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> viewDirection;
-
-  /**
-   * Gets the parallax scale input component
-   */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> parallaxScale;
-
-  /**
-   * Gets the parallax height input component
-   */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> parallaxHeight;
-
-  /**
    * Gets the output component
    */
   ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> output;
-
-  /**
-   * Gets the uv offset output component
-   */
-  ReadOnlyProperty<PerturbNormalBlock, NodeMaterialConnectionPointPtr> uvOffset;
 
 private:
   std::string _tangentSpaceParameterName;

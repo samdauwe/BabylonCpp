@@ -153,28 +153,33 @@ public:
    * @brief Gets hosting scene.
    * @returns the hosting scene
    */
-  Scene* getScene() const;
+  [[nodiscard]] Scene* getScene() const;
 
   /**
-   * @brief Does this action manager handles actions of any of the given triggers.
+   * @brief Does this action manager handles actions of any of the given
+   * triggers.
    * @param triggers defines the triggers to be tested
-   * @return a boolean indicating whether one (or more) of the triggers is handled
+   * @return a boolean indicating whether one (or more) of the triggers is
+   * handled
    */
-  bool hasSpecificTriggers(const Uint32Array& triggers) const override;
+  [[nodiscard]] bool hasSpecificTriggers(const Uint32Array& triggers) const override;
 
   /**
-   * @brief Does this action manager handles actions of any of the given triggers. This function
-   * takes two arguments for speed.
+   * @brief Does this action manager handles actions of any of the given
+   * triggers. This function takes two arguments for speed.
    * @param triggerA defines the trigger to be tested
    * @param triggerB defines the trigger to be tested
-   * @return a boolean indicating whether one (or more) of the triggers is handled
+   * @return a boolean indicating whether one (or more) of the triggers is
+   * handled
    */
-  bool hasSpecificTriggers2(unsigned int triggerA, unsigned int triggerB) const override;
+  [[nodiscard]] bool hasSpecificTriggers2(unsigned int triggerA,
+                                          unsigned int triggerB) const override;
 
   /**
    * @brief Does this action manager handles actions of a given trigger.
    * @param trigger defines the trigger to be tested
-   * @param parameterPredicate defines an optional predicate to filter triggers by parameter
+   * @param parameterPredicate defines an optional predicate to filter triggers
+   * by parameter
    * @return whether the trigger is handled
    */
   bool
@@ -201,40 +206,45 @@ public:
    * @param trigger defines the trigger to process
    * @param evt defines the event details to be processed
    */
-  void processTrigger(unsigned int trigger, const IActionEventPtr& evt = nullptr) override;
+  void processTrigger(unsigned int trigger,
+                      const std::optional<IActionEvent>& evt = std::nullopt) override;
 
   /** hidden */
-  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const std::string& propertyPath) const;
+  [[nodiscard]] IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
+                                                   const std::string& propertyPath) const;
 
   /** hidden */
-  std::string _getProperty(const std::string& propertyPath) const;
+  [[nodiscard]] std::string _getProperty(const std::string& propertyPath) const;
 
   /**
    * @brief Serialize this manager to a JSON object.
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  json serialize(const std::string& name) const override;
+  [[nodiscard]] json serialize(const std::string& name) const override;
 
   // Statics
 
   /**
    * @brief Does exist one action manager with at least one trigger.
-   * @return {boolean} whether or not it exists one action manager with one trigger
+   * @return {boolean} whether or not it exists one action manager with one
+   * trigger
    **/
   static bool HasTriggers();
 
   /**
    * @brief Does exist one action manager with at least one pick trigger.
-   * @return {boolean} whether or not it exists one action manager with one pick trigger
+   * @return {boolean} whether or not it exists one action manager with one pick
+   * trigger
    **/
   static bool HasPickTriggers();
 
   /**
-   * @brief Does exist one action manager that handles actions of a given trigger.
+   * @brief Does exist one action manager that handles actions of a given
+   *trigger.
    * @param trigger defines the trigger to be tested
-   * @return a boolean indicating whether the trigger is handeled by at least one action manager
+   * @return a boolean indicating whether the trigger is handeled by at least
+   *one action manager
    **/
   static bool HasSpecificTrigger(unsigned int trigger);
 
@@ -265,13 +275,13 @@ protected:
    * @brief Does this action manager has pointer triggers.
    * @return {boolean} whether or not it has pointer triggers
    */
-  bool get_hasPointerTriggers() const override;
+  [[nodiscard]] bool get_hasPointerTriggers() const override;
 
   /**
    * @brief Does this action manager has pick triggers.
    * @return {boolean} whether or not it has pick triggers
    */
-  bool get_hasPickTriggers() const override;
+  [[nodiscard]] bool get_hasPickTriggers() const override;
 
 private:
   Scene* _scene;

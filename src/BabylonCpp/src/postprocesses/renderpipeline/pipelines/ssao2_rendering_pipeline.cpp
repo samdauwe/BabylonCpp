@@ -12,7 +12,6 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/dynamic_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
-#include <babylon/materials/textures/pre_pass_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/maths/scalar.h>
 #include <babylon/maths/tmp_vectors.h>
@@ -30,29 +29,17 @@
 
 namespace BABYLON {
 
-const Float32Array SSAO2RenderingPipeline::ORTHO_DEPTH_PROJECTION = {
-  1.f, 0.f, 0.f, //
-  0.f, 1.f, 0.f, //
-  0.f, 0.f, 1.f  //
-};
-const Float32Array SSAO2RenderingPipeline::PERSPECTIVE_DEPTH_PROJECTION = {
-  0.f, 0.f, 0.f, //
-  0.f, 0.f, 0.f, //
-  1.f, 1.f, 1.f  //
-};
-
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* scene, float ratio,
                                                const std::vector<CameraPtr>& iCameras,
-                                               bool forceGeometryBuffer, unsigned int textureType)
-    : SSAO2RenderingPipeline(iName, scene, {ratio, ratio}, iCameras, forceGeometryBuffer,
-                             textureType)
+                                               bool forceGeometryBuffer)
+    : SSAO2RenderingPipeline(iName, scene, {ratio, ratio}, iCameras, forceGeometryBuffer)
 {
 }
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* scene,
                                                const SSAO2Ratio& iRatio,
                                                const std::vector<CameraPtr>& iCameras,
-                                               bool forceGeometryBuffer, unsigned int textureType)
+                                               bool forceGeometryBuffer)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , totalStrength{1.f}
     , maxZ{100.f}
@@ -69,8 +56,6 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
     , _samples{8}
     , _textureSamples{1}
     , _forceGeometryBuffer{false}
-    , _geometryBufferRenderer{this, &SSAO2RenderingPipeline::get__geometryBufferRenderer}
-    , _prePassRenderer{this, &SSAO2RenderingPipeline::get__prePassRenderer}
     , _expensiveBlur{true}
     , _cameraList{iCameras}
     , _randomTexture{nullptr}
@@ -79,40 +64,39 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const std::string& iName, Scene* 
     , _blurHPostProcess{nullptr}
     , _blurVPostProcess{nullptr}
     , _ssaoCombinePostProcess{nullptr}
-    , _nullGeometryBuffer{nullptr}
-    , _nullPrePassRenderer{nullptr}
+    , _prePassRenderer{nullptr}
 {
   _scene               = scene;
   _ratio               = iRatio;
   _forceGeometryBuffer = forceGeometryBuffer;
 
   if (!isSupported()) {
-    BABYLON_LOG_ERROR("SSAO2RenderingPipeline", "The current engine does not support SSAO 2.")
+    BABYLON_LOG_ERROR("SSAO2RenderingPipeline", "SSAO 2 needs WebGL 2 support.")
     return;
   }
 
   _bits.resize(1);
 
-  const auto ssaoRatio = _ratio.ssaoRatio;
-  const auto blurRatio = _ratio.blurRatio;
+  auto ssaoRatio = _ratio.ssaoRatio;
+  auto blurRatio = _ratio.blurRatio;
 
   // Set up assets
   if (_forceGeometryBuffer) {
     scene->enableGeometryBufferRenderer();
   }
   else {
-    scene->enablePrePassRenderer();
+    _prePassRenderer = scene->enablePrePassRenderer();
   }
 
   _createRandomTexture();
 
-  _originalColorPostProcess          = PassPostProcess::New("SSAOOriginalSceneColor", 1.f, nullptr,
-                                                   TextureConstants::BILINEAR_SAMPLINGMODE,
-                                                   scene->getEngine(), false, textureType);
+  _originalColorPostProcess
+    = PassPostProcess::New("SSAOOriginalSceneColor", 1.f, nullptr,
+                           TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
   _originalColorPostProcess->samples = textureSamples;
-  _createSSAOPostProcess(1.f, textureType);
-  _createBlurPostProcess(ssaoRatio, blurRatio, textureType);
-  _createSSAOCombinePostProcess(blurRatio, textureType);
+  _createSSAOPostProcess(1.f);
+  _createBlurPostProcess(ssaoRatio, blurRatio);
+  _createSSAOCombinePostProcess(blurRatio);
 
   // Set up pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -170,33 +154,16 @@ void SSAO2RenderingPipeline::set_textureSamples(unsigned int n)
 {
   _textureSamples = n;
 
-  if (_prePassRenderer()) {
-    _prePassRenderer()->samples = n;
-  }
-  else {
-    _originalColorPostProcess->samples = n;
-  }
+  _originalColorPostProcess->samples = n;
+  _blurHPostProcess->samples         = n;
+  _blurVPostProcess->samples         = n;
+  _ssaoPostProcess->samples          = n;
+  _ssaoCombinePostProcess->samples   = n;
 }
 
 unsigned int SSAO2RenderingPipeline::get_textureSamples() const
 {
   return _textureSamples;
-}
-
-GeometryBufferRendererPtr& SSAO2RenderingPipeline::get__geometryBufferRenderer()
-{
-  if (!_forceGeometryBuffer) {
-    return _nullGeometryBuffer;
-  }
-  return _scene->geometryBufferRenderer();
-}
-
-PrePassRendererPtr& SSAO2RenderingPipeline::get__prePassRenderer()
-{
-  if (_forceGeometryBuffer) {
-    return _nullPrePassRenderer;
-  }
-  return _scene->prePassRenderer();
 }
 
 void SSAO2RenderingPipeline::set_expensiveBlur(bool b)
@@ -205,10 +172,10 @@ void SSAO2RenderingPipeline::set_expensiveBlur(bool b)
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES "
     "16\n#define EXPENSIVE "
       + std::string(b ? "1" : "0") + "\n",
-    {}, {"textureSampler", "depthSampler"});
+    {}, {"textureSampler", "depthNormalSampler"});
   _blurVPostProcess->updateEffect("#define BILATERAL_BLUR\n#define SAMPLES 16\n#define EXPENSIVE "
                                     + std::string(b ? "1" : "0") + "\n",
-                                  {}, {"textureSampler", "depthSampler"});
+                                  {}, {"textureSampler", "depthNormalSampler"});
   _expensiveBlur = b;
 }
 
@@ -223,7 +190,7 @@ bool SSAO2RenderingPipeline::IsSupported()
   if (!engine) {
     return false;
   }
-  return engine->_features.supportSSAO2;
+  return engine->webGLVersion() >= 2.f;
 }
 
 void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
@@ -251,8 +218,7 @@ void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
   PostProcessRenderPipeline::dispose(disableGeometryBufferRenderer, disposeMaterialAndTextures);
 }
 
-void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurRatio,
-                                                    unsigned int textureType)
+void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurRatio)
 {
   Float32Array samplerOffsets;
   samplerOffsets.reserve(16);
@@ -263,11 +229,10 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
   }
 
   _blurHPostProcess = PostProcess::New(
-    "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ssaoRatio, nullptr,
+    "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthNormalSampler"}, ssaoRatio, nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16\n#define EXPENSIVE "
-      + std::string(expensive ? "1" : "0") + "\n",
-    textureType);
+      + std::string(expensive ? "1" : "0") + "\n");
   _blurHPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
       return;
@@ -278,26 +243,23 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     effect->setFloat("near", _scene->activeCamera()->minZ);
     effect->setFloat("far", _scene->activeCamera()->maxZ);
     effect->setFloat("radius", radius);
-    if (_geometryBufferRenderer()) {
-      effect->setTexture("depthSampler", _geometryBufferRenderer()->getGBuffer()->textures()[0]);
+    if (_forceGeometryBuffer) {
+      effect->setTexture("depthNormalSampler",
+                         _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
     }
-    else if (_prePassRenderer()) {
+    else {
       effect->setTexture(
-        "depthSampler",
-        _prePassRenderer()
-          ->getRenderTarget()
-          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
+        "depthNormalSampler",
+        _prePassRenderer->prePassRT
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
 
-  _blurVPostProcess = PostProcess::New(
-    "BlurV", "ssao", {"outSize", "samplerOffsets", "near", "far", "radius"}, {"depthSampler"},
-    blurRatio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    StringTools::printf("#define BILATERAL_BLUR\n#define BILATERAL_BLUR_V\n#define SAMPLES "
-                        "16\n#define EXPENSIVE %s\n",
-                        expensive ? "1" : "0"),
-    textureType);
+  _blurVPostProcess
+    = PostProcess::New("BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, blurRatio,
+                       nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
+                       false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
   _blurVPostProcess->onApply = [=](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
       return;
@@ -308,15 +270,15 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio, float blurR
     effect->setFloat("near", _scene->activeCamera()->minZ);
     effect->setFloat("far", _scene->activeCamera()->maxZ);
     effect->setFloat("radius", radius);
-    if (_geometryBufferRenderer()) {
-      effect->setTexture("depthSampler", _geometryBufferRenderer()->getGBuffer()->textures()[0]);
+    if (_forceGeometryBuffer) {
+      effect->setTexture("depthNormalSampler",
+                         _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
     }
-    else if (_prePassRenderer()) {
+    else {
       effect->setTexture(
-        "depthSampler",
-        _prePassRenderer()
-          ->getRenderTarget()
-          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
+        "depthNormalSampler",
+        _prePassRenderer->prePassRT
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setArray("samplerOffsets", samplerOffsets);
   };
@@ -387,20 +349,27 @@ std::string SSAO2RenderingPipeline::_getDefinesForSSAO()
   return defines;
 }
 
-void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio, unsigned int textureType)
+void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
 {
   const auto sampleSphere = _generateHemisphere();
 
   const auto defines = _getDefinesForSSAO();
-  std::vector<std::string> samplers{"randomSampler", "depthSampler", "normalSampler"};
+  std::vector<std::string> samplers;
+
+  if (_forceGeometryBuffer) {
+    samplers = {"randomSampler", "depthSampler", "normalSampler"};
+  }
+  else {
+    samplers = {"randomSampler", "depthNormalSampler"};
+  }
 
   _ssaoPostProcess
     = PostProcess::New("ssao2", "ssao2",
                        {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength",
                         "radius", "base", "range", "projection", "near", "far", "texelSize",
-                        "xViewport", "yViewport", "maxZ", "minZAspect", "depthProjection"},
+                        "xViewport", "yViewport", "maxZ", "minZAspect"},
                        samplers, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-                       _scene->getEngine(), false, defines, textureType);
+                       _scene->getEngine(), false, defines);
 
   _ssaoPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (!_scene->activeCamera()) {
@@ -419,54 +388,34 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio, unsigned int te
     effect->setFloat("base", base);
     effect->setFloat("near", _scene->activeCamera()->minZ);
     effect->setFloat("far", _scene->activeCamera()->maxZ);
-    if (_scene->activeCamera()->mode == Camera::PERSPECTIVE_CAMERA) {
-      effect->setMatrix3x3("depthProjection", SSAO2RenderingPipeline::PERSPECTIVE_DEPTH_PROJECTION);
-      effect->setFloat("xViewport",
-                       std::tan(_scene->activeCamera()->fov / 2.f)
-                         * _scene->getEngine()->getAspectRatio(*_scene->activeCamera(), true));
-      effect->setFloat("yViewport", std::tan(_scene->activeCamera()->fov / 2.f));
-    }
-    else {
-      // const auto halfWidth = _scene->getEngine()->getRenderWidth() / 2.f;
-      // const auto halfHeight = _scene->getEngine()->getRenderHeight() / 2.f;
-      const auto orthoLeft   = _scene->activeCamera()->orthoLeft;
-      const auto orthoRight  = _scene->activeCamera()->orthoRight;
-      const auto orthoBottom = _scene->activeCamera()->orthoBottom;
-      const auto orthoTop    = _scene->activeCamera()->orthoTop;
-      effect->setMatrix3x3("depthProjection", SSAO2RenderingPipeline::ORTHO_DEPTH_PROJECTION);
-      effect->setFloat("xViewport", (orthoRight.value_or(0.f) - orthoLeft.value_or(0.f)) * 0.5f);
-      effect->setFloat("yViewport", (orthoTop.value_or(0.f) - orthoBottom.value_or(0.f)) * 0.5f);
-    }
+    effect->setFloat("xViewport",
+                     std::tan(_scene->activeCamera()->fov / 2.f)
+                       * _scene->getEngine()->getAspectRatio(*_scene->activeCamera(), true));
+    effect->setFloat("yViewport", std::tan(_scene->activeCamera()->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
-    if (_geometryBufferRenderer()) {
-      if (_scene->enableGeometryBufferRenderer()) {
-        effect->setTexture("depthSampler", _geometryBufferRenderer()->getGBuffer()->textures()[0]);
-        effect->setTexture("normalSampler", _geometryBufferRenderer()->getGBuffer()->textures()[1]);
-      }
+    if (_forceGeometryBuffer) {
+      effect->setTexture("depthSampler",
+                         _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0]);
+      effect->setTexture("normalSampler",
+                         _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[1]);
     }
-    else if (_prePassRenderer()) {
+    else {
       effect->setTexture(
-        "depthSampler",
-        _prePassRenderer()
-          ->getRenderTarget()
-          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
-      effect->setTexture(
-        "normalSampler",
-        _prePassRenderer()
-          ->getRenderTarget()
-          ->textures()[_prePassRenderer()->getIndex(Constants::PREPASS_ALBEDO_SQRT_TEXTURE_TYPE)]);
+        "depthNormalSampler",
+        _prePassRenderer->prePassRT
+          ->textures()[_prePassRenderer->getIndex(Constants::PREPASS_DEPTH_TEXTURE_TYPE)]);
     }
     effect->setTexture("randomSampler", _randomTexture);
   };
   _ssaoPostProcess->samples = textureSamples;
 }
 
-void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio, unsigned int textureType)
+void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 {
   _ssaoCombinePostProcess = PostProcess::New(
     "ssaoCombine", "ssaoCombine", {}, {"originalColor", "viewport"}, ratio, nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false, "", textureType);
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
     const auto& viewport = _scene->activeCamera()->viewport;

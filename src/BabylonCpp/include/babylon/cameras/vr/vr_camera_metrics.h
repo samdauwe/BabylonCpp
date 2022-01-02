@@ -28,33 +28,33 @@ public:
   /**
    * @brief Gets the rendering aspect ratio based on the provided resolutions.
    */
-  float aspectRatio() const;
+  [[nodiscard]] float aspectRatio() const;
 
   /**
    * @brief Gets the aspect ratio based on the FOV, scale factors, and real
    * screen sizes.
    */
-  float aspectRatioFov() const;
+  [[nodiscard]] float aspectRatioFov() const;
 
   /**
    * @brief Hidden
    */
-  Matrix leftHMatrix() const;
+  [[nodiscard]] Matrix leftHMatrix() const;
 
   /**
    * @brief Hidden
    */
-  Matrix rightHMatrix() const;
+  [[nodiscard]] Matrix rightHMatrix() const;
 
   /**
    * @brief Hidden
    */
-  Matrix leftPreViewMatrix() const;
+  [[nodiscard]] Matrix leftPreViewMatrix() const;
 
   /**
    * @brief Hidden
    */
-  Matrix rightPreViewMatrix() const;
+  [[nodiscard]] Matrix rightPreViewMatrix() const;
 
   /**
    * @brief Get the default VRMetrics based on the most generic setup.

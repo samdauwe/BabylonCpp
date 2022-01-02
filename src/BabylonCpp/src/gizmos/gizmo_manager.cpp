@@ -23,7 +23,6 @@ GizmoManager::GizmoManager(Scene* iScene, float thickness,
     , keepDepthUtilityLayer{this, &GizmoManager::get_keepDepthUtilityLayer}
     , utilityLayer{this, &GizmoManager::get_utilityLayer}
     , isHovered{this, &GizmoManager::get_isHovered}
-    , scaleRatio{this, &GizmoManager::get_scaleRatio, &GizmoManager::set_scaleRatio}
     , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
                            &GizmoManager::set_positionGizmoEnabled}
     , rotationGizmoEnabled{this, &GizmoManager::get_rotationGizmoEnabled,
@@ -38,7 +37,6 @@ GizmoManager::GizmoManager(Scene* iScene, float thickness,
     , _attachedNode{nullptr}
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
     , _thickness{1.f}
-    , _scaleRatio{1.f}
 {
   _defaultUtilityLayer = utilityLayer ? utilityLayer : UtilityLayerRenderer::DefaultUtilityLayer();
   _defaultKeepDepthUtilityLayer = keepDepthUtilityLayer ?
@@ -199,25 +197,6 @@ bool GizmoManager::get_isHovered() const
   return hovered;
 }
 
-void GizmoManager::set_scaleRatio(float value)
-{
-  _scaleRatio = value;
-  if (gizmos.positionGizmo) {
-    gizmos.positionGizmo->scaleRatio = value;
-  }
-  if (gizmos.rotationGizmo) {
-    gizmos.rotationGizmo->scaleRatio = value;
-  }
-  if (gizmos.scaleGizmo) {
-    gizmos.scaleGizmo->scaleRatio = value;
-  }
-}
-
-float GizmoManager::get_scaleRatio() const
-{
-  return _scaleRatio;
-}
-
 void GizmoManager::set_positionGizmoEnabled(bool value)
 {
   if (value) {
@@ -362,16 +341,8 @@ void GizmoManager::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextu
     gizmos.boundingBoxGizmo->dispose();
     gizmos.boundingBoxGizmo = nullptr;
   }
-  if (_defaultKeepDepthUtilityLayer != UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer) {
-    if (_defaultKeepDepthUtilityLayer) {
-      _defaultKeepDepthUtilityLayer->dispose();
-    }
-  }
-  if (_defaultUtilityLayer != UtilityLayerRenderer::_DefaultUtilityLayer) {
-    if (_defaultUtilityLayer) {
-      _defaultUtilityLayer->dispose();
-    }
-  }
+  _defaultKeepDepthUtilityLayer->dispose();
+  _defaultUtilityLayer->dispose();
   boundingBoxDragBehavior->detach();
   onAttachedToMeshObservable.clear();
 }

@@ -10,41 +10,6 @@
 namespace BABYLON {
 
 /**
- * @brief This helper namespace is only here so we can apply the nativeOverride decorator to
- * functions.
- */
-namespace MathHelpers {
-
-inline void extractMinAndMaxIndexed(const Float32Array& positions, const IndicesArray& indices,
-                                    size_t indexStart, size_t indexCount, Vector3& minimum,
-                                    Vector3& maximum)
-{
-  for (size_t index = indexStart; index < indexStart + indexCount; ++index) {
-    const auto offset = indices[index] * 3;
-    const auto x      = positions[offset];
-    const auto y      = positions[offset + 1];
-    const auto z      = positions[offset + 2];
-    minimum.minimizeInPlaceFromFloats(x, y, z);
-    maximum.maximizeInPlaceFromFloats(x, y, z);
-  }
-}
-
-inline void extractMinAndMax(const Float32Array& positions, size_t start, size_t count,
-                             size_t stride, Vector3& minimum, Vector3& maximum)
-{
-  for (size_t index = start, offset = start * stride; index < start + count;
-       index++, offset += stride) {
-    const auto x = positions[offset];
-    const auto y = positions[offset + 1];
-    const auto z = positions[offset + 2];
-    minimum.minimizeInPlaceFromFloats(x, y, z);
-    maximum.maximizeInPlaceFromFloats(x, y, z);
-  }
-}
-
-} // end of namespace MathHelpers
-
-/**
  * @brief Extracts minimum and maximum values from a list of indexed
  * positions.
  * @param positions defines the positions to use
@@ -63,8 +28,14 @@ inline MinMax extractMinAndMaxIndexed(const Float32Array& positions, const Uint3
   Vector3 maximum(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(),
                   std::numeric_limits<float>::lowest());
 
-  MathHelpers::extractMinAndMaxIndexed(positions, indices, indexStart, indexCount, minimum,
-                                       maximum);
+  for (size_t index = indexStart; index < indexStart + indexCount; ++index) {
+    const auto offset = indices[index] * 3;
+    const auto x      = positions[offset];
+    const auto y      = positions[offset + 1];
+    const auto z      = positions[offset + 2];
+    minimum.minimizeInPlaceFromFloats(x, y, z);
+    maximum.maximizeInPlaceFromFloats(x, y, z);
+  }
 
   if (bias) {
     const auto& _bias = *bias;
@@ -102,7 +73,15 @@ inline MinMax extractMinAndMax(const Float32Array& positions, size_t start, size
     stride = 3;
   }
 
-  MathHelpers::extractMinAndMax(positions, start, count, *stride, minimum, maximum);
+  auto _stride = *stride;
+  for (size_t index = start, offset = start * _stride; index < start + count;
+       index++, offset += _stride) {
+    const auto x = positions[offset];
+    const auto y = positions[offset + 1];
+    const auto z = positions[offset + 2];
+    minimum.minimizeInPlaceFromFloats(x, y, z);
+    maximum.maximizeInPlaceFromFloats(x, y, z);
+  }
 
   if (bias) {
     const auto& _bias = *bias;

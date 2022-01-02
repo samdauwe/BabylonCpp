@@ -42,29 +42,28 @@ void Action::setTriggerParameter(const std::string& value)
   _triggerParameter = value;
 }
 
-bool Action::_evaluateConditionForCurrentFrame()
+void Action::_executeCurrent(const std::optional<IActionEvent>& evt)
 {
-  const auto condition = _condition;
-  if (!condition) {
-    return true;
-  }
+  if (_nextActiveAction->_condition) {
+    auto condition       = _nextActiveAction->_condition;
+    auto currentRenderId = _actionManager->getScene()->getRenderId();
 
-  const auto currentRenderId = _actionManager->getScene()->getRenderId();
+    // We cache the current evaluation for the current frame
+    if (condition->_evaluationId == currentRenderId) {
+      if (!condition->_currentResult) {
+        return;
+      }
+    }
+    else {
+      condition->_evaluationId = currentRenderId;
 
-  // We cache the current evaluation for the current frame
-  if (condition->_evaluationId != currentRenderId) {
-    condition->_evaluationId  = currentRenderId;
-    condition->_currentResult = condition->isValid();
-  }
+      if (!condition->isValid()) {
+        condition->_currentResult = false;
+        return;
+      }
 
-  return condition->_currentResult;
-}
-
-void Action::_executeCurrent(const IActionEventPtr& evt)
-{
-  const auto isConditionValid = _evaluateConditionForCurrentFrame();
-  if (!isConditionValid) {
-    return;
+      condition->_currentResult = true;
+    }
   }
 
   onBeforeExecuteObservable.notifyObservers(this);
@@ -73,7 +72,7 @@ void Action::_executeCurrent(const IActionEventPtr& evt)
   skipToNextActiveAction();
 }
 
-void Action::execute(const IActionEventPtr& /*evt*/)
+void Action::execute(const std::optional<IActionEvent>& /*evt*/)
 {
 }
 

@@ -283,25 +283,15 @@ public:
 
   /**
    * @brief Gets a new Vector2 from current Vector2 floored values.
-   * eg (1.2, 2.31) returns (1, 2)
    * @returns a new Vector2
    */
   [[nodiscard]] Vector2 floor() const;
 
   /**
-   * @brief Gets a new Vector2 from current Vector2 fractional values.
-   * eg (1.2, 2.31) returns (0.2, 0.31)
+   * @brief  Gets a new Vector2 from current Vector2 floored values.
    * @returns a new Vector2
    */
   [[nodiscard]] Vector2 fract() const;
-
-  /**
-   * @brief Rotate the current vector into a given result vector.
-   * @param angle defines the rotation angle
-   * @param result defines the result vector where to store the rotated vector
-   * @returns the current vector
-   */
-  Vector2& rotateToRef(float angle, Vector2& result);
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);
@@ -408,7 +398,7 @@ public:
 
   /**
    * @brief Returns a new Vector2 located for "amount" (float) on the Hermite spline defined by the
-   * vectors "value1", "value2", "tangent1", "tangent2".
+   * vectors "value1", "value3", "tangent1", "tangent2".
    * @param value1 defines the 1st control point
    * @param tangent1 defines the outgoing tangent
    * @param value2 defines the 2nd control point
@@ -418,33 +408,6 @@ public:
    */
   static Vector2 Hermite(const Vector2& value1, const Vector2& tangent1, const Vector2& value2,
                          const Vector2& tangent2, float amount);
-
-  /**
-   * @brief Returns a new Vector2 which is the 1st derivative of the Hermite spline defined by the
-   * vectors "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @returns 1st derivative
-   */
-  static Vector2 Hermite1stDerivative(const Vector2& value1, const Vector2& tangent1,
-                                      const Vector2& value2, const Vector2& tangent2, float time);
-
-  /**
-   * @brief Returns a new Vector2 which is the 1st derivative of the Hermite spline defined by the
-   * vectors "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @param result define where the derivative will be stored
-   */
-  static void Hermite1stDerivativeToRef(const Vector2& value1, const Vector2& tangent1,
-                                        const Vector2& value2, const Vector2& tangent2, float time,
-                                        Vector2& result);
 
   /**
    * @brief Returns a new Vector2 located for "amount" (float) on the linear interpolation between
@@ -470,13 +433,6 @@ public:
    * @returns a new Vector2
    */
   static Vector2 Normalize(Vector2& vector);
-
-  /**
-   * @brief Normalize a given vector into a second one.
-   * @param vector defines the vector to normalize
-   * @param result defines the vector where to store the result
-   */
-  static void NormalizeToRef(const Vector2& vector, Vector2& result);
 
   /**
    * @brief Gets a new Vector2 set with the minimal coordinate values from the "left" and "right"

@@ -1,4 +1,3 @@
-#include <babylon/babylon_fwd.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -12,8 +11,10 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(AbstractMesh)
-FWD_CLASS_SPTR(Skeleton)
+class AbstractMesh;
+class Skeleton;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using SkeletonPtr     = std::shared_ptr<Skeleton>;
 
 namespace Samples {
 
@@ -58,7 +59,7 @@ public:
              const std::vector<AnimationGroupPtr>& /*animationGroups*/,
              const std::vector<TransformNodePtr>& /*transformNodes*/,
              const std::vector<GeometryPtr>& /*geometries*/,
-             const std::vector<LightPtr>& /*lights*/) -> void {
+             const std::vector<LightPtr>& /*lights*/) {
         if (!meshes.empty() && !skeletons.empty()) {
           // Update mesh rotation
           _mesh               = meshes[0];

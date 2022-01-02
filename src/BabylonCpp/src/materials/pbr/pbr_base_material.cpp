@@ -1,6 +1,5 @@
 #include <babylon/materials/pbr/pbr_base_material.h>
 
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -37,6 +36,7 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/brdf_texture_tools.h>
 #include <babylon/rendering/pre_pass_renderer.h>
 #include <babylon/rendering/sub_surface_configuration.h>
@@ -45,6 +45,24 @@ namespace BABYLON {
 
 PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , realTimeFiltering{this, &PBRBaseMaterial::get_realTimeFiltering,
+                        &PBRBaseMaterial::set_realTimeFiltering}
+    , realTimeFilteringQuality{this, &PBRBaseMaterial::get_realTimeFilteringQuality,
+                               &PBRBaseMaterial::set_realTimeFilteringQuality}
+    , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
+                       &PBRBaseMaterial::set_transparencyMode}
+    , debugMode{this, &PBRBaseMaterial::get_debugMode, &PBRBaseMaterial::set_debugMode}
+    , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , brdf{std::make_shared<PBRBRDFConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
+    , sheen{std::make_shared<PBRSheenConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
+    , prePassConfiguration{nullptr}
+    , detailMap{std::make_shared<DetailMapConfiguration>(
+        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}
@@ -63,9 +81,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _roughness{std::nullopt}
     , _metallicF0Factor{1.f}
     , _metallicReflectanceColor{Color3::White()}
-    , _useOnlyMetallicFromMetallicReflectanceTexture{false}
     , _metallicReflectanceTexture{nullptr}
-    , _reflectanceTexture{nullptr}
     , _microSurfaceTexture{nullptr}
     , _bumpTexture{nullptr}
     , _lightmapTexture{nullptr}
@@ -104,28 +120,11 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _useLinearAlphaFresnel{false}
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
-    , realTimeFiltering{this, &PBRBaseMaterial::get_realTimeFiltering,
-                        &PBRBaseMaterial::set_realTimeFiltering}
-    , realTimeFilteringQuality{this, &PBRBaseMaterial::get_realTimeFilteringQuality,
-                               &PBRBaseMaterial::set_realTimeFilteringQuality}
     , _forceNormalForward{false}
     , _enableSpecularAntiAliasing{false}
-    , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
-                       &PBRBaseMaterial::set_transparencyMode}
-    , debugMode{this, &PBRBaseMaterial::get_debugMode, &PBRBaseMaterial::set_debugMode}
-    , clearCoat{std::make_shared<PBRClearCoatConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , anisotropy{std::make_shared<PBRAnisotropicConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , brdf{std::make_shared<PBRBRDFConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsMiscDirty(); })}
-    , sheen{std::make_shared<PBRSheenConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
-    , prePassConfiguration{nullptr}
-    , detailMap{std::make_shared<DetailMapConfiguration>(
-        [this]() -> void { _markAllSubMeshesAsTexturesDirty(); })}
     , _imageProcessingConfiguration{std::make_shared<ImageProcessingConfiguration>()}
     , _unlit{false}
+    , _rebuildInParallel{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity, _environmentIntensity,
                              _specularIntensity)}
     , _realTimeFiltering{false}
@@ -244,11 +243,6 @@ bool PBRBaseMaterial::get_hasRenderTargetTextures() const
   return subSurface->hasRenderTargetTextures();
 }
 
-bool PBRBaseMaterial::get_isPrePassCapable() const
-{
-  return true;
-}
-
 std::string PBRBaseMaterial::getClassName() const
 {
   return "PBRBaseMaterial";
@@ -319,16 +313,16 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<PBRMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<PBRMaterialDefines>();
   }
 
+  auto scene      = getScene();
   auto definesPtr = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
   auto& defines   = *definesPtr;
   if (_isReadyForSubMesh(subMesh)) {
     return true;
   }
 
-  auto scene  = getScene();
   auto engine = scene->getEngine();
 
   if (defines._areTexturesDirty) {
@@ -392,12 +386,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
           }
         }
 
-        if (_reflectanceTexture) {
-          if (!_reflectanceTexture->isReadyOrNotBlocking()) {
-            return false;
-          }
-        }
-
         if (_microSurfaceTexture) {
           if (!_microSurfaceTexture->isReadyOrNotBlocking()) {
             return false;
@@ -456,7 +444,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 
     // Use previous effect while new one is compiling
     if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
-      effect = previousEffect;
+      effect             = previousEffect;
+      _rebuildInParallel = true;
       defines.markAsUnprocessed();
 
       if (lightDisposed) {
@@ -466,8 +455,9 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
       }
     }
     else {
+      _rebuildInParallel = false;
       scene->resetCachedMaterial();
-      subMesh->setEffect(effect, definesPtr, _materialContext);
+      subMesh->setEffect(effect, definesPtr);
       buildUniformLayout();
     }
   }
@@ -485,7 +475,10 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bo
 bool PBRBaseMaterial::isMetallicWorkflow() const
 {
   return (_metallic.has_value() && _metallic.value() != 0.f)
-         || (_roughness.has_value() && _roughness.value() != 0.f) || _metallicTexture;
+
+         || (_roughness.has_value() && _roughness.value() != 0.f)
+
+         || _metallicTexture;
 }
 
 EffectPtr PBRBaseMaterial::_prepareEffect(
@@ -602,11 +595,12 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
     attribs.emplace_back(VertexBuffer::TangentKind);
   }
 
-  for (auto i = 1u; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
-    const auto iStr = std::to_string(i);
-    if (defines["UV" + iStr]) {
-      attribs.emplace_back(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str()));
-    }
+  if (defines["UV1"]) {
+    attribs.emplace_back(VertexBuffer::UVKind);
+  }
+
+  if (defines["UV2"]) {
+    attribs.emplace_back(VertexBuffer::UV2Kind);
   }
 
   if (defines["VERTEXCOLOR"]) {
@@ -644,7 +638,6 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "vReflectivityInfos",
                                     "vReflectionFilteringInfo",
                                     "vMetallicReflectanceInfos",
-                                    "vReflectanceInfos",
                                     "vMicroSurfaceSamplerInfos",
                                     "vBumpInfos",
                                     "vLightmapInfos",
@@ -666,7 +659,6 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "bumpMatrix",
                                     "lightmapMatrix",
                                     "metallicReflectanceMatrix",
-                                    "reflectanceMatrix",
                                     "vLightingIntensity",
                                     "logarithmicDepthConstant",
                                     "vSphericalX",
@@ -690,19 +682,16 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
                                     "vReflectionMicrosurfaceInfos",
                                     "vTangentSpaceParams",
                                     "boneTextureWidth",
-                                    "vDebugMode",
-                                    "morphTargetTextureInfo",
-                                    "morphTargetTextureIndices"};
+                                    "vDebugMode"};
 
   std::vector<std::string> samplers{
     "albedoSampler",          "reflectivitySampler", "ambientSampler",
     "emissiveSampler",        "bumpSampler",         "lightmapSampler",
     "opacitySampler",         "reflectionSampler",   "reflectionSamplerLow",
     "reflectionSamplerHigh",  "irradianceSampler",   "microSurfaceSampler",
-    "environmentBrdfSampler", "boneSampler",         "metallicReflectanceSampler",
-    "reflectanceSampler",     "morphTargets"};
+    "environmentBrdfSampler", "boneSampler",         "metallicReflectanceSampler"};
 
-  std::vector<std::string> uniformBuffers{"Material", "Scene", "Mesh"};
+  std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
   DetailMapConfiguration::AddUniforms(uniforms);
   DetailMapConfiguration::AddSamplers(samplers);
@@ -720,7 +709,7 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   PBRSheenConfiguration::AddSamplers(samplers);
 
   PrePassConfiguration::AddUniforms(uniforms);
-  PrePassConfiguration::AddSamplers(samplers);
+  PrePassConfiguration::AddSamplers(uniforms);
 
   // if (ImageProcessingConfiguration)
   {
@@ -815,18 +804,18 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
       auto reflectionTexture = _getReflectionTexture();
       if (reflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
-        defines.boolDef["REFLECTION"]               = true;
-        defines.boolDef["GAMMAREFLECTION"]          = reflectionTexture->gammaSpace;
-        defines.boolDef["RGBDREFLECTION"]           = reflectionTexture->isRGBD;
-        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]  = getScene()->useRightHandedSystem() ?
-                                                        !reflectionTexture->invertZ :
-                                                        reflectionTexture->invertZ;
+        defines.boolDef["REFLECTION"]              = true;
+        defines.boolDef["GAMMAREFLECTION"]         = reflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]          = reflectionTexture->isRGBD;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"] = getScene()->useRightHandedSystem() ?
+                                                       !reflectionTexture->invertZ :
+                                                       reflectionTexture->invertZ;
         defines.boolDef["LODINREFLECTIONALPHA"]     = reflectionTexture->lodLevelInAlpha;
         defines.boolDef["LINEARSPECULARREFLECTION"] = reflectionTexture->linearSpecularLOD();
 
         if (realTimeFiltering && realTimeFilteringQuality() > 0) {
           defines.intDef["NUM_SAMPLES"] = realTimeFilteringQuality;
-          if (engine->_features.needTypeSuffixInShaderConstants) {
+          if (engine->webGLVersion > 1.f) {
             defines.intDef["NUM_SAMPLES"] = defines.intDef["NUM_SAMPLES"];
           }
           defines.boolDef["REALTIME_FILTERING"] = true;
@@ -939,7 +928,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
 
       if (_emissiveTexture && MaterialFlags::EmissiveTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines, "EMISSIVE");
-        defines.boolDef["GAMMAEMISSIVE"] = _emissiveTexture->gammaSpace();
       }
       else {
         defines.boolDef["EMISSIVE"] = false;
@@ -953,50 +941,23 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
             = !_useRoughnessFromMetallicTextureAlpha && _useRoughnessFromMetallicTextureGreen;
           defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"] = _useMetallnessFromMetallicTextureBlue;
           defines.boolDef["AOSTOREINMETALMAPRED"] = _useAmbientOcclusionFromMetallicTextureRed;
-          defines.boolDef["REFLECTIVITY_GAMMA"]   = false;
         }
         else if (_reflectivityTexture) {
           MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture, defines, "REFLECTIVITY");
           defines.boolDef["MICROSURFACEFROMREFLECTIVITYMAP"]
             = _useMicroSurfaceFromReflectivityMapAlpha;
           defines.boolDef["MICROSURFACEAUTOMATIC"] = _useAutoMicroSurfaceFromReflectivityMap;
-          defines.boolDef["REFLECTIVITY_GAMMA"]    = _reflectivityTexture->gammaSpace();
         }
         else {
           defines.boolDef["REFLECTIVITY"] = false;
         }
 
-        if (_metallicReflectanceTexture || _reflectanceTexture) {
-          const auto identicalTextures
-            = _metallicReflectanceTexture != nullptr
-              && _metallicReflectanceTexture->_texture == _reflectanceTexture->_texture
-              && _metallicReflectanceTexture->checkTransformsAreIdentical(_reflectanceTexture);
-
-          defines.boolDef["METALLIC_REFLECTANCE_USE_ALPHA_ONLY"]
-            = _useOnlyMetallicFromMetallicReflectanceTexture && !identicalTextures;
-          if (_metallicReflectanceTexture) {
-            MaterialHelper::PrepareDefinesForMergedUV(_metallicReflectanceTexture, defines,
-                                                      "METALLIC_REFLECTANCE");
-            defines.boolDef["METALLIC_REFLECTANCE_GAMMA"]
-              = _metallicReflectanceTexture->gammaSpace();
-          }
-          else {
-            defines.boolDef["METALLIC_REFLECTANCE"] = false;
-          }
-          if (_reflectanceTexture && !identicalTextures
-              && (!_metallicReflectanceTexture
-                  || (_metallicReflectanceTexture
-                      && _useOnlyMetallicFromMetallicReflectanceTexture))) {
-            MaterialHelper::PrepareDefinesForMergedUV(_reflectanceTexture, defines, "REFLECTANCE");
-            defines.boolDef["REFLECTANCE_GAMMA"] = _reflectanceTexture->gammaSpace();
-          }
-          else {
-            defines.boolDef["REFLECTANCE"] = false;
-          }
+        if (_metallicReflectanceTexture) {
+          MaterialHelper::PrepareDefinesForMergedUV(_metallicReflectanceTexture, defines,
+                                                    "METALLIC_REFLECTANCE");
         }
         else {
           defines.boolDef["METALLIC_REFLECTANCE"] = false;
-          defines.boolDef["REFLECTANCE"]          = false;
         }
 
         if (_microSurfaceTexture) {
@@ -1030,7 +991,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& de
       }
 
       if (_environmentBRDFTexture && MaterialFlags::ReflectionTextureEnabled()) {
-        defines.boolDef["ENVIRONMENTBRDF"]      = true;
+        defines.boolDef["ENVIRONMENTBRDF"] = true;
+        // Not actual true RGBD, only the B chanel is encoded as RGBD for sheen.
         defines.boolDef["ENVIRONMENTBRDF_RGBD"] = _environmentBRDFTexture->isRGBD();
       }
       else {
@@ -1186,41 +1148,16 @@ void PBRBaseMaterial::buildUniformLayout()
   ubo.addUniform("pointSize", 1);
   ubo.addUniform("vReflectivityColor", 4);
   ubo.addUniform("vEmissiveColor", 3);
-  ubo.addUniform("vAmbientColor", 3);
-
-  ubo.addUniform("vDebugMode", 2);
-
+  ubo.addUniform("visibility", 1);
   ubo.addUniform("vMetallicReflectanceFactors", 4);
   ubo.addUniform("vMetallicReflectanceInfos", 2);
   ubo.addUniform("metallicReflectanceMatrix", 16);
-  ubo.addUniform("vReflectanceInfos", 2);
-  ubo.addUniform("reflectanceMatrix", 16);
 
   PBRClearCoatConfiguration::PrepareUniformBuffer(ubo);
   PBRAnisotropicConfiguration::PrepareUniformBuffer(ubo);
   PBRSheenConfiguration::PrepareUniformBuffer(ubo);
   PBRSubSurfaceConfiguration::PrepareUniformBuffer(ubo);
   DetailMapConfiguration::PrepareUniformBuffer(ubo);
-
-  ubo.addUniform("vSphericalL00", 3);
-  ubo.addUniform("vSphericalL1_1", 3);
-  ubo.addUniform("vSphericalL10", 3);
-  ubo.addUniform("vSphericalL11", 3);
-  ubo.addUniform("vSphericalL2_2", 3);
-  ubo.addUniform("vSphericalL2_1", 3);
-  ubo.addUniform("vSphericalL20", 3);
-  ubo.addUniform("vSphericalL21", 3);
-  ubo.addUniform("vSphericalL22", 3);
-
-  ubo.addUniform("vSphericalX", 3);
-  ubo.addUniform("vSphericalY", 3);
-  ubo.addUniform("vSphericalZ", 3);
-  ubo.addUniform("vSphericalXX_ZZ", 3);
-  ubo.addUniform("vSphericalYY_ZZ", 3);
-  ubo.addUniform("vSphericalZZ", 3);
-  ubo.addUniform("vSphericalXY", 3);
-  ubo.addUniform("vSphericalYZ", 3);
-  ubo.addUniform("vSphericalZX", 3);
 
   ubo.create();
 }
@@ -1257,16 +1194,16 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
   auto defines = *definesTmp;
 
   auto effect = subMesh->effect();
-
   if (!effect) {
     return;
   }
 
   _activeEffect = effect;
 
-  // Matrices Mesh.
-  mesh->getMeshUniformBuffer()->bindToEffect(effect.get(), "Mesh");
-  mesh->transferToEffect(world);
+  // Matrices
+  if (!defines["INSTANCES"] || defines["THIN_INSTANCES"]) {
+    bindOnlyWorldMatrix(world);
+  }
 
   // PrePass
   prePassConfiguration->bindForSubMesh(_activeEffect, scene, mesh, world, isFrozen());
@@ -1337,37 +1274,37 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
               auto polynomials = *_polynomials;
               if (defines["SPHERICAL_HARMONICS"]) {
                 auto& preScaledHarmonics = polynomials.preScaledHarmonics();
-                ubo.updateVector3("vSphericalL00", preScaledHarmonics.l00);
-                ubo.updateVector3("vSphericalL1_1", preScaledHarmonics.l1_1);
-                ubo.updateVector3("vSphericalL10", preScaledHarmonics.l10);
-                ubo.updateVector3("vSphericalL11", preScaledHarmonics.l11);
-                ubo.updateVector3("vSphericalL2_2", preScaledHarmonics.l2_2);
-                ubo.updateVector3("vSphericalL2_1", preScaledHarmonics.l2_1);
-                ubo.updateVector3("vSphericalL20", preScaledHarmonics.l20);
-                ubo.updateVector3("vSphericalL21", preScaledHarmonics.l21);
-                ubo.updateVector3("vSphericalL22", preScaledHarmonics.l22);
+                _activeEffect->setVector3("vSphericalL00", preScaledHarmonics.l00);
+                _activeEffect->setVector3("vSphericalL1_1", preScaledHarmonics.l1_1);
+                _activeEffect->setVector3("vSphericalL10", preScaledHarmonics.l10);
+                _activeEffect->setVector3("vSphericalL11", preScaledHarmonics.l11);
+                _activeEffect->setVector3("vSphericalL2_2", preScaledHarmonics.l2_2);
+                _activeEffect->setVector3("vSphericalL2_1", preScaledHarmonics.l2_1);
+                _activeEffect->setVector3("vSphericalL20", preScaledHarmonics.l20);
+                _activeEffect->setVector3("vSphericalL21", preScaledHarmonics.l21);
+                _activeEffect->setVector3("vSphericalL22", preScaledHarmonics.l22);
               }
               else {
-                ubo.updateFloat3("vSphericalX", polynomials.x.x, polynomials.x.y, polynomials.x.z,
-                                 "");
-                ubo.updateFloat3("vSphericalY", polynomials.y.x, polynomials.y.y, polynomials.y.z,
-                                 "");
-                ubo.updateFloat3("vSphericalZ", polynomials.z.x, polynomials.z.y, polynomials.z.z,
-                                 "");
-                ubo.updateFloat3("vSphericalXX_ZZ", polynomials.xx.x - polynomials.zz.x,
-                                 polynomials.xx.y - polynomials.zz.y,
-                                 polynomials.xx.z - polynomials.zz.z, "");
-                ubo.updateFloat3("vSphericalYY_ZZ", polynomials.yy.x - polynomials.zz.x,
-                                 polynomials.yy.y - polynomials.zz.y,
-                                 polynomials.yy.z - polynomials.zz.z, "");
-                ubo.updateFloat3("vSphericalZZ", polynomials.zz.x, polynomials.zz.y,
-                                 polynomials.zz.z, "");
-                ubo.updateFloat3("vSphericalXY", polynomials.xy.x, polynomials.xy.y,
-                                 polynomials.xy.z, "");
-                ubo.updateFloat3("vSphericalYZ", polynomials.yz.x, polynomials.yz.y,
-                                 polynomials.yz.z, "");
-                ubo.updateFloat3("vSphericalZX", polynomials.zx.x, polynomials.zx.y,
-                                 polynomials.zx.z, "");
+                _activeEffect->setFloat3("vSphericalX", polynomials.x.x, polynomials.x.y,
+                                         polynomials.x.z);
+                _activeEffect->setFloat3("vSphericalY", polynomials.y.x, polynomials.y.y,
+                                         polynomials.y.z);
+                _activeEffect->setFloat3("vSphericalZ", polynomials.z.x, polynomials.z.y,
+                                         polynomials.z.z);
+                _activeEffect->setFloat3("vSphericalXX_ZZ", polynomials.xx.x - polynomials.zz.x,
+                                         polynomials.xx.y - polynomials.zz.y,
+                                         polynomials.xx.z - polynomials.zz.z);
+                _activeEffect->setFloat3("vSphericalYY_ZZ", polynomials.yy.x - polynomials.zz.x,
+                                         polynomials.yy.y - polynomials.zz.y,
+                                         polynomials.yy.z - polynomials.zz.z);
+                _activeEffect->setFloat3("vSphericalZZ", polynomials.zz.x, polynomials.zz.y,
+                                         polynomials.zz.z);
+                _activeEffect->setFloat3("vSphericalXY", polynomials.xy.x, polynomials.xy.y,
+                                         polynomials.xy.z);
+                _activeEffect->setFloat3("vSphericalYZ", polynomials.yz.x, polynomials.yz.y,
+                                         polynomials.yz.z);
+                _activeEffect->setFloat3("vSphericalZX", polynomials.zx.x, polynomials.zx.y,
+                                         polynomials.zx.z);
               }
             }
           }
@@ -1411,13 +1348,6 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
                                               "metallicReflectance");
           }
 
-          if (_reflectanceTexture && defines["REFLECTANCE"]) {
-            ubo.updateFloat2("vReflectanceInfos",
-                             static_cast<float>(_reflectanceTexture->coordinatesIndex),
-                             _reflectanceTexture->level, "");
-            MaterialHelper::BindTextureMatrix(*_reflectanceTexture, ubo, "reflectance");
-          }
-
           if (_microSurfaceTexture) {
             ubo.updateFloat2("vMicroSurfaceSamplerInfos",
                              static_cast<float>(_microSurfaceTexture->coordinatesIndex),
@@ -1456,7 +1386,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
 
         const auto ior = subSurface->indexOfRefraction();
         const auto outside_ior
-          = 1.f; // consider air as clear coat and other layers would remap in the shader.
+          = 1.f; // consider air as clear coat and other layaers would remap in the shader.
 
         // We are here deriving our default reflectance from a common value for none metallic
         // surface. Based of the schlick fresnel approximation model for dielectrics.
@@ -1491,14 +1421,10 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
       _lightingInfos.w = _specularIntensity;
 
       ubo.updateVector4("vLightingIntensity", _lightingInfos);
-
-      // Colors
-      scene->ambientColor.multiplyToRef(_ambientColor, _globalAmbientColor);
-
-      ubo.updateColor3("vAmbientColor", _globalAmbientColor, "");
-
-      ubo.updateFloat2("vDebugMode", debugLimit, debugFactor, "");
     }
+
+    // Visibility
+    ubo.updateFloat("visibility", mesh->visibility());
 
     // Textures
     if (scene->texturesEnabled()) {
@@ -1559,10 +1485,6 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
           ubo.setTexture("metallicReflectanceSampler", _metallicReflectanceTexture);
         }
 
-        if (_reflectanceTexture && defines["REFLECTANCE"]) {
-          ubo.setTexture("reflectanceSampler", _reflectanceTexture);
-        }
-
         if (_microSurfaceTexture) {
           ubo.setTexture("microSurfaceSampler", _microSurfaceTexture);
         }
@@ -1576,7 +1498,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
 
     detailMap->bindForSubMesh(ubo, scene, isFrozen());
     subSurface->bindForSubMesh(ubo, scene, engine, isFrozen(), defines["LODBASEDMICROSFURACE"],
-                               _realTimeFiltering, subMesh);
+                               _realTimeFiltering);
     clearCoat->bindForSubMesh(ubo, scene, engine, _disableBumpMap, isFrozen(), _invertNormalMapX,
                               _invertNormalMapY, subMesh);
     anisotropy->bindForSubMesh(ubo, scene, isFrozen());
@@ -1585,18 +1507,32 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     // Clip plane
     MaterialHelper::BindClipPlane(_activeEffect, scene);
 
-    bindEyePosition(effect.get());
+    // Colors
+    scene->ambientColor.multiplyToRef(_ambientColor, _globalAmbientColor);
+
+    auto eyePosition = scene->_forcedViewPosition ?
+                         *scene->_forcedViewPosition :
+                         (scene->_mirroredCameraPosition ? *scene->_mirroredCameraPosition :
+                                                           scene->activeCamera()->globalPosition());
+    auto invertNormal
+      = (scene->useRightHandedSystem() == (scene->_mirroredCameraPosition != nullptr));
+    effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y, eyePosition.z,
+                      invertNormal ? -1.f : 1.f);
+    effect->setColor3("vAmbientColor", _globalAmbientColor);
+
+    effect->setFloat2("vDebugMode", debugLimit, debugFactor);
   }
 
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights);
+      MaterialHelper::BindLights(scene, mesh, _activeEffect.get(), defines, _maxSimultaneousLights,
+                                 _rebuildInParallel);
     }
 
     // View
     if ((scene->fogEnabled() && mesh->applyFog() && scene->fogMode() != Scene::FOGMODE_NONE)
-        || reflectionTexture || mesh->receiveShadows()) {
+        || reflectionTexture) {
       bindView(effect.get());
     }
 
@@ -1615,9 +1551,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh
     MaterialHelper::BindLogDepth(defines, _activeEffect.get(), scene);
   }
 
-  _afterBind(mesh, _activeEffect);
-
   ubo.update();
+
+  _afterBind(mesh, _activeEffect);
 }
 
 std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables()
@@ -1713,10 +1649,6 @@ std::vector<BaseTexturePtr> PBRBaseMaterial::getActiveTextures() const
     activeTextures.emplace_back(_metallicReflectanceTexture);
   }
 
-  if (_reflectanceTexture) {
-    activeTextures.emplace_back(_reflectanceTexture);
-  }
-
   if (_microSurfaceTexture) {
     activeTextures.emplace_back(_microSurfaceTexture);
   }
@@ -1772,10 +1704,6 @@ bool PBRBaseMaterial::hasTexture(const BaseTexturePtr& texture) const
     return true;
   }
 
-  if (_reflectanceTexture == texture) {
-    return true;
-  }
-
   if (_microSurfaceTexture == texture) {
     return true;
   }
@@ -1818,7 +1746,7 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures
     for (const auto& texture :
          {_albedoTexture, _ambientTexture, _opacityTexture, _reflectionTexture, _emissiveTexture,
           _metallicTexture, _reflectivityTexture, _bumpTexture, _lightmapTexture,
-          _metallicReflectanceTexture, _reflectanceTexture, _microSurfaceTexture}) {
+          _metallicReflectanceTexture, _microSurfaceTexture}) {
       if (texture) {
         texture->dispose();
       }

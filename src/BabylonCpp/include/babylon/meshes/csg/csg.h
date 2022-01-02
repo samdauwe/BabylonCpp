@@ -32,11 +32,9 @@ public:
   /**
    * @brief Convert the Mesh to CSG.
    * @param mesh The Mesh to convert to CSG
-   * @param absolute If true, the final (local) matrix transformation is set to the identity and not
-   * to that of `mesh`. It can help when dealing with right-handed meshes (default: false)
    * @returns A new CSG from the Mesh
    */
-  static CSGPtr FromMesh(const MeshPtr& mesh, bool absolute = false);
+  static CSGPtr FromMesh(const MeshPtr& mesh);
 
   /**
    * @brief Clones, or makes a deep copy, of the CSG.

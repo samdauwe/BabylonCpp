@@ -16,7 +16,7 @@ class Vector3;
  * avoid conflicts.
  */
 struct BABYLON_SHARED_EXPORT MathTmp {
-  static std::array<Vector3, 11> Vector3Array;
+  static std::array<Vector3, 6> Vector3Array;
   static std::array<Matrix, 2> MatrixArray;
   static std::array<Quaternion, 3> QuaternionArray;
 }; // end of class MathTmp

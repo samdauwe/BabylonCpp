@@ -2,13 +2,13 @@
 #define BABYLON_LIGHTS_DIRECTIONAL_LIGHT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(DirectionalLight)
+class DirectionalLight;
+using DirectionalLightPtr = std::shared_ptr<DirectionalLight>;
 
 /**
  * @brief A directional light is defined by a direction (what a surprise!).
@@ -66,22 +66,20 @@ public:
                                                  const std::string& lightDataUniformName) override;
 
   /**
-   * @brief Gets the minZ used for shadow according to both the scene and the light.
-   *
-   * Values are fixed on directional lights as it relies on an ortho projection hence the need to
-   * convert being -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 + 1) ->
-   * (depth * 0.5) + 0.5. (when not using reverse depth buffer / NDC half Z range)
+   * @brief Gets the minZ used for shadow according to both the scene and the light. Values are
+   * fixed on directional lights as it relies on an ortho projection hence the need to convert being
+   * -1 and 1 to 0 and 1 doing (depth
+   * + min) / (min + max) -> (depth + 1) / (1 + 1) -> (depth * 0.5) + 0.5.
    * @param activeCamera The camera we are returning the min for
    * @returns the depth min z
    */
   float getDepthMinZ(const Camera& activeCamera) const override;
 
   /**
-   * @brief Gets the maxZ used for shadow according to both the scene and the light.
-   *
-   * Values are fixed on directional lights as it relies on an ortho projection hence the need to
-   * convert being -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 + 1) ->
-   * (depth * 0.5) + 0.5. (when not using reverse depth buffer / NDC half Z range)
+   * @brief Gets the maxZ used for shadow according to both the scene and the light. Values are
+   * fixed on directional lights as it relies on an ortho projection hence the need to convert being
+   * -1 and 1 to 0 and 1 doing (depth
+   * + min) / (min + max) -> (depth + 1) / (1 + 1) -> (depth * 0.5) + 0.5.
    * @param activeCamera The camera we are returning the max for
    * @returns the depth max z
    */
@@ -104,70 +102,6 @@ protected:
    * @param scene The scene the light belongs to
    */
   DirectionalLight(const std::string& name, const Vector3& direction, Scene* scene);
-
-  /**
-   * @brief Fix frustum size for the shadow generation. This is disabled if the value is 0.
-   */
-  float get_shadowFrustumSize() const;
-
-  /**
-   * @brief Specifies a fix frustum size for the shadow generation.
-   */
-  void set_shadowFrustumSize(float value);
-
-  /**
-   * @brief Gets the shadow projection scale against the optimal computed one.
-   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
-   * This does not impact in fixed frustum size (shadowFrustumSize being set)
-   */
-  float get_shadowOrthoScale() const;
-
-  /**
-   * @brief Sets the shadow projection scale against the optimal computed one.
-   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
-   * This does not impact in fixed frustum size (shadowFrustumSize being set)
-   */
-  void set_shadowOrthoScale(float value);
-
-  /**
-   * @brief Gets the orthoLeft property used to build the light frustum.
-   */
-  float get_orthoLeft() const;
-
-  /**
-   * @brief Sets the orthoLeft property used to build the light frustum.
-   */
-  void set_orthoLeft(float left);
-
-  /**
-   * @brief Gets the orthoRight property used to build the light frustum.
-   */
-  float get_orthoRight() const;
-
-  /**
-   * @brief Sets the orthoRight property used to build the light frustum.
-   */
-  void set_orthoRight(float right);
-
-  /**
-   * @brief Gets the orthoTop property used to build the light frustum.
-   */
-  float get_orthoTop() const;
-
-  /**
-   * @brief Sets the orthoTop property used to build the light frustum.
-   */
-  void set_orthoTop(float top);
-
-  /**
-   * @brief Gets the orthoBottom property used to build the light frustum.
-   */
-  float get_orthoBottom() const;
-
-  /**
-   * @brief Sets the orthoBottom property used to build the light frustum.
-   */
-  void set_orthoBottom(float bottom);
 
   /**
    * @brief Sets the passed matrix "matrix" as projection matrix for the shadows cast by the light
@@ -194,6 +128,31 @@ protected:
 
   void _buildUniformLayout() override;
 
+private:
+  /**
+   * @brief Fix frustum size for the shadow generation. This is disabled if the value is 0.
+   */
+  float get_shadowFrustumSize() const;
+
+  /**
+   * @brief Specifies a fix frustum size for the shadow generation.
+   */
+  void set_shadowFrustumSize(float value);
+
+  /**
+   * @brief Gets the shadow projection scale against the optimal computed one.
+   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
+   * This does not impact in fixed frustum size (shadowFrustumSize being set)
+   */
+  float get_shadowOrthoScale() const;
+
+  /**
+   * @brief Sets the shadow projection scale against the optimal computed one.
+   * 0.1 by default which means that the projection window is increase by 10% from the optimal size.
+   * This does not impact in fixed frustum size (shadowFrustumSize being set)
+   */
+  void set_shadowOrthoScale(float value);
+
 public:
   /**
    * Frustum size for the shadow generation.
@@ -217,26 +176,6 @@ public:
    * work
    */
   bool autoCalcShadowZBounds;
-
-  /**
-   * Gets or sets the orthoLeft property used to build the light frustum
-   */
-  Property<DirectionalLight, float> orthoLeft;
-
-  /**
-   * Gets or sets the orthoRight property used to build the light frustum
-   */
-  Property<DirectionalLight, float> orthoRight;
-
-  /**
-   * Gets or sets the orthoTop property used to build the light frustum
-   */
-  Property<DirectionalLight, float> orthoTop;
-
-  /**
-   * Gets or sets the orthoBottom property used to build the light frustum
-   */
-  Property<DirectionalLight, float> orthoBottom;
 
 private:
   float _shadowFrustumSize;

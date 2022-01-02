@@ -8,11 +8,13 @@
 
 namespace BABYLON {
 
-FWD_CLASS_SPTR(IAnimatable)
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 namespace MaterialsLibrary {
 
-FWD_CLASS_SPTR(GradientMaterial)
+class GradientMaterial;
+using GradientMaterialPtr = std::shared_ptr<GradientMaterial>;
 
 class BABYLON_SHARED_EXPORT GradientMaterial : public PushMaterial {
 
@@ -29,34 +31,36 @@ public:
   ~GradientMaterial() override; // = default
 
   /**
-   * @brief Returns wehter or not the grid requires alpha blending.
+   * Returns wehter or not the grid requires alpha blending.
    */
-  bool needAlphaBlending() const override;
-  bool needAlphaTesting() const override;
+  [[nodiscard]] bool needAlphaBlending() const override;
+  [[nodiscard]] bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool useInstances = false) override;
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables() override;
-  std::string getClassName() const override;
+  [[nodiscard]] std::string getClassName() const override;
   void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures = false,
                bool notBoundToMesh = false) override;
-  MaterialPtr clone(const std::string& name, bool cloneChildren = false) const override;
-  json serialize() const;
+  [[nodiscard]] MaterialPtr clone(const std::string& name,
+                                  bool cloneChildren = false) const override;
+  [[nodiscard]] json serialize() const;
 
   /** Statics **/
   static GradientMaterial* Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
-   * @brief Constructor
-   * @param name The name given to the material in order to identify it afterwards.
+   * Constructor
+   * @param name The name given to the material in order to identify it
+   * afterwards.
    * @param scene The scene the material is used in.
    */
   GradientMaterial(const std::string& name, Scene* scene);
 
-  unsigned int get_maxSimultaneousLights() const;
+  [[nodiscard]] unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
-  bool get_disableLighting() const;
+  [[nodiscard]] bool get_disableLighting() const;
   void set_disableLighting(bool value);
 
 public:

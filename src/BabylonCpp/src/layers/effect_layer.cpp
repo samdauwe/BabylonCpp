@@ -2,12 +2,10 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/scene_component_constants.h>
 #include <babylon/layers/effect_layer_scene_component.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
@@ -19,6 +17,7 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/post_process.h>
@@ -37,8 +36,8 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
     , _mainTextureDesiredSize{ISize{0, 0}}
     , _shouldRender{true}
     , _indexBuffer{nullptr}
-    , _effectLayerMapGenerationDrawWrapper{nullptr}
-    , _mergeDrawWrapper{nullptr}
+    , _effectLayerMapGenerationEffect{nullptr}
+    , _mergeEffect{nullptr}
 {
   _scene         = scene ? scene : Engine::LastCreatedScene();
   auto component = std::static_pointer_cast<EffectLayerSceneComponent>(
@@ -50,9 +49,6 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
 
   _engine  = _scene->getEngine();
   _maxSize = _engine->getCaps().maxTextureSize;
-
-  _effectLayerMapGenerationDrawWrapper = std::make_shared<DrawWrapper>(_engine);
-  _mergeDrawWrapper                    = std::make_shared<DrawWrapper>(_engine);
 
   // Generate Buffers
   _generateIndexBuffer();
@@ -88,7 +84,7 @@ void EffectLayer::_init(const IEffectLayerOptions& options)
   _setMainTextureSize();
   _createMainTexture();
   _createTextureAndPostProcesses();
-  _mergeDrawWrapper->setEffect(_createMergeEffect(), std::optional<std::string>{std::nullopt});
+  _mergeEffect = _createMergeEffect();
 }
 
 void EffectLayer::_generateIndexBuffer()
@@ -110,10 +106,10 @@ void EffectLayer::_generateVertexBuffer()
 {
   // VBO
   Float32Array vertices = {
-    1.f,  1.f,  //
-    -1.f, 1.f,  //
-    -1.f, -1.f, //
-    1.f,  -1.f  //
+    1,  1,  //
+    -1, 1,  //
+    -1, -1, //
+    1,  -1  //
   };
 
   auto vertexBuffer = std::make_shared<VertexBuffer>(_engine, vertices, VertexBuffer::PositionKind,
@@ -170,7 +166,7 @@ void EffectLayer::_createMainTexture()
                                               const std::function<void()>& /*beforeTransparents*/) {
     onBeforeRenderMainTextureObservable.notifyObservers(this);
 
-    const auto engine = _scene->getEngine();
+    auto engine = _scene->getEngine();
 
     if (!depthOnlySubMeshes.empty()) {
       engine->setColorWrite(false);
@@ -350,7 +346,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   }
 
   // Morph targets
-  auto morphInfluencers = 0u;
+  unsigned int morphInfluencers = 0;
   if (auto _mesh = std::static_pointer_cast<Mesh>(mesh)) {
     auto manager = _mesh->morphTargetManager();
     if (manager) {
@@ -360,9 +356,6 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
         defines.emplace_back("#define NUM_MORPH_INFLUENCERS " + std::to_string(morphInfluencers));
         MaterialDefines iDefines;
         iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
-        if (manager->isUsingTextureForTargets()) {
-          defines.emplace_back("#define MORPHTARGETS_TEXTURE");
-        }
         MaterialHelper::PrepareAttributesForMorphTargetsInfluencers(attribs, mesh.get(),
                                                                     morphInfluencers);
       }
@@ -399,27 +392,23 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
                                            "diffuseMatrix",
                                            "emissiveMatrix",
                                            "opacityMatrix",
-                                           "opacityIntensity",
-                                           "morphTargetTextureInfo",
-                                           "morphTargetTextureIndices"};
+                                           "opacityIntensity"};
     effectCreationOptions.samplers
-      = {"diffuseSampler", "emissiveSampler", "opacitySampler", "boneSampler", "morphTargets"};
+      = {"diffuseSampler", "emissiveSampler", "opacitySampler", "boneSampler"};
 
-    _effectLayerMapGenerationDrawWrapper->setEffect(
-      _scene->getEngine()->createEffect("glowMapGeneration", effectCreationOptions,
-                                        _scene->getEngine()),
-      std::optional<std::string>{std::nullopt});
+    _effectLayerMapGenerationEffect = _scene->getEngine()->createEffect(
+      "glowMapGeneration", effectCreationOptions, _scene->getEngine());
   }
 
-  return _effectLayerMapGenerationDrawWrapper->effect->isReady();
+  return _effectLayerMapGenerationEffect->isReady();
 }
 
 void EffectLayer::render()
 {
-  const auto& currentEffect = _mergeDrawWrapper;
+  auto& currentEffect = _mergeEffect;
 
   // Check
-  if (!currentEffect->effect->isReady()) {
+  if (!currentEffect->isReady()) {
     return;
   }
 
@@ -438,7 +427,7 @@ void EffectLayer::render()
   engine->setState(false);
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer, currentEffect->effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer, currentEffect);
 
   // Cache
   auto previousAlphaMode = engine->getAlphaMode();
@@ -447,7 +436,7 @@ void EffectLayer::render()
   engine->setAlphaMode(_effectLayerOptions.alphaBlendingMode);
 
   // Blends the map on the main canvas.
-  _internalRender(currentEffect->effect);
+  _internalRender(currentEffect);
 
   // Restore Alpha
   engine->setAlphaMode(previousAlphaMode);
@@ -528,8 +517,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   const auto reverse = sideOrientation == Material::ClockWiseSideOrientation;
-  engine->setState(material->backFaceCulling(), material->zOffset, false, reverse,
-                   material->cullBackFaces(), nullptr, material->zOffsetUnits);
+  engine->setState(material->backFaceCulling, material->zOffset, false, reverse);
 
   // Managing instances
   auto batch = renderingMesh->_getInstancesRenderList(subMesh->_id, replacementMesh != nullptr);
@@ -556,22 +544,18 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
                           replacementMesh ? replacementMesh : nullptr);
   }
   else if (_isReady(subMesh, hardwareInstancedRendering, _emissiveTextureAndColor.texture)) {
-    const auto effect = _effectLayerMapGenerationDrawWrapper->effect;
+    engine->enableEffect(_effectLayerMapGenerationEffect);
+    renderingMesh->_bind(subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode);
 
-    engine->enableEffect(_effectLayerMapGenerationDrawWrapper);
-    if (!hardwareInstancedRendering) {
-      renderingMesh->_bind(subMesh, effect, Material::TriangleFillMode);
-    }
+    _effectLayerMapGenerationEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
-    effect->setMatrix("viewProjection", scene->getTransformMatrix());
+    _effectLayerMapGenerationEffect->setMatrix("world", effectiveMesh->getWorldMatrix());
 
-    effect->setMatrix("world", effectiveMesh->getWorldMatrix());
-
-    effect->setFloat4("glowColor",                      //
-                      _emissiveTextureAndColor.color.r, //
-                      _emissiveTextureAndColor.color.g, //
-                      _emissiveTextureAndColor.color.b, //
-                      _emissiveTextureAndColor.color.a);
+    _effectLayerMapGenerationEffect->setFloat4("glowColor",                      //
+                                               _emissiveTextureAndColor.color.r, //
+                                               _emissiveTextureAndColor.color.g, //
+                                               _emissiveTextureAndColor.color.b, //
+                                               _emissiveTextureAndColor.color.a);
 
     const auto needAlphaTest = material->needAlphaTesting();
 
@@ -584,11 +568,11 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
             || (pbrMaterial && pbrMaterial->useAlphaFromAlbedoTexture()));
 
     if (diffuseTexture && (needAlphaTest || needAlphaBlendFromDiffuse)) {
-      effect->setTexture("diffuseSampler", diffuseTexture);
+      _effectLayerMapGenerationEffect->setTexture("diffuseSampler", diffuseTexture);
       const auto& textureMatrix = diffuseTexture->getTextureMatrix();
 
       if (textureMatrix) {
-        effect->setMatrix("diffuseMatrix", *textureMatrix);
+        _effectLayerMapGenerationEffect->setMatrix("diffuseMatrix", *textureMatrix);
       }
     }
 
@@ -596,18 +580,20 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
                           pbrMaterial      ? pbrMaterial->opacityTexture() :
                                              nullptr;
     if (opacityTexture) {
-      effect->setTexture("opacitySampler", opacityTexture);
-      effect->setFloat("opacityIntensity", opacityTexture->level);
+      _effectLayerMapGenerationEffect->setTexture("opacitySampler", opacityTexture);
+      _effectLayerMapGenerationEffect->setFloat("opacityIntensity", opacityTexture->level);
       const auto& textureMatrix = opacityTexture->getTextureMatrix();
       if (textureMatrix) {
-        effect->setMatrix("opacityMatrix", *textureMatrix);
+        _effectLayerMapGenerationEffect->setMatrix("opacityMatrix", *textureMatrix);
       }
     }
 
     // Glow emissive only
     if (_emissiveTextureAndColor.texture) {
-      effect->setTexture("emissiveSampler", _emissiveTextureAndColor.texture);
-      effect->setMatrix("emissiveMatrix", *_emissiveTextureAndColor.texture->getTextureMatrix());
+      _effectLayerMapGenerationEffect->setTexture("emissiveSampler",
+                                                  _emissiveTextureAndColor.texture);
+      _effectLayerMapGenerationEffect->setMatrix(
+        "emissiveMatrix", *_emissiveTextureAndColor.texture->getTextureMatrix());
     }
 
     // Bones
@@ -621,20 +607,19 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
           return;
         }
 
-        effect->setTexture("boneSampler", boneTexture);
-        effect->setFloat("boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
+        _effectLayerMapGenerationEffect->setTexture("boneSampler", boneTexture);
+        _effectLayerMapGenerationEffect->setFloat(
+          "boneTextureWidth", 4.f * static_cast<float>(skeleton->bones.size() + 1));
       }
       else {
-        effect->setMatrices("mBones", skeleton->getTransformMatrices((renderingMesh.get())));
+        _effectLayerMapGenerationEffect->setMatrices(
+          "mBones", skeleton->getTransformMatrices((renderingMesh.get())));
       }
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(), effect.get());
-    if (renderingMesh->morphTargetManager()
-        && renderingMesh->morphTargetManager()->isUsingTextureForTargets()) {
-      renderingMesh->morphTargetManager()->_bind(effect.get());
-    }
+    MaterialHelper::BindMorphTargetParameters(renderingMesh.get(),
+                                              _effectLayerMapGenerationEffect.get());
 
     // Alpha mode
     if (enableAlphaMode) {
@@ -643,10 +628,10 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh, bool enableAlphaMode)
 
     // Draw
     renderingMesh->_processRendering(
-      effectiveMesh.get(), subMesh, effect, static_cast<int>(material->fillMode()), batch,
-      hardwareInstancedRendering,
+      effectiveMesh.get(), subMesh, _effectLayerMapGenerationEffect,
+      static_cast<int>(material->fillMode()), batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world, Material* /*effectiveMaterial*/) {
-        effect->setMatrix("world", world);
+        _effectLayerMapGenerationEffect->setMatrix("world", world);
       });
   }
   else {

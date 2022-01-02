@@ -1,15 +1,14 @@
 #include <babylon/sprites/sprite_renderer.h>
 
-#include <babylon/buffers/buffer.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/engines/thin_engine.h>
-#include <babylon/materials/draw_wrapper.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/textures/thin_texture.h>
+#include <babylon/meshes/buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/sprites/thin_sprite.h>
 #include <babylon/states/depth_culling_state.h>
 
@@ -31,22 +30,32 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
     , _buffer{nullptr}
     , _spriteBuffer{nullptr}
     , _indexBuffer{nullptr}
-    , _drawWrapperBase{nullptr}
-    , _drawWrapperFog{nullptr}
+    , _effectBase{nullptr}
+    , _effectFog{nullptr}
     , _vertexArrayObject{nullptr}
 {
   _capacity = capacity;
   _epsilon  = epsilon;
 
-  _engine          = engine;
-  _useInstancing   = engine->getCaps().instancedArrays;
-  _useVAO          = engine->getCaps().vertexArrayObject && !engine->disableVertexArrayObjects;
-  _scene           = scene;
-  _drawWrapperBase = std::make_shared<DrawWrapper>(engine);
-  _drawWrapperFog  = std::make_shared<DrawWrapper>(engine);
+  _engine        = engine;
+  _useInstancing = engine->getCaps().instancedArrays;
+  _useVAO        = engine->getCaps().vertexArrayObject && !engine->disableVertexArrayObjects;
+  _scene         = scene;
 
   if (!_useInstancing) {
-    _buildIndexBuffer();
+    IndicesArray indices;
+    auto index = 0;
+    for (unsigned int count = 0; count < capacity; ++count) {
+      indices.emplace_back(index + 0);
+      indices.emplace_back(index + 1);
+      indices.emplace_back(index + 2);
+      indices.emplace_back(index + 0);
+      indices.emplace_back(index + 2);
+      indices.emplace_back(index + 3);
+      index += 4;
+    }
+
+    _indexBuffer = engine->createIndexBuffer(indices);
   }
 
   // VBO
@@ -65,7 +74,7 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
   std::unique_ptr<VertexBuffer> offsets = nullptr;
 
   if (_useInstancing) {
-    const Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f};
+    const Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
     _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
     offsets       = _spriteBuffer->createVertexBuffer("offsets", 0, 2);
   }
@@ -98,7 +107,7 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
     spriteOptions.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
     spriteOptions.samplers      = {"diffuseSampler"};
 
-    _drawWrapperBase->effect = _engine->createEffect("sprites", spriteOptions, _scene->getEngine());
+    _effectBase = _engine->createEffect("sprites", spriteOptions, _scene->getEngine());
   }
 
   if (_scene) {
@@ -111,8 +120,7 @@ SpriteRenderer::SpriteRenderer(ThinEngine* engine, size_t capacity, float epsilo
     spriteOptions.samplers = {"diffuseSampler"};
     spriteOptions.defines  = "#define FOG";
 
-    _drawWrapperFog->effect
-      = _scene->getEngine()->createEffect("sprites", spriteOptions, _scene->getEngine());
+    _effectFog = _scene->getEngine()->createEffect("sprites", spriteOptions, _scene->getEngine());
   }
 }
 
@@ -132,17 +140,15 @@ void SpriteRenderer::render(
     return;
   }
 
-  auto drawWrapper     = _drawWrapperBase;
+  auto effect          = _effectBase;
   auto shouldRenderFog = false;
   if (fogEnabled && _scene && _scene->fogEnabled() && _scene->fogMode() != 0) {
-    drawWrapper     = _drawWrapperFog;
+    effect          = _effectFog;
     shouldRenderFog = true;
   }
 
-  const auto& effect = drawWrapper->effect;
-
   // Check
-  if (!effect || !effect->isReady()) {
+  if (!effect->isReady()) {
     return;
   }
   auto engine                     = _scene->getEngine();
@@ -180,14 +186,16 @@ void SpriteRenderer::render(
 
   _buffer->update(_vertexData);
 
-  const auto culling      = engine->depthCullingState()->cull().value_or(true);
-  const auto zOffset      = engine->depthCullingState()->zOffset();
-  const auto zOffsetUnits = engine->depthCullingState()->zOffsetUnits();
+  const auto culling = engine->depthCullingState()->cull().value_or(true);
+  const auto zOffset = engine->depthCullingState()->zOffset();
 
-  engine->setState(culling, zOffset, false, false);
+  // Handle Right Handed
+  if (useRightHandedSystem && _scene) {
+    _scene->getEngine()->setState(culling, zOffset, false, false);
+  }
 
   // Render
-  engine->enableEffect(drawWrapper);
+  engine->enableEffect(effect);
 
   effect->setTexture("diffuseSampler", texture);
   effect->setMatrix("view", viewMatrix);
@@ -215,13 +223,12 @@ void SpriteRenderer::render(
   }
 
   // Draw order
-  engine->depthCullingState()->depthFunc
-    = engine->useReverseDepthBuffer ? Constants::GEQUAL : Constants::LEQUAL;
+  engine->depthCullingState()->depthFunc = Constants::LEQUAL;
   if (!disableDepthWrite) {
     effect->setBool("alphaTest", true);
     engine->setColorWrite(false);
     if (_useInstancing) {
-      engine->drawArraysType(Constants::MATERIAL_TriangleStripDrawMode, 0, 4, offset);
+      engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
     }
     else {
       engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, (offset / 4) * 6);
@@ -232,7 +239,7 @@ void SpriteRenderer::render(
 
   engine->setAlphaMode(blendMode);
   if (_useInstancing) {
-    engine->drawArraysType(Constants::MATERIAL_TriangleStripDrawMode, 0, 4, offset);
+    engine->drawArraysType(Constants::MATERIAL_TriangleFanDrawMode, 0, 4, offset);
   }
   else {
     engine->drawElementsType(Constants::MATERIAL_TriangleFillMode, 0, (offset / 4) * 6);
@@ -327,44 +334,6 @@ void SpriteRenderer::_appendSpriteVertex(
   _vertexData[arrayOffset + 15] = sprite->color.g;
   _vertexData[arrayOffset + 16] = sprite->color.b;
   _vertexData[arrayOffset + 17] = sprite->color.a;
-}
-
-void SpriteRenderer::_buildIndexBuffer()
-{
-  IndicesArray indices;
-  auto index = 0;
-  for (unsigned int count = 0; count < capacity; ++count) {
-    indices.emplace_back(index + 0);
-    indices.emplace_back(index + 1);
-    indices.emplace_back(index + 2);
-    indices.emplace_back(index + 0);
-    indices.emplace_back(index + 2);
-    indices.emplace_back(index + 3);
-    index += 4;
-  }
-
-  _indexBuffer = _engine->createIndexBuffer(indices);
-}
-
-void SpriteRenderer::rebuild()
-{
-  if (_indexBuffer) {
-    _buildIndexBuffer();
-  }
-
-  if (_useVAO) {
-    _vertexArrayObject = nullptr;
-  }
-
-  _buffer->_rebuild();
-
-  for (const auto& [name, vertexBuffer] : _vertexBuffers) {
-    vertexBuffer->_rebuild();
-  }
-
-  if (_spriteBuffer) {
-    _spriteBuffer->_rebuild();
-  }
 }
 
 void SpriteRenderer::dispose()

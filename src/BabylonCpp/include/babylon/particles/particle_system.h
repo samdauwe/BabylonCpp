@@ -22,7 +22,7 @@ class Mesh;
 class Particle;
 class Scene;
 class ThinEngine;
-FWD_STRUCT_SPTR(DrawWrapper)
+FWD_CLASS_SPTR(Effect)
 FWD_CLASS_SPTR(VertexBuffer)
 FWD_CLASS_SPTR(WebGLDataBuffer)
 using WebGLVertexArrayObjectPtr = std::shared_ptr<GL::IGLVertexArrayObject>;
@@ -504,16 +504,13 @@ public:
   /**
    * @brief Parses a JSON object to create a particle system.
    * @param parsedParticleSystem The JSON object to parse
-   * @param sceneOrEngine The scene or the engine to create the particle system in
-   * @param rootUrl The root url to use to load external dependencies like texture
-   * @param doNotStart Ignore the preventAutoStart attribute and does not start
-   * @param capacity defines the system capacity (if null or undefined the sotred capacity will be
-   * used)
+   * @param scene The scene to create the particle system in
+   * @param rootUrl The root url to use to load external dependencies like
+   * texture
    * @returns the Parsed particle system
    */
   static ParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
-                               const std::string& url,
-                               const std::optional<size_t>& capacity = std::nullopt);
+                               const std::string& url);
 
 protected:
   /**
@@ -547,7 +544,6 @@ protected:
   void _reset() override;
 
 private:
-  DrawWrapperPtr _getCustomDrawWrapper(unsigned int blendMode = 0);
   float _fetchR(float u, float v, float width, float height, const Uint8Array& pixels);
   void _addFactorGradient(std::vector<FactorGradient>& factorGradients, float gradient,
                           float factor, const std::optional<float>& factor2 = std::nullopt);
@@ -566,7 +562,7 @@ private:
   // End of sub system methods
   void _update(int newParticles);
   /** @hidden */
-  DrawWrapperPtr _getWrapper(unsigned int blendMode);
+  EffectPtr _getEffect(unsigned int blendMode);
   void _appendParticleVertices(unsigned int offset, Particle* particle);
   size_t _render(unsigned int blendMode);
 
@@ -670,8 +666,9 @@ private:
   std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<Buffer> _spriteBuffer;
   WebGLDataBufferPtr _indexBuffer;
-  DrawWrapperPtr _drawWrapper;
-  std::unordered_map<unsigned int, DrawWrapperPtr> _customWrappers;
+  EffectPtr _effect;
+  std::unordered_map<unsigned int, EffectPtr> _customEffect;
+  std::string _cachedDefines;
 
   Color4 _scaledColorStep;
   Color4 _colorDiff;
@@ -698,7 +695,6 @@ private:
   Vector3 _zeroVector3;
 
   Matrix _emitterWorldMatrix;
-  Matrix _emitterInverseWorldMatrix;
 
   /** @hidden */
   Observable<Effect> _onBeforeDrawParticlesObservable;

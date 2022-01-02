@@ -231,7 +231,8 @@ public:
 
   /**
    * @brief Compute the Color3 hexadecimal code as a string.
-   * @returns a string containing the hexadecimal representation of the Color3 object
+   * @returns a string containing the hexadecimal representation of the Color3
+   * object
    */
   [[nodiscard]] std::string toHexString() const;
 
@@ -355,33 +356,6 @@ public:
    * @param result defines the Color3 object where to store the result
    */
   static void LerpToRef(const Color3& left, const Color3& right, float amount, Color3& result);
-
-  /**
-   * @brief Returns a new Color3 which is the 1st derivative of the Hermite spline defined by the
-   * colors "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @returns 1st derivative
-   */
-  static Color3 Hermite1stDerivative(const Color3& value1, const Color3& tangent1,
-                                     const Color3& value2, const Color3& tangent2, float time);
-
-  /**
-   * @brief Returns a new Color3 which is the 1st derivative of the Hermite spline defined by the
-   * colors "value1", "value2", "tangent1", "tangent2".
-   * @param value1 defines the first control point
-   * @param tangent1 defines the first tangent
-   * @param value2 defines the second control point
-   * @param tangent2 defines the second tangent
-   * @param time define where the derivative must be done
-   * @param result define where to store the derivative
-   */
-  static void Hermite1stDerivativeToRef(const Color3& value1, const Color3& tangent1,
-                                        const Color3& value2, const Color3& tangent2, float time,
-                                        Color3& result);
 
   /**
    * @brief Returns a Color3 value containing a red color.

@@ -10,7 +10,6 @@ FreeCameraGamepadInput::FreeCameraGamepadInput()
     : gamepad{nullptr}
     , gamepadAngularSensibility{200.f}
     , gamepadMoveSensibility{40.f}
-    , deadzoneDelta{0.1f}
     , invertYAxis{this, &FreeCameraGamepadInput::get_invertYAxis,
                   &FreeCameraGamepadInput::set_invertYAxis}
     , _yAxisScale{1.f}
@@ -39,7 +38,7 @@ void FreeCameraGamepadInput::attachControl(bool /*noPreventDefault*/)
 {
   auto& manager               = camera->getScene()->gamepadManager();
   _onGamepadConnectedObserver = manager->onGamepadConnectedObservable.add(
-    [this](Gamepad* iGamepad, EventState& /*es*/) -> void {
+    [this](Gamepad* iGamepad, EventState & /*es*/) -> void {
       if (iGamepad->type != Gamepad::POSE_ENABLED) {
         // prioritize XBOX gamepads.
         if (!gamepad || iGamepad->type == Gamepad::XBOX) {
@@ -49,7 +48,7 @@ void FreeCameraGamepadInput::attachControl(bool /*noPreventDefault*/)
     });
 
   _onGamepadDisconnectedObserver = manager->onGamepadDisconnectedObservable.add(
-    [this](Gamepad* iGamepad, EventState& /*es*/) -> void {
+    [this](Gamepad* iGamepad, EventState & /*es*/) -> void {
       if (gamepad == iGamepad) {
         gamepad = nullptr;
       }
@@ -75,19 +74,18 @@ void FreeCameraGamepadInput::detachControl(ICanvas* /*ignored*/)
 void FreeCameraGamepadInput::checkInputs()
 {
   if (gamepad && gamepad->leftStick()) {
-    auto& LSValues = *gamepad->leftStick();
-    if (gamepadMoveSensibility != 0.f) {
-      LSValues.x = std::abs(LSValues.x) > deadzoneDelta ? LSValues.x / gamepadMoveSensibility : 0.f;
-      LSValues.y = std::abs(LSValues.y) > deadzoneDelta ? LSValues.y / gamepadMoveSensibility : 0.f;
-    }
+    auto& LSValues    = *gamepad->leftStick();
+    auto normalizedLX = LSValues.x / gamepadMoveSensibility;
+    auto normalizedLY = LSValues.y / gamepadMoveSensibility;
+    LSValues.x        = std::abs(normalizedLX) > 0.005f ? 0.f + normalizedLX : 0.f;
+    LSValues.y        = std::abs(normalizedLY) > 0.005f ? 0.f + normalizedLY : 0.f;
 
     auto& RSValues = gamepad->rightStick();
-    if (RSValues && gamepadAngularSensibility != 0.f) {
-      RSValues->x
-        = (std::abs(RSValues->x) > deadzoneDelta) ? RSValues->x / gamepadAngularSensibility : 0.f;
-      RSValues->y
-        = ((std::abs(RSValues->y) > deadzoneDelta) ? RSValues->y / gamepadAngularSensibility : 0.f)
-          * _yAxisScale;
+    if (RSValues) {
+      auto normalizedRX = RSValues->x / gamepadAngularSensibility;
+      auto normalizedRY = (RSValues->y / gamepadAngularSensibility) * _yAxisScale;
+      RSValues->x       = std::abs(normalizedRX) > 0.001f ? 0.f + normalizedRX : 0.f;
+      RSValues->y       = std::abs(normalizedRY) > 0.001f ? 0.f + normalizedRY : 0.f;
     }
     else {
       RSValues = StickValues{

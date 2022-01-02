@@ -19,6 +19,13 @@ SubEmitter::SubEmitter(const ParticleSystemPtr& iParticleSystem)
     particleSystem->emitter
       = AbstractMesh::New("SubemitterSystemEmitter", particleSystem->getScene());
   }
+
+  // Automatically dispose of subemitter when system is disposed
+  particleSystem->onDisposeObservable.add([this](IParticleSystem* /*ps*/, EventState& /*es*/) {
+    if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
+      std::get<AbstractMeshPtr>(particleSystem->emitter)->dispose();
+    }
+  });
 }
 
 SubEmitter::~SubEmitter() = default;
@@ -40,7 +47,7 @@ SubEmitterPtr SubEmitter::clone() const
     emitter                = meshEmitter;
   }
   auto clone = std::make_shared<SubEmitter>(
-    std::static_pointer_cast<ParticleSystem>(particleSystem->clone(particleSystem->name, emitter)));
+    std::static_pointer_cast<ParticleSystem>(particleSystem->clone("", emitter)));
 
   // Clone properties
   clone->particleSystem->name += "Clone";
@@ -53,7 +60,7 @@ SubEmitterPtr SubEmitter::clone() const
   return clone;
 }
 
-json SubEmitter::serialize(bool /*serializeTexture*/) const
+json SubEmitter::serialize() const
 {
   return nullptr;
 }

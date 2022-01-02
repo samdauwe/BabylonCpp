@@ -1,8 +1,6 @@
 #include <babylon/rendering/edges_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/buffer.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -11,7 +9,9 @@
 #include <babylon/maths/tmp_vectors.h>
 #include <babylon/meshes/_instance_data_storage.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/buffer.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/rendering/face_adjacencies.h>
 
@@ -25,7 +25,6 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
     , linesPositions{this, &EdgesRenderer::get_linesPositions}
     , linesNormals{this, &EdgesRenderer::get_linesNormals}
     , linesIndices{this, &EdgesRenderer::get_linesIndices}
-    , lineShader{this, &EdgesRenderer::get_lineShader, &EdgesRenderer::set_lineShader}
     , _lineShader{nullptr}
     , _ib{nullptr}
     , _options{std::nullopt}
@@ -71,16 +70,6 @@ Float32Array& EdgesRenderer::get_linesNormals()
 IndicesArray& EdgesRenderer::get_linesIndices()
 {
   return _linesIndices;
-}
-
-ShaderMaterialPtr& EdgesRenderer::get_lineShader()
-{
-  return _lineShader;
-}
-
-void EdgesRenderer::set_lineShader(const ShaderMaterialPtr& shader)
-{
-  _lineShader = shader;
 }
 
 ShaderMaterialPtr EdgesRenderer::GetShader(Scene* scene)
@@ -535,9 +524,7 @@ void EdgesRenderer::_generateEdgesLinesAlternate()
       auto p1Index = remapVertexIndices[indices[index + (i + 1) % 3]];
       auto p2Index = remapVertexIndices[indices[index + (i + 2) % 3]];
 
-      if (p0Index == p1Index
-          || ((p0Index == p2Index || p1Index == p2Index) && _options
-              && _options->removeDegeneratedTriangles.value_or(false))) {
+      if (p0Index == p1Index) {
         continue;
       }
 
@@ -781,6 +768,16 @@ void EdgesRenderer::render()
     return;
   }
 
+  auto engine = scene->getEngine();
+  _lineShader->_preBind();
+
+  if (_source->edgesColor.a != 1.f) {
+    engine->setAlphaMode(Constants::ALPHA_COMBINE);
+  }
+  else {
+    engine->setAlphaMode(Constants::ALPHA_DISABLE);
+  }
+
   const auto hasInstances            = _source->hasInstances() && customInstances.size() > 0;
   const auto useBuffersWithInstances = hasInstances || _source->hasThinInstances();
 
@@ -797,13 +794,6 @@ void EdgesRenderer::render()
       auto& instanceStorage = _sourceMesh->_instanceDataStorage;
 
       instanceCount = customInstances.size();
-
-      if (instanceStorage->instancesData.empty()) {
-        if (!_source->getScene()->_activeMeshesFrozen) {
-          customInstances.clear();
-        }
-        return;
-      }
 
       if (!instanceStorage->isFrozen) {
         auto offset = 0u;
@@ -822,16 +812,6 @@ void EdgesRenderer::render()
     else {
       instanceCount = _sourceMesh->thinInstanceCount();
     }
-  }
-
-  const auto engine = scene->getEngine();
-  _lineShader->_preBind(EffectPtr{nullptr});
-
-  if (_source->edgesColor.a != 1.f) {
-    engine->setAlphaMode(Constants::ALPHA_COMBINE);
-  }
-  else {
-    engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
 
   // VBOs

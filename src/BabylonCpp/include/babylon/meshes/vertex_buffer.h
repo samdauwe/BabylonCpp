@@ -1,5 +1,5 @@
-#ifndef BABYLON_BUFFERS_VERTEX_BUFFER_H
-#define BABYLON_BUFFERS_VERTEX_BUFFER_H
+#ifndef BABYLON_MESHES_VERTEX_BUFFER_H
+#define BABYLON_MESHES_VERTEX_BUFFER_H
 
 #include <functional>
 #include <memory>
@@ -205,16 +205,6 @@ public:
   Float32Array& getData();
 
   /**
-   * @brief Gets current buffer's data as a float array. Float data is constructed if the vertex
-   * buffer data cannot be returned directly.
-   * @param totalVertices number of vertices in the buffer to take into account
-   * @param forceCopy defines a boolean indicating that the returned array must be cloned upon
-   * returning it
-   * @returns a float array containing vertex data
-   */
-  Float32Array getFloatData(size_t totalVertices, const std::optional<bool>& forceCopy);
-
-  /**
    * @brief Gets underlying native buffer.
    * @returns underlying native buffer
    */
@@ -236,12 +226,10 @@ public:
   size_t getOffset() const;
 
   /**
-   * @brief Returns the number of components or the byte size per vertex attribute.
-   * @param sizeInBytes If true, returns the size in bytes or else the size in number of components
-   * of the vertex attribute (default: false)
-   * @returns the number of components
+   * @brief Returns the number of components per vertex attribute (integer).
+   * @returns the size in float
    */
-  size_t getSize(bool sizeInBytes = false) const;
+  size_t getSize() const;
 
   /**
    * @brief Gets a boolean indicating is the internal buffer of the VertexBuffer is instanced.
@@ -350,8 +338,6 @@ private:
 
   Buffer* _getBuffer() const;
 
-  void _computeHashCode();
-
   static float _GetFloatValue(const DataView& dataView, unsigned int type, size_t byteOffset,
                               bool normalized);
 
@@ -365,11 +351,6 @@ public:
    * Hidden
    */
   BufferPtr _buffer;
-
-  /**
-   * Hidden
-   */
-  bool _validOffsetRange; // used internally by the engine
 
   /**
    * Instance divisor when in instanced mode
@@ -397,19 +378,7 @@ public:
    */
   unsigned int type;
 
-  /**
-   * Gets the unique id of this vertex buffer
-   */
-  size_t uniqueId;
-
-  /**
-   * Gets a hash code representing the format (type, normalized, size, instanced, stride) of this
-   * buffer All buffers with the same format will have the same hash code
-   */
-  size_t hashCode;
-
 private:
-  static size_t _Counter;
   std::string _kind;
   size_t _size;
   bool _ownsBuffer;
@@ -420,4 +389,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_BUFFERS_VERTEX_BUFFER_H
+#endif // end of BABYLON_MESHES_VERTEX_BUFFER_H

@@ -43,19 +43,7 @@ enum class PointerInput : unsigned int {
   /** Browser Back */
   BrowserBack = 5,
   /** Browser Forward */
-  BrowserForward = 6,
-  /** Mouse Wheel X */
-  MouseWheelX = 7,
-  /** Mouse Wheel Y */
-  MouseWheelY = 8,
-  /** Mouse Wheel Z */
-  MouseWheelZ = 9,
-  /** Delta X */
-  DeltaHorizontal = 10,
-  /** Delta Y */
-  DeltaVertical = 11,
-  /** MoveBeing Hijack for simultaneous buttons pressed for instance */
-  FakeMove = 12,
+  BrowserForward = 6
 }; // end of enum class PointerInput
 
 /**

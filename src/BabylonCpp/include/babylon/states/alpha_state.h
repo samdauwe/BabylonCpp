@@ -29,8 +29,8 @@ public:
   void apply(GL::IGLRenderingContext& gl);
 
 protected:
-  bool get_isDirty() const;
-  bool get_alphaBlend() const;
+  [[nodiscard]] bool get_isDirty() const;
+  [[nodiscard]] bool get_alphaBlend() const;
   void set_alphaBlend(bool value);
 
 public:

@@ -75,17 +75,6 @@ public:
                                 std::vector<std::string>& uniformBuffers) override;
 
   /**
-   * @brief Checks if the block is ready.
-   * @param mesh defines the mesh to be rendered
-   * @param nodeMaterial defines the node material requesting the update
-   * @param defines defines the material defines to update
-   * @param useInstances specifies that instances should be used
-   * @returns true if the block is ready
-   */
-  bool isReady(AbstractMesh* mesh, const NodeMaterialPtr& nodeMaterial,
-               const NodeMaterialDefines& defines, bool useInstances = false) override;
-
-  /**
    * @brief Bind data to effect. Will only be called for blocks with isBindable === true.
    * @param effect defines the effect to bind data to
    * @param nodeMaterial defines the hosting NodeMaterial
@@ -226,22 +215,22 @@ protected:
   /**
    * @brief Gets the indirect diffuse output component.
    */
-  NodeMaterialConnectionPointPtr& get_diffuseInd();
+  NodeMaterialConnectionPointPtr& get_diffuseIndirect();
 
   /**
    * @brief Gets the indirect specular output component.
    */
-  NodeMaterialConnectionPointPtr& get_specularInd();
+  NodeMaterialConnectionPointPtr& get_specularIndirect();
 
   /**
    * @brief Gets the indirect clear coat output component.
    */
-  NodeMaterialConnectionPointPtr& get_clearcoatInd();
+  NodeMaterialConnectionPointPtr& get_clearcoatIndirect();
 
   /**
    * @brief Gets the indirect sheen output component.
    */
-  NodeMaterialConnectionPointPtr& get_sheenInd();
+  NodeMaterialConnectionPointPtr& get_sheenIndirect();
 
   /**
    * @brief Gets the refraction output component.
@@ -312,13 +301,11 @@ public:
    * Defines the  falloff type used in this material.
    * It by default is Physical.
    */
-  // @editableInPropertyPage("Light falloff", PropertyTypeForEdition.List, "LIGHTING & COLORS", {
-  //     "notifiers": { "update": true }, "options": [
-  //        { label: "Physical", value: PBRBaseMaterial.LIGHTFALLOFF_PHYSICAL },
-  //        { label: "GLTF", value: PBRBaseMaterial.LIGHTFALLOFF_GLTF },
-  //        { label: "Standard", value: PBRBaseMaterial.LIGHTFALLOFF_STANDARD },
-  //    ]
-  // })
+  // @editableInPropertyPage("Light falloff", PropertyTypeForEdition.List, "LIGHTING & COLORS", { "notifiers": { "update": true }, "options": [
+  //    { label: "Physical", value: PBRBaseMaterial.LIGHTFALLOFF_PHYSICAL },
+  //    { label: "GLTF", value: PBRBaseMaterial.LIGHTFALLOFF_GLTF },
+  //    { label: "Standard", value: PBRBaseMaterial.LIGHTFALLOFF_STANDARD },
+  //]})
   unsigned int lightFalloff;
 
   /**
@@ -370,13 +357,11 @@ public:
   /**
    * Quality switch for realtime filtering
    */
-  // @editableInPropertyPage("Realtime filtering quality", PropertyTypeForEdition.List, "RENDERING", {
-  //     "notifiers": { "update": true }, "options": [
-  //         { label: "Low", value: Constants.TEXTURE_FILTERING_QUALITY_LOW },
-  //         { label: "Medium", value: Constants.TEXTURE_FILTERING_QUALITY_MEDIUM },
-  //         { label: "High", value: Constants.TEXTURE_FILTERING_QUALITY_HIGH },
-  //     ]
-  // })
+  // @editableInPropertyPage("Realtime filtering quality", PropertyTypeForEdition.List, "RENDERING", { "notifiers": { "update": true }, "options": [
+  //     { label: "Low", value: Constants.TEXTURE_FILTERING_QUALITY_LOW },
+  //     { label: "Medium", value: Constants.TEXTURE_FILTERING_QUALITY_MEDIUM },
+  //     { label: "High", value: Constants.TEXTURE_FILTERING_QUALITY_HIGH },
+  // ]})
   unsigned int realTimeFilteringQuality;
 
   /**
@@ -415,8 +400,8 @@ public:
    * Defines the material debug mode.
    * It helps seeing only some components of the material while troubleshooting.
    */
-  // @editableInPropertyPage("Debug mode", PropertyTypeForEdition.List, "DEBUG", {
-  //  "notifiers": { "update": true }, "options": [
+  // @editableInPropertyPage("Debug mode", PropertyTypeForEdition.List, "DEBUG", { "notifiers": { "update": true }, "options": [
+  //     { label: "None", value: 0 },
   //     // Geometry
   //     { label: "Normalized position", value: 1 },
   //     { label: "Normals", value: 2 },
@@ -466,8 +451,7 @@ public:
   //     { label: "Sheen Reflectance", value: 85 },
   //     { label: "Luminance Over Alpha", value: 86 },
   //     { label: "Alpha", value: 87 },
-  //   ]
-  // })
+  // ]})
   unsigned int debugMode;
 
   /**
@@ -601,22 +585,22 @@ public:
   /**
    * Gets the indirect diffuse output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> diffuseInd;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> diffuseIndirect;
 
   /**
    * Gets the indirect specular output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specularInd;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> specularIndirect;
 
   /**
    * Gets the indirect clear coat output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoatInd;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> clearcoatIndirect;
 
   /**
    * Gets the indirect sheen output component
    */
-  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenInd;
+  ReadOnlyProperty<PBRMetallicRoughnessBlock, NodeMaterialConnectionPointPtr> sheenIndirect;
 
   /**
    * Gets the refraction output component

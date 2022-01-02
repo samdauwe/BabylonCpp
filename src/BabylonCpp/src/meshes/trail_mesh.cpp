@@ -1,9 +1,9 @@
 #include <babylon/meshes/trail_mesh.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engines/scene.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
@@ -42,8 +42,8 @@ void TrailMesh::_createMesh()
   auto meshCenter = Vector3::Zero();
 
   const auto generatorAsAbstractMesh = std::static_pointer_cast<AbstractMesh>(_generator);
-  if (generatorAsAbstractMesh && generatorAsAbstractMesh->hasBoundingInfo()) {
-    meshCenter = generatorAsAbstractMesh->getBoundingInfo()->boundingBox.centerWorld;
+  if (generatorAsAbstractMesh && generatorAsAbstractMesh->_boundingInfo) {
+    meshCenter = generatorAsAbstractMesh->_boundingInfo->boundingBox.centerWorld;
   }
   else {
     meshCenter = _generator->position();

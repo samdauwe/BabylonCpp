@@ -1,7 +1,6 @@
 #include <babylon/materials/node/node_material.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
@@ -34,6 +33,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/misc/file_tools.h>
 #include <babylon/misc/string_tools.h>
 #include <babylon/particles/base_particle_system.h>
@@ -53,8 +53,7 @@ NodeMaterial::NodeMaterial(const std::string& iName, Scene* iScene,
     , imageProcessingConfiguration{this, &NodeMaterial::get_imageProcessingConfiguration,
                                    &NodeMaterial::set_imageProcessingConfiguration}
     , _mode{NodeMaterialModes::Material}
-    , mode(this, &NodeMaterial::get_mode, &NodeMaterial::set_mode)
-    , buildId(this, &NodeMaterial::get_buildId, &NodeMaterial::set_buildId)
+    , mode(this, &NodeMaterial::get_mode)
     , _imageProcessingConfiguration{nullptr}
     , _options{nullptr}
     , _vertexCompilationState{nullptr}
@@ -99,21 +98,6 @@ void NodeMaterial::set_imageProcessingConfiguration(const ImageProcessingConfigu
 NodeMaterialModes& NodeMaterial::get_mode()
 {
   return _mode;
-}
-
-void NodeMaterial::set_mode(const NodeMaterialModes& value)
-{
-  _mode = value;
-}
-
-size_t NodeMaterial::get_buildId() const
-{
-  return _buildId;
-}
-
-void NodeMaterial::set_buildId(size_t value)
-{
-  _buildId = value;
 }
 
 std::string NodeMaterial::getClassName() const
@@ -207,7 +191,7 @@ std::vector<InputBlockPtr> NodeMaterial::getInputBlocks() const
 
 NodeMaterial& NodeMaterial::registerOptimizer(const NodeMaterialOptimizerPtr& optimizer)
 {
-  const auto index = stl_util::index_of(_optimizers, optimizer);
+  auto index = stl_util::index_of(_optimizers, optimizer);
 
   if (index > -1) {
     return *this;
@@ -220,7 +204,7 @@ NodeMaterial& NodeMaterial::registerOptimizer(const NodeMaterialOptimizerPtr& op
 
 NodeMaterial& NodeMaterial::unregisterOptimizer(const NodeMaterialOptimizerPtr& optimizer)
 {
-  const auto index = stl_util::index_of(_optimizers, optimizer);
+  auto index = stl_util::index_of(_optimizers, optimizer);
 
   if (index == -1) {
     return *this;
@@ -305,7 +289,7 @@ NodeMaterial& NodeMaterial::_addFragmentOutputNode(const NodeMaterialBlockPtr& n
 
 NodeMaterial& NodeMaterial::_removeFragmentOutputNode(const NodeMaterialBlockPtr& node)
 {
-  const auto index = stl_util::index_of(_fragmentOutputNodes, node);
+  auto index = stl_util::index_of(_fragmentOutputNodes, node);
   if (index == -1) {
     return *this;
   }
@@ -330,12 +314,10 @@ bool NodeMaterial::needAlphaTesting() const
 
 void NodeMaterial::_initializeBlock(
   const NodeMaterialBlockPtr& node, const NodeMaterialBuildStatePtr& iState,
-  std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState, bool autoConfigure)
+  std::vector<NodeMaterialBlockPtr>& nodesToProcessForOtherBuildState)
 {
   node->initialize(*iState);
-  if (autoConfigure) {
-    node->autoConfigure(shared_from_this());
-  }
+  node->autoConfigure(shared_from_this());
   node->_preparationId = _buildId;
 
   if (!stl_util::contains(attachedBlocks, node)) {
@@ -367,7 +349,7 @@ void NodeMaterial::_initializeBlock(
                  && block->_preparationId != _buildId) {
           nodesToProcessForOtherBuildState.emplace_back(block);
         }
-        _initializeBlock(block, iState, nodesToProcessForOtherBuildState, autoConfigure);
+        _initializeBlock(block, iState, nodesToProcessForOtherBuildState);
       }
     }
   }
@@ -396,7 +378,7 @@ void NodeMaterial::_resetDualBlocks(const NodeMaterialBlockPtr& node, size_t iId
 
 void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
 {
-  const auto attachedBlockIndex = stl_util::index_of(attachedBlocks, block);
+  auto attachedBlockIndex = stl_util::index_of(attachedBlocks, block);
   if (attachedBlockIndex > -1) {
     stl_util::splice(attachedBlocks, attachedBlockIndex, 1);
   }
@@ -406,10 +388,10 @@ void NodeMaterial::removeBlock(const NodeMaterialBlockPtr& block)
   }
 }
 
-void NodeMaterial::build(bool verbose, bool updateBuildId, bool autoConfigure)
+void NodeMaterial::build(bool verbose)
 {
   _buildWasSuccessful = false;
-  const auto engine   = getScene()->getEngine();
+  auto engine         = getScene()->getEngine();
 
   const auto allowEmptyVertexProgram = _mode == NodeMaterialModes::Particle;
 
@@ -445,12 +427,12 @@ void NodeMaterial::build(bool verbose, bool updateBuildId, bool autoConfigure)
 
   for (const auto& vertexOutputNode : _vertexOutputNodes) {
     vertexNodes.emplace_back(vertexOutputNode);
-    _initializeBlock(vertexOutputNode, _vertexCompilationState, fragmentNodes, autoConfigure);
+    _initializeBlock(vertexOutputNode, _vertexCompilationState, fragmentNodes);
   }
 
   for (const auto& fragmentOutputNode : _fragmentOutputNodes) {
     fragmentNodes.emplace_back(fragmentOutputNode);
-    _initializeBlock(fragmentOutputNode, _fragmentCompilationState, vertexNodes, autoConfigure);
+    _initializeBlock(fragmentOutputNode, _fragmentCompilationState, vertexNodes);
   }
 
   // Optimize
@@ -479,9 +461,7 @@ void NodeMaterial::build(bool verbose, bool updateBuildId, bool autoConfigure)
   _vertexCompilationState->finalize(*_vertexCompilationState);
   _fragmentCompilationState->finalize(*_fragmentCompilationState);
 
-  if (updateBuildId) {
-    _buildId = NodeMaterial::_BuildIdGenerator++;
-  }
+  _buildId = NodeMaterial::_BuildIdGenerator++;
 
   // Errors
   _sharedData->emitErrors();
@@ -529,21 +509,16 @@ void NodeMaterial::_prepareDefinesForAttributes(AbstractMesh* mesh, NodeMaterial
 {
   const auto oldNormal  = defines["NORMAL"];
   const auto oldTangent = defines["TANGENT"];
+  const auto oldUV1     = defines["UV1"];
 
   defines.boolDef["NORMAL"] = mesh->isVerticesDataPresent(VertexBuffer::NormalKind);
 
   defines.boolDef["TANGENT"] = mesh->isVerticesDataPresent(VertexBuffer::TangentKind);
 
-  auto uvChanged = false;
-  for (unsigned int i = 1; i <= Constants::MAX_SUPPORTED_UV_SETS; ++i) {
-    const auto iStr = std::to_string(i);
-    auto oldUV      = defines["UV" + iStr];
-    defines.boolDef["UV" + iStr]
-      = mesh->isVerticesDataPresent(StringTools::printf("uv%s", i == 1 ? "" : iStr.c_str()));
-    uvChanged = uvChanged || defines["UV" + iStr] != oldUV;
-  }
+  defines.boolDef["UV1"] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
 
-  if (oldNormal != defines["NORMAL"] || oldTangent != defines["TANGENT"] || uvChanged) {
+  if (oldNormal != defines["NORMAL"] || oldTangent != defines["TANGENT"]
+      || oldUV1 != defines["UV1"]) {
     defines.markAsAttributesDirty();
   }
 }
@@ -579,7 +554,7 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
 
   const auto dummyMesh = AbstractMesh::New(tempName + "PostProcess", getScene());
 
-  auto buildId_ = _buildId;
+  auto buildId = _buildId;
 
   _processDefines(dummyMesh.get(), defines);
 
@@ -603,16 +578,16 @@ NodeMaterial::_createEffectForPostProcess(PostProcessPtr postProcess, const Came
   postProcess->nodeMaterialSource = shared_from_this();
 
   postProcess->onApplyObservable.add(
-    [this, &buildId_, &tempName, &defines, &dummyMesh](Effect* effect, EventState& /*es*/) -> void {
-      if (buildId_ != _buildId) {
+    [this, &buildId, &tempName, &defines, &dummyMesh](Effect* effect, EventState& /*es*/) -> void {
+      if (buildId != _buildId) {
         Effect::ShadersStore().erase(tempName + "VertexShader");
         Effect::ShadersStore().erase(tempName + "PixelShader");
 
         tempName = name + std::to_string(_buildId);
 
-        defines.markAllAsDirty();
+        defines.markAsUnprocessed();
 
-        buildId_ = _buildId;
+        buildId = _buildId;
       }
 
       const auto result = _processDefines(dummyMesh.get(), defines);
@@ -665,7 +640,7 @@ void NodeMaterial::_createEffectForParticles(
     }
   }
 
-  auto buildId_ = _buildId;
+  auto buildId = _buildId;
 
   std::vector<std::string> particleSystemDefines;
   auto particleSystemDefinesJoined = particleSystemDefinesJoined_;
@@ -688,18 +663,18 @@ void NodeMaterial::_createEffectForParticles(
     particleSystem->setCustomEffect(effect, blendMode);
   }
 
-  effect->onBindObservable().add([this, &buildId_, &tempName, &blendMode, &defines,
+  effect->onBindObservable().add([this, &buildId, &tempName, &blendMode, &defines,
                                   &particleSystemDefines, &particleSystem,
                                   &particleSystemDefinesJoined, &dummyMesh, iOnCompiled, iOnError,
                                   &effect](Effect* /*effect*/, EventState& /*es*/) -> void {
-    if (buildId_ != _buildId) {
+    if (buildId != _buildId) {
       Effect::ShadersStore().erase(tempName + "PixelShader");
 
       tempName = StringTools::printf("%s%ull_%u", name.c_str(), _buildId, blendMode);
 
-      defines->markAllAsDirty();
+      defines->markAsUnprocessed();
 
-      buildId_ = _buildId;
+      buildId = _buildId;
     }
 
     particleSystemDefines.clear();
@@ -709,7 +684,7 @@ void NodeMaterial::_createEffectForParticles(
     const auto particleSystemDefinesJoinedCurrent = StringTools::join(particleSystemDefines, "\n");
 
     if (particleSystemDefinesJoinedCurrent != particleSystemDefinesJoined) {
-      defines->markAllAsDirty();
+      defines->markAsUnprocessed();
       particleSystemDefinesJoined = particleSystemDefinesJoinedCurrent;
     }
 
@@ -879,7 +854,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->materialDefines = std::make_shared<NodeMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<NodeMaterialDefines>();
   }
 
   auto defines = std::static_pointer_cast<NodeMaterialDefines>(subMesh->_materialDefines);
@@ -951,7 +926,7 @@ bool NodeMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh, bool 
       }
       else {
         scene->resetCachedMaterial();
-        subMesh->setEffect(effect, defines, _materialContext);
+        subMesh->setEffect(effect, defines);
       }
     }
   }
@@ -1014,7 +989,7 @@ void NodeMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 
   if (mustRebind) {
     const auto& sharedData = _sharedData;
-    if (effect) {
+    if (effect && scene->getCachedEffect() != effect) {
       // Bindable blocks
       for (const auto& block : sharedData->bindableBlocks) {
         block->bind(effect.get(), shared_from_this(), mesh, subMesh);
@@ -1037,11 +1012,11 @@ std::vector<BaseTexturePtr> NodeMaterial::getActiveTextures() const
   if (_sharedData) {
     for (const auto& t : _sharedData->textureBlocks) {
       if (std::holds_alternative<TextureBlockPtr>(t) && std::get<TextureBlockPtr>(t)) {
-        activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture());
+        activeTextures.emplace_back(std::get<TextureBlockPtr>(t)->texture);
       }
       else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
                && std::get<ReflectionTextureBlockPtr>(t)) {
-        activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture());
+        activeTextures.emplace_back(std::get<ReflectionTextureBlockPtr>(t)->texture);
       }
     }
   }
@@ -1070,11 +1045,11 @@ bool NodeMaterial::hasTexture(const BaseTexturePtr& texture) const
 
   for (const auto& t : _sharedData->textureBlocks) {
     if (std::holds_alternative<TextureBlockPtr>(t)
-        && std::get<TextureBlockPtr>(t)->texture() == std::static_pointer_cast<Texture>(texture)) {
+        && std::get<TextureBlockPtr>(t)->texture == std::static_pointer_cast<Texture>(texture)) {
       return true;
     }
     else if (std::holds_alternative<ReflectionTextureBlockPtr>(t)
-             && std::get<ReflectionTextureBlockPtr>(t)->texture() == texture) {
+             && std::get<ReflectionTextureBlockPtr>(t)->texture == texture) {
       return true;
     }
   }
@@ -1087,13 +1062,13 @@ void NodeMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures, b
   if (forceDisposeTextures) {
     for (const auto& tb : _sharedData->textureBlocks) {
       if (std::holds_alternative<TextureBlockPtr>(tb)) {
-        auto texture = std::get<TextureBlockPtr>(tb)->texture();
+        auto texture = std::get<TextureBlockPtr>(tb)->texture;
         if (texture) {
           texture->dispose();
         }
       }
       else if (std::holds_alternative<ReflectionTextureBlockPtr>(tb)) {
-        auto texture = std::get<ReflectionTextureBlockPtr>(tb)->texture();
+        auto texture = std::get<ReflectionTextureBlockPtr>(tb)->texture;
         if (texture) {
           texture->dispose();
         }
@@ -1358,7 +1333,7 @@ std::string NodeMaterial::generateCode()
 {
   std::vector<NodeMaterialBlockPtr> alreadyDumped;
   std::vector<NodeMaterialBlockPtr> vertexBlocks;
-  std::vector<std::string> uniqueNames = {"const", "var", "let"};
+  std::vector<std::string> uniqueNames;
   // Gets active blocks
   for (const auto& outputNode : _vertexOutputNodes) {
     _gatherBlocks(outputNode, vertexBlocks);
@@ -1453,7 +1428,7 @@ void NodeMaterial::loadFromSerialization(const json& /*source*/, const std::stri
 {
 }
 
-MaterialPtr NodeMaterial::clone(const std::string& /*name*/, bool /*shareEffect*/) const
+MaterialPtr NodeMaterial::clone(const std::string& /*name*/, bool /*cloneChildren*/) const
 {
   return nullptr;
 }

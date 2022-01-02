@@ -19,11 +19,10 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
                                const UtilityLayerRendererPtr& iGizmoLayer, ScaleGizmo* parent,
                                float thickness)
     : Gizmo{iGizmoLayer}
-    , dragBehavior{std::make_shared<PointerDragBehavior>()}
+    , dragBehavior{std::make_unique<PointerDragBehavior>()}
     , snapDistance{0.f}
     , uniformScaling{false}
     , sensitivity{1.f}
-    , dragScale{1.f}
     , isEnabled{this, &AxisScaleGizmo::get_isEnabled, &AxisScaleGizmo::set_isEnabled}
     , _pointerObserver{nullptr}
     , _isEnabled{true}
@@ -73,7 +72,6 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
 
     _arrowMesh->position().z += dragStrength / 3.5f;
     _arrowTail->scaling().y += dragStrength;
-    dragScale                = _arrowTail->scaling().y;
     _arrowTail->position().z = _arrowMesh->position().z / 2.f;
   };
 
@@ -81,20 +79,18 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
     _arrowMesh->position().set(_nodePosition.x, _nodePosition.y, _nodePosition.z);
     _arrowTail->position().set(_linePosition.x, _linePosition.y, _linePosition.z);
     _arrowTail->scaling().set(_lineScale.x, _lineScale.y, _lineScale.z);
-    dragScale = _arrowTail->scaling().y;
     _dragging = false;
   };
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
   options.dragAxis           = dragAxis;
-  dragBehavior               = std::make_shared<PointerDragBehavior>(options);
+  dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
   // _rootMesh->addBehavior(dragBehavior);
 
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
     if (attachedNode()) {
-      _handlePivot();
       // Drag strength is modified by the scale of the gizmo (eg. for small objects like boombox the
       // strength will be increased to match the behavior of larger objects)
       const auto dragStrength
@@ -104,7 +100,15 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       auto snapped   = false;
       auto dragSteps = 0;
       if (uniformScaling) {
-        _tmpVector.setAll(0.57735f); // 1 / sqrt(3)
+        std::optional<Vector3> iScale       = _tmpVector;
+        std::optional<Quaternion> iRotation = std::nullopt;
+        std::optional<Vector3> iTranslation = std::nullopt;
+        attachedNode()->getWorldMatrix().decompose(iScale, iRotation, iTranslation);
+        _tmpVector = *iScale;
+        _tmpVector.normalize();
+        if (_tmpVector.y < 0.f) {
+          _tmpVector.scaleInPlace(-1.f);
+        }
       }
       else {
         _tmpVector.copyFrom(dragAxis);
@@ -166,13 +170,12 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
-  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(_gizmoMesh.get()), _cache);
   }
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
-    [&](PointerInfo* pointerInfo, EventState& /*es*/) -> void {
+    [&](PointerInfo* pointerInfo, EventState& /*es*/) {
       if (_customMeshSet) {
         return;
       }
@@ -181,16 +184,16 @@ AxisScaleGizmo::AxisScaleGizmo(const Vector3& dragAxis, const Color3& color,
       auto it = std::find(_rootMesh->getChildMeshes().begin(), _rootMesh->getChildMeshes().end(),
                           pickedMesh);
 
-      _isHovered          = (it != _rootMesh->getChildMeshes().end());
-      const auto material = dragBehavior && dragBehavior->enabled ?
-                              (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
-                              _disableMaterial;
-      _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
+      _isHovered    = (it != _rootMesh->getChildMeshes().end());
+      auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+      for (auto& m : _cache.gizmoMeshes) {
+        m->material    = material;
+        auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
+        if (linesMesh) {
+          linesMesh->color = material->diffuseColor;
+        }
+      }
     });
-
-  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
-    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _coloredMaterial : _disableMaterial);
-  });
 
   const auto& light = gizmoLayer->_getSharedGizmoLight();
   light->includedOnlyMeshes

@@ -217,8 +217,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget, const IAnimatabl
 {
   // Set value
   _currentActiveTarget = destination;
-
-  _weight = iWeight;
+  _weight              = iWeight;
 
   if (targetIndex >= _originalValue.size()) {
     _originalValue.resize(targetIndex + 1);

@@ -12,7 +12,6 @@ namespace BABYLON {
 
 class Plane;
 class Quaternion;
-class TransformNode;
 class Vector3;
 class Vector4;
 class Viewport;
@@ -296,14 +295,6 @@ public:
    * equal
    */
   [[nodiscard]] bool equals(const Matrix& value) const;
-
-  /**
-   * @brief Decomposes the current Matrix into a translation, rotation and scaling components of the
-   * provided node.
-   * @param node the node to decompose the matrix to
-   * @returns true if operation was successful
-   */
-  bool decomposeToTransformNode(TransformNode& node) const;
 
   /**
    * @brief Decomposes the current Matrix into a translation, rotation and
@@ -792,57 +783,14 @@ public:
                             Matrix& result);
 
   /**
-   * @brief Gets a new rotation matrix used to rotate an entity so as it looks in the direction
-   * specified by forward from the eye position, the up direction being oriented like "up". This
-   * function works in left handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @returns the new matrix
-   */
-  static Matrix LookDirectionLH(const Vector3& forward, const Vector3& up);
-
-  /**
-   * @brief Sets the given "result" Matrix to a rotation matrix used to rotate an entity so that it
-   * looks in the direction of forward, the up direction being oriented like "up". This function
-   * works in left handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @param result defines the target matrix
-   */
-  static void LookDirectionLHToRef(const Vector3& forward, const Vector3& up, Matrix& result);
-
-  /**
-   * @brief Gets a new rotation matrix used to rotate an entity so as it looks in the direction
-   * specified by forward from the eye position, the up Vector3 being oriented like "up". This
-   * function works in right handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @returns the new matrix
-   */
-  static Matrix LookDirectionRH(const Vector3& forward, const Vector3& up);
-
-  /**
-   * @brief Sets the given "result" Matrix to a rotation matrix used to rotate an entity so that it
-   * looks in the direction of forward, the up vector3 being oriented like "up". This function works
-   * in right handed mode
-   * @param forward defines the forward direction - Must be normalized and orthogonal to up.
-   * @param up defines the up vector for the entity - Must be normalized and orthogonal to forward.
-   * @param result defines the target matrix
-   */
-  static void LookDirectionRHToRef(const Vector3& forward, const Vector3& up, Matrix& result);
-
-  /**
    * @brief Create a left-handed orthographic projection matrix.
    * @param width defines the viewport width
    * @param height defines the viewport height
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
    * @returns a new matrix as a left-handed orthographic projection matrix
    */
-  static Matrix OrthoLH(float width, float height, float znear, float zfar,
-                        bool halfZRange = false);
+  static Matrix OrthoLH(float width, float height, float znear, float zfar);
 
   /**
    * @brief Store a left-handed orthographic projection to a given matrix.
@@ -851,11 +799,8 @@ public:
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
    */
-  static void OrthoLHToRef(float width, float height, float znear, float zfar, Matrix& result,
-                           bool halfZRange = false);
+  static void OrthoLHToRef(float width, float height, float znear, float zfar, Matrix& result);
 
   /**
    * @brief Create a left-handed orthographic projection matrix.
@@ -865,12 +810,10 @@ public:
    * @param top defines the viewport top coordinate
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
    * @returns a new matrix as a left-handed orthographic projection matrix
    */
   static Matrix OrthoOffCenterLH(float left, float right, float bottom, float top, float znear,
-                                 float zfar, bool halfZRange = false);
+                                 float zfar);
 
   /**
    * @brief Stores a left-handed orthographic projection into a given matrix.
@@ -881,11 +824,9 @@ public:
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
    */
   static void OrthoOffCenterLHToRef(float left, float right, float bottom, float top, float znear,
-                                    float zfar, Matrix& result, bool halfZRange = false);
+                                    float zfar, Matrix& result);
 
   /**
    * @brief Creates a right-handed orthographic projection matrix.
@@ -895,12 +836,10 @@ public:
    * @param top defines the viewport top coordinate
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
    * @returns a new matrix as a right-handed orthographic projection matrix
    */
   static Matrix OrthoOffCenterRH(float left, float right, float bottom, float top, float znear,
-                                 float zfar, bool halfZRange = false);
+                                 float zfar);
 
   /**
    * @brief Stores a right-handed orthographic projection into a given matrix.
@@ -911,11 +850,9 @@ public:
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
    */
   static void OrthoOffCenterRHToRef(float left, float right, float bottom, float top, float znear,
-                                    float zfar, Matrix& result, bool halfZRange = false);
+                                    float zfar, Matrix& result);
 
   /**
    * @brief Creates a left-handed perspective projection matrix.
@@ -923,14 +860,9 @@ public:
    * @param height defines the viewport height
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
    * @returns a new matrix as a left-handed perspective projection matrix
    */
-  static Matrix PerspectiveLH(float width, float height, float znear, float zfar,
-                              bool halfZRange = false, float projectionPlaneTilt = 0.f);
+  static Matrix PerspectiveLH(float width, float height, float znear, float zfar);
 
   /**
    * @brief Creates a left-handed perspective projection matrix.
@@ -938,14 +870,9 @@ public:
    * @param aspect defines the aspect ratio
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
    * @returns a new matrix as a left-handed perspective projection matrix
    */
-  static Matrix PerspectiveFovLH(float fov, float aspect, float znear, float zfar,
-                                 bool halfZRange = false, float projectionPlaneTilt = 0.f);
+  static Matrix PerspectiveFovLH(float fov, float aspect, float znear, float zfar);
 
   /**
    * @brief Stores a left-handed perspective projection into a given matrix.
@@ -955,14 +882,9 @@ public:
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
    * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
    */
   static void PerspectiveFovLHToRef(float fov, float aspect, float znear, float zfar,
-                                    Matrix& result, bool isVerticalFovFixed = true,
-                                    bool halfZRange = false, float projectionPlaneTilt = 0.f);
+                                    Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Stores a left-handed perspective projection into a given matrix with depth reversed.
@@ -972,15 +894,9 @@ public:
    * @param zfar not used as infinity is used as far clip
    * @param result defines the target matrix
    * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
    */
   static void PerspectiveFovReverseLHToRef(float fov, float aspect, float znear, float zfar,
-                                           Matrix& result, bool isVerticalFovFixed = true,
-                                           bool halfZRange           = false,
-                                           float projectionPlaneTilt = 0.f);
+                                           Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Creates a right-handed perspective projection matrix.
@@ -988,14 +904,9 @@ public:
    * @param aspect defines the aspect ratio
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
    * @returns a new matrix as a right-handed perspective projection matrix
    */
-  static Matrix PerspectiveFovRH(float fov, float aspect, float znear, float zfar,
-                                 bool halfZRange = false, float projectionPlaneTilt = 0.f);
+  static Matrix PerspectiveFovRH(float fov, float aspect, float znear, float zfar);
 
   /**
    * @brief Stores a right-handed perspective projection into a given matrix.
@@ -1004,15 +915,11 @@ public:
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
-   * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
+   * @param isVerticalFovFixed defines it the fov is vertically fixed (default)
+   * or horizontally
    */
   static void PerspectiveFovRHToRef(float fov, float aspect, float znear, float zfar,
-                                    Matrix& result, bool isVerticalFovFixed = true,
-                                    bool halfZRange = false, float projectionPlaneTilt = 0.f);
+                                    Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Stores a right-handed perspective projection into a given matrix.
@@ -1022,15 +929,9 @@ public:
    * @param zfar not used as infinity is used as far clip
    * @param result defines the target matrix
    * @param isVerticalFovFixed defines it the fov is vertically fixed (default) or horizontally
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
    */
   static void PerspectiveFovReverseRHToRef(float fov, float aspect, float znear, float zfar,
-                                           Matrix& result, bool isVerticalFovFixed = true,
-                                           bool halfZRange           = false,
-                                           float projectionPlaneTilt = 0.f);
+                                           Matrix& result, bool isVerticalFovFixed = true);
 
   /**
    * @brief Stores a perspective projection for WebVR info a given matrix.
@@ -1038,15 +939,11 @@ public:
    * @param znear defines the near clip plane
    * @param zfar defines the far clip plane
    * @param result defines the target matrix
-   * @param rightHanded defines if the matrix must be in right-handed mode (false by default)
-   * @param halfZRange true to generate NDC coordinates between 0 and 1 instead of -1 and 1
-   * (default: false)
-   * @param projectionPlaneTilt optional tilt angle of the projection plane around the X axis
-   * (horizontal)
+   * @param rightHanded defines if the matrix must be in right-handed mode
+   * (false by default)
    */
   static void PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar, Matrix& result,
-                                       bool rightHanded = false, bool halfZRange = false,
-                                       float projectionPlaneTilt = 0.f);
+                                       bool rightHanded = true);
 
   /**
    * @brief Computes a complete transformation matrix.
@@ -1127,6 +1024,7 @@ public:
   static void FromQuaternionToRef(const Quaternion& quat, Matrix& result);
 
 private:
+  /** @hidden */
   void _updateIdentityStatus(bool isIdentity, bool isIdentityDirty = false,
                              bool isIdentity3x2 = false, bool isIdentity3x2Dirty = true);
 

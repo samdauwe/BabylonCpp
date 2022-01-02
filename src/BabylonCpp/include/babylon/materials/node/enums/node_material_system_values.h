@@ -26,9 +26,7 @@ enum class BABYLON_SHARED_EXPORT NodeMaterialSystemValues : unsigned int {
   /** Fog Color */
   FogColor = 8,
   /** Delta time */
-  DeltaTime = 9,
-  /** Camera parameters */
-  CameraParameters = 10,
+  DeltaTime = 9
 }; // end of enum class NodeMaterialSystemValues
 
 } // end of namespace BABYLON

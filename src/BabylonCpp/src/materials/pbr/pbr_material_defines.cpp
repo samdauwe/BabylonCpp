@@ -13,16 +13,8 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"MAINUV1", false}, //
     {"MAINUV2", false}, //
-    {"MAINUV3", false}, //
-    {"MAINUV4", false}, //
-    {"MAINUV5", false}, //
-    {"MAINUV6", false}, //
     {"UV1", false},     //
     {"UV2", false},     //
-    {"UV3", false},     //
-    {"UV4", false},     //
-    {"UV5", false},     //
-    {"UV6", false},     //
 
     {"ALBEDO", false},      //
     {"GAMMAALBEDO", false}, //
@@ -46,28 +38,23 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"LINEARALPHAFRESNEL", false}, //
     {"PREMULTIPLYALPHA", false},   //
 
-    {"EMISSIVE", false},      //
-    {"GAMMAEMISSIVE", false}, //
+    {"EMISSIVE", false}, //
 
-    {"REFLECTIVITY", false},       //
-    {"REFLECTIVITY_GAMMA", false}, //
-    {"SPECULARTERM", false},       //
+    {"REFLECTIVITY", false}, //
+    {"SPECULARTERM", false}, //
 
     {"MICROSURFACEFROMREFLECTIVITYMAP", false}, //
     {"MICROSURFACEAUTOMATIC", false},           //
     {"LODBASEDMICROSFURACE", false},            //
     {"MICROSURFACEMAP", false},                 //
 
-    {"METALLICWORKFLOW", false},                    //
-    {"ROUGHNESSSTOREINMETALMAPALPHA", false},       //
-    {"ROUGHNESSSTOREINMETALMAPGREEN", false},       //
-    {"METALLNESSSTOREINMETALMAPBLUE", false},       //
-    {"AOSTOREINMETALMAPRED", false},                //
-    {"METALLIC_REFLECTANCE", false},                //
-    {"METALLIC_REFLECTANCE_GAMMA", false},          //
-    {"METALLIC_REFLECTANCE_USE_ALPHA_ONLY", false}, //
-    {"REFLECTANCE", false},                         //
-    {"REFLECTANCE_GAMMA", false},                   //
+    {"METALLICWORKFLOW", false},              //
+    {"ROUGHNESSSTOREINMETALMAPALPHA", false}, //
+    {"ROUGHNESSSTOREINMETALMAPGREEN", false}, //
+    {"METALLNESSSTOREINMETALMAPBLUE", false}, //
+    {"AOSTOREINMETALMAPRED", false},          //
+
+    {"METALLIC_REFLECTANCE", false}, //
 
     {"ENVIRONMENTBRDF", false},      //
     {"ENVIRONMENTBRDF_RGBD", false}, //
@@ -116,8 +103,7 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"PREPASS", false},              //
     {"PREPASS_IRRADIANCE", false},   //
     {"PREPASS_ALBEDO", false},       //
-    {"PREPASS_DEPTH", false},        //
-    {"PREPASS_NORMAL", false},       //
+    {"PREPASS_DEPTHNORMAL", false},  //
     {"PREPASS_POSITION", false},     //
     {"PREPASS_VELOCITY", false},     //
     {"PREPASS_REFLECTIVITY", false}, //
@@ -131,7 +117,6 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"MORPHTARGETS_NORMAL", false},  //
     {"MORPHTARGETS_TANGENT", false}, //
     {"MORPHTARGETS_UV", false},      //
-    {"MORPHTARGETS_TEXTURE", false}, //
 
     {"IMAGEPROCESSING", false},            //
     {"VIGNETTE", false},                   //
@@ -177,7 +162,6 @@ PBRMaterialDefines::PBRMaterialDefines()
     {"CLEARCOAT_REMAP_F0", true},                        //
     {"CLEARCOAT_TINT", false},                           //
     {"CLEARCOAT_TINT_TEXTURE", false},                   //
-    {"CLEARCOAT_TINT_GAMMATEXTURE", false},              //
 
     {"ANISOTROPIC", false},         //
     {"ANISOTROPIC_TEXTURE", false}, //
@@ -188,7 +172,6 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"SHEEN", false},                                //
     {"SHEEN_TEXTURE", false},                        //
-    {"SHEEN_GAMMATEXTURE", false},                   //
     {"SHEEN_TEXTURE_ROUGHNESS", false},              //
     {"SHEEN_LINKWITHALBEDO", false},                 //
     {"SHEEN_ROUGHNESS", false},                      //
@@ -198,72 +181,59 @@ PBRMaterialDefines::PBRMaterialDefines()
 
     {"SUBSURFACE", false}, //
 
-    {"SS_REFRACTION", false},                              //
-    {"SS_REFRACTION_USE_INTENSITY_FROM_TEXTURE", false},   //
-    {"SS_TRANSLUCENCY", false},                            //
-    {"SS_TRANSLUCENCY_USE_INTENSITY_FROM_TEXTURE", false}, //
-    {"SS_SCATTERING", false},                              //
+    {"SS_REFRACTION", false},   //
+    {"SS_TRANSLUCENCY", false}, //
+    {"SS_SCATTERING", false},   //
 
-    {"SS_THICKNESSANDMASK_TEXTURE", false},      //
-    {"SS_HAS_THICKNESS", false},                 //
-    {"SS_REFRACTIONINTENSITY_TEXTURE", false},   //
-    {"SS_TRANSLUCENCYINTENSITY_TEXTURE", false}, //
+    {"SS_THICKNESSANDMASK_TEXTURE", false}, //
 
-    {"SS_REFRACTIONMAP_3D", false},              //
-    {"SS_REFRACTIONMAP_OPPOSITEZ", false},       //
-    {"SS_LODINREFRACTIONALPHA", false},          //
-    {"SS_GAMMAREFRACTION", false},               //
-    {"SS_RGBDREFRACTION", false},                //
-    {"SS_LINEARSPECULARREFRACTION", false},      //
-    {"SS_LINKREFRACTIONTOTRANSPARENCY", false},  //
-    {"SS_ALBEDOFORREFRACTIONTINT", false},       //
-    {"SS_ALBEDOFORTRANSLUCENCYTINT", false},     //
-    {"SS_USE_LOCAL_REFRACTIONMAP_CUBIC", false}, //
-    {"SS_USE_THICKNESS_AS_DEPTH", false},        //
+    {"SS_REFRACTIONMAP_3D", false},             //
+    {"SS_REFRACTIONMAP_OPPOSITEZ", false},      //
+    {"SS_LODINREFRACTIONALPHA", false},         //
+    {"SS_GAMMAREFRACTION", false},              //
+    {"SS_RGBDREFRACTION", false},               //
+    {"SS_LINEARSPECULARREFRACTION", false},     //
+    {"SS_LINKREFRACTIONTOTRANSPARENCY", false}, //
+    {"SS_ALBEDOFORREFRACTIONTINT", false},      //
 
-    {"SS_MASK_FROM_THICKNESS_TEXTURE", false}, //
-    {"SS_USE_GLTF_TEXTURES", false},           //
+    {"SS_MASK_FROM_THICKNESS_TEXTURE", false},      //
+    {"SS_MASK_FROM_THICKNESS_TEXTURE_GLTF", false}, //
 
     {"UNLIT", false}, //
   };
 
   intDef = {
-    {"NUM_SAMPLES", 0},                              //
-    {"AMBIENTDIRECTUV", 0},                          //
-    {"ALBEDODIRECTUV", 0},                           //
-    {"DETAILDIRECTUV", 0},                           //
-    {"DETAIL_NORMALBLENDMETHOD", 0},                 //
-    {"OPACITYDIRECTUV", 0},                          //
-    {"EMISSIVEDIRECTUV", 0},                         //
-    {"GAMMAEMISSIVE", 0},                            //
-    {"REFLECTIVITYDIRECTUV", 0},                     //
-    {"MICROSURFACEMAPDIRECTUV", 0},                  //
-    {"METALLIC_REFLECTANCEDIRECTUV", 0},             //
-    {"REFLECTANCEDIRECTUV", 0},                      //
-    {"BUMPDIRECTUV", 0},                             //
-    {"LIGHTMAPDIRECTUV", 0},                         //
-    {"NUM_BONE_INFLUENCERS", 0},                     //
-    {"BonesPerMesh", 0},                             //
-    {"PREPASS_IRRADIANCE_INDEX", -1},                //
-    {"PREPASS_ALBEDO_INDEX", -1},                    //
-    {"PREPASS_DEPTH_INDEX", -1},                     //
-    {"PREPASS_NORMAL_INDEX", -1},                    //
-    {"PREPASS_POSITION_INDEX", -1},                  //
-    {"PREPASS_VELOCITY_INDEX", -1},                  //
-    {"PREPASS_REFLECTIVITY_INDEX", -1},              //
-    {"SCENE_MRT_COUNT", 0},                          //
-    {"NUM_MORPH_INFLUENCERS", 0},                    //
-    {"CLEARCOAT_TEXTUREDIRECTUV", 0},                //
-    {"CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV", 0},      //
-    {"CLEARCOAT_BUMPDIRECTUV", 0},                   //
-    {"CLEARCOAT_TINT_TEXTUREDIRECTUV", 0},           //
-    {"ANISOTROPIC_TEXTUREDIRECTUV", 0},              //
-    {"SHEEN_TEXTUREDIRECTUV", 0},                    //
-    {"SHEEN_TEXTURE_ROUGHNESSDIRECTUV", 0},          //
-    {"SS_THICKNESSANDMASK_TEXTUREDIRECTUV", 0},      //
-    {"SS_REFRACTIONINTENSITY_TEXTUREDIRECTUV", 0},   //
-    {"SS_TRANSLUCENCYINTENSITY_TEXTUREDIRECTUV", 0}, //
-    {"DEBUGMODE", 0},                                //
+    {"NUM_SAMPLES", 0},                         //
+    {"AMBIENTDIRECTUV", 0},                     //
+    {"ALBEDODIRECTUV", 0},                      //
+    {"DETAILDIRECTUV", 0},                      //
+    {"DETAIL_NORMALBLENDMETHOD", 0},            //
+    {"OPACITYDIRECTUV", 0},                     //
+    {"EMISSIVEDIRECTUV", 0},                    //
+    {"REFLECTIVITYDIRECTUV", 0},                //
+    {"MICROSURFACEMAPDIRECTUV", 0},             //
+    {"METALLIC_REFLECTANCEDIRECTUV", 0},        //
+    {"BUMPDIRECTUV", 0},                        //
+    {"LIGHTMAPDIRECTUV", 0},                    //
+    {"NUM_BONE_INFLUENCERS", 0},                //
+    {"BonesPerMesh", 0},                        //
+    {"PREPASS_IRRADIANCE_INDEX", -1},           //
+    {"PREPASS_ALBEDO_INDEX", -1},               //
+    {"PREPASS_DEPTHNORMAL_INDEX", -1},          //
+    {"PREPASS_POSITION_INDEX", -1},             //
+    {"PREPASS_VELOCITY_INDEX", -1},             //
+    {"PREPASS_REFLECTIVITY_INDEX", -1},         //
+    {"SCENE_MRT_COUNT", 0},                     //
+    {"NUM_MORPH_INFLUENCERS", 0},               //
+    {"CLEARCOAT_TEXTUREDIRECTUV", 0},           //
+    {"CLEARCOAT_TEXTURE_ROUGHNESSDIRECTUV", 0}, //
+    {"CLEARCOAT_BUMPDIRECTUV", 0},              //
+    {"CLEARCOAT_TINT_TEXTUREDIRECTUV", 0},      //
+    {"ANISOTROPIC_TEXTUREDIRECTUV", 0},         //
+    {"SHEEN_TEXTUREDIRECTUV", 0},               //
+    {"SHEEN_TEXTURE_ROUGHNESSDIRECTUV", 0},     //
+    {"SS_THICKNESSANDMASK_TEXTUREDIRECTUV", 0}, //
+    {"DEBUGMODE", 0},                           //
   };
 
   stringDef = {
@@ -277,10 +247,10 @@ void PBRMaterialDefines::reset()
 {
   MaterialDefines::reset();
 
-  stringDef["ALPHATESTVALUE"] = "0.5";
-
   boolDef["PBR"]           = true;
   boolDef["NORMALXYSCALE"] = true;
+
+  stringDef["ALPHATESTVALUE"] = "0.5";
 }
 
 std::string PBRMaterialDefines::toString() const

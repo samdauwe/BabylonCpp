@@ -113,13 +113,12 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
   PointerDragBehaviorOptions options;
   options.dragAxis = dragAxis;
   // options.pointerObservableScene = gizmoLayer->originalScene;
-  dragBehavior               = std::make_shared<PointerDragBehavior>(options);
+  dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
   // _rootMesh->addBehavior(dragBehavior.get());
 
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event, EventState& /*es*/) {
     if (attachedNode()) {
-      _handlePivot();
       // Keep world translation and use it to update world transform
       // if the node has parent, the local transform properties (position, rotation, scale)
       // will be recomputed in _matrixChanged function
@@ -178,7 +177,6 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
   _cache.hoverMaterial   = _hoverMaterial;
   _cache.disableMaterial = _disableMaterial;
   _cache.active          = false;
-  _cache.dragBehavior    = dragBehavior;
   if (_parent) {
     _parent->addToAxisCache(static_cast<Mesh*>(collider.get()), _cache);
   }
@@ -193,16 +191,16 @@ AxisDragGizmo::AxisDragGizmo(const Vector3& dragAxis, const Color3& color,
       _isHovered      = stl_util::contains(_cache.colliderMeshes, pickedMesh);
 
       if (!_parent) {
-        const auto material = dragBehavior && dragBehavior->enabled ?
-                                (_isHovered || _dragging ? _hoverMaterial : _coloredMaterial) :
-                                _disableMaterial;
-        _setGizmoMeshMaterial(_cache.gizmoMeshes, material);
+        auto material = _isHovered || _dragging ? _hoverMaterial : _coloredMaterial;
+        for (const auto& m : _cache.gizmoMeshes) {
+          m->material          = material;
+          const auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
+          if (linesMesh) {
+            linesMesh->color = material->diffuseColor;
+          }
+        }
       }
     });
-
-  dragBehavior->onEnabledObservable.add([this](bool* newState, EventState& /*es*/) -> void {
-    _setGizmoMeshMaterial(_cache.gizmoMeshes, *newState ? _cache.material : _cache.disableMaterial);
-  });
 }
 
 AxisDragGizmo::~AxisDragGizmo() = default;

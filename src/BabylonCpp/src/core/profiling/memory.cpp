@@ -3,7 +3,8 @@
 #if defined(_WIN32)
 #include <Windows.h>
 #include <psapi.h>
-#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+#elif defined(__linux__) || defined(__linux) || defined(linux)                 \
+  || defined(__gnu_linux__)
 #include <stdio.h>
 #include <sys/param.h>
 #include <sys/resource.h>
@@ -13,7 +14,7 @@
 namespace BABYLON {
 
 /**
- * @brief Returns the size of physical memory (RAM) in bytes.
+ * Returns the size of physical memory (RAM) in bytes.
  */
 size_t Memory::GetMemorySize()
 {
@@ -33,7 +34,8 @@ size_t Memory::GetMemorySize()
   return (size_t)status.ullTotalPhys;
 #elif defined(_SC_PHYS_PAGES) && defined(_SC_PAGESIZE)
   /** FreeBSD, Linux, OpenBSD, and Solaris. **/
-  return static_cast<size_t>(sysconf(_SC_PHYS_PAGES)) * static_cast<size_t>(sysconf(_SC_PAGESIZE));
+  return static_cast<size_t>(sysconf(_SC_PHYS_PAGES))
+         * static_cast<size_t>(sysconf(_SC_PAGESIZE));
 #else
   /** Unknown OS **/
   return 0L;
@@ -41,8 +43,9 @@ size_t Memory::GetMemorySize()
 }
 
 /**
- * @brief Returns the peak (maximum so far) resident set size (physical memory use) measured in
- * bytes, or zero if the value cannot be determined on this OS.
+ * Returns the peak (maximum so far) resident set size (physical
+ * memory use) measured in bytes, or zero if the value cannot be
+ * determined on this OS.
  */
 size_t Memory::GetPeakRSS()
 {
@@ -51,7 +54,8 @@ size_t Memory::GetPeakRSS()
   PROCESS_MEMORY_COUNTERS info;
   GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
   return (size_t)info.PeakWorkingSetSize;
-#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+#elif defined(__linux__) || defined(__linux) || defined(linux)                 \
+  || defined(__gnu_linux__)
   /** BSD, Linux, and OSX **/
   struct rusage rusage;
   getrusage(RUSAGE_SELF, &rusage);
@@ -63,8 +67,8 @@ size_t Memory::GetPeakRSS()
 }
 
 /**
- * @brief Returns the current resident set size (physical memory use) measured in bytes, or zero if
- * the value cannot be determined on this OS.
+ * Returns the current resident set size (physical memory use) measured
+ * in bytes, or zero if the value cannot be determined on this OS.
  * http://nadeausoftware.com/articles/c_c
  */
 size_t Memory::GetCurrentRSS()
@@ -74,7 +78,8 @@ size_t Memory::GetCurrentRSS()
   PROCESS_MEMORY_COUNTERS info;
   GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
   return (size_t)info.WorkingSetSize;
-#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+#elif defined(__linux__) || defined(__linux) || defined(linux)                 \
+  || defined(__gnu_linux__)
   /** Linux **/
   long rss = 0L;
   FILE* fp = NULL;

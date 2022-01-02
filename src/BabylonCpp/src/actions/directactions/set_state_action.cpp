@@ -6,7 +6,8 @@
 
 namespace BABYLON {
 
-SetStateAction::SetStateAction(unsigned int iTtriggerOptions, const IAnimatablePtr& target,
+SetStateAction::SetStateAction(unsigned int iTtriggerOptions,
+                               const IAnimatablePtr& target,
                                const std::string& iValue, Condition* condition)
     : Action(iTtriggerOptions, condition), value{iValue}, _target{target}
 {
@@ -14,7 +15,7 @@ SetStateAction::SetStateAction(unsigned int iTtriggerOptions, const IAnimatableP
 
 SetStateAction::~SetStateAction() = default;
 
-void SetStateAction::execute(const IActionEventPtr& /*evt*/)
+void SetStateAction::execute(const std::optional<IActionEvent>& /*evt*/)
 {
   _target->state = value;
 }

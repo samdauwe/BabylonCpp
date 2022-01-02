@@ -3,35 +3,26 @@
 
 #include <functional>
 #include <memory>
-#include <optional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/materials/effect_fallbacks.h>
 
 namespace BABYLON {
 
+class Effect;
 struct MaterialDefines;
-FWD_CLASS_SPTR(Effect)
+using EffectPtr = std::shared_ptr<Effect>;
 
 /**
  * @brief Options to be used when creating an effect.
  */
 struct BABYLON_SHARED_EXPORT IEffectCreationOptions {
   /**
-   * Name of the effect
-   */
-  std::string name{};
-  /**
-   * Key identifying uniquely compiled shader variants
-   */
-  std::string key{};
-  /**
-   * Attributes that will be used in the shader.
+   * Atrributes that will be used in the shader.
    */
   std::vector<std::string> attributes{};
   /**
-   * Uniform variable names that will be set in the shader.
+   * Uniform varible names that will be set in the shader.
    */
   std::vector<std::string> uniformsNames{};
   /**

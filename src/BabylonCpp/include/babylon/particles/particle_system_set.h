@@ -3,13 +3,10 @@
 
 #include <map>
 #include <nlohmann/json_fwd.hpp>
-#include <optional>
-#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_fwd.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/maths/vector3.h>
 #include <babylon/particles/particle_system_set_emitter_creation_options.h>
 
 using json = nlohmann::json;
@@ -19,6 +16,7 @@ namespace BABYLON {
 class IParticleSystem;
 class Scene;
 FWD_CLASS_SPTR(AbstractMesh)
+FWD_CLASS_SPTR(TransformNode)
 
 /**
  * @brief Represents a set of particle systems working together to create a specific effect.
@@ -26,8 +24,6 @@ FWD_CLASS_SPTR(AbstractMesh)
 class BABYLON_SHARED_EXPORT ParticleSystemSet : public IDisposable {
 
 public:
-  using EmitterNodeType = std::optional<std::variant<AbstractMeshPtr, Vector3>>;
-
   /**
    * Gets or sets base Assets URL
    */
@@ -69,24 +65,15 @@ public:
    * @param data defines a JSON compatible representation of the set
    * @param scene defines the hosting scene
    * @param gpu defines if we want GPU particles or CPU particles
-   * @param capacity defines the system capacity (if null or undefined the sotred capacity will be
-   * used)
    * @returns a new ParticleSystemSet
    */
-  static std::unique_ptr<ParticleSystemSet> Parse(const json& data, Scene* scene, bool gpu = false,
-                                                  const std::optional<size_t>& capacity
-                                                  = std::nullopt);
+  static std::unique_ptr<ParticleSystemSet> Parse(const json& data, Scene* scene, bool gpu = false);
 
 protected:
   /**
    * @brief Gets the emitter node used with this set.
    */
-  EmitterNodeType& get_emitterNode();
-
-  /**
-   * @brief Sets the emitter node used with this set.
-   */
-  void set_emitterNode(const EmitterNodeType& value);
+  TransformNodePtr& get_emitterNode();
 
 public:
   /**
@@ -97,12 +84,11 @@ public:
   /**
    * Gets the emitter node used with this set.
    */
-  Property<ParticleSystemSet, EmitterNodeType> emitterNode;
+  ReadOnlyProperty<ParticleSystemSet, TransformNodePtr> emitterNode;
 
 private:
   ParticleSystemSetEmitterCreationOptions _emitterCreationOptions;
-  EmitterNodeType _emitterNode;
-  bool _emitterNodeIsOwned;
+  TransformNodePtr _emitterNode;
 
 }; // end of class ParticleSystemSetEmitterCreationOptions
 

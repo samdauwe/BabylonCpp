@@ -5,19 +5,19 @@
 #include <optional>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 #include <babylon/engines/iscene_component.h>
 #include <babylon/engines/scene_component_constants.h>
-#include <babylon/events/device_input_events.h>
 
 namespace BABYLON {
 
+class Camera;
 class ICanvas;
 class PickingInfo;
 struct PointerEvent;
 class Sprite;
-FWD_CLASS_SPTR(Camera)
-FWD_CLASS_SPTR(SpriteSceneComponent)
+class SpriteSceneComponent;
+using CameraPtr               = std::shared_ptr<Camera>;
+using SpriteSceneComponentPtr = std::shared_ptr<SpriteSceneComponent>;
 
 /**
  * @brief Defines the sprite scene component responsible to manage sprites in a given scene.
@@ -70,10 +70,10 @@ private:
                                           ICanvas* element);
   std::optional<PickingInfo> _pointerDown(int unTranslatedPointerX, int unTranslatedPointerY,
                                           std::optional<PickingInfo> pickResult,
-                                          const IPointerEvent& evt);
+                                          const PointerEvent& evt);
   std::optional<PickingInfo> _pointerUp(int unTranslatedPointerX, int unTranslatedPointerY,
                                         std::optional<PickingInfo> pickResult,
-                                        const IPointerEvent& evt);
+                                        const PointerEvent& evt);
 
 private:
   /** Hidden */

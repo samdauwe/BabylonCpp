@@ -25,7 +25,7 @@ private:
 
 public:
   /**
-   * @brief Gets a default environment BRDF for MS-BRDF Height Correlated BRDF.
+   * @brief Gets a default environment BRDF for MS-BRDF Height Correlated BRDF
    * @param scene defines the hosting scene
    * @returns the environment BRDF texture
    */

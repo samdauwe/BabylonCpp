@@ -23,7 +23,7 @@ public:
   void augment(float x, float y, float z);
   void clampMin(float x, float y, float z);
   void clampMax(float x, float y, float z);
-  bool empty() const;
+  [[nodiscard]] bool empty() const;
 
 public:
   Vector3 min;

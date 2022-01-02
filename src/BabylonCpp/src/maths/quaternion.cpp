@@ -387,15 +387,6 @@ bool Quaternion::AreClose(const Quaternion& quat0, const Quaternion& quat1)
   return dot >= 0.f;
 }
 
-void Quaternion::SmoothToRef(const Quaternion& source, const Quaternion& goal, float deltaTime,
-                             float lerpTime, Quaternion& result)
-{
-  auto slerp = lerpTime == 0.f ? 1.f : deltaTime / lerpTime;
-  slerp      = Scalar::Clamp(slerp, 0.f, 1.f);
-
-  Quaternion::SlerpToRef(source, goal, slerp, result);
-}
-
 Quaternion Quaternion::Zero()
 {
   return Quaternion(0.f, 0.f, 0.f, 0.f);
@@ -567,36 +558,6 @@ void Quaternion::RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
   Quaternion::FromRotationMatrixToRef(rotMat, ref);
 }
 
-Quaternion Quaternion::FromLookDirectionLH(const Vector3& forward, const Vector3& up)
-{
-  Quaternion quat;
-  Quaternion::FromLookDirectionLHToRef(forward, up, quat);
-  return quat;
-}
-
-void Quaternion::FromLookDirectionLHToRef(const Vector3& forward, const Vector3& up,
-                                          Quaternion& ref)
-{
-  auto& rotMat = MathTmp::MatrixArray[0];
-  Matrix::LookDirectionLHToRef(forward, up, rotMat);
-  Quaternion::FromRotationMatrixToRef(rotMat, ref);
-}
-
-Quaternion Quaternion::FromLookDirectionRH(const Vector3& forward, const Vector3& up)
-{
-  Quaternion quat;
-  Quaternion::FromLookDirectionRHToRef(forward, up, quat);
-  return quat;
-}
-
-void Quaternion::FromLookDirectionRHToRef(const Vector3& forward, const Vector3& up,
-                                          Quaternion& ref)
-{
-  auto& rotMat = MathTmp::MatrixArray[0];
-  Matrix::LookDirectionRHToRef(forward, up, rotMat);
-  return Quaternion::FromRotationMatrixToRef(rotMat, ref);
-}
-
 Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right, float amount)
 {
   Quaternion result = Quaternion::Identity();
@@ -656,33 +617,6 @@ Quaternion Quaternion::Hermite(const Quaternion& value1, const Quaternion& tange
     = (((value1.w * part1) + (value2.w * part2)) + (tangent1.w * part3)) + (tangent2.w * part4);
 
   return Quaternion(x, y, z, w);
-}
-
-Quaternion Quaternion::Hermite1stDerivative(const Quaternion& value1, const Quaternion& tangent1,
-                                            const Quaternion& value2, const Quaternion& tangent2,
-                                            float time)
-{
-  auto result = Quaternion::Zero();
-
-  Hermite1stDerivativeToRef(value1, tangent1, value2, tangent2, time, result);
-
-  return result;
-}
-
-void Quaternion::Hermite1stDerivativeToRef(const Quaternion& value1, const Quaternion& tangent1,
-                                           const Quaternion& value2, const Quaternion& tangent2,
-                                           float time, Quaternion& result)
-{
-  const auto t2 = time * time;
-
-  result.x = (t2 - time) * 6.f * value1.x + (3.f * t2 - 4.f * time + 1.f) * tangent1.x
-             + (-t2 + time) * 6.f * value2.x + (3.f * t2 - 2.f * time) * tangent2.x;
-  result.y = (t2 - time) * 6.f * value1.y + (3.f * t2 - 4.f * time + 1.f) * tangent1.y
-             + (-t2 + time) * 6.f * value2.y + (3.f * t2 - 2.f * time) * tangent2.y;
-  result.z = (t2 - time) * 6.f * value1.z + (3.f * t2 - 4.f * time + 1.f) * tangent1.z
-             + (-t2 + time) * 6.f * value2.z + (3.f * t2 - 2.f * time) * tangent2.z;
-  result.w = (t2 - time) * 6.f * value1.w + (3.f * t2 - 4.f * time + 1.f) * tangent1.w
-             + (-t2 + time) * 6.f * value2.w + (3.f * t2 - 2.f * time) * tangent2.w;
 }
 
 } // end of namespace BABYLON

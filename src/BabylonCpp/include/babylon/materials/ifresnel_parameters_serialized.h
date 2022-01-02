@@ -33,7 +33,7 @@ struct BABYLON_SHARED_EXPORT IFresnelParametersSerialized {
   std::optional<float> power = std::nullopt;
 
   /**
-   * Define if the fresnel effect is enable or not
+   * Define if the fresnel effect is enable or not.
    */
   bool isEnabled;
 }; // end of struct IFresnelParametersSerialized

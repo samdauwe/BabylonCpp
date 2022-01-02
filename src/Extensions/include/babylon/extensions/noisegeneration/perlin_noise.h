@@ -86,12 +86,12 @@ public:
 
   [[nodiscard]] double noise(double x) const
   {
-    return noise(x, 0.0, 0.0);
+    return noise(x, 0, 0);
   }
 
   [[nodiscard]] double noise(double x, double y) const
   {
-    return noise(x, y, 0.0);
+    return noise(x, y, 0);
   }
 
   [[nodiscard]] double noise(double x, double y, double z) const;

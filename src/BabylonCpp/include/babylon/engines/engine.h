@@ -12,16 +12,13 @@ namespace BABYLON {
 class Camera;
 class EffectFallbacks;
 struct IEffectFallbacks;
-struct IPointerEvent;
 class Material;
 class MultiviewExtension;
 class OcclusionQueryExtension;
-class PerfCounter;
 class TransformFeedbackExtension;
 FWD_CLASS_SPTR(AudioEngine)
 FWD_CLASS_SPTR(ILoadingScreen)
 FWD_CLASS_SPTR(IParticleSystem)
-FWD_CLASS_SPTR(IStencilState)
 FWD_CLASS_SPTR(PostProcess)
 FWD_CLASS_SPTR(RenderTargetTexture)
 
@@ -70,13 +67,13 @@ public:
    */
   static constexpr unsigned int ALPHA_SCREENMODE = Constants::ALPHA_SCREENMODE;
 
-  /** Defines that the resource is not delayed */
+  /** Defines that the ressource is not delayed*/
   static constexpr unsigned int DELAYLOADSTATE_NONE = Constants::DELAYLOADSTATE_NONE;
-  /** Defines that the resource was successfully delay loaded */
+  /** Defines that the ressource was successfully delay loaded */
   static constexpr unsigned int DELAYLOADSTATE_LOADED = Constants::DELAYLOADSTATE_LOADED;
-  /** Defines that the resource is currently delay loading */
+  /** Defines that the ressource is currently delay loading */
   static constexpr unsigned int DELAYLOADSTATE_LOADING = Constants::DELAYLOADSTATE_LOADING;
-  /** Defines that the resource is delayed and has not started loading */
+  /** Defines that the ressource is delayed and has not started loading */
   static constexpr unsigned int DELAYLOADSTATE_NOTLOADED = Constants::DELAYLOADSTATE_NOTLOADED;
 
   // Depht or Stencil test Constants::
@@ -200,7 +197,7 @@ public:
   static constexpr unsigned int TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV
     = Constants::TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV;
 
-  /** nearest is mag = nearest and min = nearest and mip = none */
+  /** nearest is mag = nearest and min = nearest and mip = linear */
   static constexpr unsigned int TEXTURE_NEAREST_SAMPLINGMODE
     = Constants::TEXTURE_NEAREST_SAMPLINGMODE;
   /** Bilinear is mag = linear and min = linear and mip = nearest */
@@ -302,7 +299,7 @@ public:
 
   /**
    * @brief Method called to create the default loading screen.
-   * This can be overridden in your own app.
+   * This can be overriden in your own app.
    * @param canvas The rendering canvas element
    * @returns The loading screen
    */
@@ -336,7 +333,7 @@ public:
    * @param useScreen defines if screen size must be used (or the current render target if any)
    * @returns a number defining the aspect ratio
    */
-  float getAspectRatio(const Camera& camera, bool useScreen = false) const;
+  float getAspectRatio(const Camera& camera, bool useScreen = false);
 
   /**
    * @brief Gets current screen aspect ratio.
@@ -346,13 +343,13 @@ public:
 
   /**
    * @brief Gets the client rect of the HTML canvas attached with the current webGL context.
-   * @returns a client rectangle
+   * @returns a client rectanglee
    */
   std::optional<ClientRect> getRenderingCanvasClientRect();
 
   /**
    * @brief Gets the client rect of the HTML element used for events.
-   * @returns a client rectangle
+   * @returns a client rectanglee
    */
   std::optional<ClientRect> getInputElementClientRect();
 
@@ -387,17 +384,14 @@ public:
 
   /**
    * @brief Set various states to the webGL context.
-   * @param culling defines culling state: true to enable culling, false to disable it
+   * @param culling defines backface culling state
    * @param zOffset defines the value to apply to zOffset (0 by default)
    * @param force defines if states must be applied even if cache is up to date
-   * @param reverseSide defines if culling must be reversed (CCW if false, CW if true)
-   * @param cullBackFaces true to cull back faces, false to cull front faces (if culling is enabled)
-   * @param stencil stencil states to set
-   * @param zOffsetUnits defines the value to apply to zOffsetUnits (0 by default)
+   * @param reverseSide defines if culling must be reversed (CCW instead of CW and CW instead of
+   * CCW)
    */
   virtual void setState(bool culling, float zOffset = 0.f, bool force = false,
-                        bool reverseSide = false, bool cullBackFaces = true,
-                        const IStencilStatePtr& stencil = nullptr, float zOffsetUnits = 0.f);
+                        bool reverseSide = false);
 
   /**
    * @brief Set the z offset to apply to current rendering.
@@ -410,24 +404,6 @@ public:
    * @returns the current zOffset state
    */
   float getZOffset() const;
-
-  /**
-   * @brief Set the z offset Units to apply to current rendering.
-   * @param value defines the offset to apply
-   */
-  void setZOffsetUnits(float value);
-
-  /**
-   * @brief Gets the current value of the zOffset Units.
-   * @returns the current zOffset Units state
-   */
-  float getZOffsetUnits() const;
-
-  /**
-   * @brief Gets a boolean indicating if depth testing is enabled.
-   * @returns the current state
-   */
-  bool getDepthBuffer() const;
 
   /**
    * @brief Enable or disable depth buffering.
@@ -692,28 +668,23 @@ public:
    * @param channel The texture channel
    * @param uniform The uniform to set
    * @param texture The render target texture containing the depth stencil texture to apply
-   * @param name The texture name
    */
   void setDepthStencilTexture(int channel, const WebGLUniformLocationPtr& uniform,
-                              const RenderTargetTexturePtr& texture, const std::string& name = "");
+                              const RenderTargetTexturePtr& texture);
 
   /**
    * @brief Sets a texture to the webGL context from a postprocess.
    * @param channel defines the channel to use
    * @param postProcess defines the source postprocess
-   * @param name name of the channel
    */
-  void setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess,
-                                 const std::string& name);
+  void setTextureFromPostProcess(int channel, const PostProcessPtr& postProcess);
 
   /**
    * @brief Binds the output of the passed in post process to the texture channel specified.
    * @param channel The channel the texture should be bound to
    * @param postProcess The post process which's output should be bound
-   * @param name name of the channel
    */
-  void setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess,
-                                       const std::string& name);
+  void setTextureFromPostProcessOutput(int channel, const PostProcessPtr& postProcess);
 
   /**
    * @brief Hidden
@@ -769,18 +740,16 @@ public:
 
   /**
    * @brief Resize the view according to the canvas' size.
-   * @param forceSetSize true to force setting the sizes of the underlying canvas
    */
-  void resize(bool forceSetSize = false) override;
+  void resize() override;
 
   /**
    * @brief Force a specific size of the canvas.
    * @param width defines the new canvas' width
    * @param height defines the new canvas' height
-   * @param forceSetSize true to force setting the sizes of the underlying canvas
    * @returns true if the size was changed
    */
-  bool setSize(int width = 0, int height = 0, bool forceSetSize = false) override;
+  bool setSize(int width = 0, int height = 0) override;
 
   /**
    * @brief Hidden
@@ -810,7 +779,7 @@ public:
 
   /**
    * @brief Rescales a texture.
-   * @param source input texture
+   * @param source input texutre
    * @param destination destination texture
    * @param scene scene to use to render the resize
    * @param internalFormat format to use when resizing
@@ -883,14 +852,14 @@ public:
     const IParticleSystemPtr& particleSystem                                      = nullptr);
 
   /**
-   * @brief Creates a webGL buffer to use with instantiation.
+   * @brief Creates a webGL buffer to use with instanciation.
    * @param capacity defines the size of the buffer
    * @returns the webGL buffer
    */
   WebGLDataBufferPtr createInstancesBuffer(unsigned int capacity);
 
   /**
-   * @brief Delete a webGL buffer used with instantiation.
+   * @brief Delete a webGL buffer used with instanciation.
    * @param buffer defines the webGL buffer to delete
    */
   void deleteInstancesBuffer(const WebGLDataBufferPtr& buffer);
@@ -937,14 +906,6 @@ public:
    * Asks the browser to exit fullscreen mode
    */
   static void _ExitFullscreen();
-
-  //------------------------------------------------------------------------------------------------
-  //                              GPU Frame Time Extension
-  //------------------------------------------------------------------------------------------------
-
-  std::unique_ptr<PerfCounter>& getGPUFrameTimeCounter();
-
-  void captureGPUFrameTime(bool value);
 
   //------------------------------------------------------------------------------------------------
   //                              Multiview Extension
@@ -1103,10 +1064,10 @@ public:
 protected:
   /**
    * @brief Creates a new engine.
-   * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you
-   * provide a WebGL context, Babylon.js will not hook events on the canvas (like pointers,
-   * keyboards, etc...) so no event observables will be available. This is mostly used when
-   * Babylon.js is used as a plugin on a system which already used the WebGL context
+   * @param canvasOrContext defines the canvas or WebGL context to use for rendering. If you provide
+   * a WebGL context, Babylon.js will not hook events on the canvas (like pointers, keyboards,
+   * etc...) so no event observables will be available. This is mostly used when Babylon.js is used
+   * as a plugin on a system which alreay used the WebGL context
    * @param antialias defines enable antialiasing (default: false)
    * @param options defines further options to be sent to the getContext() function
    * @param adaptToDeviceRatio defines whether to adapt to the device's viewport characteristics
@@ -1149,15 +1110,6 @@ protected:
    */
   void set_loadingUIBackgroundColor(std::string color);
 
-  /**
-   * @brief Shared initialization across engines types.
-   * @param canvas The canvas associated with this instance of the engine.
-   * @param doNotHandleTouchAction Defines that engine should ignore modifying touch action
-   * attribute and style
-   * @param audioEngine Defines if an audio engine should be created by default
-   */
-  void _sharedInit(ICanvas* canvas, bool doNotHandleTouchAction, bool audioEngine) override;
-
   void _reportDrawCall() override;
   void _rebuildBuffers() override;
   WebGLProgramPtr
@@ -1179,8 +1131,8 @@ public:
   bool enableOfflineSupport = false;
 
   /**
-   * Gets or sets a boolean to enable/disable checking manifest if IndexedDB support is enabled
-   *(js will always consider the database is up to date)
+   * Gets or sets a boolean to enable/disable checking manifest if IndexedDB support is enabled (js
+   *will always consider the database is up to date)
    **/
   bool disableManifestCheck = false;
 
@@ -1224,7 +1176,7 @@ public:
   /**
    * Observable event triggered each time the canvas receives pointerout event
    */
-  Observable<IPointerEvent> onCanvasPointerOutObservable;
+  Observable<PointerEvent> onCanvasPointerOutObservable;
 
   /**
    * Observable raised when the engine begins a new frame
@@ -1242,7 +1194,7 @@ public:
   Observable<Engine> onBeforeShaderCompilationObservable;
 
   /**
-   * Observable raised when the engine has just compiled a shader
+   * Observable raised when the engine has jsut compiled a shader
    */
   Observable<Engine> onAfterShaderCompilationObservable;
 
@@ -1257,8 +1209,8 @@ public:
   PerfCounter _drawCalls;
 
   /**
-   * Gets or sets the tab index to set to the rendering canvas. 1 is the minimum value to set to
-   * be able to capture keyboard events
+   * Gets or sets the tab index to set to the rendering canvas. 1 is the minimum value to set to be
+   * able to capture keyboard events
    */
   int canvasTabIndex = 1;
 
@@ -1291,35 +1243,27 @@ public:
    */
   WriteOnlyProperty<Engine, std::string> loadingUIBackgroundColor;
 
-protected:
-  // Deterministic lockstepMaxSteps
-  bool _deterministicLockstep    = false;
-  unsigned int _lockstepMaxSteps = 4;
-  float _timeStep                = 1.f / 60.f;
-
 private:
   ILoadingScreenPtr _loadingScreen = nullptr;
   bool _pointerLockRequested       = false;
   PostProcessPtr _rescalePostProcess;
+
+  // Deterministic lockstepMaxSteps
+  bool _deterministicLockstep    = false;
+  unsigned int _lockstepMaxSteps = 4;
+  float _timeStep                = 1.f / 60.f;
 
   // FPS
   float _fps                                              = 60.f;
   float _deltaTime                                        = 0.f;
   std::unique_ptr<PerformanceMonitor> _performanceMonitor = nullptr;
 
-  // Query extension
-  bool _captureGPUFrameTime                    = false;
-  std::unique_ptr<PerfCounter> _gpuFrameTime   = nullptr;
-  std::optional<_TimeToken> _gpuFrameTimeToken = std::nullopt;
-  Observer<Engine>::Ptr _onBeginFrameObserver  = nullptr;
-  Observer<Engine>::Ptr _onEndFrameObserver    = nullptr;
-
   // Focus
-  std::function<void()> _onFocus                             = nullptr;
-  std::function<void()> _onBlur                              = nullptr;
-  std::function<void(IPointerEvent* ev)> _onCanvasPointerOut = nullptr;
-  std::function<void()> _onCanvasBlur                        = nullptr;
-  std::function<void()> _onCanvasFocus                       = nullptr;
+  std::function<void()> _onFocus                            = nullptr;
+  std::function<void()> _onBlur                             = nullptr;
+  std::function<void(PointerEvent* ev)> _onCanvasPointerOut = nullptr;
+  std::function<void()> _onCanvasBlur                       = nullptr;
+  std::function<void()> _onCanvasFocus                      = nullptr;
 
   std::function<void()> _onFullscreenChange  = nullptr;
   std::function<void()> _onPointerLockChange = nullptr;
@@ -1333,9 +1277,9 @@ private:
   int _cachedStencilReference;
 
   /** Extensions */
-  std::unique_ptr<MultiviewExtension> _multiviewExtension                 = nullptr;
-  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension       = nullptr;
-  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension = nullptr;
+  std::unique_ptr<MultiviewExtension> _multiviewExtension;
+  std::unique_ptr<OcclusionQueryExtension> _occlusionQueryExtension;
+  std::unique_ptr<TransformFeedbackExtension> _transformFeedbackExtension;
 
 }; // end of class Engine
 

@@ -3,19 +3,18 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/buffers/vertex_buffer.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/ieffect_creation_options.h>
 #include <babylon/materials/material.h>
-#include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 
@@ -137,8 +136,8 @@ void GlowLayer::_createTextureAndPostProcesses()
   _blurTexture1->renderParticles      = false;
   _blurTexture1->ignoreCameraViewport = true;
 
-  const auto blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
-  const auto blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
+  auto blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
+  auto blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
 
   _blurTexture2        = RenderTargetTexture::New("GlowLayerBlurRTT2",
                                            RenderTargetSize{blurTextureWidth2, blurTextureHeight2},
@@ -191,21 +190,19 @@ void GlowLayer::_createTextureAndPostProcesses()
                             static_cast<unsigned int>(*_options.mainTextureSamples) :
                             0 :
                             0;
-#if 0
   _mainTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) {
-      auto internalTexture = _blurTexture1->renderTarget();
+      auto internalTexture = _blurTexture1->getInternalTexture();
       if (internalTexture) {
         _scene->postProcessManager->directRender(_postProcesses1, internalTexture, true);
 
-        auto internalTexture2 = _blurTexture2->renderTarget();
+        auto internalTexture2 = _blurTexture2->getInternalTexture();
         if (internalTexture2) {
           _scene->postProcessManager->directRender(_postProcesses2, internalTexture2, true);
         }
         _engine->unBindFramebuffer(internalTexture2 ? internalTexture2 : internalTexture, true);
       }
     });
-#endif
 
   // Prevent autoClear.
   for (auto& pp : _postProcesses) {
@@ -291,10 +288,6 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMes
   }
   else {
     if (material) {
-      const auto pbrMaterial
-        = std::static_pointer_cast<PBRMaterial>(std::static_pointer_cast<Material>(material));
-      const auto emissiveIntensity = pbrMaterial ? pbrMaterial->emissiveIntensity() : 1.f;
-      textureLevel *= emissiveIntensity;
       _emissiveTextureAndColor.color.set(material->emissiveColor.r * textureLevel, //
                                          material->emissiveColor.g * textureLevel, //
                                          material->emissiveColor.b * textureLevel, //
@@ -376,10 +369,6 @@ bool GlowLayer::_useMeshMaterial(const AbstractMeshPtr& mesh) const
 void GlowLayer::referenceMeshToUseItsOwnMaterial(const AbstractMeshPtr& mesh)
 {
   _meshesUsingTheirOwnMaterials.emplace_back(mesh->uniqueId);
-
-  mesh->onDisposeObservable.add([this, mesh](Node* /*node*/, EventState & /*es*/) -> void {
-    _disposeMesh(static_cast<Mesh*>(mesh.get()));
-  });
 }
 
 void GlowLayer::unReferenceMeshFromUsingItsOwnMaterial(const AbstractMeshPtr& mesh)

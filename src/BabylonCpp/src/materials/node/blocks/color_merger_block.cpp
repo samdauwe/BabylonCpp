@@ -68,14 +68,6 @@ NodeMaterialConnectionPointPtr& ColorMergerBlock::get_rgbOut()
   return _outputs[1];
 }
 
-std::string ColorMergerBlock::_inputRename(const std::string& iName)
-{
-  if (iName == "rgb ") {
-    return "rgbIn";
-  }
-  return iName;
-}
-
 ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
 {
   NodeMaterialBlock::_buildBlock(state);
@@ -96,8 +88,7 @@ ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
            + StringTools::printf(" = vec4(%s, %s);\r\n", rgbInput->associatedVariableName().c_str(),
                                  aInput->isConnected() ? _writeVariable(aInput).c_str() : "0.0");
     }
-
-    if (color3Output->hasEndpoints()) {
+    else if (color3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(color3Output, state)
            + StringTools::printf(" = %s;\r\n", rgbInput->associatedVariableName().c_str());
@@ -113,8 +104,7 @@ ColorMergerBlock& ColorMergerBlock::_buildBlock(NodeMaterialBuildState& state)
                                  bInput->isConnected ? _writeVariable(bInput).c_str() : "0.0",
                                  aInput->isConnected ? _writeVariable(aInput).c_str() : "0.0");
     }
-
-    if (color3Output->hasEndpoints()) {
+    else if (color3Output->hasEndpoints()) {
       state.compilationString
         += _declareOutput(color3Output, state)
            + StringTools::printf(" = vec3(%s, %s, %s);\r\n",

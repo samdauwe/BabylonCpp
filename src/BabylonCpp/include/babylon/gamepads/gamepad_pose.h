@@ -7,8 +7,8 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT GamepadPose : public DevicePose {
-  bool hasOrientation = false;
-  bool hasPosition    = false;
+  bool hasOrientation;
+  bool hasPosition;
 }; // end of struct GamepadPose
 
 } // end of namespace BABYLON

@@ -4,13 +4,14 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/babylon_fwd.h>
 
 namespace BABYLON {
 
+class Material;
+class Mesh;
 class Scene;
-FWD_CLASS_SPTR(Material)
-FWD_CLASS_SPTR(Mesh)
+using MaterialPtr = std::shared_ptr<Material>;
+using MeshPtr     = std::shared_ptr<Mesh>;
 
 namespace Extensions {
 
